@@ -24,4 +24,7 @@
 7- Type "JAVA_HOME" in the "Variable name" field and "C:\Program Files\Java\jdk-21" in the "Variable value" field.
 8- Click on "OK"
 9- restart your IDE and terminal.
+10- in cmd prompt or powershell as admin, run the following commands : <br>
+    - setx JAVA_HOME "C:\Program Files\Java\jdk-17" <br>
+    - setx PATH "%PATH%;%JAVA_HOME%\bin" <br>
 10- to verify, open cmd prompt as administrator and type echo %ANDROID_HOME% and echo %JAVA_HOME% and it should show you the locations of both the variables.
