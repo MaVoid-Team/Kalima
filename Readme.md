@@ -1,11 +1,11 @@
-**Project Documentation (How To Guide )**
+**Project Documentation (How To Guide )** <br>
 
-1- clone or pull latest update from the repository
-2- open the project in your prefered IDE
-3- cd kalima-platform
-4- npm install
-5- npm start for default website development.
-6- npm run build for production
+1- clone or pull latest update from the repository <br>
+2- open the project in your prefered IDE <br>
+3- cd kalima-platform <br>
+4- npm install <br>
+5- npm start for default website development. <br>
+6- npm run build for production <br>
 
 **Testing for android**
 1- Download Android Studio and install
