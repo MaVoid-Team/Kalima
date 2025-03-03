@@ -8,7 +8,7 @@
 6- npm run build for production <br>
 
 **Testing for android**
-1- Download Android Studio and install
+1- Download Android Studio and install <br>
 2- Download Java JDK 21 from oracle.com
 3- Configure environment variables for %ANDROID_HOME% and %JAVA_HOME%
 4- npm run build.
