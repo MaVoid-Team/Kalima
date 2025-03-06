@@ -47,26 +47,26 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold">Login now!</h1>
-        <p className="py-6">Welcome back! Log in to access your account and enjoy our services.</p>
+        <h1 className="text-5xl font-bold text-primary">Login now!</h1>
+        <p className="py-6 text-foreground">Welcome back! Log in to access your account and enjoy our services.</p>
         {!isOnline && (
-          <div className="alert alert-warning mt-4">
+          <div className="alert bg-accent text-foreground border-none mt-4">
             You are currently offline. Some features may be limited.
           </div>
         )}
       </div>
-      <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-card-background">
         <form onSubmit={handleSubmit} className="card-body">
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Email</span>
+              <span className="label-text text-card-foreground">Email</span>
             </label>
             <input 
               type="email" 
               placeholder="email" 
-              className="input input-bordered" 
+              className="input input-bordered bg-secondary text-foreground" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
@@ -74,25 +74,25 @@ function Login() {
           </div>
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Password</span>
+              <span className="label-text text-card-foreground">Password</span>
             </label>
             <input 
               type="password" 
               placeholder="password" 
-              className="input input-bordered" 
+              className="input input-bordered bg-secondary text-foreground" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
             />
             <label className="label">
-              <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
+              <Link to="/forgot-password" className="label-text-alt link link-hover text-accent">Forgot password?</Link>
             </label>
           </div>
           <div className="form-control mt-6">
-            <button className="btn btn-primary" disabled={!isOnline}>Login</button>
+            <button className="btn bg-button-background text-button-foreground border-none hover:bg-accent hover:text-foreground" disabled={!isOnline}>Login</button>
           </div>
           <div className="text-center mt-4">
-            <Link to="/register" className="link link-hover">Need an account? Register here</Link>
+            <Link to="/register" className="link link-hover text-accent">Need an account? Register here</Link>
           </div>
         </form>
       </div>

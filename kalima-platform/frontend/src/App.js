@@ -1,11 +1,11 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/routes'
 // Lazy load components
 // const Home = lazy(() => import('./pages/Home'));
 // const About = lazy(() => import('./pages/About'));
-// const Contact = lazy(() => import('./pages/Contact'));
+const CivilcoLanding = lazy(() => import('./pages/landing'));
 const Login = lazy(() => import('./pages/login'));
+const Register = lazy(() => import('./pages/register'));
 
 // Loading component
 const Loading = () => (
@@ -28,15 +28,13 @@ function App() {
 
       <Suspense fallback={<Loading />}>
         <Routes>
-          {/* <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} /> */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<CivilcoLanding />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </Suspense>
 
-      <footer className="bg-base-300 p-4 mt-8">
+      <footer className="p-4 mt-8">
         <p>© 2025 Kalima Platform</p>
       </footer>
     </div>
