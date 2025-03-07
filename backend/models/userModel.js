@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   gender: { type: String, enum: ['male', 'female'], required: true },
   email: { type: String, unique: true, required: true },
   address: addressSchema,
-  referralSource: String
+  referralSource: String,
+  password: { type: String, required: true } // Added password field
 }, {
   timestamps: true
 });
