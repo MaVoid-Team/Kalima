@@ -1,3 +1,5 @@
+import { Link, useNavigate } from "react-router-dom"
+
 // Wavy line SVG component
 const WavyLine = ({ className }) => (
     <svg viewBox="0 0 100 20" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -8,6 +10,7 @@ const WavyLine = ({ className }) => (
   )
   
   function CivilcoLanding() {
+    const navigate = useNavigate();
     return (
       <div className="min-h-screen bg-[#f5fbfc] relative overflow-hidden">
         {/* Decorative circles */}
@@ -84,7 +87,7 @@ const WavyLine = ({ className }) => (
                   <img src="/student.png" alt="Student illustration" className="mx-auto mb-4 w-full max-w-[200px]" />
                 </div>
                 <button
-                  onClick={() => console.log("Student selected")}
+                  onClick={() => navigate('/login')}
                   className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-md text-lg transition-colors"
                 >
                   طالب
