@@ -5,30 +5,44 @@ module.exports = {
     "./public/index.html",
   ],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: "hsl(var(--primary))",
-        secondary: "hsl(var(--secondary))",
-        accent: "hsl(var(--accent))",
-        card: {
-          background: "hsl(var(--card-background))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        button: {
-          background: "hsl(var(--button-background))",
-          foreground: "hsl(var(--button-foreground))",
-        }
-      },
-    },
+    extend: {},
   },
   plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      "light",          // default light theme
+      "dark",           // default dark theme
+      "cupcake",
+      "bumblebee",
+      "emerald",
+      "corporate",
+      "synthwave",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "halloween",
+      "garden",
+      "forest",
+      "aqua",
+      "lofi",
+      "pastel",
+      "fantasy",
+      "wireframe",
+      "black",
+      "luxury",
+      "dracula",
+      "cmyk",
+      "autumn",
+      "business",
+      "acid",
+      "lemonade",
+      "night",
+      "coffee",         
+      "winter",
+    ],
+    darkTheme: "dark",  
+    base: true,         
+    styled: true,       
+    utils: true,      
+  },
 }

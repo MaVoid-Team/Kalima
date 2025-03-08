@@ -2,30 +2,3 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 91%;
-    --foreground: 355 78% 56%;
-
-    --primary: 355 78% 56%;
-    --secondary: 0 0% 91%;
-    --accent: 39 100% 70%;
-
-    --card-background: 0 0% 91%;
-    --card-foreground: 355 78% 56%;
-
-    --button-background: 355 78% 56%;
-    --button-foreground: 0 0% 91%;
-  }
-
-  * {
-    @apply font-sans;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    scroll-behavior: smooth;
-  }
-}

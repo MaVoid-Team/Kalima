@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/routes'
+
 import NavBar from './components/navbar';
 // Lazy load components
 // const Home = lazy(() => import('./pages/Home'));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import('./pages/landing'));
-const Login = lazy(() => import('./pages/login'));
+const Login = lazy(() => import('./pages/Login/login'));
 const Register = lazy(() => import('./pages/register'));
 
 // Loading component

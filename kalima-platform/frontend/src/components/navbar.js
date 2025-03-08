@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Navbar, Button } from 'react-daisyui';
+import ThemeSwitcher from './ThemeSwitcher';
 
 const NavBar = () => {
   const { t, i18n } = useTranslation('common');
@@ -48,7 +49,7 @@ const NavBar = () => {
   ];
 
   return (
-    <Navbar className="fixed top-0 left-0 right-0 z-50 bg-base-100 shadow-lg px-4 py-3" dir={isAr ? 'rtl' : 'ltr'}>
+    <Navbar className="fixed top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-3 rounded-lg" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
         <div className="flex items-center gap-4">
@@ -91,9 +92,9 @@ const NavBar = () => {
               {t('logoText')}
             </span>
           </Link>
-
+          
           {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex gap-4 ml-4">
+          <div className="hidden lg:flex gap-4 ml-4 rounded-lg">
             {navItems.map((item) => (
               <Link
                 key={item.key}
@@ -103,6 +104,7 @@ const NavBar = () => {
                 {t(item.key)}
               </Link>
             ))}
+            <ThemeSwitcher />
           </div>
         </div>
 
