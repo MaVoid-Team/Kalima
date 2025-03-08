@@ -1,11 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/routes'
+import NavBar from './components/navbar';
 // Lazy load components
 // const Home = lazy(() => import('./pages/Home'));
 // const About = lazy(() => import('./pages/About'));
 // const Contact = lazy(() => import('./pages/Contact'));
-const Login = lazy(() => import('./pages/login'));
+const Login = lazy(() => import('./pages/Login/login'));
 
 // Loading component
 const Loading = () => (
@@ -17,6 +18,7 @@ const Loading = () => (
 function App() {
   return (
     <div className="App">
+      <NavBar />
       {/* <nav className="bg-base-300 p-4">
         <ul className="flex space-x-4">
           <li><Link to="/" className="link">Home</Link></li>

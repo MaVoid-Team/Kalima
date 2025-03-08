@@ -1,0 +1,11 @@
+{
+    "title": "Login now!",
+    "welcome": "Welcome back! Log in to access your account and enjoy our services.",
+    "offline_warning": "You are currently offline. Some features may be limited.",
+    "email_label": "Email",
+    "password_label": "Password",
+    "forgot_password": "Forgot password?",
+    "login_button": "Login",
+    "register_prompt": "Need an account? Register here",
+    "offline_alert": "You are offline. Please connect to the internet and try again."
+  }
