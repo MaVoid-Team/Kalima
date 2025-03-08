@@ -1,6 +1,5 @@
 "use client"
 import { useNavigate } from "react-router-dom" // Assuming you're using React Router
-
 // Wavy line SVG component with improved design
 const WavyLine = ({ className }) => (
   <svg viewBox="0 0 100 20" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -41,6 +40,7 @@ function CivilcoLanding() {
 
   return (
     <div className="min-h-screen bg-[#f5fbfc] relative overflow-hidden">
+     
       {/* Decorative circles - adjusted to match design */}
       <div className="absolute top-0 right-0 z-0">
         <div className="w-48 h-48 rounded-full bg-[#009688] opacity-90 translate-x-1/4 -translate-y-1/4"></div>
@@ -81,7 +81,6 @@ function CivilcoLanding() {
               <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#009688] rounded-full"></span>
             </span>
           </h1>
-
           <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-12 max-w-3xl mx-auto" dir="rtl">
             منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.
           </p>

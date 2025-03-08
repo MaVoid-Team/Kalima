@@ -62,7 +62,7 @@ function Login() {
             <div className="card-body px-4 md:px-6 py-6">
               <div className="text-center mb-0 md:mb-6">
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">{t('title')}</h1>
-                <p className="text-sm md:text-base text-base-600 dark:text-gray-300">{t('welcome')}</p>
+                <p className="text-sm md:text-base text-base-600">{t('welcome')}</p>
               </div>
               {!isOnline && (
                 <div className="alert alert-warning mb-4">
@@ -106,6 +106,7 @@ function Login() {
                 <button className="btn btn-primary btn-md md:btn-lg" disabled={!isOnline}>
                   {t('login_button')}
                 </button>
+                
               </div>
               <div className="text-center mt-1 sm:mt-3">
                 <Link to="/register" className="link link-hover text-xs md:text-sm">
