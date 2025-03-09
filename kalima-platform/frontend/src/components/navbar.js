@@ -125,7 +125,7 @@ const NavBar = () => {
       {/* Mobile menu with scroll */}
       {menuOpen && (
     <div className={`lg:hidden w-1/2 sm:w-1/3 fixed ${isAr ? 'right-0' : 'left-0'} top-0 bottom-0 bg-base-100 z-50  overflow-y-auto`} dir={isAr ? 'rtl' : 'ltr'}>
-    <div className="p-2 space-y-3 h-[calc(100vh-4rem)] " dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="p-2 space-y-3 h-[calc(100vh-4rem)] " dir={isAr ? 'rtl' : 'ltr'} onMouseDown={(e) => e.stopPropagation()}>
       <div className='gap-4 flex rounded-2xl'>
           {/* Mobile menu button */}
           <Button
@@ -179,12 +179,17 @@ const NavBar = () => {
               </Link>
             ))}
             <div className="divider "></div>
+
+              <ThemeSwitcher />
+            
+            <div className="divider"></div>
             {authItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
                 className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} justify-start w-full rounded-2xl`}
                 onClick={() => setMenuOpen(false)}
+
               >
                 {t(item.key)}
               </Link>
