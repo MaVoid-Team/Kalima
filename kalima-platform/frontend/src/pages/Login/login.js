@@ -52,7 +52,7 @@ function Login() {
   };
 
   return (
-    <div className=" min-h-screen bg-base-300 flex flex-col sm:flex-row items-center justify-center p-4 overflow-hidden " dir={isAr ? 'rtl' : 'ltr'}>
+    <div className=" min-h-screen flex flex-col sm:flex-row items-center justify-center p-4 overflow-hidden " dir={isAr ? 'rtl' : 'ltr'}>
       <WaveBackground />
       
       <div className="flex flex-col lg:flex-row w-full gap-4 md:gap-8 z-10 justify-center items-center">
