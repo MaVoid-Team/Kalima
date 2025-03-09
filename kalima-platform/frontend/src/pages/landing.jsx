@@ -20,7 +20,7 @@ const CurvedLineBackground = () => (
 
 // Arrow component
 const Arrow = () => (
-  <svg className="w-20 h-20 text-primary" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-20 h-20 text-primary animate-bounce" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <path d="M20,80 C40,60 30,40 10,30 L15,25 C40,38 50,60 30,85 Z" fill="currentColor" />
   </svg>
 )
@@ -30,35 +30,35 @@ function CivilcoLanding() {
 
   const handleTeacherClick = () => {
     console.log("Teacher selected")
-    navigate('/teacher-register');
+    navigate('/login');
   }
 
   const handleStudentClick = () => {
     console.log("Student selected")
-    navigate('/register');
+    navigate('/login');
   }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
      
       {/* Decorative circles - adjusted to match design */}
-      <div className="absolute top-0 right-0 z-0">
+      <div className="absolute top-0 right-0 z-0 animate-pulse">
         <div className="w-48 h-48 rounded-full bg-secondary opacity-90 translate-x-1/4 -translate-y-1/4"></div>
         <div className="w-72 h-72 rounded-full bg-primary/50 opacity-70 -translate-y-1/2 -translate-x-1/4"></div>
       </div>
  
       {/* Additional decorative circle */}
-      <div className="absolute bottom-20 right-10 z-0">
+      <div className="absolute bottom-20 right-10 z-0 animate-pulse">
         <div className="w-64 h-64 rounded-full bg-base-300 opacity-40"></div>
       </div>
 
       {/* Decorative wavy line */}
-      <div className="absolute top-40 left-10 z-0">
+      <div className="absolute top-40 left-10 z-0 animate-bounce">
         <WavyLine className="text-primary w-40" />
       </div>
 
       {/* Arrow decoration */}
-      <div className="absolute bottom-20 left-10 z-0">
+      <div className="absolute bottom-20 left-10 z-0 animate-bounce">
         <Arrow />
       </div>
 
@@ -74,23 +74,23 @@ function CivilcoLanding() {
 
         {/* Main content */}
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800 leading-tight" dir="rtl">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight" dir="rtl">
             مرحبا بك في منصة{" "}
-            <span className="text-primary relative">
+            <span className="text-primary relative animate-pulse">
               كلمة
               <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"></span>
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-12 max-w-3xl mx-auto" dir="rtl">
+          <p className="text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto" dir="rtl">
             منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.
           </p>
 
           {/* Decorative wavy line */}
           <div className="flex justify-center mb-8">
-            <WavyLine className="text-primary w-40" />
+            <WavyLine className="text-primary w-40 animate-bounce" />
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-gray-800" dir="rtl">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12" dir="rtl">
             من انت ؟
           </h2>
 
@@ -101,7 +101,7 @@ function CivilcoLanding() {
 
             {/* Teacher card */}
             <div className="flex flex-col items-center">
-              <div className="bg-white rounded-lg shadow-md p-9 mb-6 w-full max-w-sm mx-auto">
+              <div className=" rounded-lg shadow-md p-9 mb-6 w-full max-w-sm mx-auto">
                 <img
                   src="teacher_illustration.png"
                   alt="Teacher illustration"
@@ -118,7 +118,7 @@ function CivilcoLanding() {
 
             {/* Student card */}
             <div className="flex flex-col items-center">
-              <div className="bg-white rounded-lg shadow-md p-6 mb-6 w-full max-w-sm mx-auto">
+              <div className=" rounded-lg shadow-md p-6 mb-6 w-full max-w-sm mx-auto">
                 <img
                   src="student_illustration.png"
                   alt="Student illustration"

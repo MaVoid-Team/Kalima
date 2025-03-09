@@ -84,7 +84,7 @@ const NavBar = () => {
           {/* Logo */}
           <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
             <img 
-              src="/logo.png" 
+              src="/kalima.jpg" 
               alt="Logo" 
               className="w-10 h-10 rounded-full"
             />

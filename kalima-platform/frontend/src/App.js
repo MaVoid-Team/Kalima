@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import NavBar from './components/navbar';
 // Lazy load components
-// const Home = lazy(() => import('./pages/Home'));
+const Home = lazy(() => import('./pages/Home'));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import('./pages/landing'));
 const Login = lazy(() => import('./pages/Login/login'));
@@ -32,9 +32,10 @@ function App() {
 
       <Suspense fallback={<Loading />}>
         <Routes>
-          <Route path="/" element={<CivilcoLanding />} />
+          <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/landing" element={<CivilcoLanding />} />
         </Routes>
       </Suspense>
 
