@@ -104,7 +104,7 @@ const StudentReviews = () => {
   };
 
   return (
-    <div className="w-full md:w-3/4 p-4 md:p-8 xl:pt-10 flex flex-col items-center mt-8 xl:mt-16" dir='ltr'>
+    <div className="w-full md:w-3/4 p-4 md:p-8 xl:pt-10 flex flex-col items-center mx-auto " dir='ltr'>
       <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-center">
         {t('title')}
       </h2>

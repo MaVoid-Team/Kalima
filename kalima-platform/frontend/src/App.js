@@ -19,7 +19,8 @@ const Loading = () => (
 function App() {
   return (
     <div className="App">
-      <NavBar />
+      
+      <NavBar/>
       {/* <nav className="bg-base-300 p-4">
         <ul className="flex space-x-4">
           <li><Link to="/" className="link">Home</Link></li>

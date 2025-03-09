@@ -35,7 +35,7 @@ function CivilcoLanding() {
 
   const handleStudentClick = () => {
     console.log("Student selected")
-    navigate('/student-register');
+    navigate('/register');
   }
 
   return (

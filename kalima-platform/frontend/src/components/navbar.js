@@ -49,7 +49,7 @@ const NavBar = () => {
   ];
 
   return (
-    <Navbar className="fixed top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-3 rounded-lg" dir={isAr ? 'rtl' : 'ltr'}>
+    <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
         <div className="flex items-center gap-4">
@@ -82,7 +82,7 @@ const NavBar = () => {
           
           
           {/* Logo */}
-          <Link to="/" className="btn btn-ghost px-2">
+          <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
             <img 
               src="/logo.png" 
               alt="Logo" 
@@ -94,12 +94,12 @@ const NavBar = () => {
           </Link>
           
           {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex gap-4 ml-4 rounded-lg">
+          <div className="hidden lg:flex gap-4 ml-4 rounded-2xl">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                className="btn btn-ghost font-medium hover:text-primary transition-colors"
+                className="btn btn-ghost font-medium  rounded-2xl hover:text-primary transition-colors"
               >
                 {t(item.key)}
               </Link>
@@ -114,7 +114,7 @@ const NavBar = () => {
             <Link
               key={item.key}
               to={item.path}
-              className={`btn  ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'}`}
+              className={`btn  ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
             >
               {t(item.key)}
             </Link>
@@ -125,12 +125,12 @@ const NavBar = () => {
       {/* Mobile menu with scroll */}
       {menuOpen && (
     <div className={`lg:hidden w-1/2 sm:w-1/3 fixed ${isAr ? 'right-0' : 'left-0'} top-0 bottom-0 bg-base-100 z-50  overflow-y-auto`} dir={isAr ? 'rtl' : 'ltr'}>
-    <div className="p-4 space-y-3 h-[calc(100vh-4rem)]" dir={isAr ? 'rtl' : 'ltr'}>
-      <div className='gap-4 flex'>
+    <div className="p-2 space-y-3 h-[calc(100vh-4rem)] " dir={isAr ? 'rtl' : 'ltr'}>
+      <div className='gap-4 flex rounded-2xl'>
           {/* Mobile menu button */}
           <Button
             color="ghost"
-            className="lg:hidden"
+            className="lg:hidden rounded-2xl"
             onClick={() => {
               
                 setMenuOpen(!menuOpen);
@@ -172,18 +172,18 @@ const NavBar = () => {
               
                 key={item.key}
                 to={item.path}
-                className="btn btn-ghost justify-start w-full"
+                className="btn btn-ghost justify-start w-full rounded-2xl"
                 onClick={() => setMenuOpen(false)}
               >
                 {t(item.key)}
               </Link>
             ))}
-            <div className="divider"></div>
+            <div className="divider "></div>
             {authItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} justify-start w-full`}
+                className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} justify-start w-full rounded-2xl`}
                 onClick={() => setMenuOpen(false)}
               >
                 {t(item.key)}
