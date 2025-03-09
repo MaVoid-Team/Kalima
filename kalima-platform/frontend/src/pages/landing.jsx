@@ -39,12 +39,12 @@ function CivilcoLanding() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5fbfc] relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
      
       {/* Decorative circles - adjusted to match design */}
       <div className="absolute top-0 right-0 z-0">
-        <div className="w-48 h-48 rounded-full bg-[#009688] opacity-90 translate-x-1/4 -translate-y-1/4"></div>
-        <div className="w-72 h-72 rounded-full bg-[#b2dfdb] opacity-70 -translate-y-1/2 -translate-x-1/4"></div>
+        <div className="w-48 h-48 rounded-full bg-secondary opacity-90 translate-x-1/4 -translate-y-1/4"></div>
+        <div className="w-72 h-72 rounded-full bg-primary opacity-70 -translate-y-1/2 -translate-x-1/4"></div>
       </div>
 
       {/* Additional decorative circle */}
