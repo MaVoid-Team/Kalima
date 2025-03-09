@@ -28,7 +28,7 @@ const WaveBackground = () => {
     };
 
     return (
-      <div className="absolute w-full h-[20vh] md:h-[30vh] bottom-[50%] translate-y-[30%] md:translate-y-[55%] z-0">
+      <div className="absolute w-full h-[30vh]  bottom-[50%] translate-y-[30%] md:translate-y-[55%] z-0">
         <svg 
           width="100%" 
           height="100%" 

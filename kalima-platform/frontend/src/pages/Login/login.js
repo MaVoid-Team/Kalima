@@ -52,17 +52,17 @@ function Login() {
   };
 
   return (
-    <div className=" pt-[30%] md:pt-[10%]  lg:pt-[0] min-h-screen bg-base-300 flex flex-col items-center justify-center p-4 overflow-hidden" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className=" min-h-screen bg-base-300 flex flex-col sm:flex-row items-center justify-center p-4 overflow-hidden " dir={isAr ? 'rtl' : 'ltr'}>
       <WaveBackground />
       
       <div className="flex flex-col lg:flex-row w-full gap-4 md:gap-8 z-10 justify-center items-center">
         {/* Login Form Section */}
-        <div className="mt-[8%]    mx-2 md:mx-[10%] flex flex-col items-center justify-center">
+        <div className=" mx-2 md:mx-[10%] flex flex-col items-center justify-center w-3/4 sm:w-auto">
           <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-base-100 mx-4">
-            <div className="card-body px-4 md:px-6 py-6">
+            <div className="card-body px-4 md:px-6 py-2 md:py-6 ">
               <div className="text-center mb-0 md:mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{t('title')}</h1>
-                <p className="text-sm md:text-base text-base-600">{t('welcome')}</p>
+                <h1 className="text-lg md:text-4xl font-bold mb-1 sm:mb-2">{t('title')}</h1>
+                <p className="text-xs sm:text-sm md:text-base text-base-600">{t('welcome')}</p>
               </div>
               {!isOnline && (
                 <div className="alert alert-warning mb-4">
@@ -78,20 +78,20 @@ function Login() {
                   <input 
                     type="email" 
                     placeholder={t('email_label')}
-                    className="input input-bordered" 
+                    className="input input-sm sm:input-md input-bordered" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
                   />
                 </div>
-                <div className="form-control mt-1 md:mt-4">
+                <div className="form-control  md:mt-4">
                   <label className="label">
                     <span className="label-text">{t('password_label')}:</span>
                   </label>
                   <input 
                     type="password" 
                     placeholder={t("password_label")} 
-                    className="input input-bordered" 
+                    className="input input-sm sm:input-md input-bordered  " 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required 
@@ -102,21 +102,22 @@ function Login() {
                     </Link>
                   </label>
                 </div>
-                <div className="form-control mt-2 md:mt-8">
-                <button className="btn btn-primary btn-md md:btn-lg" disabled={!isOnline}>
+                <div className="form-control  md:mt-8">
+                <button className="btn btn-primary btn-sm sm:btn-md md:btn-lg" disabled={!isOnline}>
                   {t('login_button')}
                 </button>
                 
               </div>
-              <div className="text-center mt-1 sm:mt-3">
+              <div className="text-center sm:mt-3">
                 <Link to="/register" className="link link-hover text-xs md:text-sm">
                   {t('register_prompt')}
                 </Link>
                 </div>
               </form>
-            </div>
           </div>
-        </div>
+          </div>
+          </div>
+        
 
         {/* Student Reviews Section */}  
         <div className='my-10'>
