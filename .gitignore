@@ -131,3 +131,5 @@ dist
 .pnp.*
 /build
 /android
+/kalima-platform/frontend/build
+/kalima-platform/frontend/android
