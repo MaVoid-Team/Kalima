@@ -1,55 +1,29 @@
-const path = require("path");
-const fs = require("fs");
-const fsPromises = fs.promises;
-
+// When adding a new 
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
-
-// Temporary DB setup untill mongo is implemented.
-// All JSON related code will be Swapped with MongoDB equivilant upon the schemas completion.
-
-const usersDB = {
-  users: require("../model/users.json"),
-  setUsers: function (data) {
-    this.users = data;
-  },
-};
+const User = require("../models/userModel.js");
+const Parent = require('../models/parentModel.js')
+const Lecturer = require('../models/lecturerModel.js')
+const Student = require('../models/studentModel.js')
+const Teacher = require('../models/teacherModel.js')
 
 // @route POST /register/
 const registerNewUser = asyncHandler(async (req, res) => {
-  const { name, username, email, password, role } = req.body;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (
-    !name ||
-    !name.firstname ||
-    !name.lastname ||
-    !username ||
-    !email ||
-    !password ||
-    !role
-  ) {
-    return res.status(400).json({ message: "All Fields are required." });
-  }
-
-  // Validating E-Mail using a regex pattern.
-  if (!emailRegex.test(email)) {
-    return res
-      .status(400)
-      .json({ message: "Please make sure to enter a valid E-Mail." });
-  }
+  const {
+    role,
+    name,
+    email,
+    password,
+    ...userData
+  } = req.body;
 
   // Cehcking dublicate.
-  const dublicateName = usersDB.users.find(
-    (user) => user.username === username,
-  );
+  const dublicateName = await User.findOne({ name });
 
   if (dublicateName) {
-    return res
-      .status(409)
-      .json({ message: "A user with this username already exists." });
+    return res.status(409).json({ message: "This user already exists." });
   }
-  const dublicateEmail = usersDB.users.find((user) => user.email === email);
+  const dublicateEmail = await User.findOne({ email });
 
   if (dublicateEmail) {
     return res
@@ -59,24 +33,39 @@ const registerNewUser = asyncHandler(async (req, res) => {
 
   const hashedPwd = await bcrypt.hash(password, 12);
 
-  // To be replaced with Mongo
   const newUser = {
-    name: { firstname: name.firstname, lastname: name.lastname },
-    username: username,
+    name,
+    email,
     password: hashedPwd,
-    email: email,
-    role: role,
+    ...userData
   };
 
-  usersDB.setUsers([...usersDB.users, newUser]);
-  await fsPromises.writeFile(
-    path.join(__dirname, "..", "model", "users.json"),
-    JSON.stringify(usersDB.users),
-  );
+  let user;
 
-  res
-    .status(201)
-    .json({ success: `User created successfuly with username ${username}.` });
+  switch (role) {
+    case "teacher":
+      user = Teacher.create(newUser)
+      break;
+    case "student":
+      user = Student.create(newUser)
+      break;
+    case "parent":
+      user = Parent.create(newUser);
+      break;
+    case "lecturer":
+      user = Lecturer.create(newUser)
+      break;
+    default:
+      return res.status(400).json({ error: "Invalid role" });
+  }
+
+  if (user) {
+    return res
+      .status(201)
+      .json({ message: `User created successfuly with name ${name}.` });
+  } else {
+    return res.status(400).json({ message: "Invalid user data recieved" });
+  }
 });
 
 module.exports = { registerNewUser };
