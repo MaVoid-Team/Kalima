@@ -1,53 +1,41 @@
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
-
-// Temporary DB setup untill mongo is implemented.
-// All JSON related code will be Swapped with MongoDB equivilant upon the schemas completion.
-
-const usersDB = {
-  users: require("../model/users.json"),
-  setUsers: function (data) {
-    this.users = data;
-  },
-};
+const User = require("../models/userModel.js");
 
 // @route POST /auth/
 const login = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { name, password } = req.body;
 
-  if (!username || !password) {
+  if (!name || !password) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
-  // Incase of dublicate.
-  const dublicateUser = usersDB.users.find(
-    (user) => user.username === username,
-  );
+  const foundUser = await User.findOne({ name });
 
-  if (!dublicateUser) {
+  if (!foundUser) {
     return res.status(400).json({
-      message: "Couldn't find a user with this username or password.",
+      message: "Couldn't find a user with this name or password.",
     });
   }
 
-  const match = await bcrypt.compare(password, dublicateUser.password);
+  const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
     return res.status(400).json({
-      message: "Couldn't find a user with this username or password.",
+      message: "Couldn't find a user with this name or password.",
     });
   }
   const accessToken = jwt.sign(
     {
-      UserInfo: { username: dublicateUser.username, role: dublicateUser.role },
+      UserInfo: { name: foundUser.name, role: foundUser.role },
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "10s" }, // Time should be changed in production
   );
 
   const refreshToken = jwt.sign(
-    { username: dublicateUser.username },
+    { name: foundUser.name },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1000s" }, // Time should be changed in production
   );
@@ -78,9 +66,7 @@ const refresh = (req, res) => {
         return res.status(401).json({ message: "Forbidden" });
       }
 
-      const foundUser = usersDB.users.find(
-        (user) => user.username === decoded.username,
-      );
+      const foundUser = await User.findOne({ name: decoded.user });
 
       if (!foundUser) {
         return res.status(400).json({
@@ -91,7 +77,7 @@ const refresh = (req, res) => {
       const accessToken = jwt.sign(
         {
           UserInfo: {
-            username: foundUser.username,
+            name: foundUser.name,
             role: foundUser.role,
           },
         },
