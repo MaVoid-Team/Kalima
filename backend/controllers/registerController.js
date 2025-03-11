@@ -1,21 +1,15 @@
-// When adding a new 
+// When adding a new
 const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel.js");
-const Parent = require('../models/parentModel.js')
-const Lecturer = require('../models/lecturerModel.js')
-const Student = require('../models/studentModel.js')
-const Teacher = require('../models/teacherModel.js')
+const Parent = require("../models/parentModel.js");
+const Lecturer = require("../models/lecturerModel.js");
+const Student = require("../models/studentModel.js");
+const Teacher = require("../models/teacherModel.js");
 
 // @route POST /register/
 const registerNewUser = asyncHandler(async (req, res) => {
-  const {
-    role,
-    name,
-    email,
-    password,
-    ...userData
-  } = req.body;
+  const { role, name, email, password, ...userData } = req.body;
 
   // Cehcking dublicate.
   const dublicateName = await User.findOne({ name });
@@ -37,23 +31,23 @@ const registerNewUser = asyncHandler(async (req, res) => {
     name,
     email,
     password: hashedPwd,
-    ...userData
+    ...userData,
   };
 
   let user;
 
   switch (role) {
     case "teacher":
-      user = Teacher.create(newUser)
+      user = Teacher.create(newUser);
       break;
     case "student":
-      user = Student.create(newUser)
+      user = Student.create(newUser);
       break;
     case "parent":
       user = Parent.create(newUser);
       break;
     case "lecturer":
-      user = Lecturer.create(newUser)
+      user = Lecturer.create(newUser);
       break;
     default:
       return res.status(400).json({ error: "Invalid role" });

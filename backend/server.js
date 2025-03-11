@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 const PORT = process.env.PORT || 3200;
 const cors = require("cors");
@@ -7,6 +8,8 @@ const connectDB = require("./config/dbConn.js");
 const mongoose = require("mongoose");
 const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
+const containerRouter = require("./routes/containerRoutes");
+const purchaseRouter = require("./routes/purchaseRoutes");
 
 connectDB();
 
@@ -14,9 +17,13 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
-
-app.use("/register", require("./routes/registerRoutes.js"));
-app.use("/auth", require("./routes/authRoutes.js"));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+app.use("/api/v1/register", require("./routes/registerRoutes.js"));
+app.use("/api/v1/auth", require("./routes/authRoutes.js"));
+app.use("/api/v1/containers", containerRouter);
+app.use("/api/v1/purchases", purchaseRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
