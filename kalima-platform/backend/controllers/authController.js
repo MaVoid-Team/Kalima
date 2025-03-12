@@ -1,31 +1,29 @@
 const bcrypt = require("bcrypt");
-const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
 // @route POST /auth/
-const login = asyncHandler(async (req, res) => {
+const login = catchAsync(async (req, res, next) => {
   const { name, password } = req.body;
 
   if (!name || !password) {
-    return res.status(400).json({ message: "All fields are required." });
+    return next(new AppError("All fields are required.", 400));
   }
 
   const foundUser = await User.findOne({ name });
 
   if (!foundUser) {
-    return res.status(400).json({
-      message: "Couldn't find a user with this name or password.",
-    });
+    return next(new AppError("Couldn't find a user with this name or password.", 400));
   }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
-    return res.status(400).json({
-      message: "Couldn't find a user with this name or password.",
-    });
+    return next(new AppError("Couldn't find a user with this name or password.", 400));
   }
+
   const accessToken = jwt.sign(
     {
       UserInfo: { name: foundUser.name, role: foundUser.role },
@@ -51,27 +49,25 @@ const login = asyncHandler(async (req, res) => {
 });
 
 // @route GET /auth/refresh
-const refresh = (req, res) => {
+const refresh = catchAsync(async (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) {
-    return res.status(401).json({ message: "Unauthorized attempt." });
+    return next(new AppError("Unauthorized attempt.", 401));
   }
 
   const refreshToken = cookies.jwt;
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
-    asyncHandler(async (err, decoded) => {
+    catchAsync(async (err, decoded) => {
       if (err) {
-        return res.status(401).json({ message: "Forbidden" });
+        return next(new AppError("Forbidden", 401));
       }
 
       const foundUser = await User.findOne({ name: decoded.user });
 
       if (!foundUser) {
-        return res.status(400).json({
-          message: "Couldn't find a user with this username or password.",
-        });
+        return next(new AppError("Couldn't find a user with this username or password.", 400));
       }
 
       const accessToken = jwt.sign(
@@ -88,14 +84,14 @@ const refresh = (req, res) => {
       res.json({ accessToken });
     }),
   );
-};
+});
 
 // @route POST /auth/logout
 // To clear cookie incase one exists.
-const logout = (req, res) => {
+const logout = (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) {
-    return res.status(401).json({ message: "Unauthorized attempt." });
+    return next(new AppError("Unauthorized attempt.", 401));
   }
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
   res.json({ message: "Cookies cleared." });
@@ -104,11 +100,11 @@ const logout = (req, res) => {
 const verifyRoles = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req?.role) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return next(new AppError("Unauthorized", 401));
     }
     const rolesArray = [...allowedRoles];
     if (!rolesArray.includes(req.role)) {
-      return res.status(403).json({ message: "Forbidden" });
+      return next(new AppError("Forbidden", 403));
     }
     next();
   };
