@@ -1,28 +1,26 @@
-// When adding a new
 const bcrypt = require("bcrypt");
-const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
 // @route POST /register/
-const registerNewUser = asyncHandler(async (req, res) => {
+const registerNewUser = catchAsync(async (req, res, next) => {
   const { role, name, email, password, ...userData } = req.body;
 
-  // Cehcking dublicate.
-  const dublicateName = await User.findOne({ name });
+  // Checking duplicate.
+  const duplicateName = await User.findOne({ name });
 
-  if (dublicateName) {
-    return res.status(409).json({ message: "This user already exists." });
+  if (duplicateName) {
+    return next(new AppError("This user already exists.", 409));
   }
-  const dublicateEmail = await User.findOne({ email });
+  const duplicateEmail = await User.findOne({ email });
 
-  if (dublicateEmail) {
-    return res
-      .status(409)
-      .json({ message: "This E-Mail is alread assosiated with a user." });
+  if (duplicateEmail) {
+    return next(new AppError("This E-Mail is already associated with a user.", 409));
   }
 
   const hashedPwd = await bcrypt.hash(password, 12);
@@ -38,27 +36,25 @@ const registerNewUser = asyncHandler(async (req, res) => {
 
   switch (role) {
     case "teacher":
-      user = Teacher.create(newUser);
+      user = await Teacher.create(newUser);
       break;
     case "student":
-      user = Student.create(newUser);
+      user = await Student.create(newUser);
       break;
     case "parent":
-      user = Parent.create(newUser);
+      user = await Parent.create(newUser);
       break;
     case "lecturer":
-      user = Lecturer.create(newUser);
+      user = await Lecturer.create(newUser);
       break;
     default:
-      return res.status(400).json({ error: "Invalid role" });
+      return next(new AppError("Invalid role", 400));
   }
 
   if (user) {
-    return res
-      .status(201)
-      .json({ message: `User created successfuly with name ${name}.` });
+    return res.status(201).json({ message: `User created successfully with name ${name}.` });
   } else {
-    return res.status(400).json({ message: "Invalid user data recieved" });
+    return next(new AppError("Invalid user data received", 400));
   }
 });
 

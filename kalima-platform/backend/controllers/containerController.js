@@ -1,88 +1,79 @@
 const Container = require("../models/containerModel");
 const Purchase = require("../models/purchaseModel");
 const mongoose = require("mongoose");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
-exports.getAccessibleChildContainers = async (req, res) => {
-  try {
-    const { studentId, containerId, purchaseId } = req.params;
+exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
+  const { studentId, containerId, purchaseId } = req.params;
 
-    // Validate required ObjectIds.
-    if (
-      !mongoose.Types.ObjectId.isValid(studentId) ||
-      !mongoose.Types.ObjectId.isValid(containerId) ||
-      (purchaseId && !mongoose.Types.ObjectId.isValid(purchaseId))
-    ) {
-      return res.status(400).json({ message: "Invalid ID provided." });
-    }
-
-    let purchasedContainerId;
-
-    // If purchaseId is provided, look it up directly.
-    if (purchaseId) {
-      const purchase = await Purchase.findById(purchaseId).select("container");
-      if (!purchase) {
-        return res
-          .status(403)
-          .json({ message: "Purchase not found or unauthorized" });
-      }
-      purchasedContainerId = purchase.container.toString();
-    } else {
-      // Otherwise, fallback to finding any purchase for this student.
-      const purchase = await Purchase.findOne({ student: studentId }).select(
-        "container"
-      );
-      if (!purchase) {
-        return res
-          .status(403)
-          .json({ message: "No purchases found for this student" });
-      }
-      purchasedContainerId = purchase.container.toString();
-    }
-
-    // Traverse upward from the provided container to get its parent chain.
-    const containerChainResult = await Container.aggregate([
-      {
-        $match: { _id: new mongoose.Types.ObjectId(containerId) },
-      },
-      {
-        $graphLookup: {
-          from: "containers", // Ensure this matches your actual collection name.
-          startWith: "$parent",
-          connectFromField: "parent",
-          connectToField: "_id",
-          as: "parentChain",
-        },
-      },
-    ]);
-    if (!containerChainResult || containerChainResult.length === 0) {
-      return res.status(404).json({ message: "Container not found" });
-    }
-    const containerDoc = containerChainResult[0];
-
-    // Build set of container IDs from the container upward.
-    const accessibleChainIds = new Set();
-    accessibleChainIds.add(containerDoc._id.toString());
-    containerDoc.parentChain.forEach((doc) => {
-      accessibleChainIds.add(doc._id.toString());
-    });
-
-    // Check if the purchased container is in the chain.
-    if (!accessibleChainIds.has(purchasedContainerId)) {
-      return res
-        .status(403)
-        .json({ message: "You do not have access to this container" });
-    }
-
-    // Access allowed; return the container data.
-    delete containerDoc.parentChain;
-    res.json(containerDoc);
-  } catch (error) {
-    console.error("Error in getAccessibleChildContainers:", error);
-    res.status(500).json({ error: error.message });
+  // Validate required ObjectIds.
+  if (
+    !mongoose.Types.ObjectId.isValid(studentId) ||
+    !mongoose.Types.ObjectId.isValid(containerId) ||
+    (purchaseId && !mongoose.Types.ObjectId.isValid(purchaseId))
+  ) {
+    return next(new AppError("Invalid ID provided.", 400));
   }
-};
 
-exports.createContainer = async (req, res) => {
+  let purchasedContainerId;
+
+  // If purchaseId is provided, look it up directly.
+  if (purchaseId) {
+    const purchase = await Purchase.findById(purchaseId).select("container");
+    if (!purchase) {
+      return next(new AppError("Purchase not found or unauthorized", 403));
+    }
+    purchasedContainerId = purchase.container.toString();
+  } else {
+    // Otherwise, fallback to finding any purchase for this student.
+    const purchase = await Purchase.findOne({ student: studentId }).select(
+      "container"
+    );
+    if (!purchase) {
+      return next(new AppError("No purchases found for this student", 403));
+    }
+    purchasedContainerId = purchase.container.toString();
+  }
+
+  // Traverse upward from the provided container to get its parent chain.
+  const containerChainResult = await Container.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(containerId) },
+    },
+    {
+      $graphLookup: {
+        from: "containers", // Ensure this matches your actual collection name.
+        startWith: "$parent",
+        connectFromField: "parent",
+        connectToField: "_id",
+        as: "parentChain",
+      },
+    },
+  ]);
+  if (!containerChainResult || containerChainResult.length === 0) {
+    return next(new AppError("Container not found", 404));
+  }
+  const containerDoc = containerChainResult[0];
+
+  // Build set of container IDs from the container upward.
+  const accessibleChainIds = new Set();
+  accessibleChainIds.add(containerDoc._id.toString());
+  containerDoc.parentChain.forEach((doc) => {
+    accessibleChainIds.add(doc._id.toString());
+  });
+
+  // Check if the purchased container is in the chain.
+  if (!accessibleChainIds.has(purchasedContainerId)) {
+    return next(new AppError("You do not have access to this container", 403));
+  }
+
+  // Access allowed; return the container data.
+  delete containerDoc.parentChain;
+  res.json(containerDoc);
+});
+
+exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -97,7 +88,7 @@ exports.createContainer = async (req, res) => {
       if (!parentContainer) {
         await session.abortTransaction();
         session.endSession();
-        return res.status(404).json({ message: "Parent container not found" });
+        return next(new AppError("Parent container not found", 404));
       }
       parentContainer.children.push(newContainer._id);
       await parentContainer.save({ session });
@@ -109,58 +100,46 @@ exports.createContainer = async (req, res) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    res.status(500).json({ error: error.message });
+    return next(new AppError(error.message, 500));
   } finally {
     session.endSession();
   }
-};
+});
 
-exports.getContainerById = async (req, res) => {
-  try {
-    const container = await Container.findById(req.params.containerId).populate(
-      [
-        { path: "children", select: "name" },
-        { path: "createdBy", select: "name" },
-      ]
-    );
-    if (!container)
-      return res.status(404).json({ message: "Container not found" });
-    res.json(container);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-exports.getAllContainers = async (req, res) => {
-  try {
-    const container = await Container.find().populate([
+exports.getContainerById = catchAsync(async (req, res, next) => {
+  const container = await Container.findById(req.params.containerId).populate(
+    [
+      { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
-    ]);
-    if (!container)
-      return res.status(404).json({ message: "Container not found" });
-    res.json(container);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-exports.updateContainer = async (req, res) => {
-  try {
-    const { name, type, level, price } = req.body;
-    const container = await Container.findByIdAndUpdate(
-      req.params.containerId,
-      { name, type, level, price },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    if (!container)
-      return res.status(404).json({ message: "Container not found" });
-    res.json(container);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-exports.UpdateChildOfContainer = async (req, res) => {
+    ]
+  );
+  if (!container) return next(new AppError("Container not found", 404));
+  res.json(container);
+});
+
+exports.getAllContainers = catchAsync(async (req, res, next) => {
+  const container = await Container.find().populate([
+    { path: "createdBy", select: "name" },
+  ]);
+  if (!container) return next(new AppError("Container not found", 404));
+  res.json(container);
+});
+
+exports.updateContainer = catchAsync(async (req, res, next) => {
+  const { name, type, level, price } = req.body;
+  const container = await Container.findByIdAndUpdate(
+    req.params.containerId,
+    { name, type, level, price },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!container) return next(new AppError("Container not found", 404));
+  res.json(container);
+});
+
+exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -169,14 +148,14 @@ exports.UpdateChildOfContainer = async (req, res) => {
     if (!container) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(404).json({ message: "Container not found" });
+      return next(new AppError("Container not found", 404));
     }
 
     const childContainer = await Container.findById(childId).session(session);
     if (!childContainer) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(404).json({ message: "Child container not found" });
+      return next(new AppError("Child container not found", 404));
     }
     if (operation === "add") {
       childContainer.parent = containerId;
@@ -193,7 +172,7 @@ exports.UpdateChildOfContainer = async (req, res) => {
     } else {
       await session.abortTransaction();
       session.endSession();
-      return res.status(400).json({ message: "Invalid operation" });
+      return next(new AppError("Invalid operation", 400));
     }
     await session.commitTransaction();
     session.endSession();
@@ -201,18 +180,18 @@ exports.UpdateChildOfContainer = async (req, res) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    res.status(500).json({ error: error.message });
+    return next(new AppError(error.message, 500));
   } finally {
     session.endSession();
   }
-};
+});
 
-exports.deleteContainerAndChildren = async (req, res) => {
+exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
   let session;
   try {
     const { containerId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(containerId)) {
-      return res.status(400).json({ message: "Invalid container id" });
+      return next(new AppError("Invalid container id", 400));
     }
 
     session = await mongoose.startSession();
@@ -236,7 +215,7 @@ exports.deleteContainerAndChildren = async (req, res) => {
 
     if (!containerTree || containerTree.length === 0) {
       await session.abortTransaction();
-      return res.status(404).json({ message: "Container not found" });
+      return next(new AppError("Container not found", 404));
     }
 
     const containerDoc = containerTree[0];
@@ -265,10 +244,10 @@ exports.deleteContainerAndChildren = async (req, res) => {
     if (session) {
       await session.abortTransaction();
     }
-    res.status(500).json({ error: error.message });
+    return next(new AppError(error.message, 500));
   } finally {
     if (session) {
       session.endSession();
     }
   }
-};
+});
