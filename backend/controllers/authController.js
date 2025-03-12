@@ -101,4 +101,17 @@ const logout = (req, res) => {
   res.json({ message: "Cookies cleared." });
 };
 
-module.exports = { login, refresh, logout };
+const verifyRoles = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req?.role) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const rolesArray = [...allowedRoles];
+    if (!rolesArray.includes(req.role)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+    next();
+  };
+};
+
+module.exports = { login, refresh, logout, verifyRoles };
