@@ -13,8 +13,12 @@ router
   .route("/")
   .get(containerController.getAllContainers)
   .post(containerController.createContainer);
-
+router.patch("/update-child", containerController.UpdateChildOfContainer);
 // Get container details by its ID.
-router.get("/:containerId", containerController.getContainerById);
+router
+  .route("/:containerId")
+  .get(containerController.getContainerById)
+  .patch(containerController.updateContainer)
+  .delete(containerController.deleteContainerAndChildren);
 
 module.exports = router;

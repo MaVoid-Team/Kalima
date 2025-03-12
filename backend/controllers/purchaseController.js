@@ -1,9 +1,5 @@
 const Purchase = require("../models/purchaseModel");
 
-/**
- * Create a new purchase.
- * Student purchases a container (e.g., Year, Term, Month, or Lecture).
- */
 exports.createPurchase = async (req, res) => {
   try {
     const { studentId, containerId } = req.body;
@@ -28,9 +24,6 @@ exports.createPurchase = async (req, res) => {
   }
 };
 
-/**
- * Get all purchases for a student.
- */
 exports.getPurchasesByStudent = async (req, res) => {
   try {
     const { studentId } = req.params;

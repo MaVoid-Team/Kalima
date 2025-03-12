@@ -83,12 +83,35 @@ exports.getAccessibleChildContainers = async (req, res) => {
 };
 
 exports.createContainer = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    // const { name, type, parent, price, createdBy, level } = req.body;
-    const newContainer = await Container.create(req.body);
+    // Create the new container inside the transaction.
+    const newContainers = await Container.create([req.body], { session });
+    const newContainer = newContainers[0];
+
+    if (req.body.parent) {
+      const parentContainer = await Container.findById(req.body.parent).session(
+        session
+      );
+      if (!parentContainer) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({ message: "Parent container not found" });
+      }
+      parentContainer.children.push(newContainer._id);
+      await parentContainer.save({ session });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
     res.status(201).json(newContainer);
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(500).json({ error: error.message });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -117,5 +140,135 @@ exports.getAllContainers = async (req, res) => {
     res.json(container);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+exports.updateContainer = async (req, res) => {
+  try {
+    const { name, type, level, price } = req.body;
+    const container = await Container.findByIdAndUpdate(
+      req.params.containerId,
+      { name, type, level, price },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!container)
+      return res.status(404).json({ message: "Container not found" });
+    res.json(container);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.UpdateChildOfContainer = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { containerId, childId, operation } = req.body;
+    const container = await Container.findById(containerId).session(session);
+    if (!container) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Container not found" });
+    }
+
+    const childContainer = await Container.findById(childId).session(session);
+    if (!childContainer) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Child container not found" });
+    }
+    if (operation === "add") {
+      childContainer.parent = containerId;
+      await childContainer.save({ session });
+      container.children.push(childId);
+      await container.save({ session });
+    } else if (operation === "remove") {
+      childContainer.parent = null;
+      await childContainer.save({ session });
+      container.children = container.children.filter(
+        (child) => child.toString() !== childId
+      );
+      await container.save({ session });
+    } else {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ message: "Invalid operation" });
+    }
+    await session.commitTransaction();
+    session.endSession();
+    res.json(container);
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(500).json({ error: error.message });
+  } finally {
+    session.endSession();
+  }
+};
+
+exports.deleteContainerAndChildren = async (req, res) => {
+  let session;
+  try {
+    const { containerId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(containerId)) {
+      return res.status(400).json({ message: "Invalid container id" });
+    }
+
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    // Find the container and recursively search for nested children.
+    const containerTree = await Container.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(containerId) },
+      },
+      {
+        $graphLookup: {
+          from: "containers", // Ensure this matches your actual collection name
+          startWith: "$children",
+          connectFromField: "children",
+          connectToField: "_id",
+          as: "nestedChildren",
+        },
+      },
+    ]).session(session);
+
+    if (!containerTree || containerTree.length === 0) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: "Container not found" });
+    }
+
+    const containerDoc = containerTree[0];
+    const toDeleteIds = [
+      containerDoc._id,
+      ...containerDoc.nestedChildren.map((child) => child._id),
+    ];
+
+    // Remove the container id from its parent's children array if applicable.
+    if (containerDoc.parent) {
+      await Container.findByIdAndUpdate(
+        containerDoc.parent,
+        { $pull: { children: containerDoc._id } },
+        { session }
+      );
+    }
+
+    // Delete the container and all nested children.
+    await Container.deleteMany({ _id: { $in: toDeleteIds } }).session(session);
+
+    await session.commitTransaction();
+    res.json({
+      message: "Container and its nested children deleted successfully",
+    });
+  } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+    }
+    res.status(500).json({ error: error.message });
+  } finally {
+    if (session) {
+      session.endSession();
+    }
   }
 };
