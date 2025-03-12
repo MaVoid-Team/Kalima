@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8088:80"
-      - "4445:443"
+      - "4448:443"
     environment:
       - VITE_API_URL=${BACKEND_URL}
     volumes:
