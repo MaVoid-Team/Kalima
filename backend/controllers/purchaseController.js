@@ -42,3 +42,11 @@ exports.getPurchasesByStudent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.getAllPurchases = async (req, res) => {
+  try {
+    const purchases = await Purchase.find().populate("container");
+    res.json(purchases);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

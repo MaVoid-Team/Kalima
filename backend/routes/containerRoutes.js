@@ -9,7 +9,10 @@ router.get(
 );
 
 // Create a new container.
-router.post("/", containerController.createContainer);
+router
+  .route("/")
+  .get(containerController.getAllContainers)
+  .post(containerController.createContainer);
 
 // Get container details by its ID.
 router.get("/:containerId", containerController.getContainerById);
