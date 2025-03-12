@@ -4,7 +4,7 @@ const containerController = require("../controllers/containerController");
 
 // Get accessible child containers for a student by container ID.
 router.get(
-  "/student/:studentId/container/:containerId",
+  "/student/:studentId/container/:containerId/purchase/:purchaseId",
   containerController.getAccessibleChildContainers
 );
 
