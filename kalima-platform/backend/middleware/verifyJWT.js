@@ -14,7 +14,7 @@ const verifyJWT = (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: "Forbidden" });
     }
-    req.username = decoded.UserInfo.username;
+    req.id = decoded.UserInfo.id;
     req.role = decoded.UserInfo.role;
     next();
   });
