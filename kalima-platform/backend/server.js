@@ -9,8 +9,9 @@ const mongoose = require("mongoose");
 const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const containerRouter = require("./routes/containerRoutes");
+const userRouter = require("./routes/userRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
-const errorHandler = require("./controllers/errorController.js");
+const errorHandler = require("./controllers/errorController");
 
 connectDB();
 
@@ -24,6 +25,7 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/register", require("./routes/registerRoutes.js"));
 app.use("/api/v1/auth", require("./routes/authRoutes.js"));
 app.use("/api/v1/containers", containerRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/purchases", purchaseRouter);
 
 mongoose.connection.once("open", () => {
