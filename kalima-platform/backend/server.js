@@ -10,6 +10,7 @@ const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const containerRouter = require("./routes/containerRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
+const errorHandler = require("./controllers/errorController.js");
 
 connectDB();
 
@@ -35,3 +36,5 @@ mongoose.connection.once("open", () => {
 mongoose.connection.on("error", (err) => {
   console.log(err);
 });
+
+app.use(errorHandler);
