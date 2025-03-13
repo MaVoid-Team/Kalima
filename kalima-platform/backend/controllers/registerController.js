@@ -9,28 +9,40 @@ const catchAsync = require("../utils/catchAsync");
 
 // @route POST /register/
 const registerNewUser = catchAsync(async (req, res, next) => {
-  const { role, name, email, password, ...userData } = req.body;
+  const { role, name, email, phoneNumber, password, ...userData } = req.body;
+
+  const phoneRequiredRoles = ["teacher", "parent", "student"]
 
   // Checking duplicate.
-  const duplicateName = await User.findOne({ name });
-
-  if (duplicateName) {
-    return next(new AppError("This user already exists.", 409));
-  }
   const duplicateEmail = await User.findOne({ email });
 
   if (duplicateEmail) {
     return next(new AppError("This E-Mail is already associated with a user.", 409));
   }
 
+  // For the roles with phone login only.
+  const duplicatePhone = await User.findOne({ phoneNumber });
+  if (phoneRequiredRoles.includes(role) && duplicatePhone) {
+
+    return next(new AppError("This phone number is already associated with a user.", 400));
+
+  }
+
   const hashedPwd = await bcrypt.hash(password, 12);
 
-  const newUser = {
+  const newUser = phoneNumber ? {
+    name,
+    email,
+    phoneNumber,
+    password: hashedPwd,
+    ...userData,
+  } : {
     name,
     email,
     password: hashedPwd,
     ...userData,
   };
+
 
   let user;
 
