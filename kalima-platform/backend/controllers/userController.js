@@ -27,16 +27,15 @@ const updateUser = catchAsync(async (req, res, next) => {
   const { name, email, address, password } = req.body
   const userId = req.params.userId
 
-  let hashedPwd
-
   if (password) {
-    hashedPwd = await bcrypt.hash(password, 12);
+    return next(new AppError("Can't update password on this route.", 404));
   }
+
   const foundUser = await User.findById(userId).select("-password")
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
-  const updatedUser = { name, email, address, password, ...req.body }
+  const updatedUser = { name, email, address, ...req.body }
   let user
 
   switch (foundUser.role.toLowerCase()) {
