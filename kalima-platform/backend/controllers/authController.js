@@ -6,42 +6,34 @@ const catchAsync = require("../utils/catchAsync");
 
 // @route POST /auth/
 const login = catchAsync(async (req, res, next) => {
-  const { email, phoneNumber, password } = req.body;
+  const { name, password } = req.body;
 
-  // Assisning the roles that can only login with a phone number.
-  const phoneRequiredRoles = ["Teacher", "Parent", "Student"]
-
-  // For the different methods of login.
-  if (!((email && password) || (phoneNumber && password))) {
-    return next(new AppError("Please provide either email and password or phone number and password.", 400));
+  if (!name || !password) {
+    return next(new AppError("All fields are required.", 400));
   }
 
-  const foundUser = email ? await User.findOne({ email }) : await User.findOne({ phoneNumber })
+  const foundUser = await User.findOne({ name });
 
   if (!foundUser) {
-    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
-  }
-
-  if (phoneRequiredRoles.includes(foundUser.role) && !phoneNumber) {
-    return next(new AppError("This user is required to login with a phone number.", 400));
+    return next(new AppError("Couldn't find a user with this name or password.", 400));
   }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
-    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
+    return next(new AppError("Couldn't find a user with this name or password.", 400));
   }
 
   const accessToken = jwt.sign(
     {
-      UserInfo: { id: foundUser._id, role: foundUser.role },
+      UserInfo: { name: foundUser.name, role: foundUser.role },
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "10s" }, // Time should be changed in production
   );
 
   const refreshToken = jwt.sign(
-    { id: foundUser._id, },
+    { name: foundUser.name },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1000s" }, // Time should be changed in production
   );
@@ -72,7 +64,7 @@ const refresh = catchAsync(async (req, res, next) => {
         return next(new AppError("Forbidden", 401));
       }
 
-      const foundUser = await User.findOne({ _id: decoded.id });
+      const foundUser = await User.findOne({ name: decoded.user });
 
       if (!foundUser) {
         return next(new AppError("Couldn't find a user with this username or password.", 400));
@@ -81,7 +73,7 @@ const refresh = catchAsync(async (req, res, next) => {
       const accessToken = jwt.sign(
         {
           UserInfo: {
-            id: foundUser._id,
+            name: foundUser.name,
             role: foundUser.role,
           },
         },

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const containerController = require("../controllers/containerController");
-const authController = require('../controllers/authController')
 
 // Get accessible child containers for a student by container ID.
 router.get(

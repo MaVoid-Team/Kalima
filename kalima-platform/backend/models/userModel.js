@@ -22,10 +22,4 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 
-
-// For setting up available grades.
-
-User.levels = ["Grade 4", "Grade 5", "grade 6", "First Preparatory", "Second Preparatory", "Third Preparatory", "First Secondary",
-  "Second Secondary", "Third Secondary"]
-
 module.exports = User;
