@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden p-8">
+    <section className="relative overflow-hidden md:p-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           {/* Left side with image */}
