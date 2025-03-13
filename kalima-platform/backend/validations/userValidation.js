@@ -14,9 +14,4 @@ const userValidation = Joi.object({
   role: Joi.string().required()
 });
 
-// For setting up available grades so my fingers don't work too hard.
-
-userValidation.levels = ["Grade 4", "Grade 5", "grade 6", "First Preparatory", "Second Preparatory", "Third Preparatory", "First Secondary",
-  "Second Secondary", "Third Secondary"]
-
 module.exports = userValidation
