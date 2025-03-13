@@ -32,7 +32,7 @@ export function CoursesSection() {
   ]
 
   return (
-    <section className="p-8">
+    <section className="md:p-8">
       <div className="container mx-auto px-4">
         <h2 className="text-center text-2xl font-bold mb-2">كورساتنا</h2>
         <h3 className="text-center text-3xl font-bold mb-12">
