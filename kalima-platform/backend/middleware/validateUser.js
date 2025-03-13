@@ -6,6 +6,8 @@ const teacherSchema = require("../validations/teacherValidation.js");
 const studentSchema = require("../validations/studentValidation.js");
 const parentSchema = require("../validations/parentValidation.js");
 const lecturerSchema = require("../validations/lecturerValidation.js");
+const catchAsync = require("../utils/catchAsync");
+const User = require("../models/userModel.js");
 
 const roleSchemas = {
   teacher: teacherSchema,
@@ -14,17 +16,38 @@ const roleSchemas = {
   lecturer: lecturerSchema,
 };
 
-const validateUser = (req, res, next) => {
-  const { role } = req.body;
+const validateUser = catchAsync(async (req, res, next) => {
+  let role
+  if (req.method === "PATCH") {
+    const user = await User.findById(req.params.userId).lean()
+    if (!user) return next(new AppError("Couldn't find user.", 404));
+    role = user.role
+  } else { role = req.body.role }
 
   // Check if a valid role is provided.
-  if (!role || !roleSchemas[role]) {
+  if (!role || !roleSchemas[role.toLowerCase()]) {
     return res.status(400).json({ message: "Invalid or missing role" });
   }
 
-  // Validate request body based on the role schema and casts it to an error if one exists.
-  const { error } = roleSchemas[role].validate(req.body, { abortEarly: false });
+  /* Depending if the request was a patch to update a user
+  A copy of the schema is made with optional fields.  */
 
+  let error;
+  schema = roleSchemas[role.toLowerCase()]
+  if (req.method === "PATCH") {
+    const partialSchema = schema.fork(
+      Object.keys(schema.describe().keys),
+      (field) => field.optional() // Make all fields optional
+    );
+    error = partialSchema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true, // Ignore fields not in the schema
+    }).error;
+  } else {
+    error = schema.validate(req.body, { abortEarly: false }).error;
+  }
+
+  // Validate request body based on the role schema and casts it to an error if one exists.
   if (error) {
     return res.status(400).json({
       message: error.details.map((err) => err.message),
@@ -32,6 +55,6 @@ const validateUser = (req, res, next) => {
   }
 
   next();
-};
+});
 
 module.exports = validateUser;
