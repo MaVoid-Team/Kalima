@@ -9,7 +9,7 @@ const catchAsync = require("../utils/catchAsync");
 
 // @route POST /register/
 const registerNewUser = catchAsync(async (req, res, next) => {
-  const { role, name, email, phoneNumber, password, ...userData } = req.body;
+  const { role, name, email, phoneNumber, confirmPassword, password, ...userData } = req.body;
 
   const phoneRequiredRoles = ["teacher", "parent", "student"]
 
@@ -27,6 +27,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(new AppError("This phone number is already associated with a user.", 400));
 
   }
+  if (confirmPassword !== password) return res.status(400).json({ message: "Password and password confirmation don't match." });
+
 
   const hashedPwd = await bcrypt.hash(password, 12);
 
