@@ -27,7 +27,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(new AppError("This phone number is already associated with a user.", 400));
 
   }
-  if (confirmPassword !== password) return res.status(400).json({ message: "Password and password confirmation don't match." });
 
 
   const hashedPwd = await bcrypt.hash(password, 12);
