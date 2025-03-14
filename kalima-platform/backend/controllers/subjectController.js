@@ -4,29 +4,50 @@ const AppError = require("../utils/appError");
 const Level = require("../models/levelModel");
 // Create a new subject
 exports.createSubject = catchAsync(async (req, res, next) => {
-  const subject = Subject.create(req.body);
+  const subject = await Subject.create(req.body);
   if (!subject) {
     return next(new AppError("Subject could not be created", 400));
   }
-  res.status(201).send(subject);
+  res.status(201).json({
+    status: "success",
+    data: {
+      subject,
+    },
+  });
 });
 
 // Get all subjects
 exports.getAllSubjects = catchAsync(async (req, res, next) => {
-  const subjects = await Subject.find();
+  const subjects = await Subject.find().populate({
+    path: "level",
+    select: "name",
+  });
   if (subjects.length === 0) {
     return next(new AppError("No subjects found", 404));
   }
-  res.status(200).send(subjects);
+  res.status(200).json({
+    status: "success",
+    data: {
+      subjects,
+    },
+  });
 });
 
 // Get a subject by ID
 exports.getSubjectById = catchAsync(async (req, res, next) => {
-  const subject = await Subject.findById(req.params.id);
+  const subject = await Subject.findById(req.params.id).populate({
+    path: "level",
+    select: "name",
+  });
   if (!subject) {
     return next(new AppError("No subject found with that ID", 404));
   }
-  res.status(200).send(subject);
+  res.status(200).json({
+    status: "success",
+    data: {
+      subject,
+    },
+  });
 });
 
 // Update a subject by ID
@@ -67,7 +88,7 @@ exports.updateLevelOfSubject = catchAsync(async (req, res, next) => {
   if (operation === "add") {
     subject = await Subject.findByIdAndUpdate(
       req.params.id,
-      { level: { $push: levelId } },
+      { $push: { level: levelId } },
       {
         new: true,
         runValidators: true,
@@ -76,7 +97,7 @@ exports.updateLevelOfSubject = catchAsync(async (req, res, next) => {
   } else if (operation === "remove") {
     subject = await Subject.findByIdAndUpdate(
       req.params.id,
-      { level: { $pull: levelId } },
+      { $pull: { level: levelId } },
       {
         new: true,
         runValidators: true,

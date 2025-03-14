@@ -5,7 +5,7 @@ const containerSchema = new mongoose.Schema(
     name: { type: String, required: true },
     type: {
       type: String,
-      enum: ["year", "term", "month", "lecture"],
+      enum: ["year", "term", "month", "lecture", "course"],
       required: true,
     },
     subject: {

@@ -8,7 +8,12 @@ exports.createLevel = catchAsync(async (req, res, next) => {
   if (!level) {
     return next(new AppError("Level could not be created", 400));
   }
-  res.status(201).send(level);
+  res.status(201).json({
+    status: "success",
+    data: {
+      level,
+    },
+  });
 });
 
 // Get all levels
@@ -17,7 +22,12 @@ exports.getAllLevels = catchAsync(async (req, res, next) => {
   if (levels.length === 0) {
     return next(new AppError("No levels found", 404));
   }
-  res.status(200).send(levels);
+  res.status(200).json({
+    status: "success",
+    data: {
+      levels,
+    },
+  });
 });
 
 // Get a level by ID
@@ -26,7 +36,12 @@ exports.getLevelById = catchAsync(async (req, res, next) => {
   if (!level) {
     return next(new AppError("No level found with that ID", 404));
   }
-  res.status(200).send(level);
+  res.status(200).json({
+    status: "success",
+    data: {
+      level,
+    },
+  });
 });
 
 // Update a level by ID
