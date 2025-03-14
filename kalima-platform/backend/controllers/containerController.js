@@ -3,6 +3,18 @@ const Purchase = require("../models/purchaseModel");
 const mongoose = require("mongoose");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const QueryFeatures = require("../utils/queryFeatures");
+const Level = require("../models/levelModel");
+const Subject = require("../models/subjectModel");
+const Lecturer = require("../models/lecturerModel");
+
+const checkDoc = async (Model, id, session) => {
+  const doc = await Model.findById(id).session(session);
+  if (!doc) {
+    throw new AppError(`${Model.modelName} not found`, 404);
+  }
+  return doc;
+};
 
 exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
   const { studentId, containerId, purchaseId } = req.params;
@@ -78,18 +90,18 @@ exports.createContainer = catchAsync(async (req, res, next) => {
   session.startTransaction();
   try {
     // Create the new container inside the transaction.
+    await checkDoc(Level, req.body.level, session);
+    await checkDoc(Subject, req.body.subject, session);
+    await checkDoc(Lecturer, req.body.createdBy, session);
     const newContainers = await Container.create([req.body], { session });
     const newContainer = newContainers[0];
 
     if (req.body.parent) {
-      const parentContainer = await Container.findById(req.body.parent).session(
+      const parentContainer = await checkDoc(
+        Container,
+        req.body.parent,
         session
       );
-      if (!parentContainer) {
-        await session.abortTransaction();
-        session.endSession();
-        return next(new AppError("Parent container not found", 404));
-      }
       parentContainer.children.push(newContainer._id);
       await parentContainer.save({ session });
     }
@@ -107,36 +119,72 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 });
 
 exports.getContainerById = catchAsync(async (req, res, next) => {
-  const container = await Container.findById(req.params.containerId).populate(
-    [
-      { path: "children", select: "name" },
-      { path: "createdBy", select: "name" },
-    ]
-  );
-  if (!container) return next(new AppError("Container not found", 404));
-  res.json(container);
-});
-
-exports.getAllContainers = catchAsync(async (req, res, next) => {
-  const container = await Container.find().populate([
+  const container = await Container.findById(req.params.containerId).populate([
+    { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
   ]);
   if (!container) return next(new AppError("Container not found", 404));
   res.json(container);
 });
 
+exports.getAllContainers = catchAsync(async (req, res, next) => {
+  let query = Container.find().populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const containers = await features.query.lean();
+  if (!containers) return next(new AppError("Container not found", 404));
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers,
+    },
+  });
+});
+
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, level, price } = req.body;
-  const container = await Container.findByIdAndUpdate(
-    req.params.containerId,
-    { name, type, level, price },
-    {
-      new: true,
-      runValidators: true,
+  const { name, type, price, level, subject } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let obj = { name, type, price };
+
+    if (subject) {
+      const subjectDoc = await checkDoc(Subject, subject, session);
+      obj.subject = subjectDoc._id;
     }
-  );
-  if (!container) return next(new AppError("Container not found", 404));
-  res.json(container);
+    if (level) {
+      const levelDoc = await checkDoc(Level, level, session);
+      obj.level = levelDoc._id;
+    }
+
+    const container = await Container.findByIdAndUpdate(
+      req.params.containerId,
+      obj,
+      {
+        new: true,
+        runValidators: true,
+        session,
+      }
+    );
+    if (!container) {
+      throw new AppError("Container not found", 404);
+    }
+    await session.commitTransaction();
+    res.status(200).json({ status: "success", data: { container } });
+  } catch (error) {
+    await session.abortTransaction();
+    return next(new AppError(error.message, 500));
+  } finally {
+    session.endSession();
+  }
 });
 
 exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
@@ -176,7 +224,7 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
     }
     await session.commitTransaction();
     session.endSession();
-    res.json(container);
+    res.status(200).json({ status: "success", data: { container } });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -237,9 +285,7 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
     await Container.deleteMany({ _id: { $in: toDeleteIds } }).session(session);
 
     await session.commitTransaction();
-    res.json({
-      message: "Container and its nested children deleted successfully",
-    });
+    res.status(204).json({ status: "success", data: null });
   } catch (error) {
     if (session) {
       await session.abortTransaction();
