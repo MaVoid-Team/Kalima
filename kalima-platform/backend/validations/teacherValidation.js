@@ -8,7 +8,7 @@ const teacherValidation = userValidation.concat(
     faction: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
     subject: Joi.string().required(),
-    level: Joi.string().valid(...levels).optional(),
+    level: Joi.string().valid(...levels).required(),
     school: Joi.string().hex().length(24).optional()
   })
 )
