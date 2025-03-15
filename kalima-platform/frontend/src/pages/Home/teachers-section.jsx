@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { FileText, Clock, ChevronLeft, Star, Loader } from "lucide-react"
-import { getAllUsers } from "../../routes/fetch-users"
+import { useState, useEffect } from "react";
+import { FileText, Clock, ChevronLeft, Star, Loader } from "lucide-react";
+import { getAllUsers } from "../../routes/fetch-users";
 
 export function TeachersSection() {
-  const [teachers, setTeachers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [visibleTeachers, setVisibleTeachers] = useState(3) // Number of teachers to display initially
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [visibleTeachers, setVisibleTeachers] = useState(3); // Number of teachers to display initially
 
   useEffect(() => {
-    fetchTeachers()
-  }, [])
+    fetchTeachers();
+  }, []);
 
   const fetchTeachers = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const result = await getAllUsers()
+      const result = await getAllUsers();
 
       if (result.success) {
         // Filter users with role "Lecturer" and map to the expected format
@@ -31,31 +31,34 @@ export function TeachersSection() {
             experience: lecturer.bio || "معلم خبير", // Use bio or a default text
             grade: "جميع المراحل", // Default value since API doesn't provide this
             rating: 5, // Default rating
-          }))
+          }));
 
-        setTeachers(lecturers)
+        setTeachers(lecturers);
       } else {
-        setError("فشل في تحميل بيانات المعلمين")
+        setError("فشل في تحميل بيانات المعلمين");
       }
     } catch (err) {
-      console.error("Error fetching teachers:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
+      console.error("Error fetching teachers:", err);
+      setError("حدث خطأ أثناء تحميل البيانات");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const loadMoreTeachers = () => {
     // Show all teachers when button is clicked
-    setVisibleTeachers(teachers.length)
-  }
+    setVisibleTeachers(teachers.length);
+  };
 
   return (
     <section className="md:p-8">
       <div className="container mx-auto px-4">
         <h2 className="text-center text-2xl font-bold mb-2">معلمينا</h2>
         <h3 className="text-center text-3xl font-bold mb-12">
-          شوف كل معلمين <span className="text-primary border-b-2 border-primary pb-1">منصتنا</span>
+          شوف كل معلمين{" "}
+          <span className="text-primary border-b-2 border-primary pb-1">
+            منصتنا
+          </span>
         </h3>
 
         {loading ? (
@@ -83,7 +86,10 @@ export function TeachersSection() {
 
             {visibleTeachers < teachers.length && (
               <div className="flex justify-center mt-8">
-                <button className="btn btn-primary rounded-full" onClick={loadMoreTeachers}>
+                <button
+                  className="btn btn-primary rounded-full"
+                  onClick={loadMoreTeachers}
+                >
                   عرض المزيد من المعلمين
                   <ChevronLeft className="h-4 w-4 mr-2" />
                 </button>
@@ -93,14 +99,18 @@ export function TeachersSection() {
         )}
       </div>
     </section>
-  )
+  );
 }
 
 function TeacherCard({ teacher }) {
   return (
     <div className="rounded-lg overflow-hidden hover:scale-105 hover:shadow-xl shadow-lg duration-500">
       <div className="relative">
-        <img src={teacher.image || "/placeholder.svg"} alt={teacher.name} className="w-full h-48 object-cover" />
+        <img
+          src={teacher.image || "/placeholder.svg"}
+          alt={teacher.name}
+          className="w-full h-48 object-cover"
+        />
         <div className="absolute top-2 right-2 bg-primary text-white text-xs px-2 py-1 rounded-full">
           {teacher.subject}
         </div>
@@ -125,10 +135,11 @@ function TeacherCard({ teacher }) {
               <Star key={i} className="h-4 w-4 fill-warning text-warning" />
             ))}
           </div>
-          <button className="btn btn-sm btn-primary rounded-full">عرض الملف</button>
+          <button className="btn btn-sm btn-primary rounded-full">
+            عرض الملف
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
