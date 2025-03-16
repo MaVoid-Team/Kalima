@@ -5,12 +5,17 @@ const containerSchema = new mongoose.Schema(
     name: { type: String, required: true },
     type: {
       type: String,
-      enum: ["year", "term", "month", "lecture"],
+      enum: ["year", "term", "month", "lecture", "course"],
       required: true,
     },
+    subject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+      required: false,
+    },
     level: {
-      type: String,
-      enum: ["primary", "secondary", "high"],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Level",
       required: false,
     },
     createdBy: {

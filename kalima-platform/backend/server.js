@@ -9,8 +9,11 @@ const mongoose = require("mongoose");
 const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const containerRouter = require("./routes/containerRoutes");
+const userRouter = require("./routes/userRoutes");
 const purchaseRouter = require("./routes/purchaseRoutes");
-
+const errorHandler = require("./controllers/errorController.js");
+const subjectRouter = require("./routes/subjectRoutes.js");
+const levelRouter = require("./routes/levelRoutes.js");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -23,7 +26,10 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/register", require("./routes/registerRoutes.js"));
 app.use("/api/v1/auth", require("./routes/authRoutes.js"));
 app.use("/api/v1/containers", containerRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/purchases", purchaseRouter);
+app.use("/api/v1/levels", levelRouter);
+app.use("/api/v1/subjects", subjectRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -35,3 +41,5 @@ mongoose.connection.once("open", () => {
 mongoose.connection.on("error", (err) => {
   console.log(err);
 });
+
+app.use(errorHandler);

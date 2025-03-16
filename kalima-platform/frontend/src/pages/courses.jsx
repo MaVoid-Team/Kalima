@@ -1,7 +1,141 @@
-import { Search, Book, ChevronDown, Star } from 'lucide-react'
+"use client"
+
+import { useState, useEffect } from "react"
+import { Search, Book, ChevronDown, Star, Loader } from 'lucide-react'
 import { Link } from "react-router-dom"
+import { getAllSubjects, getSubjectById } from "../routes/courses"
 
 export default function CoursesPage() {
+  const [subjects, setSubjects] = useState([])
+  const [filteredCourses, setFilteredCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [selectedSubjectDetails, setSelectedSubjectDetails] = useState(null)
+
+  // Filter states
+  const [selectedStage, setSelectedStage] = useState("")
+  const [selectedGrade, setSelectedGrade] = useState("")
+  const [selectedTerm, setSelectedTerm] = useState("")
+  const [selectedSubject, setSelectedSubject] = useState("")
+  const [selectedCourseType, setSelectedCourseType] = useState("")
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
+
+  useEffect(() => {
+    fetchSubjects()
+  }, [])
+
+  // Update filtered courses whenever filters change
+  useEffect(() => {
+    if (subjects.length > 0) {
+      applyFilters()
+    }
+  }, [selectedStage, selectedGrade, selectedTerm, selectedSubject, selectedCourseType, selectedCourseStatus, subjects])
+
+  const fetchSubjects = async () => {
+    setLoading(true)
+    try {
+      const result = await getAllSubjects()
+
+      if (result.success) {
+        setSubjects(result.data)
+        // Initialize filtered courses with all courses
+        setFilteredCourses(generateCourseData(result.data))
+      } else {
+        setError("فشل في تحميل بيانات المواد الدراسية")
+      }
+    } catch (err) {
+      console.error("Error fetching subjects:", err)
+      setError("حدث خطأ أثناء تحميل البيانات")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch subject details by ID
+  const fetchSubjectDetails = async (subjectId) => {
+    try {
+      const result = await getSubjectById(subjectId)
+      if (result.success) {
+        setSelectedSubjectDetails(result.data)
+        return result.data
+      } else {
+        console.error("Error fetching subject details:", result.error)
+        return null
+      }
+    } catch (err) {
+      console.error("Error in fetchSubjectDetails:", err)
+      return null
+    }
+  }
+
+  // Function to handle search with filters
+  const handleSearch = () => {
+    applyFilters()
+  }
+
+  // Apply filters to courses
+  const applyFilters = () => {
+    let filtered = generateCourseData(subjects)
+
+    // Apply subject filter
+    if (selectedSubject) {
+      filtered = filtered.filter(course => course.subject === selectedSubject)
+    }
+
+    // Apply other filters (in a real app, these would filter based on actual data)
+    if (selectedStage) {
+      // This is a mock filter since we don't have stage data in the API
+      filtered = filtered.filter(course => course.stage === selectedStage || !course.stage)
+    }
+
+    if (selectedGrade) {
+      filtered = filtered.filter(course => course.level === selectedGrade || course.level === "الصف الأول")
+    }
+
+    if (selectedCourseType) {
+      // Mock filter for course type
+      filtered = filtered.filter(course => course.type === selectedCourseType || !course.type)
+    }
+
+    if (selectedCourseStatus) {
+      // Mock filter for course status
+      filtered = filtered.filter(course => course.status === selectedCourseStatus || !course.status)
+    }
+
+    setFilteredCourses(filtered)
+  }
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSelectedStage("")
+    setSelectedGrade("")
+    setSelectedTerm("")
+    setSelectedSubject("")
+    setSelectedCourseType("")
+    setSelectedCourseStatus("")
+  }
+
+  // Generate course data based on subjects from API
+  const generateCourseData = (subjectsData) => {
+    if (!subjectsData || subjectsData.length === 0) return []
+
+    // Create course cards based on the subjects we have
+    return subjectsData.map((subject, index) => ({
+      id: subject._id,
+      image: `/course-${(index % 6) + 1}.png`, // Cycle through available images
+      teacherName: `أ/معلم ${index + 1}`,
+      subject: subject.name,
+      subjectId: subject._id, // Store the subject ID for linking
+      level: "الصف الأول", // Default value
+      duration: 12 + index, // Mock duration
+      rating: 4 + (index % 2) * 0.5, // Alternate between 4 and 4.5
+      // Add mock data for filters
+      stage: index % 3 === 0 ? "المرحلة الابتدائية" : index % 3 === 1 ? "المرحلة الإعدادية" : "المرحلة الثانوية",
+      type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
+      status: index % 2 === 0 ? "مجاني" : "مدفوع"
+    }))
+  }
+
   return (
     <div className="relative min-h-screen w-full">
       {/* Background Pattern - Positioned on the left */}
@@ -21,16 +155,20 @@ export default function CoursesPage() {
         {/* Title Section - Centered */}
         <div className="container mx-auto px-4 pt-8 pb-4 text-end">
           <div className="relative inline-block">
-            <p className="text-3xl font-bold text-primary md:mx-40">
-              كورساتي
-            </p>
-                <img src="/underline.png" alt="underline" className='object-contain' />
+            <p className="text-3xl font-bold text-primary md:mx-40">كورساتي</p>
+            <img src="/underline.png" alt="underline" className="object-contain" />
           </div>
         </div>
 
         {/* Search and Filters Section - Right aligned */}
         <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-between mb-4">
+            <button 
+              className="btn btn-outline btn-sm rounded-md" 
+              onClick={resetFilters}
+            >
+              إعادة ضبط الفلاتر
+            </button>
             <div className="flex items-center gap-2">
               <button className="btn btn-primary btn-sm rounded-md">اختيارات البحث</button>
               <Search className="h-6 w-6" />
@@ -42,18 +180,18 @@ export default function CoursesPage() {
               <p className="mb-1 text-sm">اختر مرحلتك الدراسية</p>
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  المرحلة الدراسية
+                  {selectedStage || "المرحلة الدراسية"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                   <li>
-                    <button>المرحلة الابتدائية</button>
+                    <button onClick={() => setSelectedStage("المرحلة الابتدائية")}>المرحلة الابتدائية</button>
                   </li>
                   <li>
-                    <button>المرحلة الإعدادية</button>
+                    <button onClick={() => setSelectedStage("المرحلة الإعدادية")}>المرحلة الإعدادية</button>
                   </li>
                   <li>
-                    <button>المرحلة الثانوية</button>
+                    <button onClick={() => setSelectedStage("المرحلة الثانوية")}>المرحلة الثانوية</button>
                   </li>
                 </ul>
               </div>
@@ -63,18 +201,18 @@ export default function CoursesPage() {
               <p className="mb-1 text-sm">اختر الصف الدراسي</p>
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  الصف الدراسي
+                  {selectedGrade || "الصف الدراسي"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                   <li>
-                    <button>الصف الأول</button>
+                    <button onClick={() => setSelectedGrade("الصف الأول")}>الصف الأول</button>
                   </li>
                   <li>
-                    <button>الصف الثاني</button>
+                    <button onClick={() => setSelectedGrade("الصف الثاني")}>الصف الثاني</button>
                   </li>
                   <li>
-                    <button>الصف الثالث</button>
+                    <button onClick={() => setSelectedGrade("الصف الثالث")}>الصف الثالث</button>
                   </li>
                 </ul>
               </div>
@@ -84,15 +222,15 @@ export default function CoursesPage() {
               <p className="mb-1 text-sm">اختر الترم الدراسي</p>
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  الترم الدراسي
+                  {selectedTerm || "الترم الدراسي"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                   <li>
-                    <button>الترم الأول</button>
+                    <button onClick={() => setSelectedTerm("الترم الأول")}>الترم الأول</button>
                   </li>
                   <li>
-                    <button>الترم الثاني</button>
+                    <button onClick={() => setSelectedTerm("الترم الثاني")}>الترم الثاني</button>
                   </li>
                 </ul>
               </div>
@@ -103,22 +241,15 @@ export default function CoursesPage() {
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
                   <Book className="h-4 w-4" />
-                  المادة الدراسية
+                  {selectedSubject || "المادة الدراسية"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button>الرياضيات</button>
-                  </li>
-                  <li>
-                    <button>العلوم</button>
-                  </li>
-                  <li>
-                    <button>اللغة العربية</button>
-                  </li>
-                  <li>
-                    <button>اللغة الإنجليزية</button>
-                  </li>
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
+                  {subjects.map((subject) => (
+                    <li key={subject._id}>
+                      <button onClick={() => setSelectedSubject(subject.name)}>{subject.name}</button>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -127,18 +258,18 @@ export default function CoursesPage() {
               <p className="mb-1 text-sm">اختر نوع الكورس</p>
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  نوع الكورس
+                  {selectedCourseType || "نوع الكورس"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                   <li>
-                    <button>شرح</button>
+                    <button onClick={() => setSelectedCourseType("شرح")}>شرح</button>
                   </li>
                   <li>
-                    <button>مراجعة</button>
+                    <button onClick={() => setSelectedCourseType("مراجعة")}>مراجعة</button>
                   </li>
                   <li>
-                    <button>تدريبات</button>
+                    <button onClick={() => setSelectedCourseType("تدريبات")}>تدريبات</button>
                   </li>
                 </ul>
               </div>
@@ -148,15 +279,15 @@ export default function CoursesPage() {
               <p className="mb-1 text-sm">اختر حالة الكورس</p>
               <div className="dropdown dropdown-bottom dropdown-end w-full">
                 <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  حالة الكورس
+                  {selectedCourseStatus || "حالة الكورس"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
                 <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
                   <li>
-                    <button>مجاني</button>
+                    <button onClick={() => setSelectedCourseStatus("مجاني")}>مجاني</button>
                   </li>
                   <li>
-                    <button>مدفوع</button>
+                    <button onClick={() => setSelectedCourseStatus("مدفوع")}>مدفوع</button>
                   </li>
                 </ul>
               </div>
@@ -164,7 +295,7 @@ export default function CoursesPage() {
           </div>
 
           <div className="flex justify-center mt-6">
-            <button className="btn btn-accent btn-md rounded-full px-8">
+            <button className="btn btn-accent btn-md rounded-full px-8" onClick={handleSearch}>
               <Search className="h-5 w-5 ml-2" />
               لعرض الكورسات
             </button>
@@ -175,20 +306,44 @@ export default function CoursesPage() {
         <div className="container mx-auto px-4 py-8">
           <h2 className="text-2xl font-bold text-center mb-8">اكتشف كورساتك المفضلة الآن!</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Course Cards */}
-            {[...Array(6)].map((_, index) => (
-              <CourseCard
-                key={index}
-                image={`/course-${index + 1}.png`}
-                teacherName={`أ/معلم ${index + 1}`}
-                subject="اللغة العربية"
-                level="الصف الأول"
-                duration={12}
-                rating={4.5}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <Loader className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : error ? (
+            <div className="alert alert-error max-w-md mx-auto">
+              <p>{error}</p>
+              <button className="btn btn-sm btn-outline" onClick={fetchSubjects}>
+                إعادة المحاولة
+              </button>
+            </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-lg">لا توجد كورسات متاحة حالياً</p>
+              {(selectedStage || selectedGrade || selectedTerm || selectedSubject || selectedCourseType || selectedCourseStatus) && (
+                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
+                  إعادة ضبط الفلاتر
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  id={course.id}
+                  image={course.image}
+                  teacherName={course.teacherName}
+                  subject={course.subject}
+                  subjectId={course.subjectId}
+                  level={course.level}
+                  duration={course.duration}
+                  rating={course.rating}
+                  fetchSubjectDetails={fetchSubjectDetails}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -196,11 +351,25 @@ export default function CoursesPage() {
 }
 
 // Course Card Component
-function CourseCard({ image, teacherName, subject, level, duration, rating }) {
+function CourseCard({ id, image, teacherName, subject, subjectId, level, duration, rating, fetchSubjectDetails }) {
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const handleViewDetails = async () => {
+    setIsLoading(true)
+    try {
+      // Pre-fetch subject details before navigating to the details page
+      await fetchSubjectDetails(subjectId)
+    } catch (error) {
+      console.error("Error pre-fetching subject details:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="card bg-base-100 shadow-lg overflow-hidden border border-base-200 hover:shadow-xl hover:scale-105 transition-all duration-300">
       <figure className="relative h-48">
-        <img src={image} alt={subject} className="w-full h-full object-cover" />
+        <img src={image || "/placeholder.svg"} alt={subject} className="w-full h-full object-cover" />
         <div className="absolute top-2 right-2 bg-base-100 p-1 rounded-md">
           <div className="flex gap-1">
             <div className="w-3 h-3 bg-primary"></div>
@@ -260,8 +429,16 @@ function CourseCard({ image, teacherName, subject, level, duration, rating }) {
               ))}
             </div>
           </div>
-          <Link to="/course-details" className="btn btn-sm btn-outline btn-accent">
-            عرض التفاصيل
+          <Link 
+            to={`/course-details/${subjectId}`} 
+            className="btn btn-sm btn-outline btn-accent"
+            onClick={handleViewDetails}
+          >
+            {isLoading ? (
+              <Loader className="h-4 w-4 animate-spin" />
+            ) : (
+              "عرض التفاصيل"
+            )}
           </Link>
         </div>
       </div>
