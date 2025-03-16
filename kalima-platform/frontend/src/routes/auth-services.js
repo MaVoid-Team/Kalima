@@ -5,7 +5,7 @@ const API_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/register`, userData);
+    const response = await axios.post(`${API_URL}/register`, userData);
     return {
       success: true,
       data: response.data
@@ -20,7 +20,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
     try {
-      const response = await axios.post(`${API_URL}/api/v1/auth`, credentials)
+      const response = await axios.post(`${API_URL}/auth`, credentials)
   
       // Store the token in localStorage for future API calls
       if (response.data.accessToken) {
