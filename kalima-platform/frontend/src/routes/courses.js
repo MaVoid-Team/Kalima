@@ -12,7 +12,7 @@ const getAuthHeader = () => {
 // Get all subjects/courses
 export const getAllSubjects = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/subjects/`, {
+    const response = await axios.get(`${API_URL}/subjects/`, {
       headers: getAuthHeader()
     });
     
@@ -31,7 +31,7 @@ export const getAllSubjects = async () => {
 // Get a specific subject by ID
 export const getSubjectById = async (subjectId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/subjects/${subjectId}`, {
+    const response = await axios.get(`${API_URL}/subjects/${subjectId}`, {
       headers: getAuthHeader()
     });
     
