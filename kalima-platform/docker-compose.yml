@@ -23,7 +23,7 @@ services:
       - "5033:5000"
     environment:
       - NODE_ENV=development
-      - DATABASE_URI={DATABASE_URI}
+      - DATABASE_URI=${DATABASE_URI}
       - PORT=${PORT}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} 
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}

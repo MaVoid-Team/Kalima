@@ -1,41 +1,47 @@
 const bcrypt = require("bcrypt");
-const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
+const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
 // @route POST /auth/
-const login = asyncHandler(async (req, res) => {
-  const { name, password } = req.body;
+const login = catchAsync(async (req, res, next) => {
+  const { email, phoneNumber, password } = req.body;
 
-  if (!name || !password) {
-    return res.status(400).json({ message: "All fields are required." });
+  // Assisning the roles that can only login with a phone number.
+  const phoneRequiredRoles = ["Teacher", "Parent", "Student"]
+
+  // For the different methods of login.
+  if (!((email && password) || (phoneNumber && password))) {
+    return next(new AppError("Please provide either email and password or phone number and password.", 400));
   }
 
-  const foundUser = await User.findOne({ name });
+  const foundUser = email ? await User.findOne({ email }) : await User.findOne({ phoneNumber })
 
   if (!foundUser) {
-    return res.status(400).json({
-      message: "Couldn't find a user with this name or password.",
-    });
+    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
+  }
+
+  if (phoneRequiredRoles.includes(foundUser.role) && !phoneNumber) {
+    return next(new AppError("This user is required to login with a phone number.", 400));
   }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
-    return res.status(400).json({
-      message: "Couldn't find a user with this name or password.",
-    });
+    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
   }
+
   const accessToken = jwt.sign(
     {
-      UserInfo: { name: foundUser.name, role: foundUser.role },
+      UserInfo: { id: foundUser._id, role: foundUser.role },
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "10s" }, // Time should be changed in production
   );
 
   const refreshToken = jwt.sign(
-    { name: foundUser.name },
+    { id: foundUser._id, },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "1000s" }, // Time should be changed in production
   );
@@ -51,33 +57,31 @@ const login = asyncHandler(async (req, res) => {
 });
 
 // @route GET /auth/refresh
-const refresh = (req, res) => {
+const refresh = catchAsync(async (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) {
-    return res.status(401).json({ message: "Unauthorized attempt." });
+    return next(new AppError("Unauthorized attempt.", 401));
   }
 
   const refreshToken = cookies.jwt;
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
-    asyncHandler(async (err, decoded) => {
+    catchAsync(async (err, decoded) => {
       if (err) {
-        return res.status(401).json({ message: "Forbidden" });
+        return next(new AppError("Forbidden", 401));
       }
 
-      const foundUser = await User.findOne({ name: decoded.user });
+      const foundUser = await User.findOne({ _id: decoded.id });
 
       if (!foundUser) {
-        return res.status(400).json({
-          message: "Couldn't find a user with this username or password.",
-        });
+        return next(new AppError("Couldn't find a user with this username or password.", 400));
       }
 
       const accessToken = jwt.sign(
         {
           UserInfo: {
-            name: foundUser.name,
+            id: foundUser._id,
             role: foundUser.role,
           },
         },
@@ -88,17 +92,30 @@ const refresh = (req, res) => {
       res.json({ accessToken });
     }),
   );
-};
+});
 
 // @route POST /auth/logout
 // To clear cookie incase one exists.
-const logout = (req, res) => {
+const logout = (req, res, next) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) {
-    return res.status(401).json({ message: "Unauthorized attempt." });
+    return next(new AppError("Unauthorized attempt.", 401));
   }
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
   res.json({ message: "Cookies cleared." });
 };
 
-module.exports = { login, refresh, logout };
+const verifyRoles = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!req?.role) {
+      return next(new AppError("Unauthorized", 401));
+    }
+    const rolesArray = [...allowedRoles];
+    if (!rolesArray.includes(req.role)) {
+      return next(new AppError("Forbidden", 403));
+    }
+    next();
+  };
+};
+
+module.exports = { login, refresh, logout, verifyRoles };
