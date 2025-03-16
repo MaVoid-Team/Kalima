@@ -2,34 +2,34 @@ const express = require("express");
 const containerController = require("../controllers/containerController");
 const authController = require("../controllers/authController.js");
 const router = express.Router();
+const verifyJWT = require("../middleware/verifyJWT");
 // Get accessible child containers for a student by container ID.
+router.use(verifyJWT);
+
 router.get(
   "/student/:studentId/container/:containerId/purchase/:purchaseId",
   containerController.getAccessibleChildContainers
 );
-
 router
   .route("/")
-  .get(
-    authController.verifyRoles(
-      "Admin",
-      "Sub-Admin",
-      "Mods",
-      "Lecturers",
-      "assistant",
-      "Student",
-      "Parent"
-    ),
+  .get(authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Lecturer",
+    "Assistant",
+    "Student",
+    "Parent"),
     containerController.getAllContainers
   )
   .post(
-    authController.verifyRoles("Admin", "Sub-Admin", "Mods", "Lecturers"),
+    authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
     containerController.createContainer
   );
 
 router.patch(
   "/update-child",
-  authController.verifyRoles("Admin", "Sub-Admin", "Mods", "Lecturers"),
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturers"),
   containerController.UpdateChildOfContainer
 );
 // Get container details by its ID.
@@ -39,9 +39,9 @@ router
     authController.verifyRoles(
       "Admin",
       "Sub-Admin",
-      "Mods",
-      "Lecturers",
-      "assistant",
+      "Moderator",
+      "Lecturer",
+      "Assistant",
       "Student",
       "Parent"
     ),
@@ -51,9 +51,9 @@ router
     authController.verifyRoles(
       "Admin",
       "Sub-Admin",
-      "Mods",
-      "Lecturers",
-      "assistant"
+      "Moderator",
+      "Lecturer",
+      "Assistant"
     ),
     containerController.updateContainer
   )
@@ -61,9 +61,8 @@ router
     authController.verifyRoles(
       "Admin",
       "Sub-Admin",
-      "Mods",
-      "Lecturers",
-      "assistant"
+      "Moderator",
+      "Lecturer",
     ),
     containerController.deleteContainerAndChildren
   );
