@@ -244,13 +244,13 @@ export default function CoursesPage() {
                   {selectedSubject || "المادة الدراسية"}
                   <ChevronDown className="h-4 w-4" />
                 </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
+                {/* <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
                   {subjects.map((subject) => (
                     <li key={subject._id}>
                       <button onClick={() => setSelectedSubject(subject.name)}>{subject.name}</button>
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
 
