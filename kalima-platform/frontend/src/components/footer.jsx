@@ -34,8 +34,8 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4">الروابط</h3>
             <ul className="space-y-2">
               <li><Link to='/'>الرئيسية</Link></li>
-              <li><Link to='#'>الكورسات</Link></li>
-              <li><Link to='/'>المعلمين</Link></li>
+              <li><Link to='/courses'>الكورسات</Link></li>
+              <li><Link to='/teachers'>المعلمين</Link></li>
               <li><Link to='/'>الخدمات</Link></li>
               <li><Link to='/'>الملفات</Link></li>
             </ul>

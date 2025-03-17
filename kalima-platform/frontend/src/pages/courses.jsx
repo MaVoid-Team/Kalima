@@ -1,41 +1,17 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { Search, Book, ChevronDown, Star, Loader } from "lucide-react";
-import { Link } from "react-router-dom";
-import { getAllSubjects, getSubjectById } from "../routes/courses";
-import { FilterDropdown } from "../../src/components/FilterDropdown";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { ErrorAlert } from "../components/ErrorAlert";
-import { CourseCard } from "../components/CourseCard";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { Search } from "lucide-react"
+import { Link } from "react-router-dom"
+import { getAllSubjects } from "../routes/courses"
+import { FilterDropdown } from "../../src/components/FilterDropdown"
+import { LoadingSpinner } from "../components/LoadingSpinner"
+import { ErrorAlert } from "../components/ErrorAlert"
+import { CourseCard } from "../components/CourseCard"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Fake data for courses
 const fakeCourses = [
-  {
-    id: 1,
-    image: "/course-1.png",
-    title: "كيمياء عامة",
-    subject: "كيمياء",
-    teacher: "أستاذ محمد",
-    grade: "الصف الثالث الثانوي",
-    rating: 5,
-    stage: "المرحلة الثانوية",
-    type: "شرح",
-    status: "مجاني",
-  },
-  {
-    id: 2,
-    image: "/course-2.png",
-    title: "أحب أن أتعلم",
-    subject: "لغة إنجليزية",
-    teacher: "أستاذ أحمد",
-    grade: "الصف الثاني الثانوي",
-    rating: 5,
-    stage: "المرحلة الثانوية",
-    type: "مراجعة",
-    status: "مدفوع",
-  },
   {
     id: 3,
     image: "/course-3.png",
@@ -48,112 +24,129 @@ const fakeCourses = [
     type: "تدريبات",
     status: "مجاني",
   },
-];
+]
 
 export default function CoursesPage() {
-  const [subjects, setSubjects] = useState([]);
-  const [filteredCourses, setFilteredCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [subjects, setSubjects] = useState([])
+  const [filteredCourses, setFilteredCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   // Filter states
-  const [selectedStage, setSelectedStage] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedCourseType, setSelectedCourseType] = useState("");
-  const [selectedCourseStatus, setSelectedCourseStatus] = useState("");
+  const [selectedStage, setSelectedStage] = useState("")
+  const [selectedGrade, setSelectedGrade] = useState("")
+  const [selectedTerm, setSelectedTerm] = useState("")
+  const [selectedSubject, setSelectedSubject] = useState("")
+  const [selectedCourseType, setSelectedCourseType] = useState("")
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
 
   useEffect(() => {
-    fetchSubjects();
-  }, []);
+    fetchSubjects()
+  }, [])
 
   // Fetch subjects from the API
   const fetchSubjects = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const result = await getAllSubjects();
+      const result = await getAllSubjects()
 
-      if (result.success && result.data.length > 0) {
-        setSubjects(result.data);
-        setFilteredCourses(generateCourseData(result.data));
+      if (result.success && result.data?.data?.subjects?.length > 0) {
+        const subjectsData = result.data.data.subjects
+        setSubjects(subjectsData)
+        setFilteredCourses(generateCourseData(subjectsData))
       } else {
         // If no data is fetched, use fake data
-        setFilteredCourses(fakeCourses);
+        setFilteredCourses(fakeCourses)
       }
     } catch (err) {
-      console.error("Error fetching subjects:", err);
-      setError("حدث خطأ أثناء تحميل البيانات");
+      console.error("Error fetching subjects:", err)
+      setError("حدث خطأ أثناء تحميل البيانات")
       // If there's an error, use fake data
-      setFilteredCourses(fakeCourses);
+      setFilteredCourses(fakeCourses)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Generate course data based on subjects from API
   const generateCourseData = (subjectsData) => {
-    if (!subjectsData || subjectsData.length === 0) return fakeCourses;
+    if (!subjectsData || subjectsData.length === 0) return fakeCourses
 
-    return subjectsData.map((subject, index) => ({
-      id: subject._id,
-      image: `/course-${(index % 6) + 1}.png`,
-      title: subject.name,
-      subject: subject.name,
-      teacher: `أستاذ ${subject.name}`,
-      grade: "الصف الأول",
-      rating: 4 + (index % 2) * 0.5,
-      stage: index % 3 === 0 ? "المرحلة الابتدائية" : index % 3 === 1 ? "المرحلة الإعدادية" : "المرحلة الثانوية",
-      type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
-      status: index % 2 === 0 ? "مجاني" : "مدفوع",
-    }));
-  };
+    return subjectsData.map((subject, index) => {
+      // Determine stage based on subject's level array if available
+      let stage = "المرحلة الثانوية" // Default
+      if (subject.level && subject.level.length > 0) {
+        const levelName = subject.level[0].name
+        if (levelName === "Primary" || levelName === "Upper Primary") {
+          stage = "المرحلة الابتدائية"
+        } else if (levelName === "Middle") {
+          stage = "المرحلة الإعدادية"
+        }
+      } else {
+        // Fallback to the original logic if level is not available
+        stage = index % 3 === 0 ? "المرحلة الابتدائية" : index % 3 === 1 ? "المرحلة الإعدادية" : "المرحلة الثانوية"
+      }
+
+      return {
+        id: subject._id,
+        image: `/course-${(index % 6) + 1}.png`,
+        title: subject.name,
+        subject: subject.name,
+        teacher: `أستاذ ${subject.name}`,
+        grade: "الصف الأول",
+        rating: 4 + (index % 2) * 0.5,
+        stage: stage,
+        type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
+        status: index % 2 === 0 ? "مجاني" : "مدفوع",
+      }
+    })
+  }
 
   // Apply filters to courses
   const applyFilters = useCallback(() => {
-    let filtered = subjects.length > 0 ? generateCourseData(subjects) : fakeCourses;
+    let filtered = subjects.length > 0 ? generateCourseData(subjects) : fakeCourses
 
     if (selectedStage) {
-      filtered = filtered.filter((course) => course.stage === selectedStage);
+      filtered = filtered.filter((course) => course.stage === selectedStage)
     }
 
     if (selectedGrade) {
-      filtered = filtered.filter((course) => course.grade === selectedGrade);
+      filtered = filtered.filter((course) => course.grade === selectedGrade)
     }
 
     if (selectedTerm) {
       // Mock filter for term (not implemented in data)
-      filtered = filtered.filter((course) => course.term === selectedTerm || !course.term);
+      filtered = filtered.filter((course) => course.term === selectedTerm || !course.term)
     }
 
     if (selectedSubject) {
-      filtered = filtered.filter((course) => course.subject === selectedSubject);
+      filtered = filtered.filter((course) => course.subject === selectedSubject)
     }
 
     if (selectedCourseType) {
-      filtered = filtered.filter((course) => course.type === selectedCourseType);
+      filtered = filtered.filter((course) => course.type === selectedCourseType)
     }
 
     if (selectedCourseStatus) {
-      filtered = filtered.filter((course) => course.status === selectedCourseStatus);
+      filtered = filtered.filter((course) => course.status === selectedCourseStatus)
     }
 
-    setFilteredCourses(filtered);
-  }, [selectedStage, selectedGrade, selectedTerm, selectedSubject, selectedCourseType, selectedCourseStatus, subjects]);
+    setFilteredCourses(filtered)
+  }, [selectedStage, selectedGrade, selectedTerm, selectedSubject, selectedCourseType, selectedCourseStatus, subjects])
 
   // Reset all filters
   const resetFilters = useCallback(() => {
-    setSelectedStage("");
-    setSelectedGrade("");
-    setSelectedTerm("");
-    setSelectedSubject("");
-    setSelectedCourseType("");
-    setSelectedCourseStatus("");
-    setFilteredCourses(subjects.length > 0 ? generateCourseData(subjects) : fakeCourses);
-  }, [subjects]);
+    setSelectedStage("")
+    setSelectedGrade("")
+    setSelectedTerm("")
+    setSelectedSubject("")
+    setSelectedCourseType("")
+    setSelectedCourseStatus("")
+    setFilteredCourses(subjects.length > 0 ? generateCourseData(subjects) : fakeCourses)
+  }, [subjects])
 
   // Memoize filtered courses to avoid recalculating on every render
-  const memoizedFilteredCourses = useMemo(() => filteredCourses, [filteredCourses]);
+  const memoizedFilteredCourses = useMemo(() => filteredCourses, [filteredCourses])
 
   const filterOptions = [
     {
@@ -204,7 +197,7 @@ export default function CoursesPage() {
       ],
       onSelect: setSelectedCourseStatus,
     },
-  ];
+  ]
 
   return (
     <div className="relative min-h-screen w-full">
@@ -232,8 +225,8 @@ export default function CoursesPage() {
 
         {/* Search and Filters Section */}
         <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between mb-4">
-            <button className="btn btn-outline btn-sm rounded-md" onClick={resetFilters}>
+          <div className="flex justify-end mb-4">
+            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               إعادة ضبط الفلاتر
             </button>
             <div className="flex items-center gap-2">
@@ -273,7 +266,12 @@ export default function CoursesPage() {
           ) : memoizedFilteredCourses.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-lg">لا توجد كورسات متاحة حالياً</p>
-              {(selectedStage || selectedGrade || selectedTerm || selectedSubject || selectedCourseType || selectedCourseStatus) && (
+              {(selectedStage ||
+                selectedGrade ||
+                selectedTerm ||
+                selectedSubject ||
+                selectedCourseType ||
+                selectedCourseStatus) && (
                 <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
                   إعادة ضبط الفلاتر
                 </button>
@@ -290,15 +288,17 @@ export default function CoursesPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <CourseCard
-                      id={course.id}
-                      image={course.image}
-                      title={course.title}
-                      subject={course.subject}
-                      teacher={course.teacher}
-                      grade={course.grade}
-                      rating={course.rating}
-                    />
+                    <Link href={`/courses/${course.id}`} passHref>
+                      <CourseCard
+                        id={course.id}
+                        image={course.image}
+                        title={course.title}
+                        subject={course.subject}
+                        teacher={course.teacher}
+                        grade={course.grade}
+                        rating={course.rating}
+                      />
+                    </Link>
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -307,5 +307,6 @@ export default function CoursesPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
+
