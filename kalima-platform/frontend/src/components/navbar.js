@@ -42,7 +42,7 @@ const NavBar = () => {
   ];
 
   const authItems = [
-    { key: 'signup', path: '/signup' },
+    { key: 'signup', path: '/register' },
     { key: 'signin', path: '/login' },
   ];
 
