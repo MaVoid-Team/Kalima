@@ -1,4 +1,5 @@
-import { Clock, FileText, Users, Award } from "lucide-react"
+import { Clock, FileText, Users, Award } from "lucide-react";
+import ServiceCard from "../../components/ServiceCard";
 
 export function ServicesSection() {
   const services = [
@@ -28,7 +29,7 @@ export function ServicesSection() {
       description:
         "نقدم كورسات تعليمية متكاملة تغطي جميع أجزاء المنهج مع شرح مفصل للمفاهيم الأساسية والتطبيقات العملية",
     },
-  ]
+  ];
 
   return (
     <section className="md:p-8">
@@ -52,25 +53,6 @@ export function ServicesSection() {
         </div>
       </div>
     </section>
-  )
-}
-
-function ServiceCard({ icon: Icon, title, subtitle, description }) {
-  return (
-    <div className="text-center hover:scale-105 hover:shadow-xl shadow-lg duration-500">
-      <div className="flex justify-center mb-4">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center bg-base-200">
-          <Icon className="h-8 w-8 text-primary hover:animate-spin" />
-        </div>
-      </div>
-      <h4 className="font-bold mb-2 text-lg">{title}</h4>
-      <br></br>
-      <h5 className="text-primary font-medium mb-2 text-lg">{subtitle}</h5>
-      <br></br>
-      <p className="text-lg text-base-content/70">{description}</p>
-      <br></br>
-      <div className="border-b-4 border-primary"></div>
-    </div>
-  )
+  );
 }
 
