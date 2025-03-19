@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, Clock, ChevronLeft, Star, Loader } from "lucide-react";
+import { FileText, Clock, ChevronLeft, Star, Loader } from 'lucide-react';
 import { getAllUsers } from "../../routes/fetch-users";
 
 export function TeachersSection() {
