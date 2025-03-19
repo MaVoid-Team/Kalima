@@ -12,6 +12,7 @@ const Login = lazy(() => import("./pages/Login/login"));
 const Register = lazy(() => import("./pages/register"));
 const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
+const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"));
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<RegisterStudent />} />
           <Route path="/login" element={<Login />} />
           <Route path="/landing" element={<CivilcoLanding />} />
           <Route path="/courses" element={<CoursesPage />} />

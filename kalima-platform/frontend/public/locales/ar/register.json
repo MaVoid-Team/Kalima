@@ -1,0 +1,62 @@
+{
+    "studentRegister": "تسجيل الطالب",
+    "steps": {
+      "step1": "المعلومات الأساسية",
+      "step2": "معلومات الاتصال",
+      "step3": "التفاصيل التعليمية",
+      "step4": "الهوايات",
+      "step5": "المراجعة"
+    },
+    "form": {
+      "studentId": "رقم الطالب",
+      "fullName": "الاسم الكامل",
+      "studentGender": "جنس الطالب",
+      "parentGender": "جنس الوالد",
+      "imParent": "أنا الوالد",
+      "studentPhone": "هاتف الطالب",
+      "parentPhone": "هاتف الوالد",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان",
+      "selectGender": "اختر الجنس",
+      "schoolName": "اسم المدرسة",
+      "schoolType": "نوع المدرسة",
+      "selectSchoolType": "اختر نوع المدرسة",
+      "grade": "الصف",
+      "selectGrade": "اختر الصف",
+      "variant": "الشعبة",
+      "selectVariant": "اختر الشعبة",
+      "selectHobbies": "اختر الهوايات",
+      "uploadAvatar": "رفع صورة شخصية",
+      "hobbies": "الهوايات",
+      "personalDetails": "البيانات الشخصية",
+      "parentDetails": "بيانات الوالدين",
+      "schoolDetails" : "تفاصيل المدرسة والدراسة"
+    },
+    "gender": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "schoolType": {
+      "arabic": "عربي",
+      "english": "انجليزي"
+    },
+    "hobbies": {
+      "reading": "قراءة",
+      "sports": "رياضة",
+      "music": "موسيقى",
+      "cooking": "طبخ",
+      "gaming": " ألعاب",
+      "art" : "فن",
+      "technology": "تكنولوجيا",
+      "dancing": "رقص",
+      "photography": "تصوير"
+    },
+    "review": {
+      "title": "مراجعة المعلومات"
+    },
+    "buttons": {
+      "previous": "السابق",
+      "next": "التالي",
+      "submit": "إرسال"
+    }
+  }
