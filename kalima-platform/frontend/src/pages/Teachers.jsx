@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, Loader } from "lucide-react";
+import { ChevronLeft, Loader } from 'lucide-react';
 import { getAllUsers } from "../routes/fetch-users";
 import { motion, AnimatePresence } from "framer-motion";
 import TeacherCard from "../components/TeacherCard";

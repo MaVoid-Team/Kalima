@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import { useState, useMemo, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../routes/auth-services";
-import { motion } from "framer-motion";
+import { useState, useMemo, useCallback } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { registerUser } from "../routes/auth-services"
+import { motion } from "framer-motion"
 
 function Register() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("parent");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState("parent")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   // Common fields for all roles
   const [formData, setFormData] = useState({
@@ -18,13 +18,13 @@ function Register() {
     password: "",
     confirmPassword: "",
     gender: "male", // Default value
-  });
+  })
 
   // Role-specific fields
   const [teacherData, setTeacherData] = useState({
     bio: "",
     expertise: "",
-  });
+  })
 
   const [studentData, setStudentData] = useState({
     sequencedId: "",
@@ -33,66 +33,80 @@ function Register() {
     parentPhoneNumber: "",
     phoneNumber: "",
     faction: "Alpha", // Default value
-  });
+  })
 
   const [parentData, setParentData] = useState({
     phoneNumber: "",
-  });
+    level: "Grade 4", // Default value
+    children: [],
+    views: 0,
+  })
 
   const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
-    }));
-  }, []);
+    }))
+  }, [])
 
   const handleRoleSpecificChange = useCallback(
     (e) => {
-      const { name, value } = e.target;
+      const { name, value } = e.target
 
       if (activeTab === "teacher") {
         setTeacherData((prev) => ({
           ...prev,
           [name]: value,
-        }));
+        }))
       } else if (activeTab === "student") {
         if (name === "hobbies") {
-          const hobbiesArray = value.split(",").map((hobby) => hobby.trim());
+          const hobbiesArray = value.split(",").map((hobby) => hobby.trim())
           setStudentData((prev) => ({
             ...prev,
             hobbies: hobbiesArray,
-          }));
+          }))
         } else {
           setStudentData((prev) => ({
             ...prev,
             [name]: value,
-          }));
+          }))
         }
       } else if (activeTab === "parent") {
-        setParentData((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
+        if (name === "children") {
+          const childrenArray = value
+            .split(",")
+            .map((id) => id.trim())
+            .filter((id) => id)
+          setParentData((prev) => ({
+            ...prev,
+            children: childrenArray,
+          }))
+        } else {
+          setParentData((prev) => ({
+            ...prev,
+            [name]: value,
+          }))
+        }
       }
     },
-    [activeTab]
-  );
+    [activeTab],
+  )
 
   const validateForm = useCallback(() => {
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return false;
+      setError("Passwords do not match")
+      return false
     }
 
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return false;
+      setError("Password must be at least 6 characters")
+      return false
     }
 
-    setError("");
-    return true;
-  }, [formData.password, formData.confirmPassword]);
+    setError("")
+    return true
+  }, [formData.password, formData.confirmPassword])
 
   const prepareRequestData = useCallback(() => {
     const requestData = {
@@ -101,14 +115,14 @@ function Register() {
       email: formData.email,
       password: formData.password,
       gender: formData.gender,
-    };
+    }
 
     if (activeTab === "teacher") {
       return {
         ...requestData,
         bio: teacherData.bio,
         expertise: teacherData.expertise,
-      };
+      }
     } else if (activeTab === "student") {
       return {
         ...requestData,
@@ -118,43 +132,46 @@ function Register() {
         parentPhoneNumber: studentData.parentPhoneNumber,
         phoneNumber: studentData.phoneNumber,
         faction: studentData.faction,
-      };
+      }
     } else if (activeTab === "parent") {
       return {
         ...requestData,
         phoneNumber: parentData.phoneNumber,
-      };
+        level: parentData.level,
+        children: parentData.children,
+        views: 0, // Default value for new accounts
+      }
     }
-  }, [activeTab, formData, teacherData, studentData, parentData]);
+  }, [activeTab, formData, teacherData, studentData, parentData])
 
   const handleSubmit = useCallback(
     async (e) => {
-      e.preventDefault();
+      e.preventDefault()
 
       if (!validateForm()) {
-        return;
+        return
       }
 
-      setLoading(true);
+      setLoading(true)
 
       try {
-        const requestData = prepareRequestData();
-        const result = await registerUser(requestData);
+        const requestData = prepareRequestData()
+        const result = await registerUser(requestData)
 
         if (result.success) {
-          navigate("/login");
+          navigate("/login")
         } else {
-          setError(result.error);
+          setError(result.error)
         }
       } catch (err) {
-        setError("An unexpected error occurred. Please try again.");
-        console.error("Registration error:", err);
+        setError("An unexpected error occurred. Please try again.")
+        console.error("Registration error:", err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     },
-    [validateForm, prepareRequestData, navigate]
-  );
+    [validateForm, prepareRequestData, navigate],
+  )
 
   const renderTeacherFields = useMemo(
     () => (
@@ -188,8 +205,8 @@ function Register() {
         </div>
       </>
     ),
-    [teacherData, handleRoleSpecificChange]
-  );
+    [teacherData, handleRoleSpecificChange],
+  )
 
   const renderStudentFields = useMemo(
     () => (
@@ -237,9 +254,7 @@ function Register() {
         </div>
         <div className="form-control">
           <label className="label">
-            <span className="label-text text-card-foreground">
-              Your Phone Number
-            </span>
+            <span className="label-text text-card-foreground">Your Phone Number</span>
           </label>
           <input
             type="text"
@@ -253,9 +268,7 @@ function Register() {
         </div>
         <div className="form-control">
           <label className="label">
-            <span className="label-text text-card-foreground">
-              Parent's Phone Number
-            </span>
+            <span className="label-text text-card-foreground">Parent's Phone Number</span>
           </label>
           <input
             type="text"
@@ -285,17 +298,15 @@ function Register() {
         </div>
       </>
     ),
-    [studentData, handleRoleSpecificChange]
-  );
+    [studentData, handleRoleSpecificChange],
+  )
 
   const renderParentFields = useMemo(
     () => (
       <>
         <div className="form-control">
           <label className="label">
-            <span className="label-text text-card-foreground">
-              Phone Number
-            </span>
+            <span className="label-text text-card-foreground">Phone Number</span>
           </label>
           <input
             type="text"
@@ -307,10 +318,54 @@ function Register() {
             required
           />
         </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-card-foreground">Grade Level</span>
+          </label>
+          <select
+            name="level"
+            className="select select-bordered text-foreground"
+            value={parentData.level}
+            onChange={handleRoleSpecificChange}
+            required
+          >
+            <option value="Grade 4">Grade 4</option>
+            <option value="Grade 5">Grade 5</option>
+            <option value="grade 6">Grade 6</option>
+            <option value="First Preparatory">First Preparatory</option>
+            <option value="Second Preparatory">Second Preparatory</option>
+            <option value="Third Preparatory">Third Preparatory</option>
+            <option value="First Secondary">First Secondary</option>
+            <option value="Second Secondary">Second Secondary</option>
+            <option value="Third Secondary">Third Secondary</option>
+          </select>
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-card-foreground">Children IDs (comma separated)</span>
+          </label>
+          <input
+            type="text"
+            name="children"
+            placeholder="e.g. 123, 456, 789"
+            className="input input-bordered text-foreground"
+            value={parentData.children.join(", ")}
+            onChange={(e) => {
+              const childrenArray = e.target.value
+                .split(",")
+                .map((id) => id.trim())
+                .filter((id) => id)
+              setParentData((prev) => ({
+                ...prev,
+                children: childrenArray,
+              }))
+            }}
+          />
+        </div>
       </>
     ),
-    [parentData, handleRoleSpecificChange]
-  );
+    [parentData, handleRoleSpecificChange],
+  )
 
   const renderCommonFields = useMemo(
     () => (
@@ -359,9 +414,7 @@ function Register() {
         </div>
         <div className="form-control">
           <label className="label">
-            <span className="label-text text-card-foreground">
-              Confirm Password
-            </span>
+            <span className="label-text text-card-foreground">Confirm Password</span>
           </label>
           <input
             type="password"
@@ -390,8 +443,8 @@ function Register() {
         </div>
       </>
     ),
-    [formData, handleInputChange]
-  );
+    [formData, handleInputChange],
+  )
 
   const renderForm = useMemo(
     () => (
@@ -421,11 +474,7 @@ function Register() {
             }`}
             disabled={loading}
           >
-            {loading
-              ? "Registering..."
-              : `Register as ${
-                  activeTab.charAt(0).toUpperCase() + activeTab.slice(1)
-                }`}
+            {loading ? "Registering..." : `Register as ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}
           </button>
         </div>
       </motion.form>
@@ -439,8 +488,8 @@ function Register() {
       error,
       loading,
       handleSubmit,
-    ]
-  );
+    ],
+  )
 
   return (
     <motion.div
@@ -451,29 +500,21 @@ function Register() {
     >
       <div className="text-center mb-8">
         <h1 className="text-5xl font-bold text-primary">Register now!</h1>
-        <p className="py-6 text-foreground">
-          Join our community and start your journey with us.
-        </p>
+        <p className="py-6 text-foreground">Join our community and start your journey with us.</p>
       </div>
 
       <div className="card flex-shrink-0 w-full max-w-md shadow-2xl bg-background">
         <div className="card-body">
           <div className="tabs tabs-boxed mb-4">
             <Link
-              className={`tab ${
-                activeTab === "parent"
-                  ? "bg-primary duration-500 transition-all"
-                  : "text-foreground"
-              }`}
+              className={`tab ${activeTab === "parent" ? "bg-primary duration-500 transition-all" : "text-foreground"}`}
               onClick={() => setActiveTab("parent")}
             >
               Parent
             </Link>
             <Link
               className={`tab ${
-                activeTab === "student"
-                  ? "bg-primary duration-500 transition-all"
-                  : "text-foreground"
+                activeTab === "student" ? "bg-primary duration-500 transition-all" : "text-foreground"
               }`}
               onClick={() => setActiveTab("student")}
             >
@@ -481,9 +522,7 @@ function Register() {
             </Link>
             <Link
               className={`tab ${
-                activeTab === "teacher"
-                  ? "bg-primary duration-500 transition-all"
-                  : "text-foreground"
+                activeTab === "teacher" ? "bg-primary duration-500 transition-all" : "text-foreground"
               }`}
               onClick={() => setActiveTab("teacher")}
             >
@@ -501,7 +540,8 @@ function Register() {
         </div>
       </div>
     </motion.div>
-  );
+  )
 }
 
 export default Register;
+
