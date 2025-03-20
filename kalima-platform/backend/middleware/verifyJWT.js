@@ -19,7 +19,7 @@ const verifyJWT = (req, res, next) => {
       id = decoded.UserInfo.id;
       const user = await User.findById(id).select('-password').lean()
       if (!user) return res.status(401).json({ message: "Forbidden" });
-      req.body = user;
+      req.user = user;
 
       next();
     })

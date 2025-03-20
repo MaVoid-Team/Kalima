@@ -9,7 +9,7 @@ const catchAsync = require("../utils/catchAsync");
 
 // @route POST /register/
 const registerNewUser = catchAsync(async (req, res, next) => {
-  const { role, name, email, phoneNumber, password, ...userData } = req.body;
+  const { role, name, email, phoneNumber, confirmPassword, password, ...userData } = req.body;
 
   const phoneRequiredRoles = ["teacher", "parent", "student"]
 
@@ -27,6 +27,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(new AppError("This phone number is already associated with a user.", 400));
 
   }
+
 
   const hashedPwd = await bcrypt.hash(password, 12);
 
