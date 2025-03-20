@@ -47,7 +47,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   let user;
 
-  switch (role) {
+  switch (role.toLowerCase()) {
     case "teacher":
       user = await Teacher.create(newUser);
       break;
