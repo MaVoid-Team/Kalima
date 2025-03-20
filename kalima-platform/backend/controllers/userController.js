@@ -6,6 +6,7 @@ const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const mongoose = require('mongoose')
 const bcrypt = require("bcrypt");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
@@ -34,7 +35,7 @@ const getUser = catchAsync(async (req, res, next) => {
 const createUser = registerController.registerNewUser;
 
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password } = req.body
+  const { name, email, address, password, children } = req.body
   const userId = req.params.userId
 
   if (password) {
@@ -45,7 +46,32 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
-  const updatedUser = { name, email, address, ...req.body }
+
+  const childrenById = []
+  if (!!children) {
+    for (let id of children) {
+      // Check if the id is a valid MongoDB ObjectId
+      const isMongoId = mongoose.Types.ObjectId.isValid(id);
+      if (isMongoId) {
+        childrenById.push(id);
+      } else {
+        try {
+          const student = await Student.findOne({ sequencedId: id }).lean();
+          if (student) {
+            childrenById.push(student._id);
+          }
+        }
+        catch (error) {
+          if (error.name === 'CastError') {
+            return next(new AppError("Not all children values are valid UserId or SequenceId.", 400));
+          }
+        }
+      }
+    }
+    req.body.children = childrenById
+  }
+
+  const updatedUser = { name, email, address, children: childrenById, ...req.body }
   let user
 
   switch (foundUser.role.toLowerCase()) {
