@@ -3,7 +3,7 @@ const User = require('./userModel');
 
 const studentSchema = new mongoose.Schema({
   sequencedId: { type: Number, unique: true, required: true },
-  level: { type: String, enum: User.levels, required: true },
+  level: { type: String, enum: User.levels, required: true, lowercase: true },
   hobbies: [String],
   parentPhoneNumber: String,
   faction: String,

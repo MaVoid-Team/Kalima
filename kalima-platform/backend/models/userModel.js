@@ -8,7 +8,7 @@ const addressSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    gender: { type: String, enum: ["male", "female"], required: true },
+    gender: { type: String, enum: ["male", "female"], required: true, lowercase: true },
     email: { type: String, unique: true, required: true },
     address: addressSchema,
     referralSource: String,
@@ -25,7 +25,7 @@ const User = mongoose.model("User", userSchema);
 
 // For setting up available grades.
 
-User.levels = ["Grade 4", "Grade 5", "grade 6", "First Preparatory", "Second Preparatory", "Third Preparatory", "First Secondary",
-  "Second Secondary", "Third Secondary"]
+User.levels = ["grade 4", "grade 5", "grade 6", "first preparatory", "second preparatory", "third preparatory", "first secondary",
+  "second secondary", "third secondary"]
 
 module.exports = User;
