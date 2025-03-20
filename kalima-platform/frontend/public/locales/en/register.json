@@ -1,16 +1,23 @@
 {
     "studentRegister": "Student Register",
+      "parentRegister": "Parent Register",
+      "lecturerRegister" : "Lecturer Register",
     "steps": {
-      "step1": "Basic Info",
-      "step2": "Contact Info",
-      "step3": "Education",
-      "step4": "Hobbies",
-      "step5": "Review"
+      "personalInfo": "Personal Information",
+      "parentInfo": "Parent Information",
+      "hobbies": "Hobbies",
+      "review": "Review",
+      "childrenInfo": "Children Information",
+      "professionalInfo": "Professional Information"
     },
     "form": {
+   
       "studentId": "Student ID",
       "fullName": "Full Name",
-      "studentGender": "Student Gender",
+      "role": "Role",
+      "bio": "Bio",
+      "expertise": "Experties",
+      "gender": "Gender",
       "parentGender": "Parent Gender",
       "imParent": "I'm the parent",
       "studentPhone": "Student Phone",
@@ -30,7 +37,10 @@
       "hobbies": "Hobbies",
       "personalDetails": "Personal Details",
       "parentDetails": "Parent Details",
-      "schoolDetails" : "School Details & Study"
+      "schoolDetails" : "School Details & Study",
+      "password": "Password",
+      "childrenDetails": "Children Details",
+      "childId": "Child ID"
     },
     "gender": {
       "male": "Male",
@@ -58,5 +68,36 @@
       "previous": "Previous",
       "next": "Next",
       "submit": "Submit"
-    }
+    },
+    "roles" : { 
+      "student": "Student",
+      "parent": "Parent",
+      "lecturer" : "Lecturer"
+     },
+     "gradeLevels": {
+      "grade 4": "Grade 4",
+      "grade 5": "Grade 5",
+      "grade 6": "Grade 6",
+      "first preparatory": "First Preparatory",
+      "second preparatory": "Second Preparatory",
+      "third preparatory": "Third Preparatory", 
+      "first secondary": "First Secondary",
+      "second secondary": "Second Secondary", 
+      "third secondary": "Third Secondary"
+     },
+     "roleSelection": {
+      "title": "Choose your role",
+      "description": "Select the role that best describes you",
+      "studentDesc": "Access learning materials and track your progress",
+      "parentDesc": "Monitor your children's academic journey",
+      "lecturerDesc": "Create courses and manage your students"
+  },
+  "validation": {
+    "required": "This field is required",
+    "passwordRequirements": "Minimum 8 characters with at least 1 letter and 1 number",
+    "phoneFormat": "Invalid phone number format",
+    "emailFormat": "Invalid email format",
+    "hobbies": "Select at least 2 hobbies",
+    "bioMinimum": "Bio must be at least 50 characters"
   }
+}

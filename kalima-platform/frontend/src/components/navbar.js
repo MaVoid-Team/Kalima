@@ -107,7 +107,7 @@ const NavBar = () => {
             <Link
               key={item.key}
               to={item.path}
-              className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
+              className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'}  rounded-2xl`}
             >
               {t(item.key)}
             </Link>

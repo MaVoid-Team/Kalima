@@ -1,19 +1,24 @@
 {
-    "studentRegister": "تسجيل الطالب",
+  "studentRegister": "  تسجيل الطالب", 
+  "parentRegister": "تسجيل الوالد",
+  "lecturerRegister" : "تسجيل المحاضر",
     "steps": {
-      "step1": "المعلومات الأساسية",
-      "step2": "معلومات الاتصال",
-      "step3": "التفاصيل التعليمية",
-      "step4": "الهوايات",
-      "step5": "المراجعة"
+      "personalInfo": "المعلومات الأساسية",
+      "parentInfo": "معلومات الاتصال",
+      "hobbies": "الهوايات",
+      "review": "المراجعة",
+      "childrenInfo": "معلومات الأبناء",
+      "professionalInfo": "معلومات المهنة"
     },
     "form": {
+     
       "studentId": "رقم الطالب",
       "fullName": "الاسم الكامل",
-      "studentGender": "جنس الطالب",
-      "parentGender": "جنس الوالد",
-      "imParent": "أنا الوالد",
-      "studentPhone": "هاتف الطالب",
+      "gender": "الجنس",
+      "role": "الدور",
+      "bio": "نبذة عنك",
+      "expertise": "الخبرات",
+      "phoneNumber": "الهاتف الشخصي",
       "parentPhone": "هاتف الوالد",
       "email": "البريد الإلكتروني",
       "address": "العنوان",
@@ -30,7 +35,11 @@
       "hobbies": "الهوايات",
       "personalDetails": "البيانات الشخصية",
       "parentDetails": "بيانات الوالدين",
-      "schoolDetails" : "تفاصيل المدرسة والدراسة"
+      "schoolDetails" : "تفاصيل المدرسة والدراسة",
+      "password": "كلمة المرور",
+      "childrenDetails": "تفاصيل الأبناء",
+      "childId": "رقم الأبن"
+
     },
     "gender": {
       "male": "ذكر",
@@ -57,6 +66,38 @@
     "buttons": {
       "previous": "السابق",
       "next": "التالي",
-      "submit": "إرسال"
-    }
+      "submit": "إرسال",
+      "addAnotherChild": "إضافة ابن آخر"
+    },
+    "role" : { 
+      "student": "طالب",
+      "parent": "والد",
+      "lecturer" : "محاضر"
+     },
+     "gradeLevels": {
+      "Grade 4": "الصف الرابع",
+      "Grade 5": "الصف الخامس",   
+      "Grade 6": "الصف السادس", 
+      "First Preparatory": "الصف الأول الإعدادي",
+      "Second Preparatory": "الصف الثاني الإعدادي",
+      "Third Preparatory": "الصف الثالث الأعدادي", 
+      "First Secondary": "الصف الأول الثانوي",  
+      "Second Secondary": "الصف الثاني الثانوي",
+      "Third Secondary": "الصف الثالث الثانوي"
+    },
+    "roleSelection": {
+     "title": "اختر دورك",
+     "description": "حدد الدور الذي يصفك بشكل أفضل",
+     "studentDesc": "الوصول إلى المواد التعليمية وتتبع تقدمك",
+     "parentDesc": "مراقبة الرحلة الأكاديمية لأطفالك",
+     "lecturerDesc": "إنشاء الدورات وإدارة طلابك"
+ },
+ "validation": {
+  "required": "هذا الحقل مطلوب",
+  "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+  "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
+  "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
+  "hobbies": "اختر هوايتان على الأقل",
+  "bioMinimum": " يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل"
   }
+}
