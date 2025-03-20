@@ -17,20 +17,27 @@ const roleSchemas = {
 };
 
 const validateUser = catchAsync(async (req, res, next) => {
-  let role
+  let { confirmPassword, role, password, ...updatedBody } = req.body
+
   if (req.method === "PATCH") {
     const user = await User.findById(req.params.userId).lean()
     if (!user) return next(new AppError("Couldn't find user.", 404));
     role = user.role
-  } else { role = req.body.role }
+  } else {
+    if (confirmPassword !== password) return res.status(400).json({ message: "Password and password confirmation don't match." });
+  }
 
   // Check if a valid role is provided.
   if (!role || !roleSchemas[role.toLowerCase()]) {
     return res.status(400).json({ message: "Invalid or missing role" });
   }
+  req.body = updatedBody
+  req.body.password = password
+  req.body.role = role
 
   /* Depending if the request was a patch to update a user
   A copy of the schema is made with optional fields.  */
+
 
   let error;
   schema = roleSchemas[role.toLowerCase()]

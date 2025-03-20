@@ -6,7 +6,7 @@ const parentValidation = userValidation.concat(
     children: Joi.array(),
     views: Joi.number().integer().min(0).default(0),
     phoneNumber: Joi.string().required(),
-    classLevel: Joi.string().optional(),
+    level: Joi.string().valid(...levels).optional()
   })
 )
 

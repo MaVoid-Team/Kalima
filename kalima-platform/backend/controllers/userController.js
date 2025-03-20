@@ -11,9 +11,19 @@ const bcrypt = require("bcrypt");
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
 
-  if (!users) return next(new AppError("Couldn't find users.", 404));
+  if (!users.length) return next(new AppError("Couldn't find users.", 404));
   res.json(users);
 })
+
+const getAllUsersByRole = catchAsync(async (req, res, next) => {
+  const role = req.params.role.charAt(0).toUpperCase() + req.params.role.slice(1).toLowerCase()
+
+  const users = await User.find({ role }).select("-password").lean();
+  if (!users.length) return next(new AppError("Couldn't find users with this role.", 404));
+
+  res.json(users);
+})
+
 const getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.userId).select("-password").lean();
 
@@ -63,4 +73,5 @@ const deleteUser = catchAsync(async (req, res, next) => {
   if (!foundUser) return next(new AppError("User not found", 404));
   res.json(foundUser);
 })
-module.exports = { getAllUsers, getUser, createUser, updateUser, deleteUser }
+
+module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser }
