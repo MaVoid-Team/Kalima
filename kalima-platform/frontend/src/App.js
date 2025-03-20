@@ -9,7 +9,6 @@ const Home = lazy(() => import("./pages/Home/Home"));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"));
 const Login = lazy(() => import("./pages/Login/login"));
-const Register = lazy(() => import("./pages/register"));
 const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
 const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"));
