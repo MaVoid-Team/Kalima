@@ -10,8 +10,21 @@ module.exports = {
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
-      "light",          // default light theme
-      "dark",           // default dark theme
+      {light: { 
+        "primary": "#018383",    // Primary color
+        "secondary": "#FFE492",  // Secondary color
+        "accent": "#14B8A6",     // Accent color
+        "neutral": "#1F2937",    // Neutral color
+        "base-100": "#F9F9F9",   // Base background color
+
+      }},          // default light theme
+      {dark: { 
+        "primary": "#018383",    // Primary color
+        "secondary": "#FFE492",  // Secondary color
+        "accent": "#14B8A6",     // Accent color
+        "neutral": "#1F2937",    // Neutral color
+        "base-100": "#333333",   // Base background color
+      }},           
       "cupcake",
       "bumblebee",
       "emerald",
@@ -40,7 +53,7 @@ module.exports = {
       "coffee",         
       "winter",
     ],
-    darkTheme: "dark",  
+  
     base: true,         
     styled: true,       
     utils: true,      

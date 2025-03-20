@@ -3,52 +3,30 @@ export default function Step2({ formData, handleInputChange, t ,errors}) {
       <div className="space-y-4">
         <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
         {/* Parent Phone */}
-        <div className="form-control">
+        <div className="relative pb-5 form-control ">
           <label className="label">
             <span className="label-text">{t('form.parentPhone')}</span>
           </label>
           <input
             type="number"
-            name="parentPhone"
-            className={`input input-bordered ${errors.parentPhone ? 'input-error animate-shake' : ''}`}
-            value={formData.parentPhone}
+            name="parentPhoneNumber"
+            className={`input input-bordered ${errors.parentPhoneNumber ? 'input-error animate-shake' : ''}`}
+            value={formData.parentPhoneNumber}
             onChange={handleInputChange}
             required
 
           />
-        </div>
+          
+          {errors.fieldName && (
+        <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
+          {t(errors.fieldName)}
+        </span>
+      )}
+      </div>
   
-        {/* Parent Checkbox (Again) */}
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-2">
-            <input
-              type="checkbox"
-              name="isParent"
-              className="checkbox checkbox-primary"
-              checked={formData.isParent}
-              onChange={handleInputChange}
-            />
-            <span className="label-text">{t('form.imParent')}</span>
-          </label>
-        </div>
-  
-        {/* Student Phone  */}
-        <div className="form-control">
-          <label className="number">
-            <span className="label-text">{t('form.studentPhone')}</span>
-          </label>
-          <input
-            type="number"
-            name="studentPhone"
-            className={`input input-bordered ${errors.studentPhone ? 'input-error animate-shake' : ''}`}
-            value={formData.studentPhone}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-  
+   
         {/* Email */}
-        <div className="form-control">
+        <div className="relative pb-5 form-control ">
           <label className="label">
             <span className="label-text">{t('form.email')}</span>
           </label>
@@ -60,21 +38,33 @@ export default function Step2({ formData, handleInputChange, t ,errors}) {
             onChange={handleInputChange}
             required
           />
+         {errors.fieldName && (
+        <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
+       {t(errors.fieldName)}
+      </span>
+  )}
         </div>
+        {/* Password */}
+          <div className="relative pb-5 form-control ">
+            <label className="label">
+              <span className="label-text">{t('form.password')}</span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              className={`input input-bordered ${errors.password ? 'input-error animate-shake' : ''}`}
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+            />
+            {errors.password && (
+              <span className="text-error text-sm mt-1">
+                {t('validation.passwordRequirements')}
+              </span>
+            )}
+          </div>
   
-        {/* Address */}
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">{t('form.address')}</span>
-          </label>
-          <textarea
-            name="address"
-            className={`textarea textarea-bordered h-24 ${errors.address ? 'textarea-error animate-shake' : ''}`}
-            value={formData.address}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
+        
       </div>
     );
   }
