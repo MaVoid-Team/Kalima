@@ -5,7 +5,7 @@ levels = userValidation.levels
 const studentValidation = userValidation.concat(
   Joi.object({
     sequencedId: Joi.number().integer().required(),
-    level: Joi.string().valid(...levels).required(),
+    level: Joi.string().valid(...levels).insensitive().required(),
     hobbies: Joi.array().items(Joi.string()).optional(),
     parentPhoneNumber: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
