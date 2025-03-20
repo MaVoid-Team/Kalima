@@ -7,6 +7,7 @@ const studentSchema = require("../validations/studentValidation.js");
 const parentSchema = require("../validations/parentValidation.js");
 const lecturerSchema = require("../validations/lecturerValidation.js");
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 const User = require("../models/userModel.js");
 
 const roleSchemas = {

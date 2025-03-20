@@ -5,7 +5,7 @@ const teacherSchema = new mongoose.Schema({
   faction: String,
   phoneNumber: { type: String, required: true },
   subject: { type: String, required: true },
-  level: { type: String, enum: User.levels, required: true },
+  level: { type: String, enum: User.levels, required: true, lowercase: true },
   school: { type: mongoose.Schema.Types.ObjectId, ref: 'School' }
 }, {
   timestamps: true
