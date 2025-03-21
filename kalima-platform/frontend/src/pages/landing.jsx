@@ -264,12 +264,12 @@ export default function CivilcoLanding() {
 
   const handleTeacherClick = () => {
     console.log("Teacher selected")
-    navigate("/login") // Using navigate instead of router.push
+    navigate("/login-teacher") // Using navigate instead of router.push
   }
 
   const handleStudentClick = () => {
     console.log("Student selected")
-    navigate("/login") // Using navigate instead of router.push
+    navigate("/login-student") // Using navigate instead of router.push
   }
 
   return (
