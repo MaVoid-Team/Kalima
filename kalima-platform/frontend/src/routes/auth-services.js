@@ -21,10 +21,10 @@ const handleRequest = async (method, url, data = {}) => {
 };
 
 // Auth API calls
-export const registerUser = (userData) => handleRequest("post", "/api/v1/register", userData);
+export const registerUser = (userData) => handleRequest("post", "/register", userData);
 
 export const loginUser = async (credentials) => {
-  const result = await handleRequest("post", "/api/v1/auth", credentials);
+  const result = await handleRequest("post", "/auth", credentials);
 
   if (result.success && result.data.accessToken) {
     sessionStorage.setItem("accessToken", result.data.accessToken);

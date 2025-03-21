@@ -238,7 +238,7 @@ export default function StudentRegistration() {
 
     try {
       console.log('Sending payload:', payload);
-      const url = `${apiUrl}/api/v1/register`;
+      const url = `${apiUrl}/register`;
       const response = await axios.post(url, payload);
       console.log('Registration successful:', response.data);
       navigate('/success');
