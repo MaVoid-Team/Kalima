@@ -22,7 +22,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   // For the roles with phone login only.
   const duplicatePhone = await User.findOne({ phoneNumber });
-  if (phoneRequiredRoles.includes(role) && duplicatePhone) {
+  if (phoneRequiredRoles.includes(role.toLowerCase()) && duplicatePhone) {
 
     return next(new AppError("This phone number is already associated with a user.", 400));
 
