@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, Loader, Search } from "lucide-react";
 import { getAllUsers } from "../routes/fetch-users";
