@@ -2,18 +2,18 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import NavBar from "./components/navbar";
-import { Teachers } from "./pages/Teachers";
 import { LoadingSpinner } from "./components/LoadingSpinner";
-import CourseDetails from "./pages/CourseDetails";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"));
-const Login = lazy(() => import("./pages/Login/login"));
+const LoginStudent = lazy(() => import("./pages/Login/login-student"));
+const TeacherLogin = lazy(() => import("./pages/Login/login-teacher"));
 const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
 const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"));
-
+const CourseDetails = lazy(() => import("./pages/CourseDetails"));
+const Teachers = lazy(() => import("./pages/Teachers"));
 function App() {
   return (
     <div className="App">
@@ -22,11 +22,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<RegisterStudent />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login-student" element={<LoginStudent />} />
           <Route path="/landing" element={<CivilcoLanding />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:courseId" element={<CourseDetails />} />
           <Route path="/teachers" element={<Teachers />} />
+          <Route path="/login-teacher" element={<TeacherLogin />} />
         </Routes>
       </Suspense>
 

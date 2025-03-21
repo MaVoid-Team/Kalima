@@ -53,7 +53,6 @@ export default function StudentRegistration() {
     level: '', // Used for both student and parent
     hobbies: [],
     parentPhoneNumber: '',
-    sequencedId: 12, // Default sequencedId for students
     // Parent-specific
     children: [''],
     // Lecturer-specific
@@ -190,8 +189,7 @@ export default function StudentRegistration() {
           name: formData.fullName,
           email: formData.email,
           password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          sequencedId: parseInt(formData.sequencedId), // Convert to number
+          confirmPassword: formData.confirmPassword, // Convert to number
           level: formData.grade, // Using grade as level for students
           hobbies: formData.hobbies.map(id => 
             hobbiesList.find(hobby => hobby.id === id)?.name || ''
