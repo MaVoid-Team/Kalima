@@ -1,20 +1,20 @@
 const mongoose = require('mongoose');
 const User = require('./userModel');
+const mongooseSequence = require('mongoose-sequence')(mongoose);
 
 const teacherPointsSchema = new mongoose.Schema({
-  teacher: { 
-    type: mongoose.Schema.Types.ObjectId, 
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Teacher',
     required: true
   },
-  points: { 
-    type: Number, 
-    default: 0 
+  points: {
+    type: Number,
+    default: 0
   }
 }, { _id: false });
 
 const studentSchema = new mongoose.Schema({
-  sequencedId: { type: Number, unique: true, required: true },
   level: { type: String, enum: User.levels, required: true, lowercase: true },
   hobbies: [String],
   parentPhoneNumber: String,
@@ -41,7 +41,7 @@ studentSchema.methods.addTeacherPoints = function(teacherId, pointsToAdd) {
   const teacherPointsEntry = this.teacherPoints.find(
     entry => entry.teacher.toString() === teacherId.toString()
   );
-  
+
   if (teacherPointsEntry) {
     teacherPointsEntry.points += pointsToAdd;
   } else {
@@ -49,19 +49,25 @@ studentSchema.methods.addTeacherPoints = function(teacherId, pointsToAdd) {
   }
 };
 
-// Helper method to use points for a specific teacher
+// Helper method to use points for a specific teacher.
 studentSchema.methods.useTeacherPoints = function(teacherId, pointsToUse) {
   const teacherPointsEntry = this.teacherPoints.find(
     entry => entry.teacher.toString() === teacherId.toString()
   );
-  
+
   if (!teacherPointsEntry || teacherPointsEntry.points < pointsToUse) {
     return false; // Not enough points
   }
-  
+
   teacherPointsEntry.points -= pointsToUse;
   return true; // Successfully used points
 };
+
+// A plugin to easily increment a field.
+studentSchema.plugin(mongooseSequence, {
+  inc_field: "sequencedId",
+  startAt: 1000000
+});
 
 const Student = User.discriminator('Student', studentSchema);
 
