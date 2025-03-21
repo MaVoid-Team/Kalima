@@ -1,57 +1,41 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Base URL can be moved to an environment variable
-const API_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
-export const registerUser = async (userData) => {
+// Create an axios instance with base URL
+const api = axios.create({
+  baseURL: API_URL,
+});
+
+// Utility function to handle API requests
+const handleRequest = async (method, url, data = {}) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, userData);
-    return {
-      success: true,
-      data: response.data
-    };
+    const response = await api[method](url, data);
+    return { success: true, data: response.data };
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 'Registration failed'
+      error: error.response?.data?.message || "Something went wrong",
     };
   }
 };
 
+// Auth API calls
+export const registerUser = (userData) => handleRequest("post", "/api/v1/register", userData);
+
 export const loginUser = async (credentials) => {
-    try {
-      const response = await axios.post(`${API_URL}/auth`, credentials)
-  
-      // Store the token in localStorage for future API calls
-      if (response.data.accessToken) {
-        localStorage.setItem("accessToken", response.data.accessToken)
-      }
-  
-      return {
-        success: true,
-        data: response.data,
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || "Login failed",
-      }
-    }
+  const result = await handleRequest("post", "/api/v1/auth", credentials);
+
+  if (result.success && result.data.accessToken) {
+    sessionStorage.setItem("accessToken", result.data.accessToken);
   }
-  
-  // Helper function to get the stored token
-  export const getToken = () => {
-    return localStorage.getItem("accessToken")
-  }
-  
-  // Helper function to check if user is logged in
-  export const isLoggedIn = () => {
-    return !!getToken()
-  }
-  
-  // Helper function to logout user
-  export const logoutUser = () => {
-    localStorage.removeItem("accessToken")
-    // You can add additional cleanup here if needed
-  }
-// You can add more auth-related API calls here (login, logout, etc.)
+
+  return result;
+};
+
+// Auth Helpers
+export const getToken = () => sessionStorage.getItem("accessToken");
+
+export const isLoggedIn = () => !!getToken();
+
+export const logoutUser = () => sessionStorage.removeItem("accessToken");

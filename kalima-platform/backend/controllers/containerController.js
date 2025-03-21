@@ -7,6 +7,7 @@ const QueryFeatures = require("../utils/queryFeatures");
 const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
+const Teacher = require("../models/teacherModel");
 
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
@@ -39,9 +40,11 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
     purchasedContainerId = purchase.container.toString();
   } else {
     // Otherwise, fallback to finding any purchase for this student.
-    const purchase = await Purchase.findOne({ student: studentId }).select(
-      "container"
-    );
+    const purchase = await Purchase.findOne({ 
+      student: studentId,
+      type: "containerPurchase" 
+    }).select("container");
+    
     if (!purchase) {
       return next(new AppError("No purchases found for this student", 403));
     }
@@ -89,30 +92,42 @@ exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    // Create the new container inside the transaction.
-    await checkDoc(Level, req.body.level, session);
-    await checkDoc(Subject, req.body.subject, session);
-    await checkDoc(Lecturer, req.body.createdBy, session);
-    const newContainers = await Container.create([req.body], { session });
-    const newContainer = newContainers[0];
-
-    if (req.body.parent) {
-      const parentContainer = await checkDoc(
-        Container,
-        req.body.parent,
-        session
+    const { name, type, price, level, subject, parent, teacher } = req.body;
+    
+    // Create the container with teacher and pointValue included
+    const container = await Container.create(
+      [{
+        name,
+        type,
+        price: price || 0,
+        level,
+        subject,
+        parent,
+        teacher: teacher || req.user?._id, // Default to current user if teacher not specified
+        createdBy: req.user._id,
+      }],
+      { session }
+    );
+    
+    // If this container has a parent, update the parent's children array
+    if (parent) {
+      await Container.findByIdAndUpdate(
+        parent,
+        { $push: { children: container[0]._id } },
+        { session }
       );
-      parentContainer.children.push(newContainer._id);
-      await parentContainer.save({ session });
     }
-
+    
     await session.commitTransaction();
-    session.endSession();
-    res.status(201).json(newContainer);
+    res.status(201).json({
+      status: "success",
+      data: {
+        container: container[0],
+      },
+    });
   } catch (error) {
     await session.abortTransaction();
-    session.endSession();
-    return next(new AppError(error.message, 500));
+    return next(new AppError(error.message, 400));
   } finally {
     session.endSession();
   }
@@ -122,6 +137,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   const container = await Container.findById(req.params.containerId).populate([
     { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
+    { path: "teacher", select: "name" }
   ]);
   if (!container) return next(new AppError("Container not found", 404));
   res.json(container);
@@ -132,6 +148,7 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
+    { path: "teacher", select: "name" },
   ]);
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -149,39 +166,75 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getTeacherContainers = catchAsync(async (req, res, next) => {
+  const { teacherId } = req.params;
+  
+  if (!teacherId) {
+    return next(new AppError("Teacher ID is required", 400));
+  }
+  
+  const containers = await Container.find({
+    $or: [
+      { teacher: teacherId },
+      { createdBy: teacherId }
+    ]
+  }).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "teacher", select: "name" },
+  ]);
+  
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers
+    }
+  });
+});
+
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject } = req.body;
+  const { name, type, price, level, subject, teacher } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let obj = { name, type, price };
-
-    if (subject) {
-      const subjectDoc = await checkDoc(Subject, subject, session);
-      obj.subject = subjectDoc._id;
-    }
-    if (level) {
-      const levelDoc = await checkDoc(Level, level, session);
-      obj.level = levelDoc._id;
-    }
-
-    const container = await Container.findByIdAndUpdate(
+    // Include teacher and pointValue in updates
+    const updatedContainer = await Container.findByIdAndUpdate(
       req.params.containerId,
-      obj,
+      {
+        name,
+        type,
+        price,
+        level,
+        subject,
+        teacher
+      },
       {
         new: true,
         runValidators: true,
         session,
       }
-    );
-    if (!container) {
-      throw new AppError("Container not found", 404);
+    ).populate([
+      { path: "children", select: "name" },
+      { path: "createdBy", select: "name" },
+      { path: "teacher", select: "name" },
+    ]);
+
+    if (!updatedContainer) {
+      return next(new AppError("No container found with that ID", 404));
     }
+
     await session.commitTransaction();
-    res.status(200).json({ status: "success", data: { container } });
+    res.status(200).json({
+      status: "success",
+      data: {
+        container: updatedContainer,
+      },
+    });
   } catch (error) {
     await session.abortTransaction();
-    return next(new AppError(error.message, 500));
+    return next(new AppError(error.message, 400));
   } finally {
     session.endSession();
   }
