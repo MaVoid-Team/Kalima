@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { motion, AnimatePresence, stagger } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getSubjectById } from "../routes/courses";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorAlert } from "../components/ErrorAlert";
@@ -45,7 +45,7 @@ export default function CourseDetails() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen w-full bg-gray-50"
+      className="min-h-screen w-full bg-background"
     >
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
@@ -56,7 +56,7 @@ export default function CourseDetails() {
           className="container mx-auto px-4 pt-8 pb-4 text-end"
         >
           <div className="relative inline-block">
-            <p className="flex items-center gap-x-4 text-3xl font-bold text-gray-800 md:mx-40 relative z-10">
+            <p className="flex items-center gap-x-4 text-3xl font-bold text-base-content md:mx-40 relative z-10">
               <FaSearch />
               كورساتي
             </p>
@@ -81,17 +81,19 @@ export default function CourseDetails() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="bg-white shadow-lg rounded-lg p-6 border-t-4 border-l-4 border-r-2 border-b-2 border-primary w-full max-w-sm"
+              className="card border-t-4 border-l-4 border-b-2 border-r-2 border-primary w-full max-w-sm shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-500"
             >
-              <h2 className="text-xl font-bold text-gray-800 text-center mb-4">
-                تفاصيل الكورس
-              </h2>
-              <div className="w-full h-px bg-gray-300 mb-4" />
-              <div className="space-y-4">
-                <DetailItem label="المدرس" value="أ.يوسف عثمان" />
-                <DetailItem label="عدد المحاضرات" value="10" />
-                <DetailItem label="الصف الدراسي" value="الصف الثانوي" />
-                <DetailItem label="المشاهدات" value="1240 مشاهدة" />
+              <div className="card-body">
+                <h2 className="card-title text-center justify-center">
+                  تفاصيل الكورس
+                </h2>
+                <div className="divider"></div>
+                <div className="space-y-4">
+                  <DetailItem label="المدرس" value="أ.يوسف عثمان" />
+                  <DetailItem label="عدد المحاضرات" value="10" />
+                  <DetailItem label="الصف الدراسي" value="الصف الثانوي" />
+                  <DetailItem label="المشاهدات" value="1240 مشاهدة" />
+                </div>
               </div>
             </motion.div>
             <motion.div
@@ -100,8 +102,8 @@ export default function CourseDetails() {
               transition={{ delay: 1 }}
               className="mt-6"
             >
-              <button className="flex items-center gap-2 bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary-dark transition duration-300 text-sm">
-                <FaDoorOpen size={16} className="text-white" />
+              <button className="btn btn-wide btn-primary gap-2 mt-6 hover:bg-primary-content hover:text-primary duration-500">
+                <FaDoorOpen size={16} />
                 اشترك الآن
               </button>
             </motion.div>
@@ -132,26 +134,26 @@ export default function CourseDetails() {
           transition={{ delay: 0.6 }}
           className="mb-12"
         >
-          <h2 className="text-xl font-bold text-gray-800 mb-4 text-right">
+          <h2 className="text-xl font-bold mb-4 text-right">
             اسم الدورة: اللغة الإنجليزية
           </h2>
-          <p className="text-sm text-gray-800 mb-4 text-right">
+          <p className="text-sm mb-4 text-right">
             تهدف هذه الدورة إلى تطوير مهارات المتعلمين في اللغة الإنجليزية من
             حيث القراءة، الكتابة، الاستماع، والتحدث. تشمل الدورة قواعد اللغة
             الأساسية، المفردات، والنطق، مع التركيز على استخدام اللغة في المواقف
             اليومية.
           </p>
           <div className="flex flex-col items-end mb-4 text-right">
-            <span className="text-sm text-gray-800">
+            <span className="text-sm">
               المستوى: مبتدئ / متوسط / متقدم
             </span>
-            <span className="text-sm text-gray-800">المدة: 10 أسابيع</span>
+            <span className="text-sm">المدة: 10 أسابيع</span>
           </div>
           <div className="space-y-2" style={{ direction: "rtl" }}>
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold">
               أهداف الدورة:
             </h3>
-            <ul className="list-disc list-inside text-sm text-gray-800 pr-4">
+            <ul className="list-disc list-inside text-sm pr-4">
               <li>تنمية المفردات وتحسين استخدام القواعد</li>
               <li>تعزيز مهارات التحدث والاستماع بثقة</li>
               <li>تحسين مهارات القراءة والكتابة</li>
@@ -166,22 +168,24 @@ export default function CourseDetails() {
           transition={{ delay: 0.6 }}
           className="mb-12"
         >
-          <h2 className="text-xl font-bold text-gray-800 text-right mb-6">
+          <h2 className="text-xl font-bold text-right mb-6">
             خطة الكورس
           </h2>
-          <div className="bg-white text-primary shadow-lg rounded-lg p-6 border-t-4 border-l-4 border-r-2 border-b-2 border-primary w-full max-w-2xl ml-auto">
-            <div className="space-y-6 text-right">
-              <PlanSection
-                month="أكتوبر"
-                items={[
-                  "24 دقيقة - الدرس: النجاح والتقريب بالنفس",
-                  "16 دقيقة - الدرس: الأرقام والأوطن",
-                ]}
-              />
-              <PlanSection
-                month="نوفمبر"
-                items={["30 دقيقة - الدرس: المدخلات اليومية في السوق"]}
-              />
+          <div className="card border-t-4 border-l-4 border-r-2 border-b-2 border-primary w-full max-w-2xl ml-auto shadow-lg hover:scale-105 hover:shadow-2xl transition-all duration-500">
+            <div className="card-body text-right">
+              <div className="space-y-6">
+                <PlanSection
+                  month="أكتوبر"
+                  items={[
+                    "24 دقيقة - الدرس: النجاح والتقريب بالنفس",
+                    "16 دقيقة - الدرس: الأرقام والأوطن",
+                  ]}
+                />
+                <PlanSection
+                  month="نوفمبر"
+                  items={["30 دقيقة - الدرس: المدخلات اليومية في السوق"]}
+                />
+              </div>
             </div>
           </div>
         </motion.div>
@@ -193,8 +197,8 @@ export default function CourseDetails() {
 // Reusable DetailItem Component
 const DetailItem = ({ label, value }) => (
   <div className="flex justify-between items-center">
-    <span className="text-sm text-gray-600">{value}</span>
-    <span className="font-semibold text-sm text-gray-800">: {label}</span>
+    <span className="text-sm text-base-content/70">{value}</span>
+    <span className="font-semibold text-sm text-base-content">: {label}</span>
   </div>
 );
 
@@ -205,9 +209,9 @@ const PlanSection = ({ month, items }) => (
     animate={{ y: 0, opacity: 1 }}
     transition={{ delay: 0.8 }}
   >
-    <h3 className="text-lg font-semibold text-gray-800">{month}</h3>
+    <h3 className="text-lg font-semibold">{month}</h3>
     <ul
-      className="list-disc list-inside text-sm text-gray-600 pr-4"
+      className="list-disc list-inside text-sm text-base-content/70 pr-4"
       style={{ direction: "rtl" }}
     >
       {items.map((item, index) => (
