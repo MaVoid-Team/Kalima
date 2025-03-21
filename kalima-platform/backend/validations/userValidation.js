@@ -3,7 +3,7 @@ const Joi = require("joi");
 
 const userValidation = Joi.object({
   name: Joi.string().trim().required(),
-  gender: Joi.string().valid("male", "female").required(), // Please add more to not get canceled on twitter.
+  gender: Joi.string().valid("male", "female").insensitive().required(), // Please add more to not get canceled on twitter.
   email: Joi.string().email().required(),
   address: Joi.object({
     city: Joi.string().required(),

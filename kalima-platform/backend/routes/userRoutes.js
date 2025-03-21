@@ -7,4 +7,6 @@ router.route("/").get(userController.getAllUsers).post(validateUser, userControl
 
 router.route("/:userId").get(userController.getUser).patch(validateUser, userController.updateUser).delete(userController.deleteUser)
 
+router.route("/role/:role").get(userController.getAllUsersByRole)
+
 module.exports = router

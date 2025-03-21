@@ -6,14 +6,25 @@ const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const mongoose = require('mongoose')
 const bcrypt = require("bcrypt");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
 
-  if (!users) return next(new AppError("Couldn't find users.", 404));
+  if (!users.length) return next(new AppError("Couldn't find users.", 404));
   res.json(users);
 })
+
+const getAllUsersByRole = catchAsync(async (req, res, next) => {
+  const role = req.params.role.charAt(0).toUpperCase() + req.params.role.slice(1).toLowerCase()
+
+  const users = await User.find({ role }).select("-password").lean();
+  if (!users.length) return next(new AppError("Couldn't find users with this role.", 404));
+
+  res.json(users);
+})
+
 const getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.userId).select("-password").lean();
 
@@ -24,7 +35,7 @@ const getUser = catchAsync(async (req, res, next) => {
 const createUser = registerController.registerNewUser;
 
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password } = req.body
+  const { name, email, address, password, children } = req.body
   const userId = req.params.userId
 
   if (password) {
@@ -35,7 +46,32 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
-  const updatedUser = { name, email, address, ...req.body }
+
+  const childrenById = []
+  if (!!children) {
+    for (let id of children) {
+      // Check if the id is a valid MongoDB ObjectId
+      const isMongoId = mongoose.Types.ObjectId.isValid(id);
+      if (isMongoId) {
+        childrenById.push(id);
+      } else {
+        try {
+          const student = await Student.findOne({ sequencedId: id }).lean();
+          if (student) {
+            childrenById.push(student._id);
+          }
+        }
+        catch (error) {
+          if (error.name === 'CastError') {
+            return next(new AppError("Not all children values are valid UserId or SequenceId.", 400));
+          }
+        }
+      }
+    }
+    req.body.children = childrenById
+  }
+
+  const updatedUser = { name, email, address, children: childrenById, ...req.body }
   let user
 
   switch (foundUser.role.toLowerCase()) {
@@ -63,4 +99,5 @@ const deleteUser = catchAsync(async (req, res, next) => {
   if (!foundUser) return next(new AppError("User not found", 404));
   res.json(foundUser);
 })
-module.exports = { getAllUsers, getUser, createUser, updateUser, deleteUser }
+
+module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser }

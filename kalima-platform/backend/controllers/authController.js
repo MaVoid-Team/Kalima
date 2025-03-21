@@ -9,7 +9,7 @@ const login = catchAsync(async (req, res, next) => {
   const { email, phoneNumber, password } = req.body;
 
   // Assisning the roles that can only login with a phone number.
-  const phoneRequiredRoles = ["Teacher", "Parent", "Student"]
+  const phoneRequiredRoles = ["teacher", "parent", "student"]
 
   // For the different methods of login.
   if (!((email && password) || (phoneNumber && password))) {
@@ -22,9 +22,6 @@ const login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
   }
 
-  if (phoneRequiredRoles.includes(foundUser.role) && !phoneNumber) {
-    return next(new AppError("This user is required to login with a phone number.", 400));
-  }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
@@ -37,7 +34,7 @@ const login = catchAsync(async (req, res, next) => {
       UserInfo: { id: foundUser._id, role: foundUser.role },
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "10s" }, // Time should be changed in production
+    { expiresIn: "90d" }, // Time should be changed in production
   );
 
   const refreshToken = jwt.sign(
@@ -86,7 +83,7 @@ const refresh = catchAsync(async (req, res, next) => {
           },
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "10s" }, // Time should be changed in production
+        { expiresIn: "90d" }, // Time should be changed in production
       );
 
       res.json({ accessToken });
@@ -107,12 +104,13 @@ const logout = (req, res, next) => {
 
 const verifyRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req?.role) {
+    const Role = req.user.role;
+    if (!req?.user.role) {
       return next(new AppError("Unauthorized", 401));
     }
     const rolesArray = [...allowedRoles];
-    if (!rolesArray.includes(req.role)) {
-      return next(new AppError("Forbidden", 403));
+    if (!rolesArray.includes(req.user.role)) {
+      return next(new AppError(`Forbidden , you are a ${Role} you don't have access for this file`, 403));
     }
     next();
   };
