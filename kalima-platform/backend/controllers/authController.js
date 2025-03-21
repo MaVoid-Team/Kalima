@@ -9,7 +9,7 @@ const login = catchAsync(async (req, res, next) => {
   const { email, phoneNumber, password } = req.body;
 
   // Assisning the roles that can only login with a phone number.
-  const phoneRequiredRoles = ["Teacher", "Parent", "Student"]
+  const phoneRequiredRoles = ["teacher", "parent", "student"]
 
   // For the different methods of login.
   if (!((email && password) || (phoneNumber && password))) {
@@ -22,9 +22,6 @@ const login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
   }
 
-  if (phoneRequiredRoles.includes(foundUser.role) && !phoneNumber) {
-    return next(new AppError("This user is required to login with a phone number.", 400));
-  }
 
   const match = await bcrypt.compare(password, foundUser.password);
 
