@@ -1,21 +1,8 @@
-import { Book, Star, Loader } from "lucide-react";
-import { useState } from "react";
+import { Book, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export function CourseCard({ id, image, teacherName, subject, subjectId, level, duration, rating, fetchSubjectDetails }) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleViewDetails = async () => {
-    setIsLoading(true);
-    try {
-      await fetchSubjectDetails(subjectId);
-    } catch (error) {
-      console.error("Error pre-fetching subject details:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+export function CourseCard({ id, image, teacherName, subject, subjectId, level, duration, rating }) {
+  console.log("Subject ID:", id);
   return (
     <div className="card bg-base-100 shadow-lg overflow-hidden border border-base-200 hover:shadow-xl hover:scale-105 transition-all duration-300">
       <figure className="relative h-48">
@@ -79,12 +66,8 @@ export function CourseCard({ id, image, teacherName, subject, subjectId, level, 
               ))}
             </div>
           </div>
-          <Link
-            to={`/course-details/${subjectId}`}
-            className="btn btn-sm btn-outline btn-accent"
-            onClick={handleViewDetails}
-          >
-            {isLoading ? <Loader className="h-4 w-4 animate-spin" /> : "عرض التفاصيل"}
+          <Link to={`/courses/${id}`} className="btn btn-sm btn-outline btn-accent">
+            عرض التفاصيل
           </Link>
         </div>
       </div>
