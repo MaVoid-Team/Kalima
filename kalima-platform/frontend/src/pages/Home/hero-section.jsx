@@ -10,19 +10,12 @@ export function HeroSection() {
           {/* Left side with image */}
           <div className="w-full md:w-1/3 relative mb-10 md:mb-0">
             <div className="relative z-10 w-full h-full">
-              {/* Background decorative elements */}
-              <img src="/waves.png" alt="" className="absolute top-0 left-0 w-20 h-auto z-0" />
-              <img src="/ball.png" alt="" className="absolute top-[20%] left-5 w-12 h-auto z-0" />
-              <img src="/ring.png" alt="" className="absolute top-[10%] right-5 w-16 h-auto z-0" />
-              <img src="/rDots.png" alt="" className="absolute top-[30%] left-0 w-32 h-auto z-0" />
-              <img src="/bDots.png" alt="" className="absolute bottom-[20%] right-0 w-32 h-auto z-0" />
-
-              {/* Main person image */}
-              <img src="/person.png" alt="Teacher with books" className="relative mx-auto w-1/2 h-auto z-10" />
+              
+              <img src="/hero.png" alt="Teacher with books" className="relative mx-auto w-full h-auto z-10" />
             </div>
 
             {/* Teacher counter positioned at bottom left */}
-            <div className="absolute bottom-0 left-10 z-20">
+            <div className="absolute bottom-0 right-10 z-20 ">
               <TeacherCounter />
             </div>
           </div>
