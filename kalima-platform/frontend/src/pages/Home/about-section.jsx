@@ -47,12 +47,8 @@ export function AboutSection() {
             </div>
   
             {/* Right side with image */}
-            <div className="w-full md:w-1/2 mb-10 md:mb-0 relative">
-              <img src="/small-hero.png" alt="Students studying" className="rounded-lg mx-auto" />
-  
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-16 h-16 border-2 border-dashed border-primary"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 border-2 border-dashed border-primary"></div>
+            <div className="w-full md:w-1/2 mb-10 md:mb-0 left-5 md:left-20 relative">
+              <img src="/about.png" alt="Students studying" className="rounded-lg mx-auto" />
             </div>
           </div>
         </div>
