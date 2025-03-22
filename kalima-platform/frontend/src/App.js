@@ -4,9 +4,10 @@ import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/navbar";
 import { Teachers } from "./pages/Teachers";
 import { LoadingSpinner } from "./components/LoadingSpinner";
-import CourseDetails from "./pages/CourseDetails";
+
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
+const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"));
 const Login = lazy(() => import("./pages/Login/login"));
