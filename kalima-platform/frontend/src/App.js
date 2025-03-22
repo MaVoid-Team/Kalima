@@ -5,6 +5,7 @@ import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
+const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"));
 const LoginStudent = lazy(() => import("./pages/Login/login-student"));
@@ -12,7 +13,6 @@ const TeacherLogin = lazy(() => import("./pages/Login/login-teacher"));
 const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
 const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"));
-const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 const Teachers = lazy(() => import("./pages/Teachers"));
 function App() {
   return (
