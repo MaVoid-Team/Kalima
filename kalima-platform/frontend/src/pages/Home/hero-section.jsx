@@ -18,7 +18,7 @@ export function HeroSection() {
               <img src="/bDots.png" alt="" className="absolute bottom-[20%] right-0 w-32 h-auto z-0" />
 
               {/* Main person image */}
-              <img src="/person.png" alt="Teacher with books" className="relative mx-auto w-3/4 h-auto z-10" />
+              <img src="/person.png" alt="Teacher with books" className="relative mx-auto w-1/2 h-auto z-10" />
             </div>
 
             {/* Teacher counter positioned at bottom left */}
@@ -40,7 +40,7 @@ export function HeroSection() {
             </p>
 
             <Link to="/landing">
-              <button className="btn bg-primary rounded-full">
+              <button className="btn btn-lg bg-primary hover:bg-accent rounded-full">
                 تسجيل الدخول
                 <ArrowLeft className="h-5 w-5 ml-2" />
               </button>
