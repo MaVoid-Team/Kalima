@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
+import Teacherdetails from "./pages/teacher details/Teacher-details";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
@@ -28,6 +29,7 @@ function App() {
           <Route path="/courses/:courseId" element={<CourseDetails />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/login-teacher" element={<TeacherLogin />} />
+          <Route path="/teacher-details" element={<Teacherdetails />} />
         </Routes>
       </Suspense>
 
