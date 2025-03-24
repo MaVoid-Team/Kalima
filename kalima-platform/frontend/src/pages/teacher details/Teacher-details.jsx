@@ -3,7 +3,7 @@ import { FileText, Clock, Star } from 'lucide-react';
 
 // Separate component for the teacher information header
 const TeacherInfoHeader = () => (
-  <div className="w-full flex flex-col items-center py-32 absolute top-0">
+  <div className="w-full flex flex-col items-center py-32 -z-10 absolute top-0">
     <div className="flex items-center gap-x-2">
       <img className="h-1 mt-4" src="/Line 5.png" alt="" />
       <h1 className="text-center text-2xl font-bold text-primary ">معلومات المعلم</h1>
