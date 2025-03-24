@@ -7,13 +7,13 @@ const authController = require("../controllers/authController");
 // Apply JWT verification to all routes
 router.use(verifyJWT);
 
-// Purchase points for a specific teacher
+// Purchase points for a specific lecturer
 router.post("/points", 
   authController.verifyRoles("Student", "Parent"),
-  purchaseController.purchaseTeacherPoints
+  purchaseController.purchaseLecturerPoints
 );
 
-// Purchase a container with teacher-specific points
+// Purchase a container with lecturer-specific points
 router.post("/container", 
   authController.verifyRoles("Student", "Parent"),
   purchaseController.purchaseContainerWithPoints
@@ -25,28 +25,28 @@ router.get("/",
   purchaseController.getAllPurchases
 );
 
-// Get current user's points balances across all teachers
+// Get current user's points balances across all lecturers
 router.get("/balances", 
   authController.verifyRoles("Student", "Parent"),
   purchaseController.getAllUserPointBalances
 );
 
-// Get all user's points balances across all teachers
+// Get all user's points balances across all lecturers
 router.get("/user/:userId/balances", 
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
   purchaseController.getAllUserPointBalances
 );
 
-// Get current user's points balance with a specific teacher
-router.get("/teacher/:teacherId/balance", 
+// Get current user's points balance with a specific lecturer
+router.get("/lecturer/:lecturerId/balance", 
   authController.verifyRoles("Student", "Parent"),
-  purchaseController.getTeacherPointsBalance
+  purchaseController.getLecturerPointsBalance
 );
 
-// Get points balance for a user with a specific teacher
-router.get("/user/:userId/teacher/:teacherId/balance", 
+// Get points balance for a user with a specific lecturer
+router.get("/user/:userId/lecturer/:lecturerId/balance", 
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-  purchaseController.getTeacherPointsBalance
+  purchaseController.getLecturerPointsBalance
 );
 
 // Get current user's purchases

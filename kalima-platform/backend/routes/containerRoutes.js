@@ -19,6 +19,12 @@ router.get(
   containerController.getTeacherContainers
 );
 
+// Get containers for a specific lecturer
+router.get(
+  "/lecturer/:lecturerId",
+  containerController.getLecturerContainers
+);
+
 // Create and get containers
 router
   .route("/")

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const User = require('./userModel');
 const mongooseSequence = require('mongoose-sequence')(mongoose);
 
-const teacherPointsSchema = new mongoose.Schema({
-  teacher: {
+const lecturerPointsSchema = new mongoose.Schema({
+  lecturer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Teacher',
+    ref: 'Lecturer',
     required: true
   },
   points: {
@@ -22,44 +22,44 @@ const studentSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   school: { type: mongoose.Schema.Types.ObjectId, ref: 'School' },
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' },
-  // Array of teacher-specific point balances
-  teacherPoints: [teacherPointsSchema]
+  // Array of lecturer-specific point balances
+  lecturerPoints: [lecturerPointsSchema]
 }, {
   timestamps: true
 });
 
-// Helper method to get points balance for a specific teacher
-studentSchema.methods.getTeacherPointsBalance = function(teacherId) {
-  const teacherPointsEntry = this.teacherPoints.find(
-    entry => entry.teacher.toString() === teacherId.toString()
+// Helper method to get points balance for a specific lecturer
+studentSchema.methods.getLecturerPointsBalance = function(lecturerId) {
+  const lecturerPointsEntry = this.lecturerPoints.find(
+    entry => entry.lecturer.toString() === lecturerId.toString()
   );
-  return teacherPointsEntry ? teacherPointsEntry.points : 0;
+  return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
 
-// Helper method to add points for a specific teacher
-studentSchema.methods.addTeacherPoints = function(teacherId, pointsToAdd) {
-  const teacherPointsEntry = this.teacherPoints.find(
-    entry => entry.teacher.toString() === teacherId.toString()
+// Helper method to add points for a specific lecturer
+studentSchema.methods.addLecturerPoints = function(lecturerId, pointsToAdd) {
+  const lecturerPointsEntry = this.lecturerPoints.find(
+    entry => entry.lecturer.toString() === lecturerId.toString()
   );
 
-  if (teacherPointsEntry) {
-    teacherPointsEntry.points += pointsToAdd;
+  if (lecturerPointsEntry) {
+    lecturerPointsEntry.points += pointsToAdd;
   } else {
-    this.teacherPoints.push({ teacher: teacherId, points: pointsToAdd });
+    this.lecturerPoints.push({ lecturer: lecturerId, points: pointsToAdd });
   }
 };
 
-// Helper method to use points for a specific teacher.
-studentSchema.methods.useTeacherPoints = function(teacherId, pointsToUse) {
-  const teacherPointsEntry = this.teacherPoints.find(
-    entry => entry.teacher.toString() === teacherId.toString()
+// Helper method to use points for a specific lecturer
+studentSchema.methods.useLecturerPoints = function(lecturerId, pointsToUse) {
+  const lecturerPointsEntry = this.lecturerPoints.find(
+    entry => entry.lecturer.toString() === lecturerId.toString()
   );
 
-  if (!teacherPointsEntry || teacherPointsEntry.points < pointsToUse) {
+  if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
     return false; // Not enough points
   }
 
-  teacherPointsEntry.points -= pointsToUse;
+  lecturerPointsEntry.points -= pointsToUse;
   return true; // Successfully used points
 };
 
