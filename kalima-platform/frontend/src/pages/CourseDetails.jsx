@@ -39,7 +39,7 @@ const PlanSection = ({ month, items, isLastMonth }) => (
   <motion.div
     initial={{ y: -20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
-    transition={{ delay: 0.8, duration: 0.5 }}
+    transition={{ duration: 0.5 }}
     className="mb-6"
     style={{ direction: "rtl" }}
   >
@@ -53,7 +53,7 @@ const PlanSection = ({ month, items, isLastMonth }) => (
           key={index}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.2, duration: 0.5 }}
+          transition={{ duration: 0.5 }}
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
         >
           <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export default function CourseDetails() {
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.6, duration: 0.5 }}
+      transition={{  duration: 0.5 }}
       whileHover={{ scale: 1.05 }} // Added hover scaling effect
       className="bg-base-100 shadow-lg rounded-lg p-6 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-sm"
     >
@@ -165,7 +165,7 @@ export default function CourseDetails() {
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1, duration: 0.5 }}
+              transition={{ duration: 0.5 }}
               className="mt-6"
             >
               <motion.button
