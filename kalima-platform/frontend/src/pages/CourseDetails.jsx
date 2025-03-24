@@ -113,6 +113,7 @@ export default function CourseDetails() {
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 0.6, duration: 0.5 }}
+      whileHover={{ scale: 1.05 }} // Added hover scaling effect
       className="bg-base-100 shadow-lg rounded-lg p-6 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-sm"
     >
       <h2 className="text-xl font-bold text-base-content text-center mb-4">تفاصيل الكورس</h2>
@@ -167,26 +168,34 @@ export default function CourseDetails() {
               transition={{ delay: 1, duration: 0.5 }}
               className="mt-6"
             >
-              <button className="flex items-center gap-2 bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary-focus transition duration-300 text-sm">
+              <motion.button
+                whileHover={{ scale: 1.1 }} // Added hover scaling effect
+                className="flex items-center gap-2 bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary-focus transition duration-300 text-sm"
+              >
                 <FaDoorOpen size={16} className="text-white" />
                 اشترك الآن
-              </button>
+              </motion.button>
             </motion.div>
           </motion.div>
 
           <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="flex items-center justify-center"
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="flex items-center justify-center"
+        >
+          <motion.div
+            whileHover={{ scale: 1.05, backgroundColor: "hsl(var(--b2))", color: "hsl(var(--s2))" }}
+            className="rounded-lg shadow-sm w-full h-[300px] md:h-[400px] hover:bg-secondary hover:text-secondary-content transition-colors duration-300 overflow-hidden flex items-center justify-center" // Added flex, items-center, justify-center
+            style={{ aspectRatio: "1/1" }}
           >
             <img
               src="/CourseDetails1.png"
               alt="Teacher with books"
-              className="rounded-lg shadow-sm w-full h-[300px] md:h-[400px] object-contain"
-              style={{ aspectRatio: "1/1" }}
+              className="rounded-lg max-w-full max-h-full object-contain" // Use object-contain to ensure the full image appears
             />
           </motion.div>
+        </motion.div>
         </div>
 
         <motion.div
@@ -223,7 +232,10 @@ export default function CourseDetails() {
           className="mb-12"
         >
           <h3 className="text-xl font-bold text-base-content text-right mb-6">خطة الكورس</h3>
-          <div className="bg-base-100 text-primary shadow-lg rounded-lg px-6 py-2 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-2xl ml-auto relative">
+          <motion.div
+            whileHover={{ scale: 1.02 }} // Added hover scaling effect
+            className="bg-base-100 text-primary shadow-lg rounded-lg px-6 py-2 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-2xl ml-auto relative"
+          >
             <div className="absolute top-4 left-2 w-[100px] h-[100px] rounded-tl-lg">
               <img src="/CourseDetails2.png" alt="Decorative Image" className="w-full h-full object-cover" />
             </div>
@@ -232,7 +244,7 @@ export default function CourseDetails() {
                 <PlanList months={months} />
               </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </motion.div>
