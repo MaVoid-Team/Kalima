@@ -37,6 +37,7 @@
       "parentDetails": "بيانات الوالدين",
       "schoolDetails" : "تفاصيل المدرسة والدراسة",
       "password": "كلمة المرور",
+      "confirmPassword": "تاكيد كلمة المرور",
       "childrenDetails": "تفاصيل الأبناء",
       "childId": "رقم الأبن"
 
