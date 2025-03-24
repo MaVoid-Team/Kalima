@@ -39,6 +39,7 @@
       "parentDetails": "Parent Details",
       "schoolDetails" : "School Details & Study",
       "password": "Password",
+      "confirmPassword": "Confirm Password",  
       "childrenDetails": "Children Details",
       "childId": "Child ID"
     },
