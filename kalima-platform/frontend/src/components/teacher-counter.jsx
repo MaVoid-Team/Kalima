@@ -13,18 +13,18 @@ export default function TeacherCounter() {
       </div>
 
       {/* Teacher avatars */}
-      <div className="flex -space-x-2 flex-row-reverse">
-        <div className="w-8 h-8 rounded-full  overflow-hidden">
-          <img src="/placeholder.svg?height=32&width=32" alt="Teacher 1" className="w-8 h-8 object-cover text-primary" />
+      <div className="flex">
+        <div className=" rounded-full  overflow-hidden">
+          <img src="/teacher_illustration.png" alt="Teacher 1" className="w-8 h-8 object-cover text-primary" />
         </div>
-        <div className="w-8 h-8 rounded-full   overflow-hidden">
-          <img src="/placeholder.svg?height=32&width=32" alt="Teacher 2" className="w-8 h-8 object-cover text-primary" />
+        <div className=" rounded-full   overflow-hidden">
+          <img src="/teacher_illustration.png" alt="Teacher 2" className="w-8 h-8 object-cover text-primary" />
         </div>
-        <div className="w-8 h-8 rounded-full   overflow-hidden">
-          <img src="/placeholder.svg?height=32&width=32" alt="Teacher 3" className="w-8 h-8 object-cover text-primary" />
+        <div className=" rounded-full   overflow-hidden">
+          <img src="/teacher_illustration.png" alt="Teacher 3" className="w-8 h-8 object-cover text-primary" />
         </div>
-        <div className="w-8 h-8 rounded-full   overflow-hidden">
-          <img src="/placeholder.svg?height=32&width=32" alt="Teacher 4" className="w-8 h-8 object-cover text-primary" />
+        <div className=" rounded-full   overflow-hidden">
+          <img src="/teacher_illustration.png" alt="Teacher 4" className="w-8 h-8 object-cover text-primary" />
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import TeacherCard from "../components/TeacherCard";
 import { FilterDropdown } from "../../src/components/FilterDropdown";
 
-export function Teachers() {
+export default function Teachers() {
   const [teachers, setTeachers] = useState([]);
   const [filteredTeachers, setFilteredTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
