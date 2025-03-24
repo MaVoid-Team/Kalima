@@ -6,15 +6,15 @@ const TeacherInfoHeader = () => (
   <div className="w-full flex flex-col items-center py-32 absolute top-0">
     <div className="flex items-center gap-x-2">
       <img className="h-1 mt-4" src="/Line 5.png" alt="" />
-      <h1 className="text-center text-2xl font-bold text-[#176160]">معلومات المعلم</h1>
+      <h1 className="text-center text-2xl font-bold text-primary ">معلومات المعلم</h1>
     </div>
-    <img className="h-auto mt-16" src="/vector 21.png" alt="" />
+    <img className="h-auto mt-16 sm:mr-56 mr-60 md:mr-0" src="/vector 21.png" alt="" />
   </div>
 );
 
 // Separate component for the rating display
 const RatingDisplay = ({ rating }) => (
-  <div className="border-[1px] border-[#13D3D4] rounded-lg flex flex-col">
+  <div className="border-[1px rounded-lg flex flex-col">
     <div className="text-center">
       <h1 className="font-bold">التقيم:4.0{rating}</h1>
     </div>
@@ -22,7 +22,7 @@ const RatingDisplay = ({ rating }) => (
       {[...Array(4)].map((_, i) => (
         <input 
           key={i}
-          className="mask mask-star-2 bg-yellow-400" 
+          className="mask mask-star-2 bg-warning" 
           aria-label={`${i+1} star`} 
         />
       ))}
@@ -34,13 +34,13 @@ const RatingDisplay = ({ rating }) => (
 const SectionHeader = ({ title }) => (
   <div className="flex justify-center">
     <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-    <h1 className="text-center text-2xl font-bold text-[#176160]">{title}</h1>
+    <h1 className="text-center text-2xl font-bold text-primary ">{title}</h1>
   </div>
 );
 
 // Course card component - Reduced size
 const CourseCard = ({ course }) => (
-  <div className="rounded-lg overflow-hidden border-2 border-yellow-500 bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 max-w-md relative">
+  <div className="rounded-lg overflow-hidden border-2 border-warning  bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 max-w-md relative">
     <div className="relative">
       <img
         src={course.image || "/placeholder.svg"}
@@ -101,11 +101,11 @@ const SocialMediaIcons = () => (
 // Teacher profile image component with decorations
 const TeacherProfileImage = () => (
   <div className="indicator">
-    <img className="indicator-item indicator-top indicator-start badge ml-8 bg-transparent border-transparent h-[240px] w-[170px] mt-[20px]" src="/rDots.png" alt="" />
+    <img className="indicator-item indicator-top indicator-start badge ml-14 bg-transparent border-transparent h-[240px] w-[170px] mt-[20px]" src="/rDots.png" alt="" />
     <img className="indicator-item indicator-top indicator-center badge bg-transparent border-transparent h-[60px] w-[130px] mt-[-110px]" src="/waves.png" alt="" />
     <img className="indicator-item indicator-top indicator-end badge bg-transparent border-transparent h-[120px] w-[100px] mt-[-10px] ml-40" src="/ring.png" alt="" />
     <img className="h-[80px] w-[80px] indicator-item indicator-bottom indicator-start badge bg-transparent border-transparent" src="/ball.png" alt="" />
-    <img className="indicator-item indicator-bottom indicator-end mr-8 bg-transparent border-transparent h-[240px] w-[170px] mb-[100px] z-0" src="/bDots.png" alt="" />
+    <img className="indicator-item indicator-bottom indicator-end mr-16 bg-transparent border-transparent h-[240px] w-[170px] mb-[100px] z-0" src="/bDots.png" alt="" />
     
     <div className="relative z-10 grid h-[300px] w-[300px] place-items-center">
       <img className="h-full w-full" src="/Ellipse 103.png" alt="" />
@@ -154,7 +154,7 @@ export default function TeacherDetails() {
       <div className="container mx-auto lg:px-32 sm:px-16 px-16 sm:py-52 py-56 md:py-32 lg:py-0">
         <div className="flex flex-col md:flex-row items-center">
           {/* Left side with image */}
-          <div className="w-full md:w-1/2 relative mb-10 md:mb-0">
+          <div className="w-full md:w-1/2 relative  sm:mb-0">
             <div className="relative z-10 w-full h-full">
               <TeacherProfileImage />
               <SocialMediaIcons />
@@ -162,7 +162,7 @@ export default function TeacherDetails() {
           </div>
           
           {/* Right side with text */}
-          <div className="w-full md:w-1/2 text-right md:ml-auto mb-72">
+          <div className="w-full md:w-1/2 text-right md:ml-auto lg:mb-72 mb-0 sm:mb-0 ">
             <h2 className="text-xl font-bold text-primary mb-2">/استاذ</h2>
             <h1 className="text-4xl font-bold mb-2">محمد عبدالله</h1>
             
@@ -175,17 +175,20 @@ export default function TeacherDetails() {
             
             <div className="flex justify-end">
               <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-              <h1 className="text-center text-2xl font-bold text-[#176160]">السيرة الذاتية</h1>
+              <h1 className="text-center text-2xl font-bold text-primary mb-5">السيرة الذاتية</h1>
             </div>
-            
+            <div className="flex justify-end">
+
             <p className="font-semibold text-xl sm:w-56 w-64 md:w-60 lg:w-auto">
               "أعزائي الطلاب، يسعدني أن أقدم لكم نفسي، أستاذ الرياضيات محمد عبدالله. أنا هنا لأكون مرشدكم في عالم الأرقام والمعادلات. أمتلك خبرة واسعة في تدريس الرياضيات وأحرص دائمًا على تبسيط المفاهيم المعقدة بحيث تكون سهلة الفهم. أنا شغوف بتعليمكم وتطوير مهاراتكم، وأعدكم بأنني سأبذل قصارى جهدي لمساعدتكم على فهم المادة بشكل عميق وتطبيقها في حياتكم اليومية. أنا هنا لدعمكم وتوجيهكم نحو النجاح والتفوق."
             </p>
+            </div>
+            
           </div>
         </div>
       </div>
       
-      <div>
+      <div >
         <SectionHeader title="كورسات المعلم" />
         <div className="flex justify-start ml-28">
           <img src="vector22.png" alt="" />
