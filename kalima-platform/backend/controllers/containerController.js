@@ -92,9 +92,9 @@ exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { name, type, price, level, subject, parent, teacher } = req.body;
+    const { name, type, price, level, subject, parent, teacher, lecturer } = req.body;
     
-    // Create the container with teacher and pointValue included
+    // Create the container with teacher/lecturer and price included
     const container = await Container.create(
       [{
         name,
@@ -103,7 +103,8 @@ exports.createContainer = catchAsync(async (req, res, next) => {
         level,
         subject,
         parent,
-        teacher: teacher || req.user?._id, // Default to current user if teacher not specified
+        teacher: teacher || null,
+        lecturer: lecturer || req.user?._id, // Use lecturer for point system
         createdBy: req.user._id,
       }],
       { session }
@@ -137,7 +138,8 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   const container = await Container.findById(req.params.containerId).populate([
     { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
-    { path: "teacher", select: "name" }
+    { path: "teacher", select: "name" },
+    { path: "lecturer", select: "name" }
   ]);
   if (!container) return next(new AppError("Container not found", 404));
   res.json(container);
@@ -149,6 +151,7 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
     { path: "teacher", select: "name" },
+    { path: "lecturer", select: "name" }
   ]);
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -183,6 +186,37 @@ exports.getTeacherContainers = catchAsync(async (req, res, next) => {
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
     { path: "teacher", select: "name" },
+    { path: "lecturer", select: "name" }
+  ]);
+  
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers
+    }
+  });
+});
+
+// Add a new route handler for getting lecturer containers
+exports.getLecturerContainers = catchAsync(async (req, res, next) => {
+  const { lecturerId } = req.params;
+  
+  if (!lecturerId) {
+    return next(new AppError("Lecturer ID is required", 400));
+  }
+  
+  const containers = await Container.find({
+    $or: [
+      { lecturer: lecturerId },
+      { createdBy: lecturerId }
+    ]
+  }).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "teacher", select: "name" },
+    { path: "lecturer", select: "name" }
   ]);
   
   res.status(200).json({
@@ -195,11 +229,11 @@ exports.getTeacherContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, teacher } = req.body;
+  const { name, type, price, level, subject, teacher, lecturer } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    // Include teacher and pointValue in updates
+    // Include lecturer for the point system
     const updatedContainer = await Container.findByIdAndUpdate(
       req.params.containerId,
       {
@@ -208,7 +242,8 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
         price,
         level,
         subject,
-        teacher
+        teacher,
+        lecturer
       },
       {
         new: true,
@@ -219,6 +254,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
       { path: "teacher", select: "name" },
+      { path: "lecturer", select: "name" }
     ]);
 
     if (!updatedContainer) {

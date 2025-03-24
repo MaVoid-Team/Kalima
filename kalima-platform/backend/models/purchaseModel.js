@@ -7,10 +7,10 @@ const purchaseSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  // For which teacher these points are valid
-  teacher: {
+  // For which lecturer these points are valid
+  lecturer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Teacher",
+    ref: "Lecturer",
     required: true,
   },
   // Points amount purchased or container purchased

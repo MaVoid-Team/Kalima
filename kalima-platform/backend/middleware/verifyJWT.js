@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
   
-  console.log('Auth header:', authHeader);
-  
   if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -20,7 +18,6 @@ const verifyJWT = (req, res, next) => {
         return res.status(403).json({ message: 'Forbidden' });
       }
       
-      console.log('Decoded JWT:', decoded);
       
       // Create user property on request with both standard formats
       req.user = {
@@ -29,8 +26,6 @@ const verifyJWT = (req, res, next) => {
         role: decoded.UserInfo.role,
         email: decoded.UserInfo.email
       };
-      
-      console.log('User set in request:', req.user);
       next();
     }
   );

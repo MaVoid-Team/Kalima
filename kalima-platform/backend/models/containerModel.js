@@ -28,6 +28,11 @@ const containerSchema = new mongoose.Schema(
       ref: "Teacher",
       required: false,
     },
+    lecturer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lecturer",
+      required: false,
+    },
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Container",
