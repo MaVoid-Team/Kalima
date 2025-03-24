@@ -42,7 +42,7 @@ router
 // Update a child container's parent
 router.patch(
   "/update-child",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturers"),
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
   containerController.UpdateChildOfContainer
 );
 
