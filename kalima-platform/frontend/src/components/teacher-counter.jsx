@@ -2,7 +2,7 @@ import { Plus } from "lucide-react"
 
 export default function TeacherCounter() {
   return (
-    <div className=" rounded-full bg-primary-content  shadow-lg px-4 py-3 flex items-center gap-3">
+    <div className=" rounded-3xl bg-primary-content w-56 md:w-full h-16 md:h-full shadow-lg px-4 py-3 flex items-center gap-3">
       {/* Right side - Arabic text */}
       <div className="flex flex-col items-end">
         <h2 className="text-primary text-xl font-bold">معلمين</h2>
