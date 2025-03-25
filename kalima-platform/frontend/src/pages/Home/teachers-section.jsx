@@ -52,6 +52,9 @@ export function TeachersSection() {
 
   return (
     <section className="md:p-8">
+      <div className="relative h-24 w-24 ml-auto mt-4 animate-pulse lg:-translate-x-96 translate-y-1/2 sm:-translate-x-24 -translate-x-56">
+        <img src="curved-arrow-services.png" alt="curved arrow" />
+      </div>
       <div className="container mx-auto px-4">
         <h2 className="text-center text-2xl font-bold mb-2">معلمينا</h2>
         <h3 className="text-center text-3xl font-bold mb-12">
@@ -78,7 +81,7 @@ export function TeachersSection() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {teachers.slice(0, visibleTeachers).map((teacher) => (
                 <TeacherCard key={teacher.id} teacher={teacher} />
               ))}
