@@ -33,7 +33,7 @@ function App() {
         </Routes>
       </Suspense>
 
-      <footer className="bg-base-300 p-4">
+      <footer className="bg-base-200 p-4">
         <Footer />
       </footer>
     </div>

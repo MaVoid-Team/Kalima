@@ -40,7 +40,7 @@ export function HeroSection() {
         </p>
 
         <Link to="/landing">
-          <button className="btn btn-lg bg-primary hover:bg-accent rounded-full">
+          <button className="btn btn-lg bg-primary text-primary-content hover:bg-accent hover:text-accent-content rounded-full">
             تسجيل الدخول
             <ArrowLeft className="h-5 w-5 ml-2" />
           </button>

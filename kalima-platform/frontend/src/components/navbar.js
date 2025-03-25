@@ -43,11 +43,11 @@ const NavBar = () => {
 
   const authItems = [
     { key: 'signup', path: '/register' },
-    { key: 'signin', path: '/login' },
+    { key: 'signin', path: '/landing' },
   ];
 
   return (
-    <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1" dir={isAr ? 'rtl' : 'ltr'}>
+    <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky" dir={isAr ? 'rtl' : 'ltr'}>
       
       <div ref={navbarRef} className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
