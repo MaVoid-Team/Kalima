@@ -123,6 +123,9 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Backend local upload folder.
+/kalima-platform/backend/uploads
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged
