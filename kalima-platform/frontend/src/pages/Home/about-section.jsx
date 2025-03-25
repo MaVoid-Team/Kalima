@@ -5,17 +5,15 @@ export function AboutSection() {
           <div className="flex flex-col-reverse md:flex-row items-center">
             {/* Left side with text */}
             <div className="w-full md:w-1/2 text-right relative">
-              <div className="absolute top-0 left-0">
-                <svg width="80" height="40" viewBox="0 0 80 40" className="text-primary animate-bounce">
-                  <path d="M0 20 Q 20 0, 40 20 Q 60 40, 80 20" fill="none" stroke="currentColor" strokeWidth="2" />
-                </svg>
+              <div className="absolute top-0 left-12">
+                <img src="waves.png" alt="waves" className="w-20 h-20 object-cover animate-float-zigzag text-primary" />
               </div>
   
               <h3 className="text-lg font-medium mb-2">معلومات عنا</h3>
               <h2 className="text-3xl font-bold mb-2">
                 أتعلم وجيب الدرجات
                 <br />
-                النهائية<span className="text-primary">مجانـــا</span>
+                النهائية<span className="text-primary border-b-4 border-primary">معانا</span>
               </h2>
               <p className="mb-6 text-base-content/80">
                 تتعامل كلمة مع منصة تعلم إلكتروني بشكل فعال للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي. إننا
@@ -38,11 +36,8 @@ export function AboutSection() {
               </div>
   
               {/* Curved arrow */}
-              <div className="relative h-24 w-24 mt-4 animate-bounce">
-                <svg viewBox="0 0 100 100" className="text-primary">
-                  <path d="M90,30 Q50,90 10,50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <polygon points="15,55 5,50 15,45" fill="currentColor" />
-                </svg>
+              <div className="relative h-24 w-24 mt-4 animate-pulse">
+                <img src="curved-arrow-about.png" alt="curved arrow"></img>
               </div>
             </div>
   

@@ -28,10 +28,7 @@ export function AppDownloadSection() {
       </div>
       {/* Curved arrow */}
       <div className="relative h-24 w-24 ml-auto mt-4 animate-pulse">
-        <svg viewBox="0 0 100 100" className="text-primary">
-          <path d="M10,30 Q50,90 90,50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <polygon points="85,55 95,50 85,45" fill="currentColor" />
-        </svg>
+        <img src="curved-arrow-services.png" alt="curved-arrow" className="translate-y-32 -translate-x-1/2" />
       </div>
     </section>
   )
