@@ -1,7 +1,9 @@
 import { motion} from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import { FileText, Clock, Star } from "lucide-react";
 function TeacherCard({ teacher }) {
+  const navigate = useNavigate();
   return (
     <motion.div
       className="rounded-lg overflow-hidden hover:scale-105 hover:shadow-xl shadow-lg duration-500"
@@ -37,7 +39,7 @@ function TeacherCard({ teacher }) {
               <Star key={i} className="h-4 w-4 fill-warning text-warning" />
             ))}
           </div>
-          <button className="btn btn-sm btn-primary rounded-full">
+          <button className="btn btn-sm btn-primary rounded-full" onClick={() => navigate(`/teacher-details/${teacher.id}`)}>
             عرض التفاصيل
           </button>
         </div>
