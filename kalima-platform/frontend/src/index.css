@@ -18,7 +18,7 @@
     transform: translateX(0);
   }
   50% {
-    transform: translateX(-32px);
+    transform: translateX(-64px);
   }
   100% {
     transform: translateX(0);
@@ -29,17 +29,17 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(32px);
+    transform: translateY(64px);
   }
   100% {
     transform: translateY(0);
   }
 }
 .animate-float-zigzag {
-  animation: float-zigzag 3s ease-in-out infinite;
+  animation: float-zigzag 4s ease-in-out infinite;
 }
 .animate-float-up-dottedball {
-  animation: float-up-dottedball 3s ease-in-out infinite;
+  animation: float-up-dottedball 4s ease-in-out infinite;
 }
 
 @keyframes float-down-dottedball {
@@ -47,7 +47,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-32px);
+    transform: translateY(-64px);
   }
   100% {
     transform: translateY(0);
@@ -55,5 +55,18 @@
 }
 
 .animate-float-down-dottedball {
-  animation: float-down-dottedball 2s ease-in-out infinite;
+  animation: float-down-dottedball 3s ease-in-out infinite;
+}
+
+@keyframes spin-y {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.animate-spin-y {
+  animation: spin-y 3s linear infinite;
 }

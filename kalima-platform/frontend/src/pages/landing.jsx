@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom" // Using React Router instead of 
 
 // New Curved Arrow component with the provided SVG
 const CurvedArrow = () => (
-  <div className="relative h-32 w-32 animate-bounce text-primary">
+  <div className="relative h-32 w-32 animate-pulse text-primary">
     <svg
       width="86"
       height="103"
@@ -242,7 +242,7 @@ const ZigzagWide = () => (
     viewBox="0 0 148 38"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="w-48 text-primary"
+    className="w-48 text-primary animate-float-zigzag"
   >
     <path d="M2.36157 18.1707L22.1034 2L39.8029 18.1707" stroke="currentColor" strokeWidth="3" />
     <path d="M108.559 18.1707L128.301 2L146 18.1707" stroke="currentColor" strokeWidth="3" />
@@ -276,17 +276,17 @@ export default function CivilcoLanding() {
     <div className="min-h-screen bg-base-100 relative overflow-hidden">
       {/* Yellow circle decoration */}
       <div className="absolute top-20 left-[350px] z-0">
-        <div className="w-10 h-10 rounded-full bg-primary"></div>
+        <div className="w-10 h-10 rounded-full bg-primary animate-float-up-dottedball"></div>
       </div>
 
       {/* Teal circles SVG - right side */}
-      <div className="absolute top-0 right-0 z-0 w-[600px] h-[600px]">
+      <div className="absolute top-0 right-0 z-0 w-[600px] h-[600px] animate-float-down-dottedball">
         <TealCircles />
       </div>
 
       {/* Yellow circle decoration - bottom right */}
       <div className="absolute bottom-20 right-20 z-0">
-        <div className="w-24 h-24 rounded-full border-4 border-primary"></div>
+        <div className="w-24 h-24 rounded-full border-4 border-primary animate-float-up-dottedball"></div>
       </div>
 
       {/* Updated zigzag pattern decoration */}
@@ -340,7 +340,7 @@ export default function CivilcoLanding() {
               </div>
               <button
                 onClick={handleTeacherClick}
-                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg"
+                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
                 معلم
               </button>
@@ -357,7 +357,7 @@ export default function CivilcoLanding() {
               </div>
               <button
                 onClick={handleStudentClick}
-                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg"
+                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
                 طالب
               </button>

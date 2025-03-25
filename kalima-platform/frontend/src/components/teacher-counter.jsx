@@ -29,7 +29,7 @@ export default function TeacherCounter() {
       </div>
 
       {/* Add button */}
-      <button className="btn rounded-full bg-primary hover:bg-accent">
+      <button className="btn rounded-full bg-primary hover:bg-accent text-primary-content">
         <Plus size={16} />
       </button>
     </div>
