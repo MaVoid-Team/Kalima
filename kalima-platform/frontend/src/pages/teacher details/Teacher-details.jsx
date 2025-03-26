@@ -121,27 +121,27 @@ const SocialMediaIcons = () => (
 const TeacherProfileImage = () => (
   <div className="indicator">
     <img
-      className="indicator-item indicator-top indicator-start badge ml-14 bg-transparent border-transparent h-[240px] w-[170px] mt-[20px] floating"
+      className="indicator-item indicator-top indicator-start animate-float-up-dottedball  badge  bg-transparent border-transparent h-[240px] w-[170px] mt-[-160px] floating ml-[-40px]"
       src="/rDots.png"
       alt=""
     />
     <img
-      className="indicator-item indicator-top indicator-center badge bg-transparent border-transparent h-[60px] w-[130px] mt-[-110px]"
+      className="indicator-item indicator-top indicator-center animate-float-zigzag badge bg-transparent border-transparent h-[60px] w-[130px] mt-[-140px]"
       src="/waves.png"
       alt=""
     />
     <img
-      className="indicator-item indicator-top indicator-end badge bg-transparent border-transparent h-[120px] w-[100px] mt-[-10px] ml-40"
+      className="indicator-item indicator-top indicator-end badge animate-float-up-dottedball bg-transparent border-transparent h-[140px] w-[120px] mt-[-130px] mr-[-55px]"
       src="/ring.png"
       alt=""
     />
     <img
-      className="h-[80px] w-[80px] indicator-item indicator-bottom indicator-start badge bg-transparent border-transparent"
+      className="h-[80px] w-[80px] indicator-item indicator-bottom indicator-start animate-float-down-dottedball badge bg-transparent border-transparent ml-[-30px] mb-[-110px]"
       src="/ball.png"
       alt=""
     />
     <img
-      className="indicator-item indicator-bottom indicator-end mr-16 bg-transparent border-transparent h-[240px] w-[170px] mb-[100px] z-0"
+      className="indicator-item indicator-bottom indicator-end mr-[-50px] bg-transparent animate-float-down-dottedball border-transparent h-[240px] w-[170px] mb-[-20px] z-0"
       src="/bDots.png"
       alt=""
     />
@@ -292,8 +292,8 @@ export default function TeacherDetails() {
       </div>
       <div className="relative">
         {/* Background dots positioned absolutely */}
-        <img className="absolute top-0 right-16 z-0 opacity-100 h-[240px] w-[170px]" src="/bDots.png" alt="" />
-        <img className="absolute top-1/3 left-16 z-0 opacity-100 h-[240px] w-[170px]" src="/bDots.png" alt="" />
+        <img className="absolute top-0 animate-float-up-dottedball right-16 z-0 opacity-100 h-[240px] w-[170px]" src="/bDots.png" alt="" />
+        <img className="absolute top-1/3 animate-float-up-dottedball left-16 z-0 opacity-100 h-[240px] w-[170px]" src="/bDots.png" alt="" />
 
         {/* Card grid with higher z-index to appear above the dots */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto px-4 max-w-6xl">
