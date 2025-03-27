@@ -1,14 +1,18 @@
-import { ArrowLeft } from "lucide-react"
-import { Link } from "react-router-dom"
-import TeacherCounter from "../../components/teacher-counter"
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+import TeacherCounter from "../../components/teacher-counter";
 
 export function HeroSection() {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
+
   return (
-<section className="relative overflow-hidden py-8">
-  <div className="container mx-auto px-4">
-    <div className="flex flex-col md:flex-row items-center justify-center">
-      {/* Left side with image */} 
-      <div className="w-full md:w-1/2 relative mb-10 md:mb-0 flex justify-center">
+    <section className="relative overflow-hidden py-8" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center justify-center">
+          {/* Left side with image */}
+          <div className="w-full md:w-1/2 relative mb-10 md:mb-0 flex justify-center">
         <div className="relative z-10 w-full h-full flex justify-center items-center">
           {/* Background decorative elements */}
           <img src="/waves.png" alt="" className="absolute top-0 left-[0%] xl:left-[22%] lg:left-[0%] md:left-[-3%] sm:left-[0%]  w-16 md:w-32 sm:w-24 h-auto z-0 animate-float-zigzag" />
@@ -28,27 +32,26 @@ export function HeroSection() {
       </div>
 
       {/* Right side with text */}
-      <div className="w-full md:w-1/3 text-center md:text-right md:ml-auto">
-        <h2 className="text-xl font-bold text-primary mb-2">اقصر طريق نحو النجاح الباهر</h2>
-        <h1 className="text-4xl font-bold mb-2">
-          مرحبا بك في منصة <span className="text-primary">كلمـــة</span>
-        </h1>
-        <p className="mb-6 text-base-content/80 text-lg">
-          منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب
-          <br />
-          من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.
-        </p>
+      <div className={`w-full md:w-1/3 text-center ${isRTL ? 'md:text-right' : 'md:text-left'}`}>
+            <h2 className="text-xl font-bold text-primary mb-2">
+              {t("hero.title")}
+            </h2>
+            <h1 className="text-4xl font-bold mb-2">
+              {t("hero.heading", { platform: "كلمـــة" })}
+            </h1>
+            <p className="mb-6 text-base-content/80 text-lg">
+              {t("hero.description")}
+            </p>
 
-        <Link to="/landing">
-          <button className="btn btn-lg bg-primary text-primary-content hover:bg-accent hover:text-accent-content rounded-full">
-            تسجيل الدخول
-            <ArrowLeft className="h-5 w-5 ml-2" />
-          </button>
-        </Link>
+            <Link to="/landing">
+              <button className="btn btn-lg bg-primary text-primary-content hover:bg-accent hover:text-accent-content rounded-full">
+                {t("hero.cta")}
+                <ArrowLeft className={`h-5 w-5 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`}  />
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
   )
 }
-

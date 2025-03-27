@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Navbar, Button } from 'react-daisyui';
 import ThemeSwitcher from './ThemeSwitcher';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const NavBar = () => {
   const { t, i18n } = useTranslation('common');
@@ -98,6 +99,7 @@ const NavBar = () => {
               </Link>
             ))}
             <ThemeSwitcher />
+            <LanguageSwitcher />
           </div>
         </div>
 

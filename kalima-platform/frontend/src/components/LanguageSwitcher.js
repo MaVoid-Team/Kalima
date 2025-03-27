@@ -1,25 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
+  // Set initial language on mount
+  useEffect(() => {
+    const savedLang = localStorage.getItem('lng') || 'ar';
+    i18n.changeLanguage(savedLang);
+  }, [i18n]);
+
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
+    localStorage.setItem('lng', lng);
   };
 
   return (
-    <div className="dropdown dropdown-end" >
-      <div tabIndex={0} role="button" className="btn btn-ghost gap-2" >
-        {/* Current language flag */}
+    <div className="dropdown dropdown-end">
+      <div tabIndex={0} role="button" className="btn btn-ghost gap-2">
         {i18n.language === 'en' ? (
-          <>
-            <span className="">Language</span>
-          </>
+          <span>Language</span>
         ) : (
-          <>
-            <span className="">اللغه</span>
-          </>
+          <span>اللغه</span>
         )}
       </div>
       <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
