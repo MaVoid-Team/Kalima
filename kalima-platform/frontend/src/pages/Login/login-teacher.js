@@ -67,7 +67,7 @@ const TeacherLogin = () => {
       </div>
       
       {/* Right side - Login Form */}
-      <div className="w-full md:w-1/2 p-6 flex justify-center items-center z-10">
+      <div className="w-full md:w-1/2 p-6 flex justify-center items-center">
         <div className="bg-base-100 shadow-xl rounded-lg p-6 w-full max-w-md">
           <h1 className="text-3xl font-bold text-center mb-2">
             {t('loginNow', 'Login Now!')}

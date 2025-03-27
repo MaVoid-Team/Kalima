@@ -83,7 +83,7 @@ const TeacherReviews = () => {
   const [currentReview, setCurrentReview] = useState(0);
   const [modalContent, setModalContent] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
-  const { t, i18n } = useTranslation('teacherReviews');
+  const { t, i18n } = useTranslation('studentReviews');
   const isRTL = i18n.language === 'ar';
   
   useEffect(() => {
@@ -107,11 +107,11 @@ const TeacherReviews = () => {
     <div className="w-full md:w-3/4 p-4 md:p-8 xl:pt-10 flex flex-col items-center mx-auto" dir='ltr'>
       <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-center flex items-center justify-center gap-2">
         <FaChalkboardTeacher className="text-primary opacity-50 w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10" /> 
-        <span>{t('title', 'Teacher Testimonials')}</span>
+        <span>{t('TeacherTitle', 'Teacher Testimonials')}</span>
       </h2>
 
       <p className="text-base-600 text-center mb-6 md:mb-8">
-        {t('description', 'See what educators are saying about our teaching platform')}
+        {t('TeacherDescription', 'See what educators are saying about our teaching platform')}
       </p>
       
       <div className="relative w-[1200px] max-w-xs md:max-w-lg">
