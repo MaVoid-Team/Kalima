@@ -6,7 +6,7 @@ import { loginUser } from '../../routes/auth-services'; // Assuming this is the 
 import { Link } from 'react-router-dom';
 
 const TeacherLogin = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const [activeTab, setActiveTab] = useState('email_tab');
   const [formData, setFormData] = useState({
@@ -92,7 +92,7 @@ const TeacherLogin = () => {
             </button>
           </div>
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Conditional Input Fields */}
             {activeTab === 'email_tab' ? (
               <div className="form-control mb-4">

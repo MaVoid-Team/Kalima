@@ -139,7 +139,7 @@ function LoginStudent() {
                     <input
                       type="tel"
                       placeholder={t("phone_label") || "Phone Number"}
-                      className="input input-sm sm:input-md input-bordered"
+                      className="input input-sm sm:input-md input-bordered "
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       required
