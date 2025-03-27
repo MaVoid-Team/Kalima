@@ -1,54 +1,63 @@
+import { useTranslation } from 'react-i18next';
+
 export function AboutSection() {
-    return (
-      <section className="p-8">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col-reverse md:flex-row items-center">
-            {/* Left side with text */}
-            <div className="w-full md:w-1/2 text-right relative">
-              <div className="absolute top-0 left-12">
-                <img src="waves.png" alt="waves" className="w-20 h-20 object-cover animate-float-zigzag text-primary" />
-              </div>
-  
-              <h3 className="text-lg font-medium mb-2">معلومات عنا</h3>
-              <h2 className="text-3xl font-bold mb-2">
-                أتعلم وجيب الدرجات
-                <br />
-                النهائية<span className="text-primary border-b-4 border-primary">معانا</span>
-              </h2>
-              <p className="mb-6 text-base-content/80">
-                تتعامل كلمة مع منصة تعلم إلكتروني بشكل فعال للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي. إننا
-                نقدم لك أفضل الحلول لضمان تفوقك بالطالب
-              </p>
-  
-              <div className="flex flex-col gap-2 text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm">معلمين محترفين</span>
-                  <div className="w-4 h-4 rounded-full bg-base-300"></div>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm">اختبارات على كل درس</span>
-                  <div className="w-4 h-4 rounded-full bg-base-300"></div>
-                </div>
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm">شرح وافي للمناهج</span>
-                  <div className="w-4 h-4 rounded-full bg-base-300"></div>
-                </div>
-              </div>
-  
-              {/* Curved arrow */}
-              <div className="relative h-24 w-24 mt-4 animate-pulse">
-                <img src="curved-arrow-about.png" alt="curved arrow"></img>
-              </div>
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
+
+  return (
+    <section className="p-8" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="container mx-auto px-4">
+        <div className={`flex flex-col-reverse md:flex-row items-center ${isRTL ? '' : 'md:flex-row-reverse'}`}>
+          {/* Text Content */}
+          <div className={`w-full md:w-1/2 relative ${isRTL ? 'md:text-right' : 'md:text-left'}`}>
+            <div className={`absolute ${isRTL ? 'left-12' : 'right-12'} top-0`}>
+              <img 
+                src="waves.png" 
+                alt="waves" 
+                className="w-20 h-20 object-cover animate-float-zigzag text-primary" 
+              />
             </div>
-  
-            {/* Right side with image */}
-            <div className="w-full md:w-1/2 mb-10 md:mb-0 left-5 md:left-20 relative">
-              <img src="/about.png" alt="Students studying" className="rounded-lg mx-auto" />
+
+            <h3 className="text-lg font-medium mb-2">{t("about.title")}</h3>
+            <h2 className="text-3xl font-bold mb-2">
+              {t("about.heading")} 
+              <span className="text-primary border-b-4 border-primary">
+                {isRTL ? "معانا" : "With Us"}
+              </span>
+            </h2>
+            <p className="mb-6 text-base-content/80">
+              {t("about.description")}
+            </p>
+
+            <div className={`flex flex-col gap-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+              {['teachers', 'tests', 'curriculum'].map((feature) => (
+                <div key={feature} className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                  <span className="text-sm">{t(`about.features.${feature}`)}</span>
+                  <div className="w-4 h-4 rounded-full bg-base-300"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Curved arrow */}
+            <div className={`relative h-24 w-24 mt-4 animate-pulse ${isRTL ? '' : 'scale-x-[-1]'}`}>
+              <img 
+                src="curved-arrow-about.png" 
+                alt="curved arrow"
+                className={isRTL ? '' : 'rotate-180'}
+              />
             </div>
           </div>
+
+          {/* Image Section */}
+          <div className="w-full md:w-1/2 mb-10 md:mb-0 relative">
+            <img 
+              src="/about.png" 
+              alt="Students studying" 
+              className="rounded-lg mx-auto" 
+            />
+          </div>
         </div>
-      </section>
-    )
-  }
-  
-  
+      </div>
+    </section>
+  )
+}

@@ -39,7 +39,15 @@
       "password": "كلمة المرور",
       "confirmPassword": "تاكيد كلمة المرور",
       "childrenDetails": "تفاصيل الأبناء",
-      "childId": "رقم الأبن"
+      "childId": "رقم الأبن",
+      "childSequenceId" : "رقم تسلسل الأبن",
+      "childrenSequenceIdsHelp" : "استخدم الفواصل لفصل أرقام تسلسل الأبناء",
+      "childrenSequenceIds"  : "رقم تسلسل الأبناء",
+      "level" : "المستوى",
+      "optional" : "اختياري",
+      "selectLevel" : "اختر المستوى"
+
+
 
     },
     "gender": {
