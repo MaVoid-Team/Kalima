@@ -1,54 +1,75 @@
+
 "use client"
 
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
 import { Clock, Loader } from "lucide-react"
 import { getUserById } from "../../routes/fetch-users"
 import { useParams } from "react-router-dom"
 
 // Separate component for the teacher information header
-const TeacherInfoHeader = () => (
-  <div className="w-full flex flex-col items-center py-32 -z-10 absolute top-0">
-    <div className="flex items-center gap-x-2">
-      <img className="h-1 mt-4" src="/Line 5.png" alt="" />
-      <h1 className="text-center text-2xl font-bold text-primary ">معلومات المعلم</h1>
+const TeacherInfoHeader = () => {
+  const { t, i18n } = useTranslation("teacherDetails");
+  const isRTL = i18n.language === 'ar';
+  
+  return (
+    <div className="w-full flex flex-col items-center py-32 -z-10 absolute top-0">
+      <div className="flex items-center gap-x-2">
+        <img className="h-1 mt-4" src="/Line 5.png" alt="" />
+        <h1 className="text-center text-2xl font-bold text-primary">
+          {t('teacherInfo')}
+        </h1>
+      </div>
+      <img className="h-auto mt-16 sm:mr-56 mr-60 md:mr-0" src="/vector 21.png" alt="" />
     </div>
-    <img className="h-auto mt-16 sm:mr-56 mr-60 md:mr-0" src="/vector 21.png" alt="" />
-  </div>
-)
+  )
+}
 
 // Separate component for the rating display
-const RatingDisplay = ({ rating = 4 }) => (
-  <div className="border-[1px] rounded-lg flex flex-col">
-    <div className="text-center">
-      <h1 className="font-bold">التقيم: {rating}</h1>
+const RatingDisplay = ({ rating = 4 }) => {
+  const { t } = useTranslation("teacherDetails");
+  
+  return (
+    <div className="border-[1px] rounded-lg flex flex-col">
+      <div className="text-center">
+        <h1 className="font-bold">{t('rating')} { rating }</h1>
+      </div>
+      <div className="rating">
+        {[...Array(5)].map((_, i) => (
+          <input
+            key={i}
+            type="radio"
+            name="rating"
+            className="mask mask-star-2 bg-warning"
+            checked={i < rating}
+            readOnly
+            aria-label={`${i + 1} star`}
+          />
+        ))}
+      </div>
     </div>
-    <div className="rating">
-      {[...Array(5)].map((_, i) => (
-        <input
-          key={i}
-          type="radio"
-          name="rating"
-          className="mask mask-star-2 bg-warning"
-          checked={i < rating}
-          readOnly
-          aria-label={`${i + 1} star`}
-        />
-      ))}
+  )
+}
+
+const SectionHeader = ({ titleKey }) => {
+  const { t } = useTranslation("teacherDetails");
+  
+  return (
+    <div className="flex justify-center">
+      <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
+      <h1 className="text-center text-2xl font-bold text-primary">
+        {t(titleKey)}
+      </h1>
     </div>
-  </div>
-)
-
-// Separate component for section headers
-const SectionHeader = ({ title }) => (
-  <div className="flex justify-center">
-    <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-    <h1 className="text-center text-2xl font-bold text-primary ">{title}</h1>
-  </div>
-)
-
+  )
+}
 // Course card component - Reduced size
-const CourseCard = ({ course }) => (
-  <div className="rounded-lg overflow-hidden border-2 border-warning bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 max-w-md relative">
+const CourseCard = ({ course }) => {
+  const { t, i18n } = useTranslation("teacherDetails");
+  const isRTL = i18n.language === 'ar';
+
+  return (
+    <div className={`rounded-lg overflow-hidden border-2 border-warning bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 max-w-md relative ${isRTL ? 'text-right' : 'text-left'}`}>
     <div className="relative">
       <img
         src={course.image || "/placeholder.svg"}
@@ -63,49 +84,39 @@ const CourseCard = ({ course }) => (
         <img src="/teacher.png" alt="" className="h-13 w-13" />
       </div>
     </div>
-    <div className="p-3">
-      {" "}
-      {/* Reduced padding */}
-      <h4 className="font-bold text-md mb-1 text-right">{course.title}</h4> {/* Smaller text */}
-      <h5 className="text-right text-sm">
-        {course.subject}-{course.class}
-      </h5>
-      <div className="flex justify-end">
-        <div className="flex items-start justify-evenly gap-1 mb-2 bg-[#E0F5F5] rounded-xl w-36 text-right mt-2">
-          <h4 className="text-xs text-right">{course.grade}</h4>
-          <div className="w-5 h-5 rounded-full bg-transparent flex items-start justify-evenly">
-            <img src="/school.png" alt="" />
+    <div className="p-3 text-right">
+        <h4 className="font-bold text-md mb-1">{course.title}</h4>
+        <h5 className="text-sm">
+          {course.subject}-{course.class}
+        </h5>
+        <div className="flex justify-end">
+          <div className="flex items-start justify-evenly gap-1 mb-2 bg-[#E0F5F5] rounded-xl w-36 mt-2">
+            <h4 className="text-xs">{course.grade}</h4>
+            <div className="w-5 h-5 rounded-full bg-transparent flex items-start justify-evenly">
+              <img src="/school.png" alt="" />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end items-center gap-1 mb-1">
+          <span className="text-xs">
+        {t('duration')} : {course.duration}    
+          </span>
+          <div className="w-5 h-5 rounded-full bg-base-200 flex items-center justify-center">
+            <Clock className="h-2.5 w-2.5" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <button className="btn btn-md btn-primary rounded-full text-xs">
+            {t('viewDetails')}
+          </button>
+          <div className="flex">
+            <RatingDisplay rating={course.rating} />
           </div>
         </div>
       </div>
-      <div className="flex justify-end items-center gap-1 mb-1">
-        {" "}
-        {/* Reduced gaps and margins */}
-        <span className="text-xs">
-          {" "}
-          المدة: {course.duration} <span>ساعة تدريبية</span>
-        </span>{" "}
-        {/* Smaller text */}
-        <div className="w-5 h-5 rounded-full bg-base-200 flex items-center justify-center">
-          {" "}
-          {/* Smaller icon container */}
-          <Clock className="h-2.5 w-2.5" /> {/* Smaller icon */}
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <button className="btn btn-md btn-primary rounded-full text-xs">
-          {" "}
-          {/* Smaller button */}
-          عرض التفاصيل
-        </button>
-        <div className="flex">
-          <RatingDisplay rating={course.rating} />
-        </div>
-      </div>
     </div>
-  </div>
-)
-
+  )
+}
 // Social media icons component
 const SocialMediaIcons = () => (
   <div className="flex flex-row gap-x-2 mt-9 justify-start ml-8 size-80">
@@ -153,34 +164,34 @@ const TeacherProfileImage = () => (
 )
 
 export default function TeacherDetails() {
+  const { t, i18n } = useTranslation("teacherDetails");
+  const isRTL = i18n.language === 'ar';
   const [teacher, setTeacher] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const { id } = useParams() // Get the teacher ID from URL params
+  const { id } = useParams()
 
   useEffect(() => {
     const fetchTeacherData = async () => {
       setLoading(true)
       try {
-        // Use the ID from URL params, or fallback to a default ID if needed
         const teacherId = id || "67d3621ee038812431fec89b"
         const result = await getUserById(teacherId)
 
         if (result.success) {
           setTeacher(result.data)
         } else {
-          setError("تعذر تحميل بيانات المعلم")
+          setError(t('error.failed'))
         }
       } catch (err) {
         console.error("Error fetching teacher:", err)
-        setError("حدث خطأ أثناء جلب البيانات")
+        setError(t('error.failed'))
       } finally {
         setLoading(false)
       }
     }
-
     fetchTeacherData()
-  }, [id])
+  }, [id, t])
 
   // Sample courses data - this would ideally come from an API as well
   const courses = [
@@ -220,6 +231,9 @@ export default function TeacherDetails() {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader className="h-8 w-8 animate-spin text-primary" />
+        <span className={isRTL ? 'mr-2' : 'ml-2'}>
+          {t('error.loading')}
+        </span>
       </div>
     )
   }
@@ -238,16 +252,15 @@ export default function TeacherDetails() {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="alert alert-warning">
-          <p>لم يتم العثور على بيانات المعلم</p>
+          <p>{t('error.notFound')}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <section className="overflow-hidden py-40">
+    <section className="overflow-hidden py-40" dir={isRTL ? 'ltr' : 'rtl'}>
       <TeacherInfoHeader />
-
       <div className="container mx-auto lg:px-32 sm:px-16 px-16 sm:py-52 py-56 md:py-32 lg:py-0">
         <div className="flex flex-col md:flex-row items-center">
           {/* Left side with image */}
@@ -259,25 +272,31 @@ export default function TeacherDetails() {
           </div>
 
           {/* Right side with text */}
-          <div className="w-full md:w-1/2 text-right md:ml-auto lg:mb-72 mb-0 sm:mb-0">
+          <div className={`w-full md:w-1/2 ${isRTL ? 'text-right' : 'text-left'} md:ml-auto lg:mb-72 mb-0 sm:mb-0`}>
             <h2 className="text-xl font-bold text-primary mb-2">/{teacher.role}</h2>
             <h1 className="text-4xl font-bold mb-2">{teacher.name}</h1>
 
             <div className="flex flex-row justify-end gap-x-3 mt-4 mb-4">
               <RatingDisplay />
               <div>
-                <h3 className="font-bold">مادة {teacher.expertise || "الرياضيات"}</h3>
+                <h3 className="font-bold">
+                  {t('subject')} {teacher.expertise}
+                </h3>
               </div>
             </div>
 
             <div className="flex justify-end">
               <img className="h-1 mt-4 mr-2" src="/Line 5.png" alt="" />
-              <h1 className="text-center text-2xl font-bold text-primary mb-5">السيرة الذاتية</h1>
+              <h1 className="text-center text-2xl font-bold text-primary mb-5">
+                {t('bioHeader')}
+              </h1>
             </div>
             <div className="flex justify-end">
               <p className="font-semibold text-xl sm:w-56 w-64 md:w-60 lg:w-auto">
-                {teacher.bio ||
-                  `"أعزائي الطلاب، يسعدني أن أقدم لكم نفسي، أستاذ ${teacher.expertise || "الرياضيات"} ${teacher.name}. أنا هنا لأكون مرشدكم في عالم الأرقام والمعادلات. أمتلك خبرة واسعة في تدريس ${teacher.expertise || "الرياضيات"} وأحرص دائمًا على تبسيط المفاهيم المعقدة بحيث تكون سهلة الفهم. أنا شغوف بتعليمكم وتطوير مهاراتكم، وأعدكم بأنني سأبذل قصارى جهدي لمساعدتكم على فهم المادة بشكل عميق وتطبيقها في حياتكم اليومية. أنا هنا لدعمكم وتوجيهكم نحو النجاح والتفوق."`}
+                {teacher.bio || t('bioTemplate', {
+                  name: teacher.name,
+                  expertise: teacher.expertise || t('defaultSubject')
+                })}
               </p>
             </div>
           </div>
@@ -285,7 +304,7 @@ export default function TeacherDetails() {
       </div>
 
       <div>
-        <SectionHeader title="كورسات المعلم" />
+        <SectionHeader titleKey="coursesHeader" />
         <div className="flex justify-start ml-28">
           <img src="/vector22.png" alt="" />
         </div>
