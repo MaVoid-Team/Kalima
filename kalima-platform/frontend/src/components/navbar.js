@@ -88,7 +88,7 @@ const NavBar = () => {
           </Link>
           
           {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex gap-4 ml-4 rounded-2xl">
+          <div className="hidden lg:flex  xl:gap-4  ml-4 rounded-2xl">
             {navItems.map((item) => (
               <Link
                 key={item.key}
@@ -170,7 +170,8 @@ const NavBar = () => {
             
             <div className="divider" />
             <ThemeSwitcher />
-            <div className="divider" />
+            <LanguageSwitcher />
+ 
             
             {authItems.map((item) => (
               <Link
