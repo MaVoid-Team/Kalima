@@ -58,14 +58,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className={`text-center mt-8 pt-4 border-t border-base-300 ${isRTL ? 'text-right' : 'text-left'}`}>
-          <p className="text-sm" dangerouslySetInnerHTML={{
-            __html: t('copyright', {
-              platform: '<a href="/" class="text-primary">Kalma</a>',
-              team: '<a href="/" class="text-primary">Kalma</a>',
-              interpolation: { escapeValue: false }
-            })
-          }} />
+        <div className="text-center mt-8 pt-4 border-t border-base-300 "dir='ltr'>
+          <p className="text-sm">
+            @Copyright 2025 <Link className="text-primary" to={'/'}>Kalma</Link> | Developed by <Link className="text-primary" to={'/'}>Kalma</Link> team, All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
