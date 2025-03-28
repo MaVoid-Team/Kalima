@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom" // Using React Router instead of Next.js Router
 
 // New Curved Arrow component with the provided SVG
@@ -260,7 +261,8 @@ const ZigzagWide = () => (
 )
 
 export default function CivilcoLanding() {
-  const navigate = useNavigate() // Using React Router's navigate instead of Next.js router
+  const { t } = useTranslation("common")
+  const navigate = useNavigate()
 
   const handleTeacherClick = () => {
     console.log("Teacher selected")
@@ -307,19 +309,20 @@ export default function CivilcoLanding() {
 
         {/* Main content */}
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-base-content" dir="rtl">
-            مرحبا بك في منصة{" "}
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-base-content">
+            {t('landing.welcome', { platform: '' })}
             <span className="text-primary relative">
-              كلمة
+              {t('landing.platformName')}
               <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"></span>
             </span>
           </h1>
-          <p className="text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto text-base-content" dir="rtl">
-            منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.
+          
+          <p className="text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto text-base-content">
+            {t('landing.description')}
           </p>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 mt-16 text-base-content" dir="rtl">
-            من انـــــــت ؟
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 mt-16 text-base-content">
+            {t('landing.whoAreYou')}
           </h2>
 
           {/* Role selection cards with flow lines */}
@@ -342,7 +345,7 @@ export default function CivilcoLanding() {
                 onClick={handleTeacherClick}
                 className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
-                معلم
+                {t('landing.teacher')}
               </button>
             </div>
 
@@ -359,7 +362,7 @@ export default function CivilcoLanding() {
                 onClick={handleStudentClick}
                 className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
-                طالب
+               {t('landing.student')}
               </button>
             </div>
           </div>
