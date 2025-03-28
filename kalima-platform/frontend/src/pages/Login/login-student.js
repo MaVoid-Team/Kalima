@@ -100,7 +100,7 @@ function LoginStudent() {
 
               <form onSubmit={handleSubmit}>
                 {/* Login Method Toggle */}
-                <div className="tabs tabs-boxed mb-4 justify-center">
+                <div className="tabs tabs-boxed mb-4 ">
                   <Link
                     className={`tab ${loginMethod === "email" ? "tab-active" : ""}`}
                     onClick={() => setLoginMethod("email")}
