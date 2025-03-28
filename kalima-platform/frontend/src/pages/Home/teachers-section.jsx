@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { FileText, Clock, ChevronLeft, Star, Loader } from 'lucide-react';
 import { getAllUsers } from "../../routes/fetch-users";
+import { useTranslation } from "react-i18next";
+
 
 export function TeachersSection() {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [visibleTeachers, setVisibleTeachers] = useState(3); // Number of teachers to display initially
+  const [visibleTeachers, setVisibleTeachers] = useState(3);
 
   useEffect(() => {
     fetchTeachers();
@@ -18,66 +22,69 @@ export function TeachersSection() {
     setLoading(true);
     try {
       const result = await getAllUsers();
-
       if (result.success) {
-        // Filter users with role "Lecturer" and map to the expected format
         const lecturers = result.data
           .filter((user) => user.role === "Lecturer")
           .map((lecturer) => ({
             id: lecturer._id,
-            image: "/course-1.png", // You can add a default image or use a field from API if available
+            image: "/course-1.png",
             name: lecturer.name,
-            subject: lecturer.expertise || "معلم", // Use expertise as subject
-            experience: lecturer.bio || "معلم خبير", // Use bio or a default text
-            grade: "جميع المراحل", // Default value since API doesn't provide this
-            rating: 5, // Default rating
+            subject: lecturer.expertise || t('teachers.labels.expertise'),
+            experience: lecturer.bio || t('teachers.labels.experience'),
+            grade: t('teachers.labels.gradeLevels'),
+            rating: 5,
           }));
-
         setTeachers(lecturers);
       } else {
-        setError("فشل في تحميل بيانات المعلمين");
+        setError(t('teachers.errors.failed'));
       }
     } catch (err) {
-      console.error("Error fetching teachers:", err);
-      setError("حدث خطأ أثناء تحميل البيانات");
+      setError(t('teachers.errors.failed'));
     } finally {
       setLoading(false);
     }
   };
 
   const loadMoreTeachers = () => {
-    // Show all teachers when button is clicked
     setVisibleTeachers(teachers.length);
   };
 
   return (
-    <section className="md:p-8">
-      <div className="relative h-24 w-24 ml-auto mt-4 animate-pulse lg:-translate-x-96 translate-y-1/2 sm:-translate-x-24 -translate-x-56">
-        <img src="curved-arrow-services.png" alt="curved arrow" />
+    <section className="md:p-8" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className={`relative h-24 w-24 ${isRTL ? 'ml-auto' : 'mr-auto'} mt-4 animate-pulse lg:-translate-x-96 translate-y-1/2 sm:-translate-x-24 -translate-x-56`}>
+        <img 
+          src="curved-arrow-services.png" 
+          alt="curved arrow" 
+          className={isRTL ? '' : 'scale-x-[-1]'}
+        />
       </div>
       <div className="container mx-auto px-4">
-        <h2 className="text-center text-2xl font-bold mb-2">معلمينا</h2>
+        <h2 className="text-center text-2xl font-bold mb-2">
+          {t('teachers.title')}
+        </h2>
         <h3 className="text-center text-3xl font-bold mb-12">
-          شوف كل معلمين{" "}
-          <span className="text-primary border-b-2 border-primary pb-1">
-            منصتنا
-          </span>
+          {t('teachers.heading')} 
+            <span className="text-primary border-b-2 border-primary pb-1">
+              {t('teachers.platform')}
+            </span>
+          
         </h3>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Loader className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">{t('teachers.errors.loading')}</span>
           </div>
         ) : error ? (
           <div className="alert alert-error">
             <p>{error}</p>
             <button className="btn btn-sm btn-outline" onClick={fetchTeachers}>
-              إعادة المحاولة
+              {t('teachers.errors.retry')}
             </button>
           </div>
         ) : teachers.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-lg">لا يوجد معلمين متاحين حالياً</p>
+            <p className="text-lg">{t('teachers.errors.noneFound')}</p>
           </div>
         ) : (
           <>
@@ -93,8 +100,8 @@ export function TeachersSection() {
                   className="btn btn-primary rounded-full"
                   onClick={loadMoreTeachers}
                 >
-                  عرض المزيد من المعلمين
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  {t('teachers.loadMore')}
+                  <ChevronLeft className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`} />
                 </button>
               </div>
             )}
@@ -106,6 +113,9 @@ export function TeachersSection() {
 }
 
 function TeacherCard({ teacher }) {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
+
   return (
     <div className="rounded-lg overflow-hidden hover:scale-105 hover:shadow-xl shadow-lg duration-500">
       <div className="relative">
@@ -119,19 +129,28 @@ function TeacherCard({ teacher }) {
         </div>
       </div>
       <div className="p-4">
-        <h4 className="font-bold text-lg mb-2 text-right">{teacher.name}</h4>
-        <div className="flex justify-end items-center gap-2 mb-2">
-          <span className="text-sm">{teacher.experience}</span>
-          <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
+        <h4 className={`font-bold text-lg mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+          {teacher.name}
+        </h4>
+        
+        {/* Experience */}
+
+        <div className={`flex  items-center gap-2 mb-2`}>              
+            <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
             <Clock className="h-3 w-3" />
+            </div>
+            <span className="text-sm">{teacher.experience}</span>
+            </div>
+
+        {/* Grade Levels */}
+        
+          <div className={`flex  items-center gap-2 mb-4`}>
+            <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
+              <FileText className="h-3 w-3" />
+              </div>
+            <span className="text-sm">{teacher.grade}</span>
           </div>
-        </div>
-        <div className="flex justify-end items-center gap-2 mb-4">
-          <span className="text-sm">{teacher.grade}</span>
-          <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
-            <FileText className="h-3 w-3" />
-          </div>
-        </div>
+       
         <div className="flex items-center justify-between">
           <div className="flex">
             {[...Array(teacher.rating)].map((_, i) => (
@@ -139,7 +158,7 @@ function TeacherCard({ teacher }) {
             ))}
           </div>
           <button className="btn btn-sm btn-primary rounded-full">
-            عرض الملف
+            {t('teachers.viewProfile')}
           </button>
         </div>
       </div>
