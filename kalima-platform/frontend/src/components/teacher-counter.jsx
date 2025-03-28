@@ -12,11 +12,11 @@ export default function TeacherCounter() {
       {/* Text Content */}
       <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
         <h2 className="text-primary text-xl font-bold">
-          {t("teachers.title")}
+          {t("teacherCount.title")}
         </h2>
         <div className="flex items-center gap-1">
           <span className="text-primary text-2xl font-bold">
-            {t("teachers.counter")} <span className="text-primary text-2xl font-bold">+10</span>
+            {t("teacherCount.counter")} <span className="text-primary text-2xl font-bold">+10</span>
           </span>
         </div>
       </div>
@@ -28,7 +28,7 @@ export default function TeacherCounter() {
           <div key={index} className="rounded-full overflow-hidden -ml-2 first:ml-0">
             <img 
               src="/teacher_illustration.png" 
-              alt={t("teachers.counter", { count: index })} 
+              alt={t("teacherCount.counter", { count: index })} 
               className="w-8 h-8 object-cover text-primary" 
             />
           </div>
@@ -38,7 +38,7 @@ export default function TeacherCounter() {
       {/* Add Button */}
       <button 
         className="btn rounded-full bg-primary hover:bg-accent text-primary-content"
-        aria-label={t("teachers.add")}
+        aria-label={t("teacherCount.add")}
       >
         <Plus size={16}  />
       </button>

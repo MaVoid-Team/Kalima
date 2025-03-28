@@ -23,10 +23,69 @@
       "now": "Now",
       "everywhere": "Everywhere"
     },
-    "teachers": {
+    "teacherCount": {
     "title": "Teachers",
     "counter": "Teacher ",
     "add": "Add Teacher"
-  }
+  },
+  "services": {
+    "title": "Our Services",
+    "heading": "Our goal is to simplify subjects to ensure your excellence ",
+    "withUs": "With Us",
+    "items": [
+      {
+        "title": "Performance Tracking",
+        "subtitle": "Anytime",
+        "description": "Continuous student progress monitoring through periodic reports showing improvement areas"
+      },
+      {
+        "title": "Regular Tests",
+        "subtitle": "On Our Platform", 
+        "description": "Diverse tests with instant correction and answer explanations"
+      },
+      {
+        "title": "Top-Level",
+        "subtitle": "Teachers",
+        "description": "Team of expert teachers providing simplified and engaging lessons"
+      },
+      {
+        "title": "High Quality",
+        "subtitle": "Courses",
+        "description": "Comprehensive courses covering all curriculum aspects with practical applications"
+      }
+    ]
+  },
+  "teachers": {
+    "title": "Our Teachers",
+    "heading": "View All Teachers from Our ",
+    "platform": "Platform",
+    "loadMore": "Show More Teachers",
+    "viewProfile": "View Profile",
+    "errors": {
+      "loading": "Loading...",
+      "failed": "Failed to load teachers",
+      "retry": "Retry",
+      "noneFound": "No teachers available currently"
+    },
+    "labels": {
+      "expertise": "Expertise",
+      "experience": "Years Experience",
+      "gradeLevels": "All Grade Levels"
+    }
+  },
+  "courses": {
+    "title": "Our Courses",
+    "heading": "Browse All ",
+    "platform": "Our Courses",
+    "viewAll": "View All Courses",
+    "duration": " study hours",
+    "viewDetails": "View Details",
+    "rating": "Rating",
+    "errors": {
+      "loading": "Loading courses...",
+      "failed": "Failed to load courses",
+      "retry": "Try Again"
+    }
 
+  }
 }
