@@ -133,7 +133,7 @@ const TeacherReviews = () => {
 
       {/* Modal */}
       <div className={`modal ${modalContent ? 'modal-open' : ''}`}>
-        <div className="modal-box relative max-w-[95%] md:max-w-2xl p-4 md:p-6">
+        <div className="modal-box relative max-w-[95%] md:max-w-2xl p-4 md:p-6 z-50">
           <button 
             className="btn btn-sm btn-circle absolute right-2 top-2"
             onClick={closeModal}
