@@ -9,7 +9,7 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden py-8" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container mx-auto px-4">
+      <div className="container px-4">
         <div className="flex flex-col md:flex-row items-center justify-center">
           {/* Left side with image */}
           <div className="w-full md:w-1/2 relative mb-10 md:mb-0 flex justify-center">
