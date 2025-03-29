@@ -14,9 +14,16 @@ router.get(
 );
 
 // Get containers for a specific teacher
+// METHOD DELETED
+// router.get(
+//   "/teacher/:teacherId",
+//   containerController.getTeacherContainers
+// );
+
+// Get containers for a specific lecturer
 router.get(
-  "/teacher/:teacherId",
-  containerController.getTeacherContainers
+  "/lecturer/:lecturerId",
+  containerController.getLecturerContainers
 );
 
 // Create and get containers
@@ -42,7 +49,7 @@ router
 // Update a child container's parent
 router.patch(
   "/update-child",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturers"),
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
   containerController.UpdateChildOfContainer
 );
 
@@ -80,5 +87,22 @@ router
     ),
     containerController.deleteContainerAndChildren
   );
+
+// Get revenue for a specific container by Id
+router
+.get(
+  "/:containerId/revenue",
+  authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Lecturer",
+    "Assistant",
+    "Student",
+    "Parent"
+  ),
+  containerController.getContainerRevenue
+);
+
 
 module.exports = router;
