@@ -18,6 +18,7 @@ const subjectRouter = require("./routes/subjectRoutes.js");
 const levelRouter = require("./routes/levelRoutes.js");
 const StudentLectureAccessRouter = require("./routes/studentLectureAccessRoutes.js");
 
+const centerRouter = require("./routes/centerRoutes");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -36,6 +37,7 @@ app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/levels", levelRouter);
 app.use("/api/v1/subjects", subjectRouter);
 app.use("/api/v1/student-lecture-access", StudentLectureAccessRouter);
+app.use("/api/v1/centers", centerRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
