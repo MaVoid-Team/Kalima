@@ -14,10 +14,11 @@ router.get(
 );
 
 // Get containers for a specific teacher
-router.get(
-  "/teacher/:teacherId",
-  containerController.getTeacherContainers
-);
+// METHOD DELETED
+// router.get(
+//   "/teacher/:teacherId",
+//   containerController.getTeacherContainers
+// );
 
 // Get containers for a specific lecturer
 router.get(
@@ -86,5 +87,22 @@ router
     ),
     containerController.deleteContainerAndChildren
   );
+
+// Get revenue for a specific container by Id
+router
+.get(
+  "/:containerId/revenue",
+  authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Lecturer",
+    "Assistant",
+    "Student",
+    "Parent"
+  ),
+  containerController.getContainerRevenue
+);
+
 
 module.exports = router;
