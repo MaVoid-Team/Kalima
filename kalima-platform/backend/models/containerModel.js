@@ -23,11 +23,7 @@ const containerSchema = new mongoose.Schema(
       ref: "Lecturer",
       required: true,
     },
-    teacher: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher",
-      required: false,
-    },
+
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Container",
@@ -39,6 +35,7 @@ const containerSchema = new mongoose.Schema(
   {
     toObject: { virtuals: true },
     toJSON: { virtuals: true },
+    discriminatorKey: "kind",
   }
 );
 
