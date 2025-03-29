@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Book, Star } from "lucide-react";
+import { Book, Star, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function CourseCard({ id, image, teacherName, subject, subjectId, level, duration, rating }) {
@@ -26,24 +26,8 @@ export function CourseCard({ id, image, teacherName, subject, subjectId, level, 
               {subject} - {level}
             </p>
           </div>
-          <div className="avatar">
-            <div className="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3" />
-                <circle cx="12" cy="10" r="3" />
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
+          <div className='flex items-center bg-base-200 p-1 rounded-full'>
+            <User className="h-6 w-6 text-primary" />
           </div>
         </div>
 
