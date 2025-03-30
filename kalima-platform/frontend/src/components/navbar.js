@@ -38,7 +38,7 @@ const NavBar = () => {
     { key: 'homepage', path: '/' },
     { key: 'educationalCourses', path: '/courses' },
     { key: 'teachers', path: '/teachers' },
-    { key: 'services', path: '/lecture-page' },
+    { key: 'lectures', path: '/lecture-page' },
     { key: 'contactUs', path: '/contact' },
   ];
 
