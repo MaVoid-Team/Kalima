@@ -1,22 +1,25 @@
 "use client"
+import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 
 function NotificationsSection() {
+  const { t, i18n } = useTranslation("settings")
+  const isRTL = i18n.language === 'ar'
+
   const notifications = [
-    { id: "new-assignment", text: "تم إضافة واجب جديد", checked: true },
-    { id: "assignment-correction", text: "تم تصحيح واجبك", checked: true },
-    { id: "new-lesson", text: "تم إضافة درس جديد", checked: true },
-    { id: "exam-date", text: "موعد اختبار قادم", checked: true },
-    { id: "notification-update", text: "تم تحديث إشعاراتك", checked: true },
-    { id: "teacher-message", text: "تم إرسال رسالة من المعلم", checked: true },
-    { id: "assignment-submission", text: "تم تسليم واجب من طالب", checked: true },
-    { id: "student-message", text: "طالب أرسل رسالة أو استفسار", checked: true },
-    { id: "grade-posted", text: "تم نشر نتائج", checked: true },
-    { id: "deadline-reminder", text: "إشعار بموعد تحديد أو موعد تسليم", checked: true },
+    { id: "new-assignment", key: "newAssignment", checked: true },
+    { id: "assignment-correction", key: "assignmentCorrection", checked: true },
+    { id: "new-lesson", key: "newLesson", checked: true },
+    { id: "exam-date", key: "examDate", checked: true },
+    { id: "notification-update", key: "notificationUpdate", checked: true },
+    { id: "teacher-message", key: "teacherMessage", checked: true },
+    { id: "assignment-submission", key: "assignmentSubmission", checked: true },
+    { id: "student-message", key: "studentMessage", checked: true },
+    { id: "grade-posted", key: "gradePosted", checked: true },
+    { id: "deadline-reminder", key: "deadlineReminder", checked: true },
   ]
 
   const handleNotificationToggle = (id) => {
-    // This would update the notification preferences via API
     console.log(`Toggled notification: ${id}`)
   }
 
@@ -39,11 +42,11 @@ function NotificationsSection() {
 
   return (
     <div className="mb-8">
-      <SectionHeader title="الإشعارات" icon={notificationIcon} />
+      <SectionHeader title={t("notifications.title")} icon={notificationIcon} />
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
           <NotificationGroup
-            title="نوع الطالب"
+            title={t("notifications.studentType")}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -62,10 +65,12 @@ function NotificationsSection() {
             }
             notifications={notifications.slice(0, 5)}
             onToggle={handleNotificationToggle}
+            t={t}
+            isRTL={isRTL}
           />
 
           <NotificationGroup
-            title="قبل المعلم"
+            title={t("notifications.teacherType")}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -84,6 +89,8 @@ function NotificationsSection() {
             }
             notifications={notifications.slice(5)}
             onToggle={handleNotificationToggle}
+            t={t}
+            isRTL={isRTL}
           />
         </div>
       </div>
@@ -91,17 +98,17 @@ function NotificationsSection() {
   )
 }
 
-function NotificationGroup({ title, icon, notifications, onToggle }) {
+function NotificationGroup({ title, icon, notifications, onToggle, t, isRTL }) {
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className={`flex items-center gap-2  mb-4 justify-end`}>
         {icon}
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className={`text-lg font-semibold `}>{title}</h3>
       </div>
 
       <div className="space-y-2">
         {notifications.map((notification) => (
-          <div key={notification.id} className="flex items-center justify-between border-b pb-2">
+          <div key={notification.id} className={`flex items-center justify-between border-b pb-2 `}>
             <div className="form-control">
               <input
                 type="checkbox"
@@ -110,7 +117,9 @@ function NotificationGroup({ title, icon, notifications, onToggle }) {
                 onChange={() => onToggle(notification.id)}
               />
             </div>
-            <span>{notification.text}</span>
+            <span className={`${isRTL ? 'text-right' : 'text-left'}`}>
+              {t(`notifications.types.${notification.key}`)}
+            </span>
           </div>
         ))}
       </div>
@@ -118,5 +127,4 @@ function NotificationGroup({ title, icon, notifications, onToggle }) {
   )
 }
 
-export default NotificationsSection;
-
+export default NotificationsSection
