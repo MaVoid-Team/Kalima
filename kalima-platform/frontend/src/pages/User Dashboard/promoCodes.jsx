@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UserSidebar from '../../components/UserSidebar';
 import { useTranslation } from 'react-i18next';
-import { FaWallet, FaInfoCircle, FaSort, FaBars } from 'react-icons/fa';
+import { FaWallet, FaInfoCircle, FaSort, FaBars, FaTicketAlt } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
 
 const PromoCodes = () => {
@@ -103,7 +103,7 @@ const PromoCodes = () => {
             </div>
 
             {/* Arrow */}
-            <div className={`absolute ${isRTL ? 'right-[45%]' : 'left-[45%]'} top-1/2 transform rotate-90 md:rotate-[160deg] translate-y-1/4 md:-translate-y-1/2 block z-10`}>
+            <div className={`absolute ${isRTL ? 'right-[45%] rotate-[180deg] scale-y-[-1]' : 'left-[45%] md:rotate-[360deg]'} top-1/2 transform rotate-90  translate-y-1/4 md:-translate-y-1/2 block z-10 `}>
               <img src="vector22.png" alt={t('arrowAlt')} className="object-cover" />
             </div>
 
@@ -112,16 +112,16 @@ const PromoCodes = () => {
             <img 
             src="ball.png" 
             alt="Decorative ball" 
-            className="absolute -bottom-16 right-1/4 w-10 animate-bounce-slow" 
+            className="absolute -bottom-16 left-4 w-10 animate-bounce-slow" 
           />
               <div className={`card-body ${isRTL ? 'text-right' : 'text-left'}`}>
 
                 <div className="card-actions justify-end">
                   <button 
                     onClick={() => document.getElementById('redeem_modal').showModal()} 
-                    className="btn btn-primary text-primary-content border-base-300 w-1/2"
+                    className="btn btn-outline hover:btn-primary bg-primary/20 text-primary border-base-300 flex items-center"
                   >
-                    {t('redeem.button')}
+                    {t('redeem.button')} <FaTicketAlt className={`${isRTL ? 'mr-2' : 'ml-2'}`} />
                   </button>
                 </div>
               </div>
