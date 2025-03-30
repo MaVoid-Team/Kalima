@@ -17,5 +17,15 @@
     "teacher": "Teacher",
     "student": "Student",
     "logoAlt": "Kalima Logo"
-  }
+  },
+  "dashboard": "Dashboard",
+  "profile": "My Profile",
+  "courses": "My Courses",
+  "promoCodes": "Promo Codes",
+  "assignments": "Assignments",
+  "exams": "Exams",
+  "settings": "Settings",
+  "logout": "Logout",
+  "dashboardTitle": "Control Panel",
+  "toggleSidebar": "Toggle Sidebar"
 }

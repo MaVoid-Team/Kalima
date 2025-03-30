@@ -17,5 +17,15 @@
     "teacher": "معلم",
     "student": "طالب",
     "logoAlt": "شعار كلمة"
-  }
+  },
+  "dashboard": "لوحة القيادة",
+  "profile": "معلوماتي",
+  "courses": "كورساتي",
+  "promoCodes": "اكواد الشحن",
+  "assignments": "الواجب",
+  "exams": "الاختبارات",
+  "settings": "الاعدادات",
+  "logout": "تسجيل الخروج",
+  "dashboardTitle": "لوحة القيادة",
+  "toggleSidebar": "تبديل القائمة الجانبية"
   }
