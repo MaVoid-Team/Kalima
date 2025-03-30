@@ -1,20 +1,23 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 
 function SecuritySection({ formData, handleInputChange }) {
+  const { t, i18n } = useTranslation("settings")
+  const isRTL = i18n.language === 'ar'
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const updatePassword = async () => {
     if (formData.newPassword !== formData.confirmPassword) {
-      alert("كلمات المرور غير متطابقة")
+      alert(t('security.errors.mismatch'))
       return
     }
 
     if (formData.newPassword.length < 8) {
-      alert("كلمة المرور يجب أن تكون على الأقل 8 أحرف")
+      alert(t('security.errors.length'))
       return
     }
 
@@ -29,7 +32,7 @@ function SecuritySection({ formData, handleInputChange }) {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      alert("تم تحديث كلمة المرور بنجاح")
+      alert(t('security.success'))
       handleInputChange({
         target: {
           name: "currentPassword",
@@ -50,7 +53,7 @@ function SecuritySection({ formData, handleInputChange }) {
       })
     } catch (error) {
       console.error("Error updating password:", error)
-      alert("حدث خطأ أثناء تحديث كلمة المرور")
+      alert(t('security.errors.general'))
     } finally {
       setLoading(false)
     }
@@ -75,14 +78,16 @@ function SecuritySection({ formData, handleInputChange }) {
 
   return (
     <div className="mb-8">
-      <SectionHeader title="أمان الحساب" icon={lockIcon} />
+      <SectionHeader title={t('security.title')} icon={lockIcon} />
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
-          <h3 className="text-lg font-semibold mb-4">تغيير كلمة السر</h3>
+          <h3 className={`text-lg font-semibold mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            {t('security.changePassword')}
+          </h3>
 
           <div className="form-control mb-4">
-            <label className="label justify-end">
-              <span className="label-text">أدخل كلمة المرور الحالية</span>
+            <label className={`label justify-end`}>
+              <span className="label-text">{t('security.labels.currentPassword')}</span>
             </label>
             <div className="relative">
               <input
@@ -90,13 +95,15 @@ function SecuritySection({ formData, handleInputChange }) {
                 name="currentPassword"
                 value={formData.currentPassword}
                 onChange={handleInputChange}
-                className="input input-bordered w-full text-right"
-                placeholder="أدخل كلمة المرور الحالية"
+                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                placeholder={t('security.placeholders.currentPassword')}
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
               <button
                 type="button"
-                className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                className={`absolute ${isRTL ? 'left-3' : 'right-3'} top-1/2 transform -translate-y-1/2`}
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? t('security.hidePassword') : t('security.showPassword')}
               >
                 {showPassword ? (
                   <svg
@@ -134,43 +141,38 @@ function SecuritySection({ formData, handleInputChange }) {
             </div>
           </div>
 
-          <div className="form-control mb-4">
-            <label className="label justify-end">
-              <span className="label-text">كلمة السر الجديدة</span>
+           <div className="form-control mb-4">
+            <label className={`label justify-end`}>
+              <span className="label-text">{t('security.labels.newPassword')}</span>
             </label>
             <input
               type="password"
               name="newPassword"
               value={formData.newPassword}
               onChange={handleInputChange}
-              className="input input-bordered w-full text-right"
-              placeholder="كلمة السر الجديدة"
+              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-rig'}`}
+              placeholder={t('security.placeholders.newPassword')}
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
           </div>
 
           <div className="form-control mb-4">
-            <label className="label justify-end">
-              <span className="label-text">تأكيد كلمة السر الجديدة</span>
+            <label className={`label justify-end`}>
+              <span className="label-text">{t('security.labels.confirmPassword')}</span>
             </label>
             <input
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="input input-bordered w-full text-right"
-              placeholder="تأكيد كلمة السر الجديدة"
+              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+              placeholder={t('security.placeholders.confirmPassword')}
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
-            <div className="text-xs text-right mt-1 text-gray-500">كلمة المرور يجب أن تكون على الأقل 8 أحرف</div>
+            <div className={`text-xs mt-1 text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+              {t('security.passwordRequirement')}
+            </div>
           </div>
-
-          <div className="form-control">
-            <label className="label cursor-pointer justify-end">
-              <span className="label-text">تأكيد كلمة السر الجديدة</span>
-              <input type="checkbox" className="checkbox checkbox-primary mr-2" />
-            </label>
-          </div>
-
-          <PasswordStrengthIndicator strength={2} />
 
           <div className="flex justify-center mt-6">
             <button
@@ -178,7 +180,7 @@ function SecuritySection({ formData, handleInputChange }) {
               onClick={updatePassword}
               disabled={loading}
             >
-              تحديث كلمة السر
+              {t('security.updateButton')}
             </button>
           </div>
         </div>
