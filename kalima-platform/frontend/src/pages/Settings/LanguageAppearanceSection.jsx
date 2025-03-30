@@ -10,14 +10,15 @@ function LanguageAppearanceSection() {
   const isRTL = i18n.language === 'ar'
 
   const themes = [
+   
     { name: "cyberpunk", colors: ["#0f172a", "#67e8f9", "#c084fc", "#fb7185"] },
+    { name: "dark", colors: ["#6d28d9", "#ec4899", "#14b8a6", "#1e293b"] },
+    { name: "light", colors: ["#6d28d9", "#ec4899", "#14b8a6", "#1e293b"] },
     { name: "retro", colors: ["#f87171", "#a7f3d0", "#fcd34d", "#92400e"] },
     { name: "synthwave", colors: ["#ec4899", "#38bdf8", "#facc15", "#1e1b4b"] },
     { name: "bumblebee", colors: ["#facc15", "#fb923c", "#22d3ee", "#1e293b"] },
     { name: "emerald", colors: ["#34d399", "#3b82f6", "#fb923c", "#1e293b"] },
     { name: "corporate", colors: ["#4f46e5", "#64748b", "#10b981", "#0f172a"] },
-    { name: "light", colors: ["#6d28d9", "#ec4899", "#14b8a6", "#1e293b"] },
-    { name: "dark", colors: ["#6d28d9", "#ec4899", "#14b8a6", "#1e293b"] },
     { name: "cupcake", colors: ["#22d3ee", "#f9a8d4", "#f59e0b", "#1e1b4b"] },
   ]
 
