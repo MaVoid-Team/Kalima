@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
+import { isMobile } from "./utils/isMobile";
+import MobileOnly from "./pages/Lecture Page/mobileOnly";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
@@ -15,7 +17,9 @@ const CoursesPage = lazy(() => import("./pages/courses"));
 const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"));
 const Teachers = lazy(() => import("./pages/Teachers"));
 const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details"));
-const LecturePage = lazy(() => import("./pages/Lecture Page/lecturePage"));
+const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"));
+const LectureList = lazy(() => import("./pages/Lecture Page/LectureDisplay"));
+const LectureDetails = lazy(() => import("./pages/Lecture Page/LectureDetails"));
 function App() {
   return (
     <div className="App">
@@ -31,7 +35,10 @@ function App() {
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/login-teacher" element={<TeacherLogin />} />
           <Route path="/teacher-details/:id" element={<TeacherDetails />} />
-          <Route path="/lecture-page" element={<LecturePage />} />
+          <Route path="/mobile-only" element={<MobileOnly />} />
+          <Route path="/lecture-page" element={isMobile ?  <LectureList /> : <MobileOnly />} />
+          <Route path="/promo-codes" element={<PromoCodes />} />
+          <Route path="/lecture-details/:id" element={<LectureDetails />} />
         </Routes>
       </Suspense>
 
