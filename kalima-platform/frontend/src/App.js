@@ -20,6 +20,7 @@ const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-detail
 const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"));
 const LectureList = lazy(() => import("./pages/Lecture Page/LectureDisplay"));
 const LectureDetails = lazy(() => import("./pages/Lecture Page/LectureDetails"));
+const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"));
 function App() {
   return (
     <div className="App">
@@ -39,6 +40,7 @@ function App() {
           <Route path="/lecture-page" element={isMobile ?  <LectureList /> : <MobileOnly />} />
           <Route path="/promo-codes" element={<PromoCodes />} />
           <Route path="/lecture-details/:id" element={<LectureDetails />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Suspense>
 
