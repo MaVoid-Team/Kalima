@@ -4,6 +4,7 @@ const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
+const Assistant = require("../models/assistantModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -155,6 +156,9 @@ const updateUser = catchAsync(async (req, res, next) => {
       })
         .select(selectedFields)
         .lean();
+      break;
+    case "assistant":
+      user = await Assistant.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select("-password").lean() 
       break;
     default:
       return next(new AppError("Invalid role", 400));
