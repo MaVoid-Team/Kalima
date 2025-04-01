@@ -1,4 +1,4 @@
-const registerController = require('../controllers/registerController')
+const registerController = require("../controllers/registerController");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
@@ -7,31 +7,38 @@ const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const handleCSV = require("../utils/upload files/handleCSV.js");
+const handleExcel = require("../utils/upload files/handleEXCEL.js");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
 
   if (!users.length) return next(new AppError("Couldn't find users.", 404));
   res.json(users);
-})
+});
 
 const getAllUsersByRole = catchAsync(async (req, res, next) => {
-  const role = req.params.role.charAt(0).toUpperCase() + req.params.role.slice(1).toLowerCase()
+  const role =
+    req.params.role.charAt(0).toUpperCase() +
+    req.params.role.slice(1).toLowerCase();
 
   const users = await User.find({ role }).select("-password").lean();
-  if (!users.length) return next(new AppError("Couldn't find users with this role.", 404));
+  if (!users.length)
+    return next(new AppError("Couldn't find users with this role.", 404));
 
   res.json(users);
-})
+});
 
 const getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.userId).select("-password").lean();
+  const user = await User.findById(req.params.userId)
+    .select("-password")
+    .lean();
 
   if (!user) return next(new AppError("Couldn't find user.", 404));
   res.json(user);
-})
+});
 
 const createUser = registerController.registerNewUser;
 
@@ -41,7 +48,13 @@ for ex :- if current user role is student that means if the children is passed i
 */
 const updateUser = catchAsync(async (req, res, next) => {
   const { name, email, address, password, children, subjectNotify } = req.body
-  const userId = req.params.userId
+
+  /*
+  BUG -->> that means any user can update any user
+  To fix it -->> Onlyy authenticated current user has permission to update his self
+  userId = req.user._id 
+  */
+  const userId = req.params.userId;
 
   /*
   BUG -->> status code here should be 400 (or 403)
@@ -50,13 +63,11 @@ const updateUser = catchAsync(async (req, res, next) => {
     return next(new AppError("Can't update password on this route.", 404));
   }
 
-  const selectedFields = "-password -passwordChangedAt"
+  const selectedFields = "-password -passwordChangedAt";
 
   const foundUser = await User.findById(userId).select(selectedFields);
-  
 
   if (!foundUser) return next(new AppError("User not found", 404));
-
 
   /*
   BUG -->> if the array here is empty, no err occured!!!!!!,
@@ -74,28 +85,32 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   TAKE CARE OFF -->> when fixing the above , don't allow the repeatition of ids in children array
   */
-  const childrenById = []
+  const childrenById = [];
   if (!!children) {
-    for (let id of children) {      
+    for (let id of children) {
       // Check if the id is a valid MongoDB ObjectId
       const isMongoId = mongoose.Types.ObjectId.isValid(id);
       if (isMongoId) {
         childrenById.push(id);
       } else {
         try {
-          const student = await Student.findOne({ sequencedId: id }).lean();          
+          const student = await Student.findOne({ sequencedId: id }).lean();
           if (student) {
             childrenById.push(student._id);
           }
-        }
-        catch (error) {
-          if (error.name === 'CastError') {
-            return next(new AppError("Not all children values are valid UserId or SequenceId.", 400));
+        } catch (error) {
+          if (error.name === "CastError") {
+            return next(
+              new AppError(
+                "Not all children values are valid UserId or SequenceId.",
+                400
+              )
+            );
           }
         }
       }
     }
-    req.body.children = childrenById
+    req.body.children = childrenById;
   }
 
   const updatedUser = { name, email, address, children: childrenById, ...req.body }
@@ -108,17 +123,37 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   switch (foundUser.role.toLowerCase()) {
     case "teacher":
-    // fix a bug here : replace runvalidators with runValidators 
-      user = await Teacher.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      // fix a bug here : replace runvalidators with runValidators
+      user = await Teacher.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "student":
-      user = await Student.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Student.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "parent":
-      user = await Parent.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Parent.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "lecturer":
-      user = await Lecturer.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Lecturer.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "assistant":
       user = await Assistant.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select("-password").lean() 
@@ -127,31 +162,38 @@ const updateUser = catchAsync(async (req, res, next) => {
       return next(new AppError("Invalid role", 400));
   }
 
-  res.json(user)
-})
+  res.json(user);
+});
 
 const deleteUser = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findByIdAndDelete(req.params.userId).select("-password").lean()
+  const foundUser = await User.findByIdAndDelete(req.params.userId)
+    .select("-password")
+    .lean();
   if (!foundUser) return next(new AppError("User not found", 404));
   res.json(foundUser);
-})
+});
 
 // we ahould make a validation for newPassword field here
 const changePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
-  if(!currentPassword || !newPassword){
-    return next(new AppError("You should provide both current and new password",400));
+  if (!currentPassword || !newPassword) {
+    return next(
+      new AppError("You should provide both current and new password", 400)
+    );
   }
 
   const user = await User.findById(req.user._id).select("+password");
-  if(!user) {
-    return next(new AppError("User not found, pleaze login again",401));
+  if (!user) {
+    return next(new AppError("User not found, pleaze login again", 401));
   }
 
-  const isValidCurrentPassword = await user.comparePassword(currentPassword,user.password);
-  if(!isValidCurrentPassword){
-    return next(new AppError("Your current password is wrong",401));
+  const isValidCurrentPassword = await user.comparePassword(
+    currentPassword,
+    user.password
+  );
+  if (!isValidCurrentPassword) {
+    return next(new AppError("Your current password is wrong", 401));
   }
 
   if (currentPassword === newPassword) {
@@ -160,9 +202,9 @@ const changePassword = catchAsync(async (req, res, next) => {
     );
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword,12);
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
   user.password = hashedPassword;
-  await user.save()
+  await user.save();
 
   // otional: regenerate jwt if we  wanna to keep the user logged in
   /*
@@ -194,18 +236,60 @@ const changePassword = catchAsync(async (req, res, next) => {
   })
   */
 
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
 
-  res.clearCookie("jwt",{
-    httpOnly:true,
-    secure:process.env.NODE_ENV==="production",
-    sameSite:"none",
-  })
-  
   res.status(200).json({
-    status:"success",
-    message:"Password updated successfully, please login again"
-  })
-  
+    status: "success",
+    message: "Password updated successfully, please login again",
+  });
 });
 
-module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser,changePassword }
+const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
+  const { accountType } = req.body;
+
+  const allAccountTypes = ["parent", "teacher", "student"];
+  if (!accountType || !allAccountTypes.includes(accountType)) {
+    return next(
+      new AppError(
+        "You should provide one of these account types: parent, teacher, student"
+      )
+    );
+  }
+
+  if (!req.file) {
+    return next(new AppError("No file uploaded", 400));
+  }
+  const fileType = req.file.mimetype;
+
+  if (fileType === "text/csv" || fileType === "application/csv") {
+    await handleCSV(req.file.buffer, accountType, res, next);
+  } else if (
+    fileType ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    fileType === "application/vnd.ms-excel"
+  ) {
+    await handleExcel(req.file.buffer, accountType, res, next);
+  } else {
+    return next(
+      new AppError(
+        "Unsupported file type. Please upload a CSV or Excel file",
+        400
+      )
+    );
+  }
+});
+
+module.exports = {
+  getAllUsers,
+  getAllUsersByRole,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  changePassword,
+  uploadFileForBulkCreation,
+};
