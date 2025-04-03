@@ -1,47 +1,56 @@
-// The controller is made with Local storage in mind.
-// Both 'Storage' constant and FileSystem operations should be changed in production.
-
 const mongoose = require("mongoose");
-const Attachment = require("../models/attachmentModel");
 const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");
+const Attachment = require("../models/attachmentModel");
 const multer = require("multer");
-const fs = require("fs").promises;
-const path = require('path')
+const cloudinary = require("cloudinary").v2;
+const axios = require("axios");
+const configureCloudinary = require("../config/cloudinaryOptions");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
+// You can configure storage options here
+// Would be changed once we have established cloud storage
 
-// You can configure store option here
-// Would be change once we have established cloud storate
-
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, 'uploads/')
+configureCloudinary();
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "attachments",
   },
-  filename: function(req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix)
-  }
-})
+});
 
 // Still Considering that one
 // function fileFilter (req, file, cb) {}
 
-exports.upload = multer({
+(exports.upload = multer({
   storage,
-  limits: { fileSize: 20 * 1024 * 1024 } // Specify the file size limit
-})
+  limits: { fileSize: 20 * 1024 * 1024 }, // Specify the file size limit
+})),
+  (exports.getLectureAttachments = catchAsync(async (req, res, next) => {
+    const { lectureId } = req.params;
+    const lecture = await Lecture.findById(lectureId)
+      .populate("attachments.booklets")
+      .populate("attachments.pdfsandimages")
+      .populate("attachments.homeworks")
+      .populate("attachments.exams")
+      .lean();
 
-exports.getLectureAttachment = catchAsync(async (req, res, next) => {
-  const { lectureId } = req.params;
-  const lecture = await Lecture.findById(lectureId);
-  if (!lecture) {
-    throw new AppError(`Lecture not found`, 404);
+    if (!lecture) {
+      throw new AppError(`Lecture not found`, 404);
+    }
+    res.status(201).json(lecture.attachments);
+  }));
+
+exports.getAttachment = catchAsync(async (req, res, next) => {
+  const { attachmentId } = req.params;
+  const attachment = await Attachment.findById(attachmentId);
+  if (!attachment) {
+    throw new AppError(`attachment not found`, 404);
   }
-  res.status(201).json({ attachments: lecture.attachments })
-
-})
+  res.status(201).json({ attachment });
+});
 
 exports.getAttachmentFile = catchAsync(async (req, res, next) => {
   const { attachmentId } = req.params;
@@ -50,36 +59,70 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
     throw new AppError(`Invalid Schema ID`, 404);
   }
 
-  const attachment = await Attachment.findById(attachmentId)
+  const attachment = await Attachment.findById(attachmentId);
   if (!attachment) {
     throw new AppError(`Attachment not found`, 404);
   }
-
-  // Get absloute path.
-  const filePath = path.resolve(attachment.filePath);
-
-  try {
-    console.log(filePath)
-    await fs.access(filePath);
-  } catch (error) {
-    throw new AppError(`Couldn't find the file on the server`, 404);
-  }
-
-
-  res.setHeader("Content-Type", attachment.fileType);
-  res.setHeader("Content-Disposition", `attachment; filename="${attachment.fileName}"`);
-
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      throw new AppError(`Error sending file.`, 500);
-    }
+  const file = await axios.get(attachment.filePath, {
+    responseType: "stream",
   });
 
-})
+  res.setHeader("Content-Type", attachment.fileType);
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${attachment.fileName}"`,
+  );
+
+  file.data.pipe(res);
+
+  file.data.on("error", (err) => {
+    console.error("Stream error:", err);
+    throw new AppError(`Error streaming file`, 500);
+  });
+});
+
+exports.deleteAttachment = catchAsync(async (req, res, next) => {
+  const { attachmentId } = req.params;
+
+  if (!mongoose.isValidObjectId(attachmentId)) {
+    throw new AppError(`Invalid Schema ID`, 404);
+  }
+
+  const attachment = await Attachment.findByIdAndDelete(attachmentId).lean();
+  if (!attachment) {
+    throw new AppError(`Couldn't find attachment`, 404);
+  }
+
+  await cloudinary.uploader.destroy(attachment.publicId);
+
+  const lecture = await Lecture.findById(attachment.lectureId);
+
+  switch (attachment.type.toLowerCase()) {
+    case "booklets":
+      lecture.attachments.booklets.pull(attachment._id);
+      break;
+    case "pdfsandimages":
+      lecture.attachments.pdfsandimages.pull(attachment._id);
+      break;
+    case "homeworks":
+      lecture.attachments.homeworks.pull(attachment._id);
+      break;
+    case "exams":
+      lecture.attachments.exams.pull(attachment._id);
+      break;
+    default:
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Invalid file type`, 404);
+  }
+
+  await lecture.save();
+  res.status(201).json({ message: "Attachment deleted successfully" });
+});
+
 exports.createAttachment = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
   const { type } = req.body;
-  const validTypes = ["booklets", 'pdfsandimages', 'homeworks', 'exams']
+  const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
 
   if (!mongoose.isValidObjectId(lectureId)) {
     await fs.unlink(req.file.path);
@@ -89,20 +132,20 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
   const lecture = await Lecture.findById(lectureId);
 
   if (!lecture) {
-    await fs.unlink(req.file.path);
+    await cloudinary.uploader.destroy(req.file.filename);
     throw new AppError(`Lecture not found`, 404);
   }
 
   if (!req.file) {
-    await fs.unlink(req.file.path);
+    await cloudinary.uploader.destroy(req.file.filename);
     throw new AppError(`No file uploaded`, 404);
   }
   if (!type) {
-    await fs.unlink(req.file.path);
+    await cloudinary.uploader.destroy(req.file.filename);
     throw new AppError(`No file type specified`, 404);
   }
   if (!validTypes.includes(type.toLowerCase())) {
-    await fs.unlink(req.file.path);
+    await cloudinary.uploader.destroy(req.file.filename);
     throw new AppError(`Invalid file type`, 404);
   }
 
@@ -113,6 +156,7 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
     fileName: req.file.originalname,
     filePath: req.file.path,
     fileSize: req.file.size,
+    publicId: req.file.filename,
     uploadedOn: new Date(),
   });
 
@@ -132,11 +176,10 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
       lecture.attachments.exams.push(savedAttachment._id);
       break;
     default:
-      await fs.unlink(req.file.path);
+      await cloudinary.uploader.destroy(req.file.filename);
       throw new AppError(`Invalid file type`, 404);
   }
 
   await lecture.save();
-  res.status(201).json({ message: 'Attachment uploaded successfully' })
-
-})
+  res.status(201).json({ message: "Attachment uploaded successfully" });
+});

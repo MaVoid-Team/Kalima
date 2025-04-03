@@ -1,6 +1,6 @@
 const express = require("express");
 const lectureController = require("../controllers/lectureController");
-const attachmentController = require('../controllers/attachmentController')
+const attachmentController = require("../controllers/attachmentController");
 
 const router = express.Router();
 
@@ -16,14 +16,21 @@ router
   .delete(lectureController.deletelecture);
 
 router
-  .route('/attachments/:lectureId')
-  .get(attachmentController.getLectureAttachment)
-  .post(attachmentController.upload.single('attachment'),
-    attachmentController.createAttachment)
+  .route("/attachments/:lectureId")
+  .get(attachmentController.getLectureAttachments)
+  .post(
+    attachmentController.upload.single("attachment"),
+    attachmentController.createAttachment,
+  );
 
 router
-  .route('/attachment/:attachmentId')
-  .get(attachmentController.getAttachmentFile)
+  .route("/attachment/:attachmentId")
+  .get(attachmentController.getAttachment)
+  .delete(attachmentController.deleteAttachment);
+
+router
+  .route("/attachment/:attachmentId/file")
+  .get(attachmentController.getAttachmentFile);
 
 router
   .route("/lecturer/:lecturerId")
