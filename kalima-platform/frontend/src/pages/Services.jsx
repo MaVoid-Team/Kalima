@@ -12,7 +12,12 @@ import {
   FaMedal,
 } from "react-icons/fa";
 import { AppDownloadSection } from "./Home/app-download-section";
-
+import { ChevronLeft, Loader } from "lucide-react"
+import {  AnimatePresence } from "framer-motion"
+import { useState, useEffect, useCallback } from "react"
+import { Link } from "react-router-dom"
+import { CourseCard } from "./../components/CourseCard"
+import { getAllSubjects } from "./../routes/courses"
 function Services() {
   const { t, i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
@@ -49,6 +54,74 @@ function Services() {
       text: isRTL ? "تعلم في أي وقت" : "Learn Anytime",
     },
   ];
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+   const [activeIndex, setActiveIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  const testimonials = [
+    {
+      id: 1,
+      name: isRTL ? "سارة علي" : "Sarah Ali",
+      role: isRTL ? "طالبة، الصف الثالث الثانوي" : "12th Grade Student",
+      content: isRTL 
+        ? "تجربة التعلم على منصة كلمة كانت رائعة بكل المقاييس! أحببت طريقة تنظيم المحتوى حيث يتم تقديم المعلومات بشكل تدريجي وسلس، مما يجعل التعلم ممتعاً ويسهل الفهم. أيضاً نظام متابعة التقدم رائع جداً."
+        : "The learning experience on Kalima was exceptional! I loved the gradual content delivery that made complex topics approachable. The progress tracking system helped me stay motivated throughout my journey.",
+      image: "/student1.jpg",
+      color: "from-indigo-500 to-purple-600"
+    },
+    {
+      id: 2,
+      name: isRTL ? "أحمد السيد" : "Ahmed Al-Sayed",
+      role: isRTL ? "طالب، الصف الثاني الثانوي" : "11th Grade Student",
+      content: isRTL 
+        ? "المنصة تقدم محتوى تعليمي مفيد جداً، والدروس يتم شرحها بأسلوب واضح وسهل. أعجبني التنوع في المواد التعليمية المتاحة، ولكن أتمنى أن يتم إضافة المزيد من التمارين العملية."
+        : "Kalima's clear explanations transformed how I understand difficult concepts. While the content variety is impressive, I'd love to see more practical exercises to reinforce learning.",
+      image: "/student2.jpg",
+      color: "from-emerald-500 to-teal-600"
+    },
+    {
+      id: 3,
+      name: isRTL ? "أسيل صفوان" : "Aseel Safwan",
+      role: isRTL ? "طالبة، الصف الأول الثانوي" : "10th Grade Student",
+      content: isRTL 
+        ? "أحببت التعلم عبر كلمة! الفيديوهات ذات جودة عالية، والمحتوى غني بالمعلومات القيمة. أكثر شيء أعجبني هو إمكانية تحميل الملخصات والمواد الإضافية."
+        : "Learning with Kalima has been transformative! The premium video quality and downloadable resources helped me excel in subjects I previously struggled with.",
+      image: "/student3.jpg",
+      color: "from-amber-500 to-orange-600"
+    }
+  ];
+
+  // Auto-rotation effect
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % testimonials.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, testimonials.length]);
+
+  const nextTestimonial = () => {
+    setIsAutoPlaying(false);
+    setActiveIndex(prev => (prev + 1) % testimonials.length);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const prevTestimonial = () => {
+    setIsAutoPlaying(false);
+    setActiveIndex(prev => (prev - 1 + testimonials.length) % testimonials.length);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const springConfig = {
+    type: "spring",
+    damping: 30,
+    stiffness: 300,
+    mass: 0.5
+  };
+
 
   const fadeIn = (direction, type, delay, duration) => ({
     hidden: {
@@ -78,6 +151,7 @@ function Services() {
       "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNlYmY0ZmYiIHN0cm9rZT0iI2Q0ZTVmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+",
   };
 
+  
   const benefits = [
     {
       id: 1,
@@ -966,97 +1040,326 @@ function Services() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-xs sm:text-xs md:text-xs font-bold text-primary mb-3">
-              {isRTL ? "التحضير للأمتحان" : "Exam Preparation"}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="h-1 bg-gradient-to-r from-primary to-secondary mt-2 mx-auto w-40"
-                style={{ originX: isRTL ? 1 : 0 }}
-              />
-            </h2>
+          <div className="relative inline-block">
+          <h2 className="text-xs sm:text-xs md:text-xs font-bold text-primary relative z-10 pb-2">
+          {isRTL ? "التحضير للأمتحان" : "Exam Preparation"}
+          {/* Underline decoration - works for both languages */}
+          <svg
+            className="absolute bottom-0 left-0 w-full h-2 text-primary"
+            viewBox="0 0 200 10"
+            preserveAspectRatio="none"
+          >
+            <path
+              d={
+                isRTL
+                  ? "M0,5 C50,0 150,10 200,5"
+                  : "M0,5 C50,10 150,0 200,5"
+              }
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              strokeLinecap="round"
+            />
+          </svg>
+        </h2>
+
+          {/* Decorative circles - same for both languages */}
+          <motion.div
+            className="absolute -top-3 -right-4 w-3 h-3 rounded-full bg-secondary"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute -bottom-2 -left-3 w-2 h-2 rounded-full bg-accent"
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+          />
+        </div>
+     
+        
             
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="text-4xl sm:text-xl text-base-content/80"
-            >
-              {isRTL ? "التحضير للأمتحان السنوى" : "Annual Exam Preparation"}
-            </motion.p>
+        
           </motion.div>
       
           {/* Two Cards in One Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Card 1 */}
-            <motion.div
-              initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="relative rounded-xl overflow-hidden shadow-xl h-64 sm:h-80"
-            >
-              <img 
-                src="https://images.unsplash.com/photo-1581726690015-c9861fa5057f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                alt={isRTL ? "طلاب يدرسون" : "Students studying"}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-              
-              <div className={`absolute inset-0 flex flex-col justify-end p-6 sm:p-8 ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                  {isRTL ? "الضم إلى دوراتنا التدريبية" : "Join Our Training Courses"}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Card 1 */}
+          <motion.div
+            initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="relative rounded-2xl overflow-hidden shadow-2xl h-72 sm:h-96"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1591123720164-de1348028a82?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80" 
+              alt={isRTL ? "طلاب في محاضرة" : "Students in lecture"}
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                  {isRTL ? "التحضير للامتحانات النهائية" : "Final Exam Preparation"}
                 </h3>
-                <p className="text-white/90 mb-4 text-lg sm:text-xl">
-                  {isRTL ? "وطور مهاراتك" : "And develop your skills"}
+                <p className={`text-white/90 mb-6 text-lg ${isRTL ? 'ml-auto' : 'mr-auto'} max-w-[90%]`}>
+                  {isRTL 
+                    ? "دورات مكثفة مع أفضل المدرسين لتأهيلك للامتحانات" 
+                    : "Intensive courses with top teachers to prepare you for exams"}
                 </p>
-                <div className="flex gap-4">
+                <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'}`}>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary btn-lg"
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`
+                      px-6 py-3 rounded-lg font-medium text-lg
+                      bg-gradient-to-r from-primary to-primary-dark
+                      text-white shadow-md
+                      border-0
+                      flex items-center gap-2
+                      transition-all duration-300
+                      hover:shadow-lg
+                    `}
                   >
-                    {isRTL ? "الضم الآن" : "Join Now"}
+                    {isRTL ? (
+                      <>
+                        <span>سجل الآن</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                        <span>Register Now</span>
+                      </>
+                    )}
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
-      
-            {/* Card 2 */}
-            <motion.div
-              initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="relative rounded-xl overflow-hidden shadow-xl h-64 sm:h-80"
-            >
-              <img 
-                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" 
-                alt={isRTL ? "فصل دراسي" : "Classroom"}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-              
-              <div className={`absolute inset-0 flex flex-col justify-end p-6 sm:p-8 ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                  {isRTL ? "الضم إلى دوراتنا التدريبية" : "Join Our Training Courses"}
+            </div>
+          </motion.div>
+        
+          {/* Card 2 */}
+          <motion.div
+            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="relative rounded-2xl overflow-hidden shadow-2xl h-72 sm:h-96"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1631&q=80" 
+              alt={isRTL ? "مجموعة دراسة" : "Study group"} 
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            
+            <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                  {isRTL ? "دورات تقوية شاملة" : "Comprehensive Training Courses"}
                 </h3>
-                <p className="text-white/90 mb-4 text-lg sm:text-xl">
-                  {isRTL ? "وطور مهاراتك" : "And develop your skills"}
+                <p className={`text-white/90 mb-6 text-lg ${isRTL ? 'ml-auto' : 'mr-auto'} max-w-[90%]`}>
+                  {isRTL 
+                    ? "برامج تدريبية متخصصة لتعزيز مهاراتك الأكاديمية" 
+                    : "Specialized training programs to enhance your academic skills"}
                 </p>
-                <div className="flex gap-4">
+                <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'}`}>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn btn-primary btn-lg"
+                    whileHover={{ 
+                      scale: 1.05,
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`
+                      px-6 py-3 rounded-lg font-medium text-lg
+                      bg-gradient-to-r from-primary to-primary-dark
+                      text-white shadow-md
+                      border-0
+                      flex items-center gap-2
+                      transition-all duration-300
+                      hover:shadow-lg
+                    `}
                   >
-                    {isRTL ? "الضم الآن" : "Join Now"}
+                    {isRTL ? (
+                      <>
+                        <span>سجل الآن</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                        <span>Register Now</span>
+                      </>
+                    )}
                   </motion.button>
                 </div>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
+        </div>
+        </div>
+      </div>
+      <AllCoursesSections />
+      <section className={`relative py-20 px-4 sm:px-6 lg:px-8 bg-base-100`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl opacity-20"></div>
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-secondary/10 rounded-full filter blur-3xl opacity-20"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className={`text-3xl sm:text-4xl font-bold text-base-content mb-4`}>
+            {isRTL ? "آراء طلابنا" : "Student Testimonials"}
+          </h2>
+          <motion.div 
+            className={`w-24 h-1.5 ${testimonials[activeIndex].accentColor} mx-auto rounded-full`}
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+          />
+        </motion.div>
+
+        <div className="relative">
+          {/* Navigation Arrows */}
+          <motion.button 
+            onClick={prevTestimonial}
+            className={`absolute top-1/2 ${isRTL ? 'right-4 sm:right-8' : 'left-4 sm:left-8'} -translate-y-1/2 z-20 p-3 rounded-full bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 group border border-base-300`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-base-content group-hover:text-primary transition-colors"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
+            </svg>
+          </motion.button>
+
+          <motion.button 
+            onClick={nextTestimonial}
+            className={`absolute top-1/2 ${isRTL ? 'left-4 sm:left-8' : 'right-4 sm:right-8'} -translate-y-1/2 z-20 p-3 rounded-full bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 group border border-base-300`}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-base-content group-hover:text-primary transition-colors"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
+            </svg>
+          </motion.button>
+
+          {/* Testimonials Carousel */}
+          <div className="relative h-[500px] sm:h-[550px] overflow-hidden">
+            <AnimatePresence mode="wait">
+              {testimonials.map((testimonial, index) => (
+                activeIndex === index && (
+                  <motion.div
+                    key={testimonial.id}
+                    initial={{ opacity: 0, x: isRTL ? 150 : -150 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: isRTL ? -150 : 150 }}
+                    transition={springConfig}
+                    className="absolute inset-0 flex flex-col lg:flex-row items-center justify-center gap-8 p-6 sm:p-8"
+                  >
+                    {/* Student Image */}
+                    <motion.div
+                      initial={{ scale: 0.8, rotate: -5 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ ...springConfig, delay: 0.2 }}
+                      className="relative w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden border-4 border-base-100 shadow-xl"
+                    >
+                      <div className={`absolute inset-0 ${testimonial.accentColor} flex items-center justify-center text-white text-5xl font-bold`}>
+                        {testimonial.name.charAt(0)}
+                      </div>
+                    </motion.div>
+
+                    {/* Testimonial Content */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ ...springConfig, delay: 0.4 }}
+                      className={`flex-1 ${isRTL ? 'text-right' : 'text-left'} max-w-2xl`}
+                    >
+                      <div className={`bg-base-100/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-base-300 relative overflow-hidden ${isRTL ? 'pr-12' : 'pl-12'}`}>
+                        {/* Quote Icon */}
+                        <div className={`absolute ${isRTL ? 'left-6' : 'right-6'} top-6 w-12 h-12 rounded-full ${testimonial.accentColor} flex items-center justify-center text-white shadow-md`}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+
+                        <p className="text-base-content/80 text-lg sm:text-xl mb-8 leading-relaxed">
+                          {testimonial.content}
+                        </p>
+
+                        <div>
+                          <h4 className="font-bold text-base-content text-xl">{testimonial.name}</h4>
+                          <p className="text-base-content/60">{testimonial.role}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-3 mt-8">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setIsAutoPlaying(false);
+                  setActiveIndex(index);
+                  setTimeout(() => setIsAutoPlaying(true), 10000);
+                }}
+                className={`relative w-3 h-3 rounded-full transition-all ${activeIndex === index ? 'bg-primary' : 'bg-base-300'}`}
+              >
+                {activeIndex === index && (
+                  <motion.span
+                    layoutId="activeDot"
+                    className="absolute inset-0 rounded-full bg-current"
+                    transition={springConfig}
+                  />
+                )}
+              </button>
+            ))}
           </div>
         </div>
       </div>
+    </section>
       </div>
     </motion.section>
   );
@@ -1093,3 +1396,225 @@ const fadeIn = (direction, type, delay, duration) => ({
     },
   },
 });
+
+
+
+export function AllCoursesSections() {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
+  const [languages, setLanguages] = useState([])
+  const [scientific, setScientific] = useState([])
+  const [literary, setLiterary] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState()
+
+  // Fake data for courses
+  const fakeCourses = {
+    languages: [
+      {
+        id: 1,
+        image: "/course-1.png",
+        title: "اللغة الإنجليزية",
+        subject: "لغة إنجليزية",
+        teacher: "أستاذ محمد",
+        grade: "الصف الثالث الثانوي",
+        rating: 5,
+        duration: 12,
+      },
+      {
+        id: 2,
+        image: "/course-2.png",
+        title: "اللغة الفرنسية",
+        subject: "لغة فرنسية",
+        teacher: "أستاذ أحمد",
+        grade: "الصف الثاني الثانوي",
+        rating: 5,
+        duration: 10,
+      },
+    ],
+    scientific: [
+      {
+        id: 3,
+        image: "/course-3.png",
+        title: "كيمياء عامة",
+        subject: "كيمياء",
+        teacher: "أستاذة سارة",
+        grade: "الصف الأول الثانوي",
+        rating: 5,
+        duration: 15,
+      },
+      {
+        id: 4,
+        image: "/course-4.png",
+        title: "أساسيات الفيزياء",
+        subject: "فيزياء",
+        teacher: "أستاذ علي",
+        grade: "الصف الثاني الثانوي",
+        rating: 4.5,
+        duration: 18,
+      },
+    ],
+    literary: [
+      {
+        id: 5,
+        image: "/course-5.png",
+        title: "الأدب العربي",
+        subject: "لغة عربية",
+        teacher: "أستاذة منى",
+        grade: "الصف الثالث الثانوي",
+        rating: 4,
+        duration: 14,
+      },
+      {
+        id: 6,
+        image: "/course-6.png",
+        title: "التاريخ الإسلامي",
+        subject: "تاريخ",
+        teacher: "أستاذ خالد",
+        grade: "الصف الأول الثانوي",
+        rating: 4.5,
+        duration: 12,
+      },
+    ]
+  }
+
+  // Fetch courses from the API
+  const fetchCourses = useCallback(async () => {
+    setLoading(true)
+    try {
+      const result = await getAllSubjects()
+      if (result.success && result.data?.data?.subjects?.length > 0) {
+        const subjectsData = result.data.data.subjects
+        
+        // Filter subjects into categories (in a real app, you'd have proper categorization)
+        setLanguages(fakeCourses.languages)
+        setScientific(fakeCourses.scientific)
+        setLiterary(fakeCourses.literary)
+      } else {
+        // Use fake data if API fails
+        setLanguages(fakeCourses.languages)
+        setScientific(fakeCourses.scientific)
+        setLiterary(fakeCourses.literary)
+      }
+    } catch (err) {
+      console.error("Error fetching courses:", err)
+      setError(t('courses.errors.failed'))
+      // Fallback to fake data
+      setLanguages(fakeCourses.languages)
+      setScientific(fakeCourses.scientific)
+      setLiterary(fakeCourses.literary)
+    } finally {
+      setLoading(false)
+    }
+  }, [t])
+
+  useEffect(() => {
+    fetchCourses()
+  }, [fetchCourses])
+
+  const fetchSubjectDetails = async (subjectId) => {
+    console.log("Fetching subject details for:", subjectId)
+  }
+
+  const renderCourseSection = (title, courses, viewAllLink) => {
+    return (
+      <div className="mb-16">
+        <h3 className="text-center text-2xl font-bold mb-8">
+          {title}
+        </h3>
+        
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader className="h-8 w-8 animate-spin text-primary" />
+            <span className={isRTL ? 'mr-2' : 'ml-2'}>
+              {t('courses.errors.loading')}
+            </span>
+          </div>
+        ) : error ? (
+          <div className="alert alert-error max-w-md mx-auto">
+            <p>{error}</p>
+            <button className="btn btn-sm btn-outline" onClick={fetchCourses}>
+              {t('courses.errors.retry')}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <AnimatePresence>
+                {courses.map((course) => (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Link to={`/courses/${course.id}`}>
+                      <CourseCard
+                        id={course.id}
+                        image={course.image}
+                        teacherName={course.teacher}
+                        subject={course.subject}
+                        subjectId={course.id}
+                        level={course.grade}
+                        duration={course.duration}
+                        rating={course.rating}
+                        fetchSubjectDetails={fetchSubjectDetails}
+                      />
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            <div className="flex justify-center mt-8">
+              <Link to={viewAllLink}>
+                <button className="btn btn-primary rounded-full">
+                  {t('courses.viewAll')}
+                  <ChevronLeft className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`} />
+                </button>
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <section className="md:p-8" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="container mx-auto px-4">
+        <h2 className="text-center text-2xl font-bold mb-2">
+          {t('courses.title')}
+        </h2>
+        <h3 className="text-center text-3xl font-bold mb-12">
+          {t('courses.heading')} 
+          <span className="text-primary border-b-2 border-primary pb-1">
+            {t('courses.platform')}
+          </span>
+        </h3>
+
+        {/* Languages Section */}
+        {renderCourseSection(
+          isRTL ? "تعلم جميع اللغات" : "Learn All Languages",
+          languages,
+          "/courses/languages"
+        )}
+
+        {/* Scientific Subjects Section */}
+        {renderCourseSection(
+          isRTL ? "المواد العلمية" : "Scientific Subjects",
+          scientific,
+          "/courses/scientific"
+        )}
+
+        {/* Literary Subjects Section */}
+        {renderCourseSection(
+          isRTL ? "المواد الأدبية" : "Literary Subjects",
+          literary,
+          "/courses/literary"
+        )}
+      </div>
+    </section>
+  )
+}
