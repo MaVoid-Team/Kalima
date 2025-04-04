@@ -12,12 +12,13 @@ import {
   FaMedal,
 } from "react-icons/fa";
 import { AppDownloadSection } from "./Home/app-download-section";
-import { ChevronLeft, Loader } from "lucide-react"
-import {  AnimatePresence } from "framer-motion"
-import { useState, useEffect, useCallback } from "react"
-import { Link } from "react-router-dom"
-import { CourseCard } from "./../components/CourseCard"
-import { getAllSubjects } from "./../routes/courses"
+import { ChevronLeft, Loader } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { CourseCard } from "./../components/CourseCard";
+import { getAllSubjects } from "./../routes/courses";
+import { Card } from "react-daisyui";
 function Services() {
   const { t, i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
@@ -56,7 +57,7 @@ function Services() {
   ];
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   const testimonials = [
@@ -64,40 +65,40 @@ function Services() {
       id: 1,
       name: isRTL ? "سارة علي" : "Sarah Ali",
       role: isRTL ? "طالبة، الصف الثالث الثانوي" : "12th Grade Student",
-      content: isRTL 
+      content: isRTL
         ? "تجربة التعلم على منصة كلمة كانت رائعة بكل المقاييس! أحببت طريقة تنظيم المحتوى حيث يتم تقديم المعلومات بشكل تدريجي وسلس، مما يجعل التعلم ممتعاً ويسهل الفهم. أيضاً نظام متابعة التقدم رائع جداً."
         : "The learning experience on Kalima was exceptional! I loved the gradual content delivery that made complex topics approachable. The progress tracking system helped me stay motivated throughout my journey.",
       image: "/student1.jpg",
-      color: "from-indigo-500 to-purple-600"
+      color: "from-indigo-500 to-purple-600",
     },
     {
       id: 2,
       name: isRTL ? "أحمد السيد" : "Ahmed Al-Sayed",
       role: isRTL ? "طالب، الصف الثاني الثانوي" : "11th Grade Student",
-      content: isRTL 
+      content: isRTL
         ? "المنصة تقدم محتوى تعليمي مفيد جداً، والدروس يتم شرحها بأسلوب واضح وسهل. أعجبني التنوع في المواد التعليمية المتاحة، ولكن أتمنى أن يتم إضافة المزيد من التمارين العملية."
         : "Kalima's clear explanations transformed how I understand difficult concepts. While the content variety is impressive, I'd love to see more practical exercises to reinforce learning.",
       image: "/student2.jpg",
-      color: "from-emerald-500 to-teal-600"
+      color: "from-emerald-500 to-teal-600",
     },
     {
       id: 3,
       name: isRTL ? "أسيل صفوان" : "Aseel Safwan",
       role: isRTL ? "طالبة، الصف الأول الثانوي" : "10th Grade Student",
-      content: isRTL 
+      content: isRTL
         ? "أحببت التعلم عبر كلمة! الفيديوهات ذات جودة عالية، والمحتوى غني بالمعلومات القيمة. أكثر شيء أعجبني هو إمكانية تحميل الملخصات والمواد الإضافية."
         : "Learning with Kalima has been transformative! The premium video quality and downloadable resources helped me excel in subjects I previously struggled with.",
       image: "/student3.jpg",
-      color: "from-amber-500 to-orange-600"
-    }
+      color: "from-amber-500 to-orange-600",
+    },
   ];
 
   // Auto-rotation effect
   useEffect(() => {
     if (!isAutoPlaying) return;
-    
+
     const interval = setInterval(() => {
-      setActiveIndex(prev => (prev + 1) % testimonials.length);
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 6000);
 
     return () => clearInterval(interval);
@@ -105,13 +106,15 @@ function Services() {
 
   const nextTestimonial = () => {
     setIsAutoPlaying(false);
-    setActiveIndex(prev => (prev + 1) % testimonials.length);
+    setActiveIndex((prev) => (prev + 1) % testimonials.length);
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
   const prevTestimonial = () => {
     setIsAutoPlaying(false);
-    setActiveIndex(prev => (prev - 1 + testimonials.length) % testimonials.length);
+    setActiveIndex(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length
+    );
     setTimeout(() => setIsAutoPlaying(true), 10000);
   };
 
@@ -119,9 +122,8 @@ function Services() {
     type: "spring",
     damping: 30,
     stiffness: 300,
-    mass: 0.5
+    mass: 0.5,
   };
-
 
   const fadeIn = (direction, type, delay, duration) => ({
     hidden: {
@@ -143,15 +145,12 @@ function Services() {
   });
 
   const images = {
-    maleStudent:
-      "https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
-    femaleStudent:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+    maleStudent: "/servicesherosection2",
+    femaleStudent: "/servicesherosection1",
     decorativeCircle:
       "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIGZpbGw9IiNlYmY0ZmYiIHN0cm9rZT0iI2Q0ZTVmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PC9zdmc+",
   };
 
-  
   const benefits = [
     {
       id: 1,
@@ -214,6 +213,33 @@ function Services() {
         : "If it is to be different to the system from their side, all can gear to a college linked to the specification.",
     },
   ];
+  const books = [
+    { id: 1, title: "العلم جميع اللغات", image: "/Book.png" },
+    { id: 2, title: "اللغة العربية", image: "/Book-1.png" },
+    { id: 3, title: "اللغة الإنجليزية", image: "/Book-2.png" },
+    { id: 4, title: "اللغة الفرنسية", image: "/Book-3.png" },
+    { id: 5, title: "اللغة الألمانية", image: "/Book-4.png" },
+    { id: 6, title: "اللغة الإسبانية", image: "/Book-5.png" },
+    { id: 7, title: "اللغة الصينية", image: "/Book-2.png" },
+  ];
+  const books1 = [
+    { id: 1, title: "العلم جميع اللغات", image: "/Book-6.png" },
+    { id: 2, title: "اللغة العربية", image: "/Book-7.png" },
+    { id: 3, title: "اللغة الإنجليزية", image: "/Book-8.png" },
+    { id: 4, title: "اللغة الفرنسية", image: "/Book-9.png" },
+    { id: 5, title: "اللغة الألمانية", image: "/Book-10.png" },
+    { id: 6, title: "اللغة الإسبانية", image: "/Book-11.png" },
+    { id: 7, title: "اللغة الصينية", image: "/Book-12.png" },
+  ];
+  const books2 = [
+    { id: 1, title: "العلم جميع اللغات", image: "/Book-13.png" },
+    { id: 2, title: "اللغة العربية", image: "/Book-14.png" },
+    { id: 3, title: "اللغة الإنجليزية", image: "/Book-15.png" },
+    { id: 4, title: "اللغة الفرنسية", image: "/Book-16.png" },
+    { id: 5, title: "اللغة الألمانية", image: "/Book-17.png" },
+    { id: 6, title: "اللغة الإسبانية", image: "/Book-18.png" },
+    { id: 7, title: "اللغة الصينية", image: "/Book-19.png" },
+  ];
 
   return (
     <motion.section
@@ -266,8 +292,7 @@ function Services() {
                   className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-secondary/30"
                   loading="lazy"
                   onError={(e) => {
-                    e.currentTarget.src =
-                      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80";
+                    e.currentTarget.src = "servicesherosection2.png";
                   }}
                 />
               </motion.div>
@@ -286,8 +311,7 @@ function Services() {
                   className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-primary/30"
                   loading="lazy"
                   onError={(e) => {
-                    e.currentTarget.src =
-                      "https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80";
+                    e.currentTarget.src = "servicesherosection1.png";
                   }}
                 />
                 {/* Kalima text label */}
@@ -335,8 +359,25 @@ function Services() {
               >
                 {isRTL ? (
                   <>
-                    <span className="text-primary">مرحبا بك في </span>
-                    منصة كلمـــــة
+                    <span className="text-base-content">مرحبا بك في منصة</span>
+                    <span className="text-primary relative inline-block">
+                    كلمـــــة
+                        <svg
+                          className="absolute -bottom-3 left-0 w-full"
+                          width="140"
+                          height="16"
+                          viewBox="0 0 140 16"
+                          fill="none"
+                        >
+                          <path
+                            d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </span>
+                    
                   </>
                 ) : (
                   <>
@@ -514,219 +555,154 @@ function Services() {
             >
               {/* Text Content - Left Side */}
               <div className="w-full lg:w-1/2 space-y-6">
-                <h3 className="text-xl font-bold text-primary">
-                  {isRTL ? "معلومات عنا" : "About Us"}
-                </h3>
+  <h3 className="text-xl font-bold text-primary">
+    {isRTL ? "معلومات عنا" : "About Us"}
+  </h3>
 
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-base-content leading-tight">
-                  {isRTL ? (
-                    <>
-                      تعلم وجيب الدرجات النهائية{" "}
-                      <span className="text-primary relative inline-block">
-                        معانا
-                        <svg
-                          className="absolute -bottom-3 left-0 w-full"
-                          width="140"
-                          height="16"
-                          viewBox="0 0 140 16"
-                          fill="none"
-                        >
-                          <path
-                            d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      Learn and achieve final grades{" "}
-                      <span className="text-primary relative inline-block">
-                        with us
-                        <svg
-                          className="absolute -bottom-3 left-0 w-full"
-                          width="140"
-                          height="16"
-                          viewBox="0 0 140 16"
-                          fill="none"
-                        >
-                          <path
-                            d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </span>
-                    </>
-                  )}
-                </h2>
+  <h2 className="text-3xl sm:text-4xl font-extrabold text-base-content leading-tight">
+    {isRTL ? (
+      <>
+        تعلم وجيب الدرجات النهائية{" "}
+        <span className="text-primary relative inline-block">
+          معانا
+          <svg
+            className="absolute -bottom-3 left-0 w-full"
+            width="140"
+            height="16"
+            viewBox="0 0 140 16"
+            fill="none"
+          >
+            <path
+              d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      </>
+    ) : (
+      <>
+        Learn and achieve final grades{" "}
+        <span className="text-primary relative inline-block">
+          with us
+          <svg
+            className="absolute -bottom-3 left-0 w-full"
+            width="140"
+            height="16"
+            viewBox="0 0 140 16"
+            fill="none"
+          >
+            <path
+              d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+      </>
+    )}
+  </h2>
 
-                <p className="text-lg text-base-content/80 leading-relaxed text-right">
-                  {isRTL
-                    ? "منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي."
-                    : "Kalima Platform is an e-learning platform that provides resources for students from 4th grade through 12th grade."}
-                </p>
+  <p className={`text-lg text-base-content/80 leading-relaxed ${isRTL ? "text-right" : "text-left"}`}>
+    {isRTL
+      ? "منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي."
+      : "Kalima Platform is an e-learning platform that provides resources for students from 4th grade through 12th grade."}
+  </p>
 
-                <div className="relative">
-                  {/* Features List - Position changes based on RTL */}
-                  <div
-                    className={`space-y-4 relative z-10 ${
-                      isRTL ? "pr-12" : "pl-12"
-                    }`}
-                  >
-                    {features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-4">
-                        <div className="text-primary text-xl bg-white dark:bg-gray-800 p-2 rounded-full shadow-sm">
-                          {feature.icon}
-                        </div>
-                        <span className="text-base-content font-medium">
-                          {feature.text}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Professional Curved Arrow - Always points to features */}
-                  <motion.svg
-                    whileHover={{ scale: 1.05 }}
-                    width="160"
-                    height="80"
-                    viewBox="0 0 160 80"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`absolute ${
-                      isRTL ? "left-0" : "right-0"
-                    } -bottom-6 text-primary z-0`}
-                    style={{ transform: isRTL ? "scaleX(-1)" : "scaleX(1)" }}
-                  >
-                    <defs>
-                      <linearGradient
-                        id="arrowGradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="currentColor"
-                          stopOpacity="0.8"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="currentColor"
-                          stopOpacity="1"
-                        />
-                      </linearGradient>
-                      <marker
-                        id="arrowhead"
-                        markerWidth="10"
-                        markerHeight="7"
-                        refX="9"
-                        refY="3.5"
-                        orient="auto"
-                      >
-                        <path d="M0 0L10 3.5L0 7Z" fill="currentColor" />
-                      </marker>
-                    </defs>
-                    <motion.path
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 1, ease: "easeInOut" }}
-                      d="M10 70C40 40 80 20 140 20"
-                      stroke="url(#arrowGradient)"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      markerEnd="url(#arrowhead)"
-                      fill="none"
-                    />
-                    <path
-                      d="M10 70C40 40 80 20 140 20"
-                      stroke="currentColor"
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeOpacity="0.1"
-                      fill="none"
-                    />
-                  </motion.svg>
-                </div>
-              </div>
+  <div className="relative">
+    {/* Features List with Arrow Images */}
+    <div className="flex flex-col gap-4 relative z-10">
+      {features.map((feature, index) => (
+        <div key={index} className="flex items-center gap-4">
+          {/* Feature Icon */}
+          <div className="text-primary text-xl bg-white dark:bg-gray-800 p-2 rounded-full shadow-sm">
+            {feature.icon}
+          </div>
+          
+          {/* Feature Text */}
+          <span className="text-base-content font-medium flex-1">
+            {feature.text}
+          </span>
+          
+          {/* Arrow Image - Shows only for the first feature */}
+          {index === 0 && (
+            <div className={`hidden   sm:block ${isRTL ? "mr-4" : "ml-4"}`}>
+              <img
+                src={isRTL ? "/curved-arrow-about.png" : "/curved-arrow-services.png"}
+                alt=""
+                className="h-12 w-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
 
               {/* Image Stack - Right Side */}
-              <div
-                className="w-full lg:w-1/2 relative"
-                style={{ height: "clamp(400px, 60vw, 500px)" }}
-              >
-                {/* Dotted SVG Background */}
-                <div className="absolute inset-0 overflow-hidden z-0">
-                  <svg
-                    className="w-full h-full"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <pattern
-                      id="dotsPattern"
-                      x="0"
-                      y="0"
-                      width="25"
-                      height="25"
-                      patternUnits="userSpaceOnUse"
-                      patternTransform="rotate(0)"
-                    >
-                      <circle
-                        cx="2.5"
-                        cy="2.5"
-                        r="1.5"
-                        fill="currentColor"
-                        className="text-primary/20"
-                      />
-                    </pattern>
-                    <rect
-                      x="0"
-                      y="0"
-                      width="100%"
-                      height="100%"
-                      fill="url(#dotsPattern)"
-                    />
-                  </svg>
-                </div>
+             <div 
+  className="w-full lg:w-1/2 relative"
+  style={{ height: "clamp(400px, 60vw, 500px)" }}
+>
+  {/* Dotted SVG Background (same as babbles) */}
+  <div className="absolute inset-0 overflow-hidden z-0">
+    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <pattern
+        id="dotsPattern"
+        x="0"
+        y="0"
+        width="25"
+        height="25"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(0)"
+      >
+        <circle
+          cx="2.5"
+          cy="2.5"
+          r="1.5"
+          fill="currentColor"
+          className="text-primary/20"
+        />
+      </pattern>
+      <rect
+        x="0"
+        y="0"
+        width="100%"
+        height="100%"
+        fill="url(#dotsPattern)"
+      />
+    </svg>
+  </div>
 
-                {/* Container for precise positioning */}
-                <div className="relative h-full w-full z-10">
-                  {/* Bottom Image */}
-                  <motion.div
-                    className="absolute left-4 sm:left-8 bottom-0 h-[80%] w-[55%] sm:w-[50%] rounded-2xl p-2 sm:p-4 z-0"
-                    whileHover={{ y: -10 }}
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                      alt={isRTL ? "طلاب يدرسون" : "Students studying"}
-                      className="w-full h-full object-cover rounded-lg shadow-xl border-2 border-secondary/30"
-                      loading="lazy"
-                    />
-                  </motion.div>
+  {/* Single Centered Image */}
+  <motion.div
+    className="absolute inset-0 flex items-center justify-center p-4 sm:p-8 z-10"
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.6 }}
+    whileHover={{ scale: 1.02 }}
+  >
+    <div className="relative w-full h-full max-w-[500px]">
+      <img
+        src="/education-image-services.png" // Your single image path
+        alt={isRTL ? "طلاب يدرسون" : "Students learning"}
+        className="w-full h-full object-contain rounded-xl "
+        loading="lazy"
+      />
+      
+      {/* Decorative glow effect */}
+      <div className="absolute -inset-4 rounded-xl bg-primary/10 mix-blend-multiply filter blur-xl z-0" />
+    </div>
+  </motion.div>
 
-                  {/* Top Image */}
-                  <motion.div
-                    className="absolute right-4 sm:right-8 top-0 h-[80%] w-[55%] sm:w-[50%] rounded-2xl p-2 sm:p-4 z-10"
-                    whileHover={{ y: -10 }}
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                      alt={isRTL ? "طالبة تدرس" : "Student learning"}
-                      className="w-full h-full object-cover rounded-lg shadow-xl border-2 border-primary/30"
-                      loading="lazy"
-                    />
-                  </motion.div>
-                </div>
-
-                {/* Decorative elements */}
-                <div className="absolute -left-12 sm:-left-20 -top-12 sm:-top-20 w-48 sm:w-64 h-48 sm:h-64 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl z-0" />
-                <div className="absolute -right-6 sm:-right-10 bottom-6 sm:bottom-10 w-32 sm:w-40 h-32 sm:h-40 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl z-0" />
-              </div>
+  {/* Decorative elements matching babbles */}
+  <div className="absolute -left-12 -top-12 w-48 h-48 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl z-0" />
+  <div className="absolute -right-6 bottom-6 w-32 h-32 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl z-0" />
+</div>
             </div>
           </div>
         </section>
@@ -1032,334 +1008,182 @@ function Services() {
           </div>
         </div>
         <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 rounded-xl">
-        <div className="max-w-7xl mx-auto">
-          {/* Animated Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative text-center mb-8 sm:mb-12"
-          >
-          <div className="relative inline-block">
-          <h2 className="text-xs sm:text-xs md:text-xs font-bold text-primary relative z-10 pb-2">
-          {isRTL ? "التحضير للأمتحان" : "Exam Preparation"}
-          {/* Underline decoration - works for both languages */}
-          <svg
-            className="absolute bottom-0 left-0 w-full h-2 text-primary"
-            viewBox="0 0 200 10"
-            preserveAspectRatio="none"
-          >
-            <path
-              d={
-                isRTL
-                  ? "M0,5 C50,0 150,10 200,5"
-                  : "M0,5 C50,10 150,0 200,5"
-              }
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-            />
-          </svg>
-        </h2>
-
-          {/* Decorative circles - same for both languages */}
-          <motion.div
-            className="absolute -top-3 -right-4 w-3 h-3 rounded-full bg-secondary"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute -bottom-2 -left-3 w-2 h-2 rounded-full bg-accent"
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-          />
-        </div>
-     
-        
-            
-        
-          </motion.div>
-      
-          {/* Two Cards in One Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Card 1 */}
-          <motion.div
-            initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="relative rounded-2xl overflow-hidden shadow-2xl h-72 sm:h-96"
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1591123720164-de1348028a82?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80" 
-              alt={isRTL ? "طلاب في محاضرة" : "Students in lecture"}
-              className="w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <div className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}>
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  {isRTL ? "التحضير للامتحانات النهائية" : "Final Exam Preparation"}
-                </h3>
-                <p className={`text-white/90 mb-6 text-lg ${isRTL ? 'ml-auto' : 'mr-auto'} max-w-[90%]`}>
-                  {isRTL 
-                    ? "دورات مكثفة مع أفضل المدرسين لتأهيلك للامتحانات" 
-                    : "Intensive courses with top teachers to prepare you for exams"}
-                </p>
-                <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'}`}>
-                  <motion.button
-                    whileHover={{ 
-                      scale: 1.05,
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`
-                      px-6 py-3 rounded-lg font-medium text-lg
-                      bg-gradient-to-r from-primary to-primary-dark
-                      text-white shadow-md
-                      border-0
-                      flex items-center gap-2
-                      transition-all duration-300
-                      hover:shadow-lg
-                    `}
-                  >
-                    {isRTL ? (
-                      <>
-                        <span>سجل الآن</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                        <span>Register Now</span>
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        
-          {/* Card 2 */}
-          <motion.div
-            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="relative rounded-2xl overflow-hidden shadow-2xl h-72 sm:h-96"
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1631&q=80" 
-              alt={isRTL ? "مجموعة دراسة" : "Study group"} 
-              className="w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            
-            <div className="absolute inset-0 flex flex-col justify-end p-8">
-              <div className={`w-full ${isRTL ? 'text-right' : 'text-left'}`}>
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  {isRTL ? "دورات تقوية شاملة" : "Comprehensive Training Courses"}
-                </h3>
-                <p className={`text-white/90 mb-6 text-lg ${isRTL ? 'ml-auto' : 'mr-auto'} max-w-[90%]`}>
-                  {isRTL 
-                    ? "برامج تدريبية متخصصة لتعزيز مهاراتك الأكاديمية" 
-                    : "Specialized training programs to enhance your academic skills"}
-                </p>
-                <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'}`}>
-                  <motion.button
-                    whileHover={{ 
-                      scale: 1.05,
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`
-                      px-6 py-3 rounded-lg font-medium text-lg
-                      bg-gradient-to-r from-primary to-primary-dark
-                      text-white shadow-md
-                      border-0
-                      flex items-center gap-2
-                      transition-all duration-300
-                      hover:shadow-lg
-                    `}
-                  >
-                    {isRTL ? (
-                      <>
-                        <span>سجل الآن</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                        <span>Register Now</span>
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-        </div>
-      </div>
-      <AllCoursesSections />
-      <section className={`relative py-20 px-4 sm:px-6 lg:px-8 bg-base-100`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl opacity-20"></div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-secondary/10 rounded-full filter blur-3xl opacity-20"></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className={`text-3xl sm:text-4xl font-bold text-base-content mb-4`}>
-            {isRTL ? "آراء طلابنا" : "Student Testimonials"}
-          </h2>
-          <motion.div 
-            className={`w-24 h-1.5 ${testimonials[activeIndex].accentColor} mx-auto rounded-full`}
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-          />
-        </motion.div>
-
-        <div className="relative">
-          {/* Navigation Arrows */}
-          <motion.button 
-            onClick={prevTestimonial}
-            className={`absolute top-1/2 ${isRTL ? 'right-4 sm:right-8' : 'left-4 sm:left-8'} -translate-y-1/2 z-20 p-3 rounded-full bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 group border border-base-300`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-base-content group-hover:text-primary transition-colors"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="max-w-7xl mx-auto">
+            {/* Animated Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative text-center mb-8 sm:mb-12"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M9 5l7 7-7 7" : "M15 19l-7-7 7-7"} />
-            </svg>
-          </motion.button>
-
-          <motion.button 
-            onClick={nextTestimonial}
-            className={`absolute top-1/2 ${isRTL ? 'left-4 sm:left-8' : 'right-4 sm:right-8'} -translate-y-1/2 z-20 p-3 rounded-full bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 group border border-base-300`}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-base-content group-hover:text-primary transition-colors"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isRTL ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"} />
-            </svg>
-          </motion.button>
-
-          {/* Testimonials Carousel */}
-          <div className="relative h-[500px] sm:h-[550px] overflow-hidden">
-            <AnimatePresence mode="wait">
-              {testimonials.map((testimonial, index) => (
-                activeIndex === index && (
-                  <motion.div
-                    key={testimonial.id}
-                    initial={{ opacity: 0, x: isRTL ? 150 : -150 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: isRTL ? -150 : 150 }}
-                    transition={springConfig}
-                    className="absolute inset-0 flex flex-col lg:flex-row items-center justify-center gap-8 p-6 sm:p-8"
+              <div className="relative inline-block">
+                <h2 className="text-sm sm:text-sm md:text-sm font-bold text-primary relative z-10 pb-2">
+                  {isRTL ? "التحضير للأمتحان" : "Exam Preparation"}
+                  {/* Underline decoration - works for both languages */}
+                  <svg
+                    className="absolute bottom-0 left-0 w-full h-2 text-primary"
+                    viewBox="0 0 200 10"
+                    preserveAspectRatio="none"
                   >
-                    {/* Student Image */}
-                    <motion.div
-                      initial={{ scale: 0.8, rotate: -5 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ ...springConfig, delay: 0.2 }}
-                      className="relative w-40 h-40 sm:w-52 sm:h-52 rounded-full overflow-hidden border-4 border-base-100 shadow-xl"
-                    >
-                      <div className={`absolute inset-0 ${testimonial.accentColor} flex items-center justify-center text-white text-5xl font-bold`}>
-                        {testimonial.name.charAt(0)}
-                      </div>
-                    </motion.div>
+                    <path
+                      d={
+                        isRTL
+                          ? "M0,5 C50,0 150,10 200,5"
+                          : "M0,5 C50,10 150,0 200,5"
+                      }
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </h2>
 
-                    {/* Testimonial Content */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 40 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ ...springConfig, delay: 0.4 }}
-                      className={`flex-1 ${isRTL ? 'text-right' : 'text-left'} max-w-2xl`}
+                {/* Decorative circles - same for both languages */}
+                <motion.div
+                  className="absolute -top-3 -right-4 w-3 h-3 rounded-full bg-secondary"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <motion.div
+                  className="absolute -bottom-2 -left-3 w-2 h-2 rounded-full bg-accent"
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                />
+              </div>
+            </motion.div>
+
+            {/* Two Cards in One Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            {/* Card 1 - Primary */}
+            <motion.div
+              initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className={`relative rounded-2xl overflow-hidden shadow-xl h-72 sm:h-96 ${
+                isRTL ? "bg-secondary" : "bg-primary"
+              }`}
+            >
+              <div className={`flex h-full ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                {/* Content */}
+                <div className={`flex-1 flex flex-col justify-center p-6 sm:p-8 ${
+                  isRTL ? "text-right" : "text-left"
+                }`}>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                    {isRTL ? "التحضير للامتحانات النهائية" : "Final Exam Preparation"}
+                  </h3>
+                  <p className="text-white/90 mb-6 text-base sm:text-lg max-w-[90%]">
+                    {isRTL
+                      ? "دورات مكثفة مع أفضل المدرسين لتأهيلك للامتحانات"
+                      : "Intensive courses with top teachers to prepare you for exams"}
+                  </p>
+                  <div className={`flex ${isRTL ? "justify-end" : "justify-start"}`}>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium text-white bg-black/20 hover:bg-black/30 border border-white/20 flex items-center gap-2 transition-all"
                     >
-                      <div className={`bg-base-100/90 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-base-300 relative overflow-hidden ${isRTL ? 'pr-12' : 'pl-12'}`}>
-                        {/* Quote Icon */}
-                        <div className={`absolute ${isRTL ? 'left-6' : 'right-6'} top-6 w-12 h-12 rounded-full ${testimonial.accentColor} flex items-center justify-center text-white shadow-md`}>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      {isRTL ? (
+                        <>
+                          <span>سجل الآن</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                           </svg>
-                        </div>
-
-                        <p className="text-base-content/80 text-lg sm:text-xl mb-8 leading-relaxed">
-                          {testimonial.content}
-                        </p>
-
-                        <div>
-                          <h4 className="font-bold text-base-content text-xl">{testimonial.name}</h4>
-                          <p className="text-base-content/60">{testimonial.role}</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                )
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-3 mt-8">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setIsAutoPlaying(false);
-                  setActiveIndex(index);
-                  setTimeout(() => setIsAutoPlaying(true), 10000);
-                }}
-                className={`relative w-3 h-3 rounded-full transition-all ${activeIndex === index ? 'bg-primary' : 'bg-base-300'}`}
-              >
-                {activeIndex === index && (
-                  <motion.span
-                    layoutId="activeDot"
-                    className="absolute inset-0 rounded-full bg-current"
-                    transition={springConfig}
+                        </>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                          <span>Register Now</span>
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </div>
+          
+                {/* Image */}
+                <div className="flex-1 relative hidden sm:block">
+                  <motion.img
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                    src="/education-card1.png"
+                    alt={isRTL ? "طلاب في محاضرة" : "Students in lecture"}
+                    className="absolute inset-0 w-full h-full object-cover object-center"
                   />
-                )}
-              </button>
-            ))}
+                </div>
+              </div>
+            </motion.div>
+          
+            {/* Card 2 - Secondary */}
+            <motion.div
+              initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className={`relative rounded-2xl overflow-hidden shadow-xl h-72 sm:h-96 ${
+                isRTL ? "bg-primary" : "bg-secondary"
+              }`}
+            >
+              <div className={`flex h-full ${isRTL ? "flex-row-reverse" : "flex-row"}`}>
+                {/* Content */}
+                <div className={`flex-1 flex flex-col justify-center p-6 sm:p-8 ${
+                  isRTL ? "text-right" : "text-left"
+                }`}>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                    {isRTL ? "دورات تقوية شاملة" : "Comprehensive Training Courses"}
+                  </h3>
+                  <p className="text-white/90 mb-6 text-base sm:text-lg max-w-[90%]">
+                    {isRTL
+                      ? "برامج تدريبية متخصصة لتعزيز مهاراتك الأكاديمية"
+                      : "Specialized training programs to enhance your academic skills"}
+                  </p>
+                  <div className={`flex ${isRTL ? "justify-end" : "justify-start"}`}>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium text-white bg-black/20 hover:bg-black/30 border border-white/20 flex items-center gap-2 transition-all"
+                    >
+                      {isRTL ? (
+                        <>
+                          <span>سجل الآن</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                        </>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                          <span>Register Now</span>
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </div>
+          
+                {/* Image */}
+                <div className="flex-1 relative hidden sm:block">
+                  <motion.img
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                    src="/education-card2.png"
+                    alt={isRTL ? "مجموعة دراسة" : "Study group"}
+                    className="absolute inset-0 w-full h-full object-cover object-center"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </div>
           </div>
         </div>
-      </div>
-    </section>
+       <CoursesSection isRTL={isRTL} />
+        <LanguageBooks books={books1} isRTL={isRTL} />
+        <LanguageBooks books={books} isRTL={isRTL}/>
+        <LanguageBooks books={books2} isRTL={isRTL}/>
+        <TestimonialsSection isRTL={isRTL} />
       </div>
     </motion.section>
   );
@@ -1398,223 +1222,357 @@ const fadeIn = (direction, type, delay, duration) => ({
 });
 
 
-
-export function AllCoursesSections() {
-  const { t, i18n } = useTranslation("home");
-  const isRTL = i18n.language === 'ar';
-  const [languages, setLanguages] = useState([])
-  const [scientific, setScientific] = useState([])
-  const [literary, setLiterary] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState()
-
-  // Fake data for courses
-  const fakeCourses = {
-    languages: [
-      {
-        id: 1,
-        image: "/course-1.png",
-        title: "اللغة الإنجليزية",
-        subject: "لغة إنجليزية",
-        teacher: "أستاذ محمد",
-        grade: "الصف الثالث الثانوي",
-        rating: 5,
-        duration: 12,
-      },
-      {
-        id: 2,
-        image: "/course-2.png",
-        title: "اللغة الفرنسية",
-        subject: "لغة فرنسية",
-        teacher: "أستاذ أحمد",
-        grade: "الصف الثاني الثانوي",
-        rating: 5,
-        duration: 10,
-      },
-    ],
-    scientific: [
-      {
-        id: 3,
-        image: "/course-3.png",
-        title: "كيمياء عامة",
-        subject: "كيمياء",
-        teacher: "أستاذة سارة",
-        grade: "الصف الأول الثانوي",
-        rating: 5,
-        duration: 15,
-      },
-      {
-        id: 4,
-        image: "/course-4.png",
-        title: "أساسيات الفيزياء",
-        subject: "فيزياء",
-        teacher: "أستاذ علي",
-        grade: "الصف الثاني الثانوي",
-        rating: 4.5,
-        duration: 18,
-      },
-    ],
-    literary: [
-      {
-        id: 5,
-        image: "/course-5.png",
-        title: "الأدب العربي",
-        subject: "لغة عربية",
-        teacher: "أستاذة منى",
-        grade: "الصف الثالث الثانوي",
-        rating: 4,
-        duration: 14,
-      },
-      {
-        id: 6,
-        image: "/course-6.png",
-        title: "التاريخ الإسلامي",
-        subject: "تاريخ",
-        teacher: "أستاذ خالد",
-        grade: "الصف الأول الثانوي",
-        rating: 4.5,
-        duration: 12,
-      },
-    ]
-  }
-
-  // Fetch courses from the API
-  const fetchCourses = useCallback(async () => {
-    setLoading(true)
-    try {
-      const result = await getAllSubjects()
-      if (result.success && result.data?.data?.subjects?.length > 0) {
-        const subjectsData = result.data.data.subjects
-        
-        // Filter subjects into categories (in a real app, you'd have proper categorization)
-        setLanguages(fakeCourses.languages)
-        setScientific(fakeCourses.scientific)
-        setLiterary(fakeCourses.literary)
-      } else {
-        // Use fake data if API fails
-        setLanguages(fakeCourses.languages)
-        setScientific(fakeCourses.scientific)
-        setLiterary(fakeCourses.literary)
-      }
-    } catch (err) {
-      console.error("Error fetching courses:", err)
-      setError(t('courses.errors.failed'))
-      // Fallback to fake data
-      setLanguages(fakeCourses.languages)
-      setScientific(fakeCourses.scientific)
-      setLiterary(fakeCourses.literary)
-    } finally {
-      setLoading(false)
+export function LanguageBooks({
+  books = {},
+  content = {
+    en: {
+      title: "Learn All Languages",
+      subtitle: "Through our platform",
+      buttonText: "View Details"
+    },
+    ar: {
+      title: "تعلم جميع اللغات",
+      subtitle: "من خلال منصتنا",
+      buttonText: "عرض التفاصيل"
     }
-  }, [t])
-
-  useEffect(() => {
-    fetchCourses()
-  }, [fetchCourses])
-
-  const fetchSubjectDetails = async (subjectId) => {
-    console.log("Fetching subject details for:", subjectId)
-  }
-
-  const renderCourseSection = (title, courses, viewAllLink) => {
-    return (
-      <div className="mb-16">
-        <h3 className="text-center text-2xl font-bold mb-8">
-          {title}
-        </h3>
-        
-        {loading ? (
-          <div className="flex justify-center items-center h-32">
-            <Loader className="h-8 w-8 animate-spin text-primary" />
-            <span className={isRTL ? 'mr-2' : 'ml-2'}>
-              {t('courses.errors.loading')}
-            </span>
-          </div>
-        ) : error ? (
-          <div className="alert alert-error max-w-md mx-auto">
-            <p>{error}</p>
-            <button className="btn btn-sm btn-outline" onClick={fetchCourses}>
-              {t('courses.errors.retry')}
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <AnimatePresence>
-                {courses.map((course) => (
-                  <motion.div
-                    key={course.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Link to={`/courses/${course.id}`}>
-                      <CourseCard
-                        id={course.id}
-                        image={course.image}
-                        teacherName={course.teacher}
-                        subject={course.subject}
-                        subjectId={course.id}
-                        level={course.grade}
-                        duration={course.duration}
-                        rating={course.rating}
-                        fetchSubjectDetails={fetchSubjectDetails}
-                      />
-                    </Link>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex justify-center mt-8">
-              <Link to={viewAllLink}>
-                <button className="btn btn-primary rounded-full">
-                  {t('courses.viewAll')}
-                  <ChevronLeft className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`} />
-                </button>
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
-    )
-  }
+  },
+  rating = 4
+}) {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const langContent = content[i18n.language] || content.en;
 
   return (
-    <section className="md:p-8" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container mx-auto px-4">
-        <h2 className="text-center text-2xl font-bold mb-2">
-          {t('courses.title')}
-        </h2>
-        <h3 className="text-center text-3xl font-bold mb-12">
-          {t('courses.heading')} 
-          <span className="text-primary border-b-2 border-primary pb-1">
-            {t('courses.platform')}
-          </span>
-        </h3>
+    <div className="py-8 px-4 sm:px-6" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="max-w-6xl mx-auto">
+        {/* Single Horizontal Row */}
+        <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide">
+          {/* Books */}
+          {books.map((book) => (
+            <motion.div
+              key={book.id}
+              className="flex-shrink-0"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: book.id * 0.1 }}
+              whileHover={{
+                y: -10,
+                scale: 1.05,
+                transition: { duration: 0.2 },
+              }}
+            >
+              <div className="relative w-[70px] sm:w-[90px]">
+                <img
+                  src={book.image}
+                  alt={book.title}
+                  className="w-full h-auto rounded-sm"
+                />
+              </div>
+            </motion.div>
+          ))}
 
-        {/* Languages Section */}
-        {renderCourseSection(
-          isRTL ? "تعلم جميع اللغات" : "Learn All Languages",
-          languages,
-          "/courses/languages"
-        )}
-
-        {/* Scientific Subjects Section */}
-        {renderCourseSection(
-          isRTL ? "المواد العلمية" : "Scientific Subjects",
-          scientific,
-          "/courses/scientific"
-        )}
-
-        {/* Literary Subjects Section */}
-        {renderCourseSection(
-          isRTL ? "المواد الأدبية" : "Literary Subjects",
-          literary,
-          "/courses/literary"
-        )}
+          {/* Card */}
+          <motion.div
+            className="flex-shrink-0 h-[50%] w-[280px] sm:w-[320px]"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            whileHover={{
+              y: -5,
+              transition: { duration: 0.2 },
+            }}
+          >
+            <LanguageCourseCard
+              isRTL={isRTL}
+              title={langContent.title}
+              subtitle={langContent.subtitle}
+              rating={rating}
+              buttonText={langContent.buttonText}
+            />
+          </motion.div>
+        </div>
       </div>
-    </section>
-  )
+    </div>
+  );
 }
+
+const LanguageCourseCard = ({
+  isRTL = false,
+  title,
+  subtitle,
+  rating = 0,
+  imageUrl = "/languagedetails.png",
+  buttonText = "View Details",
+}) => {
+  // Calculate star rating (0-5)
+  const stars = Array(5)
+    .fill(0)
+    .map((_, i) => i < rating);
+
+  return (
+    <div
+      className={`card card-side bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-3xl ${
+        isRTL ? "flex-row-reverse" : ""
+      }`}
+    >
+      <figure className="w-1/3 sm:w-2/5 relative">
+        <img
+          src={imageUrl}
+          alt="Language Course"
+          className="w-full h-full object-cover"
+        />
+      </figure>
+
+      <div className="card-body w-2/3 sm:w-3/5 p-4 sm:p-6">
+        <div className={isRTL ? "text-right" : "text-left"}>
+          <h2 className="card-title text-lg sm:text-xl font-bold text-primary">
+            {title}
+          </h2>
+
+          <p className="text-sm sm:text-base text-base-content/80 mt-1">
+            {subtitle}
+          </p>
+
+          <div className="rating rating-xs sm:rating-sm mt-2">
+            {stars.map((filled, index) => (
+              <input
+                key={index}
+                type="radio"
+                name="rating"
+                className={`mask mask-star-2 ${
+                  filled ? "bg-yellow-400" : "bg-gray-300"
+                }`}
+                checked={filled}
+                readOnly
+              />
+            ))}
+          </div>
+
+          <div className="card-actions justify-end mt-4">
+            <button
+              className={`btn btn-primary btn-xs sm:btn-sm ${
+                isRTL ? "flex-row-reverse" : ""
+              }`}
+            >
+              {buttonText}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                  isRTL ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d={
+                    isRTL
+                      ? "M10 19l-7-7m0 0l7-7m-7 7h18"
+                      : "M14 5l7 7m0 0l-7 7m7-7H3"
+                  }
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+const TestimonialsSection = ({ isRTL = false }) => {
+  // Testimonial data in both languages
+  const testimonials = {
+    en: [
+      {
+        text: "The learning experience on Kelma platform was excellent by all standards! I loved how the content was organized, presented gradually and smoothly, making learning enjoyable and easy to understand. The progress tracking system is also great.",
+        name: "Sarah Ali",
+        role: "Student",
+        rating: 5,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "The platform offers very useful educational content, and lessons are explained in a clear and simple way, making understanding easier. I liked the variety of available materials, but I hope more interactive options will be added.",
+        name: "Omar Ahmed",
+        role: "Teacher",
+        rating: 4,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "I loved learning through Kelma! The videos are of high quality, and the instructors are knowledgeable with valuable information that helps develop skills effectively. What I liked most was the ability to download needed documents.",
+        name: "Aseel Safwan",
+        role: "Designer",
+        rating: 5,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "The platform provides a unique learning experience with comprehensive content and excellent instructors. The interface is user-friendly and the community features are very helpful.",
+        name: "Mohammed Khalid",
+        role: "Developer",
+        rating: 4,
+        image: "/servicesherosection2.png"
+      }
+    ],
+    ar: [
+      {
+        text: "تجربة التعلم على منصة كلمة كانت رائعة بكل المقاييس! أحبيت طريقة تنظيم المحتوى حيث يتم تقديم المعلومات بشكل تدريجي وسلس، مما يجعل التعلم ممتعاً ويسهل الفهم. أيضاً نظام متابعة التقدم رائع جداً.",
+        name: "سارة علي",
+        role: "طالبة",
+        rating: 5,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "المنصة تقدم محتوى تعليمي مفيد جداً، والدروس يتم شرحها بأسلوب واضح وسهل، مما يجعل الفهم أسهل. أعجبني التنوع في المواد التعليمية المتاحة، ولكن آمل أن يتم إضافة المزيد من الخيارات التفاعلية.",
+        name: "عمر أحمد",
+        role: "مدرس",
+        rating: 4,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "أحبيت التعلم عبر كلمة! الفيديوهات ذات جودة عالية، والمدرسون مليئون بالمعلومات القيمة التي تساعد في تطوير المهارات بشكل فعال. أكثر شيء أعجبني هو إمكانية تحميل المستندات المطلوبة.",
+        name: "أصيل صفوان",
+        role: "مصممة",
+        rating: 5,
+        image: "/servicesherosection2.png"
+      },
+      {
+        text: "توفر المنصة تجربة تعلم فريدة مع محتوى شامل ومدرسين ممتازين. الواجهة سهلة الاستخدام وميزات المجتمع مفيدة جداً.",
+        name: "محمد خالد",
+        role: "مطور",
+        rating: 4,
+        image: "/servicesherosection2.png"
+      }
+    ]
+  };
+
+  const lang = isRTL ? "ar" : "en";
+  const data = testimonials[lang];
+
+  return (
+    <section className={`py-12 px-4 sm:px-6 lg:px-8 ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div className="max-w-7xl mx-auto">
+      <h2 className={`text-2xl sm:text-3xl font-bold mb-8 ${isRTL ? "text-right" : "text-left"} text-primary`}>
+        {isRTL ? "آراء العملاء" : "Customer Testimonials"}
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {data.map((testimonial, index) => (
+          <div 
+            key={index} 
+            className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 h-full"
+          >
+            <div className="card-body p-6 flex flex-col">
+              {/* Testimonial Text */}
+              <p className={`text-base-content/80 mb-4 ${isRTL ? "text-right" : "text-left"} text-sm sm:text-base`}>
+                {testimonial.text}
+              </p>
+              
+              {/* User Info and Rating */}
+              <div className="mt-auto">
+              <div className={`flex items-center ${isRTL ? "flex-row-reverse" : ""}`}>
+                  {/* User Image */}
+                  <div className="avatar">
+                    <div className="w-10 h-10 rounded-full bg-gray-300">
+                      <img 
+                        src={testimonial.image} 
+                        alt={testimonial.name} 
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* User Name and Role */}
+                  <div className={isRTL ? "ml-3 text-right" : "ml-3 text-left"}>
+                    <h4 className="font-medium text-base-content">{testimonial.name}</h4>
+                    <p className="text-sm text-base-content/60">{testimonial.role}</p>
+                  </div>
+                </div>
+                
+                {/* Star Rating */}
+                <div className={`mt-3 flex ${isRTL ? "justify-end" : "justify-start"}`}>
+              {[...Array(5)].map((_, i) => (
+                <svg
+                  key={i}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 ${i < testimonial.rating ? 
+                    "text-yellow-400" : "text-gray-300 dark:text-gray-600"}`}
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  );
+};
+
+
+const CoursesSection = ({ 
+  isRTL = false,
+  imageUrl = "/education-banner.png",
+  content = {
+    en: {
+      title: "Browse All Courses",
+      subtitle: "For All Academic Levels"
+    },
+    ar: {
+      title: "تصفح جميع الكورسات",
+      subtitle: "لجميع المراحل الدراسية"
+    }
+  }
+}) => {
+  // Validate and merge content with defaults
+  const langContent = {
+    ...(isRTL ? content.ar : content.en),
+    ...(isRTL ? {
+      title: content.ar?.title || "تصفح جميع الكورسات",
+      subtitle: content.ar?.subtitle || "لجميع المراحل الدراسية"
+    } : {
+      title: content.en?.title || "Browse All Courses",
+      subtitle: content.en?.subtitle || "For All Academic Levels"
+    })
+  };
+
+  return (
+    <div className={`py-6 px-4 sm:py-8 sm:px-6 ${isRTL ? "font-arabic" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+      <div className="max-w-6xl mx-auto">
+        <div className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
+          <div className={`flex flex-col md:flex-row ${isRTL ? "md:flex-row-reverse" : ""} items-center`}>
+            {/* Optimized Image Container */}
+            <div className="w-full md:w-2/5 p-4 sm:p-5 flex ">
+              <div className="relative w-[200px] sm:w-[240px] md:w-[280px]">
+                <img 
+                  src={imageUrl}
+                  alt={langContent.title}
+                  className="w-full h-auto object-contain rounded-md"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            
+            {/* Text Content with Perfect Alignment */}
+            <div className={`w-full md:w-3/5 p-4 sm:p-6 ${isRTL ? "md:text-right" : "md:text-left"}`}>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                {langContent.title}
+              </h2>
+              <p className={`text-sm sm:text-base text-gray-600 dark:text-gray-300 ${isRTL ? "leading-loose" : ""}`}>
+                {langContent.subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
