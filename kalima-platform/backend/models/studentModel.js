@@ -23,7 +23,8 @@ const studentSchema = new mongoose.Schema({
   school: { type: mongoose.Schema.Types.ObjectId, ref: 'School' },
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' },
   // Array of teacher-specific point balances
-  teacherPoints: [teacherPointsSchema]
+  teacherPoints: [teacherPointsSchema],
+  subjectNotify: { type: Boolean, default: true }
 }, {
   timestamps: true
 });

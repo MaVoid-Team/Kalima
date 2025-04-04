@@ -14,6 +14,11 @@ const purchaseRouter = require("./routes/purchaseRoutes");
 const errorHandler = require("./controllers/errorController.js");
 const subjectRouter = require("./routes/subjectRoutes.js");
 const levelRouter = require("./routes/levelRoutes.js");
+const messageRouter = require("./routes/messageRoutes");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const Notification = require("./models/notification");
+
 connectDB();
 
 app.use(cors(corsOptions));
@@ -30,10 +35,59 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/levels", levelRouter);
 app.use("/api/v1/subjects", subjectRouter);
+app.use("/api/v1/messages", messageRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
-  app.listen(PORT, () => {
+
+  const httpServer = createServer(app);
+  const io = new Server(httpServer, {
+    cors: corsOptions, // Use the same CORS options
+  });
+
+  // Track connected users
+const connectedUsers = new Map();
+
+  io.on("connection", (socket) => {
+    console.log("A client connected:", socket.id);
+
+    // Handle subscription to notifications
+    socket.on("subscribe", async (userId) => {
+      // Add user to connected users map
+      connectedUsers.set(socket.id, userId);
+      socket.join(userId);
+
+      const pendingNotifications = await Notification.find({
+        userId,
+        isSent: false
+      }).sort({ createdAt: 1 }).limit(20);
+
+      if (pendingNotifications.length > 0) {
+        pendingNotifications.forEach(async (notification) => {
+          socket.emit("notification", {
+            title: notification.title,
+            message: notification.message,
+            type: notification.type,
+            subjectId: notification.relatedId,
+            notificationId: notification._id
+          });
+  
+          await Notification.findByIdAndUpdate(notification._id, { isSent: true });
+        });
+      }
+    });
+
+    socket.on("disconnect", () => {
+      // Remove from connected users map
+      connectedUsers.delete(socket.id);
+      console.log("Client disconnected:", socket.id);
+    });
+  });
+
+  // Make io accessible in routes
+  app.set("io", io);
+
+  httpServer.listen(PORT, () => {
     console.log(`Server active and listening on port ${PORT}.`);
   });
 });
