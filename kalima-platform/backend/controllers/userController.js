@@ -35,7 +35,7 @@ const getUser = catchAsync(async (req, res, next) => {
 const createUser = registerController.registerNewUser;
 
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password, children } = req.body
+  const { name, email, address, password, children, subjectNotify } = req.body
   const userId = req.params.userId
 
   if (password) {
@@ -72,6 +72,11 @@ const updateUser = catchAsync(async (req, res, next) => {
   }
 
   const updatedUser = { name, email, address, children: childrenById, ...req.body }
+
+  if (foundUser.role.toLowerCase() === "student" && typeof subjectNotify !== 'undefined') {
+    updatedUser.subjectNotify = subjectNotify;
+  }
+  
   let user
 
   switch (foundUser.role.toLowerCase()) {
