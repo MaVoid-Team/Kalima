@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight, FaTimes ,FaChalkboardTeacher  } from 'react-icons/fa';
 
 const reviews = [
   {
@@ -30,7 +30,7 @@ const reviews = [
 ];
 
 export const StudentReviewCard = ({ review, onViewMore , isRTL, onPrev, onNext }) => (
-  <div className="card bg-base-100 shadow-xl p-6 " dir='ltr'>
+  <div className="card bg-base-100 shadow-xl p-6  " dir='ltr'>
     <div className="flex items-center gap-4 mb-4">
       <div className="avatar">
         <div className="w-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
@@ -105,11 +105,15 @@ const StudentReviews = () => {
 
   return (
     <div className="w-full md:w-3/4 p-4 md:p-8 xl:pt-10 flex flex-col items-center mx-auto " dir='ltr'>
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-center">
-        {t('title')}
-      </h2>
+     <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-center flex items-center justify-center gap-2">
+  
+  <FaChalkboardTeacher className="text-primary opacity-50 w-6 h-6 md:w-8 md:h-8 lg:w-10 lg:h-10" /> <span>{t('title')}</span>
+</h2>
 
-      <div className="relative w-full max-w-xs md:max-w-lg">
+<p className="text-base-600 text-center mb-6 md:mb-8">
+  {t('description')}
+</p>
+      <div className="relative w-[1200px] max-w-xs md:max-w-lg">
         <StudentReviewCard 
           review={{
             ...reviews[currentReview],

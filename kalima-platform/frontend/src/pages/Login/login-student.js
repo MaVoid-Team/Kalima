@@ -1,23 +1,25 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 import WaveBackground from "./WaveBackground"
 import StudentReviews from "./StudentReviews"
 import { loginUser } from "../../routes/auth-services"
 
-function Login() {
+function LoginStudent() {
   const { t, i18n } = useTranslation("login")
   const navigate = useNavigate()
   const [email, setEmail] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
+  const [loginMethod, setLoginMethod] = useState("email") // "email" or "phone"
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const isAr = i18n.language === "ar"
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
 
@@ -44,7 +46,13 @@ function Login() {
     setLoading(true)
 
     try {
-      const result = await loginUser({ email, password })
+      // Create login payload based on selected method
+      const loginPayload = {
+        password,
+        ...(loginMethod === "email" ? { email } : { phoneNumber })
+      }
+
+      const result = await loginUser(loginPayload)
 
       if (result.success) {
         // Login successful
@@ -62,6 +70,11 @@ function Login() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const toggleLoginMethod = () => {
+    setLoginMethod(loginMethod === "email" ? "phone" : "email")
+    setError("") // Clear any errors when switching methods
   }
 
   return (
@@ -86,20 +99,55 @@ function Login() {
               {error && <div className="alert alert-error mb-4">{error}</div>}
 
               <form onSubmit={handleSubmit}>
+                {/* Login Method Toggle */}
+                <div className="tabs tabs-boxed mb-4 ">
+                  <Link
+                    className={`tab ${loginMethod === "email" ? "tab-active" : ""}`}
+                    onClick={() => setLoginMethod("email")}
+                  >
+                    {t("email_tab") || "Email"}
+                  </Link>
+                  <Link 
+                    className={`tab ${loginMethod === "phone" ? "tab-active" : ""}`}
+                    onClick={() => setLoginMethod("phone")}
+                  >
+                    {t("phone_tab") || "Phone"}
+                  </Link>
+                </div>
+
+                {/* Email or Phone Input */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">{t("email_label")}:</span>
+                    <span className="label-text">
+                      {loginMethod === "email" 
+                        ? t("email_label") 
+                        : t("phone_label") || "Phone Number"}:
+                    </span>
                   </label>
-                  <input
-                    type="email"
-                    placeholder={t("email_label")}
-                    className="input input-sm sm:input-md input-bordered"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                  />
+                  
+                  {loginMethod === "email" ? (
+                    <input
+                      type="email"
+                      placeholder={t("email_label")}
+                      className="input input-sm sm:input-md input-bordered"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  ) : (
+                    <input
+                      type="tel"
+                      placeholder={t("phone_label") || "Phone Number"}
+                      className="input input-sm sm:input-md input-bordered "
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  )}
                 </div>
+
                 <div className="form-control md:mt-4">
                   <label className="label">
                     <span className="label-text">{t("password_label")}:</span>
@@ -146,5 +194,4 @@ function Login() {
   )
 }
 
-export default Login
-
+export default LoginStudent;

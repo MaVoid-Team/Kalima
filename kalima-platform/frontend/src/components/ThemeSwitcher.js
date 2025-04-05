@@ -6,6 +6,13 @@ const ThemeSwitcher = ({ onCloseMenu }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Load saved theme on initial render
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+  }, []);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -37,7 +44,7 @@ const ThemeSwitcher = ({ onCloseMenu }) => {
     >
       <button
         type="button"
-        className="btn btn-ghost gap-2"
+        className="btn btn-ghost rounded-2xl hover:text-primary transition-colors gap-2"
         onClick={toggleDropdown}
       >
         {t("theme")}
@@ -61,7 +68,7 @@ const ThemeSwitcher = ({ onCloseMenu }) => {
             <li key={theme} className="py-1">
               <button
                 data-set-theme={theme}
-                className="btn btn-sm btn-block btn-ghost justify-start"
+                className="btn btn-sm btn-block hover:text-primary transition-colors btn-ghost rounded-2xl justify-start"
                 onClick={() => handleThemeChange(theme)}
               >
                 {theme}

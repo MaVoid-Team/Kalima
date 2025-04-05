@@ -1,144 +1,234 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Search, Book, ChevronDown, Star, Loader } from 'lucide-react'
-import { Link } from "react-router-dom"
-import { getAllSubjects, getSubjectById } from "../routes/courses"
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import { getAllSubjects } from "../routes/courses";
+import { FilterDropdown } from "../../src/components/FilterDropdown";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ErrorAlert } from "../components/ErrorAlert";
+import { CourseCard } from "../components/CourseCard";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Fake data for courses
+const fakeCourses = [
+  {
+    id: 3,
+    image: "/course-3.png",
+    title: "أساسيات الفيزياء",
+    subject: "فيزياء",
+    teacher: "أستاذة سارة",
+    grade: "الصف الأول الثانوي",
+    rating: 5,
+    stage: "المرحلة الثانوية",
+    type: "تدريبات",
+    status: "مجاني",
+  },
+];
 
 export default function CoursesPage() {
-  const [subjects, setSubjects] = useState([])
-  const [filteredCourses, setFilteredCourses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [selectedSubjectDetails, setSelectedSubjectDetails] = useState(null)
+  const [subjects, setSubjects] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Filter states
-  const [selectedStage, setSelectedStage] = useState("")
-  const [selectedGrade, setSelectedGrade] = useState("")
-  const [selectedTerm, setSelectedTerm] = useState("")
-  const [selectedSubject, setSelectedSubject] = useState("")
-  const [selectedCourseType, setSelectedCourseType] = useState("")
-  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
+  const [selectedStage, setSelectedStage] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState("");
+  const [selectedTerm, setSelectedTerm] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedCourseType, setSelectedCourseType] = useState("");
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState("");
 
   useEffect(() => {
-    fetchSubjects()
-  }, [])
+    fetchSubjects();
+  }, []);
 
-  // Update filtered courses whenever filters change
-  useEffect(() => {
-    if (subjects.length > 0) {
-      applyFilters()
-    }
-  }, [selectedStage, selectedGrade, selectedTerm, selectedSubject, selectedCourseType, selectedCourseStatus, subjects])
-
+  // Fetch subjects from the API
   const fetchSubjects = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const result = await getAllSubjects()
+      const result = await getAllSubjects();
 
-      if (result.success) {
-        setSubjects(result.data)
-        // Initialize filtered courses with all courses
-        setFilteredCourses(generateCourseData(result.data))
+      if (result.success && result.data?.data?.subjects?.length > 0) {
+        const subjectsData = result.data.data.subjects;
+        setSubjects(subjectsData);
+        setFilteredCourses(generateCourseData(subjectsData));
       } else {
-        setError("فشل في تحميل بيانات المواد الدراسية")
+        // If no data is fetched, use fake data
+        setFilteredCourses(fakeCourses);
       }
     } catch (err) {
-      console.error("Error fetching subjects:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
+      console.error("Error fetching subjects:", err);
+      setError("حدث خطأ أثناء تحميل البيانات");
+      // If there's an error, use fake data
+      setFilteredCourses(fakeCourses);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  // Fetch subject details by ID
-  const fetchSubjectDetails = async (subjectId) => {
-    try {
-      const result = await getSubjectById(subjectId)
-      if (result.success) {
-        setSelectedSubjectDetails(result.data)
-        return result.data
-      } else {
-        console.error("Error fetching subject details:", result.error)
-        return null
-      }
-    } catch (err) {
-      console.error("Error in fetchSubjectDetails:", err)
-      return null
-    }
-  }
-
-  // Function to handle search with filters
-  const handleSearch = () => {
-    applyFilters()
-  }
-
-  // Apply filters to courses
-  const applyFilters = () => {
-    let filtered = generateCourseData(subjects)
-
-    // Apply subject filter
-    if (selectedSubject) {
-      filtered = filtered.filter(course => course.subject === selectedSubject)
-    }
-
-    // Apply other filters (in a real app, these would filter based on actual data)
-    if (selectedStage) {
-      // This is a mock filter since we don't have stage data in the API
-      filtered = filtered.filter(course => course.stage === selectedStage || !course.stage)
-    }
-
-    if (selectedGrade) {
-      filtered = filtered.filter(course => course.level === selectedGrade || course.level === "الصف الأول")
-    }
-
-    if (selectedCourseType) {
-      // Mock filter for course type
-      filtered = filtered.filter(course => course.type === selectedCourseType || !course.type)
-    }
-
-    if (selectedCourseStatus) {
-      // Mock filter for course status
-      filtered = filtered.filter(course => course.status === selectedCourseStatus || !course.status)
-    }
-
-    setFilteredCourses(filtered)
-  }
-
-  // Reset all filters
-  const resetFilters = () => {
-    setSelectedStage("")
-    setSelectedGrade("")
-    setSelectedTerm("")
-    setSelectedSubject("")
-    setSelectedCourseType("")
-    setSelectedCourseStatus("")
-  }
+  };
 
   // Generate course data based on subjects from API
   const generateCourseData = (subjectsData) => {
-    if (!subjectsData || subjectsData.length === 0) return []
+    if (!subjectsData || subjectsData.length === 0) return fakeCourses;
 
-    // Create course cards based on the subjects we have
-    return subjectsData.map((subject, index) => ({
-      id: subject._id,
-      image: `/course-${(index % 6) + 1}.png`, // Cycle through available images
-      teacherName: `أ/معلم ${index + 1}`,
-      subject: subject.name,
-      subjectId: subject._id, // Store the subject ID for linking
-      level: "الصف الأول", // Default value
-      duration: 12 + index, // Mock duration
-      rating: 4 + (index % 2) * 0.5, // Alternate between 4 and 4.5
-      // Add mock data for filters
-      stage: index % 3 === 0 ? "المرحلة الابتدائية" : index % 3 === 1 ? "المرحلة الإعدادية" : "المرحلة الثانوية",
-      type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
-      status: index % 2 === 0 ? "مجاني" : "مدفوع"
-    }))
-  }
+    return subjectsData.map((subject, index) => {
+      // Determine stage based on subject's level array if available
+      let stage = "المرحلة الثانوية"; // Default
+      if (subject.level && subject.level.length > 0) {
+        const levelName = subject.level[0].name;
+        if (levelName === "Primary" || levelName === "Upper Primary") {
+          stage = "المرحلة الابتدائية";
+        } else if (levelName === "Middle") {
+          stage = "المرحلة الإعدادية";
+        }
+      } else {
+        // Fallback to the original logic if level is not available
+        stage =
+          index % 3 === 0
+            ? "المرحلة الابتدائية"
+            : index % 3 === 1
+            ? "المرحلة الإعدادية"
+            : "المرحلة الثانوية";
+      }
+
+      return {
+        id: subject._id,
+        image: `/course-${(index % 6) + 1}.png`,
+        title: subject.name,
+        subject: subject.name,
+        teacher: `أستاذ ${subject.name}`,
+        grade: "الصف الأول",
+        rating: 4 + (index % 2) * 0.5,
+        stage: stage,
+        type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
+        status: index % 2 === 0 ? "مجاني" : "مدفوع",
+      };
+    });
+  };
+
+  // Apply filters to courses
+  const applyFilters = useCallback(() => {
+    let filtered =
+      subjects.length > 0 ? generateCourseData(subjects) : fakeCourses;
+
+    if (selectedStage) {
+      filtered = filtered.filter((course) => course.stage === selectedStage);
+    }
+
+    if (selectedGrade) {
+      filtered = filtered.filter((course) => course.grade === selectedGrade);
+    }
+
+    if (selectedTerm) {
+      // Mock filter for term (not implemented in data)
+      filtered = filtered.filter(
+        (course) => course.term === selectedTerm || !course.term
+      );
+    }
+
+    if (selectedSubject) {
+      filtered = filtered.filter(
+        (course) => course.subject === selectedSubject
+      );
+    }
+
+    if (selectedCourseType) {
+      filtered = filtered.filter(
+        (course) => course.type === selectedCourseType
+      );
+    }
+
+    if (selectedCourseStatus) {
+      filtered = filtered.filter(
+        (course) => course.status === selectedCourseStatus
+      );
+    }
+
+    setFilteredCourses(filtered);
+  }, [
+    selectedStage,
+    selectedGrade,
+    selectedTerm,
+    selectedSubject,
+    selectedCourseType,
+    selectedCourseStatus,
+    subjects,
+  ]);
+
+  // Reset all filters
+  const resetFilters = useCallback(() => {
+    setSelectedStage("");
+    setSelectedGrade("");
+    setSelectedTerm("");
+    setSelectedSubject("");
+    setSelectedCourseType("");
+    setSelectedCourseStatus("");
+    setFilteredCourses(
+      subjects.length > 0 ? generateCourseData(subjects) : fakeCourses
+    );
+  }, [subjects]);
+
+  // Memoize filtered courses to avoid recalculating on every render
+  const memoizedFilteredCourses = useMemo(
+    () => filteredCourses,
+    [filteredCourses]
+  );
+
+  const filterOptions = [
+    {
+      label: "المرحلة الدراسية",
+      value: selectedStage,
+      options: [
+        { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
+        { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
+        { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
+      ],
+      onSelect: setSelectedStage,
+    },
+    {
+      label: "الصف الدراسي",
+      value: selectedGrade,
+      options: [
+        { label: "الصف الأول", value: "الصف الأول" },
+        { label: "الصف الثاني", value: "الصف الثاني" },
+        { label: "الصف الثالث", value: "الصف الثالث" },
+      ],
+      onSelect: setSelectedGrade,
+    },
+    {
+      label: "الترم الدراسي",
+      value: selectedTerm,
+      options: [
+        { label: "الترم الأول", value: "الترم الأول" },
+        { label: "الترم الثاني", value: "الترم الثاني" },
+      ],
+      onSelect: setSelectedTerm,
+    },
+    {
+      label: "نوع الكورس",
+      value: selectedCourseType,
+      options: [
+        { label: "شرح", value: "شرح" },
+        { label: "مراجعة", value: "مراجعة" },
+        { label: "تدريبات", value: "تدريبات" },
+      ],
+      onSelect: setSelectedCourseType,
+    },
+    {
+      label: "حالة الكورس",
+      value: selectedCourseStatus,
+      options: [
+        { label: "مجاني", value: "مجاني" },
+        { label: "مدفوع", value: "مدفوع" },
+      ],
+      onSelect: setSelectedCourseStatus,
+    },
+  ];
 
   return (
     <div className="relative min-h-screen w-full">
-      {/* Background Pattern - Positioned on the left */}
+      {/* Background Pattern */}
       <div className="absolute top-0 left-0 w-2/3 h-screen pointer-events-none z-0">
         <div className="relative w-full h-full">
           <img
@@ -152,150 +242,52 @@ export default function CoursesPage() {
 
       {/* Main Content */}
       <div className="relative z-10">
-        {/* Title Section - Centered */}
+        {/* Title Section */}
         <div className="container mx-auto px-4 pt-8 pb-4 text-end">
           <div className="relative inline-block">
             <p className="text-3xl font-bold text-primary md:mx-40">كورساتي</p>
-            <img src="/underline.png" alt="underline" className="object-contain" />
+            <img
+              src="/underline.png"
+              alt="underline"
+              className="object-contain"
+            />
           </div>
         </div>
 
-        {/* Search and Filters Section - Right aligned */}
+        {/* Search and Filters Section */}
         <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between mb-4">
-            <button 
-              className="btn btn-outline btn-sm rounded-md" 
+          <div className="flex justify-end mb-4">
+            <button
+              className="btn btn-outline btn-sm rounded-md mx-2"
               onClick={resetFilters}
             >
               إعادة ضبط الفلاتر
             </button>
             <div className="flex items-center gap-2">
-              <button className="btn btn-primary btn-sm rounded-md">اختيارات البحث</button>
+              <button className="btn btn-primary btn-sm rounded-md">
+                اختيارات البحث
+              </button>
               <Search className="h-6 w-6" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl ml-auto">
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر مرحلتك الدراسية</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  {selectedStage || "المرحلة الدراسية"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button onClick={() => setSelectedStage("المرحلة الابتدائية")}>المرحلة الابتدائية</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedStage("المرحلة الإعدادية")}>المرحلة الإعدادية</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedStage("المرحلة الثانوية")}>المرحلة الثانوية</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر الصف الدراسي</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  {selectedGrade || "الصف الدراسي"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button onClick={() => setSelectedGrade("الصف الأول")}>الصف الأول</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedGrade("الصف الثاني")}>الصف الثاني</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedGrade("الصف الثالث")}>الصف الثالث</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر الترم الدراسي</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  {selectedTerm || "الترم الدراسي"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button onClick={() => setSelectedTerm("الترم الأول")}>الترم الأول</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedTerm("الترم الثاني")}>الترم الثاني</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر المادة الدراسية</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  <Book className="h-4 w-4" />
-                  {selectedSubject || "المادة الدراسية"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
-                  {subjects.map((subject) => (
-                    <li key={subject._id}>
-                      <button onClick={() => setSelectedSubject(subject.name)}>{subject.name}</button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر نوع الكورس</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  {selectedCourseType || "نوع الكورس"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button onClick={() => setSelectedCourseType("شرح")}>شرح</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedCourseType("مراجعة")}>مراجعة</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedCourseType("تدريبات")}>تدريبات</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <p className="mb-1 text-sm">اختر حالة الكورس</p>
-              <div className="dropdown dropdown-bottom dropdown-end w-full">
-                <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-                  {selectedCourseStatus || "حالة الكورس"}
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                  <li>
-                    <button onClick={() => setSelectedCourseStatus("مجاني")}>مجاني</button>
-                  </li>
-                  <li>
-                    <button onClick={() => setSelectedCourseStatus("مدفوع")}>مدفوع</button>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            {filterOptions.map((filter) => (
+              <FilterDropdown
+                key={filter.label}
+                label={filter.label}
+                options={filter.options}
+                selectedValue={filter.value}
+                onSelect={filter.onSelect}
+              />
+            ))}
           </div>
 
           <div className="flex justify-center mt-6">
-            <button className="btn btn-accent btn-md rounded-full px-8" onClick={handleSearch}>
+            <button
+              className="btn btn-accent btn-md rounded-full px-8"
+              onClick={applyFilters}
+            >
               <Search className="h-5 w-5 ml-2" />
               لعرض الكورسات
             </button>
@@ -304,144 +296,58 @@ export default function CoursesPage() {
 
         {/* Courses Section */}
         <div className="container mx-auto px-4 py-8">
-          <h2 className="text-2xl font-bold text-center mb-8">اكتشف كورساتك المفضلة الآن!</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">
+            اكتشف كورساتك المفضلة الآن!
+          </h2>
 
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader className="h-8 w-8 animate-spin text-primary" />
-            </div>
+            <LoadingSpinner />
           ) : error ? (
-            <div className="alert alert-error max-w-md mx-auto">
-              <p>{error}</p>
-              <button className="btn btn-sm btn-outline" onClick={fetchSubjects}>
-                إعادة المحاولة
-              </button>
-            </div>
-          ) : filteredCourses.length === 0 ? (
+            <ErrorAlert error={error} onRetry={fetchSubjects} />
+          ) : memoizedFilteredCourses.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-lg">لا توجد كورسات متاحة حالياً</p>
-              {(selectedStage || selectedGrade || selectedTerm || selectedSubject || selectedCourseType || selectedCourseStatus) && (
-                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
+              {(selectedStage ||
+                selectedGrade ||
+                selectedTerm ||
+                selectedSubject ||
+                selectedCourseType ||
+                selectedCourseStatus) && (
+                <button
+                  className="btn btn-outline btn-sm mt-4"
+                  onClick={resetFilters}
+                >
                   إعادة ضبط الفلاتر
                 </button>
               )}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCourses.map((course) => (
-                <CourseCard
-                  key={course.id}
-                  id={course.id}
-                  image={course.image}
-                  teacherName={course.teacherName}
-                  subject={course.subject}
-                  subjectId={course.subjectId}
-                  level={course.level}
-                  duration={course.duration}
-                  rating={course.rating}
-                  fetchSubjectDetails={fetchSubjectDetails}
-                />
-              ))}
+              <AnimatePresence>
+                {memoizedFilteredCourses.map((course) => (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <CourseCard
+                      id={course.id}
+                      image={course.image}
+                      title={course.title}
+                      subject={course.subject}
+                      teacher={course.teacher}
+                      grade={course.grade}
+                      rating={course.rating}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
-}
-
-// Course Card Component
-function CourseCard({ id, image, teacherName, subject, subjectId, level, duration, rating, fetchSubjectDetails }) {
-  const [isLoading, setIsLoading] = useState(false)
-  
-  const handleViewDetails = async () => {
-    setIsLoading(true)
-    try {
-      // Pre-fetch subject details before navigating to the details page
-      await fetchSubjectDetails(subjectId)
-    } catch (error) {
-      console.error("Error pre-fetching subject details:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  return (
-    <div className="card bg-base-100 shadow-lg overflow-hidden border border-base-200 hover:shadow-xl hover:scale-105 transition-all duration-300">
-      <figure className="relative h-48">
-        <img src={image || "/placeholder.svg"} alt={subject} className="w-full h-full object-cover" />
-        <div className="absolute top-2 right-2 bg-base-100 p-1 rounded-md">
-          <div className="flex gap-1">
-            <div className="w-3 h-3 bg-primary"></div>
-            <div className="w-3 h-3 bg-primary"></div>
-            <div className="w-3 h-3 bg-primary"></div>
-          </div>
-        </div>
-      </figure>
-      <div className="card-body p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex flex-col items-end text-right">
-            <h3 className="font-bold">{teacherName}</h3>
-            <p className="text-sm">
-              {subject} - {level}
-            </p>
-          </div>
-          <div className="avatar">
-            <div className="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5.52 19c.64-2.2 1.84-3 3.22-3h6.52c1.38 0 2.58.8 3.22 3" />
-                <circle cx="12" cy="10" r="3" />
-                <circle cx="12" cy="12" r="10" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center mt-2">
-          <div className="badge badge-outline badge-sm">{duration} ساعة دراسية</div>
-          <div className="flex items-center gap-1 text-right">
-            <Book className="h-4 w-4" />
-            <span className="text-xs">{subject}</span>
-          </div>
-        </div>
-
-        <div className="divider my-2"></div>
-
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <span className="text-sm font-bold ml-1">{rating}</span>
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-4 w-4 ${star <= Math.floor(rating) ? "text-warning fill-warning" : "text-base-300"}`}
-                />
-              ))}
-            </div>
-          </div>
-          <Link 
-            to={`/course-details/${subjectId}`} 
-            className="btn btn-sm btn-outline btn-accent"
-            onClick={handleViewDetails}
-          >
-            {isLoading ? (
-              <Loader className="h-4 w-4 animate-spin" />
-            ) : (
-              "عرض التفاصيل"
-            )}
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+  );
 }

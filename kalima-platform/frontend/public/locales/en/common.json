@@ -7,5 +7,14 @@
     "contactUs": "Contact",
     "signup": "Sign Up",
     "signin": "Sign In",
-    "theme": "Theme"
+    "theme": "Theme",
+    "landing": {
+    "welcome": "Welcome to the platform of ",
+    "platformName": "Kalima ",
+    "description": "Kalima is an e-learning platform that provides educational resources for students from fourth grade through twelfth grade, offering comprehensive learning materials and interactive tools.",
+    "whoAreYou": "Who are you?",
+    "teacher": "Teacher",
+    "student": "Student",
+    "logoAlt": "Kalima Logo"
+  }
 }

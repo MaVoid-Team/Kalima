@@ -1,3 +1,6 @@
- { "title": "Student Experiences",
-    "viewMore": "View More"
+ { "title": "Student Reviews",
+    "viewMore": "View More",
+    "description":"What do our students say about their experience with educational content?",
+    "TeacherTitle": "Teacher Testimonials",
+    "TeacherDescription": "See what educators are saying about our teaching platform"
 } 

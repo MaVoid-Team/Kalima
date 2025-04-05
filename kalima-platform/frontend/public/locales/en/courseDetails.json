@@ -1,0 +1,59 @@
+{
+    "header": {
+      "title": "My Courses"
+    },
+    "details": {
+      "title": "Course Details",
+      "teacher": "Teacher",
+      "teacherName": "Mr. Yusuf Othman",
+      "lectures": "Lectures Count",
+      "lecturesCount": "10",
+      "grade": "Grade Level",
+      "gradeLevel": "Secondary School",
+      "views": "Views",
+      "viewsCount": "1240 views"
+    },
+    "courseDescription": {
+      "title": "Course Name:",
+      "name": "English Language",
+      "description": "This course aims to develop learners' skills in English language including reading, writing, listening, and speaking. The course covers basic grammar, vocabulary, and pronunciation, with a focus on using the language in daily situations.",
+      "level": "Level: Beginner/Intermediate/Advanced",
+      "duration": "Duration: 10 weeks",
+      "objectivesTitle": "Course Objectives:",
+      "imageAlt": "Teacher with books",
+        "descriptionTitle": "Course Description:",
+      "objectives": [
+        "Develop vocabulary and improve grammar usage",
+        "Enhance speaking and listening skills with confidence",
+        "Improve reading and writing skills"
+      ]
+    },
+    "plan": {
+      "title": "Course Plan",
+      "decorationAlt": "Decorative Image",
+      "months": [
+        {
+          "month": "January",
+          "items": [
+            { "lesson": "Lesson 1: Introduction to React", "time": 30 },
+            { "lesson": "Lesson 2: React Components", "time": 45 }
+          ]
+        },
+        {
+          "month": "February",
+          "items": [
+            { "lesson": "Lesson 1: Component State", "time": 30 },
+            { "lesson": "Lesson 2: Events in React", "time": 45 }
+          ]
+        }
+      ]
+    },
+    "buttons": {
+      "subscribe": "Subscribe Now"
+    },
+    "errors": {
+      "fetchError": "Failed to fetch course details",
+      "unexpected": "An unexpected error occurred"
+    }
+    
+  }

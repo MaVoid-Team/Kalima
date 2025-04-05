@@ -39,14 +39,7 @@ show fields to update deending on the current user role,
 for ex :- if current user role is student that means if the children is passed in the req.body, the err msg should appear
 */
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password, children } = req.body
-
-
-  /*
-  BUG -->> that means any user can update any user
-  To fix it -->> Onlyy authenticated current user has permission to update his self
-  userId = req.user._id 
-  */
+  const { name, email, address, password, children, subjectNotify } = req.body
   const userId = req.params.userId
 
   /*
@@ -105,6 +98,10 @@ const updateUser = catchAsync(async (req, res, next) => {
   }
 
   const updatedUser = { name, email, address, children: childrenById, ...req.body }
+
+  if (foundUser.role.toLowerCase() === "student" && typeof subjectNotify !== 'undefined') {
+    updatedUser.subjectNotify = subjectNotify;
+  }
   
   let user
 
