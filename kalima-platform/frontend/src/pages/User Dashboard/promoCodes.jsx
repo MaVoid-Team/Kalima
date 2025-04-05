@@ -3,6 +3,7 @@ import UserSidebar from '../../components/UserSidebar';
 import { useTranslation } from 'react-i18next';
 import { FaWallet, FaInfoCircle, FaSort, FaBars, FaTicketAlt } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
+import { Link } from 'react-router-dom';
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation('promoCodes');
@@ -63,7 +64,7 @@ const PromoCodes = () => {
           <img 
             src="waves.png" 
             alt="Decorative waves" 
-            className="absolute  left-[10%] w-16 animate-float-x" 
+            className="absolute  left-[10%] w-16 animate-float-zigzag" 
           />
           {isMobile && (
             <button 
@@ -87,7 +88,7 @@ const PromoCodes = () => {
             <img 
               src="rDots.png" 
               alt="Decorative dots" 
-              className="absolute -top-28 -right-8 w-32  animate-pulse z-0" 
+              className="absolute -top-28 -right-8 w-32  animate-float-up-dottedball z-0" 
             />
             <div className="card bg-primary text-primary-content shadow-md w-3/4 relative z-0">
               <div className={`card-body flex`}>
@@ -150,8 +151,8 @@ const PromoCodes = () => {
                     <FaSort />
                   </label>
                   <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                    <li><a onClick={() => setSortOrder('desc')}>{t('sort.newest')}</a></li>
-                    <li><a onClick={() => setSortOrder('asc')}>{t('sort.oldest')}</a></li>
+                    <li><Link onClick={() => setSortOrder('desc')}>{t('sort.newest')}</Link></li>
+                    <li><Link onClick={() => setSortOrder('asc')}>{t('sort.oldest')}</Link></li>
                   </ul>
                 </div>
               </div>

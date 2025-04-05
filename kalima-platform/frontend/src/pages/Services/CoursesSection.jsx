@@ -45,11 +45,11 @@ const CoursesSection = React.memo(
                   isRTL ? "md:text-right" : "md:text-left"
                 }`}
               >
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-primary mb-2">
                   {langContent.title}
                 </h2>
                 <p
-                  className={`text-sm sm:text-base text-gray-600 dark:text-gray-300 ${
+                  className={`text-sm sm:text-base text-primary ${
                     isRTL ? "leading-loose" : ""
                   }`}
                 >
