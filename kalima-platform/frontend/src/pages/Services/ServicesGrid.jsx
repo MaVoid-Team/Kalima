@@ -1,56 +1,54 @@
-import React, {  useMemo } from "react";
+"use client"
 
-import { motion } from "framer-motion";
-
-import {
- 
-  FaCertificate,
-  FaClock,
-  FaGraduationCap,
-  FaMedal,
-} from "react-icons/fa";
+import React, { useMemo } from "react"
+import { motion } from "framer-motion"
+import { FaCertificate, FaClock, FaGraduationCap, FaMedal } from "react-icons/fa"
+import ServiceCard from "../../components/ServiceCard"
 
 const ServicesGrid = React.memo(({ isRTL }) => {
   const services = useMemo(
     () => [
       {
-        icon: <FaClock className="text-4xl mb-4 text-blue-300" />,
+        icon: FaClock,
         title: isRTL ? "التعلم في أي وقت" : "Learn Anytime",
-        desc: isRTL
+        subtitle: isRTL ? "مرونة كاملة" : "Complete Flexibility",
+        description: isRTL
           ? "الوصول إلى الدروس 24/7 مع إمكانية التكرار والمشاهدة في الوقت الذي يناسبك"
           : "24/7 access to lessons with replay options whenever it suits you",
-        highlight: true
       },
       {
-        icon: <FaGraduationCap className="text-4xl mb-4 text-blue-300" />,
+        icon: FaGraduationCap,
         title: isRTL ? "معلمين خبراء معتمدين" : "Certified Expert Teachers",
-        desc: isRTL
+        subtitle: isRTL ? "خبرة عالية" : "High Expertise",
+        description: isRTL
           ? "فريق من المعلمين المؤهلين ذوي الخبرة الطويلة في المناهج التعليمية"
           : "Team of qualified teachers with extensive experience in educational curricula",
-        highlight: true
       },
       {
-        icon: <FaMedal className="text-4xl mb-4 text-blue-300" />,
+        icon: FaMedal,
         title: isRTL ? "مناهج عالية الجودة" : "Premium Curriculum",
-        desc: isRTL
+        subtitle: isRTL ? "محتوى متميز" : "Outstanding Content",
+        description: isRTL
           ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب مع ضمان الجودة العالية"
           : "Carefully designed curriculum covering all student needs with guaranteed high quality",
-        highlight: true
       },
       {
-        icon: <FaCertificate className="text-4xl mb-4 text-blue-300" />,
+        icon: FaCertificate,
         title: isRTL ? "شهادات معتمدة" : "Certified Certificates",
-        desc: isRTL
+        subtitle: isRTL ? "اعتماد رسمي" : "Official Recognition",
+        description: isRTL
           ? "حصول الطلاب على شهادات معتمدة بعد إتمام كل مستوى تعليمي"
           : "Students receive certified certificates upon completion of each educational level",
-        highlight: true
-      }
+      },
     ],
-    [isRTL]
-  );
+    [isRTL],
+  )
 
   return (
-    <div className="bg-gradient-to-br from-primary/5 to-secondary/10 py-16 px-4 sm:px-6 lg:px-8 rounded-xl">
+    <div className="py-16 px-4 sm:px-6 lg:px-8 rounded-xl">
+      <div className="max-w-7xl mx-auto flex flex-row justify-end items-center">
+        <img src="waves.png" alt="waves" className="w-16 h-16 object-cover animate-float-zigzag" />
+      </div>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -67,11 +65,7 @@ const ServicesGrid = React.memo(({ isRTL }) => {
                 preserveAspectRatio="none"
               >
                 <path
-                  d={
-                    isRTL
-                      ? "M0,5 C50,0 150,10 200,5"
-                      : "M0,5 C50,10 150,0 200,5"
-                  }
+                  d={isRTL ? "M0,5 C50,0 150,10 200,5" : "M0,5 C50,10 150,0 200,5"}
                   stroke="currentColor"
                   strokeWidth="2"
                   fill="none"
@@ -82,12 +76,12 @@ const ServicesGrid = React.memo(({ isRTL }) => {
             <motion.div
               className="absolute -top-3 -right-4 w-4 h-4 rounded-full bg-secondary"
               animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
             />
             <motion.div
               className="absolute -bottom-2 -left-3 w-3 h-3 rounded-full bg-accent"
               animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+              transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, delay: 0.5 }}
             />
           </div>
           <motion.p
@@ -101,9 +95,7 @@ const ServicesGrid = React.memo(({ isRTL }) => {
             {isRTL
               ? "هدفنا هو تبسيط المعلومة لضمان تفوقك الدراسي"
               : "Our goal is to simplify information to ensure your academic excellence"}
-            <span
-              className={`inline-flex items-center ${isRTL ? "mr-2" : "ml-2"}`}
-            >
+            <span className={`inline-flex items-center ${isRTL ? "mr-2" : "ml-2"}`}>
               {[...Array(3)].map((_, i) => (
                 <motion.span
                   key={i}
@@ -111,7 +103,7 @@ const ServicesGrid = React.memo(({ isRTL }) => {
                   animate={{ y: [0, -5, 0] }}
                   transition={{
                     duration: 1.5,
-                    repeat: Infinity,
+                    repeat: Number.POSITIVE_INFINITY,
                     delay: i * 0.2,
                   }}
                 />
@@ -120,41 +112,27 @@ const ServicesGrid = React.memo(({ isRTL }) => {
           </motion.p>
         </motion.div>
 
-        <div
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${
-            isRTL ? "rtl" : "ltr"
-          }`}
-        >
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${isRTL ? "rtl" : "ltr"}`}>
           {services.map((service, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              whileHover={{
-                y: -8,
-                boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
-                borderColor: "var(--p)",
-              }}
-              className="bg-base-100 rounded-2xl shadow-sm overflow-hidden border-2 border-base-200 relative"
             >
-              <div className="p-6 flex flex-col items-center text-center h-full">
-                <div className="flex items-center justify-center w-20 h-20 mb-5 rounded-full bg-primary/10 text-primary relative">
-                  {service.icon}
-                </div>
-                <h3 className="text-xl font-bold text-base-content mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-base-content/70 mb-4">{service.desc}</p>
-                <div className="mt-auto w-full">
-                  <div className="h-1 bg-gradient-to-r from-primary to-secondary rounded-full opacity-80"></div>
-                </div>
-              </div>
+              <ServiceCard
+                icon={service.icon}
+                title={service.title}
+                subtitle={service.subtitle}
+                description={service.description}
+              />
             </motion.div>
           ))}
         </div>
       </div>
     </div>
-  );
-});
+  )
+})
+
 export default ServicesGrid;
+
