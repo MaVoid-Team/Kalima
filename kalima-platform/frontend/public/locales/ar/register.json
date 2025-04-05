@@ -1,0 +1,112 @@
+{
+  "studentRegister": "  تسجيل الطالب", 
+  "parentRegister": "تسجيل الوالد",
+  "lecturerRegister" : "تسجيل المحاضر",
+    "steps": {
+      "personalInfo": "المعلومات الأساسية",
+      "parentInfo": "معلومات الاتصال",
+      "hobbies": "الهوايات",
+      "review": "المراجعة",
+      "childrenInfo": "معلومات الأبناء",
+      "professionalInfo": "معلومات المهنة"
+    },
+    "form": {
+     
+      "studentId": "رقم الطالب",
+      "fullName": "الاسم الكامل",
+      "gender": "الجنس",
+      "role": "الدور",
+      "bio": "نبذة عنك",
+      "expertise": "الخبرات",
+      "phoneNumber": "الهاتف الشخصي",
+      "parentPhone": "هاتف الوالد",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان",
+      "selectGender": "اختر الجنس",
+      "schoolName": "اسم المدرسة",
+      "schoolType": "نوع المدرسة",
+      "selectSchoolType": "اختر نوع المدرسة",
+      "grade": "الصف",
+      "selectGrade": "اختر الصف",
+      "variant": "الشعبة",
+      "selectVariant": "اختر الشعبة",
+      "selectHobbies": "اختر الهوايات",
+      "uploadAvatar": "رفع صورة شخصية",
+      "hobbies": "الهوايات",
+      "personalDetails": "البيانات الشخصية",
+      "parentDetails": "بيانات الوالدين",
+      "schoolDetails" : "تفاصيل المدرسة والدراسة",
+      "password": "كلمة المرور",
+      "confirmPassword": "تاكيد كلمة المرور",
+      "childrenDetails": "تفاصيل الأبناء",
+      "childId": "رقم الأبن",
+      "childSequenceId" : "رقم تسلسل الأبن",
+      "childrenSequenceIdsHelp" : "استخدم الفواصل لفصل أرقام تسلسل الأبناء",
+      "childrenSequenceIds"  : "رقم تسلسل الأبناء",
+      "level" : "المستوى",
+      "optional" : "اختياري",
+      "selectLevel" : "اختر المستوى"
+
+
+
+    },
+    "gender": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "schoolType": {
+      "arabic": "عربي",
+      "english": "انجليزي"
+    },
+    "hobbies": {
+      "reading": "قراءة",
+      "sports": "رياضة",
+      "music": "موسيقى",
+      "cooking": "طبخ",
+      "gaming": " ألعاب",
+      "art" : "فن",
+      "technology": "تكنولوجيا",
+      "dancing": "رقص",
+      "photography": "تصوير"
+    },
+    "review": {
+      "title": "مراجعة المعلومات"
+    },
+    "buttons": {
+      "previous": "السابق",
+      "next": "التالي",
+      "submit": "إرسال",
+      "addAnotherChild": "إضافة ابن آخر"
+    },
+    "role" : { 
+      "student": "طالب",
+      "parent": "والد",
+      "lecturer" : "محاضر"
+     },
+     "gradeLevels": {
+      "Grade 4": "الصف الرابع",
+      "Grade 5": "الصف الخامس",   
+      "Grade 6": "الصف السادس", 
+      "First Preparatory": "الصف الأول الإعدادي",
+      "Second Preparatory": "الصف الثاني الإعدادي",
+      "Third Preparatory": "الصف الثالث الأعدادي", 
+      "First Secondary": "الصف الأول الثانوي",  
+      "Second Secondary": "الصف الثاني الثانوي",
+      "Third Secondary": "الصف الثالث الثانوي"
+    },
+    "roleSelection": {
+     "title": "اختر دورك",
+     "description": "حدد الدور الذي يصفك بشكل أفضل",
+     "studentDesc": "الوصول إلى المواد التعليمية وتتبع تقدمك",
+     "parentDesc": "مراقبة الرحلة الأكاديمية لأطفالك",
+     "lecturerDesc": "إنشاء الدورات وإدارة طلابك"
+      },
+      "validation": {
+        "required": "هذا الحقل مطلوب",
+        "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+        "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
+        "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
+        "hobbies": "اختر هوايتان على الأقل",
+        "bioMinimum": " يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل"
+        }
+      }
