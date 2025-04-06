@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-
+import AdminDashboard from "./pages/Admin dashboard/adminDashboard";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import MobileOnly from "./pages/Lecture Page/mobileOnly";
+import  Activity  from "./pages/Admin dashboard/activity";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
@@ -43,6 +44,8 @@ function App() {
           <Route path="/promo-codes" element={<PromoCodes />} />
           <Route path="/lecture-details/:id" element={<LectureDetails />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/activity" element={<Activity />} />
         </Routes>
       </Suspense>
 
