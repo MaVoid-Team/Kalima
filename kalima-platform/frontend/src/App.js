@@ -1,13 +1,13 @@
 import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import AdminDashboard from "./pages/Admin dashboard/adminDashboard";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import MobileOnly from "./pages/Lecture Page/mobileOnly";
-import  Activity  from "./pages/Admin dashboard/activity";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
+const Activity = lazy(() => import("./pages/Admin dashboard/activity"));
+const AdminDashboard = lazy(() => import("./pages/Admin dashboard/adminDashboard"));
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"));
