@@ -63,15 +63,15 @@ const StudentDashboard = () => {
   );
 
   return (
-    <div className="mx-auto  w-full max-w-6xl  mb-20 p-6 font-sans" dir="rtl">
-      <div className="max-w-6xl mx-auto">
+    <div className="overflow-hidden relative mx-auto bg-white rounded-md  w-full h-full mb-10 p-6 font-sans" dir="rtl">
+      <div className=" mx-auto">
         {/* Header with stars */}
         <div className="relative mb-8">
-          <div className="absolute -top-12 right-0">
-            <img src="starC.png" alt="cyan star"></img>
+          <div className="absolute  -top-6 right-0">
+            <img src="starC.png" alt="cyan star" className="w-[50px]"></img>
           </div>
-          <div className="absolute -top-12 left-52">
-          <img src="starG.png" alt="cyan star"></img>
+          <div className="absolute -top-6 left-52">
+          <img src="starG.png" alt="cyan star "  className="w-[40px]"></img>
           </div>
           
           {/* Title */}
@@ -134,14 +134,11 @@ const StudentDashboard = () => {
 
         {/* Bottom stars */}
         <div className="relative mt-12">
-          <div className="absolute bottom-48 left-0">
-          <img src="starP.png" alt="cyan star"></img>
+          <div className="absolute -bottom-6 right-12">
+          <img src="starP.png" alt="cyan star"  className="w-[40px]"></img>
           </div>
-          <div className="absolute -bottom-12 right-12">
-          <img src="starP.png" alt="cyan star"></img>
-          </div>
-          <div className="absolute -bottom-12 left-12">
-          <img src="starGr.png" alt="cyan star"></img>
+          <div className="absolute -bottom-6 left-12 ">
+          <img src="starGr.png" alt="cyan star"  className="w-[40px]"></img>
           </div>
         </div>
       </div>

@@ -67,7 +67,7 @@ const Dashboard = () => {
       {
         label: "نسبة الحضور",
         data: [85, 92, 78, 95, 88, 75],
-        backgroundColor: "#9783ff",
+        backgroundColor: '#9783ff',
         borderRadius: 4,
         barThickness: 30,
         maxBarThickness: 40,
@@ -87,9 +87,9 @@ const Dashboard = () => {
       },
     ],
   };
-
+  console.log("var(--color-primary)");
   return (
-    <div ref={containerRef} className="w-full max-w-6xl mx-auto p-4">
+    <div ref={containerRef} className="w-full mx-auto ">
       {/* Exam Results Chart */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -113,7 +113,11 @@ const Dashboard = () => {
           </div>
           <div className="text-sm text-gray-500 mb-4 text-right">الطلاب و المعلمين</div>
           <div className="h-72">
-            <Bar
+
+            
+          
+            <Bar 
+            consloe
               data={examResultsData}
               options={{
                 responsive: true,
