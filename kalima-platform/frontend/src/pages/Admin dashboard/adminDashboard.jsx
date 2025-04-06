@@ -14,33 +14,22 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br" dir="rtl">
+    <div className="mx-auto w-full max-w-full px-6 bg-base-100 min-h-screen bg-gradient-to-br " dir="rtl">
       {/* Import the UserSidebar component */}
       <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       
       {/* Main content with margin to accommodate sidebar */}
       <div 
-        className={`transition-all duration-300 ${
+        className={`transition-all duration-300 space-y-8 ${
           isOpen ? (isRTL ? 'mr-52' : 'ml-52') : 'ml-0 mr-0'
         }`}
       >
-        
-        {/* Hero */}
-        <div>
           <Hero/>
-        </div>
-        
-        
-        {/* BarChart */}
-        <div>
           <BarChart/>
-        </div>
-        
-        {/* Student */}
-        <div>
           <Students/>
-        </div>
-        <div className="flex justify-center items-center py-6 rounded-3xl">
+
+
+        <div className="flex justify-center items-center pb-36 max-sm:pt-20 rounded-3xl">
           <a href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0 " target="_blank">
           <img alt="arrow" src="whatsApp.png" className="w-14 right-6"></img>
           </a>
@@ -49,9 +38,12 @@ const Dashboard = () => {
           <button className="btn btn-primary w-44 rounded-xl text-black">ارسل عرضك الان!</button>
           
         </div>
-        {/* <div className="relative">
-          <img alt="" src="rDots.png" className="absolute h-32 w-20 right-16 bottom-5"/>
-        </div> */}
+        <div className="relative">
+          <img alt="" src="rDots.png" className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 "/>
+        </div>
+        <div className="relative">
+          <img alt="" src="bDots.png" className="absolute h-32 w-20 right-16 bottom-56 max-sm:bottom-80 max-sm:right-0 "/>
+        </div>
       </div>
 
     </div>
