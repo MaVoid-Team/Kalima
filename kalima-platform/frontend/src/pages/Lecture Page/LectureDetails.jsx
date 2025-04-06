@@ -24,10 +24,10 @@ const LectureDetail = () => {
 
   useEffect(() => {
     // Redirect if not on mobile
-    if (!isMobile()) {
-      navigate("/mobile-only")
-      return
-    }
+    // if (!isMobile()) {
+    //   navigate("/mobile-only")
+    //   return
+    // }
 
     const fetchLecture = async () => {
       try {
