@@ -13,6 +13,18 @@
   animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+@keyframes float-down-dottedball {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-64px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 @keyframes float-zigzag {
   0% {
     transform: translateX(0);
