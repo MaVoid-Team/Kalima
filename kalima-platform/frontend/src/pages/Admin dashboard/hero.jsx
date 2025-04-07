@@ -1,7 +1,7 @@
-function AdminDashboard() {
+const Hero = () => {
     return (
-      <div className="mx-auto p-6  w-full shadow-lg rounded-md font-[Cairo]">
-        <h1 className="text-3xl font-bold mb-8 text-right">صفحة الأدمن</h1>
+      <div className="mx-auto p-6  w-full shadow-lg rounded-xl font-[Cairo] bg-primary border border-slate-100">
+        <h1 className="text-3xl font-bold mb-8 text-right text-secondary">صفحة الأدمن</h1>
   
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 " dir="rtl">
          
@@ -10,8 +10,8 @@ function AdminDashboard() {
           <div className="card bg-[#f3e8ff] shadow-sm rounded-2xl ">
             <div className="card-body p-6 flex-row justify-between items-center">
               <div className="text-right">
-                <h2 className="text-primary text-2xl font-bold">الطلاب</h2>
-                <p className="text-primary text-3xl font-bold">2.00k</p>
+                <h2 className="text-accent text-2xl font-bold">الطلاب</h2>
+                <p className="text-accent text-3xl font-bold">2.00k</p>
               </div>
               <div className="avatar p-3 rounded-full">
                 <img
@@ -27,8 +27,8 @@ function AdminDashboard() {
           <div className="card bg-[#e8f4ff] shadow-sm rounded-2xl">
             <div className="card-body p-6 flex-row justify-between items-center">
               <div className="text-right">
-                <h2 className="text-primary text-2xl font-bold">المعلمين</h2>
-                <p className="text-base-100 text-3xl font-bold">50</p>
+                <h2 className="text-accent text-2xl font-bold">المعلمين</h2>
+                <p className="text-accent text-3xl font-bold">50</p>
               </div>
               <div className="avatar  p-3 rounded-full">
                 <img
@@ -46,8 +46,8 @@ function AdminDashboard() {
           <div className="card bg-[#ffece5] shadow-sm rounded-2xl">
             <div className="card-body p-6 flex-row justify-between items-center">
               <div className="text-right">
-                <h2 className="text-primary text-2xl font-bold">أولياء الأمور</h2>
-                <p className="text-primary text-3xl font-bold">50</p>
+                <h2 className="text-accent text-2xl font-bold">أولياء الأمور</h2>
+                <p className="text-accent text-3xl font-bold">50</p>
               </div>
               <div className="avatar  p-3 rounded-full">
                 <img
@@ -63,8 +63,8 @@ function AdminDashboard() {
            <div className="card bg-[#e8fce5] shadow-sm rounded-2xl">
             <div className="card-body p-6 flex-row justify-between items-center">
               <div className="text-right">
-                <h2 className="text-primary text-2xl font-bold">الأرباح</h2>
-                <p className="text-primary text-3xl font-bold">5400k</p>
+                <h2 className="text-accent text-2xl font-bold">الأرباح</h2>
+                <p className="text-accent text-3xl font-bold">5400k</p>
               </div>
               <div className="avatar  p-3 rounded-full">
                 <img
@@ -82,6 +82,6 @@ function AdminDashboard() {
     )
   }
   
-  export default AdminDashboard
+  export default Hero
   
   

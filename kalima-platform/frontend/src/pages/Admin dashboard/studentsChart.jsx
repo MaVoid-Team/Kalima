@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Bar } from "react-chartjs-2"
+import { Doughnut } from "react-chartjs-2"
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from "chart.js"
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend)
 
-const AttendanceChart = () => {
+const StudentsChart = () => {
   // Reference to the container for RTL adjustment
   const containerRef = useRef(null)
 
@@ -19,69 +19,50 @@ const AttendanceChart = () => {
     }
   }, [])
 
-  // Data for the attendance chart
-  const attendanceData = {
-    labels: ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"],
+  // Data for the doughnut chart
+  const doughnutData = {
+    labels: ["بنين", "بنات"],
     datasets: [
       {
-        label: "نسبة الحضور",
-        data: [85, 92, 78, 95, 88, 75],
-        backgroundColor: "#9783ff",
-        borderRadius: 4,
-        barThickness: 30,
-        maxBarThickness: 40,
+        data: [850, 650],
+        backgroundColor: ["#9783ff", "#B5E8E0"],
+        borderWidth: 0,
+        cutout: "75%",
       },
     ],
   }
 
   return (
     <div ref={containerRef}>
-      {/* Attendance Chart */}
+      {/* Students Doughnut Chart */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
         className="card bg-primary shadow-lg rounded-2xl overflow-hidden border border-slate-100 h-full"
       >
         <div className="card-body p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="card-title text-xl font-bold text-secondary">نسبة الحضور</h2>
+          <h2 className="card-title text-xl font-bold text-secondary">الطلاب</h2>
+            <div className="flex gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-[#9783ff]"></span>
+                <span className="text-sm font-medium text-secondary">بنين</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-4 h-4 rounded-full bg-[#B5E8E0]"></span>
+                <span className="text-sm font-medium text-secondary">بنات</span>
+              </div>
+            </div>
+            
           </div>
-          <div className="h-64">
-            <Bar
-            className="bg-accent"
-              data={attendanceData}
+          <div className="flex justify-center items-center h-64 relative">
+            <Doughnut className="bg-accent"
+              data={doughnutData}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                      stepSize: 25,
-                      font: {
-                        family: "Arial",
-                        size: 12,
-                      },
-                    },
-                    grid: {
-                      color: "rgba(0, 0, 0, 0.05)",
-                      drawBorder: false,
-                    },
-                  },
-                  x: {
-                    grid: {
-                      display: false,
-                    },
-                    ticks: {
-                      font: {
-                        family: "Arial",
-                        size: 12,
-                      },
-                    },
-                  },
-                },
+                cutout: "75%",
                 plugins: {
                   legend: {
                     display: false,
@@ -103,6 +84,12 @@ const AttendanceChart = () => {
                 },
               }}
             />
+            <div className="absolute inset-0 flex items-center justify-center flex-col">
+              <div className="text-lg font-medium text-gray-500">Total</div>
+              <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+                1500
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -110,5 +97,5 @@ const AttendanceChart = () => {
   )
 }
 
-export default AttendanceChart
+export default StudentsChart
 

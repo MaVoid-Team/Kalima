@@ -6,7 +6,7 @@ import { isMobile } from "./utils/isMobile";
 import MobileOnly from "./pages/Lecture Page/mobileOnly";
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"));
-const Activity = lazy(() => import("./pages/Admin dashboard/activity"));
+const AuditLog = lazy(() => import("./pages/Admin dashboard/auditLog"));
 const AdminDashboard = lazy(() => import("./pages/Admin dashboard/adminDashboard"));
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 // const About = lazy(() => import('./pages/About'));
@@ -45,7 +45,7 @@ function App() {
           <Route path="/lecture-details/:id" element={<LectureDetails />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/activity" element={<Activity />} />
+          <Route path="/audit-log" element={<AuditLog />} />
         </Routes>
       </Suspense>
 
