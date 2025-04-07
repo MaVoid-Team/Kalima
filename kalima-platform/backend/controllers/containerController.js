@@ -398,3 +398,27 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
     }
   }
 });
+
+// get the total revenue for a container by Id
+exports.getContainerRevenue = catchAsync(async (req , res , next) => {
+
+  const { containerId } = req.params;
+  const container = await Container.findById(containerId);
+  if (!container) {
+    return next(new AppError("Container not found", 404));
+  }
+
+  const purchaseCount = await Purchase.countDocuments({ container: containerId });
+
+  const revenue = container.price * purchaseCount;
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      containerId,
+      purchaseCount,
+      containerPrice: container.price,
+      revenue
+    }
+  });
+});

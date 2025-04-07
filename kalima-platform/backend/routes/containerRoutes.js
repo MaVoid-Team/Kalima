@@ -87,4 +87,21 @@ router
     containerController.deleteContainerAndChildren
   );
 
+// Get revenue for a specific container by Id
+router
+.get(
+  "/:containerId/revenue",
+  authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Lecturer",
+    "Assistant",
+    "Student",
+    "Parent"
+  ),
+  containerController.getContainerRevenue
+);
+
+
 module.exports = router;
