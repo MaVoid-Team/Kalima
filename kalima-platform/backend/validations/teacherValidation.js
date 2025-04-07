@@ -1,6 +1,5 @@
-const Joi = require('joi')
-const userValidation = require('./userValidation.js')
-levels = userValidation.levels
+const Joi = require("joi");
+const userValidation = require("./userValidation.js");
 
 const teacherValidation = userValidation.concat(
   Joi.object({
@@ -8,9 +7,14 @@ const teacherValidation = userValidation.concat(
     faction: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
     subject: Joi.string().required(),
-    level: Joi.string().valid(...levels).insensitive().required(),
-    school: Joi.string().hex().length(24).optional()
+    level: Joi.string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .required()
+      .messages({
+        "string.pattern.base": "level must be a valid MongoDB ObjectId.",
+      }),
+    school: Joi.string().hex().length(24).optional(),
   })
-)
+);
 
-module.exports = teacherValidation
+module.exports = teacherValidation;
