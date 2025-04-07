@@ -34,10 +34,11 @@ const UserManagementTable = () => {
   ];
 
   return (
-    <div className="container  font-sans w-full max-w-6xl mx-auto p-4 my-14" dir="rtl">
+    <div className="rounded-xl font-sans w-full bg-primary mx-auto p-4 my-14 border border-slate-100" dir="rtl">
+      <h1 className="text-3xl font-bold mb-8 text-right text-secondary">سجل الاجراءات</h1>
       <div className="flex flex-wrap gap-4 mb-8 justify-between">
         {/* Filter button */}
-        <button className="btn bg-primary hover:bg-accent text-black border-none rounded-full px-6">
+        <button className="btn bg-primary hover:bg-secondary text-secondary border-none rounded-full px-6">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
@@ -56,8 +57,8 @@ const UserManagementTable = () => {
         </button>
 
         {/* Dropdown filters */}
-        <div className="flex flex-wrap gap-3">
-          <FilterDropdown label="الاسم" />
+        <div className="flex flex-wrap gap-3 ">
+          <FilterDropdown className="text-secondary bg-secondary" label="الاسم" />
           <FilterDropdown label="رقم الهاتف" />
           <FilterDropdown label="نوع الحساب" />
           <FilterDropdown label="الحالة" />
@@ -69,19 +70,19 @@ const UserManagementTable = () => {
       <div className="w-full overflow-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-right">
+            <tr className="text-right text-secondary">
               <th className="pb-4 text-lg font-medium">الإجراءات</th>
               <th className="pb-4 text-lg font-medium">الحالة</th>
               <th className="pb-4 text-lg font-medium">نوع الحساب</th>
               <th className="pb-4 text-lg font-medium">رقم الهاتف</th>
-              <th className="pb-4 text-lg font-medium">الاسم</th>
+              <th className="pb-4 text-lg font-medium ">الاسم</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-t border-none">
                 <td className="py-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 ">
                     <button className="flex items-center justify-center w-6 h-6 rounded-full bg-[#ff0000]">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +102,7 @@ const UserManagementTable = () => {
                     <button className="flex items-center justify-center w-6 h-6">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-[#e4a300]"
+                        className="h-4 w-4 text-secondary"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -116,10 +117,10 @@ const UserManagementTable = () => {
                     </button>
                   </div>
                 </td>
-                <td className="py-4 text-[#666666]">{user.status}</td>
-                <td className="py-4 text-[#666666]">{user.accountType}</td>
-                <td className="py-4 text-[#666666]">{user.phone}</td>
-                <td className="py-4 text-[#666666]">{user.name}</td>
+                <td className="py-4 text-secondary">{user.status}</td>
+                <td className="py-4 text-secondary">{user.accountType}</td>
+                <td className="py-4 text-secondary">{user.phone}</td>
+                <td className="py-4 text-secondary">{user.name}</td>
               </tr>
             ))}
           </tbody>
@@ -134,7 +135,7 @@ const FilterDropdown = ({ label }) => {
     <div className="dropdown dropdown-end">
       <label
         tabIndex={0}
-        className="btn btn-outline border-[#000000] text-[#000000] rounded-full px-6 min-w-[140px] flex items-center justify-between"
+        className="btn btn-outline border-secondary text-secondary rounded-full px-6 min-w-[140px] flex items-center justify-between"
       >
         {label}
         <svg

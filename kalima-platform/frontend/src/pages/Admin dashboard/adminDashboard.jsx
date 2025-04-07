@@ -1,11 +1,11 @@
 // components/Dashboard.jsx
 import { useState } from "react"
 import Hero from "./hero"
-import BarChart from "./bar"
-import Students from "./students"
+import Charts from "./chartsSection"
+import StudentsSection from "./studentsSection"
 import AdminSidebar from "../../components/AdminSidebar"
-
-const Dashboard = () => {
+import UserManagementTable from "./userManageTable"
+const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(true)
   const isRTL = true // Assuming Arabic language based on RTL direction
   
@@ -25,24 +25,25 @@ const Dashboard = () => {
         }`}
       >
           <Hero/>
-          <BarChart/>
-          <Students/>
+          <Charts/>
+          <StudentsSection/>
+          <UserManagementTable/>
 
 
         <div className="flex justify-center items-center pb-36 max-sm:pt-20 rounded-3xl">
-          <a href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0 " target="_blank">
-          <img alt="arrow" src="whatsApp.png" className="w-14 right-6"></img>
+          <a target="_blank" href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0 " rel="noreferrer" >
+          <img alt="arrow" src="whatsApp.png" className="w-14 right-6 max-sm:w-16"></img>
           </a>
         <img alt="arrow" src="AdminA.png" className="w-36"></img>
         
-          <button className="btn btn-primary w-44 rounded-xl text-black">ارسل عرضك الان!</button>
+          <button className="btn btn-primary w-44 rounded-xl text-secondary">ارسل عرضك الان!</button>
           
         </div>
         <div className="relative">
-          <img alt="" src="rDots.png" className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 "/>
+          <img alt="" src="rDots.png" className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 animate-float-up-dottedball "/>
         </div>
         <div className="relative">
-          <img alt="" src="bDots.png" className="absolute h-32 w-20 right-16 bottom-56 max-sm:bottom-80 max-sm:right-0 "/>
+          <img alt="" src="bDots.png" className="absolute h-32 w-20 right-16 bottom-44 max-sm:bottom-72 max-sm:right-0 animate-float-down-dottedball"/>
         </div>
       </div>
 
@@ -50,4 +51,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default AdminDashboard

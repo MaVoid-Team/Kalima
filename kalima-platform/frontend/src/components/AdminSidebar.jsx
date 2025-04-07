@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FaUser, FaClipboardList, FaTicketAlt, FaGraduationCap, FaCog, FaSignOutAlt, FaTimes, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
-import  Activity  from '../pages/Admin dashboard/activity';
+import  Activity  from '../pages/Admin dashboard/userManageTable';
 const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
   const isRTL = i18n.language === 'ar';
