@@ -21,6 +21,7 @@ const messageRouter = require("./routes/messageRoutes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const Notification = require("./models/notification");
+const adminDashboardRouter = require("./routes/adminDashboardRoutes.js");
 
 connectDB();
 
@@ -41,6 +42,7 @@ app.use("/api/v1/levels", levelRouter);
 app.use("/api/v1/subjects", subjectRouter);
 app.use("/api/v1/student-lecture-access", StudentLectureAccessRouter);
 app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/dashboard", adminDashboardRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -51,7 +53,7 @@ mongoose.connection.once("open", () => {
   });
 
   // Track connected users
-const connectedUsers = new Map();
+  const connectedUsers = new Map();
 
   io.on("connection", (socket) => {
     console.log("A client connected:", socket.id);
@@ -64,8 +66,10 @@ const connectedUsers = new Map();
 
       const pendingNotifications = await Notification.find({
         userId,
-        isSent: false
-      }).sort({ createdAt: 1 }).limit(20);
+        isSent: false,
+      })
+        .sort({ createdAt: 1 })
+        .limit(20);
 
       if (pendingNotifications.length > 0) {
         pendingNotifications.forEach(async (notification) => {
@@ -74,10 +78,12 @@ const connectedUsers = new Map();
             message: notification.message,
             type: notification.type,
             subjectId: notification.relatedId,
-            notificationId: notification._id
+            notificationId: notification._id,
           });
-  
-          await Notification.findByIdAndUpdate(notification._id, { isSent: true });
+
+          await Notification.findByIdAndUpdate(notification._id, {
+            isSent: true,
+          });
         });
       }
     });

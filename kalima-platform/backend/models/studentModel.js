@@ -1,45 +1,55 @@
-const mongoose = require('mongoose');
-const User = require('./userModel');
-const mongooseSequence = require('mongoose-sequence')(mongoose);
+const mongoose = require("mongoose");
+const User = require("./userModel");
+const mongooseSequence = require("mongoose-sequence")(mongoose);
 
-const lecturerPointsSchema = new mongoose.Schema({
-  lecturer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Lecturer',
-    required: true
+const lecturerPointsSchema = new mongoose.Schema(
+  {
+    lecturer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lecturer",
+      required: true,
+    },
+    points: {
+      type: Number,
+      default: 0,
+    },
   },
-  points: {
-    type: Number,
-    default: 0
-  }
-}, { _id: false });
+  { _id: false }
+);
 
-const studentSchema = new mongoose.Schema({
-  level: { type: String, enum: User.levels, required: true, lowercase: true },
-  hobbies: [String],
-  parentPhoneNumber: String,
-  faction: String,
-  phoneNumber: { type: String, required: true },
-  school: { type: mongoose.Schema.Types.ObjectId, ref: 'School' },
-  parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' },
-  // Array of lecturer-specific point balances
-  lecturerPoints: [lecturerPointsSchema]
-}, {
-  timestamps: true
-});
+const studentSchema = new mongoose.Schema(
+  {
+    level: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Level",
+      required: true,
+    },
+    hobbies: [String],
+    parentPhoneNumber: String,
+    faction: String,
+    phoneNumber: { type: String, required: true },
+    school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "Parent" },
+    // Array of lecturer-specific point balances
+    lecturerPoints: [lecturerPointsSchema],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 // Helper method to get points balance for a specific lecturer
-studentSchema.methods.getLecturerPointsBalance = function(lecturerId) {
+studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    entry => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString()
   );
   return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
 
 // Helper method to add points for a specific lecturer
-studentSchema.methods.addLecturerPoints = function(lecturerId, pointsToAdd) {
+studentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    entry => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString()
   );
 
   if (lecturerPointsEntry) {
@@ -50,9 +60,9 @@ studentSchema.methods.addLecturerPoints = function(lecturerId, pointsToAdd) {
 };
 
 // Helper method to use points for a specific lecturer
-studentSchema.methods.useLecturerPoints = function(lecturerId, pointsToUse) {
+studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    entry => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString()
   );
 
   if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
@@ -66,9 +76,9 @@ studentSchema.methods.useLecturerPoints = function(lecturerId, pointsToUse) {
 // A plugin to easily increment a field.
 studentSchema.plugin(mongooseSequence, {
   inc_field: "sequencedId",
-  startAt: 1000000
+  startAt: 1000000,
 });
 
-const Student = User.discriminator('Student', studentSchema);
+const Student = User.discriminator("Student", studentSchema);
 
 module.exports = Student;
