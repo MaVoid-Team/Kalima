@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { getLectureById } from "../../routes/lectures"
+import { getContainerById } from "../../routes/lectures"
 import { isMobile } from "../../utils/isMobile"
 
 // Tab data
@@ -32,7 +32,7 @@ const LectureDetail = () => {
     const fetchLecture = async () => {
       try {
         setLoading(true)
-        const result = await getLectureById(id)
+        const result = await getContainerById(id)
         setLecture(result.data.container)
         setLoading(false)
       } catch (err) {

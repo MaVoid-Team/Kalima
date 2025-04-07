@@ -1,27 +1,26 @@
 import axios from "axios"
 
 // Base URL for API requests
-const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000"; // Replace with your actual API base URL
+const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
-// Function to get all lectures
-export const getAllLectures = async () => {
+// Function to get all containers
+export const getAllContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures`)
+    const response = await axios.get(`${API_URL}/api/v1/containers`, {withCredentials: true})
     return response.data
   } catch (error) {
-    console.error("Error fetching lectures:", error)
+    console.error("Error fetching containers:", error)
     throw error
   }
 }
 
-// Function to get a lecture by ID
-export const getLectureById = async (lectureId) => {
+// Function to get a container by ID
+export const getContainerById = async (containerId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/${lectureId}`)
+    const response = await axios.get(`${API_URL}/api/v1/containers/${containerId}`, {withCredentials: true})
     return response.data
   } catch (error) {
-    console.error(`Error fetching lecture with ID ${lectureId}:`, error)
+    console.error(`Error fetching container with ID ${containerId}:`, error)
     throw error
   }
 }
-
