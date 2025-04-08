@@ -3,6 +3,10 @@ const express = require("express");
 const router = express.Router();
 
 router.route("/users").get(adminDashboardController.getAllUsers);
+router.route("/containers").get(adminDashboardController.getAllContainers);
+router
+  .route("/containers/:containerId")
+  .get(adminDashboardController.getContainerData);
 router
   .route("/students/:studentId")
   .get(adminDashboardController.getStudentData);
