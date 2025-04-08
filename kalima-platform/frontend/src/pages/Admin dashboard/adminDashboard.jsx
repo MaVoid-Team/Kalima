@@ -36,7 +36,7 @@ const AdminDashboard = () => {
           </a>
         <img alt="arrow" src="AdminA.png" className="w-36"></img>
         
-          <button className="btn btn-primary w-44 rounded-xl text-secondary">ارسل عرضك الان!</button>
+          <button className="btn btn-primary w-44 rounded-xl">ارسل عرضك الان!</button>
           
         </div>
         <div className="relative">

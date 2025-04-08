@@ -34,11 +34,11 @@ const UserManagementTable = () => {
   ];
 
   return (
-    <div className="rounded-xl font-sans w-full bg-primary mx-auto p-4 my-14 border border-slate-100" dir="rtl">
-      <h1 className="text-3xl font-bold mb-8 text-right text-secondary">سجل الاجراءات</h1>
+    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir="rtl">
+      <h1 className="text-3xl font-bold mb-8 text-right">سجل الاجراءات</h1>
       <div className="flex flex-wrap gap-4 mb-8 justify-between">
         {/* Filter button */}
-        <button className="btn bg-primary hover:bg-secondary text-secondary border-none rounded-full px-6">
+        <button className="btn bg-primary border-none rounded-full px-6">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
@@ -57,8 +57,8 @@ const UserManagementTable = () => {
         </button>
 
         {/* Dropdown filters */}
-        <div className="flex flex-wrap gap-3 ">
-          <FilterDropdown className="text-secondary bg-secondary" label="الاسم" />
+        <div className="flex flex-wrap gap-3">
+          <FilterDropdown label="الاسم" />
           <FilterDropdown label="رقم الهاتف" />
           <FilterDropdown label="نوع الحساب" />
           <FilterDropdown label="الحالة" />
@@ -70,7 +70,7 @@ const UserManagementTable = () => {
       <div className="w-full overflow-auto">
         <table className="w-full">
           <thead>
-            <tr className="text-right text-secondary">
+            <tr className="text-right">
               <th className="pb-4 text-lg font-medium">الإجراءات</th>
               <th className="pb-4 text-lg font-medium">الحالة</th>
               <th className="pb-4 text-lg font-medium">نوع الحساب</th>
@@ -117,10 +117,10 @@ const UserManagementTable = () => {
                     </button>
                   </div>
                 </td>
-                <td className="py-4 text-secondary">{user.status}</td>
-                <td className="py-4 text-secondary">{user.accountType}</td>
-                <td className="py-4 text-secondary">{user.phone}</td>
-                <td className="py-4 text-secondary">{user.name}</td>
+                <td className="py-4">{user.status}</td>
+                <td className="py-4">{user.accountType}</td>
+                <td className="py-4">{user.phone}</td>
+                <td className="py-4">{user.name}</td>
               </tr>
             ))}
           </tbody>
@@ -135,7 +135,7 @@ const FilterDropdown = ({ label }) => {
     <div className="dropdown dropdown-end">
       <label
         tabIndex={0}
-        className="btn btn-outline border-secondary text-secondary rounded-full px-6 min-w-[140px] flex items-center justify-between"
+        className="btn btn-outline rounded-full px-6 min-w-[140px] flex items-center justify-between"
       >
         {label}
         <svg
