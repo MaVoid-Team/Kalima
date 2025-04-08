@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FaUser, FaClipboardList, FaTicketAlt, FaGraduationCap, FaCog, FaSignOutAlt, FaTimes, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
-import  Activity  from '../pages/Admin dashboard/userManageTable';
 const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
   const isRTL = i18n.language === 'ar';
@@ -11,7 +10,7 @@ const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const menuItems = [
-    { id: 1, title: t('activity'), icon: <MdDashboard className="w-5 h-5" />, path: '/activity' },
+    { id: 1, title: t('activity'), icon: <MdDashboard className="w-5 h-5" />, path: '/audit-log' }, 
     { id: 2, title: t('profile'), icon: <FaUser className="w-5 h-5" />, path: '/profile' },
     { id: 3, title: t('courses'), icon: <FaGraduationCap className="w-5 h-5" />, path: '/lecture-page' },
     { id: 4, title: t('promoCodes'), icon: <FaTicketAlt className="w-5 h-5" />, path: '/promo-codes' },
