@@ -13,7 +13,7 @@ const tabData = [
   { id: "tests", label: "اختبارات", active: false },
 ]
 
-const LectureDetail = () => {
+const ContainerDetailsPage = () => {
   const { id } = useParams()
   const [lecture, setLecture] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -227,5 +227,5 @@ const LectureDetail = () => {
   )
 }
 
-export default LectureDetail;
+export default ContainerDetailsPage;
 
