@@ -17,6 +17,7 @@ const errorHandler = require("./controllers/errorController.js");
 const subjectRouter = require("./routes/subjectRoutes.js");
 const levelRouter = require("./routes/levelRoutes.js");
 const StudentLectureAccessRouter = require("./routes/studentLectureAccessRoutes.js");
+const centerRouter = require("./routes/centerRoutes");
 const messageRouter = require("./routes/messageRoutes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
@@ -41,6 +42,7 @@ app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/levels", levelRouter);
 app.use("/api/v1/subjects", subjectRouter);
 app.use("/api/v1/student-lecture-access", StudentLectureAccessRouter);
+app.use("/api/v1/centers", centerRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/dashboard", adminDashboardRouter);
 
