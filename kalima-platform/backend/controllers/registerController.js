@@ -4,6 +4,7 @@ const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
+const Assistant = require("../models/assistantModel.js");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
@@ -105,6 +106,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       break;
     case "lecturer":
       user = await Lecturer.create(newUser);
+      break;
+    case "assistant":
+      user = await Assistant.create(newUser);
       break;
     default:
       return next(new AppError("Invalid role", 400));
