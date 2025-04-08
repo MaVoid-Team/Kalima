@@ -1,12 +1,13 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
-import { FiX, FiRefreshCw, FiFileText, FiChevronDown, FiUser, FiEdit, FiRotateCw } from "react-icons/fi";
+import { FiX, FiFileText, FiChevronDown, FiUser, FiEdit, FiRotateCw } from "react-icons/fi";
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from "react-icons/fa";
 
 const AuditLog = () => {
   return (
-    <div className="w-full max-w-full mx-auto p-4 font-sans  rounded-xl" dir="rtl">      
+    <div className="container w-full h-screen mx-auto mt-20 p-4 font-sans  rounded-xl" dir="rtl">      
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-6 justify-center">
+      <div className="flex flex-wrap gap-3 mb-6 justify-start">
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
