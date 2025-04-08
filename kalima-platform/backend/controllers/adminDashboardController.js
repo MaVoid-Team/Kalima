@@ -202,6 +202,18 @@ exports.getContainerData = catchAsync(async (req, res, next) => {
     },
     {
       $lookup: {
+        from: "containers",
+        let: { parentId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$parent", "$$parentId"] } } },
+          { $project: { _id: 1, name: 1 } },
+        ],
+        as: "children",
+      },
+    },
+
+    {
+      $lookup: {
         from: "subjects",
         let: { subjectId: "$subject" },
         pipeline: [
