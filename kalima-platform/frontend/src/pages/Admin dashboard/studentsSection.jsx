@@ -57,7 +57,7 @@ const StudentDashboard = () => {
   );
 
   return (
-    <div className="overflow-hidden relative mx-auto shadow-lg bg-primary rounded-xl border border-slate-100 w-full h-full mb-10 p-6 font-sans" dir="rtl">
+    <div className="overflow-hidden relative mx-auto shadow-lg rounded-xl border border-slate-100 w-full h-full mb-10 p-6 font-sans" dir="rtl">
       <div className=" mx-auto">
         {/* Header with stars */}
         <div className="relative mb-8">
@@ -70,7 +70,7 @@ const StudentDashboard = () => {
           
           {/* Title */}
           <div className="flex justify-start items-center gap-2 mb-8">
-            <h1 className="text-2xl font-bold text-secondary">أكثر الطلاب تميزًا</h1>
+            <h1 className="text-2xl font-bold">أكثر الطلاب تميزًا</h1>
             <span className="text-[#ffcc00] text-2xl">😊</span>
           </div>
         </div>
@@ -79,7 +79,7 @@ const StudentDashboard = () => {
         <div className="w-full overflow-auto">
           <table className="table w-full ">
             <thead>
-              <tr className="text-secondary">
+              <tr>
                 <th className="py-4 px-2 text-right font-bold text-xl"></th>
                 <th className="py-4 px-2 text-right  font-bold text-xl">الاسم</th>
                 <th className="py-4 px-2 text-right  font-bold text-xl">الرقم التعريفي</th>
@@ -113,13 +113,13 @@ const StudentDashboard = () => {
                         </div>
                         <WhatsAppIcon />
                       </div>
-                      <span className="font-medium text-secondary">{student.name}</span>
+                      <span className="font-medium">{student.name}</span>
                     </div>
                   </td>
-                  <td className="py-3 px-2 text-secondary">{student.id}</td>
-                  <td className="py-3 px-2 text-secondary">{student.marks}</td>
-                  <td className="py-3 px-2 text-secondary">{student.percentage}</td>
-                  <td className="py-3 px-2 text-secondary">{student.year}</td>
+                  <td className="py-3 px-2">{student.id}</td>
+                  <td className="py-3 px-2">{student.marks}</td>
+                  <td className="py-3 px-2">{student.percentage}</td>
+                  <td className="py-3 px-2">{student.year}</td>
                 </tr>
               ))}
             </tbody>

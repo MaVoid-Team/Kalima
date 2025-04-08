@@ -39,25 +39,25 @@ const StudentsChart = () => {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
-        className="card bg-primary shadow-lg rounded-2xl overflow-hidden border border-slate-100 h-full"
+        className="card shadow-lg rounded-2xl overflow-hidden border border-slate-100 h-full"
       >
         <div className="card-body p-6">
           <div className="flex justify-between items-center mb-6">
-          <h2 className="card-title text-xl font-bold text-secondary">الطلاب</h2>
+          <h2 className="card-title text-xl font-bold">الطلاب</h2>
             <div className="flex gap-4 items-center">
               <div className="flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full bg-[#9783ff]"></span>
-                <span className="text-sm font-medium text-secondary">بنين</span>
+                <span className="text-sm font-medium">بنين</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full bg-[#B5E8E0]"></span>
-                <span className="text-sm font-medium text-secondary">بنات</span>
+                <span className="text-sm font-medium">بنات</span>
               </div>
             </div>
             
           </div>
           <div className="flex justify-center items-center h-64 relative">
-            <Doughnut className="bg-accent"
+            <Doughnut
               data={doughnutData}
               options={{
                 responsive: true,
@@ -85,7 +85,7 @@ const StudentsChart = () => {
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center flex-col">
-              <div className="text-lg font-medium text-gray-500">Total</div>
+              <div className="text-lg font-medium">Total</div>
               <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
                 1500
               </div>

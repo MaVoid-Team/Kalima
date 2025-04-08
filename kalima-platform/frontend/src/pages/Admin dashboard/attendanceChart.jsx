@@ -41,15 +41,14 @@ const AttendanceChart = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
-        className="card bg-primary shadow-lg rounded-2xl overflow-hidden border border-slate-100 h-full"
+        className="card shadow-lg rounded-2xl overflow-hidden border border-slate-100 h-full"
       >
         <div className="card-body p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="card-title text-xl font-bold text-secondary">نسبة الحضور</h2>
+            <h2 className="card-title text-xl font-bold">نسبة الحضور</h2>
           </div>
           <div className="h-64">
             <Bar
-            className="bg-accent"
               data={attendanceData}
               options={{
                 responsive: true,

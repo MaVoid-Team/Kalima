@@ -62,26 +62,26 @@ const ExamResChart = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="card bg-primary shadow-lg rounded-2xl overflow-hidden border border-slate-100"
+        className="card shadow-lg rounded-2xl overflow-hidden border border-slate-100"
       >
         <div className="card-body p-6">
           <div className="flex justify-between items-center mb-6">
-          <h2 className="card-title text-xl font-bold text-secondary">نتائج الامتحانات</h2>
+          <h2 className="card-title text-xl font-bold">نتائج الامتحانات</h2>
             <div className="flex gap-6 items-center">
               <div className="flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full bg-[#9783ff]"></span>
-                <span className="text-sm font-medium text-secondary">معلم</span>
+                <span className="text-sm font-medium">معلم</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-4 h-4 rounded-full bg-[#B5E8E0]"></span>
-                <span className="text-sm font-medium text-secondary">طالب</span>
+                <span className="text-sm font-medium">طالب</span>
               </div>
             </div>
             
           </div>
-          <div className="text-sm text-gray-500 mb-4 text-right">الطلاب و المعلمين</div>
+          <div className="text-sm mb-4 text-right">الطلاب و المعلمين</div>
           <div className="h-72">
-            <Bar className="bg-accent"
+            <Bar
               data={examResultsData}
               options={{
                 responsive: true,
