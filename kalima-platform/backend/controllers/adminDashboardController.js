@@ -115,7 +115,7 @@ exports.getStudentData = catchAsync(async (req, res, next) => {
             },
           },
           { $unwind: { path: "$container", preserveNullAndEmptyArrays: true } },
-          // Optionally, if you also want to populate lecturer on the purchase itself:
+          // populate lecturer on the purchase itself:
           {
             $lookup: {
               from: "users",
