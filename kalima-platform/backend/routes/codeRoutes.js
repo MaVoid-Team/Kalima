@@ -15,6 +15,10 @@ router
   .post(
     authController.verifyRoles("Admin", "Lecturer", "Assistant"),
     codeController.createCodes
+  )
+  .delete(
+    authController.verifyRoles("Admin", "Lecturer", "Assistant"),
+    codeController.deleteCodes
   );
 
 module.exports = router;
