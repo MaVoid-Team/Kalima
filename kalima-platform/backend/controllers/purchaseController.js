@@ -10,6 +10,7 @@ const catchAsync = require("../utils/catchAsync");
 const mongoose = require("mongoose");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 
+// updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
   if (!lecturerId) {
@@ -50,6 +51,22 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
       currentUser.lecturerPoints[currentUserIndexOfPointsToThisLecture];
 
     const lecturePrice = lecture.price;
+
+    const hasEnoughPoints = currentUser.useLecturerPoints(
+      lecturerId,
+      lecturePrice
+    );
+    if (!hasEnoughPoints) {
+      await session.abortTransaction();
+      return next(
+        new AppError(
+          "You don't have enough points for purchasing from this lecturer",
+          400
+        )
+      );
+    }
+    /*
+    const lecturePrice = lecture.price;
     if (currentUserPointsForThisLecturer.points < lecturePrice) {
       await session.abortTransaction();
       return next(
@@ -59,9 +76,10 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
         )
       );
     }
+    */
 
     currentUser.totalPoints -= lecturePrice;
-    currentUserPointsForThisLecturer.points -= lecturePrice;
+    // currentUserPointsForThisLecturer.points -= lecturePrice;
 
     await Promise.all([
       studentLectureAccess.create(
@@ -69,7 +87,6 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
         { session }
       ),
       currentUser.save({ session }),
-      ,
       Purchase.create(
         [
           {
@@ -86,11 +103,20 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     await session.commitTransaction();
 
-    const updatedUser = await User.findById(req.user._id).select("totalPoints");
+    /*
+    const updatedUser = await User.findById(req.user._id).select(
+      "lecturerPoints"
+    );
+    const updatedPoints = updatedUser.lecturerPoints.find(
+      (p) => p.lecturer.toString() === lecturerId
+    )?.points;
+    */
+
+    const updatedPoints = currentUser.getLecturerPointsBalance(lecturerId);
 
     res.status(200).json({
       status: "success",
-      message: `Lecture purchased successfully, remaining points ${updatedUser.totalPoints}`,
+      message: `Lecture purchased successfully, your remaining points for this lecturer now ${updatedPoints}`,
     });
   } catch (error) {
     await session.abortTransaction();
