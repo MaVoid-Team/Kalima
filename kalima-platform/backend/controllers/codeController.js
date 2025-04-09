@@ -50,4 +50,41 @@ const getCodes = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { createCodes, getCodes };
+const deleteCodes = catchAsync(async (req, res, next) => {
+  const { pointsAmount, numOfCodes } = req.body;
+  if (!pointsAmount || !numOfCodes) {
+    return next(new AppError("All fields are required"));
+  }
+
+  const codesToDelete = await Code.find({
+    isRedeemed: false,
+    pointsAmount,
+  })
+    .limit(numOfCodes)
+    .select("_id");
+
+  if (codesToDelete.length === 0) {
+    return next(
+      new AppError(`You don't have codes yet with points ${pointsAmount}`, 404)
+    );
+  }
+
+  if (codesToDelete.length < numOfCodes) {
+    return next(
+      new AppError(
+        `You cannot delete ${numOfCodes} code(s), you only have ${codesToDelete.length} code(s)`,
+        400
+      )
+    );
+  }
+
+  const codesToDeleteIds = codesToDelete.map((code) => code._id);
+  await Code.deleteMany({ _id: { $in: codesToDeleteIds } });
+
+  res.status(200).json({
+    status: "success",
+    message: `${codesToDeleteIds.length} code(s) with ${pointsAmount} points have been deleted successfully`,
+  });
+});
+
+module.exports = { createCodes, getCodes, deleteCodes };
