@@ -8,7 +8,82 @@ const Lecturer = require("../models/lecturerModel"); // Add this import
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const mongoose = require("mongoose");
-const Code = require("../models/codeModel");
+const studentLectureAccess = require("../models/studentLectureAccessModel");
+
+exports.purchaseLecture = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.body;
+  if (!lectureId) {
+    return next(new AppError("Lecture id is required", 400));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const [lecture, currentUser] = await Promise.all([
+      Container.findOne({ _id: lectureId, kind: "Lecture" }).session(session),
+      User.findById(req.user._id).session(session),
+    ]);
+
+    if (!lecture) {
+      await session.abortTransaction();
+      return next(new AppError("Lecture not found", 404));
+    }
+    if (!currentUser) {
+      await session.abortTransaction();
+      return next(new AppError("Unauthorized", 401));
+    }
+
+    const lecturePrice = lecture.price;
+    if (currentUser.totalPoints < lecturePrice) {
+      await session.abortTransaction();
+      return next(
+        new AppError("You don't have enough points to buy this lecture", 400)
+      );
+    }
+
+    currentUser.totalPoints -= lecturePrice;
+
+    await Promise.all([
+      studentLectureAccess.create(
+        [{ student: req.user._id, lecture: lecture._id }],
+        { session }
+      ),
+      currentUser.save({ session }),
+      ,
+      Purchase.create(
+        [
+          {
+            student: req.user._id,
+            lecturer: lecture.createdBy,
+            points: lecturePrice,
+            type: "pointPurchase",
+            description: `Purchased lecture ${lecture.name} for ${lecturePrice} points`,
+          },
+        ],
+        { session }
+      ),
+    ]);
+
+    await session.commitTransaction();
+
+    const updatedUser = await User.findById(req.user._id).select("totalPoints");
+
+    res.status(200).json({
+      status: "success",
+      message: `Lecture purchased successfully, remaining points ${updatedUser.totalPoints}`,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+
+    if (error.code === 11000 ) {
+      return next(new AppError("You have already purchased this lecture", 400));
+    }
+    return next(new AppError("Failed to purchase lecture", 500));
+  } finally {
+    await session.endSession();
+  }
+});
 
 /**
  * Purchase points for a specific lecturer
