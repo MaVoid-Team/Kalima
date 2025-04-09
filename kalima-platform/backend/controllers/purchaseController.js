@@ -76,7 +76,7 @@ exports.purchaseLecture = catchAsync(async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
 
-    if (error.code === 11000 ) {
+    if (error.code === 11000) {
       return next(new AppError("You have already purchased this lecture", 400));
     }
     return next(new AppError("Failed to purchase lecture", 500));
