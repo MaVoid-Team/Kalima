@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import TeacherReviews from './TeacherReviews';
 import WaveBackground from './WaveBackground';
 import { loginUser } from '../../routes/auth-services'; // Assuming this is the correct import path
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const TeacherLogin = () => {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const [activeTab, setActiveTab] = useState('email_tab');
@@ -46,6 +47,9 @@ const TeacherLogin = () => {
       
       if (!result.success) {
         setError(result.message || 'Login failed. Please check your credentials.');
+      }
+      else {
+        navigate('/lecturer-dashboard');
       }
       // Successful login is handled by the loginUser function (sets token in sessionStorage)
       
