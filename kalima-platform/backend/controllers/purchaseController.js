@@ -65,21 +65,8 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
         )
       );
     }
-    /*
-    const lecturePrice = lecture.price;
-    if (currentUserPointsForThisLecturer.points < lecturePrice) {
-      await session.abortTransaction();
-      return next(
-        new AppError(
-          "You don't have enough points for purchasing from this lecturer",
-          400
-        )
-      );
-    }
-    */
 
     currentUser.totalPoints -= lecturePrice;
-    // currentUserPointsForThisLecturer.points -= lecturePrice;
 
     await Promise.all([
       studentLectureAccess.create(
@@ -102,15 +89,6 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     ]);
 
     await session.commitTransaction();
-
-    /*
-    const updatedUser = await User.findById(req.user._id).select(
-      "lecturerPoints"
-    );
-    const updatedPoints = updatedUser.lecturerPoints.find(
-      (p) => p.lecturer.toString() === lecturerId
-    )?.points;
-    */
 
     const updatedPoints = currentUser.getLecturerPointsBalance(lecturerId);
 
