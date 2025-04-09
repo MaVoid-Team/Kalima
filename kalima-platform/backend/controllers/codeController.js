@@ -1,6 +1,7 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Code = require("../models/codeModel");
+const QueryFeatures = require("../utils/queryFeatures");
 
 // i will modify err msg and make validation later
 // restricted to admin-center-lectural
@@ -27,9 +28,16 @@ const createCodes = catchAsync(async (req, res, next) => {
 });
 
 const getCodes = catchAsync(async (req, res, next) => {
-  const codes = await Code.find({ isRedeemed: false }).select(
+  const codesQuery = Code.find({ isRedeemed: false }).select(
     "code pointsAmount"
   );
+
+  const features = new QueryFeatures(codesQuery, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const codes = await features.query;
   if (codes.length === 0) {
     return next(new AppError("No codes yet", 404));
   }
