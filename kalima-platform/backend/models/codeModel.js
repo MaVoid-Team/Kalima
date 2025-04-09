@@ -15,11 +15,17 @@ const codeSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  redeemedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   redeemedAt: {
     type: Date,
     default: null,
   },
 });
+
+codeSchema.indexes({ code: 1 });
 
 codeSchema.methods.generateCode = function () {
   const objectIdHex = this._id.toString();
