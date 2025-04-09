@@ -21,5 +21,13 @@ const codeSchema = new mongoose.Schema({
   },
 });
 
+codeSchema.methods.generateCode = function () {
+  const objectIdHex = this._id.toString();
+  const base36 = BigInt("0x" + objectIdHex)
+    .toString(36)
+    .toUpperCase();
+  this.code = base36;
+};
+
 const Code = mongoose.model("Code", codeSchema);
 module.exports = Code;
