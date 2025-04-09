@@ -15,9 +15,9 @@ router.post("/points",
 );*/
 
 // updated version
-router.post("/lecture", 
+router.post("/points", 
   authController.verifyRoles("Student"),
-  purchaseController.purchaseLecture
+  purchaseController.purchaseLecturerPoints
 );
 
 // Purchase a container with lecturer-specific points

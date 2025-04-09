@@ -58,10 +58,10 @@ const deleteCodes = catchAsync(async (req, res, next) => {
     return next(new AppError("Code is required", 400));
   }
 
-  const codeToDelete = await Code.findOneAndDelete({ code });
+  const codeToDelete = await Code.findOneAndDelete({ code, isRedeemed: false });
 
   if (!codeToDelete) {
-    return next(new AppError("Code not found", 404));
+    return next(new AppError("Code not found or has been redeemed", 404));
   }
 
   res.status(200).json({
@@ -72,9 +72,9 @@ const deleteCodes = catchAsync(async (req, res, next) => {
 
 //restricted only to users(stud)
 const redeemCode = catchAsync(async (req, res, next) => {
-  const { code } = req.body;
-  if (!code) {
-    return next(new AppError("Code is a required field", 400));
+  const { lecturerId, code } = req.body;
+  if (!code || !lecturerId) {
+    return next(new AppError("Code and Lecturer Id are required fields", 400));
   }
 
   const session = await mongoose.startSession();
@@ -86,16 +86,35 @@ const redeemCode = catchAsync(async (req, res, next) => {
     );
     if (!isExistCode) {
       await session.abortTransaction();
-      return next(new AppError("Code not found", 404));
+      return next(
+        new AppError("Code not found or has been redeemed before", 404)
+      );
+    }
+    
+    const isExistLectureId = await User.findById({ _id: lecturerId });
+    if (!isExistLectureId) {
+      await session.abortTransaction();
+      return next(new AppError("Lecturer not found", 404));
     }
 
     const pointsAmount = isExistCode.pointsAmount;
 
     const currentUser = await User.findById(req.user._id).session(session);
     currentUser.totalPoints += pointsAmount;
+    currentUser.lecturerPoints.push({
+      lecturer: lecturerId,
+      points: pointsAmount,
+    });
     await currentUser.save({ session });
 
-    await Code.deleteOne({ code }).session(session);
+    await Code.findOneAndUpdate(
+      { code },
+      {
+        isRedeemed: true,
+        redeemedBy: req.user._id,
+        redeemedAt: new Date(),
+      }
+    ).session(session);
 
     await session.commitTransaction();
     res.status(200).json({
@@ -104,7 +123,8 @@ const redeemCode = catchAsync(async (req, res, next) => {
     });
   } catch (error) {
     await session.abortTransaction();
-    return next(new AppError("Failed to reddem code, try again later", 500));
+    console.log(error);
+    return next(new AppError("Failed to redeem code, try again later", 500));
   } finally {
     await session.endSession();
   }

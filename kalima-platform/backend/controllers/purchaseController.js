@@ -10,10 +10,10 @@ const catchAsync = require("../utils/catchAsync");
 const mongoose = require("mongoose");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 
-exports.purchaseLecture = catchAsync(async (req, res, next) => {
-  const { lectureId } = req.body;
-  if (!lectureId) {
-    return next(new AppError("Lecture id is required", 400));
+exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
+  const { lecturerId, lectureId } = req.body;
+  if (!lecturerId) {
+    return next(new AppError("lecturer Id and Lecture Id is required", 400));
   }
 
   const session = await mongoose.startSession();
@@ -21,7 +21,11 @@ exports.purchaseLecture = catchAsync(async (req, res, next) => {
 
   try {
     const [lecture, currentUser] = await Promise.all([
-      Container.findOne({ _id: lectureId, kind: "Lecture" }).session(session),
+      Container.findOne({
+        _id: lectureId,
+        createdBy: lecturerId,
+        kind: "Lecture",
+      }).session(session),
       User.findById(req.user._id).session(session),
     ]);
 
@@ -34,15 +38,30 @@ exports.purchaseLecture = catchAsync(async (req, res, next) => {
       return next(new AppError("Unauthorized", 401));
     }
 
+    const currentUserIndexOfPointsToThisLecture =
+      currentUser.lecturerPoints.findIndex(
+        (index) => index.lecturer.toString() === lecturerId
+      );
+    if (currentUserIndexOfPointsToThisLecture === -1) {
+      return next(new AppError("You don't have points to this lecturer", 400));
+    }
+
+    const currentUserPointsForThisLecturer =
+      currentUser.lecturerPoints[currentUserIndexOfPointsToThisLecture];
+
     const lecturePrice = lecture.price;
-    if (currentUser.totalPoints < lecturePrice) {
+    if (currentUserPointsForThisLecturer.points < lecturePrice) {
       await session.abortTransaction();
       return next(
-        new AppError("You don't have enough points to buy this lecture", 400)
+        new AppError(
+          "You don't have enough points for purchasing from this lecturer",
+          400
+        )
       );
     }
 
     currentUser.totalPoints -= lecturePrice;
+    currentUserPointsForThisLecturer.points -= lecturePrice;
 
     await Promise.all([
       studentLectureAccess.create(
@@ -79,6 +98,7 @@ exports.purchaseLecture = catchAsync(async (req, res, next) => {
     if (error.code === 11000) {
       return next(new AppError("You have already purchased this lecture", 400));
     }
+    console.log(error);
     return next(new AppError("Failed to purchase lecture", 500));
   } finally {
     await session.endSession();
@@ -88,6 +108,7 @@ exports.purchaseLecture = catchAsync(async (req, res, next) => {
 /**
  * Purchase points for a specific lecturer
  */
+/*
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   // Get userId from the authenticated user's JWT token - try multiple possible properties
   let userId;
@@ -197,7 +218,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     session.endSession();
   }
 });
-
+*/
 /**
  * Purchase a container using lecturer-specific points
  */
