@@ -49,7 +49,7 @@ const TeacherLogin = () => {
         setError(result.message || 'Login failed. Please check your credentials.');
       }
       else {
-        navigate('/lecturer-dashboard');
+        navigate('/lecturer-dashboard'); // Redirect to the lecturer dashboard on successful login
       }
       // Successful login is handled by the loginUser function (sets token in sessionStorage)
       

@@ -14,7 +14,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-full px-6 bg-base-100 min-h-screen bg-gradient-to-br " dir="rtl">
+    <div className="mx-auto w-full max-w-full p-10 bg-base-100 min-h-screen bg-gradient-to-br " dir="rtl">
       {/* Import the UserSidebar component */}
       <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
       

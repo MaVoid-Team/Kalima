@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.kalima.mavoid',
+  appId: 'com.kalimatest.mavoid',
   appName: 'Kalima Platform',
   webDir: 'build',
 };

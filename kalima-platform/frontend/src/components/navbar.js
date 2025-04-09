@@ -94,7 +94,7 @@ const NavBar = () => {
               <Link
                 key={item.key}
                 to={item.path}
-                className="btn btn-ghost font-medium rounded-2xl hover:text-primary transition-colors"
+                className="btn btn-ghost font-medium rounded-2xl transition-colors"
               >
                 {t(item.key)}
               </Link>
