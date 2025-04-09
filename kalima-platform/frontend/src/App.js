@@ -27,13 +27,14 @@ const LectureList = lazy(() => import("./pages/Lecture Page/LectureDisplay"))
 const ContainerDetailsPage = lazy(() => import("./pages/Lecture Page/ContainerDetails"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
+const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
 
   // Routes where UserNavbar should be shown
-  const userNavbarRoutes = ["/mobile-only", "/lecture-page", "/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details"]
+  const userNavbarRoutes = ["/mobile-only", "/lecture-page", "/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details", "/lecturer-dashboard"]
 
   useEffect(() => {
     // Check if current route should show UserNavbar
@@ -64,6 +65,7 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/audit-log" element={<AuditLog />} />
+          <Route path="/lecturer-dashboard" element={<DashboardPage />} />
         </Routes>
       </Suspense>
 
