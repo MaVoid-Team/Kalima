@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const Code = require("../models/codeModel");
 
 // i will modify err msg and make validation later
+// restricted to admin-center-lectural
 const createCodes = catchAsync(async (req, res, next) => {
   const { pointsAmount, numOfCodes } = req.body;
   if (!pointsAmount || !numOfCodes) {
@@ -25,4 +26,20 @@ const createCodes = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { createCodes };
+const getCodes = catchAsync(async (req, res, next) => {
+  const codes = await Code.find({ isRedeemed: false }).select(
+    "code pointsAmount"
+  );
+  if (codes.length === 0) {
+    return next(new AppError("No codes yet", 404));
+  }
+  res.status(201).json({
+    status: "success",
+    results: codes.length,
+    data: {
+      codes,
+    },
+  });
+});
+
+module.exports = { createCodes, getCodes };

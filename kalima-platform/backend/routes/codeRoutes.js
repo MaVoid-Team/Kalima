@@ -8,6 +8,10 @@ router.use(verifyJWT);
 
 router
   .route("/")
+  .get(
+    authController.verifyRoles("Admin", "Lecturer", "Assistant"),
+    codeController.getCodes
+  )
   .post(
     authController.verifyRoles("Admin", "Lecturer", "Assistant"),
     codeController.createCodes
