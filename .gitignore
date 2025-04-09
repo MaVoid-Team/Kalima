@@ -160,3 +160,9 @@ kalima-platform/frontend/android/gradlew
 kalima-platform/frontend/android/gradle.properties
 kalima-platform/frontend/android/capacitor.settings.gradle
 kalima-platform/frontend/android/build.gradle
+kalima-platform/frontend/android/app/build.gradle
+kalima-platform/frontend/android/build.gradle
+kalima-platform/frontend/android/capacitor.settings.gradle
+kalima-platform/frontend/android/app/build.gradle
+kalima-platform/frontend/android/app/capacitor.build.gradle
+kalima-platform/frontend/capacitor.config.ts
