@@ -8,17 +8,12 @@ router.use(verifyJWT);
 
 router
   .route("/")
-  .get(
-    authController.verifyRoles("Admin", "Lecturer", "Assistant"),
-    codeController.getCodes
-  )
-  .post(
-    authController.verifyRoles("Admin", "Lecturer", "Assistant"),
-    codeController.createCodes
-  )
-  .delete(
-    authController.verifyRoles("Admin", "Lecturer", "Assistant"),
-    codeController.deleteCodes
-  );
+  .get(authController.verifyRoles("Admin"), codeController.getCodes)
+  .post(authController.verifyRoles("Admin"), codeController.createCodes)
+  .delete(authController.verifyRoles("Admin"), codeController.deleteCodes);
+
+router
+  .route("/redeem")
+  .post(authController.verifyRoles("Student"), codeController.redeemCode);
 
 module.exports = router;
