@@ -47,9 +47,6 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
       return next(new AppError("You don't have points to this lecturer", 400));
     }
 
-    const currentUserPointsForThisLecturer =
-      currentUser.lecturerPoints[currentUserIndexOfPointsToThisLecture];
-
     const lecturePrice = lecture.price;
 
     const hasEnoughPoints = currentUser.useLecturerPoints(
@@ -68,25 +65,25 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     currentUser.totalPoints -= lecturePrice;
 
-    await Promise.all([
-      studentLectureAccess.create(
-        [{ student: req.user._id, lecture: lecture._id }],
-        { session }
-      ),
-      currentUser.save({ session }),
-      Purchase.create(
-        [
-          {
-            student: req.user._id,
-            lecturer: lecture.createdBy,
-            points: lecturePrice,
-            type: "pointPurchase",
-            description: `Purchased lecture ${lecture.name} for ${lecturePrice} points`,
-          },
-        ],
-        { session }
-      ),
-    ]);
+    await studentLectureAccess.create(
+      [{ student: req.user._id, lecture: lecture._id }],
+      { session }
+    );
+
+    await currentUser.save({ session });
+
+    await Purchase.create(
+      [
+        {
+          student: req.user._id,
+          lecturer: lecture.createdBy,
+          points: lecturePrice,
+          type: "pointPurchase",
+          description: `Purchased lecture ${lecture.name} for ${lecturePrice} points`,
+        },
+      ],
+      { session }
+    );
 
     await session.commitTransaction();
 
