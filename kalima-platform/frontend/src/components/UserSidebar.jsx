@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaUser, FaClipboardList, FaTicketAlt, FaGraduationCap, FaCog, FaSignOutAlt, FaTimes, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaGraduationCap, FaCog, FaSignOutAlt, FaTimes, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 
 const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
@@ -10,8 +10,8 @@ const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const menuItems = [
-    { id: 3, title: t('courses'), icon: <FaGraduationCap className="w-5 h-5" />, path: '/lecture-page' },
-    { id: 4, title: t('promoCodes'), icon: <FaTicketAlt className="w-5 h-5" />, path: '/promo-codes' },
+    { id: 3, title: t('courses'), icon: <FaGraduationCap className="w-5 h-5" />, path: '/dashboard/lecture-page' },
+    { id: 4, title: t('promoCodes'), icon: <FaTicketAlt className="w-5 h-5" />, path: '/dashboard/promo-codes' },
     { id: 7, title: t('settings'), icon: <FaCog className="w-5 h-5" />, path: '/settings' },
     { id: 8, title: t('logout'), icon: <FaSignOutAlt className="w-5 h-5" />, path: '/logout' },
   ];
