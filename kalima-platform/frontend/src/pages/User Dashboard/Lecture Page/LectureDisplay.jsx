@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { getAllContainers } from "../../routes/lectures"
+import { getAllContainers } from "../../../routes/lectures"
 
 const LectureList = () => {
   const [containers, setContainers] = useState([])
@@ -13,7 +13,7 @@ const LectureList = () => {
       try {
         setLoading(true)
         const result = await getAllContainers()
-        // The API returns data in a nested structure: result.data.containers
+        
         setContainers(result.data.containers)
         setLoading(false)
       } catch (err) {
@@ -27,6 +27,7 @@ const LectureList = () => {
   }, [])
 
   const handleContainerClick = (containerId) => {
+    // If the container has children (lectures), navigate to the container details page
     navigate(`/container-details/${containerId}`)
   }
 
@@ -63,7 +64,7 @@ const LectureList = () => {
 
   return (
     <div className="container mx-auto p-4" dir="rtl">
-      <h1 className="text-2xl font-bold mb-6 text-center">المحاضرات المتاحة</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">الكورسات المتاحه</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {containers.map((container) => (

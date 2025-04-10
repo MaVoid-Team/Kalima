@@ -163,7 +163,7 @@ export function CoursesSection() {
             </div>
 
             <div className="flex justify-center mt-8">
-              <Link href="/courses" passHref>
+              <Link to="/courses">
                 <button className="btn btn-primary rounded-full">
                   {t('courses.viewAll')}
                   <ChevronLeft className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`} />

@@ -59,7 +59,7 @@ function LoginStudent() {
         console.log("Login successful")
 
         // Redirect to dashboard or home page
-        navigate("/promo-codes") // Adjust this to your app's route structure
+        navigate("/dashboard/promo-codes") // Adjust this to your app's route structure
       } else {
         // Login failed
         setError(result.error)
