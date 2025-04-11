@@ -8,15 +8,15 @@ const mongoose = require("mongoose");
 // i will modify err msg and make validation later
 // restricted to admin-center-lectural
 const createCodes = catchAsync(async (req, res, next) => {
-  const { pointsAmount, numOfCodes } = req.body;
-  if (!pointsAmount || !numOfCodes) {
+  const { pointsAmount, numOfCodes, lecturerId } = req.body;
+  if (!pointsAmount || !numOfCodes || !lecturerId) {
     return next(new AppError("All fields are required"));
   }
 
   const newCodes = [];
 
   for (let i = 0; i < numOfCodes; i++) {
-    const code = new Code({ pointsAmount });
+    const code = new Code({ pointsAmount, lecturerId });
     code.generateCode();
     newCodes.push(code);
   }
@@ -39,7 +39,9 @@ const getCodes = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
 
-  const codes = await features.query;
+  const codes = await features.query
+    .populate({ path: "lecturerId", select: "name" })
+    .lean();
   if (codes.length === 0) {
     return next(new AppError("No codes yet", 404));
   }
@@ -72,8 +74,8 @@ const deleteCodes = catchAsync(async (req, res, next) => {
 
 //restricted only to users(stud)
 const redeemCode = catchAsync(async (req, res, next) => {
-  const { lecturerId, code } = req.body;
-  if (!code || !lecturerId) {
+  const { code } = req.body;
+  if (!code) {
     return next(new AppError("Code and Lecturer Id are required fields", 400));
   }
 
@@ -90,21 +92,34 @@ const redeemCode = catchAsync(async (req, res, next) => {
         new AppError("Code not found or has been redeemed before", 404)
       );
     }
-    
-    const isExistLectureId = await User.findById({ _id: lecturerId });
-    if (!isExistLectureId) {
-      await session.abortTransaction();
-      return next(new AppError("Lecturer not found", 404));
-    }
-
-    const pointsAmount = isExistCode.pointsAmount;
 
     const currentUser = await User.findById(req.user._id).session(session);
-    currentUser.totalPoints += pointsAmount;
-    currentUser.lecturerPoints.push({
-      lecturer: lecturerId,
-      points: pointsAmount,
-    });
+    if (!currentUser) {
+      await session.abortTransaction();
+      return next(new AppError("User not found", 404));
+    }
+    currentUser.totalPoints += isExistCode.pointsAmount;
+    if (currentUser.lecturerPoints.length === 0) {
+      currentUser.lecturerPoints.push({
+        lecturer: isExistCode.lecturerId,
+        points: isExistCode.pointsAmount,
+      });
+    } else {
+      const lecturerPointsIndex = currentUser.lecturerPoints.findIndex(
+        (points) =>
+          points.lecturer.toString() === isExistCode.lecturerId._id.toString()
+      );
+      if (lecturerPointsIndex !== -1) {
+        currentUser.lecturerPoints[lecturerPointsIndex].points +=
+          isExistCode.pointsAmount;
+      } else {
+        currentUser.lecturerPoints.push({
+          lecturer: isExistCode.lecturerId,
+          points: isExistCode.pointsAmount,
+        });
+      }
+    }
+
     await currentUser.save({ session });
 
     await Code.findOneAndUpdate(
