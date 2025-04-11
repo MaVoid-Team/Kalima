@@ -24,6 +24,11 @@ const { Server } = require("socket.io");
 const Notification = require("./models/notification");
 const adminDashboardRouter = require("./routes/adminDashboardRoutes.js");
 const codeRouter = require("./routes/codeRoutes");
+const adminRouter = require("./routes/adminRoutes.js");
+const subAdminRouter = require("./routes/subAdminRoutes.js");
+const moderatorRouter = require("./routes/moderatorRoutes.js");
+const lecturerRouter = require("./routes/lecturerRoutes.js");
+const assistantRouter = require("./routes/assistantRoutes.js");
 
 connectDB();
 
@@ -47,6 +52,12 @@ app.use("/api/v1/centers", centerRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/dashboard", adminDashboardRouter);
 app.use("/api/v1/codes", codeRouter);
+app.use("/api/v1/admins", adminRouter);
+app.use("/api/v1/sub-admins", subAdminRouter);
+app.use("/api/v1/moderators", moderatorRouter);
+app.use("/api/v1/lecturers", lecturerRouter);
+app.use("/api/v1/assistants", assistantRouter);
+
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -84,6 +95,8 @@ mongoose.connection.once("open", () => {
             subjectId: notification.relatedId,
             notificationId: notification._id,
           });
+
+
 
           await Notification.findByIdAndUpdate(notification._id, {
             isSent: true,

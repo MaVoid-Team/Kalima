@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Container = require("../models/containerModel.js"); // Import the Container model
 
 // @route POST /auth/
 const login = catchAsync(async (req, res, next) => {
@@ -103,17 +104,90 @@ const logout = (req, res, next) => {
 };
 
 const verifyRoles = (...allowedRoles) => {
-  return (req, res, next) => {
-    const Role = req.user.role;
-    if (!req?.user.role) {
+  return async (req, res, next) => {
+    const Role = req.user.role?.toLowerCase();
+    if (!Role) {
       return next(new AppError("Unauthorized", 401));
     }
-    const rolesArray = [...allowedRoles];
-    if (!rolesArray.includes(req.user.role)) {
-      return next(new AppError(`Forbidden , you are a ${Role} you don't have access for this file`, 403));
+
+    const rolesArray = allowedRoles.map((role) => role.toLowerCase());
+    if (!rolesArray.includes(Role)) {
+      return next(new AppError(`Forbidden, you are a ${Role} and don't have access to this resource.`, 403));
     }
-    next();
+    next()
   };
-};
+}
+
+// Special handling for teachers
+// if (Role === "teacher") {
+//   const { containerId } = req.params;
+
+//   if (containerId) {
+//     // If containerId is provided, return only that container
+//     const container = await Container.findById(containerId)
+//     if (!container) {
+//       return next(new AppError("Container not found.", 404));
+//     }
+
+//     if (!container.teacherAllowed) {
+//       return res.status(200).json({
+//         status: "restricted",
+//         data: {
+//           id: container._id,
+//           name: container.name,
+//           owner: container.createdBy.name || container.createdBy._id,
+//           subject: container.subject.name || container.subject._id,
+//           type: container.type,
+//         },
+//       });
+//     }
+
+//     return res.status(200).json({
+//       status: "success",
+//       data: container,
+//     });
+//   }
+
+// If no containerId is provided, return all containers
+//   const containers = await Container.find()
+
+//   const filteredContainers = containers.map((container) => {
+//     if (!container.teacherAllowed) {
+//       return {
+//         id: container._id,
+//         name: container.name,
+//         owner: container.createdBy.name || container.createdBy._id,
+//         subject: container.subject.name || container.subject._id,
+//         type: container.type,
+//       };
+//     }
+//     return container;
+//   });
+
+//   return res.status(200).json({
+//     status: "success",
+//     data: filteredContainers,
+//   });
+// }
+
+// if (rolesArray.includes(Role)) {
+//   const { containerId } = req.params;
+
+//   if (containerId) {
+//     const container = await Container.findById(containerId)
+//     if (!container) {
+//       return next(new AppError("Container not found.", 404));
+//     }
+//     if (!containerId) {
+//       const containers = await Container.find();
+//       return res.status(200).json({
+//         status: "success",
+//         data: containers,
+//       });
+//     }
+//   }
+// } else {
+
+// }
 
 module.exports = { login, refresh, logout, verifyRoles };
