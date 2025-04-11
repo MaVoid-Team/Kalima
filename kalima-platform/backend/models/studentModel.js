@@ -32,8 +32,13 @@ const studentSchema = new mongoose.Schema(
     parent: { type: mongoose.Schema.Types.ObjectId, ref: "Parent" },
     // Array of lecturer-specific point balances
     lecturerPoints: [lecturerPointsSchema],
+  totalPoints: {
+    type: Number,
+    default:0
+  },,
   },
-  {
+  
+{
     timestamps: true,
   }
 );

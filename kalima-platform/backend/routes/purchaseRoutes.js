@@ -8,8 +8,15 @@ const authController = require("../controllers/authController");
 router.use(verifyJWT);
 
 // Purchase points for a specific lecturer
+/*
 router.post("/points", 
   authController.verifyRoles("Student", "Parent"),
+  purchaseController.purchaseLecturerPoints
+);*/
+
+// updated version
+router.post("/points", 
+  authController.verifyRoles("Student"),
   purchaseController.purchaseLecturerPoints
 );
 

@@ -239,7 +239,7 @@ export default function StudentRegistration() {
       const url = `${apiUrl}/api/v1/register`;
       const response = await axios.post(url, payload);
       console.log('Registration successful:', response.data);
-      navigate('/success');
+      navigate('/login', { state: { message: t('registrationSuccess') } });
     } catch (error) {
       console.error('Registration failed:', error.response?.data || error.message);
       // You might want to show an error message to the user here
