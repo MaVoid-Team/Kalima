@@ -27,5 +27,6 @@
   "settings": "Settings",
   "logout": "Logout",
   "dashboardTitle": "Control Panel",
-  "toggleSidebar": "Toggle Sidebar"
+  "toggleSidebar": "Toggle Sidebar",
+  "myPage": "My Page"
 }
