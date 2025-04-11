@@ -32,6 +32,7 @@ const PromoCodes = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
