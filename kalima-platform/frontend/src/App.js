@@ -8,6 +8,7 @@ import { LoadingSpinner } from "./components/LoadingSpinner"
 import { isMobile } from "./utils/isMobile"
 import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
 import UserSidebar from "./components/UserSidebar"
+import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
@@ -30,7 +31,7 @@ const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
-
+const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
@@ -78,6 +79,7 @@ function App() {
           <Route path="/audit-log" element={<AuditLog />} />
           <Route path="/lecturer-dashboard" element={<DashboardPage />} />
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
+          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>
       </Suspense>
 
