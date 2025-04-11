@@ -38,8 +38,9 @@ const NavBar = () => {
     { key: 'homepage', path: '/' },
     { key: 'educationalCourses', path: '/courses' },
     { key: 'teachers', path: '/teachers' },
-    { key: 'services', path: '/services' },
+    { key: 'lectures', path: '/lecture-page' },
     { key: 'contactUs', path: '/contact' },
+    { key: 'services', path: '/services' },
   ];
 
   const authItems = [
