@@ -24,6 +24,7 @@ const { Server } = require("socket.io");
 const Notification = require("./models/notification");
 const adminDashboardRouter = require("./routes/adminDashboardRoutes.js");
 const codeRouter = require("./routes/codeRoutes");
+const packegeRouter = require("./routes/packageRoutes.js");
 
 connectDB();
 
@@ -47,6 +48,7 @@ app.use("/api/v1/centers", centerRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/dashboard", adminDashboardRouter);
 app.use("/api/v1/codes", codeRouter);
+app.use("/api/v1/packages", packegeRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
