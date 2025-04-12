@@ -3,19 +3,19 @@
 import { useTranslation } from "react-i18next"
 import { useState, useEffect } from "react"
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom';
 import CourseGrid from "./CourseGrid"
 import InstructorsList from "./InstructorsList"
 import CourseCategories from "./CourseCategories"
 import FeaturedCourses from "./FeaturedCourses"
 import UserSidebar from "../../components/UserSidebar"
-
 export default function LecturerDashboard() {
   const { t, i18n } = useTranslation("dashboard")
   const isRTL = i18n.language === "ar"
   const [currentPage, setCurrentPage] = useState(1)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-
+  const navigate = useNavigate();
   // Check if mobile on mount and resize
   useEffect(() => {
     const checkIfMobile = () => {
@@ -58,7 +58,7 @@ export default function LecturerDashboard() {
               <Search className="absolute top-1/2 transform -translate-y-1/2 right-3 h-5 w-5 text-base-content/50" />
             </div>
 
-            <button className="btn btn-outline btn-primary gap-2">
+            <button onClick={() => navigate("./coursesDetails.jsx")} className="btn btn-outline btn-primary gap-2">
               <Plus className="h-5 w-5" />
               <span>{t("add_new_course")}</span>
             </button>
