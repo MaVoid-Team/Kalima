@@ -133,11 +133,12 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
     session.endSession();
   }
 });
+
 exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { name, type, price, level, subject, parent, createdBy } = req.body;
+    const { name, type, price, level, teacherAllowed, subject, parent, createdBy } = req.body;
     await checkDoc(Level, level, session);
     await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
@@ -149,6 +150,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
           type,
           price: price || 0,
           level,
+          teacherAllowed,
           subject,
           parent,
           createdBy: createdBy || req.user._id,
@@ -184,33 +186,88 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 });
 
 exports.getContainerById = catchAsync(async (req, res, next) => {
-  const container = await Container.findById(req.params.containerId).populate([
+  const Role = req.user.role?.toLowerCase();
+  const { containerId } = req.params;
+
+  // Check if containerId is provided
+  if (!containerId) {
+    return next(new AppError("Container ID is required.", 400));
+  }
+
+  // Fetch the container
+  const container = await Container.findById(containerId).populate([
     { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
   ]);
-  if (!container) return next(new AppError("Container not found", 404));
-  res.status(201).json({
+
+  if (!container) {
+    return next(new AppError("Container not found.", 404));
+  }
+
+  // Role-specific logic
+  if (Role === "teacher") {
+    if (!container.teacherAllowed) {
+      return res.status(200).json({
+        status: "restricted",
+        data: {
+          id: container._id,
+          name: container.name,
+          owner: container.createdBy.name || container.createdBy._id,
+          subject: container.subject.name || container.subject._id,
+          type: container.type,
+        },
+      });
+    }
+  }
+
+  // Default response for all roles
+  return res.status(200).json({
     status: "success",
-    data: {
-      container,
-    },
+    data: container,
   });
 });
 
 exports.getAllContainers = catchAsync(async (req, res, next) => {
-  let query = Container.find().populate([
+  const Role = req.user.role?.toLowerCase();
+
+  // Fetch all containers
+  const containers = await Container.find().populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
   ]);
-  const features = new QueryFeatures(query, req.query)
-    .filter()
-    .sort()
-    .paginate();
 
-  const containers = await features.query.lean();
-  if (!containers) return next(new AppError("Container not found", 404));
-  res.status(200).json({
+  if (!containers || containers.length === 0) {
+    return next(new AppError("No containers found.", 404));
+  }
+
+  // Role-specific logic
+  if (Role === "teacher") {
+    // Filter containers based on `teacherAllowed` property
+    const filteredContainers = containers.map((container) => {
+      if (!container.teacherAllowed) {
+        return {
+          id: container._id,
+          name: container.name,
+          owner: container.createdBy.name || container.createdBy._id,
+          subject: container.subject.name || container.subject._id,
+          type: container.type,
+        };
+      }
+      return container;
+    });
+
+    return res.status(200).json({
+      status: "success",
+      results: filteredContainers.length,
+      data: {
+        containers: filteredContainers,
+      },
+    });
+  }
+
+  // Default response for all roles
+  return res.status(200).json({
     status: "success",
     results: containers.length,
     data: {
@@ -400,7 +457,7 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
 });
 
 // get the total revenue for a container by Id
-exports.getContainerRevenue = catchAsync(async (req , res , next) => {
+exports.getContainerRevenue = catchAsync(async (req, res, next) => {
 
   const { containerId } = req.params;
   const container = await Container.findById(containerId);

@@ -173,7 +173,8 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
   const container = await query
     .populate({ path: "subject", select: "name" })
     .populate({ path: "level", select: "name" })
-    .populate({ path: "createdBy", select: "name" });
+    .populate({ path: "createdBy", select: "name" })
+    .populate({ path: "children", select: "name" });
   if (!container.length)
     return next(new AppError("Couldn't find containers.", 404));
   res.status(200).json({
