@@ -17,7 +17,7 @@ const purchaseSchema = new mongoose.Schema({
   points: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   // If this is a container purchase, reference it
   container: {
@@ -25,21 +25,31 @@ const purchaseSchema = new mongoose.Schema({
     ref: "Container",
     required: false,
   },
+  code: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Code",
+    required: false,
+  },
+  package: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+    required: false,
+  },
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,
-    enum: ["pointPurchase", "containerPurchase"],
-    required: true
+    enum: ["pointPurchase", "containerPurchase", "packagePurchase"],
+    required: true,
   },
   // Additional details
   description: {
     type: String,
-    default: "Purchase"
+    default: "Purchase",
   },
   // When the purchase was made
-  purchasedAt: { 
-    type: Date, 
-    default: Date.now 
+  purchasedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
