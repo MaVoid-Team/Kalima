@@ -171,44 +171,41 @@ export function CourseManagementSection() {
   };
 
   return (
-    <section className="p-6 md:p-8 bg-base-100" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="container mx-auto px-4">
+    <section className="p-4 md:p-8 bg-base-100" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="container mx-auto px-2 sm:px-4">
         {/* Header matching your image exactly */}
         <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col items-center gap-6 mb-8"
-      >
-        {/* Button row - positioned left in RTL, right in LTR */}
-        <div 
-          className={`w-full flex ${isRTL ? 'justify-start' : 'justify-end'}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center gap-4 md:gap-6 mb-6 md:mb-8"
         >
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`flex items-center gap-2 text-primary px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-all border border-primary ${
-              isRTL ? 'mr-auto' : 'ml-auto'
-            }`}
-          >
-            <Plus className="w-5 h-5" />
-            <span>{isRTL ? "إنشاء كورس جديد" : "Create New Course"}</span>
-          </motion.button>
-        </div>
-      
-        {/* Centered title section */}
-        <div className="text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-primary">
-            {isRTL ? "إدارة الكورسات" : "Course Management"}
-          </h1>
+          {/* Button row - positioned left in RTL, right in LTR */}
+          <div className={`w-full flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${
+                isRTL ? 'mr-auto' : 'ml-auto'
+              }`}
+            >
+              <Plus className="w-4 h-4 md:w-5 md:h-5" />
+              <span>{isRTL ? "إنشاء كورس جديد" : "Create New Course"}</span>
+            </motion.button>
+          </div>
         
-        </div>
-      </motion.div>
+          {/* Centered title section */}
+          <div className="text-center">
+            <h1 className="text-xl md:text-3xl font-bold text-primary">
+              {isRTL ? "إدارة الكورسات" : "Course Management"}
+            </h1>
+          </div>
+        </motion.div>
 
         {/* Loading state */}
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <Loader className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex justify-center items-center h-48 md:h-64">
+            <Loader className="h-6 w-6 md:h-8 md:w-8 animate-spin text-primary" />
             <span className={isRTL ? "mr-2" : "ml-2"}>
               {isRTL ? "جاري تحميل البيانات..." : "Loading data..."}
             </span>
@@ -222,8 +219,8 @@ export function CourseManagementSection() {
           </div>
         ) : (
           <>
-            {/* 3x3 Grid matching your image exactly */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Responsive Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               <AnimatePresence>
                 {courses.slice(0, 9).map((course) => (
                   <motion.div
@@ -271,8 +268,10 @@ export function ReviewCoursesSection() {
   const isRTL = i18n.language === "ar";
   const [favorites, setFavorites] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const coursesPerPage = 6; // 2 rows x 3 columns
+  const [coursesPerPage, setCoursesPerPage] = useState(6); // Default to desktop view
 
+  // Review courses data (same as before)
+ 
   // Review courses data
   const allCourses = [
     {
@@ -473,13 +472,28 @@ export function ReviewCoursesSection() {
     }
   ];
 
+
+  // Handle responsive layout
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) { // Mobile
+        setCoursesPerPage(1);
+      } else if (window.innerWidth < 1024) { // Tablet
+        setCoursesPerPage(2);
+      } else { // Desktop
+        setCoursesPerPage(6);
+      }
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Pagination logic
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = allCourses.slice(
-    indexOfFirstCourse,
-    indexOfLastCourse
-  );
+  const currentCourses = allCourses.slice(indexOfFirstCourse, indexOfLastCourse);
   const totalPages = Math.ceil(allCourses.length / coursesPerPage);
 
   const toggleFavorite = (courseId) => {
@@ -496,21 +510,21 @@ export function ReviewCoursesSection() {
 
   return (
     <section
-      className="relative py-12 md:py-16 lg:py-20 bg-base-100"
+      className="relative py-8 md:py-16 bg-base-100"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-3 md:gap-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            <h2 className="text-xl md:text-3xl font-bold text-base-content mb-1 md:mb-2">
               {isRTL ? "كورسـات المراجعة" : "Review Courses"}
             </h2>
-            <p className="text-base-content/70 text-lg">
+            <p className="text-base-content/70 text-sm md:text-lg">
               {isRTL
                 ? "اكتشف أهم كورسات المراجعة النهائية"
                 : "Discover top final review courses"}
@@ -520,15 +534,20 @@ export function ReviewCoursesSection() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2  text-primary px-4 py-2 rounded-r-full  rounded-l-full shadow-sm hover:shadow-md transition-all border border-primary"
+            className="flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4 md:w-5 md:h-5" />
             <span>{isRTL ? "أضف كورس" : "Add Course"}</span>
           </motion.button>
         </div>
 
-        {/* Courses Grid - 2x3 layout */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {/* Responsive Courses Grid */}
+        <div className={`
+          grid gap-4 md:gap-6 mb-8 md:mb-12
+          ${coursesPerPage === 1 ? 'grid-cols-1' : ''}
+          ${coursesPerPage === 2 ? 'grid-cols-1 sm:grid-cols-2' : ''}
+          ${coursesPerPage === 6 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : ''}
+        `}>
           {currentCourses.map((course) => (
             <motion.div
               key={course.id}
@@ -539,7 +558,7 @@ export function ReviewCoursesSection() {
               className="bg-base-100 rounded-xl shadow-sm hover:shadow-md overflow-hidden border border-base-200/50 hover:border-primary/20 transition-all duration-300"
             >
               {/* Course Image */}
-              <div className="relative h-48 w-full">
+              <div className="relative h-40 sm:h-48 w-full">
                 <img
                   src={course.image}
                   alt={isRTL ? course.title.ar : course.title.en}
@@ -548,19 +567,19 @@ export function ReviewCoursesSection() {
                 />
 
                 {/* Subject Tag */}
-                <div className="absolute top-4 left-4 bg-base-content text-base-100 text-sm px-3 py-1 rounded-full">
+                <div className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-base-content text-base-100 text-xs sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                   {isRTL ? course.subject.ar : course.subject.en}
                 </div>
 
                 {/* Favorite Button */}
                 <motion.button
                   onClick={() => toggleFavorite(course.id)}
-                  className="absolute top-4 right-4 bg-base-100/80 p-2 rounded-full shadow-sm hover:bg-error/20 hover:text-error transition-colors"
+                  className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-base-100/80 p-1 sm:p-2 rounded-full shadow-sm hover:bg-error/20 hover:text-error transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   <Heart
-                    className="w-5 h-5"
+                    className="w-4 h-4 sm:w-5 sm:h-5"
                     fill={
                       favorites.includes(course.id) ? "currentColor" : "none"
                     }
@@ -569,22 +588,22 @@ export function ReviewCoursesSection() {
               </div>
 
               {/* Course Content */}
-              <div className="p-4">
-                <p className="text-base-content/70 text-sm mb-1">
+              <div className="p-3 sm:p-4">
+                <p className="text-base-content/70 text-xs sm:text-sm mb-1">
                   {isRTL ? course.instructor.ar : course.instructor.en}
                 </p>
-                <h3 className="font-bold text-base-content mb-3 text-lg">
+                <h3 className="font-bold text-base-content mb-2 sm:mb-3 text-base sm:text-lg">
                   {isRTL ? course.title.ar : course.title.en}
                 </h3>
 
                 {/* Course Info */}
-                <div className="flex items-center gap-4 text-sm text-base-content/70 mb-4">
+                <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-base-content/70 mb-3 sm:mb-4">
                   <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>{course.duration[isRTL ? "ar" : "en"]}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>
                       {course.students} {isRTL ? "طالب" : "Students"}
                     </span>
@@ -594,11 +613,11 @@ export function ReviewCoursesSection() {
                 {/* Pricing */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="line-through text-base-content/50 text-sm mr-2">
+                    <span className="line-through text-base-content/50 text-xs sm:text-sm mr-1 sm:mr-2">
                       {course.originalPrice[isRTL ? "ar" : "en"]}
                     </span>
                     {course.isFree && (
-                      <span className="text-primary font-medium">
+                      <span className="text-primary font-medium text-xs sm:text-sm">
                         {isRTL
                           ? "المراجعة مجاناً مع الكورس"
                           : "Free with course"}
@@ -607,7 +626,7 @@ export function ReviewCoursesSection() {
                   </div>
                   <a
                     href="#"
-                    className="text-primary hover:text-primary/80 text-sm"
+                    className="text-primary hover:text-primary/80 text-xs sm:text-sm"
                   >
                     {isRTL ? "عرض المزيد" : "View More"}
                   </a>
@@ -618,22 +637,22 @@ export function ReviewCoursesSection() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center items-center gap-2">
+        <div className="flex justify-center items-center gap-1 sm:gap-2">
           <motion.button
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-50"
+            className="p-1 sm:p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-50"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <ChevronLeft className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`} />
+            <ChevronLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${isRTL ? "rotate-180" : ""}`} />
           </motion.button>
 
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <motion.button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`w-10 h-10 rounded-full font-medium transition-colors ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full font-medium text-sm sm:text-base transition-colors ${
                 currentPage === page
                   ? "bg-primary text-white"
                   : "hover:bg-base-200"
@@ -650,17 +669,18 @@ export function ReviewCoursesSection() {
               handlePageChange(Math.min(totalPages, currentPage + 1))
             }
             disabled={currentPage === totalPages}
-            className="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-50"
+            className="p-1 sm:p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-50"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <ChevronRight className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`} />
+            <ChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 ${isRTL ? "rotate-180" : ""}`} />
           </motion.button>
         </div>
       </div>
     </section>
   );
 }
+
 function CourseSection() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -731,25 +751,25 @@ function CourseSection() {
 
   return (
     <section
-      className="relative py-12 md:py-16 lg:py-20 bg-base-100"
+      className="relative py-8 md:py-16 bg-base-100"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
         {/* Section Header - Matches the reference image style */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-12 md:mb-16"
+          className="mb-8 md:mb-12"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-base-content mb-2">
+          <h2 className="text-xl md:text-3xl font-bold text-base-content mb-1 md:mb-2">
             {isRTL ? "أهم الكورسات" : "Featured Courses"}
           </h2>
-          <div className="flex items-center  gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-primary" />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+              <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
-            <p className="text-base-content/70 text-lg md:text-xl">
+            <p className="text-base-content/70 text-sm md:text-lg">
               {isRTL
                 ? "استكشف كورساتنا الشائعة"
                 : "Explore our popular courses"}
@@ -758,7 +778,7 @@ function CourseSection() {
         </motion.div>
 
         {/* Courses Grid with enhanced animations */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-6">
           {categories.map((category, index) => (
             <motion.div
               key={category.id}
@@ -771,14 +791,14 @@ function CourseSection() {
                 stiffness: 100,
               }}
               whileHover={{
-                y: -8,
-                boxShadow: "0 10px 20px -5px rgba(0, 0, 0, 0.1)",
+                y: -5,
+                boxShadow: "0 5px 15px -5px rgba(0, 0, 0, 0.1)",
               }}
-              className="bg-base-100 rounded-xl shadow-sm hover:shadow-md p-4 text-center transition-all duration-300 border border-base-200/50 hover:border-primary/20"
+              className="bg-base-100 rounded-xl shadow-sm hover:shadow-md p-3 text-center transition-all duration-300 border border-base-200/50 hover:border-primary/20"
             >
               <motion.div
                 whileHover={{ scale: 1.1 }}
-                className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/5 flex items-center justify-center p-2"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 md:mb-4 rounded-full bg-primary/5 flex items-center justify-center p-1 sm:p-2"
               >
                 <img
                   src={category.icon}
@@ -787,10 +807,10 @@ function CourseSection() {
                   loading="lazy"
                 />
               </motion.div>
-              <h3 className="font-bold text-base-content mb-1 text-lg">
+              <h3 className="font-bold text-base-content mb-1 text-sm sm:text-base md:text-lg">
                 {isRTL ? category.name.ar : category.name.en}
               </h3>
-              <p className="text-sm text-base-content/70">
+              <p className="text-xs sm:text-sm text-base-content/70">
                 {category.count} {isRTL ? "كورس" : "Courses"}
               </p>
             </motion.div>
@@ -877,7 +897,7 @@ export function AssistantsSection() {
 
   return (
     <section
-      className="relative py-12 md:py-16 lg:py-20 bg-base-100"
+      className="relative py-8 md:py-16 bg-base-100"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Background pattern similar to TeachersSection */}
@@ -889,37 +909,37 @@ export function AssistantsSection() {
         />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6"
+          className="flex flex-col md:flex-row justify-between items-center mb-8 md:mb-12 gap-4 md:gap-6"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
-              <Users className="w-6 h-6 text-primary dark:text-primary-400" />
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center">
+              <Users className="w-5 h-5 md:w-6 md:h-6 text-primary dark:text-primary-400" />
             </div>
-            <h2 className="text-lg sm:text-lg md:text-xl font-bold text-primary hover:text-primary-600">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-primary hover:text-primary-600">
               {isRTL ? "نخبه من المساعدين" : "Elite Assistants"}
-              <span className="block h-1 w-16 mt-2 bg-primary dark:bg-primary-400 rounded-full"></span>
+              <span className="block h-1 w-12 md:w-16 mt-1 md:mt-2 bg-primary dark:bg-primary-400 rounded-full"></span>
             </h2>
           </div>
 
           <Link
             to="/assistants"
-            className="flex items-center text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 font-medium text-sm sm:text-base transition-colors duration-300"
+            className="flex items-center text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 font-medium text-xs sm:text-sm md:text-base transition-colors duration-300"
           >
             {isRTL ? "مشاهده الجميع" : "View All"}
             <ChevronLeft
-              className={`h-4 w-4 ${isRTL ? "mr-2" : "ml-2 rotate-180"}`}
+              className={`h-3 w-3 sm:h-4 sm:w-4 ${isRTL ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2 rotate-180"}`}
             />
           </Link>
         </motion.div>
 
         {/* Assistants Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           <AnimatePresence>
             {assistants.map((assistant, index) => (
               <motion.div
@@ -929,12 +949,12 @@ export function AssistantsSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{
                   y: -5,
-                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  boxShadow: "0 5px 15px -5px rgba(0, 0, 0, 0.1)",
                 }}
-                className="bg-base-100 rounded-xl shadow-lg hover:shadow-lg transition-all duration-300 relative mt-24"
+                className="bg-base-100 rounded-xl shadow-lg hover:shadow-lg transition-all duration-300 relative mt-16 sm:mt-20 md:mt-24"
               >
                 {/* Assistant Image container - positioned half outside the card */}
-                <div className="absolute -top-24 left-1/2 transform -translate-x-1/2 w-48 h-48">
+                <div className="absolute -top-12 sm:-top-16 md:-top-20 left-1/2 transform -translate-x-1/2 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40">
                   <div className="w-full h-full p-1 shadow-lg overflow-hidden">
                     <img
                       src={assistant.image}
@@ -946,14 +966,14 @@ export function AssistantsSection() {
                 </div>
 
                 {/* Content container - pushed down to make space for the image */}
-                <div className="pt-24 pb-6 px-6 flex flex-col items-center text-center">
+                <div className="pt-16 sm:pt-20 md:pt-24 pb-4 sm:pb-6 px-4 sm:px-6 flex flex-col items-center text-center">
                   {/* Assistant Name */}
-                  <h3 className="text-lg sm:text-xl font-bold text-base-content">
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-base-content">
                     {isRTL ? assistant.name.ar : assistant.name.en}
                   </h3>
 
                   {/* Assistant Description */}
-                  <p className="text-base-content text-sm sm:text-base mb-4">
+                  <p className="text-base-content text-xs sm:text-sm md:text-base mb-2 sm:mb-4">
                     {isRTL
                       ? assistant.description.ar
                       : assistant.description.en}
@@ -967,9 +987,10 @@ export function AssistantsSection() {
     </section>
   );
 }
+
 function CoursesDashboard() {
   return (
-    <div className="w-full overflow-x-hidden p-14">
+    <div className="w-full overflow-x-hidden p-4 sm:p-8 md:p-14">
       <CourseManagementSection />
       <AssistantsSection />
       <CourseSection />
