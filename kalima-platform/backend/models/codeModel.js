@@ -11,6 +11,11 @@ const codeSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
+  lecturerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Lecturer",
+    required: true,
+  },
   isRedeemed: {
     type: Boolean,
     default: false,

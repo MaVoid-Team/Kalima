@@ -29,6 +29,7 @@ const subAdminRouter = require("./routes/subAdminRoutes.js");
 const moderatorRouter = require("./routes/moderatorRoutes.js");
 const lecturerRouter = require("./routes/lecturerRoutes.js");
 const assistantRouter = require("./routes/assistantRoutes.js");
+const packegeRouter = require("./routes/packageRoutes.js");
 
 connectDB();
 
@@ -58,6 +59,7 @@ app.use("/api/v1/moderators", moderatorRouter);
 app.use("/api/v1/lecturers", lecturerRouter);
 app.use("/api/v1/assistants", assistantRouter);
 
+app.use("/api/v1/packages", packegeRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
