@@ -14,7 +14,7 @@ import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
 const Home = lazy(() => import("./pages/Home/Home"))
 const AuditLog = lazy(() => import("./pages/Admin dashboard/auditLog"))
 const AdminDashboard = lazy(() => import("./pages/Admin dashboard/adminDashboard"))
-const CourseDetails = lazy(() => import("./pages/CourseDetails"))
+const CourseDetailsId = lazy(() => import("./pages/CourseDetails"))
 // const About = lazy(() => import('./pages/About'));
 const CivilcoLanding = lazy(() => import("./pages/landing"))
 const LoginStudent = lazy(() => import("./pages/Login/login-student"))
@@ -31,6 +31,7 @@ const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
+const CourseDetails = lazy(() => import("./pages/Lecturer Dashboard/coursesDetails"))
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 function App() {
   const location = useLocation()
@@ -65,7 +66,7 @@ function App() {
           <Route path="/login-student" element={<LoginStudent />} />
           <Route path="/landing" element={<CivilcoLanding />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/course-details/:containerId" element={<CourseDetails />} />
+          <Route path="/course-details/:containerId" element={<CourseDetailsId />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/services" element={<Services />} />
           <Route path="/login-teacher" element={<TeacherLogin />} />
@@ -79,7 +80,8 @@ function App() {
           <Route path="/audit-log" element={<AuditLog />} />
           <Route path="/lecturer-dashboard" element={<DashboardPage />} />
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
-          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
+          <Route path="/course-details" element={<CourseDetails />} />
+          
         </Routes>
       </Suspense>
 
