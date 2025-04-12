@@ -23,7 +23,10 @@ const containerSchema = new mongoose.Schema(
       ref: "Lecturer",
       required: true,
     },
-
+    teacherAllowed: {
+      type: Boolean,
+      required: true,
+    },
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Container",
