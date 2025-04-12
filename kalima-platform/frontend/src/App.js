@@ -32,6 +32,7 @@ const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
+const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
@@ -78,6 +79,7 @@ function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/audit-log" element={<AuditLog />} />
           <Route path="/lecturer-dashboard" element={<DashboardPage />} />
+          <Route path="/coursesdashboard" element={<CoursesDashboard />} />
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
           <Route path="dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>
