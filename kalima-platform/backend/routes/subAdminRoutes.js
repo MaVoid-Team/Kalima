@@ -1,9 +1,12 @@
 const express = require("express");
 const subAdminController = require("../controllers/subAdminController");
 const authController = require("../controllers/authController");
+const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
-//authController.verifyRoles("Admin"),
+
+router.use(verifyJWT, authController.verifyRoles("admin"));
+
 router
     .route("/")
     .post(subAdminController.createSubAdmin)
