@@ -7,7 +7,7 @@ const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000"
 // Function to get all containers
 export const getAllContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers`, {
+    const response = await axios.get(`${API_URL}/containers`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -24,7 +24,7 @@ export const getAllContainers = async () => {
 // Function to get a container by ID
 export const getContainerById = async (containerId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/${containerId}`, {
+    const response = await axios.get(`${API_URL}/containers/${containerId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -44,7 +44,7 @@ export const getAllLectures = async () => {
       throw new Error("User not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/lectures`, {
+    const response = await axios.get(`${API_URL}/lectures`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -99,7 +99,7 @@ export const getLecturesByContainerId = async (containerId) => {
 // Function to get a lecture by ID
 export const getLectureById = async (lectureId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/lectures/${lectureId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
