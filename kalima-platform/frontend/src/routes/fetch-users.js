@@ -29,7 +29,7 @@ export const getAllUsers = async () => {
 
 export const getUserById = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/${userId}`, {
+    const response = await axios.get(`${API_URL}/users/${userId}`, {
       headers: getAuthHeader(),
     })
 
