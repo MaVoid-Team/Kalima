@@ -6,6 +6,11 @@ const codeSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  type: {
+    type: String,
+    enum: ["general", "specific"],
+    required: true,
+  },
   pointsAmount: {
     type: Number,
     required: true,
@@ -14,7 +19,12 @@ const codeSchema = new mongoose.Schema({
   lecturerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Lecturer",
-    required: true,
+    required: [
+      function () {
+        return this.type === "specific";
+      },
+      "Lecturer ID is required for specific codes",
+    ],
   },
   isRedeemed: {
     type: Boolean,

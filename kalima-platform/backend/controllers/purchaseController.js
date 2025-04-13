@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Purchase = require("../models/purchaseModel");
 const Container = require("../models/containerModel");
 const Student = require("../models/studentModel");
@@ -7,9 +8,8 @@ const Teacher = require("../models/teacherModel");
 const Lecturer = require("../models/lecturerModel"); // Add this import
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const mongoose = require("mongoose");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
-
+const Package = require("../models/packageModel");
 // updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
@@ -602,4 +602,104 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     status: "success",
     data: null,
   });
+});
+
+//purchase package with general points
+exports.purchasePackageWithPoints = catchAsync(async (req, res, next) => {
+  const { packageId } = req.body;
+
+  if (!packageId) {
+    return next(new AppError("Package ID is required", 400));
+  }
+
+  // Start a session and transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Find the package within the session and rename variable to packageDoc
+    const packageDoc = await Package.findById(packageId).session(session);
+    if (!packageDoc) {
+      await session.abortTransaction();
+      return next(new AppError("Package not found", 404));
+    }
+
+    // Determine the appropriate user model based on role
+    let Model =
+      req.user.role === "Student"
+        ? Student
+        : req.user.role === "Parent"
+        ? Parent
+        : null;
+
+    if (!Model) {
+      await session.abortTransaction();
+      return next(new AppError("User role not found", 400));
+    }
+
+    // Find the user using the correct model
+    const user = await Model.findById(req.user._id).session(session);
+    console.log("welcome", user.name);
+    if (!user) {
+      await session.abortTransaction();
+      return next(new AppError(`User not found with ID: ${req.user._id}`, 404));
+    }
+
+    // Check if the user has enough points
+    const currentPoints = user.generalPoints || 0;
+    const packagePrice = packageDoc.price || 0;
+
+    if (currentPoints < packagePrice) {
+      await session.abortTransaction();
+      return next(
+        new AppError(
+          `No enough points. Required: ${packagePrice}, Available: ${currentPoints}`,
+          400
+        )
+      );
+    }
+
+    // Deduct points
+    user.generalPoints -= packagePrice;
+    await user.save({ session });
+
+    // Create purchase record using packageDoc and passing required fields correctly
+    const purchaseDocs = await Purchase.create(
+      [
+        {
+          student: user._id,
+          package: packageDoc._id,
+          points: packagePrice,
+          type: "packagePurchase",
+          description: `Purchased package ${packageDoc.name} for ${packagePrice} points`,
+        },
+      ],
+      { session }
+    );
+    if (!purchaseDocs[0]) {
+      await session.abortTransaction();
+      return next(new AppError("Failed to create purchase record", 500));
+    }
+    //Add lecturer-specific points from package to the student’s account.
+    if (packageDoc.points && packageDoc.points.length > 0) {
+      packageDoc.points.forEach((lp) => {
+        // Use the helper method defined in Student model
+        user.addLecturerPoints(lp.lecturer, lp.points);
+      });
+      await user.save({ session });
+    }
+    await session.commitTransaction();
+    res.status(201).json({
+      status: "success",
+      data: {
+        purchase: purchaseDocs[0],
+        remainingPoints: user.generalPoints,
+      },
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    return next(new AppError(error.message, 500));
+  } finally {
+    await session.endSession();
+  }
 });
