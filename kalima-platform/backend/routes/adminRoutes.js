@@ -1,11 +1,12 @@
 const express = require("express");
 const adminController = require("../controllers/adminController");
 const authController = require("../controllers/authController");
+const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
 // Protect all routes and restrict access to Admin role
-//router.use(authController.verifyJWT, authController.verifyRoles("admin"));
+router.use(verifyJWT, authController.verifyRoles("admin"));
 
 
 router
