@@ -19,8 +19,9 @@ const corsOptions = {
       callback(err);
     }
   },
+
   credentials: true,
-  optionsSuccessStatus: 200,
+  optionSuccessStatus: 200,
 };
 
 module.exports = corsOptions;

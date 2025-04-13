@@ -1,17 +1,19 @@
 "use client"
 
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, Loader } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useCallback } from "react"
 import { Link } from "react-router-dom"
-import { CourseCard } from "../../components/CourseCard" // Import the CourseCard component
-import { getAllSubjects } from "../../routes/courses" // Import the API function
+import { CourseCard } from "../../components/CourseCard"
+import { getAllSubjects } from "../../routes/courses"
 
 export function CoursesSection() {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === 'ar';
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-
+  const [error, setError] = useState()
   // Fake data for courses
   const fakeCourses = [
     {
@@ -82,18 +84,16 @@ export function CoursesSection() {
           }),
         )
       } else {
-        // If no data is available, use fake data
         setCourses(fakeCourses)
       }
     } catch (err) {
       console.error("Error fetching courses:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
-      // If there's an error, use fake data
+      setError(t('courses.errors.failed'))
       setCourses(fakeCourses)
     } finally {
       setLoading(false)
     }
-  }, []) // No dependencies, so it won't recreate on re-renders
+    }, [t]) // No dependencies, so it won't recreate on re-renders
 
   useEffect(() => {
     fetchCourses() // Fetch data on component mount
@@ -105,27 +105,36 @@ export function CoursesSection() {
   }
 
   return (
-    <section className="md:p-8">
+    <section className="md:p-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4">
-        <h2 className="text-center text-2xl font-bold mb-2">كورساتنا</h2>
+        <h2 className="text-center text-2xl font-bold mb-2">
+          {t('courses.title')}
+        </h2>
         <h3 className="text-center text-3xl font-bold mb-12">
-          شوف كل الكورسات <span className="text-primary border-b-2 border-primary pb-1">بتاعتنا</span>
+          {t('courses.heading')} 
+            <span className="text-primary border-b-2 border-primary pb-1">
+              {t('courses.platform')}
+            </span>
+          
         </h3>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex justify-center items-center h-64" >
             <Loader className="h-8 w-8 animate-spin text-primary" />
+            <span className={isRTL ? 'mr-2' : 'ml-2'}>
+              {t('courses.errors.loading')}
+            </span>
           </div>
         ) : error ? (
-          <div className="alert alert-error max-w-md mx-auto">
+          <div className="alert alert-error max-w-md mx-auto" >
             <p>{error}</p>
             <button className="btn btn-sm btn-outline" onClick={fetchCourses}>
-              إعادة المحاولة
+              {t('courses.errors.retry')}
             </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" >
               <AnimatePresence>
                 {courses.map((course) => (
                   <motion.div
@@ -141,11 +150,11 @@ export function CoursesSection() {
                         image={course.image}
                         teacherName={course.teacher}
                         subject={course.subject}
-                        subjectId={course.id} // Using course.id as subjectId for now
+                        subjectId={course.id}
                         level={course.grade}
                         duration={course.duration}
                         rating={course.rating}
-                        fetchSubjectDetails={fetchSubjectDetails} // Pass the mock function
+                        fetchSubjectDetails={fetchSubjectDetails}
                       />
                     </Link>
                   </motion.div>
@@ -154,24 +163,19 @@ export function CoursesSection() {
             </div>
 
             <div className="flex justify-center mt-8">
-              <Link href="/courses" passHref>
+              <Link to="/courses">
                 <button className="btn btn-primary rounded-full">
-                  عرض الكورسات
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  {t('courses.viewAll')}
+                  <ChevronLeft className={`h-4 w-4 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`} />
                 </button>
               </Link>
             </div>
           </>
         )}
       </div>
-      {/* Curved arrow */}
-      <div className="relative h-24 w-24 ml-auto mt-4 animate-pulse">
-        <svg viewBox="0 0 100 100" className="text-primary">
-          <path d="M10,30 Q50,90 90,50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <polygon points="85,55 95,50 85,45" fill="currentColor" />
-        </svg>
-      </div>
     </section>
   )
 }
+
+
 

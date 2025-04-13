@@ -14,9 +14,15 @@ router.get(
 );
 
 // Get containers for a specific teacher
+// router.get(
+//   "/teacher/:teacherId",
+//   containerController.getTeacherContainers
+// );
+
+// Get containers for a specific lecturer
 router.get(
-  "/teacher/:teacherId",
-  containerController.getTeacherContainers
+  "/lecturer/:lecturerId",
+  containerController.getLecturerContainers
 );
 
 // Create and get containers
@@ -25,24 +31,25 @@ router
   .get(
     authController.verifyRoles(
       "Admin",
-      "Sub-Admin",
+      "SubAdmin",
       "Moderator",
       "Lecturer",
       "Assistant",
       "Student",
-      "Parent"
+      "Parent",
+      "teacher"
     ),
     containerController.getAllContainers
   )
   .post(
-    authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
     containerController.createContainer
   );
 
 // Update a child container's parent
 router.patch(
   "/update-child",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturers"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
   containerController.UpdateChildOfContainer
 );
 
@@ -52,19 +59,20 @@ router
   .get(
     authController.verifyRoles(
       "Admin",
-      "Sub-Admin",
+      "SubAdmin",
       "Moderator",
       "Lecturer",
       "Assistant",
       "Student",
-      "Parent"
+      "Parent",
+      "teacher"
     ),
     containerController.getContainerById
   )
   .patch(
     authController.verifyRoles(
       "Admin",
-      "Sub-Admin",
+      "SubAdmin",
       "Moderator",
       "Lecturer",
       "Assistant"
@@ -74,11 +82,28 @@ router
   .delete(
     authController.verifyRoles(
       "Admin",
-      "Sub-Admin",
+      "SubAdmin",
       "Moderator",
       "Lecturer"
     ),
     containerController.deleteContainerAndChildren
   );
+
+// Get revenue for a specific container by Id
+router
+  .get(
+    "/:containerId/revenue",
+    authController.verifyRoles(
+      "Admin",
+      "Sub-Admin",
+      "Moderator",
+      "Lecturer",
+      "Assistant",
+      "Student",
+      "Parent"
+    ),
+    containerController.getContainerRevenue
+  );
+
 
 module.exports = router;

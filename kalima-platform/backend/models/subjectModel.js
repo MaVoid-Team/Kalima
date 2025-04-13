@@ -19,4 +19,9 @@ const subjectSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+subjectSchema.pre("save", function (next) {
+  this.level = [...new Set(this.level.map(String))];
+  next();
+});
 module.exports = mongoose.model("Subject", subjectSchema);
