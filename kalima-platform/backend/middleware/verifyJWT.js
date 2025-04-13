@@ -39,16 +39,16 @@ const verifyJWT = async (req, res, next) => {
       )
     );
   }
-
+//logging the logged in user's information
   req.user = currentUser;
-  console.log("Authenticated User:", {
-    id: req.user._id.toString(), // 67e4b08442290f1d7b5eaeb8
-    _id: req.user._id, // new ObjectId('67e4b08442290f1d7b5eaeb8')
-    role: req.user.role, // Student
-    email: req.user.email, // abmawogud@example.com
-  });
+  // console.log("Authenticated User:", {
+  //   id: req.user._id.toString(), // 67e4b08442290f1d7b5eaeb8
+  //   _id: req.user._id, // new ObjectId('67e4b08442290f1d7b5eaeb8')
+  //   role: req.user.role, // Student
+  //   email: req.user.email, // abmawogud@example.com
+  // });
 
-  console.log("req.user", req.user);
+  // console.log("req.user", req.user);
   /**
   req.user {
   _id: new ObjectId('67e4b08442290f1d7b5eaeb8'),

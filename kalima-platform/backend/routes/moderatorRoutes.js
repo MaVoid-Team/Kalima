@@ -1,11 +1,12 @@
 const express = require("express");
 const moderatorController = require("../controllers/moderatorController");
+const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-//router.use(authController.verifyJWT);
-//authController.verifyRoles("Admin", "SubAdmin")
+router.use(verifyJWT,authController.verifyRoles("Admin", "SubAdmin"));
+
 router
     .route("/")
     .post(moderatorController.createModerator)
