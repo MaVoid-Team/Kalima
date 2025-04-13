@@ -25,14 +25,14 @@ exports.getAllCenters = catchAsync(async (req, res, next) => {
 
 // Add a lesson to a center
 exports.addLesson = catchAsync(async (req, res, next) => {
-  const { subject, lecturer, startTime, duration, centerId } = req.body;
+  const { subject, lecturer, level, startTime, duration, centerId } = req.body;
 
   // Ensure the lecturer field is provided
   if (!lecturer) {
     return next(new AppError("Lecturer is required.", 400));
   }
 
-  const lesson = await Lesson.create({ subject, lecturer, startTime, duration, center: centerId });
+  const lesson = await Lesson.create({ subject, lecturer, level, startTime, duration, center: centerId });
 
   res.status(201).json({
     status: "success",
@@ -49,13 +49,23 @@ exports.getTimetable = catchAsync(async (req, res, next) => {
 
   const lessons = await Lesson.find({ center: centerId }).populate("lecturer", "name");
 
-  const timetable = lessons.map((lesson) => ({
-    subject: lesson.subject,
-    lecturer: lesson.lecturer.name,
-    startTime: lesson.startTime,
-    endTime: new Date(new Date(lesson.startTime).getTime() + lesson.duration * 60000),
-    lessonId: lesson._id,
-  }));
+  const timetable = lessons.map((lesson) => {
+    const timetableEntry = {
+      subject: lesson.subject,
+      lecturer: lesson.lecturer.name,
+      startTime: lesson.startTime,
+      duration: lesson.duration,
+      level: lesson.level,
+      lessonId: lesson._id,
+    };
+    
+    // Calculate endTime only if duration is available
+    if (lesson.duration) {
+      timetableEntry.endTime = new Date(new Date(lesson.startTime).getTime() + lesson.duration * 60000);
+    }
+    
+    return timetableEntry;
+  });
 
   res.status(200).json({
     status: "success",
