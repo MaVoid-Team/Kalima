@@ -4,35 +4,51 @@ const Code = require("../models/codeModel");
 const QueryFeatures = require("../utils/queryFeatures");
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
+const Lecturer = require("../models/lecturerModel");
 
 // i will modify err msg and make validation later
 // restricted to admin-center-lectural
 const createCodes = catchAsync(async (req, res, next) => {
-  const { pointsAmount, numOfCodes, lecturerId } = req.body;
-  if (!pointsAmount || !numOfCodes || !lecturerId) {
+  const { pointsAmount, numOfCodes, type, lecturerId } = req.body;
+  if (!pointsAmount || !numOfCodes || !type) {
     return next(new AppError("All fields are required"));
   }
 
-  const newCodes = [];
-
-  for (let i = 0; i < numOfCodes; i++) {
-    const code = new Code({ pointsAmount, lecturerId });
-    code.generateCode();
-    newCodes.push(code);
+  let lecturer = null;
+  if (type === "specific") {
+    if (!lecturerId) {
+      return next(new AppError("Lecturer ID is required for specific codes"));
+    }
+    lecturer = await Lecturer.findById(lecturerId);
+    if (!lecturer) {
+      return next(new AppError("Lecturer not found", 404));
+    }
   }
 
-  await Code.insertMany(newCodes);
+  const newCodes = [];
+  for (let i = 0; i < numOfCodes; i++) {
+    const codeDoc = new Code({
+      pointsAmount,
+      type,
+      lecturerId: lecturer ? lecturer._id : null,
+    });
+    codeDoc.generateCode();
+    newCodes.push(codeDoc);
+  }
+
+  const codes = await Code.insertMany(newCodes);
 
   res.status(201).json({
     status: "success",
-    message: `${newCodes.length} Code(s) has been created successfully`,
+    message: `${newCodes.length} Code(s) have been created successfully`,
+    data: {
+      codes,
+    },
   });
 });
 
-const getCodes = catchAsync(async (req, res, next) => {
-  const codesQuery = Code.find({ isRedeemed: false }).select(
-    "code pointsAmount"
-  );
+const getAllCodes = catchAsync(async (req, res, next) => {
+  const codesQuery = Code.find().select("-__v");
 
   const features = new QueryFeatures(codesQuery, req.query)
     .filter()
@@ -53,7 +69,24 @@ const getCodes = catchAsync(async (req, res, next) => {
     },
   });
 });
-
+const getCodeById = catchAsync(async (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("Code ID is required", 400));
+  }
+  const code = await Code.findById(req.params.id)
+    .select("-__v")
+    .populate({ path: "lecturerId", select: "name" })
+    .lean();
+  if (!code) {
+    return next(new AppError("Code not found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      code,
+    },
+  });
+});
 const deleteCodes = catchAsync(async (req, res, next) => {
   const { code } = req.body;
   if (!code) {
@@ -98,28 +131,18 @@ const redeemCode = catchAsync(async (req, res, next) => {
       await session.abortTransaction();
       return next(new AppError("User not found", 404));
     }
-    currentUser.totalPoints += isExistCode.pointsAmount;
-    if (currentUser.lecturerPoints.length === 0) {
-      currentUser.lecturerPoints.push({
-        lecturer: isExistCode.lecturerId,
-        points: isExistCode.pointsAmount,
-      });
-    } else {
-      const lecturerPointsIndex = currentUser.lecturerPoints.findIndex(
-        (points) =>
-          points.lecturer.toString() === isExistCode.lecturerId._id.toString()
+    //specific type for lecturer
+    // add points to the specific lecturer's balance
+    if (isExistCode.type === "specific") {
+      currentUser.addLecturerPoints(
+        isExistCode.lecturerId,
+        isExistCode.pointsAmount
       );
-      if (lecturerPointsIndex !== -1) {
-        currentUser.lecturerPoints[lecturerPointsIndex].points +=
-          isExistCode.pointsAmount;
-      } else {
-        currentUser.lecturerPoints.push({
-          lecturer: isExistCode.lecturerId,
-          points: isExistCode.pointsAmount,
-        });
-      }
+    } else {
+      //type is general
+      // add points to the general points balance
+      currentUser.generalPoints += isExistCode.pointsAmount;
     }
-
     await currentUser.save({ session });
 
     await Code.findOneAndUpdate(
@@ -134,15 +157,22 @@ const redeemCode = catchAsync(async (req, res, next) => {
     await session.commitTransaction();
     res.status(200).json({
       status: "success",
-      message: `Your code has been redeemed successfully, +${pointsAmount} points`,
+      message: `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points`,
     });
   } catch (error) {
-    await session.abortTransaction();
-    console.log(error);
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
     return next(new AppError("Failed to redeem code, try again later", 500));
   } finally {
     await session.endSession();
   }
 });
 
-module.exports = { createCodes, getCodes, deleteCodes, redeemCode };
+module.exports = {
+  createCodes,
+  getAllCodes,
+  deleteCodes,
+  redeemCode,
+  getCodeById,
+};
