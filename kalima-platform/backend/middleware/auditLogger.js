@@ -24,7 +24,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     { keywords: ["code", "codes"], type: "code" },
     { keywords: ["container", "containers"], type: "container" },
     { keywords: ["moderator", "moderators"], type: "moderator" },
-    { keywords: ["subadmin", "subadmins"], type: "subAdmin" },
+    { keywords: ["sub-admin", "sub-admins", "subadmin", "subadmins"], type: "subAdmin" },
     { keywords: ["assistant", "assistants"], type: "assistant" },
     { keywords: ["admin", "admins"], type: "admin" },
     { keywords: ["lecturer", "lecturers"], type: "lecturer" },
@@ -33,7 +33,8 @@ const createAuditLogEntry = async (req, res, originalRes) => {
   
   // Find matching resource type
   for (const resource of resourceIdentifiers) {
-    if (resource.keywords.some(keyword => pathSegments.includes(keyword))) {
+    if (resource.keywords.some(keyword => pathSegments.some(segment => 
+      segment.toLowerCase() === keyword.toLowerCase()))) {
       resourceType = resource.type;
       break;
     }
@@ -62,46 +63,97 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       break;
   }
   
+  // Handle special case for center operations
+  let specialAction = null;
+  let specialResource = null;
+  
+  // Special case for center-related endpoints
+  if (resourceType === "center") {
+    // Check for lesson-related operations in the center context
+    if (pathSegments.includes("lessons")) {
+      if (req.method === "POST") {
+        specialAction = "create";
+        specialResource = {
+          type: "lesson",
+          name: req.body.subject,
+          id: originalRes?._body?.data?.lesson?._id
+        };
+      } else if (req.method === "DELETE" && req.params.lessonId) {
+        specialAction = "delete";
+        specialResource = {
+          type: "lesson",
+          id: req.params.lessonId,
+          name: "Lesson"
+        };
+      }
+    } else if (pathSegments.includes("timetable")) {
+      specialAction = "read";
+      specialResource = {
+        type: "timetable",
+        id: req.params.centerId,
+        name: `Timetable for center ${req.params.centerId}`
+      };
+    }
+  }
+  
   // Extract resource details from response if available
   const resData = originalRes?._body?.data;
-  if (resData) {
-    // Use switch case for resource data extraction
-    switch (true) {
-      case !!resData.center:
-        resourceId = resourceId || resData.center._id;
-        resourceName = resData.center.name;
-        break;
-      case !!(resData.codes && resData.codes.length > 0):
-        resourceName = `${resData.codes.length} codes`;
-        break;
-      case !!resData.container:
-        resourceId = resourceId || resData.container._id;
-        resourceName = resData.container.name;
-        break;
-      case !!resData.moderator:
-        resourceId = resourceId || resData.moderator._id;
-        resourceName = resData.moderator.name;
-        break;
-      case !!resData.subAdmin:
-        resourceId = resourceId || resData.subAdmin._id;
-        resourceName = resData.subAdmin.name;
-        break;
-      case !!resData.assistant:
-        resourceId = resourceId || resData.assistant._id;
-        resourceName = resData.assistant.name;
-        break;
-      case !!resData.admin:
-        resourceId = resourceId || resData.admin._id;
-        resourceName = resData.admin.name;
-        break;
-      case !!resData.lecturer:
-        resourceId = resourceId || resData.lecturer._id;
-        resourceName = resData.lecturer.name;
-        break;
-      case !!resData.package:
-        resourceId = resourceId || resData.package._id;
+  
+  // Handle different response structures for different endpoints
+  if (resData && !specialResource) {
+    // Special case for packages which have a different structure
+    if (resourceType === "package") {
+      if (resData.package) {
+        resourceId = resourceId || resData.package._id || resData.package.id;
         resourceName = resData.package.name;
-        break;
+      } else if (resData.packages && resData.packages.length) {
+        resourceName = `${resData.packages.length} packages`;
+      }
+    }
+    // For other resource types
+    else if (resourceType === "admin" && resData.admin) {
+      resourceId = resourceId || resData.admin._id || resData.admin.id;
+      resourceName = resData.admin.name;
+    } else if (resourceType === "subAdmin" && resData.subAdmin) {
+      resourceId = resourceId || resData.subAdmin._id || resData.subAdmin.id;
+      resourceName = resData.subAdmin.name;
+    } else if (resourceType === "moderator" && resData.moderator) {
+      resourceId = resourceId || resData.moderator._id || resData.moderator.id;
+      resourceName = resData.moderator.name;
+    } else if (resourceType === "assistant" && resData.assistant) {
+      resourceId = resourceId || resData.assistant._id || resData.assistant.id;
+      resourceName = resData.assistant.name;
+    } else if (resourceType === "lecturer" && resData.lecturer) {
+      resourceId = resourceId || resData.lecturer._id || resData.lecturer.id;
+      resourceName = resData.lecturer.name;
+    } else if (resourceType === "center" && resData.center) {
+      resourceId = resourceId || resData.center._id || resData.center.id;
+      resourceName = resData.center.name;
+    } else if (resourceType === "container" && resData.container) {
+      resourceId = resourceId || resData.container._id || resData.container.id;
+      resourceName = resData.container.name;
+    } else if (resData.codes && resData.codes.length > 0) {
+      resourceName = `${resData.codes.length} codes`;
+    } else if (resData.lesson) {
+      // Handle lesson creation in center
+      resourceId = resourceId || resData.lesson._id || resData.lesson.id;
+      resourceName = resData.lesson.subject || "Lesson";
+      // Since this is a center lesson operation, update resourceType
+      if (pathSegments.includes("lessons") && pathSegments.includes("centers")) {
+        resourceType = "center-lesson";
+      }
+    }
+    
+    // For direct data without specific property naming
+    if (!resourceId && !resourceName && typeof resData === 'object') {
+      // Check if the response data itself is the resource (common in some controllers)
+      if (resData._id || resData.id) {
+        resourceId = resourceId || resData._id || resData.id; 
+        resourceName = resData.name;
+      } else if (Array.isArray(resData)) {
+        // Handle array responses
+        resourceName = `${resData.length} items`;
+      }
     }
   }
   
@@ -110,14 +162,29 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     resourceName = req.body.name;
   }
   
-  // Determine if the request was successful based on status code and resource ID
+  // Special case for DELETE operations
+  const isDeleteOperation = req.method === 'DELETE';
+  
+  // Determine if the request was successful based on status code
+  // For DELETE operations, we only check the status code, not the resource ID
   const statusCode = originalRes?.statusCode || 500;
   const isSuccess = statusCode >= 200 && statusCode < 400 && (
-    // For read operations or operations where we have a resource ID
+    isDeleteOperation || // DELETE operations are successful if status code is in 2xx range
     methodToAction[req.method] === 'read' || 
     resourceId || 
-    (resData && resData.results > 0)
+    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable))
   );
+  
+  // Use special resource and action if defined
+  const finalResource = specialResource || {
+    type: resourceType,
+    id: resourceId,
+    name: resourceName || (isSuccess 
+      ? (isDeleteOperation ? "Resource deleted successfully" : undefined)
+      : "Operation failed")
+  };
+  
+  const finalAction = specialAction || methodToAction[req.method];
   
   // Create the audit log
   await AuditLog.create({
@@ -126,12 +193,8 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       name: req.user.name,
       role: req.user.role
     },
-    action: methodToAction[req.method],
-    resource: {
-      type: resourceType,
-      id: resourceId,
-      name: resourceName || (isSuccess ? undefined : "Operation failed")
-    },
+    action: finalAction,
+    resource: finalResource,
     status: isSuccess ? "success" : "failed",
     timestamp: new Date()
   });
