@@ -1,0 +1,114 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
+import UserSidebar from "../../components/UserSidebar"
+import PageHeader from "./PageHeader"
+import PersonalInfoSection from "./PersonalInfoSection"
+import LanguageAppearanceSection from "./LanguageAppearanceSection"
+import SecuritySection from "./SecuritySection"
+import NotificationsSection from "./NotificationsSection"
+import { FaBars } from "react-icons/fa"
+
+function SettingsPage() {
+  const { t, i18n } = useTranslation("settings")
+  const isRTL = i18n.language === 'ar'
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: t('personalInfo.placeholders.fullName'),
+    phoneNumber: t('personalInfo.placeholders.phoneNumber'),
+    email: t('personalInfo.placeholders.email'),
+    idNumber: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  })
+  useEffect(() => {
+    setFormData({
+      fullName: t('personalInfo.placeholders.fullName'),
+      phoneNumber: t('personalInfo.placeholders.phoneNumber'),
+      email: t('personalInfo.placeholders.email'),
+      idNumber: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    })
+  }, [t])
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIfMobile()
+    window.addEventListener("resize", checkIfMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkIfMobile)
+    }
+  }, [])
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value,
+    })
+  }
+
+  return (
+    <div 
+      className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100 ${
+        sidebarOpen && !isMobile ? ` ${isRTL ? 'mr-52' : 'ml-52'} transition-all duration-500` : `mr-0`
+      }`} 
+      dir={isRTL ? 'ltr' : 'rtl'}
+    >
+      {/* Mobile Sidebar Toggle Button */}
+      <div className={`md:hidden fixed top-16 ${isRTL ? 'left-4' : 'right-4'} z-50`}>
+        <button
+          id="sidebar-toggle"
+          className="btn btn-circle btn-primary"
+          onClick={toggleSidebar}
+          aria-label={t('toggleSidebar')}
+        >
+          <FaBars className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className={`flex-1 p-4 lg:p-8 md:pt-4 pt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <PageHeader title={t('title')} />
+
+            <PersonalInfoSection 
+        formData={formData}
+        handleInputChange={handleInputChange}
+      />
+
+        <LanguageAppearanceSection 
+          title={t('languageAppearance.title')}
+          options={t('languageAppearance.options', { returnObjects: true })}
+        />
+
+        <SecuritySection
+          formData={formData}
+          handleInputChange={handleInputChange}
+          labels={t('security.labels', { returnObjects: true })}
+        />
+
+        <NotificationsSection
+          title={t('notifications.title')}
+          options={t('notifications.options', { returnObjects: true })}
+        />
+      </div>
+
+      {/* Sidebar */}
+      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+    </div>
+  )
+}
+
+export default SettingsPage

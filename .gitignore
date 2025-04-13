@@ -123,6 +123,9 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Backend local upload folder.
+/kalima-platform/backend/uploads
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged
@@ -133,3 +136,33 @@ dist
 /android
 /kalima-platform/frontend/build
 /kalima-platform/frontend/android
+kalima-platform/frontend/capacitor.config.ts
+kalima-platform/frontend/android/gradle/wrapper/gradle-wrapper.properties
+kalima-platform/frontend/android/app/src/test/java/com/getcapacitor/myapp/ExampleUnitTest.java
+kalima-platform/frontend/android/app/src/main/res/xml/file_paths.xml
+kalima-platform/frontend/android/app/src/main/res/values/styles.xml
+kalima-platform/frontend/android/app/src/main/res/values/strings.xml
+kalima-platform/frontend/android/app/src/main/res/values/ic_launcher_background.xml
+kalima-platform/frontend/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+kalima-platform/frontend/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+kalima-platform/frontend/android/app/src/main/res/layout/activity_main.xml
+kalima-platform/frontend/android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml
+kalima-platform/frontend/android/app/src/main/res/drawable/ic_launcher_background.xml
+kalima-platform/frontend/android/app/src/main/AndroidManifest.xml
+kalima-platform/frontend/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java
+kalima-platform/frontend/android/app/proguard-rules.pro
+kalima-platform/frontend/android/app/src/main/java/com/kalimaplatform/mavoid/MainActivity.java
+kalima-platform/frontend/android/app/capacitor.build.gradle
+kalima-platform/frontend/android/app/build.gradle
+kalima-platform/frontend/android/variables.gradle
+kalima-platform/frontend/android/settings.gradle
+kalima-platform/frontend/android/gradlew
+kalima-platform/frontend/android/gradle.properties
+kalima-platform/frontend/android/capacitor.settings.gradle
+kalima-platform/frontend/android/build.gradle
+kalima-platform/frontend/android/app/build.gradle
+kalima-platform/frontend/android/build.gradle
+kalima-platform/frontend/android/capacitor.settings.gradle
+kalima-platform/frontend/android/app/build.gradle
+kalima-platform/frontend/android/app/capacitor.build.gradle
+kalima-platform/frontend/capacitor.config.ts

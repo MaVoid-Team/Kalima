@@ -6,6 +6,7 @@ const teacherSchema = require("../validations/teacherValidation.js");
 const studentSchema = require("../validations/studentValidation.js");
 const parentSchema = require("../validations/parentValidation.js");
 const lecturerSchema = require("../validations/lecturerValidation.js");
+const assistantSchema = require("../validations/assistantValidation.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel.js");
@@ -15,6 +16,7 @@ const roleSchemas = {
   student: studentSchema,
   parent: parentSchema,
   lecturer: lecturerSchema,
+  assistant: assistantSchema,
 };
 
 const validateUser = catchAsync(async (req, res, next) => {

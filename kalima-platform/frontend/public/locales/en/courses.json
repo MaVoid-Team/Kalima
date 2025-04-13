@@ -1,0 +1,41 @@
+{
+    "title": "My Courses",
+    "discover": "Discover your favorite courses now!",
+    "noCourses": "No courses available currently",
+    "showCourses": "Show Courses",
+    "filters": {
+      "reset": "Reset Filters",
+      "stage": "Academic Stage",
+      "grade": "Grade",
+      "term": "Term",
+      "type": "Course Type",
+      "status": "Course Status",
+      "subject": "Subject"
+    },
+    "stages": {
+      "primary": "Primary Stage",
+      "middle": "Middle Stage",
+      "secondary": "Secondary Stage"
+    },
+    "grades": {
+      "first": "First Grade",
+      "second": "Second Grade",
+      "third": "Third Grade"
+    },
+    "terms": {
+      "first": "First Term",
+      "second": "Second Term"
+    },
+    "types": {
+      "explanation": "Explanation",
+      "review": "Review",
+      "exercises": "Exercises"
+    },
+    "status": {
+      "free": "Free",
+      "paid": "Paid"
+    },
+    "search": {
+      "options": "Search Options"
+    }
+  }

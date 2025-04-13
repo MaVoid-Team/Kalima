@@ -1,10 +1,11 @@
 "use client"
 
+import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom" // Using React Router instead of Next.js Router
 
 // New Curved Arrow component with the provided SVG
 const CurvedArrow = () => (
-  <div className="relative h-32 w-32 animate-bounce text-primary">
+  <div className="relative h-32 w-32 animate-pulse text-primary">
     <svg
       width="86"
       height="103"
@@ -242,7 +243,7 @@ const ZigzagWide = () => (
     viewBox="0 0 148 38"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    className="w-48 text-primary"
+    className="w-48 text-primary animate-float-zigzag"
   >
     <path d="M2.36157 18.1707L22.1034 2L39.8029 18.1707" stroke="currentColor" strokeWidth="3" />
     <path d="M108.559 18.1707L128.301 2L146 18.1707" stroke="currentColor" strokeWidth="3" />
@@ -260,33 +261,34 @@ const ZigzagWide = () => (
 )
 
 export default function CivilcoLanding() {
-  const navigate = useNavigate() // Using React Router's navigate instead of Next.js router
+  const { t } = useTranslation("common")
+  const navigate = useNavigate()
 
   const handleTeacherClick = () => {
     console.log("Teacher selected")
-    navigate("/login") // Using navigate instead of router.push
+    navigate("/login-teacher") // Using navigate instead of router.push
   }
 
   const handleStudentClick = () => {
     console.log("Student selected")
-    navigate("/login") // Using navigate instead of router.push
+    navigate("/login-student") // Using navigate instead of router.push
   }
 
   return (
     <div className="min-h-screen bg-base-100 relative overflow-hidden">
       {/* Yellow circle decoration */}
       <div className="absolute top-20 left-[350px] z-0">
-        <div className="w-10 h-10 rounded-full bg-primary"></div>
+        <div className="w-10 h-10 rounded-full bg-primary animate-float-up-dottedball"></div>
       </div>
 
       {/* Teal circles SVG - right side */}
-      <div className="absolute top-0 right-0 z-0 w-[600px] h-[600px]">
+      <div className="absolute top-0 right-0 z-0 w-[600px] h-[600px] animate-float-down-dottedball">
         <TealCircles />
       </div>
 
       {/* Yellow circle decoration - bottom right */}
       <div className="absolute bottom-20 right-20 z-0">
-        <div className="w-24 h-24 rounded-full border-4 border-primary"></div>
+        <div className="w-24 h-24 rounded-full border-4 border-primary animate-float-up-dottedball"></div>
       </div>
 
       {/* Updated zigzag pattern decoration */}
@@ -307,19 +309,20 @@ export default function CivilcoLanding() {
 
         {/* Main content */}
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-base-content" dir="rtl">
-            مرحبا بك في منصة{" "}
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-base-content">
+            {t('landing.welcome', { platform: '' })}
             <span className="text-primary relative">
-              كلمة
+              {t('landing.platformName')}
               <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-full"></span>
             </span>
           </h1>
-          <p className="text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto text-base-content" dir="rtl">
-            منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.
+          
+          <p className="text-lg md:text-xl leading-relaxed mb-12 max-w-3xl mx-auto text-base-content">
+            {t('landing.description')}
           </p>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 mt-16 text-base-content" dir="rtl">
-            من انـــــــت ؟
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 mt-16 text-base-content">
+            {t('landing.whoAreYou')}
           </h2>
 
           {/* Role selection cards with flow lines */}
@@ -340,9 +343,9 @@ export default function CivilcoLanding() {
               </div>
               <button
                 onClick={handleTeacherClick}
-                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg"
+                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
-                معلم
+                {t('landing.teacher')}
               </button>
             </div>
 
@@ -357,9 +360,9 @@ export default function CivilcoLanding() {
               </div>
               <button
                 onClick={handleStudentClick}
-                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg"
+                className="btn btn-primary text-primary-content font-bold py-3 px-12 rounded-md text-lg hover:btn-secondary hover:text-primary-content"
               >
-                طالب
+               {t('landing.student')}
               </button>
             </div>
           </div>

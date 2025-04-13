@@ -4,8 +4,29 @@
     "educationalCourses": "الدورات التعليمية",
     "teachers": "المعلمين",
     "services": "الخدمات",
+    "lectures": "المحاضرات",
     "contactUs": "اتصل بنا",
     "signup": "التسجيل",
     "signin": "تسجيل الدخول",
-    "theme": "الألوان"
+    "theme": "الألوان",
+    "landing": {
+    "welcome": "مرحبا بك في منصة ",
+    "platformName": "كلمة",
+    "description": "منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي.",
+    "whoAreYou": "من انـــــــت ؟",
+    "teacher": "معلم",
+    "student": "طالب",
+    "logoAlt": "شعار كلمة"
+  },
+  "dashboard": "لوحة القيادة",
+  "profile": "معلوماتي",
+  "courses": "كورساتي",
+  "promoCodes": "اكواد الشحن",
+  "assignments": "الواجب",
+  "exams": "الاختبارات",
+  "settings": "الاعدادات",
+  "logout": "تسجيل الخروج",
+  "dashboardTitle": "لوحة القيادة",
+  "toggleSidebar": "تبديل القائمة الجانبية",
+  "myPage": "صفحتي"
   }

@@ -27,15 +27,15 @@ export const loginUser = async (credentials) => {
   const result = await handleRequest("post", "/auth", credentials);
 
   if (result.success && result.data.accessToken) {
-    sessionStorage.setItem("accessToken", result.data.accessToken);
+    sessionStorage.setItem("authToken", result.data.accessToken);
   }
 
   return result;
 };
 
 // Auth Helpers
-export const getToken = () => sessionStorage.getItem("accessToken");
+export const getToken = () => sessionStorage.getItem("authToken");
 
 export const isLoggedIn = () => !!getToken();
 
-export const logoutUser = () => sessionStorage.removeItem("accessToken");
+export const logoutUser = () => sessionStorage.removeItem("authToken");

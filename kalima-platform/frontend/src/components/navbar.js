@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Navbar, Button } from 'react-daisyui';
 import ThemeSwitcher from './ThemeSwitcher';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const NavBar = () => {
   const { t, i18n } = useTranslation('common');
@@ -37,17 +38,18 @@ const NavBar = () => {
     { key: 'homepage', path: '/' },
     { key: 'educationalCourses', path: '/courses' },
     { key: 'teachers', path: '/teachers' },
-    { key: 'services', path: '/services' },
+    { key: 'lectures', path: '/lecture-page' },
     { key: 'contactUs', path: '/contact' },
+    { key: 'services', path: '/services' },
   ];
 
   const authItems = [
     { key: 'signup', path: '/register' },
-    { key: 'signin', path: '/login' },
+    { key: 'signin', path: '/landing' },
   ];
 
   return (
-    <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1" dir={isAr ? 'rtl' : 'ltr'}>
+    <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky" dir={isAr ? 'rtl' : 'ltr'}>
       
       <div ref={navbarRef} className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
@@ -87,17 +89,18 @@ const NavBar = () => {
           </Link>
           
           {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex gap-4 ml-4 rounded-2xl">
+          <div className="hidden lg:flex  xl:gap-4  ml-4 rounded-2xl">
             {navItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                className="btn btn-ghost font-medium rounded-2xl hover:text-primary transition-colors"
+                className="btn btn-ghost font-medium rounded-2xl transition-colors"
               >
                 {t(item.key)}
               </Link>
             ))}
             <ThemeSwitcher />
+            <LanguageSwitcher />
           </div>
         </div>
 
@@ -168,7 +171,8 @@ const NavBar = () => {
             
             <div className="divider" />
             <ThemeSwitcher />
-            <div className="divider" />
+            <LanguageSwitcher />
+ 
             
             {authItems.map((item) => (
               <Link

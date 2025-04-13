@@ -1,0 +1,91 @@
+{
+
+"hero": {
+      "title": "The shortest path to brilliant success",
+      "heading": "Welcome to the Kalima Platform",
+      "description": "Kelma Platform is an e-learning platform that provides resources for students from fourth grade primary to third grade secondary.",
+      "cta": "Login"
+    },
+    "about": {
+      "title": "About Us",
+      "heading": "Learn Smart, Score High ",
+      "description": "Kelma provides an effective e-learning platform for students from 4th grade primary to 12th grade secondary. We offer the best solutions to ensure student excellence.",
+      "features": {
+        "teachers": "Professional Teachers",
+        "tests": "Lesson-wise Tests",
+        "curriculum": "Comprehensive Curriculum Coverage"
+      }
+    },
+    "appDownload": {
+      "title": "Download Our App ",
+      "content1": "Best free learning app - get it ",
+      "content2": " on your mobile to learn ",
+      "now": "Now",
+      "everywhere": "Everywhere"
+    },
+    "teacherCount": {
+    "title": "Teachers",
+    "counter": "Teacher ",
+    "add": "Add Teacher"
+  },
+  "services": {
+    "title": "Our Services",
+    "heading": "Our goal is to simplify subjects to ensure your excellence ",
+    "withUs": "With Us",
+    "items": [
+      {
+        "title": "Performance Tracking",
+        "subtitle": "Anytime",
+        "description": "Continuous student progress monitoring through periodic reports showing improvement areas"
+      },
+      {
+        "title": "Regular Tests",
+        "subtitle": "On Our Platform", 
+        "description": "Diverse tests with instant correction and answer explanations"
+      },
+      {
+        "title": "Top-Level",
+        "subtitle": "Teachers",
+        "description": "Team of expert teachers providing simplified and engaging lessons"
+      },
+      {
+        "title": "High Quality",
+        "subtitle": "Courses",
+        "description": "Comprehensive courses covering all curriculum aspects with practical applications"
+      }
+    ]
+  },
+  "teachers": {
+    "title": "Our Teachers",
+    "heading": "View All Teachers from Our ",
+    "platform": "Platform",
+    "loadMore": "Show More Teachers",
+    "viewProfile": "View Profile",
+    "errors": {
+      "loading": "Loading...",
+      "failed": "Failed to load teachers",
+      "retry": "Retry",
+      "noneFound": "No teachers available currently"
+    },
+    "labels": {
+      "expertise": "Expertise",
+      "experience": "Years Experience",
+      "gradeLevels": "All Grade Levels"
+    }
+  },
+  "courses": {
+    "title": "Our Courses",
+    "heading": "Browse All ",
+    "platform": "Our Courses",
+    "viewAll": "View All Courses",
+    "duration": " study hours",
+    "viewDetails": "View Details",
+    "rating": "Rating",
+    "errors": {
+      "loading": "Loading courses...",
+      "failed": "Failed to load courses",
+      "retry": "Try Again"
+    }
+
+  }
+}

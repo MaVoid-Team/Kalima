@@ -1,100 +1,106 @@
 {
-    "studentRegister": "Student Register",
-      "parentRegister": "Parent Register",
-      "lecturerRegister" : "Lecturer Register",
-    "steps": {
-      "personalInfo": "Personal Information",
-      "parentInfo": "Parent Information",
-      "hobbies": "Hobbies",
-      "review": "Review",
-      "childrenInfo": "Children Information",
-      "professionalInfo": "Professional Information"
-    },
-    "form": {
-   
-      "studentId": "Student ID",
-      "fullName": "Full Name",
-      "role": "Role",
-      "bio": "Bio",
-      "expertise": "Experties",
-      "gender": "Gender",
-      "parentGender": "Parent Gender",
-      "imParent": "I'm the parent",
-      "studentPhone": "Student Phone",
-      "parentPhone": "Parent Phone",
-      "email": "Email Address",
-      "address": "Address",
-      "selectGender": "Select Gender",
-      "schoolName": "School Name",
-      "schoolType": "School Type",
-      "selectSchoolType": "Select School Type",
-      "grade": "Grade",
-      "selectGrade": "Select Grade",
-      "variant": "Variant",
-      "selectVariant": "Select Variant",
-      "selectHobbies": "Select Your Hobbies",
-      "uploadAvatar": "Upload Profile Picture",
-      "hobbies": "Hobbies",
-      "personalDetails": "Personal Details",
-      "parentDetails": "Parent Details",
-      "schoolDetails" : "School Details & Study",
-      "password": "Password",
-      "childrenDetails": "Children Details",
-      "childId": "Child ID"
-    },
-    "gender": {
-      "male": "Male",
-      "female": "Female"
-    },
-    "schoolType": {
-      "arabic": "Arabic",
-      "english": "English"
-    },
-    "hobbies": {
-      "reading": "Reading",
-      "sports": "Sports",
-      "music": "Music",
-      "cooking": "Cooking",
-      "gaming": "Gaming",
-      "art" : "Art",
-      "technology": "Technology",
-      "dancing": "Dancing",
-      "photography": "Photography"
-    },
-    "review": {
-      "title": "Review Your Information"
-    },
-    "buttons": {
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Submit"
-    },
-    "roles" : { 
-      "student": "Student",
-      "parent": "Parent",
-      "lecturer" : "Lecturer"
-     },
-     "gradeLevels": {
-      "grade 4": "Grade 4",
-      "grade 5": "Grade 5",
-      "grade 6": "Grade 6",
-      "first preparatory": "First Preparatory",
-      "second preparatory": "Second Preparatory",
-      "third preparatory": "Third Preparatory", 
-      "first secondary": "First Secondary",
-      "second secondary": "Second Secondary", 
-      "third secondary": "Third Secondary"
-     },
-     "roleSelection": {
-      "title": "Choose your role",
-      "description": "Select the role that best describes you",
-      "studentDesc": "Access learning materials and track your progress",
-      "parentDesc": "Monitor your children's academic journey",
-      "lecturerDesc": "Create courses and manage your students"
+  "studentRegister": "Student Register",
+  "parentRegister": "Parent Register",
+  "lecturerRegister": "Lecturer Register",
+  "steps": {
+    "personalInfo": "Basic Information",
+    "parentInfo": "Contact Information",
+    "hobbies": "Hobbies",
+    "review": "Review",
+    "childrenInfo": "Children Information",
+    "professionalInfo": "Professional Information"
+  },
+  "form": {
+    "studentId": "Student ID",
+    "fullName": "Full Name",
+    "gender": "Gender",
+    "role": "Role",
+    "bio": "Bio",
+    "expertise": "Expertise",
+    "phoneNumber": "Personal Phone Number",
+    "parentPhone": "Parent Phone",
+    "email": "Email Address",
+    "address": "Address",
+    "selectGender": "Select Gender",
+    "schoolName": "School Name",
+    "schoolType": "School Type",
+    "selectSchoolType": "Select School Type",
+    "grade": "Grade",
+    "selectGrade": "Select Grade",
+    "variant": "Variant",
+    "selectVariant": "Select Variant",
+    "selectHobbies": "Select Your Hobbies",
+    "uploadAvatar": "Upload Profile Picture",
+    "hobbies": "Hobbies",
+    "personalDetails": "Personal Details",
+    "parentDetails": "Parent Details",
+    "schoolDetails": "School and Study Details",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "childrenDetails": "Children Details",
+    "childId": "Child ID",
+    "childSequenceId" :"Child Sequence ID",
+    "childrenSequenceIdsHelp" :"Use commas to separate child sequence IDs",
+    "childrenSequenceIds" : "Children Sequence IDs",
+    "level" : "Level",
+    "optional" : "Optional",
+    "selectLevel" : "Select Level"
+  
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "schoolType": {
+    "arabic": "Arabic",
+    "english": "English"
+  },
+  "hobbies": {
+    "reading": "Reading",
+    "sports": "Sports",
+    "music": "Music",
+    "cooking": "Cooking",
+    "gaming": "Games",
+    "art": "Art",
+    "technology": "Technology",
+    "dancing": "Dancing",
+    "photography": "Photography"
+  },
+  "review": {
+    "title": "Review Information"
+  },
+  "buttons": {
+    "previous": "Previous",
+    "next": "Next",
+    "submit": "Submit",
+    "addAnotherChild": "Add Another Child"
+  },
+  "role": {
+    "student": "Student",
+    "parent": "Parent",
+    "lecturer": "Lecturer"
+  },
+  "gradeLevels": {
+    "Grade 4": "Grade 4",
+    "Grade 5": "Grade 5",
+    "Grade 6": "Grade 6",
+    "First Preparatory": "First Preparatory",
+    "Second Preparatory": "Second Preparatory",
+    "Third Preparatory": "Third Preparatory",
+    "First Secondary": "First Secondary",
+    "Second Secondary": "Second Secondary",
+    "Third Secondary": "Third Secondary"
+  },
+  "roleSelection": {
+    "title": "Choose your role",
+    "description": "Select the role that best describes you",
+    "studentDesc": "Access learning materials and track your progress",
+    "parentDesc": "Monitor your children's academic journey",
+    "lecturerDesc": "Create courses and manage your students"
   },
   "validation": {
     "required": "This field is required",
-    "passwordRequirements": "Minimum 8 characters with at least 1 letter and 1 number",
+    "passwordRequirements": "Password must contain at least 8 characters",
     "phoneFormat": "Invalid phone number format",
     "emailFormat": "Invalid email format",
     "hobbies": "Select at least 2 hobbies",
