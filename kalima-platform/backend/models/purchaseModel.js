@@ -11,7 +11,12 @@ const purchaseSchema = new mongoose.Schema({
   lecturer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Lecturer",
-    required: true,
+    required: [
+      function () {
+        return this.type === "containerPurchase";
+      },
+      "Lecturer ID is required for specific codes",
+    ],
   },
   // Points amount purchased or container purchased
   points: {
@@ -23,17 +28,23 @@ const purchaseSchema = new mongoose.Schema({
   container: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Container",
-    required: false,
+    required: [
+      function () {
+        return this.type === "containerPurchase";
+      },
+      "Container ID is required for specific codes",
+    ],
   },
-  code: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Code",
-    required: false,
-  },
+
   package: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Package",
-    required: false,
+    required: [
+      function () {
+        return this.type === "packagePurchase";
+      },
+      "package ID is required for specific codes",
+    ],
   },
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
