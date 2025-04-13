@@ -101,11 +101,11 @@ const CoursesSection = () => {
   return (
     <div className="mb-12 relative">
       {/* Updated Section Header */}
-      <div className={`flex justify-between items-center mb-6 `}>
+      <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <h1 className="text-3xl font-bold px-10">{t('assistantPageTitle')}</h1>
         <div className={`flex items-center gap-4 `}>
           <img 
-            src={isRTL ? "/arabic-bookshelf.png" : "/bookshelf.png"} 
+            src= "/bookshelf.png" 
             alt="Section" 
             className="w-32 h-16 object-cover rounded"
           />
@@ -176,12 +176,12 @@ const CoursesSection = () => {
         {/* Navigation Arrows */}
         <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full">
           <button className={`btn btn-circle btn-sm ${isRTL ? 'order-2' : ''}`}
-            onClick={() => handleScroll(isRTL ? 'right' : 'left')}>
-            <FaChevronLeft className="text-xl" />
-          </button>
-          <button className={`btn btn-circle btn-sm ${isRTL ? 'order-1' : ''}`}
             onClick={() => handleScroll(isRTL ? 'left' : 'right')}>
             <FaChevronRight className="text-xl" />
+          </button>
+          <button className={`btn btn-circle btn-sm ${isRTL ? 'order-1' : ''}`}
+            onClick={() => handleScroll(isRTL ? 'right' : 'left')}>
+            <FaChevronLeft className="text-xl" />
           </button>
         </div>
       </div>
