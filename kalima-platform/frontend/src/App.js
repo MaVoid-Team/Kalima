@@ -46,7 +46,7 @@ function App() {
     setShowUserSidebar(shouldShowUserSidebar)
   }, [location.pathname])
   // Routes where UserNavbar should be shown
-  const userNavbarRoutes = ["/mobile-only", "/dashboard/lecture-page", "/dashboard/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details"]
+  const userNavbarRoutes = ["/mobile-only", "/dashboard/lecture-page", "/dashboard/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details", "/dashboard/assistant-page"]
 
   useEffect(() => {
     // Check if current route should show UserNavbar
@@ -82,6 +82,7 @@ function App() {
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
           <Route path="/course-details" element={<CourseDetails />} />
           
+          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>
       </Suspense>
 
