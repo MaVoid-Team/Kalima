@@ -4,174 +4,172 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import { Search } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { getAllSubjects } from "../routes/courses"
-import { FilterDropdown } from "../../src/components/FilterDropdown"
+import { getAllLectures } from "../routes/lectures"
+import { FilterDropdown } from "../components/FilterDropdown"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { CourseCard } from "../components/CourseCard"
 import { motion, AnimatePresence } from "framer-motion"
 
-export default function CoursesPage() {
-  const [subjects, setSubjects] = useState([])
-  const [filteredSubjects, setFilteredSubjects] = useState([])
+export default function LecturesPage() {
+  const [lectures, setLectures] = useState([])
+  const [filteredLectures, setFilteredLectures] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const { t, i18n } = useTranslation("courses")
+  const { t, i18n } = useTranslation("lectures")
   const isRTL = i18n.language === "ar"
 
   // Filter states
   const [selectedStage, setSelectedStage] = useState("")
   const [selectedGrade, setSelectedGrade] = useState("")
-  const [selectedTerm, setSelectedTerm] = useState("")
   const [selectedSubject, setSelectedSubject] = useState("")
-  const [selectedCourseType, setSelectedCourseType] = useState("")
-  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
+  const [selectedStatus, setSelectedStatus] = useState("")
 
   useEffect(() => {
-    fetchSubjects()
+    fetchLectures()
   }, [])
 
-  const fetchSubjects = async () => {
+  const fetchLectures = async () => {
     setLoading(true)
     setError("")
     try {
-      const result = await getAllSubjects()
+      const result = await getAllLectures()
       console.log("API Response:", result)
 
       if (result.success) {
-        setSubjects(result.data)
-        setFilteredSubjects(result.data)
+        setLectures(result.data)
+        setFilteredLectures(result.data)
       } else {
         setError(result.error)
       }
     } catch (err) {
-      console.error("Error fetching subjects:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
+      console.error("Error fetching lectures:", err)
+      setError("حدث خطأ أثناء تحميل المحاضرات")
     } finally {
       setLoading(false)
     }
   }
 
-  // Generate course data based on subjects from API
-  const generateCourseData = (subjectsData) => {
-    return subjectsData.map((subject, index) => {
-      // Get the first level name if available
-      const levelName = subject.level?.[0]?.name || ""
-
-      // Map level name to stage in Arabic
-      let stage = "المرحلة الثانوية" // Default
-      if (levelName) {
-        switch (levelName) {
-          case "Primary":
-            stage = "المرحلة الابتدائية"
-            break
-          case "Middle":
-            stage = "المرحلة الإعدادية"
-            break
-          case "Upper Primary":
-            stage = "المرحلة الابتدائية العليا"
-            break
-          default:
-            stage = "المرحلة الثانوية"
-        }
-      }
+  // Generate lecture data for display
+  const generateLectureData = (lecturesData) => {
+    return lecturesData.map((lecture, index) => {
+      // Count attachments
+      const attachmentsCount = lecture.attachments
+        ? (lecture.attachments.booklets?.length || 0) +
+          (lecture.attachments.homeworks?.length || 0) +
+          (lecture.attachments.exams?.length || 0) +
+          (lecture.attachments.pdfsandimages?.length || 0)
+        : 0
 
       return {
-        id: subject._id,
-        image: `/course-${(index % 6) + 1}.png`,
-        title: subject.name,
-        subject: subject.name,
-        teacher: "مدرس غير محدد", // You might want to get this from the API
-        teacherRole: "مدرس",
-        grade: levelName,
-        rating: 4 + (index % 2) * 0.5, // Default rating
-        stage: stage,
-        type: "شرح", // Default type
-        status: "مجاني", // Default status
-        price: 0, // Default price
-        childrenCount: 0, // Default children count
-        containerType: "lecture", // Default container type
+        id: lecture._id,
+        image: `/course-${(index % 6) + 1}.png`, // Default lecture image
+        title: lecture.name,
+        subject: lecture.subject?.name || "غير محدد",
+        teacher: lecture.createdBy?.name || "مدرس غير محدد",
+        teacherRole: lecture.createdBy?.role || "محاضر",
+        grade: lecture.level?.name || "غير محدد",
+        rating: 4, // Default rating
+        stage: mapLevelToStage(lecture.level?.name),
+        type: "محاضرة",
+        status: lecture.price > 0 ? "مدفوع" : "مجاني",
+        price: lecture.price || 0,
+        childrenCount: attachmentsCount,
+        views: lecture.numberOfViews || 0,
+        description: lecture.description || "لا يوجد وصف",
       }
     })
   }
 
-  // Apply filters to subjects
+  // Map level name to stage in Arabic
+  const mapLevelToStage = (levelName) => {
+    if (!levelName) return "غير محدد"
+    switch (levelName) {
+      case "Primary":
+        return "المرحلة الابتدائية"
+      case "Middle":
+        return "المرحلة الإعدادية"
+      case "Upper Primary":
+        return "المرحلة الابتدائية العليا"
+      default:
+        return "المرحلة الثانوية"
+    }
+  }
+
+  // Apply filters to lectures
   const applyFilters = useCallback(() => {
-    let filtered = generateCourseData(subjects)
+    let filtered = lectures
 
     if (selectedStage) {
-      filtered = filtered.filter((course) => course.stage === selectedStage)
+      filtered = filtered.filter(
+        (lecture) => mapLevelToStage(lecture.level?.name) === selectedStage
+      )
     }
 
     if (selectedGrade) {
-      filtered = filtered.filter((course) => course.grade === selectedGrade)
+      filtered = filtered.filter(
+        (lecture) => lecture.level?.name === selectedGrade
+      )
     }
 
     if (selectedSubject) {
-      filtered = filtered.filter((course) => course.subject === selectedSubject)
+      filtered = filtered.filter(
+        (lecture) => lecture.subject?.name === selectedSubject
+      )
     }
 
-    if (selectedCourseType) {
-      filtered = filtered.filter((course) => course.type === selectedCourseType)
+    if (selectedStatus) {
+      const statusFilter = selectedStatus === "مجاني" ? 0 : 1
+      filtered = filtered.filter(
+        (lecture) => (lecture.price > 0) === statusFilter
+      )
     }
 
-    if (selectedCourseStatus) {
-      filtered = filtered.filter((course) => course.status === selectedCourseStatus)
-    }
-
-    setFilteredSubjects(filtered)
-  }, [
-    selectedStage,
-    selectedGrade,
-    selectedSubject,
-    selectedCourseType,
-    selectedCourseStatus,
-    subjects,
-  ])
+    setFilteredLectures(filtered)
+  }, [selectedStage, selectedGrade, selectedSubject, selectedStatus, lectures])
 
   // Reset all filters
   const resetFilters = useCallback(() => {
     setSelectedStage("")
     setSelectedGrade("")
-    setSelectedTerm("")
     setSelectedSubject("")
-    setSelectedCourseType("")
-    setSelectedCourseStatus("")
-    setFilteredSubjects(subjects)
-  }, [subjects])
+    setSelectedStatus("")
+    setFilteredLectures(lectures)
+  }, [lectures])
 
-  // Memoize filtered courses
-  const memoizedFilteredCourses = useMemo(() => generateCourseData(filteredSubjects), [filteredSubjects])
+  // Memoize filtered lectures
+  const memoizedFilteredLectures = useMemo(
+    () => generateLectureData(filteredLectures),
+    [filteredLectures]
+  )
 
   // Get unique subjects for the subject filter
   const subjectOptions = useMemo(() => {
-    return subjects.map((subject) => ({
-      label: subject.name,
-      value: subject.name,
+    const uniqueSubjects = new Set()
+    lectures.forEach((lecture) => {
+      if (lecture.subject?.name) {
+        uniqueSubjects.add(lecture.subject.name)
+      }
+    })
+    return Array.from(uniqueSubjects).map((subject) => ({
+      label: subject,
+      value: subject,
     }))
-  }, [subjects])
+  }, [lectures])
 
   // Get unique levels for the grade filter
   const levelOptions = useMemo(() => {
     const uniqueLevels = new Set()
-    subjects.forEach((subject) => {
-      subject.level?.forEach((level) => {
-        uniqueLevels.add(level.name)
-      })
+    lectures.forEach((lecture) => {
+      if (lecture.level?.name) {
+        uniqueLevels.add(lecture.level.name)
+      }
     })
     return Array.from(uniqueLevels).map((level) => ({
       label: level,
       value: level,
     }))
-  }, [subjects])
-
-  // Course type options
-  const typeOptions = [
-    { label: "شرح", value: "شرح" },
-    { label: "مراجعة", value: "مراجعة" },
-    { label: "تدريبات", value: "تدريبات" },
-    { label: "كورس كامل", value: "كورس كامل" },
-  ]
+  }, [lectures])
 
   const filterOptions = [
     {
@@ -198,24 +196,15 @@ export default function CoursesPage() {
       onSelect: setSelectedSubject,
     },
     {
-      label: t("filters.type"),
-      value: selectedCourseType,
-      options: typeOptions,
-      onSelect: setSelectedCourseType,
-    },
-    {
       label: t("filters.status"),
-      value: selectedCourseStatus,
+      value: selectedStatus,
       options: [
         { label: "مجاني", value: "مجاني" },
         { label: "مدفوع", value: "مدفوع" },
       ],
-      onSelect: setSelectedCourseStatus,
+      onSelect: setSelectedStatus,
     },
   ]
-
-  // Rest of your component remains the same...
-  // Just make sure to use memoizedFilteredCourses for rendering the courses
 
   return (
     <div className="relative min-h-screen w-full" dir={isRTL ? "rtl" : "ltr"}>
@@ -272,12 +261,12 @@ export default function CoursesPage() {
               onClick={applyFilters}
             >
               <Search className="h-5 w-5 ml-2" />
-              {t("showCourses")}
+              {t("showLectures")}
             </button>
           </div>
         </div>
 
-        {/* Courses Section */}
+        {/* Lectures Section */}
         <div className="container mx-auto px-4 py-8">
           <h2 className={`text-2xl font-bold text-center mb-8 ${isRTL ? "text-right" : "text-left"}`}>
             {t("discover")}
@@ -286,16 +275,11 @@ export default function CoursesPage() {
           {loading ? (
             <LoadingSpinner />
           ) : error ? (
-            <ErrorAlert error={error} onRetry={fetchSubjects} />
-          ) : memoizedFilteredCourses.length === 0 ? (
+            <ErrorAlert error={error} onRetry={fetchLectures} />
+          ) : memoizedFilteredLectures.length === 0 ? (
             <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
-              <p className="text-lg">{t("noCourses")}</p>
-              {(selectedStage ||
-                selectedGrade ||
-                selectedTerm ||
-                selectedSubject ||
-                selectedCourseType ||
-                selectedCourseStatus) && (
+              <p className="text-lg">{t("noLectures")}</p>
+              {(selectedStage || selectedGrade || selectedSubject || selectedStatus) && (
                 <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
                   {t("filters.reset")}
                 </button>
@@ -304,21 +288,21 @@ export default function CoursesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence>
-                {memoizedFilteredCourses.map((course) => (
+                {memoizedFilteredLectures.map((lecture) => (
                   <motion.div
-                    key={course.id}
+                    key={lecture.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Link to={`/course-details/${course.id}`}>
+                    <Link to={`/lecture-details/${lecture.id}`}>
                       <CourseCard
-                        {...course}
+                        {...lecture}
                         isRTL={isRTL}
-                        childrenCount={course.childrenCount}
-                        teacherRole={course.teacherRole}
-                        status={course.status}
+                        childrenCount={lecture.childrenCount}
+                        teacherRole={lecture.teacherRole}
+                        status={lecture.status}
                       />
                     </Link>
                   </motion.div>

@@ -12,10 +12,10 @@ import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
-const AuditLog = lazy(() => import("./pages/Admin dashboard/auditLog"))
-const AdminDashboard = lazy(() => import("./pages/Admin dashboard/adminDashboard"))
-const CourseDetailsId = lazy(() => import("./pages/CourseDetails"))
-// const About = lazy(() => import('./pages/About'));
+const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
+const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/adminDashboard"))
+const CourseDetails = lazy(() => import("./pages/CourseDetails"))
+const LecturesPage = lazy(() => import("./pages/lectures"))
 const CivilcoLanding = lazy(() => import("./pages/landing"))
 const LoginStudent = lazy(() => import("./pages/Login/login-student"))
 const TeacherLogin = lazy(() => import("./pages/Login/login-teacher"))
@@ -31,27 +31,43 @@ const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
-const CourseDetails = lazy(() => import("./pages/Lecturer Dashboard/coursesDetails"))
-const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
+
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
   const [showUserSidebar, setShowUserSidebar] = useState(false)
 
-  const userSidebarRoutes = ["/dashboard", "/dashboard/lecture-page", "/dashboard/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details"]
+  // Define routes that should show user-specific UI components
+  const userRoutes = [
+    "/dashboard",
+    "/dashboard/lecture-page",
+    "/dashboard/promo-codes",
+    "/settings",
+    "/lecture-details",
+    "/lecture-details/:lectureId",
+    "/container-details/:containerId",
+    "/container-details/:containerId/lecture-page/:lectureId"
+  ]
 
   useEffect(() => {
-    // Check if current route should show UserSidebar
-    const shouldShowUserSidebar = userSidebarRoutes.includes(location.pathname)
-    setShowUserSidebar(shouldShowUserSidebar)
-  }, [location.pathname])
-  // Routes where UserNavbar should be shown
-  const userNavbarRoutes = ["/mobile-only", "/dashboard/lecture-page", "/dashboard/promo-codes", "/settings", "/lecture-details/:lectureId", "/lecture-details", "/dashboard/assistant-page"]
+    // Check if current route should show user-specific components
+    const isUserRoute = userRoutes.some(route => {
+      if (route.includes(':')) {
+        // Handle dynamic routes
+        const routeParts = route.split('/')
+        const pathParts = location.pathname.split('/')
+        
+        if (routeParts.length !== pathParts.length) return false
+        
+        return routeParts.every((part, i) => {
+          return part.startsWith(':') || part === pathParts[i]
+        })
+      }
+      return route === location.pathname
+    })
 
-  useEffect(() => {
-    // Check if current route should show UserNavbar
-    const shouldShowUserNavbar = userNavbarRoutes.includes(location.pathname)
-    setShowUserNavbar(shouldShowUserNavbar)
+    setShowUserNavbar(isUserRoute)
+    setShowUserSidebar(isUserRoute)
   }, [location.pathname])
 
   return (
@@ -59,36 +75,58 @@ function App() {
       {showUserNavbar ? <UserNavbar /> : <NavBar />}
       {showUserSidebar ? <UserSidebar /> : null}
 
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<LoadingSpinner fullScreen />}>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<RegisterStudent />} />
-          <Route path="/login-student" element={<LoginStudent />} />
           <Route path="/landing" element={<CivilcoLanding />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/course-details/:containerId" element={<CourseDetailsId />} />
-          <Route path="/teachers" element={<Teachers />} />
           <Route path="/services" element={<Services />} />
+          
+          {/* Authentication Routes */}
+          <Route path="/login-student" element={<LoginStudent />} />
           <Route path="/login-teacher" element={<TeacherLogin />} />
-          <Route path="/teacher-details/:id" element={<TeacherDetails />} />
-          <Route path="/mobile-only" element={<MobileOnly />} />
-          <Route path="/dashboard/lecture-page" element={isMobile ? <LectureList /> : <MobileOnly />} />
+          <Route path="/register" element={<RegisterStudent />} />
+          
+          {/* Content Routes */}
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/course-details/:subjectId" element={<CourseDetails />} />
+          <Route path="/lectures" element={<LecturesPage />} />
+          <Route path="/lectures/:lectureId" element={<LecturePage />} />
+          <Route path="/teachers" element={<Teachers />} />
+          <Route path="/teachers/:teacherId" element={<TeacherDetails />} />
+          
+          {/* User Dashboard Routes */}
+          <Route path="/dashboard" element={<AssistantPage />} />
+          <Route path="/dashboard/lecture-page" element={isMobile() ? <LectureList /> : <MobileOnly />} />
           <Route path="/dashboard/promo-codes" element={<PromoCodes />} />
-          <Route path="/container-details/:containerId" element={<ContainerDetails />} />
           <Route path="/settings" element={<SettingsPage />} />
+          
+          {/* Admin Routes */}
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/audit-log" element={<AuditLog />} />
-          <Route path="/lecturer-dashboard" element={<DashboardPage />} />
-          <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
-          <Route path="/course-details" element={<CourseDetails />} />
           
+          {/* Lecturer Routes */}
+          <Route path="/lecturer-dashboard" element={<DashboardPage />} />
+          
+          {/* Container/Lecture Management */}
+          <Route path="/container-details/:containerId" element={<ContainerDetails />} />
+          <Route 
+            path="/container-details/:containerId/lecture-page/:lectureId" 
+            element={<LecturePage />} 
+          />
+          
+          {/* Mobile Fallback */}
+          <Route path="/mobile-only" element={<MobileOnly />} />
           <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>
       </Suspense>
 
-      <footer className="bg-base-200 p-4">
-        <Footer />
-      </footer>
+      {/* Only show footer on public routes */}
+      {!showUserNavbar && (
+        <footer className="bg-base-200 p-4">
+          <Footer />
+        </footer>
+      )}
     </div>
   )
 }
