@@ -66,7 +66,7 @@ function App() {
           <Route path="/login-student" element={<LoginStudent />} />
           <Route path="/landing" element={<CivilcoLanding />} />
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/course-details/:containerId" element={<CourseDetails />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/services" element={<Services />} />
           <Route path="/login-teacher" element={<TeacherLogin />} />
