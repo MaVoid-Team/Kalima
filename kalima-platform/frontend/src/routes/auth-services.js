@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_BASE_URL
 
 // Create an axios instance with base URL
 const api = axios.create({
@@ -38,4 +38,7 @@ export const getToken = () => sessionStorage.getItem("authToken");
 
 export const isLoggedIn = () => !!getToken();
 
-export const logoutUser = () => sessionStorage.removeItem("authToken");
+export const logoutUser = () => {
+  sessionStorage.removeItem("authToken");
+  sessionStorage.clear();
+}
