@@ -34,6 +34,8 @@ const containerSchema = new mongoose.Schema(
     },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Container" }],
     price: { type: Number, default: 0 },
+    description: { type: String }, // Optional field for courses
+    goal: { type: String },       // Optional field for courses
   },
   {
     toObject: { virtuals: true },
@@ -41,5 +43,6 @@ const containerSchema = new mongoose.Schema(
     discriminatorKey: "kind",
   }
 );
+
 
 module.exports = mongoose.model("Container", containerSchema);

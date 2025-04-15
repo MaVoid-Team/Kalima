@@ -24,6 +24,18 @@ router.get(
   "/lecturer/:lecturerId",
   containerController.getLecturerContainers
 );
+//purchaseCounter for all containers
+router.get(
+  "/purchase-counts",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getAllContainerPurchaseCounts
+);
+//purchaseCounter for a container
+router.get(
+  "/purchase-counts/:containerId",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getContainerPurchaseCountById
+);
 
 // Create and get containers
 router

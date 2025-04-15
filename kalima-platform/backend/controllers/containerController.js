@@ -134,14 +134,81 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.getAllContainerPurchaseCounts = catchAsync(async (req, res, next) => {
+  // Aggregate purchase counts for all containers
+  const purchaseCounts = await Purchase.aggregate([
+    {
+      $group: {
+        _id: "$container", // Group by container ID
+        purchaseCount: { $sum: 1 }, // Count the number of purchases
+      },
+    },
+    {
+      $lookup: {
+        from: "containers", // Ensure this matches your actual collection name
+        localField: "_id",
+        foreignField: "_id",
+        as: "containerDetails",
+      },
+    },
+    {
+      $unwind: "$containerDetails", // Unwind the container details
+    },
+    {
+      $project: {
+        _id: 0,
+        containerId: "$_id",
+        containerName: "$containerDetails.name",
+        purchaseCount: 1,
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    results: purchaseCounts.length,
+    data: purchaseCounts,
+  });
+});
+
+exports.getContainerPurchaseCountById = catchAsync(async (req, res, next) => {
+  const { containerId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID", 400));
+  }
+
+  // Fetch the container details
+  const container = await Container.findById(containerId).select("name");
+  if (!container) {
+    return next(new AppError("Container not found", 404));
+  }
+
+  // Count the number of purchases for the specific container
+  const purchaseCount = await Purchase.countDocuments({ container: containerId });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      containerId,
+      containerName: container.name,
+      purchaseCount,
+    },
+  });
+});
+
 exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { name, type, price, level, teacherAllowed, subject, parent, createdBy } = req.body;
+    const { name, type, price, level, teacherAllowed, subject, parent, createdBy, description, goal } = req.body;
     await checkDoc(Level, level, session);
     await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
+
+    if (type === "course" && (!description || !goal)) {
+      return next(new AppError("Description and goal are required for course type.", 400));
+    }
 
     const container = await Container.create(
       [
@@ -154,11 +221,12 @@ exports.createContainer = catchAsync(async (req, res, next) => {
           subject,
           parent,
           createdBy: createdBy || req.user._id,
+          description: type === "course" ? description : undefined,
+          goal: type === "course" ? goal : undefined,
         },
       ],
       { session }
     );
-
     // If this container has a parent, update the parent's children array
     if (parent) {
       const parentContainer = await checkDoc(
@@ -301,11 +369,19 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject } = req.body;
+  const { name, type, price, level, subject, description, goal } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     let obj = { name, type, price };
+
+    if (type === "course") {
+      if (!description || !goal) {
+        return next(new AppError("Description and goal are required for course type.", 400));
+      }
+      obj.description = description;
+      obj.goal = goal;
+    }
 
     if (subject) {
       const subjectDoc = await checkDoc(Subject, subject, session);
