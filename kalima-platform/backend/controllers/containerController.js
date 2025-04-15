@@ -296,10 +296,15 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllContainers = catchAsync(async (req, res, next) => {
-  const Role = req.user.role?.toLowerCase();
+  let query = {};
+  
+  // If user is not authenticated (not logged in), only show non-lecture containers
+  if (!req.user) {
+    query.type = { $ne: 'lecture' };
+  }
 
-  // Fetch all containers
-  const containers = await Container.find().populate([
+  // Fetch containers based on the query
+  const containers = await Container.find(query).populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
@@ -309,8 +314,8 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     return next(new AppError("No containers found.", 404));
   }
 
-  // Role-specific logic
-  if (Role === "teacher") {
+  // Role-specific logic for authenticated users
+  if (req.user && req.user.role?.toLowerCase() === "teacher") {
     // Filter containers based on `teacherAllowed` property
     const filteredContainers = containers.map((container) => {
       if (!container.teacherAllowed) {
@@ -334,7 +339,7 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Default response for all roles
+  // Default response for all roles and unauthenticated users
   return res.status(200).json({
     status: "success",
     results: containers.length,
@@ -365,6 +370,35 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     data: {
       containers,
     },
+  });
+});
+
+exports.getMyContainers = catchAsync(async (req, res, next) => {
+  const lecturerId = req.user._id; // Extract the logged-in lecturer's ID from the JWT token
+
+  const containers = await Container.find({ createdBy: lecturerId })
+    .populate([
+      { path: "subject", select: "name" },
+      { path: "level", select: "name" },
+      { 
+        path: "children", 
+        populate: [
+          { path: "subject", select: "name" },
+          { path: "level", select: "name" }
+        ] 
+      },
+      { path: "parent", select: "name type" },
+      { path: "createdBy", select: "name email" }
+    ]);
+
+  if (!containers || containers.length === 0) {
+    return next(new AppError("No containers found for this lecturer.", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: { containers },
   });
 });
 
