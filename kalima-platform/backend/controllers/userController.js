@@ -310,7 +310,6 @@ const getMyData = catchAsync(async (req, res, next) => {
 
   // Determine user model based on role
   let userModel;
-  let purchases = [];
   let pointsBalances = [];
 
   // Find the appropriate user model
