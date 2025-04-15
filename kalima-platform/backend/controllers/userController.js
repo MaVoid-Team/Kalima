@@ -8,6 +8,7 @@ const Assistant = require("../models/assistantModel.js");
 const Purchase = require("../models/purchaseModel.js");
 const Code = require("../models/codeModel.js");
 const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
+const Container = require("../models/containerModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -301,111 +302,240 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Get all data for the currently logged-in student/parent
- * Includes user profile, balance information and purchase history
+ * Get all data for the currently logged-in user (any role)
+ * Includes user profile, balance information (for student/parent) and purchase history (for student/parent)
  */
 const getMyData = catchAsync(async (req, res, next) => {
   // Get user ID from authenticated user
   const userId = req.user._id;
-
-  // Determine user model based on role
-  let userModel;
-  let pointsBalances = [];
-
-  // Find the appropriate user model
-  if (req.user.role === "Student") {
-    userModel = await Student.findById(userId)
-      .populate("level", "name")
-      .populate({
-        path: "lecturerPoints.lecturer",
-        select: "name subject expertise",
+  const userRole = req.user.role;
+  
+  // Common response data
+  let responseData = {
+    userInfo: {
+      id: userId,
+      name: req.user.name,
+      email: req.user.email,
+      role: userRole,
+    }
+  };
+  
+  // Role-specific data retrieval
+  switch(userRole) {
+    case "Student":
+      // Find student with all related data
+      const student = await Student.findById(userId)
+        .populate("level", "name")
+        .populate({
+          path: "lecturerPoints.lecturer",
+          select: "name subject expertise"
+        })
+        .lean();
+      
+      if (!student) {
+        return next(new AppError("Student not found", 404));
+      }
+      
+      // Add student-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: student.phoneNumber,
+        level: student.level,
+        generalPoints: student.generalPoints || 0,
+        totalPoints: student.totalPoints || 0,
+        hobbies: student.hobbies,
+        faction: student.faction
+      };
+      
+      // Get student purchases, redeemed codes, and lecture access
+      responseData = await getStudentParentAdditionalData(userId, responseData, student.lecturerPoints || []);
+      break;
+      
+    case "Parent":
+      // Find parent with all related data
+      const parent = await Parent.findById(userId)
+        .populate({
+          path: "children",
+          select: "name level sequencedId"
+        })
+        .populate({
+          path: "lecturerPoints.lecturer",
+          select: "name subject expertise"
+        })
+        .lean();
+      
+      if (!parent) {
+        return next(new AppError("Parent not found", 404));
+      }
+      
+      // Add parent-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: parent.phoneNumber,
+        level: parent.level,
+        children: parent.children,
+        generalPoints: parent.generalPoints || 0
+      };
+      
+      // Get parent purchases, redeemed codes, and lecture access
+      responseData = await getStudentParentAdditionalData(userId, responseData, parent.lecturerPoints || []);
+      break;
+      
+    case "Lecturer":
+      // Find lecturer with relevant data
+      const lecturer = await Lecturer.findById(userId)
+        .lean();
+      
+      if (!lecturer) {
+        return next(new AppError("Lecturer not found", 404));
+      }
+      
+      // Add lecturer-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        bio: lecturer.bio,
+        expertise: lecturer.expertise
+      };
+      
+      // Get lecturer-specific data (containers created by this lecturer)
+      const containers = await Container.find({ createdBy: userId })
+        .select("name type price subject level")
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+      
+      responseData.containers = containers;
+      
+      // Get point purchases made for this lecturer's content
+      const pointPurchases = await Purchase.find({ 
+        lecturer: userId 
       })
+      .populate("student", "name")
+      .sort({ purchasedAt: -1 })
       .lean();
-  } else if (req.user.role === "Parent") {
-    userModel = await Parent.findById(userId)
-      .populate({
-        path: "children",
-        select: "name level sequencedId",
-      })
-      .populate({
-        path: "lecturerPoints.lecturer",
-        select: "name subject expertise",
-      })
-      .lean();
-  } else {
-    return next(
-      new AppError("Only students and parents can access this resource", 403)
-    );
+      
+      responseData.pointPurchases = pointPurchases;
+      break;
+      
+    case "Teacher":
+      // Find teacher with relevant data
+      const teacher = await Teacher.findById(userId)
+        .populate("school", "name")
+        .lean();
+      
+      if (!teacher) {
+        return next(new AppError("Teacher not found", 404));
+      }
+      
+      // Add teacher-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: teacher.phoneNumber,
+        subject: teacher.subject,
+        level: teacher.level,
+        faction: teacher.faction,
+        school: teacher.school
+      };
+      break;
+      
+    case "Admin":
+    case "SubAdmin":
+    case "Moderator":
+      // For admin roles, just return basic profile info
+      const admin = await User.findById(userId)
+        .select("-password")
+        .lean();
+      
+      if (!admin) {
+        return next(new AppError("User not found", 404));
+      }
+      
+      // No additional fields needed for admin roles
+      break;
+      
+    case "Assistant":
+      // Find assistant with related lecturer
+      const assistant = await Assistant.findById(userId)
+        .populate("assignedLecturer", "name expertise")
+        .lean();
+      
+      if (!assistant) {
+        return next(new AppError("Assistant not found", 404));
+      }
+      
+      // Add assistant-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        assignedLecturer: assistant.assignedLecturer
+      };
+      break;
+      
+    default:
+      // For any other role, return basic user info
+      const user = await User.findById(userId)
+        .select("-password")
+        .lean();
+      
+      if (!user) {
+        return next(new AppError("User not found", 404));
+      }
   }
+  
+  res.status(200).json({
+    status: "success",
+    data: responseData
+  });
+});
 
-  if (!userModel) {
-    return next(new AppError("User not found", 404));
-  }
-
+// Helper function to get additional data for students and parents
+const getStudentParentAdditionalData = async (userId, responseData, pointsBalances) => {
   // Get all types of purchases for the user
   const purchaseHistory = await Purchase.find({
-    student: userId,
+    student: userId
   })
-    .populate([
-      { path: "container", select: "name type price" },
-      { path: "lecturer", select: "name expertise" },
-      { path: "package", select: "name type price description" },
-    ])
-    .sort({ purchasedAt: -1 })
-    .lean();
+  .populate([
+    { path: "container", select: "name type price" },
+    { path: "lecturer", select: "name expertise" },
+    { path: "package", select: "name type price description" }
+  ])
+  .sort({ purchasedAt: -1 })
+  .lean();
 
   // Get redeemed codes
   const redeemedCodes = await Code.find({
     redeemedBy: userId,
-    isRedeemed: true,
+    isRedeemed: true
   }).lean();
 
   // Get lecture access information
   const lectureAccess = await StudentLectureAccess.find({
-    student: userId,
+    student: userId
   })
-    .populate({
-      path: "lecture",
-      select: "name videoLink description numberOfViews",
-    })
-    .lean();
-
-  // Format point balances for better readability
-  pointsBalances = userModel.lecturerPoints || [];
-
+  .populate({
+    path: "lecture",
+    select: "name videoLink description numberOfViews"
+  })
+  .lean();
+  
   // Determine if any lecture types were purchased
   const purchasedLectureTypes = new Set();
-  purchaseHistory.forEach((purchase) => {
-    if (purchase.container && purchase.container.type === "lecture") {
-      purchasedLectureTypes.add("lecture");
+  purchaseHistory.forEach(purchase => {
+    if (purchase.container && purchase.container.type === 'lecture') {
+      purchasedLectureTypes.add('lecture');
     }
   });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      userInfo: {
-        id: userModel._id,
-        name: userModel.name,
-        email: userModel.email,
-        role: userModel.role || req.user.role,
-        phoneNumber: userModel.phoneNumber,
-        level: userModel.level,
-        ...(userModel.children && { children: userModel.children }),
-        generalPoints: userModel.generalPoints || 0,
-        totalPoints: userModel.totalPoints || 0,
-      },
-      pointsBalances,
-      purchaseHistory,
-      redeemedCodes,
-      lectureAccess,
-      purchasedFeatures: {
-        hasLectures: purchasedLectureTypes.size > 0,
-      },
-    },
-  });
-});
-
+  
+  return {
+    ...responseData,
+    pointsBalances,
+    purchaseHistory,
+    redeemedCodes,
+    lectureAccess,
+    purchasedFeatures: {
+      hasLectures: purchasedLectureTypes.size > 0
+    }
+  };
+};
 
 module.exports = {
   getAllUsers,
