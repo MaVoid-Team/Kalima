@@ -31,20 +31,20 @@ export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/users/${userId}`, {
       headers: getAuthHeader(),
-    })
+    });
 
     return {
       success: true,
       data: response.data,
-    }
+    };
   } catch (error) {
-    console.error("API Error:", error)
+    console.error("API Error:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch user",
-    }
+    };
   }
-}
+};
 
 export const getToken = () => {
   return localStorage.getItem("accessToken");
