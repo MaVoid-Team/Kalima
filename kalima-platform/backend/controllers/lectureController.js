@@ -226,42 +226,6 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.getLecturesByType = catchAsync(async (req, res, next) => {
-  const { lectureType } = req.params;
-  const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
-
-  if (!allowedTypes.includes(lectureType)) {
-    return next(
-      new AppError(
-        `Invalid lecture type specified: ${lectureType}. Allowed types are: ${allowedTypes.join(
-          ", "
-        )}`,
-        400
-      )
-    );
-  }
-
-  let query = Lecture.find({ lecture_type: lectureType }).populate([
-    { path: "createdBy", select: "name" },
-    { path: "subject", select: "name" },
-    { path: "level", select: "name" },
-  ]);
-
-  const features = new QueryFeatures(query, req.query)
-    .filter()
-    .sort()
-    .paginate();
-
-  const lectures = await features.query.lean();
-
-  res.status(200).json({
-    status: "success",
-    results: lectures.length,
-    data: {
-      lectures,
-    },
-  });
-});
 
 exports.UpdateParentOfLecture = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
