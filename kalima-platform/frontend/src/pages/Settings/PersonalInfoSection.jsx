@@ -86,29 +86,6 @@ function PersonalInfoSection({ formData, handleInputChange }) {
               />
             </div>
           </div>
-
-          {/* ID Number Field */}
-          <div className="form-control mb-4">
-            <label className={`label justify-end`}>
-              <span className="label-text">
-                {personalInfo.labels.idNumber}<span className="text-error">*</span>
-              </span>
-            </label>
-            <div className={`flex gap-4 ${isRTL ? 'flex-row' : 'flex-row-reverse'}`}>
-              <button className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}>
-                {personalInfo.buttons.add}
-              </button>
-              <input
-                type="text"
-                name="idNumber"
-                value={formData.idNumber}
-                onChange={handleInputChange}
-                placeholder={personalInfo.placeholders.idNumber}
-                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
-                dir={isRTL ? 'rtl' : 'ltr'}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

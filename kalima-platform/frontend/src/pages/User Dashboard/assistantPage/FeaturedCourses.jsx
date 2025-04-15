@@ -27,7 +27,7 @@ const FeaturedCourses = () => {
             </p>
           </div>
           <img 
-            src={isRTL ? "/3books-ar.png" : "/3books.png"} 
+            src={'/3books.png'} 
             alt={t('coursesAlt')} 
             className={`w-32 lg:w-24 rounded-lg ${isRTL ? 'mr-4' : 'ml-4'}`}
           />
