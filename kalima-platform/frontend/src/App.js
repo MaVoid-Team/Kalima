@@ -31,7 +31,8 @@ const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
-
+const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
+const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
@@ -80,6 +81,9 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/landing" element={<CivilcoLanding />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route path="/teachers" element={<Teachers />} />
           <Route path="/services" element={<Services />} />
           
           {/* Authentication Routes */}
@@ -107,17 +111,9 @@ function App() {
           
           {/* Lecturer Routes */}
           <Route path="/lecturer-dashboard" element={<DashboardPage />} />
-          
-          {/* Container/Lecture Management */}
-          <Route path="/container-details/:containerId" element={<ContainerDetails />} />
-          <Route 
-            path="/container-details/:containerId/lecture-page/:lectureId" 
-            element={<LecturePage />} 
-          />
-          
-          {/* Mobile Fallback */}
-          <Route path="/mobile-only" element={<MobileOnly />} />
-          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
+          <Route path="/coursesdashboard" element={<CoursesDashboard />} />
+          <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
+          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>
       </Suspense>
 
