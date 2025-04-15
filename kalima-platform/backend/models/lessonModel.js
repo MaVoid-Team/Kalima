@@ -1,12 +1,28 @@
 const mongoose = require("mongoose");
 
 const lessonSchema = new mongoose.Schema({
-  subject: { type: String, required: true },
-  lecturer: { type: String, required: true },
-  level: { type: String, required: true },
+  subject: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subject",
+    required: true,
+  },
+  lecturer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  level: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Level",
+    required: true,
+  },
   startTime: { type: Date, required: true },
-  duration: { type: Number, required: false }, // Duration in minutes
-  center: { type: mongoose.Schema.Types.ObjectId, ref: "Center", required: true }, // Reference to Center
+  duration: { type: Number, required: false },
+  center: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Center",
+    required: true,
+  },
 }, {
   timestamps: true,
 });
