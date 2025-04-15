@@ -7,7 +7,10 @@ const uploadFileMiddleware =
   require("../utils/upload files/uploadFiles").uploadFileMiddleware;
 
 // Routes that don't require authentication
-router.route("/").get(userController.getAllUsers).post(validateUser, userController.createUser)
+router
+  .route("/")
+  .get(userController.getAllUsers)
+  .post(validateUser, userController.createUser);
 
 router
   .route("/:userId")
@@ -29,6 +32,6 @@ router.use(verifyJWT);
 // Get current user's data (for student/parent only)
 router.get("/me/dashboard", userController.getMyData);
 
-router.route("/update/password").patch(userController.changePassword)
+router.route("/update/password").patch(userController.changePassword);
 
 module.exports = router;
