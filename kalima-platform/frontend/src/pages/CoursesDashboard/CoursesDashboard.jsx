@@ -13,8 +13,8 @@ function CoursesDashboard() {
     <div className="w-full overflow-x-hidden p-4 sm:p-8 md:p-14">
       <CourseManagementSection />
       <AssistantsSection />
-      <CourseSection />
-      <ReviewCoursesSection />
+      {/* <CourseSection /> */}
+      {/* <ReviewCoursesSection /> */}
     </div>
   );
 }
