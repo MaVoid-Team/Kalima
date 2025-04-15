@@ -32,7 +32,8 @@ const lecturerRouter = require("./routes/lecturerRoutes.js");
 const assistantRouter = require("./routes/assistantRoutes.js");
 const packegeRouter = require("./routes/packageRoutes.js");
 const auditLogRouter = require("./routes/auditLogRoutes.js");
-
+const cLecturerRouter = require("./routes/center.lecturerRoutes.js");
+const cStudentRouter = require("./routes/center.studentRoutes.js");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -62,6 +63,8 @@ app.use("/api/v1/lecturers", auditLogger, lecturerRouter);
 app.use("/api/v1/assistants", auditLogger, assistantRouter);
 app.use("/api/v1/packages", auditLogger, packegeRouter);
 app.use("/api/v1/audit-logs", auditLogRouter);
+app.use("/api/v1/center-lecturer", cLecturerRouter);
+app.use("/api/v1/center-student", cStudentRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -99,8 +102,6 @@ mongoose.connection.once("open", () => {
             subjectId: notification.relatedId,
             notificationId: notification._id,
           });
-
-
 
           await Notification.findByIdAndUpdate(notification._id, {
             isSent: true,
