@@ -1,13 +1,39 @@
-"use client";
-
 import { useState, useEffect, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { getSubjectById, getLecturesBySubject } from "../routes/courses";
+import { getSubjectById } from "../routes/courses";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorAlert } from "../components/ErrorAlert";
-import { FaDoorOpen, FaSearch, FaRegStickyNote, FaArrowLeft } from "react-icons/fa";
+import {
+  FaDoorOpen,
+  FaSearch,
+  FaRegStickyNote,
+  FaRegCalendarCheck,
+} from "react-icons/fa";
+
+// Placeholder values and functions to avoid runtime errors (you need to implement these)
+const t = (key) => key; // Replace with i18n
+const lectures = []; // Replace with actual lectures
+const handleLectureClick = () => {};
+const LecturesList = () => <></>;
+const isRTL = true;
+
+const months = [
+  {
+    month: "يناير",
+    items: [
+      { lesson: "الدرس الأول: مقدمة إلى React", time: 30 },
+      { lesson: "الدرس الثاني: مكونات React", time: 45 },
+    ],
+  },
+  {
+    month: "فبراير",
+    items: [
+      { lesson: "الدرس الأول: حالة المكونات", time: 30 },
+      { lesson: "الدرس الثاني: الأحداث في React", time: 45 },
+    ],
+  },
+];
 
 const DetailItem = ({ label, value, isRTL }) => (
   <motion.div
@@ -23,129 +49,105 @@ const DetailItem = ({ label, value, isRTL }) => (
   </motion.div>
 );
 
-const LectureItem = ({ lecture, onClick, isRTL }) => (
-  <motion.li
-    initial={{ opacity: 0, x: -20 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.5 }}
-    className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 cursor-pointer hover:bg-base-200 p-3 rounded-md transition-colors"
-    onClick={onClick}
+const PlanSection = ({ month, items, isLastMonth }) => (
+  <motion.div
+    initial={{ y: -20, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ delay: 0.8, duration: 0.5 }}
+    className="mb-6"
+    style={{ direction: "rtl" }}
   >
-    <div className="flex items-center gap-3">
-      <FaRegStickyNote className="text-primary w-4 h-4 flex-shrink-0" />
-      <span className="break-words font-medium text-base-content">{lecture.name}</span>
+    <div className="flex items-center gap-2 mb-2">
+      <FaRegCalendarCheck className="text-base-content w-5 h-5" />
+      <h3 className="text-lg font-bold text-base-content">{month}</h3>
     </div>
-    <span className="badge badge-primary badge-sm">
-      {lecture.type || "Lecture"}
-    </span>
-  </motion.li>
-);
-
-const LecturesList = ({ lectures, onLectureClick, isRTL }) => (
-  <div className="w-full">
-    <ul className="list-none space-y-2">
-      {lectures.map((lecture) => (
-        <LectureItem
-          key={lecture._id}
-          lecture={lecture}
-          onClick={() => onLectureClick(lecture._id)}
-          isRTL={isRTL}
-        />
+    <ul className="list-none text-xs text-base-content space-y-2">
+      {items.map((item, index) => (
+        <motion.li
+          key={index}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.2, duration: 0.5 }}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
+        >
+          <div className="flex items-center gap-2">
+            <FaRegStickyNote className="text-base-content w-4 h-4 flex-shrink-0" />
+            <span className="break-words font-semibold">{item.lesson}</span>
+          </div>
+          <span className="font-semibold text-base-content/70 sm:bg-transparent bg-primary text-white rounded-full px-3 py-1 whitespace-nowrap">
+            {item.time} دقيقة
+          </span>
+        </motion.li>
       ))}
     </ul>
+    {!isLastMonth && <div className="w-full h-px bg-base-300 my-4"></div>}
+  </motion.div>
+);
+
+const PlanList = ({ months }) => (
+  <div>
+    {months.map((monthData, index) => (
+      <PlanSection
+        key={index}
+        month={monthData.month}
+        items={monthData.items}
+        isLastMonth={index === months.length - 1}
+      />
+    ))}
   </div>
 );
 
 export default function CourseDetails() {
-  const { t, i18n } = useTranslation("courseDetails");
-  const isRTL = i18n.language === "ar";
-  const { subjectId } = useParams();
-  const navigate = useNavigate();
-  const [subject, setSubject] = useState(null);
-  const [lectures, setLectures] = useState([]);
+  const { courseId } = useParams();
+  const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourseDetails = async () => {
       try {
-        setLoading(true);
-        setError("");
-
-        const subjectResult = await getSubjectById(subjectId);
-        if (!subjectResult.success || !subjectResult.data?.subject) {
-          throw new Error(subjectResult.error || "Failed to fetch subject details");
-        }
-        setSubject(subjectResult.data.subject);
-
-        const lecturesResult = await getLecturesBySubject(subjectId);
-        if (lecturesResult.success) {
-          setLectures(lecturesResult.data || []);
+        const result = await getSubjectById(courseId);
+        console.log("Full API response:", result);
+        if (result.success) {
+          setCourse(result.data);
+        } else {
+          setError(result.error || "Failed to fetch course details");
         }
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.message || "An unexpected error occurred");
+        setError("An unexpected error occurred");
       } finally {
         setLoading(false);
       }
     };
 
-    if (subjectId) {
-      fetchData();
-    }
-  }, [subjectId]);
-
-  const handleLectureClick = (lectureId) => {
-    navigate(`/course-details/${subjectId}/lectures/${lectureId}`);
-  };
-
-  const levelName = useMemo(() => {
-    if (!subject?.level || subject.level.length === 0) return t("unknown");
-
-    const levels = subject.level.map((level) => {
-      switch (level.name) {
-        case "Primary":
-          return t("levels.primary");
-        case "Middle":
-          return t("levels.middle");
-        case "Upper Primary":
-          return t("levels.upperPrimary");
-        default:
-          return level.name;
-      }
-    });
-
-    return levels.join(", ");
-  }, [subject, t]);
+    fetchCourseDetails();
+  }, [courseId]);
 
   const courseDetailsContent = useMemo(() => (
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-base-100 shadow-lg rounded-lg p-6 border border-base-300 w-full"
+      transition={{ delay: 0.6, duration: 0.5 }}
+      whileHover={{ scale: 1.05 }}
+      className="bg-base-100 shadow-lg rounded-lg p-6 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-sm"
     >
-      <h2 className="text-xl font-bold text-base-content text-center mb-4">{t("courseDetails")}</h2>
+      <h2 className="text-xl font-bold text-base-content text-center mb-4">تفاصيل الكورس</h2>
       <div className="w-full h-px bg-base-300 mb-4" />
-      <div className="space-y-2">
-        <DetailItem label={t("labels.subject")} value={subject?.name || t("unknown")} isRTL={isRTL} />
-        <DetailItem label={t("labels.levels")} value={levelName} isRTL={isRTL} />
+      <div className="space-y-4">
+        <DetailItem label="المدرس" value={course?.teacher || "أ.يوسف عثمان"} isRTL={isRTL} />
+        <DetailItem label="عدد المحاضرات" value={`${course?.lecturesCount || 10}`} isRTL={isRTL} />
         <DetailItem
-          label={t("labels.lecturesCount")}
-          value={lectures.length}
+          label="الصف الدراسي"
+          value={course?.level?.map((l) => l.name).join("، ") || "الصف الثانوي"}
           isRTL={isRTL}
         />
-        <DetailItem
-          label={t("labels.teacherCount")}
-          value={subject?.teachers?.length || t("unknown")}
-          isRTL={isRTL}
-        />
+        <DetailItem label="المشاهدات" value={`${course?.views || 1240} مشاهدة`} isRTL={isRTL} />
       </div>
     </motion.div>
-  ), [subject, lectures, isRTL, t, levelName]);
+  ), [course]);
 
-  if (loading) return <LoadingSpinner fullScreen />;
-  if (error) return <ErrorAlert error={error} onRetry={() => window.location.reload()} />
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorAlert message={error} />;
 
   return (
     <motion.div
@@ -154,72 +156,43 @@ export default function CourseDetails() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       className="min-h-screen w-full bg-base-200"
-      style={{ direction: isRTL ? "rtl" : "ltr" }}
     >
       <div className="container mx-auto px-4 py-8">
-        {/* Header Section */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex flex-col items-center gap-4 mb-8"
+          className="container mx-auto px-4 pt-4 mb-8 text-end"
         >
-          <h1 className="text-2xl md:text-3xl font-bold text-base-content text-center">
-            {subject?.name || t("courseDetails")}
-          </h1>
-          <Link to="/courses" className="btn btn-outline">
-            <FaArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
-            {t("backToCourses")}
-          </Link>
+          <div className="relative inline-block">
+            <p className="flex items-center gap-x-4 text-3xl font-bold text-base-content md:mx-40 relative z-10">
+              <FaSearch />
+              كورساتي
+            </p>
+            <img
+              src="/underline.png"
+              alt="underline"
+              className="absolute bottom-0 left-0 w-full h-auto object-contain z-0"
+            />
+          </div>
         </motion.div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Course Details */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Course Description */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="bg-base-100 p-6 rounded-lg shadow-md"
+              transition={{ delay: 1, duration: 0.5 }}
+              className="mt-6"
             >
-              <h2 className="text-xl font-bold mb-4">{t("description")}</h2>
-              <p className="text-base-content/90">
-                {subject?.description || t("noDescription")}
-              </p>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-bold mb-3">{t("objectives")}</h3>
-                <ul className={`list-disc ${isRTL ? "pr-5" : "pl-5"} space-y-2`}>
-                  <li>{t("objectivesList.1", { subject: subject?.name || t("subject") })}</li>
-                  <li>{t("objectivesList.2")}</li>
-                  <li>{t("objectivesList.3")}</li>
-                  <li>{t("objectivesList.4")}</li>
-                </ul>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">{t("courseContent")}</h2>
+                <span className="badge badge-primary">{lectures.length} {t("lectures")}</span>
               </div>
+              <LecturesList lectures={lectures} onLectureClick={handleLectureClick} isRTL={isRTL} />
             </motion.div>
-
-            {/* Course Content */}
-            {lectures.length > 0 && (
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                className="bg-base-100 p-6 rounded-lg shadow-md"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold">{t("courseContent")}</h2>
-                  <span className="badge badge-primary">
-                    {lectures.length} {t("lectures")}
-                  </span>
-                </div>
-                <LecturesList lectures={lectures} onLectureClick={handleLectureClick} isRTL={isRTL} />
-              </motion.div>
-            )}
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {courseDetailsContent}
 
@@ -239,7 +212,87 @@ export default function CourseDetails() {
                 {t("exploreCourses")}
               </motion.button>
             </motion.div>
+
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="flex items-center justify-center"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="rounded-lg shadow-sm w-full h-[300px] md:h-[400px] hover:bg-secondary hover:text-secondary-content transition-colors duration-300 overflow-hidden flex items-center justify-center"
+                style={{ aspectRatio: "1/1" }}
+              >
+                <img
+                  src={course?.image || "/CourseDetails1.png"}
+                  alt="Course cover"
+                  className="rounded-lg max-w-full max-h-full object-contain"
+                />
+              </motion.div>
+            </motion.div>
           </div>
+
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mb-12"
+          >
+            <h4 className="text-lg mb-2 font-semibold text-base-content text-right">
+              <span className="font-bold">اسم الدورة:</span> {course?.subject?.name || "اللغة الإنجليزية"}
+            </h4>
+            <h4 className="text-lg font-bold text-base-content text-right">: وصف الدورة</h4>
+            <p className="text-sm font-semibold text-base-content mb-4 text-right">
+              {course?.description || "تهدف هذه الدورة إلى تطوير مهارات المتعلمين..."}
+              <br />
+              <span className="text-sm font-normal inline-block text-base-content">
+                المستوى: {course?.subject?.level?.map((l) => l.name).join(" / ") || "مبتدئ / متوسط / متقدم"}
+              </span>
+            </p>
+            <div className="flex flex-col items-end mb-4 text-right">
+              <span className="text-lg font-semibold text-base-content">
+                المدة: {course?.duration || "10 أسابيع"}
+              </span>
+            </div>
+
+            <div className="space-y-2 text-right">
+              <h4 className="text-lg font-bold text-base-content">أهداف الدورة:</h4>
+              <ul className="list-disc list-inside text-sm font-semibold text-base-content pr-4">
+                {course?.objectives?.length > 0 ? (
+                  course.objectives.map((obj, index) => <li key={index}>{obj}</li>)
+                ) : (
+                  <>
+                    <li>تنمية المفردات وتحسين استخدام القواعد</li>
+                    <li>تعزيز مهارات التحدث والاستماع بثقة</li>
+                    <li>تحسين مهارات القراءة والكتابة</li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mb-12"
+          >
+            <h3 className="text-xl font-bold text-base-content text-right mb-6">خطة الكورس</h3>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="bg-base-100 text-primary shadow-lg rounded-lg px-6 py-2 border-t-[3px] border-l-[3px] border-r-[1px] border-b-[1px] border-primary w-full max-w-2xl ml-auto relative"
+            >
+              <div className="absolute top-4 left-2 w-[100px] h-[100px] rounded-tl-lg">
+                <img src="/CourseDetails2.png" alt="Decorative" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex justify-end">
+                <div className="w-full md:w-4/6 pl-4">
+                  <PlanList months={course?.plan || months} />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </motion.div>
