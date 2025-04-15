@@ -93,15 +93,15 @@ function App() {
           
           {/* Content Routes */}
           <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/course-details/:subjectId" element={<CourseDetails />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
           <Route path="/lectures" element={<LecturesPage />} />
           <Route path="/lectures/:lectureId" element={<LecturePage />} />
           <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teachers/:teacherId" element={<TeacherDetails />} />
+          <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
           
           {/* User Dashboard Routes */}
           <Route path="/dashboard" element={<AssistantPage />} />
-          <Route path="/dashboard/lecture-page" element={isMobile() ? <LectureList /> : <MobileOnly />} />
+          <Route path="/dashboard/lecture-page" element={<LectureList />} />
           <Route path="/dashboard/promo-codes" element={<PromoCodes />} />
           <Route path="/settings" element={<SettingsPage />} />
           
@@ -112,6 +112,7 @@ function App() {
           {/* Lecturer Routes */}
           <Route path="/lecturer-dashboard" element={<DashboardPage />} />
           <Route path="/coursesdashboard" element={<CoursesDashboard />} />
+          <Route path="container-details/:containerId" element={<ContainerDetails />} />
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
           <Route path="dashboard/assistant-page" element={<AssistantPage />} />
         </Routes>

@@ -312,7 +312,7 @@ export default function CoursesPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Link to={`/course-details/${course.id}`}>
+                    <Link to={`/courses/${course.id}`}>
                       <CourseCard
                         {...course}
                         isRTL={isRTL}

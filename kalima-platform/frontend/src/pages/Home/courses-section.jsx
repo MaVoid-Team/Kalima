@@ -107,7 +107,7 @@ export function CoursesSection() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Link to={`/course-details/${course.id}`}>
+                    <Link to={`/courses/${course.id}`}>
                       <CourseCard
                         id={course.id}
                         image={course.image}

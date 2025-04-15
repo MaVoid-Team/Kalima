@@ -66,36 +66,33 @@ export const getLecturesByContainerId = async (containerId) => {
       throw new Error("User not authenticated")
     }
 
-    // First get the container to access its children array
     const containerResponse = await getContainerById(containerId)
-    const childrenArray = containerResponse.data.container.children
-    
+    const containerData = containerResponse.data
+    const childrenArray = containerData?.children || containerData?.container?.children || []
+
     console.log("Children array:", childrenArray)
-    
-    if (!childrenArray || childrenArray.length === 0) {
+
+    if (!childrenArray.length) {
       return { data: { lectures: [] } }
     }
-    
-    // Extract lecture IDs from the children array
-    const lectureIds = childrenArray.map(child => child._id || child.id)
-    console.log("Extracted lecture IDs:", lectureIds)
-    
-    // Get lectures directly from the children array
-    // Since the children array already contains basic lecture info
+
     const lectures = childrenArray.map(child => ({
       _id: child._id || child.id,
       name: child.name,
-      kind: child.kind || "Lecture", // Default to "Lecture" if kind is not provided
-      // Add other properties that might be needed
-      parent: containerId
+      kind: child.kind || "Lecture",
+      parent: containerId,
+      price: child.price || 0,
+      description: child.description || "",
+      numberOfViews: child.numberOfViews || 0,
     }))
-    
+
     return { data: { lectures } }
   } catch (error) {
     console.error(`Error fetching lectures for container ${containerId}:`, error)
     throw error
   }
 }
+
 
 // Function to get a lecture by ID
 export const getLectureById = async (lectureId) => {

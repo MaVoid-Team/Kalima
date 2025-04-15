@@ -14,21 +14,20 @@ const ContainerDetailsPage = () => {
 
   useEffect(() => {
     console.log("Container ID from params:", containerId)
-
+  
     const fetchContainerAndLectures = async () => {
       try {
         setLoading(true)
-
-        // Fetch container details
+  
         const containerResult = await getContainerById(containerId)
         console.log("Container data:", containerResult.data)
-        setContainer(containerResult.data.container)
-
-        // Fetch lectures that belong to this container
+        const containerData = containerResult.data.container || containerResult.data
+        setContainer(containerData)
+  
         const lecturesResult = await getLecturesByContainerId(containerId)
         console.log("Lectures data:", lecturesResult.data)
         setLectures(lecturesResult.data.lectures)
-
+  
         setLoading(false)
       } catch (err) {
         setError("Failed to load container details. Please try again later.")
@@ -36,11 +35,12 @@ const ContainerDetailsPage = () => {
         console.error("Error:", err)
       }
     }
-
+  
     if (containerId) {
       fetchContainerAndLectures()
     }
   }, [containerId])
+  
 
   const handleLectureClick = (lectureId) => {
     navigate(`/container-details/${containerId}/lecture-page/${lectureId}`)

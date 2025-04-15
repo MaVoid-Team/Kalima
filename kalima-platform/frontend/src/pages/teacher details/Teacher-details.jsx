@@ -1,11 +1,10 @@
-
 "use client"
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
 import { Clock, Loader } from "lucide-react"
-import { getUserById } from "../../routes/fetch-users"
 import { useParams } from "react-router-dom"
+import { getUserById } from "../../routes/fetch-users" // Import from our API services file
 
 // Separate component for the teacher information header
 const TeacherInfoHeader = () => {
@@ -169,29 +168,41 @@ export default function TeacherDetails() {
   const [teacher, setTeacher] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const { id } = useParams()
+  const { userId } = useParams()
 
+  // Fetch teacher data using the imported getUserById function
   useEffect(() => {
     const fetchTeacherData = async () => {
-      setLoading(true)
+      // Check if userId exists before making the API call
+      if (!userId) {
+        setError(t('error.invalid_user_id'));
+        setLoading(false);
+        return;
+      }
+  
+      setLoading(true);
       try {
-        const teacherId = id || "67d3621ee038812431fec89b"
-        const result = await getUserById(teacherId)
-
-        if (result.success) {
-          setTeacher(result.data)
+        console.log("Fetching teacher with ID:", userId);
+        
+        const result = await getUserById(userId);
+        
+        console.log("API Response:", result);
+        
+        if (result.success && result.data) {
+          setTeacher(result.data);
         } else {
-          setError(t('error.failed'))
+          setError(result.error || t('error.failed'));
         }
       } catch (err) {
-        console.error("Error fetching teacher:", err)
-        setError(t('error.failed'))
+        console.error("Error in component:", err);
+        setError(t('error.failed'));
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchTeacherData()
-  }, [id, t])
+    };
+  
+    fetchTeacherData();
+  }, [userId, t]);
 
   // Sample courses data - this would ideally come from an API as well
   const courses = [
@@ -324,4 +335,3 @@ export default function TeacherDetails() {
     </section>
   )
 }
-

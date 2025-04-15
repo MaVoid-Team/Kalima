@@ -63,11 +63,11 @@ const AssistantPage = () => {
           </div>
         <div className="container mx-auto">
       <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-      <CoursesSection />
-      <VideoSection />
+      {/* <CoursesSection /> */}
+      {/* <VideoSection /> */}
       <FeaturedCourses />
       <RevisionCourses />
-      <EliteAssistants />
+      {/* <EliteAssistants /> */}
     </div>
     </div>
     
