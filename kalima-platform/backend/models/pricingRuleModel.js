@@ -4,7 +4,7 @@ const pricingRuleSchema = new mongoose.Schema(
   {
     lecturer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Refers to the base User model (Lecturer)
+      ref: "CLecturer", 
       required: true,
     },
     subject: {

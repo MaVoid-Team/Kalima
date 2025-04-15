@@ -2,7 +2,6 @@ const PricingRule = require("../models/pricingRuleModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
-const mongoose = require("mongoose");
 
 // Create a new pricing rule
 exports.createPricingRule = catchAsync(async (req, res, next) => {
