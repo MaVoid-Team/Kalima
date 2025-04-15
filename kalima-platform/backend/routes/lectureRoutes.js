@@ -5,6 +5,10 @@ const attachmentController = require("../controllers/attachmentController");
 const router = express.Router();
 
 router
+  .route("/type/:lectureType")
+  .get(lectureController.getLecturesByType);
+
+router
   .route("/")
   .get(lectureController.getAllLectures)
   .post(lectureController.createLecture);

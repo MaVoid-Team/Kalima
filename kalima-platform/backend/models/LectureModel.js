@@ -5,6 +5,11 @@ const lectureSchema = new mongoose.Schema({
   videoLink: { type: String, required: true },
   description: { type: String },
   numberOfViews: { type: Number, default: 3 },
+  lecture_type: { // New field
+    type: String,
+    enum: ['Free', 'Paid', 'Revision', 'Teachers Only'],
+    required: [true, 'A lecture must have a type'],
+  },
   attachments: {
     booklets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],
     pdfsandimages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],

@@ -1,5 +1,4 @@
 const Container = require("../models/containerModel");
-const Purchase = require("../models/purchaseModel");
 const mongoose = require("mongoose");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -23,7 +22,6 @@ exports.createLecture = catchAsync(async (req, res, next) => {
   try {
     const {
       name,
-      type,
       price,
       level,
       subject,
@@ -32,7 +30,17 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       videoLink,
       description,
       numberOfViews,
+      lecture_type, // Add lecture_type
     } = req.body;
+
+    // Basic validation for lecture_type (Mongoose enum validation also applies)
+    const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
+    if (lecture_type && !allowedTypes.includes(lecture_type)) {
+      throw new AppError(
+        `Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`,
+        400
+      );
+    }
 
     await checkDoc(Level, level, session);
     await checkDoc(Subject, subject, session);
@@ -51,6 +59,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           videoLink,
           description,
           numberOfViews,
+          lecture_type, // Add lecture_type here
         },
       ],
       { session }
@@ -151,11 +160,31 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     videoLink,
     description,
     numberOfViews,
+    lecture_type, // Add lecture_type
   } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let obj = { name, type, price, videoLink, description, numberOfViews };
+    let obj = {
+      name,
+      type,
+      price,
+      videoLink,
+      description,
+      numberOfViews,
+      lecture_type, // Add lecture_type
+    };
+
+    // Basic validation for lecture_type (Mongoose enum validation also applies)
+    if (lecture_type) {
+      const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
+      if (!allowedTypes.includes(lecture_type)) {
+        throw new AppError(
+          `Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`,
+          400
+        );
+      }
+    }
 
     if (subject) {
       const subjectDoc = await checkDoc(Subject, subject, session);
@@ -195,6 +224,43 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
   } finally {
     session.endSession();
   }
+});
+
+exports.getLecturesByType = catchAsync(async (req, res, next) => {
+  const { lectureType } = req.params;
+  const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
+
+  if (!allowedTypes.includes(lectureType)) {
+    return next(
+      new AppError(
+        `Invalid lecture type specified: ${lectureType}. Allowed types are: ${allowedTypes.join(
+          ", "
+        )}`,
+        400
+      )
+    );
+  }
+
+  let query = Lecture.find({ lecture_type: lectureType }).populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
+
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const lectures = await features.query.lean();
+
+  res.status(200).json({
+    status: "success",
+    results: lectures.length,
+    data: {
+      lectures,
+    },
+  });
 });
 
 exports.UpdateParentOfLecture = catchAsync(async (req, res, next) => {
