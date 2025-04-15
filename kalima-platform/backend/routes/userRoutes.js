@@ -6,10 +6,8 @@ const verifyJWT = require("../middleware/verifyJWT");
 const uploadFileMiddleware =
   require("../utils/upload files/uploadFiles").uploadFileMiddleware;
 
-router
-  .route("/")
-  .get(userController.getAllUsers)
-  .post(validateUser, userController.createUser);
+// Routes that don't require authentication
+router.route("/").get(userController.getAllUsers).post(validateUser, userController.createUser)
 
 router
   .route("/:userId")
@@ -25,5 +23,12 @@ router
 router
   .route("/accounts/bulk-create")
   .post(uploadFileMiddleware, userController.uploadFileForBulkCreation);
+// Routes that require authentication
+router.use(verifyJWT);
+
+// Get current user's data (for student/parent only)
+router.get("/me/dashboard", userController.getMyData);
+
+router.route("/update/password").patch(userController.changePassword)
 
 module.exports = router;
