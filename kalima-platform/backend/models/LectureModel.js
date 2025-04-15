@@ -3,8 +3,10 @@ const Container = require("./containerModel");
 
 const lectureSchema = new mongoose.Schema({
   videoLink: { type: String, required: true },
+  examLink: { type: String },
   description: { type: String },
   numberOfViews: { type: Number, default: 3 },
+  teacherAllowed: { type: Boolean, required: true },
   attachments: {
     booklets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],
     pdfsandimages: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],

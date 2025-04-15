@@ -1,8 +1,11 @@
 const express = require("express");
 const lectureController = require("../controllers/lectureController");
 const attachmentController = require("../controllers/attachmentController");
+const verifyJWT = require("../middleware/verifyJWT");
 
+// Apply JWT verification middleware
 const router = express.Router();
+router.use(verifyJWT);
 
 router
   .route("/")
