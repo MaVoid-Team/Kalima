@@ -1,5 +1,6 @@
 const multer = require("multer");
 const AppError = require("../appError");
+const cloudinary = require("cloudinary").v2;
 
 const multerStorage = multer.memoryStorage();
 
@@ -32,7 +33,7 @@ const upload = multer({
 
 const uploadFileMiddleware = upload.single("file");
 
-const uploadFileToCloudinary = async (file, folder) => {
+const uploadFileToCloudinary = async (file, folder, next) => {
   if (!file || !file.buffer) {
     return next(new AppError("No file buffer found for upload", 400));
   }

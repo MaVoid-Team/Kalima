@@ -50,7 +50,7 @@ show fields to update deending on the current user role,
 for ex :- if current user role is student that means if the children is passed in the req.body, the err msg should appear
 */
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password, children, subjectNotify } = req.body
+  const { name, email, address, password, children, subjectNotify } = req.body;
 
   /*
   BUG -->> that means any user can update any user
@@ -116,13 +116,22 @@ const updateUser = catchAsync(async (req, res, next) => {
     req.body.children = childrenById;
   }
 
-  const updatedUser = { name, email, address, children: childrenById, ...req.body }
+  const updatedUser = {
+    name,
+    email,
+    address,
+    children: childrenById,
+    ...req.body,
+  };
 
-  if (foundUser.role.toLowerCase() === "student" && typeof subjectNotify !== 'undefined') {
+  if (
+    foundUser.role.toLowerCase() === "student" &&
+    typeof subjectNotify !== "undefined"
+  ) {
     updatedUser.subjectNotify = subjectNotify;
   }
-  
-  let user
+
+  let user;
 
   switch (foundUser.role.toLowerCase()) {
     case "teacher":
@@ -159,7 +168,12 @@ const updateUser = catchAsync(async (req, res, next) => {
         .lean();
       break;
     case "assistant":
-      user = await Assistant.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select("-password").lean() 
+      user = await Assistant.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password")
+        .lean();
       break;
     default:
       return next(new AppError("Invalid role", 400));
@@ -286,16 +300,6 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = {
-  getAllUsers,
-  getAllUsersByRole,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  changePassword,
-  uploadFileForBulkCreation,
-};
 /**
  * Get all data for the currently logged-in student/parent
  * Includes user profile, balance information and purchase history
@@ -303,33 +307,35 @@ module.exports = {
 const getMyData = catchAsync(async (req, res, next) => {
   // Get user ID from authenticated user
   const userId = req.user._id;
-  
+
   // Determine user model based on role
   let userModel;
   let pointsBalances = [];
-  
+
   // Find the appropriate user model
   if (req.user.role === "Student") {
     userModel = await Student.findById(userId)
       .populate("level", "name")
       .populate({
         path: "lecturerPoints.lecturer",
-        select: "name subject expertise"
+        select: "name subject expertise",
       })
       .lean();
   } else if (req.user.role === "Parent") {
     userModel = await Parent.findById(userId)
       .populate({
         path: "children",
-        select: "name level sequencedId"
+        select: "name level sequencedId",
       })
       .populate({
         path: "lecturerPoints.lecturer",
-        select: "name subject expertise"
+        select: "name subject expertise",
       })
       .lean();
   } else {
-    return next(new AppError("Only students and parents can access this resource", 403));
+    return next(
+      new AppError("Only students and parents can access this resource", 403)
+    );
   }
 
   if (!userModel) {
@@ -338,40 +344,40 @@ const getMyData = catchAsync(async (req, res, next) => {
 
   // Get all types of purchases for the user
   const purchaseHistory = await Purchase.find({
-    student: userId
+    student: userId,
   })
-  .populate([
-    { path: "container", select: "name type price" },
-    { path: "lecturer", select: "name expertise" },
-    { path: "package", select: "name type price description" }
-  ])
-  .sort({ purchasedAt: -1 })
-  .lean();
+    .populate([
+      { path: "container", select: "name type price" },
+      { path: "lecturer", select: "name expertise" },
+      { path: "package", select: "name type price description" },
+    ])
+    .sort({ purchasedAt: -1 })
+    .lean();
 
   // Get redeemed codes
   const redeemedCodes = await Code.find({
     redeemedBy: userId,
-    isRedeemed: true
+    isRedeemed: true,
   }).lean();
 
   // Get lecture access information
   const lectureAccess = await StudentLectureAccess.find({
-    student: userId
+    student: userId,
   })
-  .populate({
-    path: "lecture",
-    select: "name videoLink description numberOfViews"
-  })
-  .lean();
+    .populate({
+      path: "lecture",
+      select: "name videoLink description numberOfViews",
+    })
+    .lean();
 
   // Format point balances for better readability
   pointsBalances = userModel.lecturerPoints || [];
-  
+
   // Determine if any lecture types were purchased
   const purchasedLectureTypes = new Set();
-  purchaseHistory.forEach(purchase => {
-    if (purchase.container && purchase.container.type === 'lecture') {
-      purchasedLectureTypes.add('lecture');
+  purchaseHistory.forEach((purchase) => {
+    if (purchase.container && purchase.container.type === "lecture") {
+      purchasedLectureTypes.add("lecture");
     }
   });
 
@@ -387,17 +393,28 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: userModel.level,
         ...(userModel.children && { children: userModel.children }),
         generalPoints: userModel.generalPoints || 0,
-        totalPoints: userModel.totalPoints || 0
+        totalPoints: userModel.totalPoints || 0,
       },
       pointsBalances,
       purchaseHistory,
       redeemedCodes,
       lectureAccess,
       purchasedFeatures: {
-        hasLectures: purchasedLectureTypes.size > 0
-      }
-    }
+        hasLectures: purchasedLectureTypes.size > 0,
+      },
+    },
   });
 });
 
-module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser, changePassword, getMyData };
+
+module.exports = {
+  getAllUsers,
+  getAllUsersByRole,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  changePassword,
+  uploadFileForBulkCreation,
+  getMyData,
+};
