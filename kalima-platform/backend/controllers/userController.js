@@ -5,6 +5,9 @@ const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
+const Purchase = require("../models/purchaseModel.js");
+const Code = require("../models/codeModel.js");
+const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -293,3 +296,109 @@ module.exports = {
   changePassword,
   uploadFileForBulkCreation,
 };
+/**
+ * Get all data for the currently logged-in student/parent
+ * Includes user profile, balance information and purchase history
+ */
+const getMyData = catchAsync(async (req, res, next) => {
+  // Get user ID from authenticated user
+  const userId = req.user._id;
+  
+  // Determine user model based on role
+  let userModel;
+  let purchases = [];
+  let pointsBalances = [];
+  
+  // Find the appropriate user model
+  if (req.user.role === "Student") {
+    userModel = await Student.findById(userId)
+      .populate("level", "name")
+      .populate({
+        path: "lecturerPoints.lecturer",
+        select: "name subject expertise"
+      })
+      .lean();
+  } else if (req.user.role === "Parent") {
+    userModel = await Parent.findById(userId)
+      .populate({
+        path: "children",
+        select: "name level sequencedId"
+      })
+      .populate({
+        path: "lecturerPoints.lecturer",
+        select: "name subject expertise"
+      })
+      .lean();
+  } else {
+    return next(new AppError("Only students and parents can access this resource", 403));
+  }
+
+  if (!userModel) {
+    return next(new AppError("User not found", 404));
+  }
+
+  // Get all types of purchases for the user
+  const purchaseHistory = await Purchase.find({
+    student: userId
+  })
+  .populate([
+    { path: "container", select: "name type price" },
+    { path: "lecturer", select: "name expertise" },
+    { path: "package", select: "name type price description" }
+  ])
+  .sort({ purchasedAt: -1 })
+  .lean();
+
+  // Get redeemed codes
+  const redeemedCodes = await Code.find({
+    redeemedBy: userId,
+    isRedeemed: true
+  }).lean();
+
+  // Get lecture access information
+  const lectureAccess = await StudentLectureAccess.find({
+    student: userId
+  })
+  .populate({
+    path: "lecture",
+    select: "name videoLink description numberOfViews"
+  })
+  .lean();
+
+  // Format point balances for better readability
+  pointsBalances = userModel.lecturerPoints || [];
+  
+  // Determine if any lecture types were purchased
+  const purchasedLectureTypes = new Set();
+  purchaseHistory.forEach(purchase => {
+    if (purchase.container && purchase.container.type === 'lecture') {
+      purchasedLectureTypes.add('lecture');
+    }
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      userInfo: {
+        id: userModel._id,
+        name: userModel.name,
+        email: userModel.email,
+        role: userModel.role || req.user.role,
+        phoneNumber: userModel.phoneNumber,
+        level: userModel.level,
+        ...(userModel.children && { children: userModel.children }),
+        generalPoints: userModel.generalPoints || 0,
+        totalPoints: userModel.totalPoints || 0
+      },
+      pointsBalances,
+      purchaseHistory,
+      redeemedCodes,
+      lectureAccess,
+      purchasedFeatures: {
+        hasLectures: purchasedLectureTypes.size > 0
+      }
+    }
+  });
+});
+
+module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser, changePassword, getMyData };
