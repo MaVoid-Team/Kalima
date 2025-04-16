@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getSubjectById } from "../routes/courses";
+import { getContainerById } from "../routes/lectures";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { ErrorAlert } from "../components/ErrorAlert";
 import { FaRegCalendarCheck, FaRegStickyNote } from "react-icons/fa";
@@ -53,11 +53,11 @@ export default function CourseDetails() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const result = await getSubjectById(courseId);
-        if (result.success) {
+        const result = await getContainerById(courseId);
+        if (result) {
           setCourse(result.data);
         } else {
-          setError(result.error || "فشل في جلب بيانات الدورة");
+          setError("فشل في جلب بيانات الدورة");
         }
       } catch (err) {
         setError("حدث خطأ غير متوقع");

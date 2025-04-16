@@ -36,11 +36,11 @@ export default function LecturesPage() {
       const result = await getAllLectures()
       console.log("API Response:", result)
 
-      if (result.success) {
-        setLectures(result.data)
-        setFilteredLectures(result.data)
+      if (result.status === "success") {
+        setLectures(result.data.containers) // Access the containers array
+        setFilteredLectures(result.data.containers)
       } else {
-        setError(result.error)
+        setError(result.message || "Failed to fetch lectures")
       }
     } catch (err) {
       console.error("Error fetching lectures:", err)
@@ -52,48 +52,30 @@ export default function LecturesPage() {
 
   // Generate lecture data for display
   const generateLectureData = (lecturesData) => {
-    return lecturesData.map((lecture, index) => {
-      // Count attachments
-      const attachmentsCount = lecture.attachments
-        ? (lecture.attachments.booklets?.length || 0) +
-          (lecture.attachments.homeworks?.length || 0) +
-          (lecture.attachments.exams?.length || 0) +
-          (lecture.attachments.pdfsandimages?.length || 0)
-        : 0
-
+    return lecturesData.map((lecture) => {
       return {
         id: lecture._id,
-        image: `/course-${(index % 6) + 1}.png`, // Default lecture image
+        image: `/course-${Math.floor(Math.random() * 6) + 1}.png`, // Random lecture image
         title: lecture.name,
         subject: lecture.subject?.name || "غير محدد",
         teacher: lecture.createdBy?.name || "مدرس غير محدد",
         teacherRole: lecture.createdBy?.role || "محاضر",
         grade: lecture.level?.name || "غير محدد",
         rating: 4, // Default rating
-        stage: mapLevelToStage(lecture.level?.name),
+        stage: lecture.createdBy?.role || "غير محدد",
         type: "محاضرة",
         status: lecture.price > 0 ? "مدفوع" : "مجاني",
         price: lecture.price || 0,
-        childrenCount: attachmentsCount,
+        childrenCount: lecture.attachments 
+          ? (lecture.attachments.booklets?.length || 0) + 
+            (lecture.attachments.exams?.length || 0) + 
+            (lecture.attachments.homeworks?.length || 0) + 
+            (lecture.attachments.pdfsandimages?.length || 0)
+          : 0,
         views: lecture.numberOfViews || 0,
         description: lecture.description || "لا يوجد وصف",
       }
     })
-  }
-
-  // Map level name to stage in Arabic
-  const mapLevelToStage = (levelName) => {
-    if (!levelName) return "غير محدد"
-    switch (levelName) {
-      case "Primary":
-        return "المرحلة الابتدائية"
-      case "Middle":
-        return "المرحلة الإعدادية"
-      case "Upper Primary":
-        return "المرحلة الابتدائية العليا"
-      default:
-        return "المرحلة الثانوية"
-    }
   }
 
   // Apply filters to lectures
@@ -102,7 +84,7 @@ export default function LecturesPage() {
 
     if (selectedStage) {
       filtered = filtered.filter(
-        (lecture) => mapLevelToStage(lecture.level?.name) === selectedStage
+        (lecture) => lecture.createdBy?.role === selectedStage
       )
     }
 
@@ -119,10 +101,10 @@ export default function LecturesPage() {
     }
 
     if (selectedStatus) {
-      const statusFilter = selectedStatus === "مجاني" ? 0 : 1
-      filtered = filtered.filter(
-        (lecture) => (lecture.price > 0) === statusFilter
-      )
+      filtered = filtered.filter((lecture) => {
+        const status = lecture.price > 0 ? "مدفوع" : "مجاني"
+        return status === selectedStatus
+      })
     }
 
     setFilteredLectures(filtered)
@@ -176,10 +158,8 @@ export default function LecturesPage() {
       label: t("filters.stage"),
       value: selectedStage,
       options: [
-        { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
-        { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
-        { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
-        { label: "المرحلة الابتدائية العليا", value: "المرحلة الابتدائية العليا" },
+        { label: "محاضر", value: "Lecturer" },
+        { label: "أستاذ", value: "Professor" }
       ],
       onSelect: setSelectedStage,
     },
@@ -296,7 +276,7 @@ export default function LecturesPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Link to={`/lecture-details/${lecture.id}`}>
+                    <Link to={`/lectures/${lecture.id}`}>
                       <CourseCard
                         {...lecture}
                         isRTL={isRTL}
