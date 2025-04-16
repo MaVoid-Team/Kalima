@@ -32,7 +32,12 @@ const lecturerRouter = require("./routes/lecturerRoutes.js");
 const assistantRouter = require("./routes/assistantRoutes.js");
 const packegeRouter = require("./routes/packageRoutes.js");
 const auditLogRouter = require("./routes/auditLogRoutes.js");
-
+const cLecturerRouter = require("./routes/center.lecturerRoutes.js");
+const cStudentRouter = require("./routes/center.studentRoutes.js");
+const lessonRouter = require("./routes/lessonRoutes.js");
+const attendanceRouter = require("./routes/attendanceRoutes");
+const revenueRouter = require("./routes/revenueRoutes");
+const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import pricing rule router
 connectDB();
 
 app.use(cors(corsOptions));
@@ -62,6 +67,12 @@ app.use("/api/v1/lecturers", auditLogger, lecturerRouter);
 app.use("/api/v1/assistants", auditLogger, assistantRouter);
 app.use("/api/v1/packages", auditLogger, packegeRouter);
 app.use("/api/v1/audit-logs", auditLogRouter);
+app.use("/api/v1/center-lecturer", cLecturerRouter);
+app.use("/api/v1/center-student", cStudentRouter);
+app.use("/api/v1/lessons", lessonRouter);
+app.use("/api/v1/attendance", attendanceRouter);
+app.use("/api/v1/revenue", revenueRouter);
+app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule router
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -99,8 +110,6 @@ mongoose.connection.once("open", () => {
             subjectId: notification.relatedId,
             notificationId: notification._id,
           });
-
-
 
           await Notification.findByIdAndUpdate(notification._id, {
             isSent: true,

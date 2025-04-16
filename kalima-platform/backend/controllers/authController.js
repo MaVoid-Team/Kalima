@@ -118,76 +118,35 @@ const verifyRoles = (...allowedRoles) => {
   };
 }
 
-// Special handling for teachers
-// if (Role === "teacher") {
-//   const { containerId } = req.params;
+// Middleware to optionally verify JWT
+// This middleware attempts to verify the JWT if provided, but continues either way
+const optionalJWT = async (req, res, next) => {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
 
-//   if (containerId) {
-//     // If containerId is provided, return only that container
-//     const container = await Container.findById(containerId)
-//     if (!container) {
-//       return next(new AppError("Container not found.", 404));
-//     }
+  // If no auth header is provided, continue without authentication
+  if (!authHeader?.startsWith("Bearer ")) {
+    return next(); // Continue without authentication
+  }
 
-//     if (!container.teacherAllowed) {
-//       return res.status(200).json({
-//         status: "restricted",
-//         data: {
-//           id: container._id,
-//           name: container.name,
-//           owner: container.createdBy.name || container.createdBy._id,
-//           subject: container.subject.name || container.subject._id,
-//           type: container.type,
-//         },
-//       });
-//     }
+  const token = authHeader.split(" ")[1];
 
-//     return res.status(200).json({
-//       status: "success",
-//       data: container,
-//     });
-//   }
+  try {
+    // Try to verify token
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
+    // If token is valid, set req.user
+    const currentUser = await User.findById(decoded.UserInfo.id).select("-password");
+    
+    if (currentUser) {
+      req.user = currentUser;
+    }
+  } catch (err) {
+    // If token verification fails, continue without setting req.user
+    // No error is thrown, the route will work as unauthenticated
+  }
+  
+  // Continue to the next middleware or route handler
+  next();
+};
 
-// If no containerId is provided, return all containers
-//   const containers = await Container.find()
-
-//   const filteredContainers = containers.map((container) => {
-//     if (!container.teacherAllowed) {
-//       return {
-//         id: container._id,
-//         name: container.name,
-//         owner: container.createdBy.name || container.createdBy._id,
-//         subject: container.subject.name || container.subject._id,
-//         type: container.type,
-//       };
-//     }
-//     return container;
-//   });
-
-//   return res.status(200).json({
-//     status: "success",
-//     data: filteredContainers,
-//   });
-// }
-
-// if (rolesArray.includes(Role)) {
-//   const { containerId } = req.params;
-
-//   if (containerId) {
-//     const container = await Container.findById(containerId)
-//     if (!container) {
-//       return next(new AppError("Container not found.", 404));
-//     }
-//     if (!containerId) {
-//       const containers = await Container.find();
-//       return res.status(200).json({
-//         status: "success",
-//         data: containers,
-//       });
-//     }
-//   }
-// } else {
-
-// }
-
-module.exports = { login, refresh, logout, verifyRoles };
+module.exports = { login, refresh, logout, verifyRoles, optionalJWT };

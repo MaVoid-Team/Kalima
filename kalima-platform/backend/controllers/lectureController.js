@@ -1,5 +1,4 @@
 const Container = require("../models/containerModel");
-const Purchase = require("../models/purchaseModel");
 const mongoose = require("mongoose");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -23,16 +22,27 @@ exports.createLecture = catchAsync(async (req, res, next) => {
   try {
     const {
       name,
-      type,
       price,
       level,
       subject,
       parent,
+      teacherAllowed,
       createdBy,
       videoLink,
+      examLink,
       description,
       numberOfViews,
+      lecture_type, // Add lecture_type
     } = req.body;
+
+    // Basic validation for lecture_type (Mongoose enum validation also applies)
+    const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
+    if (lecture_type && !allowedTypes.includes(lecture_type)) {
+      throw new AppError(
+        `Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`,
+        400
+      );
+    }
 
     await checkDoc(Level, level, session);
     await checkDoc(Subject, subject, session);
@@ -46,11 +56,14 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           price: price || 0,
           level,
           subject,
+          teacherAllowed,
           parent,
           createdBy: createdBy || req.user._id,
           videoLink,
+          examLink,
           description,
           numberOfViews,
+          lecture_type, // Add lecture_type here
         },
       ],
       { session }
@@ -82,11 +95,27 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 });
 
 exports.getLectureById = catchAsync(async (req, res, next) => {
+  const Role = req.user.role?.toLowerCase();
   const container = await Lecture.findById(req.params.lectureId).populate([
     // { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
   ]);
   if (!container) return next(new AppError("Lecture not found", 404));
+  if (Role === "teacher") {
+    if (!container.teacherAllowed) {
+      return res.status(200).json({
+        status: "restricted",
+        data: {
+          id: container._id,
+          name: container.name,
+          owner: container.createdBy.name || container.createdBy._id,
+          subject: container.subject.name || container.subject._id,
+          type: container.type,
+        },
+      });
+    }
+  }
+
   res.status(200).json({
     status: "success",
     data: {
@@ -96,6 +125,7 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllLectures = catchAsync(async (req, res, next) => {
+  const Role = req.user.role?.toLowerCase();
   let query = Lecture.find().populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
@@ -108,6 +138,21 @@ exports.getAllLectures = catchAsync(async (req, res, next) => {
 
   const containers = await features.query.lean();
   if (!containers) return next(new AppError("Lectures not found", 404));
+  if (Role === "teacher") {
+    if (!containers.teacherAllowed) {
+      return res.status(200).json({
+        status: "restricted",
+        data: {
+          id: containers._id,
+          name: containers.name,
+          owner: containers.createdBy.name || container.createdBy._id,
+          subject: containers.subject.name || container.subject._id,
+          type: containers.type,
+        },
+      });
+    }
+  }
+
   res.status(200).json({
     status: "success",
     results: containers.length,
@@ -149,13 +194,35 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     level,
     subject,
     videoLink,
+    teacherAllowed,
+    examLink,
     description,
     numberOfViews,
+    lecture_type, // Add lecture_type
   } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let obj = { name, type, price, videoLink, description, numberOfViews };
+    let obj = {
+      name,
+      type,
+      price,
+      videoLink,
+      description,
+      numberOfViews,
+      lecture_type, // Add lecture_type
+    };
+
+    // Basic validation for lecture_type (Mongoose enum validation also applies)
+    if (lecture_type) {
+      const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
+      if (!allowedTypes.includes(lecture_type)) {
+        throw new AppError(
+          `Invalid lecture type. Allowed types are: ${allowedTypes.join(", ")}`,
+          400
+        );
+      }
+    }
 
     if (subject) {
       const subjectDoc = await checkDoc(Subject, subject, session);
@@ -196,6 +263,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     session.endSession();
   }
 });
+
 
 exports.UpdateParentOfLecture = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
