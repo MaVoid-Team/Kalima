@@ -28,7 +28,10 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     { keywords: ["assistant", "assistants"], type: "assistant" },
     { keywords: ["admin", "admins"], type: "admin" },
     { keywords: ["lecturer", "lecturers"], type: "lecturer" },
-    { keywords: ["package", "packages"], type: "package" }
+    { keywords: ["package", "packages"], type: "package" },
+    { keywords: ["attendance"], type: "attendance" },
+    { keywords: ["revenue"], type: "revenue" },
+    { keywords: ["pricing-rule", "pricing-rules"], type: "pricingRule" } // Added pricing rule type
   ];
   
   // Find matching resource type
@@ -132,6 +135,23 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     } else if (resourceType === "container" && resData.container) {
       resourceId = resourceId || resData.container._id || resData.container.id;
       resourceName = resData.container.name;
+    } else if (resourceType === "attendance" && resData.attendance) {
+      resourceId = resourceId || resData.attendance._id;
+      resourceName = `Attendance for student ${resData.attendance.student}`; // Example name
+    } else if (resourceType === "revenue") {
+      resourceName = `Revenue calculation`; // Example name
+      // Revenue might not have a specific ID in the response data
+      if (resData.totalRevenue !== undefined) {
+        resourceName += ` (Total: ${resData.totalRevenue})`;
+      } else if (resData.breakdown) {
+        resourceName += ` (Breakdown)`;
+      }
+    } else if (resourceType === "pricingRule" && resData.pricingRule) { // Handle pricing rule responses
+      resourceId = resourceId || resData.pricingRule._id;
+      resourceName = `Pricing Rule ${resData.pricingRule._id}`; // Use ID or description
+      if (resData.pricingRule.description) {
+        resourceName += ` (${resData.pricingRule.description})`;
+      }
     } else if (resData.codes && resData.codes.length > 0) {
       resourceName = `${resData.codes.length} codes`;
     } else if (resData.lesson) {
@@ -172,7 +192,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     isDeleteOperation || // DELETE operations are successful if status code is in 2xx range
     methodToAction[req.method] === 'read' || 
     resourceId || 
-    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable))
+    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.pricingRule))
   );
   
   // Use special resource and action if defined
