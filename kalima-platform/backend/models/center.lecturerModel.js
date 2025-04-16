@@ -27,5 +27,8 @@ const cLecturerSchema = new mongoose.Schema({
     ref: "Center",
     required: true,
   },
-});
-module.exports = mongoose.model("CLecturer", cLecturerSchema);
+}, { timestamps: true });
+
+const CLecturer = mongoose.models.CLecturer || mongoose.model("CLecturer", cLecturerSchema);
+
+module.exports = CLecturer;
