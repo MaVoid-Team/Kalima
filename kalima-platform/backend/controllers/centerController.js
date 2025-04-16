@@ -2,6 +2,7 @@ const Center = require("../models/centerModel");
 const Lesson = require("../models/lessonModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const mongoose = require("mongoose");
 
 // Create a new center
 exports.createCenter = catchAsync(async (req, res, next) => {
@@ -25,14 +26,37 @@ exports.getAllCenters = catchAsync(async (req, res, next) => {
 
 // Add a lesson to a center
 exports.addLesson = catchAsync(async (req, res, next) => {
-  const { subject, lecturer, startTime, duration, centerId } = req.body;
+  const {
+    subject,
+    lecturer,
+    level,
+    startTime,
+    duration,
+    centerId,
+  } = req.body;
 
-  // Ensure the lecturer field is provided
-  if (!lecturer) {
-    return next(new AppError("Lecturer is required.", 400));
+  // Basic validation
+  if (!subject || !lecturer || !level || !startTime || !centerId) {
+    return next(new AppError("Subject, Lecturer, Level, StartTime, and CenterId are required.", 400));
+  }
+  if (!mongoose.Types.ObjectId.isValid(subject) || !mongoose.Types.ObjectId.isValid(lecturer) || !mongoose.Types.ObjectId.isValid(level) || !mongoose.Types.ObjectId.isValid(centerId)) {
+    return next(new AppError("Invalid ID format for Subject, Lecturer, Level, or Center.", 400));
   }
 
-  const lesson = await Lesson.create({ subject, lecturer, startTime, duration, center: centerId });
+  // Validate center exists
+  const center = await Center.findById(centerId);
+  if (!center) {
+    return next(new AppError("Center not found.", 404));
+  }
+
+  const lesson = await Lesson.create({
+    subject,
+    lecturer,
+    level,
+    startTime,
+    duration,
+    center: centerId,
+  });
 
   res.status(201).json({
     status: "success",
@@ -47,15 +71,30 @@ exports.getTimetable = catchAsync(async (req, res, next) => {
   const center = await Center.findById(centerId);
   if (!center) return next(new AppError("Center not found", 404));
 
-  const lessons = await Lesson.find({ center: centerId }).populate("lecturer", "name");
+  const lessons = await Lesson.find({ center: centerId }).populate([
+    { path: "lecturer", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
 
-  const timetable = lessons.map((lesson) => ({
-    subject: lesson.subject,
-    lecturer: lesson.lecturer.name,
-    startTime: lesson.startTime,
-    endTime: new Date(new Date(lesson.startTime).getTime() + lesson.duration * 60000),
-    lessonId: lesson._id,
-  }));
+  const timetable = lessons.map((lesson) => {
+    const timetableEntry = {
+      subject: lesson.subject?.name || 'N/A',
+      lecturer: lesson.lecturer?.name || 'N/A',
+      startTime: lesson.startTime,
+      duration: lesson.duration,
+      level: lesson.level?.name || 'N/A',
+      lessonId: lesson._id,
+    };
+
+    if (lesson.duration) {
+      timetableEntry.endTime = new Date(
+        new Date(lesson.startTime).getTime() + lesson.duration * 60000
+      );
+    }
+
+    return timetableEntry;
+  });
 
   res.status(200).json({
     status: "success",
@@ -67,11 +106,16 @@ exports.getTimetable = catchAsync(async (req, res, next) => {
 exports.deleteLesson = catchAsync(async (req, res, next) => {
   const { lessonId } = req.params;
 
+  if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+    return next(new AppError("Invalid Lesson ID format.", 400));
+  }
+
   const lesson = await Lesson.findByIdAndDelete(lessonId);
   if (!lesson) return next(new AppError("Lesson not found", 404));
 
   res.status(200).json({
     status: "success",
     message: "Lesson deleted successfully",
+    data: null,
   });
 });

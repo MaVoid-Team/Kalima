@@ -15,7 +15,7 @@ const FeaturedCourses = () => {
   ];
 
   return (
-    <div className="mb-12 p-4 lg:p-0" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="mb-12 p-4 lg:p-0 mt-8" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className={`flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 `}>
         <div className="mb-4 lg:mb-0 flex items-center gap-4">
           <div className="flex flex-col">
@@ -27,7 +27,7 @@ const FeaturedCourses = () => {
             </p>
           </div>
           <img 
-            src={isRTL ? "/3books-ar.png" : "/3books.png"} 
+            src={'/3books.png'} 
             alt={t('coursesAlt')} 
             className={`w-32 lg:w-24 rounded-lg ${isRTL ? 'mr-4' : 'ml-4'}`}
           />

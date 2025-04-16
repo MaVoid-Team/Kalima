@@ -1,10 +1,10 @@
 export default function Step1({ formData, handleInputChange, t, errors, role }) {
 
   const gradeLevels = [
-    { value: 'Grade 4', label: 'Grade 4' },
-    { value: 'First Preparatory', label: 'First Preparatory' },
-    { value: 'Second Preparatory', label: 'Second Preparatory' },
-    { value: 'Third Preparatory', label: 'Third Preparatory' },
+    { value: '67d3594de4a0bacdc2ece381', label: 'Higher Secondary' },
+    { value: '67d35943e4a0bacdc2ece37f', label: 'Upper Primary' },
+    { value: '67d3593ce4a0bacdc2ece37d', label: 'Middle' },
+    { value: '67d35903e4a0bacdc2ece37b', label: 'Primary' },
     { value: 'First Secondary', label: 'First Secondary' },
     { value: 'Second Secondary', label: 'Second Secondary' },
     { value: 'Third Secondary', label: 'Third Secondary' },

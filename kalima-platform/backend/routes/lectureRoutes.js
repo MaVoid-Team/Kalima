@@ -1,8 +1,18 @@
 const express = require("express");
 const lectureController = require("../controllers/lectureController");
 const attachmentController = require("../controllers/attachmentController");
+const verifyJWT = require("../middleware/verifyJWT");
 
+// Apply JWT verification middleware
 const router = express.Router();
+
+// New public route for non-sensitive lecture data
+router
+  .route("/public")
+  .get(lectureController.getAllLecturesPublic);
+
+// Apply JWT verification middleware for subsequent routes
+router.use(verifyJWT);
 
 router
   .route("/")
