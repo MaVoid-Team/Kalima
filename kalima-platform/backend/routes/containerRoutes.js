@@ -2,6 +2,12 @@ const express = require("express");
 const containerController = require("../controllers/containerController");
 const authController = require("../controllers/authController.js");
 const router = express.Router();
+
+router.get(
+  "/public",
+  containerController.getAllContainersPublic
+);
+
 const verifyJWT = require("../middleware/verifyJWT");
 
 
@@ -10,6 +16,9 @@ router.get(
   "/lecturer/:lecturerId",
   containerController.getLecturerContainers
 );
+
+router.get("/", containerController.getAllContainers);
+
 // Get container by ID - works with or without authentication
 router.get(
   "/:containerId",

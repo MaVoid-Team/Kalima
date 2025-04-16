@@ -185,7 +185,9 @@ exports.getContainerPurchaseCountById = catchAsync(async (req, res, next) => {
   }
 
   // Count the number of purchases for the specific container
-  const purchaseCount = await Purchase.countDocuments({ container: containerId });
+  const purchaseCount = await Purchase.countDocuments({
+    container: containerId,
+  });
 
   res.status(200).json({
     status: "success",
@@ -201,13 +203,26 @@ exports.createContainer = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { name, type, price, level, teacherAllowed, subject, parent, createdBy, description, goal } = req.body;
+    const {
+      name,
+      type,
+      price,
+      level,
+      teacherAllowed,
+      subject,
+      parent,
+      createdBy,
+      description,
+      goal,
+    } = req.body;
     await checkDoc(Level, level, session);
     await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
 
     if (type === "course" && (!description || !goal)) {
-      return next(new AppError("Description and goal are required for course type.", 400));
+      return next(
+        new AppError("Description and goal are required for course type.", 400)
+      );
     }
 
     const container = await Container.create(
@@ -274,7 +289,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   }
 
   // If user is not authenticated (not logged in) and it's a lecture, return 404
-  if (!req.user && container.type === 'lecture') {
+  if (!req.user && container.type === "lecture") {
     return next(new AppError("Container not found. Please, login first!", 404));
   }
 
@@ -302,19 +317,8 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllContainers = catchAsync(async (req, res, next) => {
-  let query = {};
-  
-  // If user is not authenticated (not logged in), only show non-lecture containers
-  if (!req.user) {
-    query.type = { $ne: 'lecture' };
-  }
-
   // Fetch containers based on the query
-  const containers = await Container.find(query).populate([
-    { path: "createdBy", select: "name" },
-    { path: "subject", select: "name" },
-    { path: "level", select: "name" },
-  ]);
+  const containers = await Container.find().populate();
 
   if (!containers || containers.length === 0) {
     return next(new AppError("No containers found.", 404));
@@ -391,20 +395,19 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
 exports.getMyContainers = catchAsync(async (req, res, next) => {
   const lecturerId = req.user._id; // Extract the logged-in lecturer's ID from the JWT token
 
-  const containers = await Container.find({ createdBy: lecturerId })
-    .populate([
-      { path: "subject", select: "name" },
-      { path: "level", select: "name" },
-      { 
-        path: "children", 
-        populate: [
-          { path: "subject", select: "name" },
-          { path: "level", select: "name" }
-        ] 
-      },
-      { path: "parent", select: "name type" },
-      { path: "createdBy", select: "name email" }
-    ]);
+  const containers = await Container.find({ createdBy: lecturerId }).populate([
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    {
+      path: "children",
+      populate: [
+        { path: "subject", select: "name" },
+        { path: "level", select: "name" },
+      ],
+    },
+    { path: "parent", select: "name type" },
+    { path: "createdBy", select: "name email" },
+  ]);
 
   if (!containers || containers.length === 0) {
     return next(new AppError("No containers found for this lecturer.", 404));
@@ -426,7 +429,12 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
 
     if (type === "course") {
       if (!description || !goal) {
-        return next(new AppError("Description and goal are required for course type.", 400));
+        return next(
+          new AppError(
+            "Description and goal are required for course type.",
+            400
+          )
+        );
       }
       obj.description = description;
       obj.goal = goal;
@@ -513,7 +521,9 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
 
     // Re-fetch the updated container to return in the response
     const updatedContainer = await Container.findById(containerId);
-    res.status(200).json({ status: "success", data: { container: updatedContainer } });
+    res
+      .status(200)
+      .json({ status: "success", data: { container: updatedContainer } });
   } catch (error) {
     await session.abortTransaction();
     return next(error);
@@ -593,14 +603,15 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
 
 // get the total revenue for a container by Id
 exports.getContainerRevenue = catchAsync(async (req, res, next) => {
-
   const { containerId } = req.params;
   const container = await Container.findById(containerId);
   if (!container) {
     return next(new AppError("Container not found", 404));
   }
 
-  const purchaseCount = await Purchase.countDocuments({ container: containerId });
+  const purchaseCount = await Purchase.countDocuments({
+    container: containerId,
+  });
 
   const revenue = container.price * purchaseCount;
 
@@ -610,7 +621,45 @@ exports.getContainerRevenue = catchAsync(async (req, res, next) => {
       containerId,
       purchaseCount,
       containerPrice: container.price,
-      revenue
-    }
+      revenue,
+    },
+  });
+});
+
+// New function specifically for public, non-sensitive data
+exports.getAllContainersPublic = catchAsync(async (req, res, next) => {
+  let query = Container.find();
+
+  // Populate common fields
+  query = query.populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "name", select: "name" },
+    { path: "type", select: "name" },
+  ]);
+
+  // Always select only basic, non-sensitive fields for this public route
+  query = query.select(
+    "name type subject level createdBy "
+  );
+
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const containers = await features.query.lean();
+
+  if (!containers || containers.length === 0) {
+    return next(new AppError("Lectures not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers,
+    },
   });
 });
