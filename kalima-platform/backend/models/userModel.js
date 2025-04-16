@@ -9,7 +9,7 @@ const addressSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    gender: { type: String, enum: ["male", "female"], required: true, lowercase: true },
+    gender: { type: String, enum: ["male", "female","not determined"], required: true, lowercase: true },
     email: { type: String, unique: true, required: true },
     address: addressSchema,
     referralSource: String,

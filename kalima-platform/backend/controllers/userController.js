@@ -1,37 +1,48 @@
-const registerController = require('../controllers/registerController')
+const registerController = require("../controllers/registerController");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
 const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
+const Purchase = require("../models/purchaseModel.js");
+const Code = require("../models/codeModel.js");
+const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
+const Container = require("../models/containerModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const handleCSV = require("../utils/upload files/handleCSV.js");
+const handleExcel = require("../utils/upload files/handleEXCEL.js");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
 
   if (!users.length) return next(new AppError("Couldn't find users.", 404));
   res.json(users);
-})
+});
 
 const getAllUsersByRole = catchAsync(async (req, res, next) => {
-  const role = req.params.role.charAt(0).toUpperCase() + req.params.role.slice(1).toLowerCase()
+  const role =
+    req.params.role.charAt(0).toUpperCase() +
+    req.params.role.slice(1).toLowerCase();
 
   const users = await User.find({ role }).select("-password").lean();
-  if (!users.length) return next(new AppError("Couldn't find users with this role.", 404));
+  if (!users.length)
+    return next(new AppError("Couldn't find users with this role.", 404));
 
   res.json(users);
-})
+});
 
 const getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.userId).select("-password").lean();
+  const user = await User.findById(req.params.userId)
+    .select("-password")
+    .lean();
 
   if (!user) return next(new AppError("Couldn't find user.", 404));
   res.json(user);
-})
+});
 
 const createUser = registerController.registerNewUser;
 
@@ -40,8 +51,14 @@ show fields to update deending on the current user role,
 for ex :- if current user role is student that means if the children is passed in the req.body, the err msg should appear
 */
 const updateUser = catchAsync(async (req, res, next) => {
-  const { name, email, address, password, children, subjectNotify } = req.body
-  const userId = req.params.userId
+  const { name, email, address, password, children, subjectNotify } = req.body;
+
+  /*
+  BUG -->> that means any user can update any user
+  To fix it -->> Onlyy authenticated current user has permission to update his self
+  userId = req.user._id 
+  */
+  const userId = req.params.userId;
 
   /*
   BUG -->> status code here should be 400 (or 403)
@@ -50,13 +67,11 @@ const updateUser = catchAsync(async (req, res, next) => {
     return next(new AppError("Can't update password on this route.", 404));
   }
 
-  const selectedFields = "-password -passwordChangedAt"
+  const selectedFields = "-password -passwordChangedAt";
 
   const foundUser = await User.findById(userId).select(selectedFields);
-  
 
   if (!foundUser) return next(new AppError("User not found", 404));
-
 
   /*
   BUG -->> if the array here is empty, no err occured!!!!!!,
@@ -74,84 +89,129 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   TAKE CARE OFF -->> when fixing the above , don't allow the repeatition of ids in children array
   */
-  const childrenById = []
+  const childrenById = [];
   if (!!children) {
-    for (let id of children) {      
+    for (let id of children) {
       // Check if the id is a valid MongoDB ObjectId
       const isMongoId = mongoose.Types.ObjectId.isValid(id);
       if (isMongoId) {
         childrenById.push(id);
       } else {
         try {
-          const student = await Student.findOne({ sequencedId: id }).lean();          
+          const student = await Student.findOne({ sequencedId: id }).lean();
           if (student) {
             childrenById.push(student._id);
           }
-        }
-        catch (error) {
-          if (error.name === 'CastError') {
-            return next(new AppError("Not all children values are valid UserId or SequenceId.", 400));
+        } catch (error) {
+          if (error.name === "CastError") {
+            return next(
+              new AppError(
+                "Not all children values are valid UserId or SequenceId.",
+                400
+              )
+            );
           }
         }
       }
     }
-    req.body.children = childrenById
+    req.body.children = childrenById;
   }
 
-  const updatedUser = { name, email, address, children: childrenById, ...req.body }
+  const updatedUser = {
+    name,
+    email,
+    address,
+    children: childrenById,
+    ...req.body,
+  };
 
-  if (foundUser.role.toLowerCase() === "student" && typeof subjectNotify !== 'undefined') {
+  if (
+    foundUser.role.toLowerCase() === "student" &&
+    typeof subjectNotify !== "undefined"
+  ) {
     updatedUser.subjectNotify = subjectNotify;
   }
-  
-  let user
+
+  let user;
 
   switch (foundUser.role.toLowerCase()) {
     case "teacher":
-    // fix a bug here : replace runvalidators with runValidators 
-      user = await Teacher.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      // fix a bug here : replace runvalidators with runValidators
+      user = await Teacher.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "student":
-      user = await Student.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Student.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "parent":
-      user = await Parent.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Parent.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "lecturer":
-      user = await Lecturer.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select(selectedFields).lean()
+      user = await Lecturer.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
       break;
     case "assistant":
-      user = await Assistant.findByIdAndUpdate(userId, updatedUser, { new: true, runValidators: true }).select("-password").lean() 
+      user = await Assistant.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password")
+        .lean();
       break;
     default:
       return next(new AppError("Invalid role", 400));
   }
 
-  res.json(user)
-})
+  res.json(user);
+});
 
 const deleteUser = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findByIdAndDelete(req.params.userId).select("-password").lean()
+  const foundUser = await User.findByIdAndDelete(req.params.userId)
+    .select("-password")
+    .lean();
   if (!foundUser) return next(new AppError("User not found", 404));
   res.json(foundUser);
-})
+});
 
 // we ahould make a validation for newPassword field here
 const changePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
-  if(!currentPassword || !newPassword){
-    return next(new AppError("You should provide both current and new password",400));
+  if (!currentPassword || !newPassword) {
+    return next(
+      new AppError("You should provide both current and new password", 400)
+    );
   }
 
   const user = await User.findById(req.user._id).select("+password");
-  if(!user) {
-    return next(new AppError("User not found, pleaze login again",401));
+  if (!user) {
+    return next(new AppError("User not found, pleaze login again", 401));
   }
 
-  const isValidCurrentPassword = await user.comparePassword(currentPassword,user.password);
-  if(!isValidCurrentPassword){
-    return next(new AppError("Your current password is wrong",401));
+  const isValidCurrentPassword = await user.comparePassword(
+    currentPassword,
+    user.password
+  );
+  if (!isValidCurrentPassword) {
+    return next(new AppError("Your current password is wrong", 401));
   }
 
   if (currentPassword === newPassword) {
@@ -160,9 +220,9 @@ const changePassword = catchAsync(async (req, res, next) => {
     );
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword,12);
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
   user.password = hashedPassword;
-  await user.save()
+  await user.save();
 
   // otional: regenerate jwt if we  wanna to keep the user logged in
   /*
@@ -194,18 +254,297 @@ const changePassword = catchAsync(async (req, res, next) => {
   })
   */
 
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
 
-  res.clearCookie("jwt",{
-    httpOnly:true,
-    secure:process.env.NODE_ENV==="production",
-    sameSite:"none",
-  })
-  
   res.status(200).json({
-    status:"success",
-    message:"Password updated successfully, please login again"
-  })
-  
+    status: "success",
+    message: "Password updated successfully, please login again",
+  });
 });
 
-module.exports = { getAllUsers, getAllUsersByRole, getUser, createUser, updateUser, deleteUser,changePassword }
+const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
+  const { accountType } = req.body;
+
+  const allAccountTypes = ["parent", "teacher", "student"];
+  if (!accountType || !allAccountTypes.includes(accountType)) {
+    return next(
+      new AppError(
+        "You should provide one of these account types: parent, teacher, student"
+      )
+    );
+  }
+
+  if (!req.file) {
+    return next(new AppError("No file uploaded", 400));
+  }
+  const fileType = req.file.mimetype;
+
+  if (fileType === "text/csv" || fileType === "application/csv") {
+    await handleCSV(req.file.buffer, accountType, res, next);
+  } else if (
+    fileType ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    fileType === "application/vnd.ms-excel"
+  ) {
+    await handleExcel(req.file.buffer, accountType, res, next);
+  } else {
+    return next(
+      new AppError(
+        "Unsupported file type. Please upload a CSV or Excel file",
+        400
+      )
+    );
+  }
+});
+
+/**
+ * Get all data for the currently logged-in user (any role)
+ * Includes user profile, balance information (for student/parent) and purchase history (for student/parent)
+ */
+const getMyData = catchAsync(async (req, res, next) => {
+  // Get user ID from authenticated user
+  const userId = req.user._id;
+  const userRole = req.user.role;
+  
+  // Common response data
+  let responseData = {
+    userInfo: {
+      id: userId,
+      name: req.user.name,
+      email: req.user.email,
+      role: userRole,
+    }
+  };
+  
+  // Role-specific data retrieval
+  switch(userRole) {
+    case "Student":
+      // Find student with all related data
+      const student = await Student.findById(userId)
+        .populate("level", "name")
+        .populate({
+          path: "lecturerPoints.lecturer",
+          select: "name subject expertise"
+        })
+        .lean();
+      
+      if (!student) {
+        return next(new AppError("Student not found", 404));
+      }
+      
+      // Add student-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: student.phoneNumber,
+        level: student.level,
+        generalPoints: student.generalPoints || 0,
+        totalPoints: student.totalPoints || 0,
+        hobbies: student.hobbies,
+        faction: student.faction
+      };
+      
+      // Get student purchases, redeemed codes, and lecture access
+      responseData = await getStudentParentAdditionalData(userId, responseData, student.lecturerPoints || []);
+      break;
+      
+    case "Parent":
+      // Find parent with all related data
+      const parent = await Parent.findById(userId)
+        .populate({
+          path: "children",
+          select: "name level sequencedId"
+        })
+        .populate({
+          path: "lecturerPoints.lecturer",
+          select: "name subject expertise"
+        })
+        .lean();
+      
+      if (!parent) {
+        return next(new AppError("Parent not found", 404));
+      }
+      
+      // Add parent-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: parent.phoneNumber,
+        level: parent.level,
+        children: parent.children,
+        generalPoints: parent.generalPoints || 0
+      };
+      
+      // Get parent purchases, redeemed codes, and lecture access
+      responseData = await getStudentParentAdditionalData(userId, responseData, parent.lecturerPoints || []);
+      break;
+      
+    case "Lecturer":
+      // Find lecturer with relevant data
+      const lecturer = await Lecturer.findById(userId)
+        .lean();
+      
+      if (!lecturer) {
+        return next(new AppError("Lecturer not found", 404));
+      }
+      
+      // Add lecturer-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        bio: lecturer.bio,
+        expertise: lecturer.expertise
+      };
+      
+      // Get lecturer-specific data (containers created by this lecturer)
+      const containers = await Container.find({ createdBy: userId })
+        .select("name type price subject level")
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+      
+      responseData.containers = containers;
+      
+      // Get point purchases made for this lecturer's content
+      const pointPurchases = await Purchase.find({ 
+        lecturer: userId 
+      })
+      .populate("student", "name")
+      .sort({ purchasedAt: -1 })
+      .lean();
+      
+      responseData.pointPurchases = pointPurchases;
+      break;
+      
+    case "Teacher":
+      // Find teacher with relevant data
+      const teacher = await Teacher.findById(userId)
+        .populate("school", "name")
+        .lean();
+      
+      if (!teacher) {
+        return next(new AppError("Teacher not found", 404));
+      }
+      
+      // Add teacher-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        phoneNumber: teacher.phoneNumber,
+        subject: teacher.subject,
+        level: teacher.level,
+        faction: teacher.faction,
+        school: teacher.school
+      };
+      break;
+      
+    case "Admin":
+    case "SubAdmin":
+    case "Moderator":
+      // For admin roles, just return basic profile info
+      const admin = await User.findById(userId)
+        .select("-password")
+        .lean();
+      
+      if (!admin) {
+        return next(new AppError("User not found", 404));
+      }
+      
+      // No additional fields needed for admin roles
+      break;
+      
+    case "Assistant":
+      // Find assistant with related lecturer
+      const assistant = await Assistant.findById(userId)
+        .populate("assignedLecturer", "name expertise")
+        .lean();
+      
+      if (!assistant) {
+        return next(new AppError("Assistant not found", 404));
+      }
+      
+      // Add assistant-specific fields
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        assignedLecturer: assistant.assignedLecturer
+      };
+      break;
+      
+    default:
+      // For any other role, return basic user info
+      const user = await User.findById(userId)
+        .select("-password")
+        .lean();
+      
+      if (!user) {
+        return next(new AppError("User not found", 404));
+      }
+  }
+  
+  res.status(200).json({
+    status: "success",
+    data: responseData
+  });
+});
+
+// Helper function to get additional data for students and parents
+const getStudentParentAdditionalData = async (userId, responseData, pointsBalances) => {
+  // Get all types of purchases for the user
+  const purchaseHistory = await Purchase.find({
+    student: userId
+  })
+  .populate([
+    { path: "container", select: "name type price" },
+    { path: "lecturer", select: "name expertise" },
+    { path: "package", select: "name type price description" }
+  ])
+  .sort({ purchasedAt: -1 })
+  .lean();
+
+  // Get redeemed codes
+  const redeemedCodes = await Code.find({
+    redeemedBy: userId,
+    isRedeemed: true
+  }).lean();
+
+  // Get lecture access information
+  const lectureAccess = await StudentLectureAccess.find({
+    student: userId
+  })
+  .populate({
+    path: "lecture",
+    select: "name videoLink description numberOfViews"
+  })
+  .lean();
+  
+  // Determine if any lecture types were purchased
+  const purchasedLectureTypes = new Set();
+  purchaseHistory.forEach(purchase => {
+    if (purchase.container && purchase.container.type === 'lecture') {
+      purchasedLectureTypes.add('lecture');
+    }
+  });
+  
+  return {
+    ...responseData,
+    pointsBalances,
+    purchaseHistory,
+    redeemedCodes,
+    lectureAccess,
+    purchasedFeatures: {
+      hasLectures: purchasedLectureTypes.size > 0
+    }
+  };
+};
+
+module.exports = {
+  getAllUsers,
+  getAllUsersByRole,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  changePassword,
+  uploadFileForBulkCreation,
+  getMyData,
+};

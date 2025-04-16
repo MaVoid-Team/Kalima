@@ -44,7 +44,7 @@ router.get(
 // Get current user's points balances across all lecturers
 router.get(
   "/balances",
-  authController.verifyRoles("Student", "Parent"),
+  authController.verifyRoles("Admin", "Student", "Parent"),
   purchaseController.getAllUserPointBalances
 );
 
