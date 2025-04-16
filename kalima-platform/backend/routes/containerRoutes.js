@@ -11,6 +11,13 @@ router.get(
   containerController.getAllContainers
 );
 
+// Get container by ID - works with or without authentication
+router.get(
+  "/:containerId",
+  authController.optionalJWT,  // Apply optional JWT middleware
+  containerController.getContainerById
+);
+
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
 
@@ -69,19 +76,6 @@ router.patch(
 // Operations on a specific container by ID
 router
   .route("/:containerId")
-  .get(
-    authController.verifyRoles(
-      "Admin",
-      "SubAdmin",
-      "Moderator",
-      "Lecturer",
-      "Assistant",
-      "Student",
-      "Parent",
-      "teacher"
-    ),
-    containerController.getContainerById
-  )
   .patch(
     authController.verifyRoles(
       "Admin",

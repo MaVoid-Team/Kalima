@@ -1,8 +1,9 @@
 const Attendance = require("../models/attendanceModel");
 const Lesson = require("../models/lessonModel");
-const User = require("../models/userModel"); // Assuming Student is derived from User
+// const User = require("../models/userModel"); // Assuming Student is derived from User
 const PricingRule = require("../models/pricingRuleModel"); // Import PricingRule
 const AppError = require("../utils/appError");
+const cStudent = require("../models/center.studentModel"); // Assuming Student is derived from User
 const catchAsync = require("../utils/catchAsync");
 const QueryFeatures = require("../utils/queryFeatures");
 
@@ -13,7 +14,6 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     paymentType,
   } = req.body;
   const recordedById = req.user._id;
-
   if (!studentId || !lessonId || !paymentType) {
     return next(
       new AppError("Student ID, Lesson ID, and Payment Type are required.", 400)
@@ -26,10 +26,17 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     return next(new AppError("Lesson not found.", 404));
   }
 
-  const student = await User.findById(studentId).lean();
-  if (!student || student.role !== "Student") {
+  const student = await cStudent.findById(studentId).lean();
+  if (!student) {
     return next(new AppError("Student not found.", 404));
   }
+
+  // --- Check for Existing Attendance for this specific lesson instance ---
+  const existingAttendance = await Attendance.findOne({ student: studentId, lesson: lessonId });
+  if (existingAttendance) {
+      return next(new AppError("Student attendance already recorded for this specific lesson.", 409)); // 409 Conflict
+  }
+  // --- End Check ---
 
   // --- Find Applicable Pricing Rule ---
   // Find center-specific rule first, then fall back to global rule (center: null)
@@ -70,38 +77,43 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
   if (paymentType === "daily") {
     attendanceData.amountPaid = lessonDailyPrice;
   } else if (paymentType === "multi-session") {
-    // Find the most recent multi-session attendance record for this student
-    // attending this specific conceptual lesson (defined by lecturer, subject, level).
-    // This works even if the lessonId changes for each scheduled instance,
-    // because we query based on the stable identifiers.
-    const existingMultiSessionRecord = await Attendance.findOne({
+    // Step 1: Find the absolute latest multi-session record for this student/conceptual lesson
+    const latestMultiSessionRecord = await Attendance.findOne({
       student: studentId,
-      lecturer: lesson.lecturer, // Stable identifier for the conceptual lesson
-      subject: lesson.subject,   // Stable identifier
-      level: lesson.level,     // Stable identifier
+      lecturer: lesson.lecturer,
+      subject: lesson.subject,
+      level: lesson.level,
       paymentType: "multi-session",
-      sessionsRemaining: { $gt: 0 },
-    }).sort({ attendanceDate: -1 }); // Get the latest relevant record
+      // Removed sessionsRemaining > 0 from here to find the latest regardless of status
+    }).sort({ attendanceDate: -1 }); // Get the very latest record
 
-    if (existingMultiSessionRecord) {
-      // Use an existing session from a previous payment for this conceptual lesson
+    // Step 2: Check if that record exists AND has sessions remaining
+    if (latestMultiSessionRecord && latestMultiSessionRecord.sessionsRemaining > 0) {
+      // Active package found, use an existing session
+      console.log(`DEBUG: Found active package, remaining: ${latestMultiSessionRecord.sessionsRemaining}`); // Added console log
       attendanceData.amountPaid = 0;
       attendanceData.sessionsPaidFor = 0;
-      attendanceData.sessionsRemaining = existingMultiSessionRecord.sessionsRemaining - 1;
+      attendanceData.sessionsRemaining = latestMultiSessionRecord.sessionsRemaining - 1;
     } else {
-      // No active multi-session package found for this student + conceptual lesson.
-      // Start a new multi-session package using the applicable pricing rule.
+      // No active package found (either never existed or latest one is depleted)
+      // A NEW payment is required.
+      console.log(`DEBUG: No active package found or latest depleted. Creating new payment.`); // Added console log
       const finalAmountPaid = lessonMultiSessionPrice;
       const finalSessionsPaidFor = lessonMultiSessionCount;
 
+      if (!pricingRule) { // Double check pricing rule exists before using its values
+           return next(new AppError("Cannot process multi-session payment without a valid pricing rule.", 404));
+      }
       if (finalSessionsPaidFor <= 0) {
         return next(
           new AppError("Pricing rule's multi-session count must be positive.", 400)
         );
       }
 
+      // Record the new payment amount and reset the session counter
       attendanceData.amountPaid = finalAmountPaid;
       attendanceData.sessionsPaidFor = finalSessionsPaidFor;
+      // Consume the first session of the new package
       attendanceData.sessionsRemaining = finalSessionsPaidFor - 1;
     }
   } else if (paymentType === "unpaid") {
@@ -110,12 +122,26 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid payment type.", 400));
   }
 
+  console.log("DEBUG: Final attendanceData before create:", attendanceData); // Added console log
   const newAttendance = await Attendance.create(attendanceData);
+
+  // Determine payment status for the response
+  let paymentStatus = 'unknown';
+  if (attendanceData.paymentType === 'unpaid') {
+      paymentStatus = 'unpaid';
+  } else if (attendanceData.amountPaid > 0) {
+      // This covers both daily payments and the initial multi-session payment
+      paymentStatus = 'paid';
+  } else if (attendanceData.paymentType === 'multi-session' && attendanceData.amountPaid === 0) {
+      // This covers using a pre-paid session from a multi-session package
+      paymentStatus = 'session_used';
+  }
 
   res.status(201).json({
     status: "success",
     data: {
       attendance: newAttendance,
+      paymentStatus: paymentStatus // Add payment status to the response
     },
   });
 });
@@ -125,7 +151,6 @@ exports.getAttendance = catchAsync(async (req, res, next) => {
     const features = new QueryFeatures(Attendance.find(), req.query)
       .filter()
       .sort()
-      .limitFields()
       .paginate();
 
     // Populate related fields for better readability
