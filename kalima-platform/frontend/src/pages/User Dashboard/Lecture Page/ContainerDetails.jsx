@@ -2,32 +2,83 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { getContainerById, getLecturesByContainerId } from "../../../routes/lectures"
+import { getContainerById } from "../../../routes/lectures"
+import { BookOpen, FileText } from "lucide-react"
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
   const [container, setContainer] = useState(null)
-  const [lectures, setLectures] = useState([])
+  const [childContainers, setChildContainers] = useState([])
+  const [subjectName, setSubjectName] = useState("Unknown Subject")
+  const [levelName, setLevelName] = useState("Unknown Level")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("Container ID from params:", containerId)
-  
-    const fetchContainerAndLectures = async () => {
+    const fetchContainerAndChildren = async () => {
       try {
         setLoading(true)
-  
+
+        // Fetch container details
         const containerResult = await getContainerById(containerId)
         console.log("Container data:", containerResult.data)
-        const containerData = containerResult.data.container || containerResult.data
+
+        if (containerResult.status !== "success") {
+          throw new Error("Failed to fetch container details")
+        }
+
+        const containerData = containerResult.data
         setContainer(containerData)
-  
-        const lecturesResult = await getLecturesByContainerId(containerId)
-        console.log("Lectures data:", lecturesResult.data)
-        setLectures(lecturesResult.data.lectures)
-  
+
+        // Fetch subject and level details if they're just IDs
+        if (
+          typeof containerData.subject === "string" ||
+          (typeof containerData.subject === "object" && !containerData.subject?.name)
+        ) {
+          try {
+            // This would be a separate API call to get subject details
+            // For now, we'll use a placeholder
+            setSubjectName("Unknown Subject")
+          } catch (err) {
+            console.error("Error fetching subject:", err)
+          }
+        } else if (containerData.subject?.name) {
+          setSubjectName(containerData.subject.name)
+        }
+
+        if (
+          typeof containerData.level === "string" ||
+          (typeof containerData.level === "object" && !containerData.level?.name)
+        ) {
+          try {
+            // This would be a separate API call to get level details
+            // For now, we'll use a placeholder
+            setLevelName("Unknown Level")
+          } catch (err) {
+            console.error("Error fetching level:", err)
+          }
+        } else if (containerData.level?.name) {
+          setLevelName(containerData.level.name)
+        }
+
+        // Fetch child containers if available
+        if (containerData.children && containerData.children.length > 0) {
+          const childIds = containerData.children.map((child) =>
+            typeof child === "string" ? child : child._id || child.id,
+          )
+
+          if (childIds.length > 0) {
+            try {
+              // This would be a batch fetch of child containers
+              // For now, we'll use the children data directly
+              setChildContainers(containerData.children)
+            } catch (err) {
+              console.error("Error fetching child containers:", err)
+            }
+          }
+        }
+
         setLoading(false)
       } catch (err) {
         setError("Failed to load container details. Please try again later.")
@@ -35,15 +86,32 @@ const ContainerDetailsPage = () => {
         console.error("Error:", err)
       }
     }
-  
+
     if (containerId) {
-      fetchContainerAndLectures()
+      fetchContainerAndChildren()
     }
   }, [containerId])
-  
 
-  const handleLectureClick = (lectureId) => {
-    navigate(`/container-details/${containerId}/lecture-page/${lectureId}`)
+  const handleChildClick = (childId) => {
+    navigate(`/container-details/${childId}`)
+  }
+
+  // Get container type in Arabic
+  const getContainerTypeArabic = (type) => {
+    switch (type) {
+      case "course":
+        return "كورس"
+      case "year":
+        return "سنة دراسية"
+      case "term":
+        return "فصل دراسي"
+      case "month":
+        return "شهر"
+      case "lecture":
+        return "محاضرة"
+      default:
+        return type
+    }
   }
 
   if (loading) {
@@ -77,108 +145,128 @@ const ContainerDetailsPage = () => {
     )
   }
 
-  // Handle the case where subject and level might be objects or just IDs
-  const subjectName = container.subject?.name || "Unknown Subject"
-  const levelName = container.level?.name || "Unknown Level"
-
   return (
     <div className="container mx-auto p-4" dir="rtl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{container.name}</h1>
-        <div className="flex gap-2 mb-4">
+      {/* Container Header */}
+      <div className="bg-base-100 rounded-lg shadow-lg p-6 mb-8">
+        <h1 className="text-3xl font-bold mb-4">{container.name}</h1>
+
+        <div className="flex flex-wrap gap-2 mb-4">
           <div className="badge badge-primary">{subjectName}</div>
           <div className="badge badge-secondary">{levelName}</div>
-          <div className="badge badge-outline">{container.type}</div>
+          <div className="badge badge-outline">{getContainerTypeArabic(container.type)}</div>
+          {container.teacherAllowed && <div className="badge badge-success">مسموح للمعلمين</div>}
         </div>
 
-        {container.description && <p className="text-gray-700 mb-4">{container.description}</p>}
+        {container.description && (
+          <div className="bg-base-200 p-4 rounded-md mb-4">
+            <h3 className="font-bold mb-2">الوصف:</h3>
+            <p className="text-base-content">{container.description}</p>
+          </div>
+        )}
 
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6">
+          <div className="flex items-center gap-3">
             <div className="avatar placeholder">
-              <div className="bg-neutral text-neutral-content rounded-full w-10">
-                <span>{container.createdBy?.name?.charAt(0) || "?"}</span>
+              <div className="bg-primary text-primary-content rounded-full w-12 h-12 flex items-center justify-center">
+                <span className="text-lg">{container.createdBy?.name?.charAt(0) || "?"}</span>
               </div>
             </div>
             <div>
-              <p className="font-medium">{container.createdBy?.name || "Unknown"}</p>
-              <p className="text-sm text-gray-500">{container.createdBy?.role || "Unknown"}</p>
+              <p className="font-medium text-lg">{container.createdBy?.name || "Unknown"}</p>
+              <p className="text-sm text-base-content/70">{container.createdBy?.role || "Unknown"}</p>
             </div>
           </div>
-          <div className="text-lg">
-            <span className="font-bold">{container.price}</span> جنيه
+
+          <div className="flex items-center gap-4">
+            {container.price > 0 ? (
+              <div className="bg-primary/10 text-primary px-4 py-2 rounded-full">
+                <span className="font-bold text-lg">{container.price}</span> جنيه
+              </div>
+            ) : (
+              <div className="bg-success/10 text-success px-4 py-2 rounded-full">
+                <span className="font-bold text-lg">مجاني</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold mb-4">المحاضرات ({lectures.length})</h2>
+      {/* Container Children/Content */}
+      <div className="bg-base-100 rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <FileText className="h-6 w-6 text-primary" />
+          المحتويات ({childContainers.length})
+        </h2>
 
-      {lectures.length === 0 ? (
-        <div className="alert alert-info">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="stroke-current shrink-0 w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>لا توجد محاضرات متاحة في هذا الكورس حاليا.</span>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {lectures.map((lecture) => (
-            <div
-              key={lecture._id}
-              className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all cursor-pointer"
-              onClick={() => handleLectureClick(lecture._id)}
+        {childContainers.length === 0 ? (
+          <div className="alert alert-info">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              className="stroke-current shrink-0 w-6 h-6"
             >
-              <div className="card-body">
-                <h3 className="card-title">{lecture.name}</h3>
-                {lecture.description && <p className="mt-2">{lecture.description}</p>}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>لا يوجد محتوى متاح في هذا الكورس حاليا.</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {childContainers.map((child) => (
+              <div
+                key={child._id || child.id}
+                className="card bg-base-200 hover:bg-base-300 transition-colors shadow-md hover:shadow-lg cursor-pointer"
+                onClick={() => handleChildClick(child._id || child.id)}
+              >
+                <div className="card-body">
+                  <h3 className="card-title text-lg">{child.name}</h3>
 
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-sm">
-                    <span className="font-bold">{lecture.price || "Free"}</span> {lecture.price ? "جنيه" : ""}
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                    {lecture.numberOfViews || 0}
+                  {child.type && (
+                    <div className="mt-2">
+                      <span className="badge badge-sm">{getContainerTypeArabic(child.type)}</span>
+                    </div>
+                  )}
+
+                  <div className="card-actions justify-end mt-4">
+                    <button className="btn btn-primary btn-sm">عرض المحتوى</button>
                   </div>
                 </div>
-
-                {lecture.kind && (
-                  <div className="mt-2 text-xs">
-                    <span className="badge badge-sm">{lecture.kind}</span>
-                  </div>
-                )}
               </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Parent Container Info (if available) */}
+      {container.parent && (
+        <div className="mt-8 bg-base-100 rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4">جزء من:</h2>
+          <div
+            className="flex items-center gap-3 p-4 bg-base-200 rounded-lg cursor-pointer hover:bg-base-300 transition-colors"
+            onClick={() =>
+              navigate(
+                `/container-details/${typeof container.parent === "string" ? container.parent : container.parent._id || container.parent.id}`,
+              )
+            }
+          >
+            <div className="bg-primary/10 p-2 rounded-full">
+              <BookOpen className="h-6 w-6 text-primary" />
             </div>
-          ))}
+            <div>
+              <p className="font-medium">
+                {typeof container.parent === "string" ? "الكورس الأساسي" : container.parent.name || "الكورس الأساسي"}
+              </p>
+              <p className="text-sm text-base-content/70">
+                {typeof container.parent === "string" ? "" : getContainerTypeArabic(container.parent.type) || ""}
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>

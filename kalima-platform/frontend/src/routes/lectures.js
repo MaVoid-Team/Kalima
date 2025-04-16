@@ -30,9 +30,26 @@ export const getContainerById = async (containerId) => {
         Authorization: `Bearer ${getToken()}`,
       },
     })
+
     return response.data
   } catch (error) {
-    console.error(`Error fetching container with ID ${containerId}:`, error)
+    console.error(`Error fetching container ${containerId}:`, error)
+    throw error
+  }
+}
+
+export const getMyContainers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/containers/my-containers`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    console.error("Error fetching my containers:", error)
     throw error
   }
 }
