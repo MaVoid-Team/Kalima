@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
-const CLecturer = require("../models/Center.LecturerModel");
+const CLecturer = require("../models/center.lecturerModel");
 const Center = require("../models/centerModel");
 const Subject = require("../models/subjectModel");
 const AppError = require("../utils/AppError");
@@ -137,7 +137,7 @@ exports.deleteLecturer = catchAsync(async (req, res, next) => {
 
   const deletedLecturer = await CLecturer.findByIdAndDelete(id);
   if (!deletedLecturer) {
-    returnnext(new AppError("Lecturer not found.", 404));
+    return(next(new AppError("Lecturer not found.", 404)));
   }
   res.status(204).json({
     status: "success",
