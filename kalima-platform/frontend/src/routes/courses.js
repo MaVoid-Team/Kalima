@@ -45,7 +45,7 @@ export const getSubjectById = async (subjectId) => {
 
 export const getLecturesBySubject = async (subjectId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures?subject=${subjectId}`, {
+    const response = await axios.get(`${API_URL}/lectures?subject=${subjectId}`, {
       headers: getAuthHeader(),
     })
     return {

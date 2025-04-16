@@ -73,7 +73,7 @@ export const getAllLectures = async () => {
 
 export const getContainersByLecturerId = async (lecturerId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/lecturer/${lecturerId}`, {
+    const response = await axios.get(`${API_URL}/containers/lecturer/${lecturerId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
