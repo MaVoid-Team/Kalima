@@ -34,6 +34,7 @@ const packegeRouter = require("./routes/packageRoutes.js");
 const auditLogRouter = require("./routes/auditLogRoutes.js");
 const cLecturerRouter = require("./routes/center.lecturerRoutes.js");
 const cStudentRouter = require("./routes/center.studentRoutes.js");
+const lessonRouter = require("./routes/lessonRoutes.js");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -65,6 +66,7 @@ app.use("/api/v1/packages", auditLogger, packegeRouter);
 app.use("/api/v1/audit-logs", auditLogRouter);
 app.use("/api/v1/center-lecturer", cLecturerRouter);
 app.use("/api/v1/center-student", cStudentRouter);
+app.use("/api/v1/lessons", lessonRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");

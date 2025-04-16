@@ -8,6 +8,7 @@ const cStudentSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
+      unique: true,
       required: true,
     },
     gender: {

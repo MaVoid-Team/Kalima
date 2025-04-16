@@ -3,7 +3,11 @@ const _ = require("lodash");
 
 const cLecturerSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  phone: { type: String, required: true },
+  phone: {
+    type: String,
+    unique: true,
+    required: true,
+  },
   subjects: {
     type: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Subject", required: true },
