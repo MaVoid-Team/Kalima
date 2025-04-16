@@ -1,5 +1,5 @@
 // assistantPage.jsx
-import { FaBell, FaEnvelope, FaChevronDown } from 'react-icons/fa';
+import { FaBell, FaEnvelope, FaChevronDown,FaBars } from 'react-icons/fa';
 import CoursesSection from './CoursesSection';
 import VideoSection from './VideoSection';
 import FeaturedCourses from './FeaturedCourses';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 const AssistantPage = () => {
    const [isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { i18n } = useTranslation();
+  const {t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
   // Dummy profile data
@@ -21,41 +21,51 @@ const AssistantPage = () => {
     role: "Teaching Assistant",
     image: "https://via.placeholder.com/40"
   };
-   useEffect(() => {
-      const checkScreenSize = () => {
-        const mobile = window.innerWidth < 768;
-        setIsMobile(mobile);
-        setSidebarOpen(!mobile); // Open by default on desktop, closed on mobile
-      };
-        const toggleSidebar = () => {
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+  
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-      // Initial check
-      checkScreenSize();
-      
-      // Add event listener
-      window.addEventListener('resize', checkScreenSize);
-      
-      // Cleanup
-      return () => window.removeEventListener('resize', checkScreenSize);
-    }, []);
-    const toggleSidebar = () => {
-      setSidebarOpen(!sidebarOpen);
-    };
+  
 
   return (
-    <div className="mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className={`transition-all duration-300 ${!isMobile && sidebarOpen ? (isRTL ? 'md:mr-24' : 'md:ml-24') : 'md:mrl-0'}`}>
+     <div 
+          className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100 ${
+            sidebarOpen && !isMobile ? ` ${isRTL ? 'mr-52' : 'ml-52'} transition-all duration-500` : `mr-0`
+          }`} 
+          dir={isRTL ? 'ltr' : 'rtl'}
+        >
+          {/* Mobile Sidebar Toggle Button */}
+          <div className={`md:hidden fixed top-16 ${isRTL ? 'left-4' : 'right-4'} z-50`}>
+            <button
+              id="sidebar-toggle"
+              className="btn btn-circle btn-primary"
+              onClick={toggleSidebar}
+              aria-label={t('toggleSidebar')}
+            >
+              <FaBars className="w-5 h-5" />
+            </button>
+          </div>
         <div className="container mx-auto">
       <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       <CoursesSection />
-      <VideoSection />
+      {/* <VideoSection /> */}
       <FeaturedCourses />
-      <RevisionCourses />
-      <EliteAssistants />
+      {/* <RevisionCourses /> */}
+      {/* <EliteAssistants /> */}
     </div>
     </div>
-    </div>
+    
   );
 };
 

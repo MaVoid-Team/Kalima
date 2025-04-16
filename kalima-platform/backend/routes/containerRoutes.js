@@ -4,8 +4,23 @@ const authController = require("../controllers/authController.js");
 const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
 
-// Apply JWT verification middleware
+
+// Get containers for a specific lecturer
+router.get(
+  "/lecturer/:lecturerId",
+  containerController.getLecturerContainers
+);
+// Get container by ID - works with or without authentication
+router.get(
+  "/:containerId",
+  authController.optionalJWT,  // Apply optional JWT middleware
+  containerController.getContainerById
+);
+
+// Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
+
+
 
 // Get accessible child containers for a student by container ID
 router.get(
@@ -19,28 +34,29 @@ router.get(
 //   containerController.getTeacherContainers
 // );
 
-// Get containers for a specific lecturer
+//purchaseCounter for all containers
 router.get(
-  "/lecturer/:lecturerId",
-  containerController.getLecturerContainers
+  "/purchase-counts",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getAllContainerPurchaseCounts
+);
+//purchaseCounter for a container
+router.get(
+  "/purchase-counts/:containerId",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getContainerPurchaseCountById
+);
+
+// Add a route to get containers of the currently logged-in lecturer
+router.get(
+  "/my-containers",
+  authController.verifyRoles("Lecturer"),
+  containerController.getMyContainers
 );
 
 // Create and get containers
 router
   .route("/")
-  .get(
-    authController.verifyRoles(
-      "Admin",
-      "SubAdmin",
-      "Moderator",
-      "Lecturer",
-      "Assistant",
-      "Student",
-      "Parent",
-      "teacher"
-    ),
-    containerController.getAllContainers
-  )
   .post(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
     containerController.createContainer
@@ -56,19 +72,6 @@ router.patch(
 // Operations on a specific container by ID
 router
   .route("/:containerId")
-  .get(
-    authController.verifyRoles(
-      "Admin",
-      "SubAdmin",
-      "Moderator",
-      "Lecturer",
-      "Assistant",
-      "Student",
-      "Parent",
-      "teacher"
-    ),
-    containerController.getContainerById
-  )
   .patch(
     authController.verifyRoles(
       "Admin",

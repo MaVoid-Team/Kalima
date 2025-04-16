@@ -60,10 +60,10 @@ const PromoCodes = () => {
         <div className="bg-base-100 p-4 flex items-center justify-between  top-0 z-10 mt-10">
           <div className="flex-1 flex items-center justify-center ">
             <h1 className="text-xl font-bold text-primary px-1">{t('title')}</h1>
-            <img src="Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
+            <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
           </div>
           <img 
-            src="waves.png" 
+            src="/waves.png" 
             alt="Decorative waves" 
             className="absolute  left-[10%] w-16 animate-float-zigzag" 
           />
@@ -87,7 +87,7 @@ const PromoCodes = () => {
             {/* Balance Card */}
             <div className="relative">
             <img 
-              src="rDots.png" 
+              src="/rDots.png" 
               alt="Decorative dots" 
               className="absolute -top-28 -right-8 w-32  animate-float-up-dottedball z-0" 
             />
@@ -106,13 +106,13 @@ const PromoCodes = () => {
 
             {/* Arrow */}
             <div className={`absolute ${isRTL ? 'right-[45%] rotate-[180deg] scale-y-[-1]' : 'left-[45%] md:rotate-[360deg]'} top-1/2 transform rotate-90  translate-y-1/4 md:-translate-y-1/2 block z-10 `}>
-              <img src="vector22.png" alt={t('arrowAlt')} className="object-cover" />
+              <img src="/vector22.png" alt={t('arrowAlt')} className="object-cover" />
             </div>
 
             {/* Redeem Code Box */}
             <div className="card  shadow-sm relative  my-auto">
             <img 
-            src="ball.png" 
+            src="/ball.png" 
             alt="Decorative ball" 
             className="absolute -bottom-16 left-4 w-10 animate-bounce-slow" 
           />
@@ -133,7 +133,7 @@ const PromoCodes = () => {
           {/* Transactions History */}
           <div className="card bg-base-100 shadow-sm relative">
             <div className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-32 h-32 -z-10 `}>
-              <img src="rDots.png" alt={t('decorativeAlt')} className="w-full h-full object-cover animate-float-up-dottedball" />
+              <img src="/rDots.png" alt={t('decorativeAlt')} className="w-full h-full object-cover animate-float-up-dottedball" />
             </div>
             
             <div className="card-body p-0">
@@ -141,7 +141,7 @@ const PromoCodes = () => {
                 <h2 className={`card-title text-primary inline-block px-2 pb-2`}>
                   {t('transactions.title')}
                 </h2>
-                 <img src="Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
+                 <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
               </div>
 
               {/* Sort Dropdown */}

@@ -3,7 +3,7 @@ import { useState } from "react"
 import Hero from "./hero"
 import Charts from "./chartsSection"
 import StudentsSection from "./studentsSection"
-import AdminSidebar from "../../components/AdminSidebar"
+import AdminSidebar from "../../../components/AdminSidebar"
 import UserManagementTable from "./userManageTable"
 const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(true)
