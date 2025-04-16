@@ -46,13 +46,12 @@ const TeacherLogin = () => {
       const result = await loginUser(credentials);
       
       if (!result.success) {
-        setError(result.message || 'Login failed. Please check your credentials.');
+        setError(result.message || 'Login failed.');
+      } else {
+        // EXPLICIT TOKEN STORAGE ADDED
+        sessionStorage.setItem("accessToken", result.accessToken);
+        navigate('/lecturer-dashboard');
       }
-      else {
-        navigate('/lecturer-dashboard'); // Redirect to the lecturer dashboard on successful login
-      }
-      // Successful login is handled by the loginUser function (sets token in sessionStorage)
-      
     } catch (err) {
       setError('An error occurred. Please try again later.');
       console.error(err);
