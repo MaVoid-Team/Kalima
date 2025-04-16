@@ -57,24 +57,34 @@ export const getMyContainers = async () => {
 // Function to get all lectures
 export const getAllLectures = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures`, {withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
-      },
-    })
-
-    return {
-      success: true,
-      data: response.data.data.containers, // Access the containers array from the response
-      count: response.data.results,
-    }
+      },});
+    return response.data;
   } catch (error) {
+    console.error("Error fetching lectures:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch lectures",
-    }
+    };
   }
-}
+};
+
+export const getContainersByLecturerId = async (lecturerId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/containers/lecturer/${lecturerId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching containers for lecturer ${lecturerId}:`, error);
+    throw error;
+  }
+};
 
 // Function to get lectures by container ID
 export const getLecturesByContainerId = async (containerId) => {
