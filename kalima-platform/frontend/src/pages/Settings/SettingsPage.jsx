@@ -13,7 +13,7 @@ import { FaBars } from "react-icons/fa"
 function SettingsPage() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [formData, setFormData] = useState({
     fullName: t('personalInfo.placeholders.fullName'),
@@ -61,7 +61,7 @@ function SettingsPage() {
   }
 
   return (
-    <div 
+      <div 
       className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100 ${
         sidebarOpen && !isMobile ? ` ${isRTL ? 'mr-52' : 'ml-52'} transition-all duration-500` : `mr-0`
       }`} 
@@ -78,35 +78,35 @@ function SettingsPage() {
           <FaBars className="w-5 h-5" />
         </button>
       </div>
+      <div className="container mx-auto">
+        <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Main Content */}
-      <div className={`flex-1 p-4 lg:p-8 md:pt-4 pt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
-        <PageHeader title={t('title')} />
+        {/* Main Content */}
+        <div className={`flex-1 p-4 lg:p-8 md:pt-4 pt-16 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <PageHeader title={t('title')} />
 
-            <PersonalInfoSection 
-        formData={formData}
-        handleInputChange={handleInputChange}
-      />
+          <PersonalInfoSection 
+            formData={formData}
+            handleInputChange={handleInputChange}
+          />
 
-        <LanguageAppearanceSection 
-          title={t('languageAppearance.title')}
-          options={t('languageAppearance.options', { returnObjects: true })}
-        />
+          <LanguageAppearanceSection 
+            title={t('languageAppearance.title')}
+            options={t('languageAppearance.options', { returnObjects: true })}
+          />
 
-        <SecuritySection
-          formData={formData}
-          handleInputChange={handleInputChange}
-          labels={t('security.labels', { returnObjects: true })}
-        />
+          <SecuritySection
+            formData={formData}
+            handleInputChange={handleInputChange}
+            labels={t('security.labels', { returnObjects: true })}
+          />
 
-        <NotificationsSection
-          title={t('notifications.title')}
-          options={t('notifications.options', { returnObjects: true })}
-        />
+          <NotificationsSection
+            title={t('notifications.title')}
+            options={t('notifications.options', { returnObjects: true })}
+          />
+        </div>
       </div>
-
-      {/* Sidebar */}
-      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
     </div>
   )
 }

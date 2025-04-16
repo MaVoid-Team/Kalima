@@ -21,27 +21,22 @@ const AssistantPage = () => {
     role: "Teaching Assistant",
     image: "https://via.placeholder.com/40"
   };
-   useEffect(() => {
-      const checkScreenSize = () => {
-        const mobile = window.innerWidth < 768;
-        setIsMobile(mobile);
-        setSidebarOpen(!mobile); // Open by default on desktop, closed on mobile
-      };
-        const toggleSidebar = () => {
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+  
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-      // Initial check
-      checkScreenSize();
-      
-      // Add event listener
-      window.addEventListener('resize', checkScreenSize);
-      
-      // Cleanup
-      return () => window.removeEventListener('resize', checkScreenSize);
-    }, []);
-    const toggleSidebar = () => {
-      setSidebarOpen(!sidebarOpen);
-    };
+  
 
   return (
      <div 
