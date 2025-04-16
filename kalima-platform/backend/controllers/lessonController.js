@@ -5,7 +5,7 @@ const CLecturer = require("../models/center.lecturerModel");
 const Level = require("../models/levelModel");
 const Center = require("../models/centerModel");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 
 // Helper function to validate related document IDs
