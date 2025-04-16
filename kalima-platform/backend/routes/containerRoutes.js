@@ -10,6 +10,9 @@ router.get(
   "/lecturer/:lecturerId",
   containerController.getLecturerContainers
 );
+
+router.get("/", containerController.getAllContainers);
+
 // Get container by ID - works with or without authentication
 router.get(
   "/:containerId",
