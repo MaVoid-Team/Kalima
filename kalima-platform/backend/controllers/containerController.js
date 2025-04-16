@@ -362,13 +362,22 @@ exports.getLecturerContainers = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecturer ID is required", 400));
   }
 
-  const containers = await Container.find({
-    createdBy: lecturerId,
-  }).populate([
-    { path: "createdBy", select: "name" },
+  let query = Container.find({ createdBy: lecturerId });
+
+  // If the user is not authenticated, select only basic fields
+  if (!req.user) {
+    query = query.select("name type subject level createdBy"); // Select basic fields + createdBy for context
+  }
+
+  const containers = await query.populate([
+    { path: "createdBy", select: "name" }, // Keep createdBy populated for context
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
   ]);
+
+  if (!containers || containers.length === 0) {
+    return next(new AppError("No containers found for this lecturer.", 404));
+  }
 
   res.status(200).json({
     status: "success",

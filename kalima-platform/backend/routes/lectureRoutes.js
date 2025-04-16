@@ -5,6 +5,13 @@ const verifyJWT = require("../middleware/verifyJWT");
 
 // Apply JWT verification middleware
 const router = express.Router();
+
+// New public route for non-sensitive lecture data
+router
+  .route("/public")
+  .get(lectureController.getAllLecturesPublic);
+
+// Apply JWT verification middleware for subsequent routes
 router.use(verifyJWT);
 
 router
