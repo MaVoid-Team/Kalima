@@ -24,7 +24,7 @@ export const getAllContainers = async () => {
 // Function to get all containers
 export const getAllContainersPublic = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/public`, {
+    const response = await axios.get(`${API_URL}/containers/public`, {
       withCredentials: true,
 
     })
