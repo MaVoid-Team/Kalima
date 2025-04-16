@@ -124,34 +124,69 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllLectures = catchAsync(async (req, res, next) => {
-  const Role = req.user.role?.toLowerCase();
-  let query = Lecture.find().populate([
+// New function specifically for public, non-sensitive data
+exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
+  let query = Lecture.find();
+
+  // Populate common fields
+  query = query.populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
+    { path: "name", select: "name" },
+    { path: "type", select: "name" },
   ]);
+
+  // Always select only basic, non-sensitive fields for this public route
+  query = query.select(
+    "name type subject level createdBy price description lecture_type teacherAllowed"
+  );
+
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
 
   const containers = await features.query.lean();
-  if (!containers) return next(new AppError("Lectures not found", 404));
-  if (Role === "teacher") {
-    if (!containers.teacherAllowed) {
-      return res.status(200).json({
-        status: "restricted",
-        data: {
-          id: containers._id,
-          name: containers.name,
-          owner: containers.createdBy.name || container.createdBy._id,
-          subject: containers.subject.name || container.subject._id,
-          type: containers.type,
-        },
-      });
-    }
+
+  if (!containers || containers.length === 0) {
+    return next(new AppError("Lectures not found", 404));
   }
+
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers,
+    },
+  });
+});
+
+// Existing function for authenticated users (returns full data if authenticated)
+exports.getAllLectures = catchAsync(async (req, res, next) => {
+  // This function now assumes req.user exists because it's protected by verifyJWT middleware
+  let query = Lecture.find().populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+  ]);
+
+  // No need to check req.user here as this route requires authentication
+  // It will return all fields by default
+
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const containers = await features.query.lean();
+
+  if (!containers || containers.length === 0) { // Check length for lean() results
+      return next(new AppError("Lectures not found", 404));
+  }
+
+  // Removed the teacher-specific role check and mapping logic.
+  // Authenticated users get full data (unless specific role restrictions are added back later).
 
   res.status(200).json({
     status: "success",

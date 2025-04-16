@@ -4,13 +4,12 @@ const authController = require("../controllers/authController.js");
 const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
 
-// Route that works both with and without authentication
-router.get(
-  "/", 
-  authController.optionalJWT,  // Apply our optional JWT middleware
-  containerController.getAllContainers
-);
 
+// Get containers for a specific lecturer
+router.get(
+  "/lecturer/:lecturerId",
+  containerController.getLecturerContainers
+);
 // Get container by ID - works with or without authentication
 router.get(
   "/:containerId",
@@ -20,6 +19,8 @@ router.get(
 
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
+
+
 
 // Get accessible child containers for a student by container ID
 router.get(
@@ -33,11 +34,6 @@ router.get(
 //   containerController.getTeacherContainers
 // );
 
-// Get containers for a specific lecturer
-router.get(
-  "/lecturer/:lecturerId",
-  containerController.getLecturerContainers
-);
 //purchaseCounter for all containers
 router.get(
   "/purchase-counts",
