@@ -4,7 +4,7 @@ const attendanceSchema = new mongoose.Schema(
   {
     student: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Refers to the base User model
+      ref: "cStudent", // Refers to the base User model
       required: true,
     },
     lesson: {
