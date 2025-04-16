@@ -1,17 +1,17 @@
 const express = require("express");
-const lecturerController = require("../controllers/lecturerController"); // Adjust path if necessary
+const clecturerController = require("../controllers/center.lecturerController"); // Adjust path if necessary
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(lecturerController.getAllLecturers)
-  .post(lecturerController.createLecturer);
+  .get(clecturerController.getAllLecturers)
+  .post(clecturerController.createLecturer);
 
 router
   .route("/:id")
-  .get(lecturerController.getLecturerById)
-  .patch(lecturerController.updateLecturer)
-  .delete(lecturerController.deleteLecturer);
+  .get(clecturerController.getLecturerById)
+  .patch(clecturerController.updateLecturer)
+  .delete(clecturerController.deleteLecturer);
 
 module.exports = router;
