@@ -254,7 +254,6 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 });
 
 exports.getContainerById = catchAsync(async (req, res, next) => {
-  const Role = req.user.role?.toLowerCase();
   const { containerId } = req.params;
 
   // Check if containerId is provided
@@ -266,14 +265,21 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   const container = await Container.findById(containerId).populate([
     { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
   ]);
 
   if (!container) {
     return next(new AppError("Container not found.", 404));
   }
 
-  // Role-specific logic
-  if (Role === "teacher") {
+  // If user is not authenticated (not logged in) and it's a lecture, return 404
+  if (!req.user && container.type === 'lecture') {
+    return next(new AppError("Container not found. Please, login first!", 404));
+  }
+
+  // Role-specific logic for authenticated users
+  if (req.user && req.user.role?.toLowerCase() === "teacher") {
     if (!container.teacherAllowed) {
       return res.status(200).json({
         status: "restricted",
@@ -281,14 +287,14 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
           id: container._id,
           name: container.name,
           owner: container.createdBy.name || container.createdBy._id,
-          subject: container.subject.name || container.subject._id,
+          subject: container.subject?.name || container.subject?._id,
           type: container.type,
         },
       });
     }
   }
 
-  // Default response for all roles
+  // Default response for all roles and unauthenticated users
   return res.status(200).json({
     status: "success",
     data: container,
@@ -472,13 +478,21 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
       throw new AppError("Child container not found", 404);
     }
     if (operation === "add") {
-      childContainer.parent = containerId;
-      await childContainer.save({ session });
+      // Use findByIdAndUpdate instead of save to avoid validation
+      await Container.findByIdAndUpdate(
+        childId,
+        { parent: containerId },
+        { session, runValidators: false }
+      );
       container.children.push(childId);
       await container.save({ session });
     } else if (operation === "remove") {
-      childContainer.parent = null;
-      await childContainer.save({ session });
+      // Use findByIdAndUpdate instead of save to avoid validation
+      await Container.findByIdAndUpdate(
+        childId,
+        { parent: null },
+        { session, runValidators: false }
+      );
       container.children = container.children.filter(
         (child) => child.toString() !== childId
       );
@@ -488,7 +502,9 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
     }
     await session.commitTransaction();
 
-    res.status(200).json({ status: "success", data: { container } });
+    // Re-fetch the updated container to return in the response
+    const updatedContainer = await Container.findById(containerId);
+    res.status(200).json({ status: "success", data: { container: updatedContainer } });
   } catch (error) {
     await session.abortTransaction();
     return next(error);
