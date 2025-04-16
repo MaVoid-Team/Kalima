@@ -1,106 +1,111 @@
-const Lesson = require("../models/lessonModel");
-const Attendance = require("../models/attendanceModel");
-const PricingRule = require("../models/pricingRuleModel"); // Import PricingRule
-const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
-const QueryFeatures = require("../utils/queryFeatures");
 const mongoose = require("mongoose");
+const Lesson = require("../models/lessonModel");
+const Subject = require("../models/subjectModel");
+const CLecturer = require("../models/Center.LecturerModel");
+const Level = require("../models/levelModel");
+const Center = require("../models/centerModel");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/AppError");
+const QueryFeatures = require("../utils/queryFeatures");
 
-// Get all lessons with filtering, sorting, pagination
+// Helper function to validate related document IDs
+const validateRelatedDocs = async (
+  subjectId,
+  lecturerId,
+  levelId,
+  centerId
+) => {
+  const [subject, lecturer, level, center] = await Promise.all([
+    Subject.findById(subjectId),
+    CLecturer.findById(lecturerId),
+    Level.findById(levelId),
+    Center.findById(centerId),
+  ]);
+
+  if (!subject) throw new AppError("Subject not found.", 404);
+  if (!lecturer) throw new AppError("Lecturer not found.", 404);
+  if (!level) throw new AppError("Level not found.", 404);
+  if (!center) throw new AppError("Center not found.", 404);
+
+  // Optional: Check if the lecturer belongs to the specified center
+  if (lecturer.center.toString() !== centerId) {
+    throw new AppError(
+      "Lecturer does not belong to the specified center.",
+      400
+    );
+  }
+};
+
+// Create a new lesson
+exports.createLesson = catchAsync(async (req, res, next) => {
+  const { subject, lecturer, level, startTime, duration, center } = req.body;
+
+  if (!subject || !lecturer || !level || !startTime || !center) {
+    return next(
+      new AppError(
+        "Subject, lecturer, level, start time, and center are required.",
+        400
+      )
+    );
+  }
+
+  // Validate related documents
+  await validateRelatedDocs(subject, lecturer, level, center);
+
+  const newLesson = await Lesson.create({
+    subject,
+    lecturer,
+    level,
+    startTime,
+    duration, // Optional
+    center,
+  });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      lesson: newLesson,
+    },
+  });
+});
+
+// Get all lessons
 exports.getAllLessons = catchAsync(async (req, res, next) => {
   const features = new QueryFeatures(Lesson.find(), req.query)
     .filter()
     .sort()
-    .limitFields()
     .paginate();
 
-  const lessons = await features.query.populate([
-    { path: "center", select: "name location" },
-    { path: "lecturer", select: "name" },
-    { path: "level", select: "name" },
-    { path: "subject", select: "name" },
-  ]);
-
-  // Optional: Fetch and attach applicable pricing rule for display
-  // This adds overhead, consider if needed on the list view
-  // const lessonsWithPricing = await Promise.all(lessons.map(async (lesson) => {
-  //   const pricingRule = await PricingRule.findOne({
-  //       lecturer: lesson.lecturer._id,
-  //       subject: lesson.subject._id,
-  //       level: lesson.level._id,
-  //       $or: [{ center: lesson.center._id }, { center: null }] // Check center-specific then global
-  //   }).sort({ center: -1 }); // Prioritize center-specific rule
-  //   return { ...lesson.toObject(), applicablePricing: pricingRule };
-  // }));
-
+  const lessons = await features.query
+    .populate({ path: "subject", select: "name" }) // Adjust select as needed
+    .populate({ path: "lecturer", select: "name" }) // Adjust select as needed
+    .populate({ path: "level", select: "name" }) // Adjust select as needed
+    .populate({ path: "center", select: "name" }); // Adjust select as needed
 
   res.status(200).json({
     status: "success",
     results: lessons.length,
     data: {
-      lessons, // Use lessons or lessonsWithPricing if implemented
+      lessons,
     },
   });
 });
 
 // Get a single lesson by ID
 exports.getLessonById = catchAsync(async (req, res, next) => {
-  const lesson = await Lesson.findById(req.params.id).populate([
-    { path: "center", select: "name location" },
-    { path: "lecturer", select: "name" },
-    { path: "level", select: "name" },
-    { path: "subject", select: "name" },
-  ]);
-
-  if (!lesson) {
-    return next(new AppError("No lesson found with that ID", 404));
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError("Invalid lesson ID format.", 400));
   }
 
-  // Optional: Fetch and attach applicable pricing rule for display
-  // const pricingRule = await PricingRule.findOne({
-  //     lecturer: lesson.lecturer._id,
-  //     subject: lesson.subject._id,
-  //     level: lesson.level._id,
-  //     $or: [{ center: lesson.center._id }, { center: null }]
-  // }).sort({ center: -1 });
-  // const lessonData = { ...lesson.toObject(), applicablePricing: pricingRule };
-
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      lesson, // Use lesson or lessonData if implemented
-    },
-  });
-});
-
-// Update a lesson by ID
-exports.updateLesson = catchAsync(async (req, res, next) => {
-  // Exclude fields that shouldn't be updated directly here (like center, lecturer, subject, level)
-  // Pricing fields are also removed as they are not stored here anymore.
-  const { center, lecturer, subject, level, ...updateData } = req.body;
-
-  // Only allow updating fields like startTime, duration
-  const allowedUpdates = {
-      startTime: updateData.startTime,
-      duration: updateData.duration
-  };
-  // Filter out undefined values to avoid overwriting with null
-  Object.keys(allowedUpdates).forEach(key => allowedUpdates[key] === undefined && delete allowedUpdates[key]);
-
-
-  if (Object.keys(allowedUpdates).length === 0) {
-      return next(new AppError("No valid fields provided for update.", 400));
-  }
-
-
-  const lesson = await Lesson.findByIdAndUpdate(req.params.id, allowedUpdates, {
-    new: true,
-    runValidators: true,
-  });
+  const lesson = await Lesson.findById(id)
+    .populate({ path: "subject", select: "name" })
+    .populate({ path: "lecturer", select: "name" })
+    .populate({ path: "level", select: "name" })
+    .populate({ path: "center", select: "name" });
 
   if (!lesson) {
-    return next(new AppError("No lesson found with that ID", 404));
+    return next(new AppError("Lesson not found.", 404));
   }
 
   res.status(200).json({
@@ -111,31 +116,66 @@ exports.updateLesson = catchAsync(async (req, res, next) => {
   });
 });
 
+// Update a lesson by ID
+exports.updateLesson = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { subject, lecturer, level, startTime, duration, center } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError("Invalid lesson ID format.", 400));
+  }
+
+  // Validate related documents if they are being updated
+  if (subject || lecturer || level || center) {
+    const currentLesson = await Lesson.findById(id);
+    if (!currentLesson) {
+      return next(new AppError("Lesson not found.", 404));
+    }
+    // Use existing values if not provided in the request body for validation
+    await validateRelatedDocs(
+      subject || currentLesson.subject,
+      lecturer || currentLesson.lecturer,
+      level || currentLesson.level,
+      center || currentLesson.center
+    );
+  }
+
+  const updatedLesson = await Lesson.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+    .populate({ path: "subject", select: "name" })
+    .populate({ path: "lecturer", select: "name" })
+    .populate({ path: "level", select: "name" })
+    .populate({ path: "center", select: "name" });
+
+  if (!updatedLesson) {
+    return next(new AppError("Lesson not found.", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      lesson: updatedLesson,
+    },
+  });
+});
+
 // Delete a lesson by ID
 exports.deleteLesson = catchAsync(async (req, res, next) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {
-    const lesson = await Lesson.findByIdAndDelete(req.params.id, { session });
-
-    if (!lesson) {
-      await session.abortTransaction();
-      session.endSession();
-      return next(new AppError("No lesson found with that ID", 404));
-    }
-
-    // Optional: Delete related attendance records if needed (use with caution)
-    // await Attendance.deleteMany({ lesson: req.params.id }, { session });
-
-    await session.commitTransaction();
-    session.endSession();
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    return next(error);
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return next(new AppError("Invalid lesson ID format.", 400));
   }
+
+  const deletedLesson = await Lesson.findByIdAndDelete(id);
+
+  if (!deletedLesson) {
+    return next(new AppError("Lesson not found.", 404));
+  }
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });

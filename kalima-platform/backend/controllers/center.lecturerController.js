@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 const CLecturer = require("../models/Center.LecturerModel");
 const Center = require("../models/centerModel");
-const Subject = require("../models/Subject");
+const Subject = require("../models/subjectModel");
 const AppError = require("../utils/AppError");
 const QueryFeatures = require("../utils/queryFeatures");
 
 exports.createLecturer = catchAsync(async (req, res, next) => {
-  const { name, phone, subjects } = req.body;
+  const { name, phone, subjects, center } = req.body;
   if (!name || !phone || !subjects || !center) {
     return next(new AppError("Name, phone, and subjects are required.", 400));
   }
@@ -17,8 +17,8 @@ exports.createLecturer = catchAsync(async (req, res, next) => {
   if (existedSubjects.includes(null)) {
     return next(new AppError("One or more subjects do not exist.", 400));
   }
-  const center = await Center.findById(center);
-  if (!center) {
+  const existedCenter = await Center.findById(center);
+  if (!existedCenter) {
     return next(new AppError("Center not found.", 400));
   }
   const newLecturer = new CLecturer({ name, phone, subjects, center });
@@ -58,7 +58,7 @@ exports.getAllLecturers = catchAsync(async (req, res, next) => {
 });
 
 // Get a single lecturer by ID
-exports.getLecturerById = catchAsync(async (req, res) => {
+exports.getLecturerById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return next("Invalid lecturer ID format.", 400);
@@ -83,7 +83,7 @@ exports.getLecturerById = catchAsync(async (req, res) => {
 });
 
 // Update a lecturer by ID
-exports.updateLecturer = catchAsync(async (req, res) => {
+exports.updateLecturer = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { name, phone, subjects, center } = req.body;
 
@@ -101,12 +101,14 @@ exports.updateLecturer = catchAsync(async (req, res) => {
     if (existedSubjects.includes(null)) {
       return next(new AppError("One or more subjects do not exist.", 400));
     }
+    updateData.subjects = subjects;
   }
   if (center) {
     const existedCenter = await Center.findById(center);
     if (!existedCenter) {
       return next(new AppError("Center not found.", 400));
     }
+    updateData.center = center;
   }
   const updatedLecturer = await CLecturer.findByIdAndUpdate(id, updateData, {
     new: true,
@@ -127,7 +129,7 @@ exports.updateLecturer = catchAsync(async (req, res) => {
 });
 
 // Delete a lecturer by ID
-exports.deleteLecturer = catchAsync(async (req, res) => {
+exports.deleteLecturer = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return next(new AppError("Invalid lecturer ID format.", 400));
