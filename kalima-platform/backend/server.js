@@ -34,6 +34,7 @@ const packegeRouter = require("./routes/packageRoutes.js");
 const auditLogRouter = require("./routes/auditLogRoutes.js");
 const cLecturerRouter = require("./routes/center.lecturerRoutes.js");
 const cStudentRouter = require("./routes/center.studentRoutes.js");
+const lessonRouter = require("./routes/lessonRoutes.js");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const revenueRouter = require("./routes/revenueRoutes");
 const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import pricing rule router
@@ -68,6 +69,7 @@ app.use("/api/v1/packages", auditLogger, packegeRouter);
 app.use("/api/v1/audit-logs", auditLogRouter);
 app.use("/api/v1/center-lecturer", cLecturerRouter);
 app.use("/api/v1/center-student", cStudentRouter);
+app.use("/api/v1/lessons", lessonRouter);
 app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/revenue", revenueRouter);
 app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule router
