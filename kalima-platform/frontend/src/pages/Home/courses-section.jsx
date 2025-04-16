@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect, useCallback } from "react"
 import { Link } from "react-router-dom"
 import { CourseCard } from "../../components/CourseCard"
-import { getAllContainers } from "../../routes/lectures"
+import { getAllContainersPublic } from "../../routes/lectures"
 
 export function CoursesSection() {
   const { t, i18n } = useTranslation("home")
@@ -20,7 +20,7 @@ export function CoursesSection() {
     setLoading(true)
     setError(null)
     try {
-      const result = await getAllContainers()
+      const result = await getAllContainersPublic()
 
       if (result.status === "success") {
         const containersData = result.data.containers

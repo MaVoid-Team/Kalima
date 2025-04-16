@@ -21,6 +21,21 @@ export const getAllContainers = async () => {
   }
 }
 
+// Function to get all containers
+export const getAllContainersPublic = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/containers/public`, {
+      withCredentials: true,
+
+    })
+
+    return response.data
+  } catch (error) {
+    console.error("Error fetching containers:", error)
+    throw error
+  }
+}
+
 // Function to get a container by ID
 export const getContainerById = async (containerId) => {
   try {

@@ -625,3 +625,41 @@ exports.getContainerRevenue = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// New function specifically for public, non-sensitive data
+exports.getAllContainersPublic = catchAsync(async (req, res, next) => {
+  let query = Container.find();
+
+  // Populate common fields
+  query = query.populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "name", select: "name" },
+    { path: "type", select: "name" },
+  ]);
+
+  // Always select only basic, non-sensitive fields for this public route
+  query = query.select(
+    "name type subject level createdBy "
+  );
+
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+
+  const containers = await features.query.lean();
+
+  if (!containers || containers.length === 0) {
+    return next(new AppError("Lectures not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: containers.length,
+    data: {
+      containers,
+    },
+  });
+});

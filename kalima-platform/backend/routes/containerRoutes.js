@@ -2,6 +2,12 @@ const express = require("express");
 const containerController = require("../controllers/containerController");
 const authController = require("../controllers/authController.js");
 const router = express.Router();
+
+router.get(
+  "/public",
+  containerController.getAllContainersPublic
+);
+
 const verifyJWT = require("../middleware/verifyJWT");
 
 
