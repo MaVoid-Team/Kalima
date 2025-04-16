@@ -34,6 +34,8 @@ const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/Lectu
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
+const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
+const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
@@ -48,7 +50,8 @@ function App() {
     "/lecture-details",
     "/lecture-details/:lectureId",
     "/container-details/:containerId",
-    "/container-details/:containerId/lecture-page/:lectureId"
+    "/container-details/:containerId/lecture-page/:lectureId",
+    "/dashboard/assistant-page",
   ]
 
   useEffect(() => {
@@ -75,7 +78,7 @@ function App() {
   return (
     <div className="App">
       {showUserNavbar ? <UserNavbar /> : <NavBar />}
-      {showUserSidebar ? <UserSidebar /> : null}
+
 
       <Suspense fallback={<LoadingSpinner fullScreen />}>
         <Routes>
@@ -99,13 +102,14 @@ function App() {
           <Route path="/lectures/:lectureId" element={<LecturePage />} />
           <Route path="/teachers" element={<Teachers />} />
           <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
-          
+          <Route path="/packages" element={<PackagesPage />} />
+          <Route path="/package-details/:packageId" element={<PackageDetails />} />
           {/* User Dashboard Routes */}
           <Route path="/dashboard" element={<AssistantPage />} />
           <Route path="/dashboard/lecture-page" element={<LectureList />} />
           <Route path="/dashboard/promo-codes" element={<PromoCodes />} />
           <Route path="/settings" element={<SettingsPage />} />
-          
+          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
           {/* Admin Routes */}
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/audit-log" element={<AuditLog />} />
