@@ -2,6 +2,28 @@ const PricingRule = require("../models/pricingRuleModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
+const mongoose = require("mongoose"); // Import mongoose
+// Import models to check for existence
+const CLecturer = require("../models/center.lecturerModel"); 
+const Subject = require("../models/subjectModel");
+const Level = require("../models/levelModel");
+const Center = require("../models/centerModel");
+
+// Helper function to check document existence
+const checkDocExists = async (Model, id, modelName) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError(`Invalid ID format for ${modelName}`, 400);
+  }
+  const doc = await Model.findById(id).lean(); // Use lean for performance
+  if (!doc) {
+    throw new AppError(`${modelName} not found with ID: ${id}`, 404);
+  }
+  // Special check for Lecturer role
+  if (modelName === "CLecturer") {
+    throw new AppError(`User with ID ${id} is not a Lecturer`, 400);
+  }
+  return doc;
+};
 
 // Create a new pricing rule
 exports.createPricingRule = catchAsync(async (req, res, next) => {
@@ -33,7 +55,24 @@ exports.createPricingRule = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Add validation for ObjectId formats and existence of refs if needed
+  // --- Validate Referenced IDs ---
+  const validationPromises = [
+    checkDocExists(CLecturer, lecturer, "Lecturer"), // Check User model for Lecturer role
+    checkDocExists(Subject, subject, "Subject"),
+    checkDocExists(Level, level, "Level"),
+  ];
+  if (center) {
+    // Only validate center if it's provided
+    validationPromises.push(checkDocExists(Center, center, "Center"));
+  }
+
+  try {
+    await Promise.all(validationPromises);
+  } catch (error) {
+    // If any validation fails, catch the AppError and pass it to the error handler
+    return next(error);
+  }
+  // --- End Validation ---
 
   try {
     const newRule = await PricingRule.create({
@@ -63,7 +102,8 @@ exports.createPricingRule = catchAsync(async (req, res, next) => {
         )
       );
     }
-    return next(error); // Handle other errors
+    // Handle other potential errors during creation
+    return next(new AppError(`Failed to create pricing rule: ${error.message}`, 500));
   }
 });
 
@@ -72,7 +112,6 @@ exports.getAllPricingRules = catchAsync(async (req, res, next) => {
   const features = new QueryFeatures(PricingRule.find(), req.query)
     .filter()
     .sort()
-    .limitFields()
     .paginate();
 
   const pricingRules = await features.query.populate([
@@ -115,14 +154,17 @@ exports.getPricingRuleById = catchAsync(async (req, res, next) => {
 // Update a pricing rule by ID
 exports.updatePricingRule = catchAsync(async (req, res, next) => {
   // Only allow updating pricing fields and description
+  // No need to re-validate lecturer, subject, level, center here as they are not being updated.
   const { dailyPrice, multiSessionPrice, multiSessionCount, description } = req.body;
   const updateData = { dailyPrice, multiSessionPrice, multiSessionCount, description };
 
   // Filter out undefined values to avoid overwriting with null
-  Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+  Object.keys(updateData).forEach(
+    (key) => updateData[key] === undefined && delete updateData[key]
+  );
 
   if (Object.keys(updateData).length === 0) {
-      return next(new AppError("No valid fields provided for update.", 400));
+    return next(new AppError("No valid fields provided for update.", 400));
   }
 
   const rule = await PricingRule.findByIdAndUpdate(req.params.id, updateData, {

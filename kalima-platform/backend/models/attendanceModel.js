@@ -80,6 +80,8 @@ attendanceSchema.index({
 attendanceSchema.index({ lesson: 1, attendanceDate: 1 });
 // Index for querying by center and date
 attendanceSchema.index({ center: 1, attendanceDate: 1 });
+// Index for querying by student and lesson
+attendanceSchema.index({ student: 1, lesson: 1 }, { unique: true });
 
 const Attendance = mongoose.model("Attendance", attendanceSchema);
 
