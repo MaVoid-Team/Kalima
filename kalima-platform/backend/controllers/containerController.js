@@ -275,6 +275,22 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   if (!containerId) {
     return next(new AppError("Container ID is required.", 400));
   }
+  
+  // Special case handling for "my-containers" path
+  if (containerId === "my-containers") {
+    // Only authenticated users with role Lecturer can access this resource
+    if (!req.user || req.user.role !== "Lecturer") {
+      return next(new AppError("Please log in as a lecturer to access your containers.", 401));
+    }
+    
+    // Forward to the getMyContainers function
+    return exports.getMyContainers(req, res, next);
+  }
+
+  // Verify containerId is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID format.", 400));
+  }
 
   // Fetch the container
   const container = await Container.findById(containerId).populate([
@@ -286,11 +302,6 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 
   if (!container) {
     return next(new AppError("Container not found.", 404));
-  }
-
-  // If user is not authenticated (not logged in) and it's a lecture, return 404
-  if (!req.user && container.type === "lecture") {
-    return next(new AppError("Container not found. Please, login first!", 404));
   }
 
   // Role-specific logic for authenticated users

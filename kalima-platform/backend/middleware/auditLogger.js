@@ -66,6 +66,12 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       break;
   }
   
+  // Handle special case for "my-containers" which isn't a valid ObjectId
+  if (resourceId === "my-containers") {
+    resourceId = null; // Set to null since it's not a valid ObjectId
+    resourceName = "User's Containers"; // Provide a descriptive name instead
+  }
+  
   // Handle special case for center operations
   let specialAction = null;
   let specialResource = null;
