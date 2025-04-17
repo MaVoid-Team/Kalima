@@ -34,6 +34,7 @@ const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/Lectu
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
+const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
@@ -117,6 +118,7 @@ function App() {
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
           <Route path="dashboard/assistant-page" element={<AssistantPage />} />
           <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
+          <Route path="/CoursesForm" element={<CoursesForm />} />
         </Routes>
       </Suspense>
 
