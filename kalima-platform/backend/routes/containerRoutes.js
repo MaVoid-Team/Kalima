@@ -5,7 +5,6 @@ const router = express.Router();
 
 const verifyJWT = require("../middleware/verifyJWT");
 
-
 // Get containers for a specific lecturer
 router.get(
   "/lecturer/:lecturerId",
@@ -19,42 +18,8 @@ router.get(
   containerController.getAllContainers
 );
 
-// Get container by ID - works with or without authentication
-router.get(
-  "/:containerId",
-  authController.optionalJWT,  // Apply optional JWT middleware
-  containerController.getContainerById
-);
-
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
-
-
-
-// Get accessible child containers for a student by container ID
-router.get(
-  "/student/:studentId/container/:containerId/purchase/:purchaseId",
-  containerController.getAccessibleChildContainers
-);
-
-// Get containers for a specific teacher
-// router.get(
-//   "/teacher/:teacherId",
-//   containerController.getTeacherContainers
-// );
-
-//purchaseCounter for all containers
-router.get(
-  "/purchase-counts",
-  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
-  containerController.getAllContainerPurchaseCounts
-);
-//purchaseCounter for a container
-router.get(
-  "/purchase-counts/:containerId",
-  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
-  containerController.getContainerPurchaseCountById
-);
 
 // Add a route to get containers of the currently logged-in lecturer
 router.get(
@@ -63,7 +28,34 @@ router.get(
   containerController.getMyContainers
 );
 
-// Create and get containers
+// Get accessible child containers for a student by container ID
+router.get(
+  "/student/:studentId/container/:containerId/purchase/:purchaseId",
+  containerController.getAccessibleChildContainers
+);
+
+//purchaseCounter for all containers
+router.get(
+  "/purchase-counts",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getAllContainerPurchaseCounts
+);
+
+//purchaseCounter for a container
+router.get(
+  "/purchase-counts/:containerId",
+  authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
+  containerController.getContainerPurchaseCountById
+);
+
+// Update a child container's parent
+router.patch(
+  "/update-child",
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
+  containerController.UpdateChildOfContainer
+);
+
+// Create containers
 router
   .route("/")
   .post(
@@ -71,11 +63,12 @@ router
     containerController.createContainer
   );
 
-// Update a child container's parent
-router.patch(
-  "/update-child",
-  authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
-  containerController.UpdateChildOfContainer
+// Get container by ID - works with or without authentication
+// Note: This route must come after all other specific routes with static path segments
+router.get(
+  "/:containerId",
+  authController.optionalJWT,  // Apply optional JWT middleware
+  containerController.getContainerById
 );
 
 // Operations on a specific container by ID
@@ -116,6 +109,5 @@ router
     ),
     containerController.getContainerRevenue
   );
-
 
 module.exports = router;
