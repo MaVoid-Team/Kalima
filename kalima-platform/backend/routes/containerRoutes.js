@@ -18,15 +18,15 @@ router.get(
   containerController.getAllContainers
 );
 
+// Get container by ID - works with or without authentication
+// Note: This handles /my-containers as a special case for authenticated lecturers
+router.get(
+  "/:containerId",  // Apply optional JWT middleware
+  containerController.getContainerById
+);
+
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
-
-// Add a route to get containers of the currently logged-in lecturer
-router.get(
-  "/my-containers",
-  authController.verifyRoles("Lecturer"),
-  containerController.getMyContainers
-);
 
 // Get accessible child containers for a student by container ID
 router.get(
@@ -62,14 +62,6 @@ router
     authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
     containerController.createContainer
   );
-
-// Get container by ID - works with or without authentication
-// Note: This route must come after all other specific routes with static path segments
-router.get(
-  "/:containerId",
-  authController.optionalJWT,  // Apply optional JWT middleware
-  containerController.getContainerById
-);
 
 // Operations on a specific container by ID
 router
