@@ -30,7 +30,7 @@ const AboutSection = React.memo(({ isRTL }) => {
   );
 
   return (
-    <section className="bg-gradient-to-b from-base-100 to-base-200 py-16 px-4 sm:px-6 lg:px-8">
+    <section className="bg-gradient-to-b from-base-100 to-base-200 py-16 px-4 sm:px-6 lg:px-8 rounded-3xl">
       <div className="max-w-7xl mx-auto">
         <div
           className={`flex flex-col lg:flex-row items-center gap-8 ${

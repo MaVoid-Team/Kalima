@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { ChevronLeft, Loader } from 'lucide-react';
-import { getAllUsers } from "../../routes/fetch-users";
+import { getAllLecturers } from "../../routes/fetch-users";
 import { useTranslation } from "react-i18next";
 import TeacherCard from "../../components/TeacherCard";
-
 
 export function TeachersSection() {
   const { t, i18n } = useTranslation("home");
@@ -15,8 +14,6 @@ export function TeachersSection() {
   const [error, setError] = useState("");
   const [visibleTeachers, setVisibleTeachers] = useState(3);
 
-  
-
   useEffect(() => {
     fetchTeachers();
   }, []);
@@ -24,22 +21,22 @@ export function TeachersSection() {
   const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const result = await getAllUsers();
+      const result = await getAllLecturers();
       if (result.success) {
-        const lecturers = result.data
-          .filter((user) => user.role === "Lecturer")
-          .map((lecturer) => ({
-            id: lecturer._id,
-            image: "/course-1.png",
-            name: lecturer.name,
-            subject: lecturer.expertise || t('teachers.labels.expertise'),
-            experience: lecturer.bio || t('teachers.labels.experience'),
-            grade: t('teachers.labels.gradeLevels'),
-            rating: 5,
-          }));
-        setTeachers(lecturers);
+        const formattedTeachers = result.data.map((lecturer) => ({
+          id: lecturer._id,
+          image: "/course-1.png", // Default image or consider adding profile pics to your API
+          name: lecturer.name,
+          subject: lecturer.expertise || t('teachers.labels.expertise'),
+          experience: lecturer.bio || t('teachers.labels.experience'),
+          grade: t('teachers.labels.gradeLevels'),
+          rating: 5, // Default rating or consider adding to your API
+          email: lecturer.email, // Additional fields from API
+          gender: lecturer.gender
+        }));
+        setTeachers(formattedTeachers);
       } else {
-        setError(t('teachers.errors.failed'));
+        setError(result.error || t('teachers.errors.failed'));
       }
     } catch (err) {
       setError(t('teachers.errors.failed'));
@@ -48,7 +45,6 @@ export function TeachersSection() {
     }
   };
 
-  
   const loadMoreTeachers = () => {
     setVisibleTeachers(teachers.length);
   };
@@ -68,10 +64,9 @@ export function TeachersSection() {
         </h2>
         <h3 className="text-center text-3xl font-bold mb-12">
           {t('teachers.heading')} 
-            <span className="text-primary border-b-2 border-primary pb-1">
-              {t('teachers.platform')}
-            </span>
-          
+          <span className="text-primary border-b-2 border-primary pb-1">
+            {t('teachers.platform')}
+          </span>
         </h3>
 
         {loading ? (

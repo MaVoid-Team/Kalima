@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TeacherReviews from './TeacherReviews';
 import WaveBackground from './WaveBackground';
-import { loginUser } from '../../routes/auth-services'; // Assuming this is the correct import path
+import { loginUser, getUserDashboard } from '../../routes/auth-services';
 import { Link, useNavigate } from 'react-router-dom';
 
 const TeacherLogin = () => {
@@ -32,7 +32,6 @@ const TeacherLogin = () => {
     setError('');
 
     try {
-      // Prepare credentials based on active tab
       const credentials = {
         password: formData.password
       };
@@ -43,15 +42,29 @@ const TeacherLogin = () => {
         credentials.phoneNumber = formData.phoneNumber;
       }
 
-      const result = await loginUser(credentials);
+      const loginResult = await loginUser(credentials);
       
-      if (!result.success) {
-        setError(result.message || 'Login failed.');
-      } else {
-        // EXPLICIT TOKEN STORAGE ADDED
-        sessionStorage.setItem("accessToken", result.accessToken);
-        navigate('/lecturer-dashboard');
+      if (!loginResult.success) {
+        setError(loginResult.error || 'Login failed.');
+        return;
       }
+
+      const dashboardResult = await getUserDashboard();
+      
+      if (!dashboardResult.success) {
+        setError(dashboardResult.error || 'Failed to fetch user data.');
+        return;
+      }
+
+      const userRole = dashboardResult.data.data.userInfo.role;
+      if (userRole === 'Admin' || userRole === 'SubAdmin') {
+        navigate('/dashboard/admin-dashboard');
+      } else if (userRole === 'Lecturer') {
+        navigate('/dashboard/lecturer-dashboard');
+      } else if (userRole === 'Student') {
+        navigate('/dashboard/student-dashboard');
+      }
+
     } catch (err) {
       setError('An error occurred. Please try again later.');
       console.error(err);
@@ -96,7 +109,6 @@ const TeacherLogin = () => {
           </div>
           
           <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
-            {/* Conditional Input Fields */}
             {activeTab === 'email_tab' ? (
               <div className="form-control mb-4">
                 <label className="label">
@@ -109,7 +121,7 @@ const TeacherLogin = () => {
                   onChange={handleInputChange}
                   placeholder="teacher@example.com" 
                   className="input input-bordered w-full" 
-                  required={activeTab === 'email_tab'}
+                  required
                 />
               </div>
             ) : (
@@ -124,12 +136,11 @@ const TeacherLogin = () => {
                   onChange={handleInputChange}
                   placeholder="01234567890" 
                   className="input input-bordered w-full" 
-                  required={activeTab === 'phone_tab'}
+                  required
                 />
               </div>
             )}
             
-            {/* Password Field */}
             <div className="form-control mb-6">
               <label className="label">
                 <span className="label-text">{t('passwordLabel', 'Password')}</span>
@@ -144,20 +155,18 @@ const TeacherLogin = () => {
                 required
               />
               <label className="label">
-                <Link href="#" className="label-text-alt link link-hover text-primary">
+                <Link to="/forgot-password" className="label-text-alt link link-hover text-primary">
                   {t('forgotPassword', 'Forgot password?')}
                 </Link>
               </label>
             </div>
             
-            {/* Error Message */}
             {error && (
               <div className="alert alert-error mb-4">
                 <span>{error}</span>
               </div>
             )}
             
-            {/* Submit Button */}
             <button 
               type="submit" 
               className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
@@ -166,11 +175,10 @@ const TeacherLogin = () => {
               {loading ? t('loggingIn', 'Logging in...') : t('login', 'Login')}
             </button>
             
-            {/* Register Link */}
             <div className="text-center mt-4">
               <p>
-                {t('needAccount', "Don't have an account?")} {' '}
-                <Link href="#" className="link link-primary">
+                {t('needAccount', "Don't have an account?")}{' '}
+                <Link to="/register" className="link link-primary">
                   {t('register', 'Register here')}
                 </Link>
               </p>

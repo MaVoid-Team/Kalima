@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router-dom"
 import WaveBackground from "./WaveBackground"
 import StudentReviews from "./StudentReviews"
-import { loginUser } from "../../routes/auth-services"
+import { loginUser, getUserDashboard } from "../../routes/auth-services"
 
 function LoginStudent() {
   const { t, i18n } = useTranslation("login")
@@ -44,14 +44,28 @@ function LoginStudent() {
         credentials.phoneNumber = formData.phoneNumber
       }
 
-      const result = await loginUser(credentials)
+      const loginResult = await loginUser(credentials)
       
-      if (!result.success) {
-        setError(result.message || "Login failed. Please check your credentials.")
-      } else {
-        sessionStorage.setItem("accessToken", result.accessToken)
-        navigate("/dashboard/promo-codes")
+      if (!loginResult.success) {
+        setError(loginResult.error || "Login failed. Please check your credentials.")
+        return
       }
+
+      const dashboardResult = await getUserDashboard()
+      
+      if (!dashboardResult.success) {
+        setError(dashboardResult.error || "Failed to fetch user data.")
+        return
+      }
+      console.log("User Dashboard Data:", dashboardResult.data)
+
+      const userRole = dashboardResult.data.data.userInfo.role
+      if (userRole === "Student") {
+        navigate("/dashboard/promo-codes")
+      } else {
+        navigate("/lecturer-dashboard")
+      }
+
     } catch (err) {
       setError("An error occurred. Please try again later.")
       console.error(err)
@@ -61,8 +75,8 @@ function LoginStudent() {
   }
 
   return (
-    <div  className="min-h-screen flex flex-col sm:flex-row items-center justify-center p-4 overflow-hidden"
-    dir={isRTL ? "rtl" : "ltr"}
+    <div className="min-h-screen flex flex-col sm:flex-row items-center justify-center p-4 overflow-hidden"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       <WaveBackground />
       
