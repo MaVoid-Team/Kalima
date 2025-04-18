@@ -10,7 +10,7 @@ const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   const menuItems = [
-    { id: 1, title: t('activity'), icon: <MdDashboard className="w-5 h-5" />, path: '/audit-log' }, 
+    { id: 1, title: t('activity'), icon: <MdDashboard className="w-5 h-5" />, path: '/dashboard/admin-dashboard/audit-log' }, 
     { id: 2, title: t('profile'), icon: <FaUser className="w-5 h-5" />, path: '/profile' },
     { id: 3, title: t('courses'), icon: <FaGraduationCap className="w-5 h-5" />, path: '/lecture-page' },
     { id: 4, title: t('promoCodes'), icon: <FaTicketAlt className="w-5 h-5" />, path: '/promo-codes' },

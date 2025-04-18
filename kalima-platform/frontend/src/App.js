@@ -71,7 +71,7 @@ function App() {
       return route === location.pathname
     })
 
-    setShowUserNavbar(isUserRoute)
+    // setShowUserNavbar(isUserRoute)
     setShowUserSidebar(isUserRoute)
   }, [location.pathname])
 
@@ -103,22 +103,25 @@ function App() {
           <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
           {/* <Route path="/packages" element={<PackagesPage />} />
           <Route path="/package-details/:packageId" element={<PackageDetails />} /> */}
+
+
           {/* User Dashboard Routes */}
-          <Route path="/dashboard" element={<AssistantPage />} />
           <Route path="/dashboard/lecture-page" element={<LectureList />} />
           <Route path="/dashboard/promo-codes" element={<PromoCodes />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
+          <Route path="/dashboard/settings" element={<SettingsPage />} />
+
+          {/* Assistant Routes */}
+          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
           {/* Admin Routes */}
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/audit-log" element={<AuditLog />} />
+          <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
           
           {/* Lecturer Routes */}
-          <Route path="/lecturer-dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
           <Route path="/coursesdashboard" element={<CoursesDashboard />} />
           <Route path="/lecturer-dashboard/container-details/:containerId" element={<ContainerDetailsPage />} />
           <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
-          <Route path="dashboard/assistant-page" element={<AssistantPage />} />
+          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
           <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
         </Routes>
       </Suspense>

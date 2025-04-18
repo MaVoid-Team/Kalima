@@ -62,10 +62,10 @@ const StudentDashboard = () => {
         {/* Header with stars */}
         <div className="relative mb-8">
           <div className="absolute  -top-6 left-0">
-            <img src="starC.png" alt="cyan star" className="w-[50px]"></img>
+            <img src="/starC.png" alt="cyan star" className="w-[50px]"></img>
           </div>
           <div className="absolute -top-6 right-52">
-          <img src="starG.png" alt="cyan star "  className="w-[40px]"></img>
+          <img src="/starG.png" alt="cyan star "  className="w-[40px]"></img>
           </div>
           
           {/* Title */}
@@ -129,10 +129,10 @@ const StudentDashboard = () => {
         {/* Bottom stars */}
         <div className="relative mt-12">
           <div className="absolute -bottom-6 right-12">
-          <img src="starP.png" alt="cyan star"  className="w-[40px]"></img>
+          <img src="/starP.png" alt="cyan star"  className="w-[40px]"></img>
           </div>
           <div className="absolute -bottom-6 left-12 ">
-          <img src="starGr.png" alt="cyan star"  className="w-[40px]"></img>
+          <img src="/starGr.png" alt="cyan star"  className="w-[40px]"></img>
           </div>
         </div>
       </div>

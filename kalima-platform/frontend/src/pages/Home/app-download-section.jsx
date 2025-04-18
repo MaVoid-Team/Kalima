@@ -35,10 +35,10 @@ export function AppDownloadSection() {
                 {t("appDownload.title")}
                 <span className="text-primary"> {t("appDownload.now")}</span>
               </h2>
-              <p className="mb-4 sm:mb-6 text-base-content/80 sm:text-xl md:text-3xl mt-14 px-4">
+              <p className="mb-4 sm:mb-6 text-base-content/80 sm:text-xl md:text-3xl mt-14 px-4 hidden md:block">
                 {t("appDownload.content1")}
-                <span className="text-primary text-3xl"> {t("appDownload.now")}</span> {t("appDownload.content2")}
-                <span className="text-primary text-3xl"> {t("appDownload.everywhere")}</span>
+                <span className="text-primary text-3xl hidden md:block"> {t("appDownload.now")}</span> {t("appDownload.content2")}
+                <span className="text-primary text-3xl hidden md:block"> {t("appDownload.everywhere")}</span>
               </p>
             </div>
           </div>

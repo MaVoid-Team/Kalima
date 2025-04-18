@@ -1,166 +1,253 @@
-import { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { getContainerById } from "../routes/lectures";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { ErrorAlert } from "../components/ErrorAlert";
-import { FaRegCalendarCheck, FaRegStickyNote } from "react-icons/fa";
+"use client"
 
-const DetailItem = ({ label, value }) => (
-  <div className="flex justify-between items-center py-2 border-b last:border-b-0 text-right">
-    <span className="text-sm font-medium text-gray-800">{value}</span>
-    <span className="text-sm text-gray-600">{label}</span>
-  </div>
-);
+import { useState, useEffect, useMemo } from "react"
+import { useParams } from "react-router-dom"
+import { getContainerById } from "../routes/lectures"
+import { LoadingSpinner } from "../components/LoadingSpinner"
+import { ErrorAlert } from "../components/ErrorAlert"
+import {
+  FaChalkboardTeacher,
+  FaBook,
+  FaGraduationCap,
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaStickyNote,
+  FaPlayCircle,
+  FaClock,
+} from "react-icons/fa"
 
-const PlanSection = ({ month, items, isLastMonth }) => (
-  <div className="mb-6 text-right">
-    <div className="flex items-center gap-2 mb-2">
-      <FaRegCalendarCheck className="text-gray-800 w-5 h-5" />
-      <h3 className="text-lg font-bold text-gray-800">{month}</h3>
+const DetailItem = ({ label, value, icon }) => (
+  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-3 border-b border-base-200 last:border-b-0">
+    <div className="flex items-center gap-2">
+      {icon}
+      <span className="text-sm font-medium">{label}</span>
     </div>
-    <ul className="text-sm text-gray-700 space-y-2">
-      {items.map((item, index) => (
-        <li key={index} className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <FaRegStickyNote className="text-gray-800 w-4 h-4" />
-            <span className="font-medium">{item.lesson}</span>
-          </div>
-          <span className="bg-gray-100 border px-3 py-1 rounded-full">
-            {item.time} دقيقة
-          </span>
-        </li>
-      ))}
-    </ul>
-    {!isLastMonth && <div className="w-full h-px bg-gray-200 my-4"></div>}
+    <span className="text-sm font-semibold text-right">{value}</span>
   </div>
-);
+)
 
-const PlanList = ({ months }) => (
-  <div>
-    {months.map((m, i) => (
-      <PlanSection key={i} {...m} isLastMonth={i === months.length - 1} />
-    ))}
+const PlanItem = ({ lesson, time }) => (
+  <li className="flex justify-between items-center p-3 hover:bg-base-200 rounded-lg transition-colors">
+    <div className="flex items-center gap-3">
+      <FaStickyNote className="text-primary" />
+      <span className="font-medium">{lesson}</span>
+    </div>
+    <span className="badge badge-neutral">{time} دقيقة</span>
+  </li>
+)
+
+const PlanSection = ({ month, items }) => (
+  <div className="collapse collapse-plus bg-base-100 mb-2">
+    <input type="checkbox" defaultChecked />
+    <div className="collapse-title text-lg font-bold flex items-center gap-2">
+      <FaCalendarAlt className="text-secondary" />
+      {month}
+    </div>
+    <div className="collapse-content">
+      <ul className="menu">
+        {items.map((item, index) => (
+          <PlanItem key={index} lesson={item.lesson} time={item.time} />
+        ))}
+      </ul>
+    </div>
   </div>
-);
+)
+
+const LectureItem = ({ lecture }) => (
+  <li className="flex justify-between items-center p-3 hover:bg-base-200 rounded-lg transition-colors">
+    <div className="flex items-center gap-3">
+      <span className="font-medium">{lecture.name}</span>
+    </div>
+  </li>
+)
+
+const LectureSection = ({ month, lectures }) => (
+  <div className="collapse collapse-plus bg-base-100 mb-2">
+    <input type="checkbox" defaultChecked />
+    <div className="collapse-title text-lg font-bold flex items-center gap-2">
+      <FaCalendarAlt className="text-secondary" />
+      {month}
+    </div>
+    <div className="collapse-content">
+      {lectures.length > 0 ? (
+        <ul className="menu">
+          {lectures.map((lecture) => (
+            <LectureItem key={lecture.id} lecture={lecture} />
+          ))}
+        </ul>
+      ) : (
+        <p className="text-center text-base-content/70 py-4">لا توجد محاضرات متاحة لهذا الشهر</p>
+      )}
+    </div>
+  </div>
+)
 
 export default function CourseDetails() {
-  const { courseId } = useParams();
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { courseId } = useParams()
+  const [course, setCourse] = useState(null)
+  const [lectures, setLectures] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [lecturesLoading, setLecturesLoading] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const result = await getContainerById(courseId);
-        if (result) {
-          setCourse(result.data);
+        const result = await getContainerById(courseId)
+        if (result?.status === "success") {
+          setCourse(result.data)
+
+          // After getting course data, fetch lectures for each child container
+          if (result.data.children && result.data.children.length > 0) {
+            await fetchLectures(result.data.children)
+          }
         } else {
-          setError("فشل في جلب بيانات الدورة");
+          setError("فشل في جلب بيانات الدورة")
         }
       } catch (err) {
-        setError("حدث خطأ غير متوقع");
+        setError("حدث خطأ غير متوقع")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchCourse();
-  }, [courseId]);
+    }
 
-  const fallbackPlan = [
-    {
-      month: "شهر أكتوبر",
-      items: [
-        { lesson: "الدرس الأول: مقدمة", time: 24 },
-        { lesson: "الدرس الثاني: المفاهيم", time: 16 },
-      ],
-    },
-    {
-      month: "شهر نوفمبر",
-      items: [{ lesson: "الدرس الثالث: التطبيقات", time: 30 }],
-    },
-  ];
+    fetchCourse()
+  }, [courseId])
 
-  const detailsBox = useMemo(() => (
-    <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-cyan-500 w-full max-w-sm">
-      <h2 className="text-xl font-bold text-center text-gray-800 mb-4">تفاصيل الكورس</h2>
-      <div className="space-y-3">
-        <DetailItem label="المدرس" value={course?.teacher || "أ. يوسف عثمان"} />
-        <DetailItem label="عدد المحاضرات" value={course?.lecturesCount || 10} />
-        <DetailItem
-          label="الصف الدراسي"
-          value={
-            course?.level?.length
-              ? course.level.map((l) => l.name).join("، ")
-              : "الصف الثانوي"
-          }
-        />
-        <DetailItem label="المشاهدات" value={`${course?.views || 1240} مشاهدة`} />
+  const fetchLectures = async (children) => {
+    setLecturesLoading(true)
+    const lecturesByMonth = {}
+
+    try {
+      // Process each month container
+      for (const child of children) {
+        const monthResult = await getContainerById(child.id)
+
+        if (monthResult?.status === "success" && monthResult.data) {
+          // Store lectures by month name
+          lecturesByMonth[monthResult.data.name] = monthResult.data.children || []
+        }
+      }
+
+      setLectures(lecturesByMonth)
+    } catch (err) {
+      console.error("Error fetching lectures:", err)
+      // We don't set the main error here to still show the course details
+    } finally {
+      setLecturesLoading(false)
+    }
+  }
+
+  const detailsBox = useMemo(
+    () => (
+      <div className="card bg-base-100 shadow-xl sticky top-6">
+        <div className="card-body">
+          <h2 className="card-title justify-center text-2xl mb-4">تفاصيل الكورس</h2>
+          <div className="space-y-2">
+            <DetailItem
+              icon={<FaChalkboardTeacher className="text-accent" />}
+              label="المدرس"
+              value={course?.createdBy?.name || "غير محدد"}
+            />
+            <DetailItem
+              icon={<FaBook className="text-accent" />}
+              label="المادة"
+              value={course?.subject?.name || "غير محدد"}
+            />
+            <DetailItem
+              icon={<FaGraduationCap className="text-accent" />}
+              label="الصف الدراسي"
+              value={course?.level?.name || "غير محدد"}
+            />
+            <DetailItem
+              icon={<FaMoneyBillWave className="text-accent" />}
+              label="السعر"
+              value={`${course?.price || 0} جنيه`}
+            />
+          </div>
+          <div className="card-actions mt-6">
+            <button className="btn btn-primary w-full">اشترك الآن</button>
+          </div>
+        </div>
       </div>
-      <button className="mt-6 w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 rounded-lg">
-        اشترك الآن
-      </button>
-    </div>
-  ), [course]);
+    ),
+    [course],
+  )
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error} />;
+  if (loading) return <LoadingSpinner />
+  if (error) return <ErrorAlert message={error} />
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-cyan-50 to-white py-10 px-4">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-        {/* Sidebar with Course Details */}
-        <div className="lg:col-span-1 flex flex-col items-center space-y-8">
-          {detailsBox}
-        </div>
+    <div className="min-h-screen bg-base-100">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar with Course Details - shown first on mobile */}
+          <div className="lg:w-1/3 order-1 lg:order-none">{detailsBox}</div>
 
-        {/* Main Content Area */}
-        <div className="lg:col-span-2 space-y-8">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-6">
-            <img
-              src="/CourseDetails1.png"
-              alt="Course Illustration"
-              className="w-72 h-auto object-contain"
-            />
-            <div className="text-right w-full">
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                {course?.title || "دورة تعلم اللغة الإنجليزية"}
-              </h1>
-              <h2 className="text-md text-gray-700 mb-4">
-                {course?.description || "تهدف الدورة لتطوير مهارات اللغة باستخدام الأنشطة والتمارين العملية."}
-              </h2>
-              <ul className="list-none text-sm text-gray-700 pr-4 space-y-2">
-                {course?.objectives?.length ? (
-                  course.objectives.map((obj, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="text-teal-600">✔</span> {obj}
-                    </li>
-                  ))
-                ) : (
-                  <>
-                    <li className="flex items-center gap-2">
-                      <span className="text-teal-600">✔</span> تنمية المفردات وتحسين استخدام القواعد
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="text-teal-600">✔</span> تعزيز مهارات التحدث والاستماع
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="text-teal-600">✔</span> تحسين مهارات القراءة والكتابة
-                    </li>
-                  </>
-                )}
-              </ul>
+          {/* Main Content Area */}
+          <div className="lg:w-2/3 space-y-8">
+            {/* Course Header */}
+            <div className="card bg-base-100 shadow-lg">
+              <div className="card-body">
+                <h1 className="card-title text-2xl md:text-3xl mb-4">{course?.name}</h1>
+                {course?.description && <p className="text-base-content/80">{course.description}</p>}
+              </div>
             </div>
-          </div>
 
-          {/* Plan Section */}
-          <div className="bg-white shadow-md border-2 border-cyan-500 rounded-xl p-6 max-w-2xl ml-auto">
-            <h3 className="text-xl font-bold text-gray-800 mb-6 text-right">خطة الكورس</h3>
-            <PlanList months={course?.plan?.length ? course.plan : fallbackPlan} />
+            {/* Objectives Section */}
+            {course?.objectives?.length > 0 && (
+              <div className="card bg-base-100 shadow-lg">
+                <div className="card-body">
+                  <h2 className="card-title text-xl mb-4">أهداف الدورة</h2>
+                  <ul className="space-y-3">
+                    {course.objectives.map((obj, i) => (
+                      <li key={i} className="flex gap-3">
+                        <span className="text-primary">•</span>
+                        <span>{obj}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Lectures Section */}
+            <div className="card bg-base-100 shadow-lg">
+              <div className="card-body">
+                <h2 className="card-title text-xl mb-4">محاضرات الدورة</h2>
+
+                {lecturesLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner />
+                  </div>
+                ) : Object.keys(lectures).length > 0 ? (
+                  <div className="space-y-4">
+                    {Object.entries(lectures).map(([month, monthLectures]) => (
+                      <LectureSection key={month} month={month} lectures={monthLectures} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-base-content/70">لا توجد محاضرات متاحة لهذه الدورة</div>
+                )}
+              </div>
+            </div>
+
+            {/* Plan Section */}
+            {course?.plan?.length > 0 && (
+              <div className="card bg-base-100 shadow-lg">
+                <div className="card-body">
+                  <h2 className="card-title text-xl mb-4">خطة الدورة</h2>
+                  <div className="space-y-4">
+                    {course.plan.map((monthPlan, index) => (
+                      <PlanSection key={index} month={monthPlan.month} items={monthPlan.items} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

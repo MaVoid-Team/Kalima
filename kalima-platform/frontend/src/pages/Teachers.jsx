@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, Loader, Search } from "lucide-react";
-import { getAllUsers } from "../routes/fetch-users";
+import { getAllLecturers } from "../routes/fetch-users";
 import { motion, AnimatePresence } from "framer-motion";
 import TeacherCard from "../components/TeacherCard";
 import { FilterDropdown } from "../../src/components/FilterDropdown";
@@ -28,7 +28,7 @@ export default function Teachers() {
   const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const result = await getAllUsers();
+      const result = await getAllLecturers();
       if (result.success) {
         const lecturers = result.data
           .filter((user) => user.role === "Lecturer")
