@@ -21,7 +21,8 @@ router.get(
 // Get container by ID - works with or without authentication
 // Note: This handles /my-containers as a special case for authenticated lecturers
 router.get(
-  "/:containerId",  // Apply optional JWT middleware
+  "/:containerId",
+  authController.optionalJWT,  // Apply optional JWT middleware
   containerController.getContainerById
 );
 
