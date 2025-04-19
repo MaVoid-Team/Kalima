@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import CourseFilters from "./CourseFilters"
-import CourseList from "./CourseList"
-import PromoBanner from "./PromoBanner"
-import RecommendedCourses from "./RecommendedCourses"
-import StatisticsSection from "./StatisticsSection"
-import ActivityTracker from "./ActivityTracker"
-import AddCourseForm from "./AddCourseForm"
+import { useState } from "react";
+import CourseFilters from "./CourseFilters";
+import CourseList from "./CourseList";
+import PromoBanner from "./PromoBanner";
+import RecommendedCourses from "./RecommendedCourses";
+import StatisticsSection from "./StatisticsSection";
+import ActivityTracker from "./ActivityTracker";
+import AddCourseForm from "./AddCourseForm";
+import QrScannerCard from "./QrScannerCard";
 
 const Dashboard = () => {
   const [filters, setFilters] = useState({
@@ -15,14 +16,14 @@ const Dashboard = () => {
     group: "",
     semester: "",
     teacher: "",
-  })
+  });
 
   const handleFilterChange = (filterType, value) => {
     setFilters((prev) => ({
       ...prev,
       [filterType]: value,
-    }))
-  }
+    }));
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 rtl">
@@ -46,15 +47,15 @@ const Dashboard = () => {
         <RecommendedCourses />
       </div>
 
+     
       <div className="mb-8">
-        <StatisticsSection />
+        <QrScannerCard />
       </div>
-
       <div className="mb-8">
         <ActivityTracker />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
