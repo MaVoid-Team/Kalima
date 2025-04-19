@@ -11,7 +11,7 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/v1/levels/`, {
+      const response = await axios.get(`${API_URL}/levels/`, {
         headers: getAuthHeader(),
       })
   

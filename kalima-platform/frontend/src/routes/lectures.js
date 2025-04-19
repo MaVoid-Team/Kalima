@@ -55,7 +55,7 @@ export const getContainerById = async (containerId) => {
 
 export const getAllLecturesPublic = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
+    const response = await axios.get(`${API_URL}/lectures/public`, {
       withCredentials: true,
       auth: `Bearer ${getToken()}`,
     })
