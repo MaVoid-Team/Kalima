@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FaWallet, FaInfoCircle, FaSort, FaBars, FaTicketAlt } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
 import { Link } from 'react-router-dom';
+import { getUserDashboard } from '../../routes/auth-services';
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation('promoCodes');
@@ -13,51 +14,84 @@ const PromoCodes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [redeemCode, setRedeemCode] = useState('');
-  
-  // Check screen size on initial load and resize
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        const result = await getUserDashboard();
+
+        if (result.success) {
+          const { userInfo, pointsBalances, redeemedCodes } = result.data || {};
+
+          // Ensure userInfo exists before accessing its properties
+          if (userInfo) {
+            setBalance(userInfo.totalPoints || 0); // Default to 0 if totalPoints is undefined
+          } else {
+            console.error("userInfo is undefined in the response.");
+          }
+
+          // Map redeemed codes to transactions
+          const mappedTransactions = (redeemedCodes || []).map((code, index) => {
+            const lecturer = pointsBalances?.find(
+              (balance) => balance.lecturer._id === code.lecturerId
+            );
+
+            return {
+              id: index + 1,
+              code: code.code,
+              amount: code.pointsAmount,
+              instructorName: lecturer ? lecturer.lecturer.name : "N/A",
+              createdAt: new Date(code.redeemedAt).toLocaleDateString(),
+            };
+          });
+
+          setTransactions(mappedTransactions);
+        } else {
+          console.error("Failed to load dashboard data:", result.error);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      setSidebarOpen(!mobile); // Open by default on desktop, closed on mobile
+      setSidebarOpen(!mobile);
     };
     
-    // Initial check
     checkScreenSize();
-    
-    // Add event listener
     window.addEventListener('resize', checkScreenSize);
-    
-    // Cleanup
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
-
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
   const handleRedeemCode = () => {
-    // Handle redeem code logic here
-    console.log('Redeeming code:', redeemCode);
-    // Close the modal using DaisyUI's dialog method
     document.getElementById('redeem_modal').close();
     setRedeemCode('');
   };
 
-  // This would normally come from an API
-  const balance = 324;
-
   return (
     <div className="min-h-screen bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Main Content */}
-            <div 
-        className={`transition-all duration-300 ${
-          !isMobile && sidebarOpen ? (isRTL ? 'md:mr-52' : 'md:ml-52') : 'mr-0'
-        }`}
-      >
+      <div className={`transition-all duration-300 ${
+        !isMobile && sidebarOpen ? (isRTL ? 'md:mr-52' : 'md:ml-52') : 'mr-0'
+      }`}>
         {/* Header */}
-        <div className="bg-base-100 p-4 flex items-center justify-between  top-0 z-10 mt-10">
+        <div className="bg-base-100 p-4 flex items-center justify-between top-0 z-10 mt-10">
           <div className="flex-1 flex items-center justify-center ">
             <h1 className="text-xl font-bold text-primary px-1">{t('title')}</h1>
             <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
@@ -65,7 +99,7 @@ const PromoCodes = () => {
           <img 
             src="/waves.png" 
             alt="Decorative waves" 
-            className="absolute  left-[10%] w-16 animate-float-zigzag" 
+            className="absolute left-[10%] w-16 animate-float-zigzag" 
           />
           {isMobile && (
             <button 
@@ -80,44 +114,44 @@ const PromoCodes = () => {
 
         {/* Page Content */}
         <div className="p-6 relative">
-          {/* Waves animation in title container */}
-          
-          {/* Balance and Redeem Code Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-44 mb-8 relative">
             {/* Balance Card */}
             <div className="relative">
-            <img 
-              src="/rDots.png" 
-              alt="Decorative dots" 
-              className="absolute -top-28 -right-8 w-32  animate-float-up-dottedball z-0" 
-            />
-            <div className="card bg-primary text-primary-content shadow-md w-3/4 relative z-0">
-              <div className={`card-body flex`}>
-                <div className={`flex justify-between mb-2 border-b-2 border-white/25 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <FaWallet className={`w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <h2 className="card-title">{t('balance.title')}</h2>
+              <img 
+                src="/rDots.png" 
+                alt="Decorative dots" 
+                className="absolute -top-28 -right-8 w-32 animate-float-up-dottedball z-0" 
+              />
+              <div className="card bg-primary text-primary-content shadow-md w-3/4 relative z-0">
+                <div className={`card-body flex`}>
+                  <div className={`flex justify-between mb-2 border-b-2 border-white/25 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <FaWallet className={`w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                    <h2 className="card-title">{t('balance.title')}</h2>
+                  </div>
+                  <p className="text-4xl font-bold text-center my-2">
+                    {loading ? (
+                      <span className="loading loading-dots loading-md"></span>
+                    ) : (
+                      `${balance} ${t('balance.currency')}`
+                    )}
+                  </p>
                 </div>
-                <p className="text-4xl font-bold text-center my-2">
-                  {balance} {t('balance.currency')}
-                </p>
               </div>
-            </div>
             </div>
 
             {/* Arrow */}
-            <div className={`absolute ${isRTL ? 'right-[45%] rotate-[180deg] scale-y-[-1]' : 'left-[45%] md:rotate-[360deg]'} top-1/2 transform rotate-90  translate-y-1/4 md:-translate-y-1/2 block z-10 `}>
+            <div className={`absolute ${isRTL ? 'right-[45%] rotate-[180deg] scale-y-[-1]' : 'left-[45%] md:rotate-[360deg]'} top-1/2 transform rotate-90 translate-y-1/4 md:-translate-y-1/2 block z-10`}>
               <img src="/vector22.png" alt={t('arrowAlt')} className="object-cover" />
             </div>
 
             {/* Redeem Code Box */}
-            <div className="card  shadow-sm relative  my-auto">
-            <img 
-            src="/ball.png" 
-            alt="Decorative ball" 
-            className="absolute -bottom-16 left-4 w-10 animate-bounce-slow" 
-          />
+            <div className="card shadow-sm relative my-auto">
+              <img 
+                src="/ball.png" 
+                alt="Decorative ball" 
+                className="absolute -bottom-16 left-4 w-10 animate-bounce-slow" 
+              />
               <div className={`card-body ${isRTL ? 'text-right' : 'text-left'}`}>
-
                 <div className="card-actions justify-end">
                   <button 
                     onClick={() => document.getElementById('redeem_modal').showModal()} 
@@ -132,7 +166,7 @@ const PromoCodes = () => {
 
           {/* Transactions History */}
           <div className="card bg-base-100 shadow-sm relative">
-            <div className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-32 h-32 -z-10 `}>
+            <div className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-32 h-32 -z-10`}>
               <img src="/rDots.png" alt={t('decorativeAlt')} className="w-full h-full object-cover animate-float-up-dottedball" />
             </div>
             
@@ -141,12 +175,12 @@ const PromoCodes = () => {
                 <h2 className={`card-title text-primary inline-block px-2 pb-2`}>
                   {t('transactions.title')}
                 </h2>
-                 <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
+                <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
               </div>
 
               {/* Sort Dropdown */}
               <div className="p-4 border-b border-base-300">
-                <div className={`dropdown dropdown-bottom w-full `}>
+                <div className={`dropdown dropdown-bottom w-full`}>
                   <label tabIndex={0} className="btn btn-sm btn-outline hover:btn-primary flex justify-between gap-2">
                     <span>{t('sort.label')}</span>
                     <FaSort />
@@ -160,7 +194,6 @@ const PromoCodes = () => {
 
               {/* Table */}
               <div className="overflow-x-auto rounded-2xl">
-                
                 <table className="table w-full">
                   <thead className="bg-primary/20 mt-10">
                     <tr className='text-center'>
@@ -171,24 +204,34 @@ const PromoCodes = () => {
                   </thead>
                   <div className="h-4"></div>
                   <tbody>
-                    {transactions.length > 0 ? (
-                      transactions.map((transaction, index) => (
-                        <tr key={index} className="hover:bg-base-200">
-                          <td>{transaction.id}</td>
-                          <td>{transaction.code}</td>
-                          <td>{transaction.amount}</td>
-                          <td>{transaction.instructorName}</td>
-                          <td>{transaction.createdAt}</td>
+                    {!loading ? (
+                      transactions.length > 0 ? (
+                        transactions.map((transaction, index) => (
+                          <tr key={index} className="hover:bg-base-200">
+                            <td>{transaction.id}</td>
+                            <td>{transaction.code}</td>
+                            <td>{transaction.amount}</td>
+                            <td>{transaction.instructorName}</td>
+                            <td>{transaction.createdAt}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="5" className="text-center py-16 bg-primary/20">
+                            <div className="flex flex-col items-center justify-center text-base-content opacity-60">
+                              <div className="bg-primary bg-opacity-20 p-4 rounded-full mb-4">
+                                <FaInfoCircle className="w-8 h-8 text-primary" />
+                              </div>
+                              <p className="text-lg font-medium">{t('noData')}</p>
+                            </div>
+                          </td>
                         </tr>
-                      ))
+                      )
                     ) : (
                       <tr>
-                       <td colSpan="5" className="text-center py-16 bg-primary/20">
-                          <div className="flex flex-col items-center justify-center text-base-content opacity-60">
-                            <div className="bg-primary bg-opacity-20 p-4 rounded-full mb-4">
-                              <FaInfoCircle className="w-8 h-8 text-primary" />
-                            </div>
-                            <p className="text-lg font-medium">{t('noData')}</p>
+                        <td colSpan="5" className="text-center py-16 bg-primary/20">
+                          <div className="flex flex-col items-center justify-center">
+                            <span className="loading loading-dots loading-lg"></span>
                           </div>
                         </td>
                       </tr>
@@ -211,13 +254,11 @@ const PromoCodes = () => {
             <button className={`btn btn-sm btn-circle btn-ghost absolute ${isRTL ? 'left-2' : 'right-2'} top-2`}>✕</button>
           </form>
           
-          {/* Header */}
           <div className={`flex items-center mb-6 text-primary ${isRTL ? 'flex-row-reverse' : ''}`}>
             <MdCardGiftcard className={`w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             <h3 className="font-bold text-xl">{t('redeem.modalTitle')}</h3>
           </div>
           
-          {/* Form */}
           <div className="mb-6">
             <input
               type="text"

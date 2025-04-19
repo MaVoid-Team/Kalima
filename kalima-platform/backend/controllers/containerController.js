@@ -275,6 +275,22 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   if (!containerId) {
     return next(new AppError("Container ID is required.", 400));
   }
+  
+  // Special case handling for "my-containers" path
+  if (containerId === "my-containers") {
+    // Only authenticated users with role Lecturer can access this resource
+    if (!req.user || req.user.role !== "Lecturer") {
+      return next(new AppError("Please log in as a lecturer to access your containers.", 401));
+    }
+    
+    // Forward to the getMyContainers function
+    return exports.getMyContainers(req, res, next);
+  }
+
+  // Verify containerId is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(containerId)) {
+    return next(new AppError("Invalid container ID format.", 400));
+  }
 
   // Fetch the container
   const container = await Container.findById(containerId).populate([
@@ -286,11 +302,6 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 
   if (!container) {
     return next(new AppError("Container not found.", 404));
-  }
-
-  // If user is not authenticated (not logged in) and it's a lecture, return 404
-  if (!req.user && container.type === "lecture") {
-    return next(new AppError("Container not found. Please, login first!", 404));
   }
 
   // Role-specific logic for authenticated users
@@ -317,8 +328,16 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllContainers = catchAsync(async (req, res, next) => {
+  // Create base query
+  let query = Container.find();
+  
+  // If user is not authenticated (not logged in), exclude lecture containers
+  if (!req.user) {
+    query = query.where('type').ne('lecture');
+  }
+
   // Fetch containers based on the query
-  const containers = await Container.find().populate();
+  const containers = await query.populate();
 
   if (!containers || containers.length === 0) {
     return next(new AppError("No containers found.", 404));
@@ -622,44 +641,6 @@ exports.getContainerRevenue = catchAsync(async (req, res, next) => {
       purchaseCount,
       containerPrice: container.price,
       revenue,
-    },
-  });
-});
-
-// New function specifically for public, non-sensitive data
-exports.getAllContainersPublic = catchAsync(async (req, res, next) => {
-  let query = Container.find();
-
-  // Populate common fields
-  query = query.populate([
-    { path: "createdBy", select: "name" },
-    { path: "subject", select: "name" },
-    { path: "level", select: "name" },
-    { path: "name", select: "name" },
-    { path: "type", select: "name" },
-  ]);
-
-  // Always select only basic, non-sensitive fields for this public route
-  query = query.select(
-    "name type subject level createdBy "
-  );
-
-  const features = new QueryFeatures(query, req.query)
-    .filter()
-    .sort()
-    .paginate();
-
-  const containers = await features.query.lean();
-
-  if (!containers || containers.length === 0) {
-    return next(new AppError("Lectures not found", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    results: containers.length,
-    data: {
-      containers,
     },
   });
 });

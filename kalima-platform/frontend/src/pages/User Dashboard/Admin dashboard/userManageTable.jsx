@@ -1,68 +1,210 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getAllUsers, deleteUser, createUser } from "../../../routes/fetch-users";
+import { useTranslation } from "react-i18next";
+import { FaFilter, FaSync } from "react-icons/fa";
+import Pagination from "../../../components/Pagination"; // Import the Pagination component
+import CreateUserModal from "../../../components/CreateUserModal"; // Import the CreateUserModal component
 
 const UserManagementTable = () => {
-  // Sample data for the table
-  const users = [
-    {
-      id: 1,
-      name: "أحمد علي",
-      phone: "01012345678",
-      accountType: "ولي أمر",
-      status: "صالح",
-    },
-    {
-      id: 2,
-      name: "سارة حسن",
-      phone: "01198765432",
-      accountType: "معلم",
-      status: "بيانات ناقصة",
-    },
-    {
-      id: 3,
-      name: "يوسف سعيد",
-      phone: "01234567890",
-      accountType: "طالب",
-      status: "صالح",
-    },
-    {
-      id: 4,
-      name: "عمر خالد",
-      phone: "01567890987",
-      accountType: "ولي أمر",
-      status: "رقم الهاتف غير صحيح",
-    },
-  ];
+  const { t } = useTranslation();
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({
+    name: "",
+    phone: "",
+    role: "",
+    status: ""
+  });
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
+
+  // Fetch users on mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const result = await getAllUsers();
+      if (result.success) {
+        setUsers(result.data);
+        setFilteredUsers(result.data);
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError("Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter users whenever filters or users change
+  useEffect(() => {
+    applyFilters();
+    // Reset to first page when filters change
+    setCurrentPage(1);
+  }, [filters, users]);
+
+  const applyFilters = () => {
+    let filtered = users;
+
+    if (filters.name) {
+      filtered = filtered.filter(user => 
+        user.name.toLowerCase().includes(filters.name.toLowerCase())
+      );
+    }
+
+    if (filters.phone) {
+      filtered = filtered.filter(user => 
+        user.phoneNumber?.includes(filters.phone)
+      );
+    }
+
+    if (filters.role) {
+      filtered = filtered.filter(user => 
+        user.role.toLowerCase() === filters.role.toLowerCase()
+      );
+    }
+
+    if (filters.status) {
+      filtered = filtered.filter(user => 
+        getStatus(user) === filters.status
+      );
+    }
+
+    setFilteredUsers(filtered);
+  };
+
+  const getRoleLabel = (role) => {
+    const roles = {
+      student: "طالب",
+      parent: "ولي أمر",
+      lecturer: "معلم",
+      teacher: "معلم",
+      assistant: "مساعد",
+      admin: "أدمن"
+    };
+    return roles[role.toLowerCase()] || role;
+  };
+
+  const getStatus = (user) => {
+    if (!user.phoneNumber) return "بيانات ناقصة";
+    if (user.role === "student" && !user.level) return "بيانات ناقصة";
+    return "صالح";
+  };
+
+  const handleDelete = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    
+    try {
+      const result = await deleteUser(userId);
+      if (result.success) {
+        setUsers(prev => prev.filter(u => u._id !== userId));
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleCreateUser = async (userData) => {
+    try {
+      setError(null);
+      const result = await createUser(userData);
+      if (result.success) {
+        setUsers(prev => [...prev, result.data]);
+        setShowCreateModal(false);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  // Get current users for pagination
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  // Handle page change from Pagination component
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center p-8">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (error && !showCreateModal) {
+    return (
+      <div className="alert alert-error max-w-md mx-auto mt-8">
+        <span>{error}</span>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir="rtl">
       <h1 className="text-3xl font-bold mb-8 text-right">سجل الاجراءات</h1>
+      
+      {/* Filter Controls */}
       <div className="flex flex-wrap gap-4 mb-8 justify-between">
-        {/* Filter button */}
-        <button className="btn bg-primary border-none rounded-full px-6">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="الاسم"
+            className="input input-bordered"
+            value={filters.name}
+            onChange={e => setFilters({...filters, name: e.target.value})}
+          />
+          <input
+            type="text"
+            placeholder="رقم الهاتف"
+            className="input input-bordered"
+            value={filters.phone}
+            onChange={e => setFilters({...filters, phone: e.target.value})}
+          />
+          <select
+            className="select select-bordered"
+            value={filters.role}
+            onChange={e => setFilters({...filters, role: e.target.value})}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          تطبيق الفلتر
-        </button>
+            <option value="">كل الأنواع</option>
+            <option value="student">طالب</option>
+            <option value="parent">ولي أمر</option>
+            <option value="lecturer">معلم</option>
+          </select>
+          <select
+            className="select select-bordered"
+            value={filters.status}
+            onChange={e => setFilters({...filters, status: e.target.value})}
+          >
+            <option value="">كل الحالات</option>
+            <option value="صالح">صالح</option>
+            <option value="بيانات ناقصة">بيانات ناقصة</option>
+          </select>
+        </div>
 
-        {/* Dropdown filters */}
-        <div className="flex flex-wrap gap-3">
-          <FilterDropdown label="الاسم" />
-          <FilterDropdown label="رقم الهاتف" />
-          <FilterDropdown label="نوع الحساب" />
-          <FilterDropdown label="الحالة" />
-          <FilterDropdown label="الإجراءات" />
+        <div className="flex gap-4">
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+            إنشاء مستخدم جديد
+          </button>
+          <button className="btn btn-ghost" onClick={fetchUsers}>
+            <FaSync />
+          </button>
         </div>
       </div>
 
@@ -75,98 +217,56 @@ const UserManagementTable = () => {
               <th className="pb-4 text-lg font-medium">الحالة</th>
               <th className="pb-4 text-lg font-medium">نوع الحساب</th>
               <th className="pb-4 text-lg font-medium">رقم الهاتف</th>
-              <th className="pb-4 text-lg font-medium ">الاسم</th>
+              <th className="pb-4 text-lg font-medium">الاسم</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="border-t border-none">
+            {currentUsers.map((user) => (
+              <tr key={user._id} className="border-t border-none">
                 <td className="py-4">
-                  <div className="flex items-center gap-3 ">
-                    <button className="flex items-center justify-center w-6 h-6 rounded-full bg-[#ff0000]">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      className="btn btn-error btn-xs"
+                      onClick={() => handleDelete(user._id)}
+                    >
+                      حذف
                     </button>
-                    <button className="flex items-center justify-center w-6 h-6">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-secondary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
+                    <button className="btn btn-warning btn-xs">
+                      تعديل
                     </button>
                   </div>
                 </td>
-                <td className="py-4">{user.status}</td>
-                <td className="py-4">{user.accountType}</td>
-                <td className="py-4">{user.phone}</td>
+                <td className="py-4">{getStatus(user)}</td>
+                <td className="py-4">{getRoleLabel(user.role)}</td>
+                <td className="py-4">{user.phoneNumber || "N/A"}</td>
                 <td className="py-4">{user.name}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
-  );
-};
 
-const FilterDropdown = ({ label }) => {
-  return (
-    <div className="dropdown dropdown-end">
-      <label
-        tabIndex={0}
-        className="btn btn-outline rounded-full px-6 min-w-[140px] flex items-center justify-between"
-      >
-        {label}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 ml-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </label>
-      <ul
-        tabIndex={0}
-        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-      >
-        <li>
-          <a>الكل</a>
-        </li>
-        <li>
-          <a>خيار 1</a>
-        </li>
-        <li>
-          <a>خيار 2</a>
-        </li>
-      </ul>
+      {/* Pagination Component */}
+      <Pagination 
+        currentPage={currentPage}
+        totalItems={filteredUsers.length}
+        itemsPerPage={usersPerPage}
+        onPageChange={handlePageChange}
+        labels={{
+          previous: "السابق",
+          next: "التالي",
+          showing: "عرض",
+          of: "من"
+        }}
+      />
+
+      {/* Create User Modal Component */}
+      <CreateUserModal 
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateUser={handleCreateUser}
+        error={error}
+      />
     </div>
   );
 };

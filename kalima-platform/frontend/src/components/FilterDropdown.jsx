@@ -14,14 +14,14 @@ export function FilterDropdown({ label, options, selectedValue, onSelect }) {
         <div
           tabIndex={0}
           role="button"
-          className="btn btn-outline w-full justify-between"
+          className="btn w-full justify-between"
         >
           {selectedValue || label}
           <ChevronDown className="h-4 w-4" />
         </div>
         <ul
           tabIndex={0}
-          className="dropdown-content z-[1] menu p-2 shadow rounded-box w-full"
+          className="dropdown-content z-[1] menu p-2 shadow rounded-box w-full bg-base-100"
         >
           {options.map((option) => (
             <li key={option.value}>

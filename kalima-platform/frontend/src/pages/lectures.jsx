@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { Search } from "lucide-react"
-import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { getAllLectures } from "../routes/lectures"
+import { getAllLecturesPublic } from "../routes/lectures"
 import { FilterDropdown } from "../components/FilterDropdown"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
@@ -33,7 +32,7 @@ export default function LecturesPage() {
     setLoading(true)
     setError("")
     try {
-      const result = await getAllLectures()
+      const result = await getAllLecturesPublic()
       console.log("API Response:", result)
 
       if (result.status === "success") {
@@ -276,7 +275,6 @@ export default function LecturesPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <Link to={`/lectures/${lecture.id}`}>
                       <CourseCard
                         {...lecture}
                         isRTL={isRTL}
@@ -284,7 +282,6 @@ export default function LecturesPage() {
                         teacherRole={lecture.teacherRole}
                         status={lecture.status}
                       />
-                    </Link>
                   </motion.div>
                 ))}
               </AnimatePresence>

@@ -3,13 +3,7 @@ const containerController = require("../controllers/containerController");
 const authController = require("../controllers/authController.js");
 const router = express.Router();
 
-router.get(
-  "/public",
-  containerController.getAllContainersPublic
-);
-
 const verifyJWT = require("../middleware/verifyJWT");
-
 
 // Get containers for a specific lecturer
 router.get(
@@ -17,19 +11,22 @@ router.get(
   containerController.getLecturerContainers
 );
 
-router.get("/", containerController.getAllContainers);
+// Get all containers - works with or without authentication
+router.get(
+  "/",
+  authController.optionalJWT,  // Apply optional JWT middleware
+  containerController.getAllContainers
+);
 
 // Get container by ID - works with or without authentication
+// Note: This handles /my-containers as a special case for authenticated lecturers
 router.get(
-  "/:containerId",
-  authController.optionalJWT,  // Apply optional JWT middleware
+  "/:containerId",  // Apply optional JWT middleware
   containerController.getContainerById
 );
 
 // Apply JWT verification middleware to all routes below this line
 router.use(verifyJWT);
-
-
 
 // Get accessible child containers for a student by container ID
 router.get(
@@ -37,18 +34,13 @@ router.get(
   containerController.getAccessibleChildContainers
 );
 
-// Get containers for a specific teacher
-// router.get(
-//   "/teacher/:teacherId",
-//   containerController.getTeacherContainers
-// );
-
 //purchaseCounter for all containers
 router.get(
   "/purchase-counts",
   authController.verifyRoles("admin", "subadmin", "moderator"), // Restrict access to specific roles
   containerController.getAllContainerPurchaseCounts
 );
+
 //purchaseCounter for a container
 router.get(
   "/purchase-counts/:containerId",
@@ -56,27 +48,20 @@ router.get(
   containerController.getContainerPurchaseCountById
 );
 
-// Add a route to get containers of the currently logged-in lecturer
-router.get(
-  "/my-containers",
-  authController.verifyRoles("Lecturer"),
-  containerController.getMyContainers
-);
-
-// Create and get containers
-router
-  .route("/")
-  .post(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
-    containerController.createContainer
-  );
-
 // Update a child container's parent
 router.patch(
   "/update-child",
   authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
   containerController.UpdateChildOfContainer
 );
+
+// Create containers
+router
+  .route("/")
+  .post(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
+    containerController.createContainer
+  );
 
 // Operations on a specific container by ID
 router
@@ -116,6 +101,5 @@ router
     ),
     containerController.getContainerRevenue
   );
-
 
 module.exports = router;

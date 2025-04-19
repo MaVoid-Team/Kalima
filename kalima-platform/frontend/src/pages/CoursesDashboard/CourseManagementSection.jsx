@@ -5,14 +5,14 @@ import { Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAllSubjects } from "../../routes/courses";
 import { CourseCard } from "../../components/CourseCard";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 export default function CourseManagementSection() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState();
-
+  const navigate = useNavigate();
   // Enhanced fake data combining your image structure and provided data
   const fakeCourses = [
     {
@@ -180,18 +180,18 @@ export default function CourseManagementSection() {
         >
           {/* Button row - positioned left in RTL, right in LTR */}
           <div className={`w-full flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${
-                isRTL ? 'mr-auto' : 'ml-auto'
-              }`}
-            >
-              <Plus className="w-4 h-4 md:w-5 md:h-5" />
-              <span>{isRTL ? "إنشاء كورس جديد" : "Create New Course"}</span>
-            </motion.button>
-          </div>
-        
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate('/coursesform')}
+        className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${
+          isRTL ? 'mr-auto' : 'ml-auto'
+        }`}
+      >
+        <Plus className="w-4 h-4 md:w-5 md:h-5" />
+        <span>{isRTL ? "إنشاء كورس جديد" : "Create New Course"}</span>
+      </motion.button>
+    </div>
           {/* Centered title section */}
           <div className="text-center">
             <h1 className="text-xl md:text-3xl font-bold text-primary">
