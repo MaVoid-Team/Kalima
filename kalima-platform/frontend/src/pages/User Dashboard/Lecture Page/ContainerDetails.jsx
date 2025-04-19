@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { getContainerById } from "../../../routes/lectures"
+import { getContainerById, getLecturesByContainerId } from "../../../routes/lectures"
 import { BookOpen, FileText } from "lucide-react"
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
   const [container, setContainer] = useState(null)
+  const [lecture, setLecture] = useState(null)
   const [childContainers, setChildContainers] = useState([])
   const [subjectName, setSubjectName] = useState("Unknown Subject")
   const [levelName, setLevelName] = useState("Unknown Level")
@@ -21,15 +22,19 @@ const ContainerDetailsPage = () => {
         setLoading(true)
 
         // Fetch container details
-        const containerResult = await getContainerById(containerId)
+        const containerResult = await getContainerById(containerId);
+        const lectureResult = await getLecturesByContainerId(containerId);
         console.log("Container data:", containerResult.data)
+        console.log("lecture data:", lectureResult.data)
 
         if (containerResult.status !== "success") {
           throw new Error("Failed to fetch container details")
         }
 
         const containerData = containerResult.data
+        const lectureData = lectureResult.data
         setContainer(containerData)
+        setLecture(lectureData)
 
         // Fetch subject and level details if they're just IDs
         if (
@@ -218,27 +223,34 @@ const ContainerDetailsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childContainers.map((child) => (
-              <div
-                key={child._id || child.id}
-                className="card bg-base-200 hover:bg-base-300 transition-colors shadow-md hover:shadow-lg cursor-pointer"
-                onClick={() => handleChildClick(child._id || child.id)}
-              >
-                <div className="card-body">
-                  <h3 className="card-title text-lg">{child.name}</h3>
-
-                  {child.type && (
-                    <div className="mt-2">
-                      <span className="badge badge-sm">{getContainerTypeArabic(child.type)}</span>
-                    </div>
-                  )}
-
-                  <div className="card-actions justify-end mt-4">
-                    <button className="btn btn-primary btn-sm">عرض المحتوى</button>
+          {childContainers.map((child) => (
+            <div
+              key={child._id || child.id}
+              className="card bg-base-200 hover:bg-base-300 transition-colors shadow-md hover:shadow-lg cursor-pointer"
+            >
+              <div className="card-body">
+                <h3 className="card-title text-lg">{child.name}</h3>
+          
+                {child.type && (
+                  <div className="mt-2">
+                    <span className="badge badge-sm">{getContainerTypeArabic(child.type)}</span>
                   </div>
+                )}
+          
+                <div className="card-actions justify-end mt-4">
+                <button 
+                className="btn btn-primary btn-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/dashboard/container-details/${container._id}/lecture-page/${child._id || child.id}`);
+                }}
+              >
+                عرض المحتوى
+              </button>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
           </div>
         )}
       </div>

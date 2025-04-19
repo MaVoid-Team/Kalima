@@ -5,19 +5,19 @@ import { useParams } from "react-router-dom"
 import { getLectureById } from "../../../routes/lectures"
 
 const LecturePage = () => {
-  const { lectureId } = useParams()
+  const { containerId, lectureId } = useParams() // Now getting both IDs
   const [lecture, setLecture] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
 
   useEffect(() => {
     const fetchLecture = async () => {
       try {
         setLoading(true)
-        const result = await getLectureById(lectureId)
+        const result = await getLectureById(lectureId) // Using lectureId
         
         if (result.success) {
-          // The lecture data is in result.data.container
           setLecture(result.data.container)
         } else {
           setError(result.error || "Failed to load lecture")
@@ -33,8 +33,7 @@ const LecturePage = () => {
     if (lectureId) {
       fetchLecture()
     }
-  }, [lectureId])
-
+  }, [lectureId]) // Only depend on lectureId
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
