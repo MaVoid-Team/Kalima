@@ -1,82 +1,95 @@
-import CourseCard from "./CourseCard"
+import { useTranslation } from "react-i18next";
+import CourseCard from "./CourseCard";
 
 const CourseList = ({ filters }) => {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const dir = isRTL ? "rtl" : "ltr";
+
   // This would typically come from an API
   const courses = [
     {
       id: 1,
-      subject: "الرياضيات",
-      session: "٢",
-      type: "محاضرة",
-      room: "١٥٧",
-      time: "١١:٠٠ - ٩:٣٠",
+      subject: isRTL ? "الرياضيات" : "Mathematics",
+      session: isRTL ? "٢" : "2",
+      type: isRTL ? "محاضرة" : "Lecture",
+      room: isRTL ? "١٥٧" : "157",
+      time: isRTL ? "١١:٠٠ - ٩:٣٠" : "9:30 - 11:00",
       teacher: {
-        name: "أ/ عماد عبدالعزيز",
+        name: isRTL ? "أ/ عماد عبدالعزيز" : "Mr. Emad Abdulaziz",
         email: "Keegan_Mraz@gmail.com",
-        group: "المجموعة ١٢٢",
+        group: isRTL ? "المجموعة ١٢٢" : "Group 122",
       },
     },
     {
       id: 2,
-      subject: "العلوم",
-      session: "٣",
-      type: "محاضرة",
-      room: "٤٥",
-      time: "١٢:٣٠ - ١١:٣٠",
+      subject: isRTL ? "العلوم" : "Science",
+      session: isRTL ? "٣" : "3",
+      type: isRTL ? "محاضرة" : "Lecture",
+      room: isRTL ? "٤٥" : "45",
+      time: isRTL ? "١٢:٣٠ - ١١:٣٠" : "11:30 - 12:30",
       teacher: {
-        name: "أ/ إيهاب سعيد",
+        name: isRTL ? "أ/ إيهاب سعيد" : "Mr. Ehab Said",
         email: "Olaf_Hegmann40@hotmail.com",
-        group: "المجموعة ١٠٢",
+        group: isRTL ? "المجموعة ١٠٢" : "Group 102",
       },
     },
     {
       id: 3,
-      subject: "الفلسفة",
-      session: "٤",
-      type: "مراجعة",
-      room: "١٠٠",
-      time: "١٠:٥ - ١٢:٣٠",
+      subject: isRTL ? "الفلسفة" : "Philosophy",
+      session: isRTL ? "٤" : "4",
+      type: isRTL ? "مراجعة" : "Review",
+      room: isRTL ? "١٠٠" : "100",
+      time: isRTL ? "١٠:٥ - ١٢:٣٠" : "10:05 - 12:30",
       teacher: {
-        name: "أ/ علي حسن",
+        name: isRTL ? "أ/ علي حسن" : "Mr. Ali Hassan",
         email: "Bennett_Nolan@gmail.com",
-        group: "المجموعة ١٤٠",
+        group: isRTL ? "المجموعة ١٤٠" : "Group 140",
       },
     },
     {
       id: 4,
-      subject: "مراجعة إضافية",
-      session: "٥",
-      type: "مراجعة",
-      room: "١٨٥",
-      time: "١٢:٤٥ - ١٠:١٥",
+      subject: isRTL ? "مراجعة إضافية" : "Extra Review",
+      session: isRTL ? "٥" : "5",
+      type: isRTL ? "مراجعة" : "Review",
+      room: isRTL ? "١٨٥" : "185",
+      time: isRTL ? "١٢:٤٥ - ١٠:١٥" : "10:15 - 12:45",
       teacher: {
-        name: "أ/ مالك حسام",
+        name: isRTL ? "أ/ مالك حسام" : "Mr. Malek Hossam",
         email: "Felipe_Rohan@gmail.com",
-        group: "المجموعة ١٦٠",
+        group: isRTL ? "المجموعة ١٦٠" : "Group 160",
       },
     },
-  ]
+  ];
 
   // Apply filters if any
-  let filteredCourses = [...courses]
+  let filteredCourses = [...courses];
   if (filters.teacher) {
-    filteredCourses = filteredCourses.filter((course) => course.teacher.name.includes(filters.teacher))
+    filteredCourses = filteredCourses.filter((course) =>
+      course.teacher.name.includes(filters.teacher)
+    );
   }
 
   return (
-    <div>
+    <div dir={dir}>
       <div className="flex justify-between items-center mb-4">
-        <div className="badge badge-outline">المواد: {filteredCourses.length}</div>
-        <h2 className="text-xl font-bold text-right">المواد الدراسية والمقررات</h2>
+      <h2 className="text-xl font-bold text-base-content text-right">
+        {isRTL
+          ? "المواد الدراسية والمقررات"
+          : "Academic Subjects and Courses"}
+      </h2>
+        <div className="badge badge-outline border-base-300 text-base-content">
+          {isRTL ? "المواد" : "Courses"}: {filteredCourses.length}
+        </div>
       </div>
 
       <div className="space-y-6">
         {filteredCourses.map((course) => (
-          <CourseCard key={course.id} course={course} />
+          <CourseCard key={course.id} course={course} isRTL={isRTL} />
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseList
+export default CourseList;

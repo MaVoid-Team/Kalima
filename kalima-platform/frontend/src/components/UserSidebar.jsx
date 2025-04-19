@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FaUser, FaTicketAlt, FaGraduationCap, FaCog, FaSignOutAlt, FaTimes, FaChevronRight, FaChevronLeft, FaUserAlt } from 'react-icons/fa';
-import { logoutUser } from '../routes/fetch-users';
+import { logoutUser } from '../routes/auth-services';
 
 const UserSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
