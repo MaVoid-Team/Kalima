@@ -58,11 +58,11 @@ const TeacherLogin = () => {
 
       const userRole = dashboardResult.data.data.userInfo.role;
       if (userRole === 'Admin' || userRole === 'SubAdmin') {
-        navigate('/dashboard/admin-dashboard');
+        navigate('/dashboard/dashboards-for-admins');
       } else if (userRole === 'Lecturer') {
         navigate('/dashboard/lecturer-dashboard');
       } else if (userRole === 'Student') {
-        navigate('/dashboard/student-dashboard');
+        navigate('/dashboard/student-dashboard/promo-codes');
       }
 
     } catch (err) {
@@ -74,7 +74,7 @@ const TeacherLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
       <WaveBackground />
       
       {/* Left side - Teacher Reviews */}
@@ -89,7 +89,7 @@ const TeacherLogin = () => {
             {t('loginNow', 'Login Now!')}
           </h1>
           <p className="text-center text-base-600 mb-6">
-            {t('loginWelcome', 'Welcome! Sign in to access your teacher dashboard and resources')}
+            {/* {t('loginWelcome', 'Welcome! Sign in to access your teacher dashboard and resources')} */}
           </p>
           
           {/* Tabs */}

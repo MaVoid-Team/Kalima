@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from '../../../routes/fetch-users';
+import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from '../../../../routes/fetch-users';
 
 const Hero = () => {
   const [lecturers, setLecturers] = useState([]);

@@ -9,7 +9,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import CourseGrid from "./CourseGrid"
 import InstructorsList from "./InstructorsList"
 import FeaturedCourses from "./FeaturedCourses"
-import UserSidebar from "../../components/UserSidebar"
 
 export default function LecturerDashboard() {
   const { t, i18n } = useTranslation("dashboard")
@@ -39,20 +38,17 @@ export default function LecturerDashboard() {
     }
   }, [])
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
+  // const toggleSidebar = () => {
+  //   setSidebarOpen(!sidebarOpen)
+  // }
 
   return (
     <div className="flex flex-col min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
       {/* Sidebar */}
-      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Main Content */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          sidebarOpen ? (isRTL ? "mr-52" : "ml-52") : "ml-0 mr-0"
-        } pt-14`}
+        className={`transition-all duration-300 ease-in-out pt-14`}
       >
         <div className="mx-auto p-6 md:p-10 lg:p-14">
           <h1 className="text-3xl md:text-4xl text-center mb-8 text-primary font-semibold">
@@ -65,9 +61,9 @@ export default function LecturerDashboard() {
           </section>
 
           {/* Instructors List Section */}
-          <section className="mb-16">
+          {/* <section className="mb-16">
             <InstructorsList />
-          </section>
+          </section> */}
 
           {/* Course Categories Section */}
           <section className="mb-16">

@@ -3,7 +3,6 @@ import { FaBell, FaEnvelope, FaChevronDown,FaBars } from 'react-icons/fa';
 import CoursesSection from './CoursesSection';
 import VideoSection from './VideoSection';
 import FeaturedCourses from './FeaturedCourses';
-import UserSidebar from '../../../components/UserSidebar';
 import { useEffect, useState } from 'react';
 import RevisionCourses from './RevisionCourses';
 import EliteAssistants from './EliteAssistants';
@@ -40,9 +39,7 @@ const AssistantPage = () => {
 
   return (
      <div 
-          className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100 ${
-            sidebarOpen && !isMobile ? ` ${isRTL ? 'mr-52' : 'ml-52'} transition-all duration-500` : `mr-0`
-          }`} 
+          className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100`} 
           dir={isRTL ? 'ltr' : 'rtl'}
         >
           {/* Mobile Sidebar Toggle Button */}
@@ -56,8 +53,7 @@ const AssistantPage = () => {
               <FaBars className="w-5 h-5" />
             </button>
           </div>
-        <div className="container mx-auto">
-      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+        <div className="mx-auto w-full max-w-full p-10 bg-base-100 min-h-screen bg-gradient-to-br" dir="rtl">
       <CoursesSection />
       {/* <VideoSection /> */}
       <FeaturedCourses />

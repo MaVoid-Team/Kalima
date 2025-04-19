@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getAllUsers, deleteUser, createUser } from "../../../routes/fetch-users";
+import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users";
 import { useTranslation } from "react-i18next";
 import { FaFilter, FaSync } from "react-icons/fa";
-import Pagination from "../../../components/Pagination"; // Import the Pagination component
-import CreateUserModal from "../../../components/CreateUserModal"; // Import the CreateUserModal component
+import Pagination from "../../../../components/Pagination"; // Import the Pagination component
+import CreateUserModal from "../CreateUserModal/CreateUserModal"; // Import the CreateUserModal component
 
 const UserManagementTable = () => {
   const { t } = useTranslation();
