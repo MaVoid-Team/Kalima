@@ -47,7 +47,7 @@ export const getAllParents = async () => {
 
 export const getAllAssistants = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/assistant`, {
+    const response = await axios.get(`${API_URL}/users/role/assistant`, {
       headers: getAuthHeader(),
     });
 
@@ -66,7 +66,7 @@ export const getAllAssistants = async () => {
 
 export const getAllLecturers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/lecturer`, {
+    const response = await axios.get(`${API_URL}/users/role/lecturer`, {
       headers: getAuthHeader(),
     });
 
@@ -104,7 +104,7 @@ export const getUserById = async (userId) => {
 
 export const getAllUsers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/`, {
+    const response = await axios.get(`${API_URL}/users/`, {
       headers: getAuthHeader(),
     });
 
@@ -125,7 +125,7 @@ export const getAllUsers = async () => {
 // --------START CREATE USER--------
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/users/`, userData, {
+    const response = await axios.post(`${API_URL}/users/`, userData, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };
@@ -142,7 +142,7 @@ export const createUser = async (userData) => {
 // --------START DELETE USER--------
 export const deleteUser = async (userId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/users/${userId}`, {
+    const response = await axios.delete(`${API_URL}/users/${userId}`, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };
