@@ -5,25 +5,28 @@ import { useParams } from "react-router-dom"
 import { getLectureById } from "../../../routes/lectures"
 
 const LecturePage = () => {
-  const { containerId, lectureId } = useParams()
+  const { lectureId } = useParams()
   const [lecture, setLecture] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    console.log("Lecture ID from params:", lectureId)
-
     const fetchLecture = async () => {
       try {
         setLoading(true)
         const result = await getLectureById(lectureId)
-        console.log("Lecture data:", result.data)
-        setLecture(result.data.lecture || result.data.data?.lecture)
-        setLoading(false)
+        
+        if (result.success) {
+          // The lecture data is in result.data.container
+          setLecture(result.data.container)
+        } else {
+          setError(result.error || "Failed to load lecture")
+        }
       } catch (err) {
         setError("Failed to load lecture. Please try again later.")
-        setLoading(false)
         console.error("Error:", err)
+      } finally {
+        setLoading(false)
       }
     }
 

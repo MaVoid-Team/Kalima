@@ -93,7 +93,7 @@ const ContainerDetailsPage = () => {
   }, [containerId])
 
   const handleChildClick = (childId) => {
-    navigate(`/container-details/${childId}`)
+    navigate(`/dashboard/lecturer-dashboard/container-details/${childId}`)
   }
 
   // Get container type in Arabic

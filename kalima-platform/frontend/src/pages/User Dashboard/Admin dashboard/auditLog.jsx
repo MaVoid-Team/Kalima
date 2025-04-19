@@ -5,7 +5,7 @@ import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from "react-ico
 
 const AuditLog = () => {
   return (
-    <div className="container w-full h-screen mx-auto mt-20 p-4 font-sans  rounded-xl" dir="rtl">      
+    <div className="mx-auto w-full max-w-full p-20 bg-base-100 min-h-screen bg-gradient-to-br" dir="rtl">      
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6 justify-start">
         <div className="dropdown dropdown-end">

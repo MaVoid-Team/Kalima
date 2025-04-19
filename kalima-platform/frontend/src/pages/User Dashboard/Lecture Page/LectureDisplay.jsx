@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { getAllContainers } from "../../../routes/lectures"
-import UserSidebar from '../../../components/UserSidebar';
 import { useTranslation } from "react-i18next"
 import { FaBars } from "react-icons/fa"
 
@@ -104,7 +103,6 @@ const LectureList = () => {
           <FaBars className="w-5 h-5" />
         </button>
       </div>
-      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-6 text-center">الكورسات المتاحه</h1>
 

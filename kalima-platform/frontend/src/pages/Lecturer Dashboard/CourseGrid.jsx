@@ -112,7 +112,7 @@ export default function CourseGrid() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t("courseManagement")}</h2>
-        <Link to="/add-course">
+        <Link to="/dashboard/lecturer-dashboard/CoursesForm">
           <button className="btn btn-primary btn-sm rounded-full">
             <span>{t("addNewCourse")}</span>
           </button>
@@ -122,7 +122,7 @@ export default function CourseGrid() {
       {containers.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-lg text-gray-500">{t("noCourses")}</p>
-          <Link to="/add-course">
+          <Link to="/dashboard/lecturer-dashboard/CoursesForm">
             <button className="btn btn-primary mt-4">{t("addNewCourse")}</button>
           </Link>
         </div>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import UserSidebar from '../../components/UserSidebar';
 import { useTranslation } from 'react-i18next';
 import { FaWallet, FaInfoCircle, FaSort, FaBars, FaTicketAlt } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
@@ -87,9 +86,7 @@ const PromoCodes = () => {
   return (
     <div className="min-h-screen bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Main Content */}
-      <div className={`transition-all duration-300 ${
-        !isMobile && sidebarOpen ? (isRTL ? 'md:mr-52' : 'md:ml-52') : 'mr-0'
-      }`}>
+      <div className={`transition-all duration-300`}>
         {/* Header */}
         <div className="bg-base-100 p-4 flex items-center justify-between top-0 z-10 mt-10">
           <div className="flex-1 flex items-center justify-center ">
@@ -243,9 +240,6 @@ const PromoCodes = () => {
           </div>
         </div>
       </div>
-
-      {/* Sidebar */}
-      <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Redeem Code Dialog */}
       <dialog id="redeem_modal" className="modal modal-bottom sm:modal-middle">

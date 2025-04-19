@@ -3,22 +3,20 @@
 import { Suspense, lazy, useEffect, useState } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
 import NavBar from "./components/navbar"
-import UserNavbar from "./components/UserNavbar"
 import { LoadingSpinner } from "./components/LoadingSpinner"
 import { isMobile } from "./utils/isMobile"
 import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
-import UserSidebar from "./components/UserSidebar"
+import UnifiedSidebar from "./components/UnifiedSidebar"
 import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
-const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/adminDashboard"))
+const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
 const CourseDetails = lazy(() => import("./pages/CourseDetails"))
 const LecturesPage = lazy(() => import("./pages/lectures"))
-const CivilcoLanding = lazy(() => import("./pages/landing"))
-const LoginStudent = lazy(() => import("./pages/Login/login-student"))
-const TeacherLogin = lazy(() => import("./pages/Login/login-teacher"))
+// const CivilcoLanding = lazy(() => import("./pages/landing"))
+const TeacherLogin = lazy(() => import("./pages/Login/login"))
 const Footer = lazy(() => import("./components/footer"))
 const CoursesPage = lazy(() => import("./pages/courses"))
 const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"))
@@ -37,96 +35,91 @@ const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboa
 // const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
 // const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
 const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
+const DashboardsForAdmins = lazy(() => import("./pages/User Dashboard/Admin dashboard/Dashboards/DashboardsForAdmin"))
+
 function App() {
   const location = useLocation()
   const [showUserNavbar, setShowUserNavbar] = useState(false)
-  const [showUserSidebar, setShowUserSidebar] = useState(false)
-
-  // Define routes that should show user-specific UI components
-  const userRoutes = [
-    "/dashboard",
-    "/dashboard/lecture-page",
-    "/dashboard/promo-codes",
-    "/settings",
-    "/lecture-details",
-    "/lecture-details/:lectureId",
-    "/container-details/:containerId",
-    "/container-details/:containerId/lecture-page/:lectureId",
-    "/dashboard/assistant-page",
-  ]
+  const [showSidebar, setShowSidebar] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
-    // Check if current route should show user-specific components
-    const isUserRoute = userRoutes.some(route => {
-      if (route.includes(':')) {
-        // Handle dynamic routes
-        const routeParts = route.split('/')
-        const pathParts = location.pathname.split('/')
-        
-        if (routeParts.length !== pathParts.length) return false
-        
-        return routeParts.every((part, i) => {
-          return part.startsWith(':') || part === pathParts[i]
-        })
-      }
-      return route === location.pathname
-    })
-
-    // setShowUserNavbar(isUserRoute)
-    setShowUserSidebar(isUserRoute)
+    // Show sidebar on any route that starts with "/dashboard/"
+    const isDashboardRoute = location.pathname.startsWith('/dashboard/')
+    setShowSidebar(isDashboardRoute)
+    
+    // You can keep or modify this based on your needs
+    setShowUserNavbar(isDashboardRoute)
   }, [location.pathname])
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
   return (
     <div className="App">
-      {showUserNavbar ? <UserNavbar /> : <NavBar />}
+       <NavBar />
+
+      {/* Render the unified sidebar on dashboard routes */}
+      {showSidebar && (
+        <UnifiedSidebar 
+          isOpen={sidebarOpen} 
+          toggleSidebar={toggleSidebar} 
+        />
+      )}
+
+      <div 
+        className={`transition-all duration-300 ${
+          showSidebar && sidebarOpen ? 'md:mr-52' : 'ml-0'
+        }`}
+      >
+        <Suspense fallback={<LoadingSpinner fullScreen />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            {/* <Route path="/landing" element={<CivilcoLanding />} /> */}
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/services" element={<Services />} />
+            
+            {/* Authentication Routes */}
+            <Route path="/login" element={<TeacherLogin />} />
+            <Route path="/register" element={<RegisterStudent />} />
+            
+            {/* Content Routes */}
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/courses/:courseId" element={<CourseDetails />} />
+            <Route path="/lectures" element={<LecturesPage />} />
+            <Route path="/lectures/:lectureId" element={<LecturePage />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
+            {/* <Route path="/packages" element={<PackagesPage />} />
+            <Route path="/package-details/:packageId" element={<PackageDetails />} /> */}
 
 
-      <Suspense fallback={<LoadingSpinner fullScreen />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/landing" element={<CivilcoLanding />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/services" element={<Services />} />
-          
-          {/* Authentication Routes */}
-          <Route path="/login-student" element={<LoginStudent />} />
-          <Route path="/login-teacher" element={<TeacherLogin />} />
-          <Route path="/register" element={<RegisterStudent />} />
-          
-          {/* Content Routes */}
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:courseId" element={<CourseDetails />} />
-          <Route path="/lectures" element={<LecturesPage />} />
-          <Route path="/lectures/:lectureId" element={<LecturePage />} />
-          <Route path="/teachers" element={<Teachers />} />
-          <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
-          {/* <Route path="/packages" element={<PackagesPage />} />
-          <Route path="/package-details/:packageId" element={<PackageDetails />} /> */}
+            {/* User Dashboard Routes */}
+            <Route path="/dashboard/lecture-page" element={<LectureList />} />
+            <Route path="/dashboard/student-dashboard/promo-codes" element={<PromoCodes />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
 
-
-          {/* User Dashboard Routes */}
-          <Route path="/dashboard/lecture-page" element={<LectureList />} />
-          <Route path="/dashboard/promo-codes" element={<PromoCodes />} />
-          <Route path="/dashboard/settings" element={<SettingsPage />} />
-
-          {/* Assistant Routes */}
-          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
-          {/* Admin Routes */}
-          <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
-          
-          {/* Lecturer Routes */}
-          <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
-          <Route path="/coursesdashboard" element={<CoursesDashboard />} />
-          <Route path="/lecturer-dashboard/container-details/:containerId" element={<ContainerDetailsPage />} />
-          <Route path="container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
-          <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
-          <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
-          <Route path="/CoursesForm" element={<CoursesForm />} />
-        </Routes>
-      </Suspense>
+            {/* Assistant Routes */}
+            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
+            {/* Admin Routes */}
+            <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
+            <Route path="/dashboard/dashboards-for-admins" element={<DashboardsForAdmins />} />
+            
+            {/* Lecturer Routes */}
+            <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/coursesdashboard" element={<CoursesDashboard />} />
+            <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetailsPage />} />
+            <Route path="/dashboard/container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
+            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
+            <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
+            <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
+          </Routes>
+        </Suspense>
+      </div>
 
       {/* Only show footer on public routes */}
       {!showUserNavbar && (
