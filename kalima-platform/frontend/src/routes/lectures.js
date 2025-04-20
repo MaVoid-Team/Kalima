@@ -53,6 +53,38 @@ export const getContainerById = async (containerId) => {
   }
 }
 
+export const getLectureAttachments = async (lectureId) => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      return {
+        status: "error",
+        message: "Authentication required",
+      };
+    }
+
+    const response = await axios.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return {
+      status: "success",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching lecture attachments:", error);
+
+    return {
+      status: "error",
+      message:
+        error.response?.data?.message || "Failed to fetch lecture attachments. Please try again later.",
+    };
+  }
+};
+
 export const getAllLecturesPublic = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
@@ -67,6 +99,8 @@ export const getAllLecturesPublic = async () => {
   }
 }
 
+// Add this to your lectures.js file or wherever your API functions are located
+
 export const getMyContainers = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/containers/my-containers`, {
@@ -76,10 +110,16 @@ export const getMyContainers = async () => {
       },
     })
 
-    return response.data
+    return {
+      status: "success",
+      data: response.data.data
+    }
   } catch (error) {
     console.error("Error fetching my containers:", error)
-    throw error
+    return {
+      status: "error",
+      error: error.response?.data?.message || "Failed to fetch containers"
+    }
   }
 }
 

@@ -98,7 +98,8 @@ function App() {
 
 
             {/* User Dashboard Routes */}
-            <Route path="/dashboard/lecture-page" element={<LectureList />} />
+            <Route path="/dashboard/lecture-page" element={<LecturePage />} />
+            <Route path="/dashboard/lecture-page/:lectureId" element={<LecturePage />} />
             <Route path="/dashboard/student-dashboard/promo-codes" element={<PromoCodes />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 

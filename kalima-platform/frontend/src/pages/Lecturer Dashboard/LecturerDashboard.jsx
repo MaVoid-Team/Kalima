@@ -61,9 +61,9 @@ export default function LecturerDashboard() {
           </section>
 
           {/* Instructors List Section */}
-          {/* <section className="mb-16">
+          <section className="mb-16">
             <InstructorsList />
-          </section> */}
+          </section>
 
           {/* Course Categories Section */}
           <section className="mb-16">

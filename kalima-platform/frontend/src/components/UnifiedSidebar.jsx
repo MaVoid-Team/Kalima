@@ -145,10 +145,10 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/lecturer-dashboard' 
       },
       { 
-        id: 'courses', 
-        title: t('courses') || 'Courses', 
+        id: 'lectures', 
+        title: t('lectures') || 'Lectures', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/lecture-page' 
+        path: '/dashboard/lecture-page'
       },
     ];
 
