@@ -75,16 +75,16 @@ export default function LecturerDashboard() {
           </section>
 
           {/* Featured Courses Section */}
-          <section className="mb-16">
+          {/* <section className="mb-16">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">{t("featured_courses")}</h2>
               <button className="btn btn-ghost btn-sm text-primary">{t("view_all")}</button>
             </div>
             <FeaturedCourses />
-          </section>
+          </section> */}
 
           {/* Pagination */}
-          <div className="flex justify-center my-8">
+          {/* <div className="flex justify-center my-8">
             <div className="join">
               <button
                 className="join-item btn btn-sm"
@@ -114,7 +114,7 @@ export default function LecturerDashboard() {
                 {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
