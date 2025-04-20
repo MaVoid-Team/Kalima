@@ -63,6 +63,8 @@ const TeacherLogin = () => {
         navigate('/dashboard/lecturer-dashboard');
       } else if (userRole === 'Student') {
         navigate('/dashboard/student-dashboard/promo-codes');
+      } else if (userRole === 'Assistant') {
+        navigate('/dashboard/assistant-page');
       }
 
     } catch (err) {

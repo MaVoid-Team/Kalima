@@ -56,9 +56,9 @@ const AssistantPage = () => {
         <div className="mx-auto w-full max-w-full p-10 bg-base-100 min-h-screen bg-gradient-to-br" dir="rtl">
       <CoursesSection />
       {/* <VideoSection /> */}
-      <FeaturedCourses />
+      {/* <FeaturedCourses /> */}
       {/* <RevisionCourses /> */}
-      {/* <EliteAssistants /> */}
+      <EliteAssistants />
     </div>
     </div>
     
