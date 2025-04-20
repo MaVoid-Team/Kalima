@@ -42,6 +42,14 @@ const DashboardsForAdmins = () => {
       icon: <FaUserGraduate className="w-12 h-12" />,
       path: "/dashboard/promo-codes",
       isDefault: false
+    },
+    {
+      id: "Center",
+      title: "Center Dashboard",
+      description: "View the center dashboard, access timetables and lectures offline times.",
+      icon: <FaUserGraduate className="w-12 h-12" />,
+      path: "/dashboard/center-dashboard",
+      isDefault: false
     }
   ];
 

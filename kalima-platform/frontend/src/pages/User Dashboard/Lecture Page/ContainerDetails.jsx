@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getContainerById } from "../../../routes/lectures"
-import { BookOpen, FileText } from "lucide-react"
+import { BookOpen, FileText, Video } from 'lucide-react'
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
@@ -92,8 +92,20 @@ const ContainerDetailsPage = () => {
     }
   }, [containerId])
 
-  const handleChildClick = (childId) => {
-    navigate(`/dashboard/lecturer-dashboard/container-details/${childId}`)
+  useEffect(() => {
+    if (container && container.type === "lecture") {
+      navigate(`/dashboard/lecture-page/${container._id || container.id}`)
+    }
+  }, [container, navigate])
+
+  const handleChildClick = (child) => {
+    // If the child is a lecture, navigate to the lecture page
+    if (child.type === "lecture") {
+      navigate(`/dashboard/lecture-page/${child._id || child.id}`)
+    } else {
+      // Otherwise, navigate to the container details page
+      navigate(`/dashboard/lecturer-dashboard/container-details/${child._id || child.id}`)
+    }
   }
 
   // Get container type in Arabic
@@ -144,6 +156,8 @@ const ContainerDetailsPage = () => {
       </div>
     )
   }
+
+  // If the current container is a lecture, redirect to the lecture page
 
   return (
     <div className="container mx-auto p-4" dir="rtl">
@@ -222,19 +236,32 @@ const ContainerDetailsPage = () => {
               <div
                 key={child._id || child.id}
                 className="card bg-base-200 hover:bg-base-300 transition-colors shadow-md hover:shadow-lg cursor-pointer"
-                onClick={() => handleChildClick(child._id || child.id)}
+                onClick={() => handleChildClick(child)}
               >
                 <div className="card-body">
-                  <h3 className="card-title text-lg">{child.name}</h3>
+                  <h3 className="card-title text-lg flex items-center gap-2">
+                    {child.type === "lecture" && (
+                      <Video className="h-5 w-5 text-primary" />
+                    )}
+                    {child.name}
+                  </h3>
 
                   {child.type && (
                     <div className="mt-2">
                       <span className="badge badge-sm">{getContainerTypeArabic(child.type)}</span>
+                      {child.type === "lecture" && child.videoLink && (
+                        <span className="badge badge-sm badge-primary ml-2">فيديو</span>
+                      )}
+                      {child.type === "lecture" && child.lecture_type === "Free" && (
+                        <span className="badge badge-sm badge-success ml-2">مجاني</span>
+                      )}
                     </div>
                   )}
 
                   <div className="card-actions justify-end mt-4">
-                    <button className="btn btn-primary btn-sm">عرض المحتوى</button>
+                    <button className="btn btn-primary btn-sm">
+                      {child.type === "lecture" ? "مشاهدة المحاضرة" : "عرض المحتوى"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -249,11 +276,12 @@ const ContainerDetailsPage = () => {
           <h2 className="text-xl font-bold mb-4">جزء من:</h2>
           <div
             className="flex items-center gap-3 p-4 bg-base-200 rounded-lg cursor-pointer hover:bg-base-300 transition-colors"
-            onClick={() =>
-              navigate(
-                `/container-details/${typeof container.parent === "string" ? container.parent : container.parent._id || container.parent.id}`,
-              )
-            }
+            onClick={() => {
+              const parentId = typeof container.parent === "string" 
+                ? container.parent 
+                : container.parent._id || container.parent.id;
+              navigate(`/dashboard/lecturer-dashboard/container-details/${parentId}`);
+            }}
           >
             <div className="bg-primary/10 p-2 rounded-full">
               <BookOpen className="h-6 w-6 text-primary" />
