@@ -99,7 +99,22 @@ export const getAllLecturesPublic = async () => {
   }
 }
 
-// Add this to your lectures.js file or wherever your API functions are located
+export const createContainer = async (containerData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/containers`, containerData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating container:", error);
+    throw error;
+  }
+};
 
 export const getMyContainers = async () => {
   try {

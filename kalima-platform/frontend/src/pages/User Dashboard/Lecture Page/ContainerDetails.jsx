@@ -92,12 +92,6 @@ const ContainerDetailsPage = () => {
     }
   }, [containerId])
 
-  useEffect(() => {
-    if (container && container.type === "lecture") {
-      navigate(`/dashboard/lecture-page/${container._id || container.id}`)
-    }
-  }, [container, navigate])
-
   const handleChildClick = (child) => {
     // If the child is a lecture, navigate to the lecture page
     if (child.type === "lecture") {
@@ -107,6 +101,11 @@ const ContainerDetailsPage = () => {
       navigate(`/dashboard/lecturer-dashboard/container-details/${child._id || child.id}`)
     }
   }
+  useEffect(() => {
+    if (container && container.type === "lecture") {
+      navigate(`/dashboard/lecture-page/${container._id || container.id}`)
+    }
+  }, [container, navigate])
 
   // Get container type in Arabic
   const getContainerTypeArabic = (type) => {
@@ -158,6 +157,7 @@ const ContainerDetailsPage = () => {
   }
 
   // If the current container is a lecture, redirect to the lecture page
+  
 
   return (
     <div className="container mx-auto p-4" dir="rtl">
