@@ -67,6 +67,23 @@ export const getAllLecturesPublic = async () => {
   }
 }
 
+export const createContainer = async (containerData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/containers`, containerData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating container:", error);
+    throw error;
+  }
+};
+
 export const getMyContainers = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/containers/my-containers`, {

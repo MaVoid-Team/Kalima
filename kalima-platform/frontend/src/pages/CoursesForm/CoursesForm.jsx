@@ -13,8 +13,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { createContainer } from "../../routes/lectures";
+import { getAllSubjects } from "../../routes/courses";
+import { getAllLevels } from "../../routes/levels";
+import { getUserById } from "../../routes/fetch-users";
+import { getUserDashboard } from "../../routes/auth-services";
 
 const CurriculumSection = () => {
   const [expandedCards, setExpandedCards] = useState({
@@ -58,7 +62,9 @@ const CurriculumSection = () => {
           </h2>
           <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL ? "اضف حاوية لمحتوايات الكورس" : "Add Course Content Container"}
+              {isRTL
+                ? "اضف حاوية لمحتوايات الكورس"
+                : "Add Course Content Container"}
             </h3>
             <button
               className="btn btn-primary gap-2 w-full sm:w-auto"
@@ -272,12 +278,13 @@ const CurriculumSection = () => {
     </div>
   );
 };
+
 function CourseCreationForm() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   // Form state
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     courseName: "",
     teacherName: "",
     gradeLevel: "",
@@ -293,6 +300,147 @@ function CourseCreationForm() {
     privacy: "student",
   });
 
+  // Data fetching states
+  const [subjects, setSubjects] = useState([]);
+  const [levels, setLevels] = useState([
+    {
+      _id: "67d35903e4a0bacdc2ece37b",
+      name: "Primary",
+      createdAt: "2025-03-13T22:15:31.863Z",
+      updatedAt: "2025-03-13T22:15:31.863Z",
+      __v: 0,
+    },
+    {
+      _id: "67d3593ce4a0bacdc2ece37d",
+      name: "Middle",
+      createdAt: "2025-03-13T22:16:28.110Z",
+      updatedAt: "2025-03-13T22:16:28.110Z",
+      __v: 0,
+    },
+    {
+      _id: "67d35943e4a0bacdc2ece37f",
+      name: "Upper Primary",
+      createdAt: "2025-03-13T22:16:35.763Z",
+      updatedAt: "2025-03-13T22:16:35.763Z",
+      __v: 0,
+    },
+    {
+      _id: "67d3594de4a0bacdc2ece381",
+      name: "Higher Secondary",
+      createdAt: "2025-03-13T22:16:45.695Z",
+      updatedAt: "2025-03-13T22:16:45.695Z",
+      __v: 0,
+    },
+    {
+      _id: "67fe54c5f5fdde2732b443cf",
+      name: "Higher Secondary",
+      createdAt: "2025-04-15T12:44:53.246Z",
+      updatedAt: "2025-04-15T12:44:53.246Z",
+      __v: 0,
+    },
+    {
+      _id: "67fe6b488c398e57870e8e35",
+      name: "Fourth Elementary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e37",
+      name: "Second Primary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e38",
+      name: "Third Primary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e3a",
+      name: "Second Secondary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e39",
+      name: "First Secondary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e36",
+      name: "First Primary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+    {
+      _id: "67fe6b488c398e57870e8e3b",
+      name: "Third Secondary",
+      createdAt: "2025-04-15T14:20:56.231Z",
+      updatedAt: "2025-04-15T14:20:56.231Z",
+    },
+  ]);
+  const [teachers, setTeachers] = useState([]);
+  const [createdBy, setCreatedBy] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // File upload state
+  const [courseImage, setCourseImage] = useState(null);
+  const [courseVideo, setCourseVideo] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch all required data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch subjects
+        const subjectsResponse = await getAllSubjects();
+        setSubjects(subjectsResponse.data.subjects || []);
+        console.log(subjectsResponse.data.subjects);
+
+        // Fetch levels
+        const levelsResponse = await getAllLevels();
+        console.log(levelsResponse);
+        // setLevels(levelsResponse || []);
+
+        // Fetch user dashboard to get teacher info
+        const dashboardResponse = await getUserDashboard();
+        const userData = dashboardResponse.data;
+        console.log(userData);
+
+        // Set teacher data
+        if (userData && userData?.userInfo) {
+          setTeachers([
+            { _id: userData.userInfo.id, name: userData.userInfo.name },
+          ]);
+          setFormData((prev) => ({
+            ...prev,
+            teacherName: userData.userInfo.name,
+            teacher: userData.userInfo.id,
+          }));
+        }
+
+        // Fetch createdBy info
+        if (userData && userData?.userInfo) {
+          const userDetails = await getUserById(userData?.userInfo?.id);
+          console.log(userDetails.data);
+          setCreatedBy(userDetails.data._id);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message || "Failed to load data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -300,6 +448,104 @@ function CourseCreationForm() {
       [name]: type === "radio" ? (checked ? value : prev[name]) : value,
     }));
   };
+
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 1024 * 1024 * 1024) {
+      // 1GB limit
+      setCourseImage(file);
+    } else {
+      alert(
+        isRTL
+          ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت"
+          : "File size must be less than 1GB"
+      );
+    }
+  };
+
+  // Handle video upload
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 1024 * 1024 * 1024) {
+      // 1GB limit
+      setCourseVideo(file);
+    } else {
+      alert(
+        isRTL
+          ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت"
+          : "File size must be less than 1GB"
+      );
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Prepare the data in the required format
+      const containerData = {
+        name: formData.courseName,
+        type: "course",
+        level: formData.gradeLevel,
+        subject: formData.subject,
+        description: formData.description,
+        goal: formData.objectives
+          .split("\n")
+          .filter((line) => line.trim() !== ""),
+        price:
+          formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
+        teacher: formData.teacherName,
+        teacherAllowed: formData.privacy === "teacher",
+        duration: formData.duration,
+        accessType: formData.accessType,
+        createdBy: createdBy,
+      };
+
+      console.log("Submitting data:", containerData);
+
+      // Call the API
+      const response = await createContainer(containerData);
+
+      console.log("Course created successfully:", response);
+      alert(isRTL ? "تم إنشاء الكورس بنجاح" : "Course created successfully");
+    } catch (error) {
+      console.error("Error creating course:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء الكورس" : "Error creating course");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-error max-w-md mx-auto mt-8">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{error}</span>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -344,374 +590,398 @@ function CourseCreationForm() {
         </motion.div>
 
         {/* Main Form */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-base-100 rounded-xl shadow-md p-6"
-        >
-          {/* Basic Information Section */}
-          <div className="mb-8">
-            <h2 className="text-lg font-bold mb-6 text-primary">
-              {isRTL ? "البيانات الاساسية" : "Basic Information"}
-            </h2>
+        <form onSubmit={handleSubmit}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="bg-base-100 rounded-xl shadow-md p-6"
+          >
+            {/* Basic Information Section */}
+            <div className="mb-8">
+              <h2 className="text-lg font-bold mb-6 text-primary">
+                {isRTL ? "البيانات الاساسية" : "Basic Information"}
+              </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
-              {/* Left Column */}
-              <div className="space-y-6">
-                {/* Course Name */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "اسم الكورس" : "Course Name"}
-                  </label>
-                  <input
-                    type="text"
-                    name="courseName"
-                    value={formData.courseName}
-                    onChange={handleChange}
-                    placeholder={
-                      isRTL
-                        ? "مثل: دوره تقديم اللغة الإنجليزية"
-                        : "e.g., English Language Course"
-                    }
-                    className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
+                {/* Left Column */}
+                <div className="space-y-6">
+                  {/* Course Name */}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "اسم الكورس" : "Course Name"}
+                    </label>
+                    <input
+                      type="text"
+                      name="courseName"
+                      value={formData.courseName}
+                      onChange={handleChange}
+                      placeholder={
+                        isRTL
+                          ? "مثل: دوره تقديم اللغة الإنجليزية"
+                          : "e.g., English Language Course"
+                      }
+                      className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
+                      required
+                    />
+                  </div>
 
-                {/* Teacher Name */}
-                <div className="relative">
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "اسم المعلم" : "Teacher Name"}
-                  </label>
-                  <select
-                    name="teacherName"
-                    value={formData.teacherName}
-                    onChange={handleChange}
-                    className="w-full select select-bordered bg-base-200 appearance-none"
-                  >
-                    <option value="" disabled>
-                      {isRTL ? "مثل: بوسف عثمان" : "e.g., Youssef Othman"}
-                    </option>
-                    <option value="teacher1">Teacher 1</option>
-                    <option value="teacher2">Teacher 2</option>
-                  </select>
-                  <ChevronDown
-                    className={`h-4 w-4 absolute top-10 ${
-                      isRTL ? "left-3" : "right-3"
-                    } pointer-events-none`}
-                  />
-                </div>
+                  {/* Grade Level */}
+                  <div className="relative">
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "المرحلة الدراسية" : "Grade Level"}
+                    </label>
+                    <select
+                      name="gradeLevel"
+                      value={formData.gradeLevel}
+                      onChange={handleChange}
+                      className="w-full select select-bordered bg-base-200 appearance-none"
+                      required
+                    >
+                      <option value="" disabled>
+                        {isRTL ? "اختر المرحلة" : "Select Level"}
+                      </option>
+                      {levels.map((level) => (
+                        <option key={level._id} value={level._id}>
+                          {level.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      className={`h-4 w-4 absolute top-10 ${
+                        isRTL ? "left-3" : "right-3"
+                      } pointer-events-none`}
+                    />
+                  </div>
 
-                {/* Grade Level */}
-                <div className="relative">
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "المرحلة الدراسية" : "Grade Level"}
-                  </label>
-                  <select
-                    name="gradeLevel"
-                    value={formData.gradeLevel}
-                    onChange={handleChange}
-                    className="w-full select select-bordered bg-base-200 appearance-none"
-                  >
-                    <option value="" disabled>
-                      {isRTL
-                        ? "مثل: الصف الرابع الابتدائي"
-                        : "e.g., 4th Grade Elementary"}
-                    </option>
-                    <option value="elementary">Elementary</option>
-                    <option value="middle">Middle School</option>
-                    <option value="high">High School</option>
-                  </select>
-                  <ChevronDown
-                    className={`h-4 w-4 absolute top-10 ${
-                      isRTL ? "left-3" : "right-3"
-                    } pointer-events-none`}
-                  />
-                </div>
+                  {/* Subject */}
+                  <div className="relative">
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "المادة الدراسية" : "Subject"}
+                    </label>
+                    <select
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      className="w-full select select-bordered bg-base-200 appearance-none"
+                      required
+                    >
+                      <option value="" disabled>
+                        {isRTL ? "اختر المادة" : "Select Subject"}
+                      </option>
+                      {subjects.map((subject) => (
+                        <option key={subject._id} value={subject._id}>
+                          { subject.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      className={`h-4 w-4 absolute top-10 ${
+                        isRTL ? "left-3" : "right-3"
+                      } pointer-events-none`}
+                    />
+                  </div>
 
-                {/* Subject */}
-                <div className="relative">
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "المادة الدراسية" : "Subject"}
-                  </label>
-                  <select
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full select select-bordered bg-base-200 appearance-none"
-                  >
-                    <option value="" disabled>
-                      {isRTL
-                        ? "مثل: اللغة الإنجليزية"
-                        : "e.g., English Language"}
-                    </option>
-                    <option value="math">Mathematics</option>
-                    <option value="science">Science</option>
-                    <option value="english">English</option>
-                  </select>
-                  <ChevronDown
-                    className={`h-4 w-4 absolute top-10 ${
-                      isRTL ? "left-3" : "right-3"
-                    } pointer-events-none`}
-                  />
-                </div>
+                  {/* Duration */}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "مدة الكورس" : "Course Duration"}
+                    </label>
+                    <input
+                      type="text"
+                      name="duration"
+                      value={formData.duration}
+                      onChange={handleChange}
+                      placeholder={
+                        isRTL
+                          ? "مثل: عدد الأسبوع أو الساعات"
+                          : "e.g., Number of weeks or hours"
+                      }
+                      className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
+                    />
+                  </div>
+                  {/* Course Description */}
+                  <div className="mb-8">
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "وصف الكورس" : "Course Description"}
+                    </label>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder={
+                        isRTL
+                          ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة. تشمل الدورة قواعد اللغة الإنجليزية والمفردات، والعمل على استخدام اللغة في المواقف اليومية."
+                          : "e.g., The course aims to improve learners' English language skills in reading and speaking. The course includes English grammar, vocabulary, and practice using the language in daily situations."
+                      }
+                      rows="4"
+                      className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
+                    ></textarea>
+                  </div>
 
-                {/* Duration */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "مدة الكورس" : "Course Duration"}
-                  </label>
-                  <input
-                    type="text"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder={
-                      isRTL
-                        ? "مثل: عدد الأسبوع أو الساعات"
-                        : "e.g., Number of weeks or hours"
-                    }
-                    className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
-                  />
-                </div>
-                {/* Course Description */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "وصف الكورس" : "Course Description"}
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder={
-                      isRTL
-                        ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة. تشمل الدورة قواعد اللغة الإنجليزية والمفردات، والعمل على استخدام اللغة في المواقف اليومية."
-                        : "e.g., The course aims to improve learners' English language skills in reading and speaking. The course includes English grammar, vocabulary, and practice using the language in daily situations."
-                    }
-                    rows="4"
-                    className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
-                  ></textarea>
-                </div>
-
-                {/* Course Objectives */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium mb-1">
-                    {isRTL ? "اهداف الكورس" : "Course Objectives"}
-                  </label>
-                  <textarea
-                    name="objectives"
-                    value={formData.objectives}
-                    onChange={handleChange}
-                    placeholder={
-                      isRTL
-                        ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة، تعلم قواعد اللغة الأساسية، زيادة الثقة في استخدام اللغة الإنجليزية في الحياة اليومية."
-                        : "e.g., Improve reading, writing and speaking skills, learn basic grammar rules, increase confidence in using English in daily life."
-                    }
-                    rows="4"
-                    className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
-                  ></textarea>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-6">
-                {/* Course Image Upload */}
-                <div>
-                  <h2 className="block text-lg text-primary font-medium mb-2">
-                    {isRTL ? "صورة الكورس" : "Course Image"}
-                  </h2>
-                  <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center  h-48">
-                    <Image className="w-10 h-10 mb-2 text-primary" />
-                    <button className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
-                      {isRTL ? "اضف صورة" : "Add Image"}
-                    </button>
-                    <p className="text-xs text-base-content/50">
-                      {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
-                    </p>
+                  {/* Course Objectives */}
+                  <div className="mb-8">
+                    <label className="block text-sm font-medium mb-1">
+                      {isRTL ? "اهداف الكورس" : "Course Objectives"}
+                    </label>
+                    <textarea
+                      name="objectives"
+                      value={formData.objectives}
+                      onChange={handleChange}
+                      placeholder={
+                        isRTL
+                          ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة، تعلم قواعد اللغة الأساسية، زيادة الثقة في استخدام اللغة الإنجليزية في الحياة اليومية."
+                          : "e.g., Improve reading, writing and speaking skills, learn basic grammar rules, increase confidence in using English in daily life."
+                      }
+                      rows="4"
+                      className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
+                    ></textarea>
                   </div>
                 </div>
 
-                {/* Course Video Upload */}
-                <div>
-                  <h2 className="block text-lg text-primary font-medium mb-2">
-                    {isRTL ? "فيديو مقدمة الكورس" : "Course Introduction Video"}
-                  </h2>
-                  <div className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center  h-48">
-                    <Video className="w-10 h-10 mb-2 text-primary" />
-                    <button className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
-                      {isRTL ? "اضف فيديو" : "Add Video"}
-                    </button>
-                    <p className="text-xs text-base-content/50">
-                      {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Course Type and Pricing */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {/* Right Column */}
+                <div className="space-y-6">
+                  {/* Course Image Upload */}
                   <div>
                     <h2 className="block text-lg text-primary font-medium mb-2">
-                      {isRTL ? "نوع الكورس" : "Course Type"}
+                      {isRTL ? "صورة الكورس" : "Course Image"}
                     </h2>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="courseType"
-                          value="paid"
-                          checked={formData.courseType === "paid"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "مدفوع" : "Paid"}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="courseType"
-                          value="free"
-                          checked={formData.courseType === "free"}
-                          onChange={handleChange}
-                          className="radio radio-primary"
-                        />
-                        <span>{isRTL ? "مجاني" : "Free"}</span>
-                      </label>
-                    </div>
-
-                    {formData.courseType === "paid" && (
-                      <div className="mt-6 space-y-4 mb-6">
-                        <h2 className="block text-lg text-primary font-medium">
-                          {isRTL ? "سعر الكورس" : "Course Price"}
-                        </h2>
-                        {/* Full Course Price */}
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            {isRTL ? "الكورس كامل" : "Full Course"}
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              name="priceFull"
-                              value={formData.priceFull}
-                              onChange={handleChange}
-                              placeholder={
-                                isRTL ? "الكورس كامل" : "Full Course"
-                              }
-                              className="input input-bordered bg-base-200 flex-1"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Monthly Price */}
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            {isRTL ? "سعر الشهر" : "Monthly Price"}
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              name="priceMonthly"
-                              value={formData.priceMonthly}
-                              onChange={handleChange}
-                              placeholder={
-                                isRTL ? "سعر الشهر" : "Monthly Price"
-                              }
-                              className="input input-bordered bg-base-200 flex-1"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Session Price */}
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            {isRTL ? "سعر الحصة" : "Session Price"}
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              name="priceSession"
-                              value={formData.priceSession}
-                              onChange={handleChange}
-                              placeholder={
-                                isRTL ? "سعر الحصة" : "Session Price"
-                              }
-                              className="input input-bordered bg-base-200 flex-1"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                    <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
+                      <Image className="w-10 h-10 mb-2 text-primary" />
+                      <span className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
+                        {isRTL ? "اضف صورة" : "Add Image"}
+                      </span>
+                      <p className="text-xs text-base-content/50">
+                        {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {courseImage && (
+                      <p className="text-sm mt-2 text-center">
+                        {isRTL ? "تم اختيار: " : "Selected: "}
+                        {courseImage.name}
+                      </p>
                     )}
-                    {/* Access Validity */}
-                    <div className="mb-6">
-                      <h2 className="block text-primary text-lg font-medium mb-2">
-                        {isRTL ? "صلاحية الوصول" : "Access Validity"}
+                  </div>
+
+                  {/* Course Video Upload */}
+                  <div>
+                    <h2 className="block text-lg text-primary font-medium mb-2">
+                      {isRTL
+                        ? "فيديو مقدمة الكورس"
+                        : "Course Introduction Video"}
+                    </h2>
+                    <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
+                      <Video className="w-10 h-10 mb-2 text-primary" />
+                      <span className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
+                        {isRTL ? "اضف فيديو" : "Add Video"}
+                      </span>
+                      <p className="text-xs text-base-content/50">
+                        {isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}
+                      </p>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {courseVideo && (
+                      <p className="text-sm mt-2 text-center">
+                        {isRTL ? "تم اختيار: " : "Selected: "}
+                        {courseVideo.name}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Course Type and Pricing */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                      <h2 className="block text-lg text-primary font-medium mb-2">
+                        {isRTL ? "نوع الكورس" : "Course Type"}
                       </h2>
-                      <div className="flex gap-8  ">
+                      <div className="flex gap-4">
                         <label className="flex items-center gap-2">
                           <input
                             type="radio"
-                            name="accessType"
-                            value="both"
-                            checked={formData.accessType === "both"}
+                            name="courseType"
+                            value="paid"
+                            checked={formData.courseType === "paid"}
                             onChange={handleChange}
                             className="radio radio-primary"
                           />
-                          <span>
-                            {isRTL ? "التطبيق و المنصة" : "App and Platform"}
-                          </span>
+                          <span>{isRTL ? "مدفوع" : "Paid"}</span>
                         </label>
                         <label className="flex items-center gap-2">
                           <input
                             type="radio"
-                            name="accessType"
-                            value="app"
-                            checked={formData.accessType === "app"}
+                            name="courseType"
+                            value="free"
+                            checked={formData.courseType === "free"}
                             onChange={handleChange}
                             className="radio radio-primary"
                           />
-                          <span>{isRTL ? "التطبيق" : "App"}</span>
+                          <span>{isRTL ? "مجاني" : "Free"}</span>
                         </label>
                       </div>
-                    </div>
 
-                    {/* Course Privacy */}
-                    <div>
-                      <h2 className="block text-primary text-lg font-medium mb-3">
-                        {isRTL ? "خصوصية الكورس" : "Course Privacy"}
-                      </h2>
-                      <div className="flex gap-8 ">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name="privacy"
-                            value="student"
-                            checked={formData.privacy === "student"}
-                            onChange={handleChange}
-                            className="radio radio-primary"
-                          />
-                          <span>
-                            {isRTL ? "طالب / ولی امر" : "Student / Guardian"}
-                          </span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            name="privacy"
-                            value="teacher"
-                            checked={formData.privacy === "teacher"}
-                            onChange={handleChange}
-                            className="radio radio-primary"
-                          />
-                          <span>{isRTL ? "المعلم" : "Teacher"}</span>
-                        </label>
+                      {formData.courseType === "paid" && (
+                        <div className="mt-6 space-y-4 mb-6">
+                          <h2 className="block text-lg text-primary font-medium">
+                            {isRTL ? "سعر الكورس" : "Course Price"}
+                          </h2>
+                          {/* Full Course Price */}
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              {isRTL ? "الكورس كامل" : "Full Course"}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                name="priceFull"
+                                value={formData.priceFull}
+                                onChange={handleChange}
+                                placeholder={
+                                  isRTL ? "الكورس كامل" : "Full Course"
+                                }
+                                className="input input-bordered bg-base-200 flex-1"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Monthly Price */}
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              {isRTL ? "سعر الشهر" : "Monthly Price"}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                name="priceMonthly"
+                                value={formData.priceMonthly}
+                                onChange={handleChange}
+                                placeholder={
+                                  isRTL ? "سعر الشهر" : "Monthly Price"
+                                }
+                                className="input input-bordered bg-base-200 flex-1"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Session Price */}
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              {isRTL ? "سعر الحصة" : "Session Price"}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                name="priceSession"
+                                value={formData.priceSession}
+                                onChange={handleChange}
+                                placeholder={
+                                  isRTL ? "سعر الحصة" : "Session Price"
+                                }
+                                className="input input-bordered bg-base-200 flex-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {/* Access Validity */}
+                      <div className="mb-6">
+                        <h2 className="block text-primary text-lg font-medium mb-2">
+                          {isRTL ? "صلاحية الوصول" : "Access Validity"}
+                        </h2>
+                        <div className="flex gap-8  ">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="accessType"
+                              value="both"
+                              checked={formData.accessType === "both"}
+                              onChange={handleChange}
+                              className="radio radio-primary"
+                            />
+                            <span>
+                              {isRTL ? "التطبيق و المنصة" : "App and Platform"}
+                            </span>
+                          </label>
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="accessType"
+                              value="app"
+                              checked={formData.accessType === "app"}
+                              onChange={handleChange}
+                              className="radio radio-primary"
+                            />
+                            <span>{isRTL ? "التطبيق" : "App"}</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Course Privacy */}
+                      <div>
+                        <h2 className="block text-primary text-lg font-medium mb-3">
+                          {isRTL ? "خصوصية الكورس" : "Course Privacy"}
+                        </h2>
+                        <div className="flex gap-8 ">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="privacy"
+                              value="student"
+                              checked={formData.privacy === "student"}
+                              onChange={handleChange}
+                              className="radio radio-primary"
+                            />
+                            <span>
+                              {isRTL ? "طالب / ولی امر" : "Student / Guardian"}
+                            </span>
+                          </label>
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="privacy"
+                              value="teacher"
+                              checked={formData.privacy === "teacher"}
+                              onChange={handleChange}
+                              className="radio radio-primary"
+                            />
+                            <span>{isRTL ? "المعلم" : "Teacher"}</span>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center mt-8">
+              <button
+                type="submit"
+                className="btn btn-primary px-8 py-3 text-lg"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="loading loading-spinner"></span>
+                ) : isRTL ? (
+                  "إنشاء الكورس"
+                ) : (
+                  "Create Course"
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </form>
       </div>
     </div>
   );
