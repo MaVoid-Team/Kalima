@@ -90,3 +90,28 @@ exports.deleteAssistant = catchAsync(async (req, res, next) => {
         message: "Assistant deleted successfully.",
     });
 });
+
+// Get assistants by assigned lecturer
+exports.getAssistantsByLecturer = catchAsync(async (req, res, next) => {
+    const { lecturerId } = req.params;
+
+    if (!lecturerId) {
+        return next(new AppError("Lecturer ID is required.", 400));
+    }
+
+    const assistants = await Assistant.find({ assignedLecturer: lecturerId })
+        .populate("assignedLecturer", "name email")
+        .select("-password");
+
+    if (!assistants || assistants.length === 0) {
+        return next(new AppError("No assistants found for this lecturer.", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        results: assistants.length,
+        data: {
+            assistants
+        }
+    });
+});
