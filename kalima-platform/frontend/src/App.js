@@ -17,7 +17,6 @@ const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/audit
 const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
 const CourseDetails = lazy(() => import("./pages/CourseDetails"))
 const LecturesPage = lazy(() => import("./pages/lectures"))
-// const CivilcoLanding = lazy(() => import("./pages/landing"))
 const TeacherLogin = lazy(() => import("./pages/Login/login"))
 const Footer = lazy(() => import("./components/footer"))
 const CoursesPage = lazy(() => import("./pages/courses"))
@@ -25,12 +24,12 @@ const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"))
 const Teachers = lazy(() => import("./pages/Teachers"))
 const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details"))
 const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
-const LectureList = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
-const ContainerDetailsPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
 const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
+const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
+const WatchLecture = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
@@ -102,9 +101,10 @@ function App() {
 
 
             {/* User Dashboard Routes */}
-            <Route path="/dashboard/lecture-page" element={<LecturePage />} />
-            <Route path="/dashboard/lecture-page/:lectureId" element={<LecturePage />} />
+            <Route path="/dashboard/student-dashboard/lecture-page" element={<LecturePage />} />
             <Route path="/dashboard/student-dashboard/promo-codes" element={<PromoCodes />} />
+            <Route path="/dashboard/student-dashboard/container-details/:containerId" element={<ContainerDetails />} />
+            <Route path="/dashboard/student-dashboard/lecture-page/:lectureId" element={<WatchLecture />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
@@ -116,12 +116,13 @@ function App() {
             
             {/* Lecturer Routes */}
             <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard/lecturer-dashboard/lecture-page" element={<LecturePage />} />
+            <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
+            <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetails />} />
+            <Route path="/dashboard/lecturer-dashboard/lecture-page/:lectureId" element={<WatchLecture />} />
             <Route path="/dashboard/coursesdashboard" element={<CoursesDashboard />} />
-            <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetailsPage />} />
-            <Route path="/dashboard/container-details/:containerId/lecture-page/:lectureId" element={<LecturePage />} />
             <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
-            <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
           </Routes>
         </Suspense>
       </div>

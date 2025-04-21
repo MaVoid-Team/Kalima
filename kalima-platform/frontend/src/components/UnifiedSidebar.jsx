@@ -110,25 +110,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/admin-dashboard' 
       },
       { 
-        id: 'lecturer-dashboard', 
-        title: t('lecturerDashboard') || 'Lecturer Dashboard', 
-        icon: <FaUserTie className="w-5 h-5" />, 
-        path: '/dashboard/lecturer-dashboard' 
-      },
-      { 
-        id: 'assistant-dashboard', 
-        title: t('assistantDashboard') || 'Assistant Dashboard', 
-        icon: <FaUserAlt className="w-5 h-5" />, 
-        path: '/dashboard/assistant-page' 
-      },
-      { 
-        id: 'student-dashboard', 
-        title: t('studentDashboard') || 'Student Dashboard', 
-        icon: <FaUserGraduate className="w-5 h-5" />, 
-        path: '/dashboard/student-dashboard/promo-codes',
-        comment: 'TODO: Configure student dashboard path'
-      },
-      { 
         id: 'audit-log', 
         title: t('auditLog') || 'Audit Log', 
         icon: <MdDashboard className="w-5 h-5" />, 
@@ -148,7 +129,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: 'lectures', 
         title: t('lectures') || 'Lectures', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/lecture-page'
+        path: '/dashboard/lecturer-dashboard/lecture-page'
       },
     ];
 
@@ -164,7 +145,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: 'courses', 
         title: t('courses') || 'Courses', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/lecture-page' 
+        path: '/dashboard/assistant-dashboard/lecture-page' 
       },
     ];
 
@@ -180,7 +161,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         id: 'courses', 
         title: t('courses') || 'Courses', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/lecture-page' 
+        path: '/dashboard/student-dashboard/lecture-page' 
       },
     ];
 

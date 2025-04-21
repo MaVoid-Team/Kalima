@@ -108,24 +108,25 @@ export const loginUser = async (credentials) => {
 export const logoutUser = async () => {
   try {
     const token = getToken();
-    
+
     if (token) {
-      await handleRequest("post", "/api/v1/logout");
+      // Make a POST request to logout endpoint (no credentials needed)
+      await handleRequest("post", "/api/v1/auth/logout");
     }
-    
+
     // Clear all auth-related data
     clearAuthData();
-    
+
     return { success: true };
   } catch (error) {
     console.error("Logout error:", error);
-    
+
     // Still clear local data even if server logout fails
     clearAuthData();
-    
-    return { 
-      success: false, 
-      error: "Logout process encountered an error, but local session was cleared" 
+
+    return {
+      success: false,
+      error: "Logout failed on server, but local session was cleared",
     };
   }
 };

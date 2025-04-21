@@ -13,7 +13,6 @@ export const getAllContainers = async () => {
         Authorization: `Bearer ${getToken()}`,
       },
     })
-
     return response.data
   } catch (error) {
     console.error("Error fetching containers:", error)
@@ -35,7 +34,27 @@ export const getAllContainersPublic = async () => {
     throw error
   }
 }
-
+//Function to purchase a container
+export const purchaseContainer = async (containerId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/purchases/container`, 
+      { containerId }, // Send containerId in the request body
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    console.log("Purchase container response:", response);
+    return response;
+    
+  } catch (error) {
+    console.error(`Error purchasing container ${containerId}:`, error)
+    throw error;
+  }
+}
 // Function to get a container by ID
 export const getContainerById = async (containerId) => {
   try {
