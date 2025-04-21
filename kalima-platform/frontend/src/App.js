@@ -8,6 +8,8 @@ import { isMobile } from "./utils/isMobile"
 import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
 import UnifiedSidebar from "./components/UnifiedSidebar"
 import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
+import PackagesPage from "./pages/Packages Page/packagesPage"
+import PackageDetails from "./pages/Packages Page/packageDetails"
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
@@ -93,6 +95,8 @@ function App() {
             <Route path="/lectures/:lectureId" element={<LecturePage />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
+            <Route path="package-details/:packageId" element={<PackageDetails />} />
+            <Route path="/packages" element={<PackagesPage />} />
             {/* <Route path="/packages" element={<PackagesPage />} />
             <Route path="/package-details/:packageId" element={<PackageDetails />} /> */}
 
