@@ -17,11 +17,11 @@ export const getCenterTimetable = async (centerId) => {
     }
 
     const response = await axios.get(`${API_URL}/api/v1/centers/${centerId}/timetable`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
     });
 
     // Check if the response has the expected structure
