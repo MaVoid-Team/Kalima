@@ -1,114 +1,37 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, Link, useNavigate } from "react-router-dom"
-import { getLectureAttachments} from "../../../routes/lectures"
-import { getUserDashboard } from "../../../routes/auth-services"
-import { FileText, Download, Image, File } from 'lucide-react'
+import { useParams, useNavigate } from "react-router-dom"
+import { getLectureById } from "../../../routes/lectures"
 
-const WatchLecture = () => {
+const LectureDisplay = () => {
   const { lectureId } = useParams()
   const navigate = useNavigate()
   const [lecture, setLecture] = useState(null)
-  const [attachments, setAttachments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [userRole, setUserRole] = useState(null)
-  const [hasAccess, setHasAccess] = useState(false)
 
-  // Extract video ID from YouTube URL
-  const getYouTubeVideoId = (url) => {
-    if (!url) return null
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-    const match = url?.match(regExp)
-    return match && match[2].length === 11 ? match[2] : null
-  }
-
-  // Handle file download
-  const handleDownload = (fileUrl, fileName) => {
-    const link = document.createElement('a')
-    link.href = fileUrl
-    link.target = '_blank'
-    link.download = fileName || 'download'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
-  // Get file icon based on type
-  const getFileIcon = (fileType) => {
-    if (!fileType) return <File className="h-5 w-5" />
-    if (fileType.includes('pdf')) return <FileText className="h-5 w-5" />
-    if (fileType.includes('image')) return <Image className="h-5 w-5" />
-    return <File className="h-5 w-5" />
-  }
-
-  // Fetch lecture data and verify access
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchLecture = async () => {
       try {
         setLoading(true)
-        
-        // First get user info and verify access
-        const userResult = await getUserDashboard()
-        if (!userResult.success) {
-          throw new Error("Failed to verify user access")
-        }
+        const result = await getLectureById(lectureId)
 
-        const { userInfo, purchaseHistory = [] } = userResult.data.data
-        setUserRole(userInfo.role)
-
-        // Get lecture attachments
-        const attachmentsResult = await getLectureAttachments(lectureId)
-        if (!attachmentsResult.success) {
-          throw new Error("Failed to load lecture data")
-        }
-        
-        const lectureData = attachmentsResult.data.lecture
-        setLecture(lectureData)
-
-        // Combine all attachments into one array
-        const allAttachments = [
-          ...(attachmentsResult.data.booklets || []),
-          ...(attachmentsResult.data.exams || []),
-          ...(attachmentsResult.data.homeworks || []),
-          ...(attachmentsResult.data.pdfsandimages || [])
-        ]
-        setAttachments(allAttachments)
-
-        // Verify access
-        if (userInfo.role === 'Lecturer') {
-          // Lecturers can access their own lectures
-          const isOwner = lectureData.createdBy?._id === userInfo.id
-          if (!isOwner) {
-            throw new Error("You don't have access to this lecture")
-          }
-          setHasAccess(true)
+        if (result.success) {
+          setLecture(result.data.container)
         } else {
-          // Students can access purchased lectures
-          const hasPurchased = purchaseHistory.some(
-            p => (p.type === 'containerPurchase' || p.type === 'lecturePurchase') && 
-                 (p.container?._id === lectureId || p.lecture?._id === lectureId)
-          )
-          if (!hasPurchased) {
-            throw new Error("You don't have access to this lecture")
-          }
-          setHasAccess(true)
+          setError(result.error || "Failed to load lecture")
         }
-
       } catch (err) {
-        setError(err.message || "Failed to load lecture data")
+        setError("Failed to load lecture. Please try again later.")
         console.error("Error:", err)
-        navigate(userRole === 'Lecturer' 
-          ? "/dashboard/lecturer-dashboard" 
-          : "/dashboard/student-dashboard/promo-codes")
       } finally {
         setLoading(false)
       }
     }
 
-    fetchData()
-  }, [lectureId, navigate])
+    fetchLecture()
+  }, [lectureId])
 
   if (loading) {
     return (
@@ -141,113 +64,132 @@ const WatchLecture = () => {
     )
   }
 
-  if (!lecture || !hasAccess) {
+  if (!lecture) {
     return (
       <div className="flex justify-center items-center min-h-screen p-4">
-        <div className="alert alert-warning">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <div className="alert alert-info">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
           </svg>
-          <span>لا تملك صلاحية الوصول إلى هذه المحاضرة</span>
+          <span>لا توجد محاضرة متاحة.</span>
         </div>
       </div>
     )
   }
 
-  const videoId = lecture.videoLink ? getYouTubeVideoId(lecture.videoLink) : null
+  // Extract YouTube embed ID from video link
+  const getYouTubeEmbedId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  const youtubeEmbedId = getYouTubeEmbedId(lecture.videoLink)
+
+  // Render attachments with view and download links
+  const renderAttachments = (attachmentType, attachments) => {
+    if (!attachments || attachments.length === 0) return null
+
+    return (
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">{attachmentType}</h3>
+        <ul className="list-disc pl-5">
+          {attachments.map((attachment, index) => (
+            <li key={index} className="mt-2">
+              <div className="flex gap-4">
+                <a
+                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  عرض المرفق {index + 1}
+                </a>
+                <a
+                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  download
+                  className="text-green-600 hover:underline"
+                >
+                  تحميل
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto p-4 pb-20" dir="rtl">
-      {/* Back Button */}
-      <div className="mb-4">
-        <Link
-          to={userRole === 'Lecturer'
-            ? "/dashboard/lecturer-dashboard"
-            : "/dashboard/student-dashboard/promo-codes"}
-          className="btn btn-sm btn-outline"
-        >
-          العودة
-        </Link>
-      </div>
-
-      {/* Lecture Title */}
-      <h1 className="text-2xl font-bold mb-4">{lecture.name}</h1>
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {lecture.subject?.name && (
-          <div className="badge badge-primary">{lecture.subject.name}</div>
-        )}
-        {lecture.level?.name && (
-          <div className="badge badge-secondary">{lecture.level.name}</div>
-        )}
-        {lecture.lecture_type && (
-          <div className="badge badge-accent">{lecture.lecture_type}</div>
-        )}
-      </div>
+    <div className="container mx-auto p-4" dir="rtl">
+      <button
+        onClick={() => navigate(-1)}
+        className="btn btn-outline mb-4"
+      >
+        رجوع
+      </button>
+      <h1 className="text-3xl font-bold mb-6">{lecture.name}</h1>
 
       {/* Video Embed */}
-      {videoId && (
-        <div className="mb-6 rounded-lg overflow-hidden">
-          <div className="aspect-w-16 aspect-h-9">
-            <iframe
-              className="w-full h-48 md:h-64 lg:h-80"
-              src={`https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0`}
-              title={lecture.name}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      )}
-
-      {/* Description */}
-      {lecture.description && (
-        <div className="mb-6 bg-base-200 p-4 rounded-lg">
-          <h2 className="text-xl font-bold mb-2">الوصف</h2>
-          <p className="text-gray-700">{lecture.description}</p>
-        </div>
-      )}
-
-      {/* Attachments */}
-      {attachments.length > 0 ? (
+      {youtubeEmbedId ? (
         <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">المرفقات</h2>
-          <div className="space-y-3">
-            {attachments.map((file, index) => (
-              <div key={index} className="card bg-base-100 shadow-sm">
-                <div className="card-body p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {getFileIcon(file.fileType)}
-                      <span className="text-sm font-medium line-clamp-1">
-                        {file.fileName || `ملف ${index + 1}`}
-                      </span>
-                    </div>
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => handleDownload(file.filePath, file.fileName)}
-                    >
-                      <Download className="h-4 w-4" />
-                      <span className="mr-1">فتح</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <iframe
+            width="100%"
+            height="400"
+            src={`https://www.youtube.com/embed/${youtubeEmbedId}`}
+            title={lecture.name}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="rounded-lg"
+          ></iframe>
         </div>
       ) : (
-        <div className="alert alert-info">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>لا توجد مرفقات متاحة لهذه المحاضرة</span>
+        <div className="alert alert-warning mb-6">
+          <span>لا يوجد رابط فيديو صالح متاح.</span>
         </div>
       )}
+
+      {/* Lecture Details */}
+      <div className="card bg-base-100 shadow-xl mb-6">
+        <div className="card-body">
+          <h2 className="card-title">تفاصيل المحاضرة</h2>
+          <p><strong>الوصف:</strong> {lecture.description || "لا يوجد وصف"}</p>
+          <p><strong>السعر:</strong> {lecture.price} نقاط</p>
+          <p><strong>النوع:</strong> {lecture.lecture_type}</p>
+          <p><strong>عدد المشاهدات:</strong> {lecture.numberOfViews}</p>
+          <p><strong>أنشأها:</strong> {lecture.createdBy?.name || "غير محدد"}</p>
+        </div>
+      </div>
+
+      {/* Attachments */}
+      <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+          <h2 className="card-title">المرفقات</h2>
+          {renderAttachments("الامتحانات", lecture.attachments.exams)}
+          {renderAttachments("الكتيبات", lecture.attachments.booklets)}
+          {renderAttachments("الواجبات", lecture.attachments.homeworks)}
+          {renderAttachments("ملفات PDF وصور", lecture.attachments.pdfsandimages)}
+          {(lecture.attachments.exams.length === 0 &&
+            lecture.attachments.booklets.length === 0 &&
+            lecture.attachments.homeworks.length === 0 &&
+            lecture.attachments.pdfsandimages.length === 0) && (
+            <p>لا توجد مرفقات متاحة.</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
-export default WatchLecture
+export default LectureDisplay

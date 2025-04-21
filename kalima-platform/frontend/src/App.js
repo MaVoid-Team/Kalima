@@ -8,8 +8,7 @@ import { isMobile } from "./utils/isMobile"
 import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
 import UnifiedSidebar from "./components/UnifiedSidebar"
 import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
-import PackagesPage from "./pages/Packages Page/packagesPage"
-import PackageDetails from "./pages/Packages Page/packageDetails"
+
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
@@ -27,16 +26,16 @@ const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
-const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
+// const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
+const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
-const WatchLecture = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
+const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
 const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
-// const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
-// const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
+const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
+const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
 const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
-const DashboardsForAdmins = lazy(() => import("./pages/User Dashboard/Admin dashboard/Dashboards/DashboardsForAdmin"))
 
 function App() {
   const location = useLocation()
@@ -78,7 +77,6 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            {/* <Route path="/landing" element={<CivilcoLanding />} /> */}
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/services" element={<Services />} />
@@ -91,20 +89,20 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:courseId" element={<CourseDetails />} />
             <Route path="/lectures" element={<LecturesPage />} />
-            <Route path="/lectures/:lectureId" element={<LecturePage />} />
+            {/* <Route path="/lectures/:lectureId" element={<LecturePage />} /> */}
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
             <Route path="package-details/:packageId" element={<PackageDetails />} />
             <Route path="/packages" element={<PackagesPage />} />
-            {/* <Route path="/packages" element={<PackagesPage />} />
-            <Route path="/package-details/:packageId" element={<PackageDetails />} /> */}
+            <Route path="/packages" element={<PackagesPage />} /> 
+            <Route path="/package-details/:packageId" element={<PackageDetails />} />
 
 
             {/* User Dashboard Routes */}
-            <Route path="/dashboard/student-dashboard/lecture-page" element={<LecturePage />} />
+            <Route path="/dashboard/student-dashboard/lecture-page" element={<ContainersPage />} />
             <Route path="/dashboard/student-dashboard/promo-codes" element={<PromoCodes />} />
             <Route path="/dashboard/student-dashboard/container-details/:containerId" element={<ContainerDetails />} />
-            <Route path="/dashboard/student-dashboard/lecture-page/:lectureId" element={<WatchLecture />} />
+            <Route path="/dashboard/student-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
@@ -112,16 +110,14 @@ function App() {
             {/* Admin Routes */}
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
-            <Route path="/dashboard/dashboards-for-admins" element={<DashboardsForAdmins />} />
             
             {/* Lecturer Routes */}
             <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
-            <Route path="/dashboard/lecturer-dashboard/lecture-page" element={<LecturePage />} />
+            <Route path="/dashboard/lecturer-dashboard/lecture-page" element={<ContainersPage />} />
             <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
             <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetails />} />
-            <Route path="/dashboard/lecturer-dashboard/lecture-page/:lectureId" element={<WatchLecture />} />
+            <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
             <Route path="/dashboard/coursesdashboard" element={<CoursesDashboard />} />
-            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
           </Routes>
         </Suspense>

@@ -25,10 +25,14 @@ const ContainersPage = () => {
             // For lecturers: show all their containers
             setContainers(containers)
           } else {
-            // For students: show purchased containers
+            // For students: show unique purchased containers
             const purchasedContainers = purchaseHistory
-              .filter(p => p.type === 'containerPurchase')
+              .filter(p => p.type === 'containerPurchase' && p.container)
               .map(p => p.container)
+              // Remove duplicates based on container._id
+              .filter((container, index, self) =>
+                index === self.findIndex(c => c._id === container._id)
+              )
             
             setContainers(purchasedContainers)
           }
