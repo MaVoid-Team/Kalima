@@ -14,270 +14,11 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { createContainer } from "../../routes/lectures";
+import { createContainer, createLecture } from "../../routes/lectures";
 import { getAllSubjects } from "../../routes/courses";
 import { getAllLevels } from "../../routes/levels";
 import { getUserById } from "../../routes/fetch-users";
 import { getUserDashboard } from "../../routes/auth-services";
-
-const CurriculumSection = () => {
-  const [expandedCards, setExpandedCards] = useState({
-    curriculum1: false,
-    curriculum2: false,
-    curriculum3: false,
-  });
-  const [expandedMonths, setExpandedMonths] = useState({
-    card1: null,
-    card2: null,
-    card3: null,
-  });
-
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === "ar";
-
-  const toggleCard = (card) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [card]: !prev[card],
-    }));
-  };
-
-  const toggleMonth = (card, month) => {
-    setExpandedMonths((prev) => ({
-      ...prev,
-      [card]: prev[card] === month ? null : month,
-    }));
-  };
-
-  return (
-    <div className="flex justify-center w-full px-4 sm:px-6 lg:px-8">
-      <div
-        className="bg-base-100 p-4 sm:p-6 rounded-lg shadow-sm w-full max-w-4xl space-y-6"
-        dir={isRTL ? "rtl" : "ltr"}
-      >
-        {/* First Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "المنهج الدراسي" : "Curriculum"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL
-                ? "اضف حاوية لمحتوايات الكورس"
-                : "Add Course Content Container"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum1")}
-            >
-              {isRTL ? "اضف حاوية" : "Add to Container"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum1 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "حاوية الترم الاول" : "First Term Container"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {[1, 2, 3, 4].map((month) => (
-                  <li
-                    key={`card1-${month}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card1", month)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `الشهر ${
-                              month === 1
-                                ? "الاول"
-                                : month === 2
-                                ? "الثاني"
-                                : month === 3
-                                ? "الثالث"
-                                : "الرابع"
-                            }`
-                          : `Month ${month}`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card1 === month ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card1 === month && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
-                        <p className="text-xs sm:text-sm text-base-content/70">
-                          {isRTL ? "محتويات الشهر..." : "Month contents..."}
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Second Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "الملحقات" : "Attachments"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL ? "اضف ملحقات الكورس" : "Add Course Attachments"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum2")}
-            >
-              {isRTL ? "اضف ملحق" : "Add Attachment"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum2 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "ملحقات الكورس" : "Course Attachments"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {["PDF", "Video", "Audio", "Document"].map((type, index) => (
-                  <li
-                    key={`card2-${index}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card2", index)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `ملحق ${index + 1} (${type})`
-                          : `Attachment ${index + 1} (${type})`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card2 === index ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card2 === index && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
-                        <p className="text-xs sm:text-sm text-base-content/70">
-                          {isRTL ? "تفاصيل المرفق..." : "Attachment details..."}
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Third Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "الامتحانات" : "Exams"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL ? "اضف امتحانات الكورس" : "Add Course Exams"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum3")}
-            >
-              {isRTL ? "اضف امتحان" : "Add Exam"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum3 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "امتحانات الكورس" : "Course Exams"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {["Midterm", "Final", "Quiz 1", "Quiz 2"].map((exam, index) => (
-                  <li
-                    key={`card3-${index}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card3", index)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `امتحان ${index + 1} (${exam})`
-                          : `Exam ${index + 1} (${exam})`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card3 === index ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card3 === index && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
-                        <p className="text-xs sm:text-sm text-base-content/70">
-                          {isRTL ? "تفاصيل الامتحان..." : "Exam details..."}
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation();
@@ -391,6 +132,16 @@ function CourseCreationForm() {
   const [courseVideo, setCourseVideo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Lecture creation state
+  const [containerId, setContainerId] = useState(null);
+  const [monthLectures, setMonthLectures] = useState({
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+  });
+  const [newLectureLink, setNewLectureLink] = useState("");
+
   // Fetch all required data on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -402,21 +153,16 @@ function CourseCreationForm() {
         setSubjects(subjectsResponse.data.subjects || []);
         console.log(subjectsResponse.data.subjects);
 
-        // Fetch levels
-        const levelsResponse = await getAllLevels();
-        console.log(levelsResponse);
-        // setLevels(levelsResponse || []);
-
         // Fetch user dashboard to get teacher info
         const dashboardResponse = await getUserDashboard();
         const userData = dashboardResponse.data;
-        console.log(userData);
+        const userId = userData?.data?.userInfo?.id;
+        console.log(userData?.data?.userInfo?.id);
+        setCreatedBy(userData?.data?.userInfo?.id);
 
         // Set teacher data
         if (userData && userData?.userInfo) {
-          setTeachers([
-            { _id: userData.userInfo.id, name: userData.userInfo.name },
-          ]);
+          setTeachers([{ _id: userId, name: userData.data.userInfo.name }]);
           setFormData((prev) => ({
             ...prev,
             teacherName: userData.userInfo.name,
@@ -424,12 +170,7 @@ function CourseCreationForm() {
           }));
         }
 
-        // Fetch createdBy info
-        if (userData && userData?.userInfo) {
-          const userDetails = await getUserById(userData?.userInfo?.id);
-          console.log(userDetails.data);
-          setCreatedBy(userDetails.data._id);
-        }
+        
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err.message || "Failed to load data");
@@ -447,6 +188,68 @@ function CourseCreationForm() {
       ...prev,
       [name]: type === "radio" ? (checked ? value : prev[name]) : value,
     }));
+  };
+
+  const handleAddLecture = (month) => {
+    if (!newLectureLink.trim()) return;
+
+    setMonthLectures((prev) => ({
+      ...prev,
+      [month]: [
+        ...prev[month],
+        {
+          videoLink: newLectureLink,
+          description: `Lecture ${prev[month].length + 1} for month ${month}`,
+        },
+      ],
+    }));
+
+    setNewLectureLink("");
+  };
+
+  const handleSubmitLectures = async () => {
+    setIsSubmitting(true);
+    try {
+      // Submit lectures for all months
+      for (const month in monthLectures) {
+        for (const lecture of monthLectures[month]) {
+          const lectureData = {
+            name: `${formData.courseName} - Month ${month}`,
+            type: "lecture",
+            lecture_type: "Regular",
+            createdBy: createdBy,
+            level: formData.gradeLevel,
+            teacherAllowed: true,
+            subject: formData.subject,
+            parent: containerId,
+            price:
+              formData.courseType === "paid"
+                ? Number(formData.priceFull) || 0
+                : 0,
+            description: lecture.description,
+            numberOfViews: 0,
+            videoLink: lecture.videoLink,
+            examLink: lecture.examLink || "", // default empty if not provided
+          };
+          console.log(lectureData);
+          await createLecture(lectureData);
+        }
+      }
+
+      alert(isRTL ? "تم إضافة المحاضرات بنجاح" : "Lectures added successfully");
+      // Reset form after successful submission
+      setMonthLectures({
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+      });
+    } catch (error) {
+      console.error("Error submitting lectures:", error);
+      alert(isRTL ? "حدث خطأ أثناء إضافة المحاضرات" : "Error adding lectures");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle image upload
@@ -505,8 +308,9 @@ function CourseCreationForm() {
 
       console.log("Submitting data:", containerData);
 
-      // Call the API
+      // Call the API to create container first
       const response = await createContainer(containerData);
+      setContainerId(response.data.container.id); // Save container ID for lecture creation
 
       console.log("Course created successfully:", response);
       alert(isRTL ? "تم إنشاء الكورس بنجاح" : "Course created successfully");
@@ -671,7 +475,7 @@ function CourseCreationForm() {
                       </option>
                       {subjects.map((subject) => (
                         <option key={subject._id} value={subject._id}>
-                          { subject.name}
+                          {subject.name}
                         </option>
                       ))}
                     </select>
@@ -982,16 +786,374 @@ function CourseCreationForm() {
             </div>
           </motion.div>
         </form>
+
+        {/* Curriculum Section - Added after the main form */}
+        <div className="mt-12">
+          <CurriculumSection
+            courseData={{
+              courseName: formData.courseName,
+              createdBy: createdBy,
+              gradeLevel: formData.gradeLevel,
+              subject: formData.subject,
+              privacy: formData.privacy,
+              priceFull: formData.priceFull,
+              _id: containerId,
+            }}
+            monthLectures={monthLectures}
+            setMonthLectures={setMonthLectures}
+            newLectureLink={newLectureLink}
+            setNewLectureLink={setNewLectureLink}
+            handleAddLecture={handleAddLecture}
+            handleSubmitLectures={handleSubmitLectures}
+            isSubmitting={isSubmitting}
+            isRTL={isRTL}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
+const CurriculumSection = ({
+  courseData,
+  monthLectures,
+  setMonthLectures,
+  newLectureLink,
+  setNewLectureLink,
+  handleAddLecture,
+  handleSubmitLectures,
+  isSubmitting,
+  isRTL,
+}) => {
+  const [expandedCards, setExpandedCards] = useState({
+    curriculum1: false,
+    curriculum2: false,
+    curriculum3: false,
+  });
+  const [expandedMonths, setExpandedMonths] = useState({
+    card1: null,
+    card2: null,
+    card3: null,
+  });
+
+  const toggleCard = (card) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [card]: !prev[card],
+    }));
+  };
+
+  const toggleMonth = (card, month) => {
+    setExpandedMonths((prev) => ({
+      ...prev,
+      [card]: prev[card] === month ? null : month,
+    }));
+  };
+
+  return (
+    <div className="flex justify-center w-full px-4 sm:px-6 lg:px-8">
+      <div
+        className="bg-base-100 p-4 sm:p-6 rounded-lg shadow-sm w-full max-w-4xl space-y-6"
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        {/* First Curriculum Card */}
+        <div className="space-y-4">
+          <h2 className="text-center text-lg font-semibold text-primary">
+            {isRTL ? "المنهج الدراسي" : "Curriculum"}
+          </h2>
+          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
+              {isRTL
+                ? "اضف حاوية لمحتوايات الكورس"
+                : "Add Course Content Container"}
+            </h3>
+            <button
+              className="btn btn-primary gap-2 w-full sm:w-auto"
+              onClick={() => toggleCard("curriculum1")}
+            >
+              {isRTL ? "اضف حاوية" : "Add to Container"}
+              <PlusCircle className="w-4 h-4" />
+            </button>
+          </div>
+
+          {expandedCards.curriculum1 && (
+            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <h4 className="font-medium text-base-content text-center sm:text-start">
+                  {isRTL ? "حاوية الترم الاول" : "First Term Container"}
+                </h4>
+                <div className="flex gap-2">
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Edit2 className="w-4 h-4 text-primary" />
+                  </button>
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Trash2 className="w-4 h-4 text-error" />
+                  </button>
+                </div>
+              </div>
+
+              <ul className="space-y-2">
+                {[1, 2, 3, 4].map((month) => (
+                  <li
+                    key={`card1-${month}`}
+                    className="bg-base-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
+                      onClick={() => toggleMonth("card1", month)}
+                    >
+                      <span className="text-sm sm:text-base text-base-content/80">
+                        {isRTL
+                          ? `الشهر ${
+                              month === 1
+                                ? "الاول"
+                                : month === 2
+                                ? "الثاني"
+                                : month === 3
+                                ? "الثالث"
+                                : "الرابع"
+                            }`
+                          : `Month ${month}`}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          expandedMonths.card1 === month ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+
+                    {expandedMonths.card1 === month && (
+                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300 space-y-3">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newLectureLink}
+                            onChange={(e) => setNewLectureLink(e.target.value)}
+                            placeholder={
+                              isRTL ? "رابط المحاضرة" : "Lecture link"
+                            }
+                            className="input input-bordered flex-1"
+                          />
+                          <button
+                            onClick={() => handleAddLecture(month)}
+                            className="btn btn-primary"
+                          >
+                            {isRTL ? "إضافة" : "Add"}
+                          </button>
+                        </div>
+
+                        {monthLectures[month].length > 0 && (
+                          <div className="space-y-2">
+                            <h5 className="text-sm font-medium">
+                              {isRTL ? "المحاضرات المضافة" : "Added lectures"}
+                            </h5>
+                            <ul className="space-y-1">
+                              {monthLectures[month].map((lecture, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-center justify-between"
+                                >
+                                  <span className="text-sm truncate max-w-xs">
+                                    {lecture.videoLink}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      setMonthLectures((prev) => ({
+                                        ...prev,
+                                        [month]: prev[month].filter(
+                                          (_, i) => i !== idx
+                                        ),
+                                      }))
+                                    }
+                                    className="btn btn-ghost btn-xs"
+                                  >
+                                    <Trash2 className="w-3 h-3 text-error" />
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Submit button for all lectures */}
+              {(monthLectures[1].length > 0 ||
+                monthLectures[2].length > 0 ||
+                monthLectures[3].length > 0 ||
+                monthLectures[4].length > 0) && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={handleSubmitLectures}
+                    disabled={isSubmitting}
+                    className="btn btn-primary"
+                  >
+                    {isSubmitting ? (
+                      <span className="loading loading-spinner"></span>
+                    ) : isRTL ? (
+                      "حفظ المحاضرات"
+                    ) : (
+                      "Save Lectures"
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Second Curriculum Card */}
+        <div className="space-y-4">
+          <h2 className="text-center text-lg font-semibold text-primary">
+            {isRTL ? "الملحقات" : "Attachments"}
+          </h2>
+          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
+              {isRTL ? "اضف ملحقات الكورس" : "Add Course Attachments"}
+            </h3>
+            <button
+              className="btn btn-primary gap-2 w-full sm:w-auto"
+              onClick={() => toggleCard("curriculum2")}
+            >
+              {isRTL ? "اضف ملحق" : "Add Attachment"}
+              <PlusCircle className="w-4 h-4" />
+            </button>
+          </div>
+
+          {expandedCards.curriculum2 && (
+            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <h4 className="font-medium text-base-content text-center sm:text-start">
+                  {isRTL ? "ملحقات الكورس" : "Course Attachments"}
+                </h4>
+                <div className="flex gap-2">
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Edit2 className="w-4 h-4 text-primary" />
+                  </button>
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Trash2 className="w-4 h-4 text-error" />
+                  </button>
+                </div>
+              </div>
+
+              <ul className="space-y-2">
+                {["PDF", "Video", "Audio", "Document"].map((type, index) => (
+                  <li
+                    key={`card2-${index}`}
+                    className="bg-base-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
+                      onClick={() => toggleMonth("card2", index)}
+                    >
+                      <span className="text-sm sm:text-base text-base-content/80">
+                        {isRTL
+                          ? `ملحق ${index + 1} (${type})`
+                          : `Attachment ${index + 1} (${type})`}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          expandedMonths.card2 === index ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+
+                    {expandedMonths.card2 === index && (
+                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
+                        <p className="text-xs sm:text-sm text-base-content/70">
+                          {isRTL ? "تفاصيل المرفق..." : "Attachment details..."}
+                        </p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Third Curriculum Card */}
+        <div className="space-y-4">
+          <h2 className="text-center text-lg font-semibold text-primary">
+            {isRTL ? "الامتحانات" : "Exams"}
+          </h2>
+          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
+              {isRTL ? "اضف امتحانات الكورس" : "Add Course Exams"}
+            </h3>
+            <button
+              className="btn btn-primary gap-2 w-full sm:w-auto"
+              onClick={() => toggleCard("curriculum3")}
+            >
+              {isRTL ? "اضف امتحان" : "Add Exam"}
+              <PlusCircle className="w-4 h-4" />
+            </button>
+          </div>
+
+          {expandedCards.curriculum3 && (
+            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+                <h4 className="font-medium text-base-content text-center sm:text-start">
+                  {isRTL ? "امتحانات الكورس" : "Course Exams"}
+                </h4>
+                <div className="flex gap-2">
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Edit2 className="w-4 h-4 text-primary" />
+                  </button>
+                  <button className="btn btn-ghost btn-square btn-sm">
+                    <Trash2 className="w-4 h-4 text-error" />
+                  </button>
+                </div>
+              </div>
+
+              <ul className="space-y-2">
+                {["Midterm", "Final", "Quiz 1", "Quiz 2"].map((exam, index) => (
+                  <li
+                    key={`card3-${index}`}
+                    className="bg-base-200 rounded-lg overflow-hidden"
+                  >
+                    <div
+                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
+                      onClick={() => toggleMonth("card3", index)}
+                    >
+                      <span className="text-sm sm:text-base text-base-content/80">
+                        {isRTL
+                          ? `امتحان ${index + 1} (${exam})`
+                          : `Exam ${index + 1} (${exam})`}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          expandedMonths.card3 === index ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+
+                    {expandedMonths.card3 === index && (
+                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
+                        <p className="text-xs sm:text-sm text-base-content/70">
+                          {isRTL ? "تفاصيل الامتحان..." : "Exam details..."}
+                        </p>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function CoursesForm() {
   return (
     <div className="w-full overflow-x-hidden p-4 sm:p-8 md:p-14">
       <CourseCreationForm />
-      <CurriculumSection />
+      {/*<CurriculumSection />*/}
     </div>
   );
 }
