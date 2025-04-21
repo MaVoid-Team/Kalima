@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useNavigate, Link } from "react-router-dom"
+import { BookOpen, Edit } from "lucide-react"
 
 // Components
 import CourseGrid from "./CourseGrid"

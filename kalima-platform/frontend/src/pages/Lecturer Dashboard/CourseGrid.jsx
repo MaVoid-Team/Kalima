@@ -109,12 +109,18 @@ export default function CourseGrid() {
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">خطأ!</strong>
-        <span className="block sm:inline"> {error}</span>
-        <button className="btn btn-sm btn-outline mt-2" onClick={fetchContainers}>
-          إعادة المحاولة
-        </button>
+      <div className="text-center py-12 space-y-4">
+        <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
+          <BookOpen className="h-12 w-12 text-primary" />
+        </div>
+        <h3 className="text-xl font-bold">{t("noCoursesTitle")}</h3>
+        <p className="text-lg text-gray-500 max-w-md mx-auto">{t("noCoursesDescription")}</p>
+        <Link to="/dashboard/lecturer-dashboard/CoursesForm">
+          <button className="btn btn-primary mt-4">
+            <Edit className="h-4 w-4 mr-2" />
+            {t("addNewCourse")}
+          </button>
+        </Link>
       </div>
     )
   }
@@ -158,9 +164,8 @@ export default function CourseGrid() {
                       onClick={() => toggleFavorite(container._id)}
                     >
                       <Heart
-                        className={`h-4 w-4 ${
-                          favorites[container._id] ? "fill-primary text-primary" : "text-base-content/70"
-                        }`}
+                        className={`h-4 w-4 ${favorites[container._id] ? "fill-primary text-primary" : "text-base-content/70"
+                          }`}
                       />
                     </button>
                     {container.price > 0 && (

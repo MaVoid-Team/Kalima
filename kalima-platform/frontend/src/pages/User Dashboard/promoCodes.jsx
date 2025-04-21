@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaWallet, FaInfoCircle, FaSort, FaBars, FaTicketAlt } from 'react-icons/fa';
+import { FaWallet, FaInfoCircle, FaBars, FaTicketAlt } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
-import { Link } from 'react-router-dom';
 import { getUserDashboard } from '../../routes/auth-services';
+import { redeemPromoCode } from '../../routes/codes'; // Import the redeem function
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation('promoCodes');
   const isRTL = i18n.language === 'ar';
   const [transactions, setTransactions] = useState([]);
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [pointsBalances, setPointsBalances] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [redeemCode, setRedeemCode] = useState('');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [redeemLoading, setRedeemLoading] = useState(false); // Added loading state for redeem
+  const [redeemError, setRedeemError] = useState(null); // Added error state for redeem
+  const [redeemSuccess, setRedeemSuccess] = useState(null); // Added success state for redeem
 
-  // Fetch user data on component mount
+  // Fetch user data on component mount and when redeem is successful
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -24,11 +27,11 @@ const PromoCodes = () => {
         const result = await getUserDashboard();
 
         if (result.success) {
-          const { userInfo, pointsBalances, redeemedCodes } = result.data || {};
+          const { userInfo, pointsBalances, redeemedCodes } = result.data.data || {};
 
-          // Ensure userInfo exists before accessing its properties
+          // Set total points
           if (userInfo) {
-            setBalance(userInfo.totalPoints || 0); // Default to 0 if totalPoints is undefined
+            setBalance(userInfo.totalPoints || 0);
           } else {
             console.error("userInfo is undefined in the response.");
           }
@@ -38,7 +41,6 @@ const PromoCodes = () => {
             const lecturer = pointsBalances?.find(
               (balance) => balance.lecturer._id === code.lecturerId
             );
-
             return {
               id: index + 1,
               code: code.code,
@@ -49,6 +51,7 @@ const PromoCodes = () => {
           });
 
           setTransactions(mappedTransactions);
+          setPointsBalances(pointsBalances || []);
         } else {
           console.error("Failed to load dashboard data:", result.error);
         }
@@ -60,7 +63,7 @@ const PromoCodes = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [redeemSuccess]); // Add redeemSuccess as dependency to refetch data after successful redemption
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -68,7 +71,7 @@ const PromoCodes = () => {
       setIsMobile(mobile);
       setSidebarOpen(!mobile);
     };
-    
+
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
@@ -78,9 +81,31 @@ const PromoCodes = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleRedeemCode = () => {
-    document.getElementById('redeem_modal').close();
-    setRedeemCode('');
+  const handleRedeemCode = async () => {
+    if (!redeemCode.trim()) {
+      setRedeemError(t('redeem.errors.emptyCode'));
+      return;
+    }
+
+    setRedeemLoading(true);
+    setRedeemError(null);
+    setRedeemSuccess(null);
+
+    try {
+      const result = await redeemPromoCode(redeemCode);
+      
+      if (result.success) {
+        setRedeemSuccess(t('redeem.success'));
+        setRedeemCode('');
+        document.getElementById('redeem_modal').close();
+      } else {
+        setRedeemError(result.error || t('redeem.errors.generic'));
+      }
+    } catch (error) {
+      setRedeemError(t('redeem.errors.generic'));
+    } finally {
+      setRedeemLoading(false);
+    }
   };
 
   return (
@@ -93,13 +118,13 @@ const PromoCodes = () => {
             <h1 className="text-xl font-bold text-primary px-1">{t('title')}</h1>
             <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
           </div>
-          <img 
-            src="/waves.png" 
-            alt="Decorative waves" 
-            className="absolute left-[10%] w-16 animate-float-zigzag" 
+          <img
+            src="/waves.png"
+            alt="Decorative waves"
+            className="absolute left-[10%] w-16 animate-float-zigzag"
           />
           {isMobile && (
-            <button 
+            <button
               className={`btn btn-ghost btn-sm p-1 ${isRTL ? 'ml-2' : 'mr-2'}`}
               onClick={toggleSidebar}
               aria-label={t('toggleSidebar')}
@@ -114,10 +139,10 @@ const PromoCodes = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-44 mb-8 relative">
             {/* Balance Card */}
             <div className="relative">
-              <img 
-                src="/rDots.png" 
-                alt="Decorative dots" 
-                className="absolute -top-28 -right-8 w-32 animate-float-up-dottedball z-0" 
+              <img
+                src="/rDots.png"
+                alt="Decorative dots"
+                className="absolute -top-28 -right-8 w-32 animate-float-up-dottedball z-0"
               />
               <div className="card bg-primary text-primary-content shadow-md w-3/4 relative z-0">
                 <div className={`card-body flex`}>
@@ -143,15 +168,19 @@ const PromoCodes = () => {
 
             {/* Redeem Code Box */}
             <div className="card shadow-sm relative my-auto">
-              <img 
-                src="/ball.png" 
-                alt="Decorative ball" 
-                className="absolute -bottom-16 left-4 w-10 animate-bounce-slow" 
+              <img
+                src="/ball.png"
+                alt="Decorative ball"
+                className="absolute -bottom-16 left-4 w-10 animate-bounce-slow"
               />
               <div className={`card-body ${isRTL ? 'text-right' : 'text-left'}`}>
                 <div className="card-actions justify-end">
-                  <button 
-                    onClick={() => document.getElementById('redeem_modal').showModal()} 
+                  <button
+                    onClick={() => {
+                      setRedeemError(null);
+                      setRedeemSuccess(null);
+                      document.getElementById('redeem_modal').showModal();
+                    }}
                     className="btn btn-outline hover:btn-primary bg-primary/20 text-primary border-base-300 flex items-center"
                   >
                     {t('redeem.button')} <FaTicketAlt className={`${isRTL ? 'mr-2' : 'ml-2'}`} />
@@ -161,32 +190,43 @@ const PromoCodes = () => {
             </div>
           </div>
 
+          {/* Lecturer Points Section */}
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">{t('lecturerPoints.title')}</h2>
+            {loading ? (
+              <div className="flex justify-center">
+                <span className="loading loading-spinner loading-lg"></span>
+              </div>
+            ) : pointsBalances.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pointsBalances.map((balance, index) => (
+                  <div key={index} className="card bg-base-200 shadow-md">
+                    <div className="card-body">
+                      <h3 className="card-title">{balance.lecturer.name}</h3>
+                      <p className="text-2xl font-bold">{balance.points} {t('balance.currency')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500">{t('noLecturerPoints')}</p>
+              </div>
+            )}
+          </div>
+
           {/* Transactions History */}
-          <div className="card bg-base-100 shadow-sm relative">
+          <div className="card bg-base-100 shadow-sm relative mt-8">
             <div className={`absolute top-0 ${isRTL ? 'right-0' : 'left-0'} w-32 h-32 -z-10`}>
               <img src="/rDots.png" alt={t('decorativeAlt')} className="w-full h-full object-cover animate-float-up-dottedball" />
             </div>
-            
+
             <div className="card-body p-0">
               <div className="p-4 border-t border-base-300 text-center">
                 <h2 className={`card-title text-primary inline-block px-2 pb-2`}>
                   {t('transactions.title')}
                 </h2>
                 <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
-              </div>
-
-              {/* Sort Dropdown */}
-              <div className="p-4 border-b border-base-300">
-                <div className={`dropdown dropdown-bottom w-full`}>
-                  <label tabIndex={0} className="btn btn-sm btn-outline hover:btn-primary flex justify-between gap-2">
-                    <span>{t('sort.label')}</span>
-                    <FaSort />
-                  </label>
-                  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                    <li><Link onClick={() => setSortOrder('desc')}>{t('sort.newest')}</Link></li>
-                    <li><Link onClick={() => setSortOrder('asc')}>{t('sort.oldest')}</Link></li>
-                  </ul>
-                </div>
               </div>
 
               {/* Table */}
@@ -204,7 +244,7 @@ const PromoCodes = () => {
                     {!loading ? (
                       transactions.length > 0 ? (
                         transactions.map((transaction, index) => (
-                          <tr key={index} className="hover:bg-base-200">
+                          <tr key={index} className="hover:bg-base-200 text-center">
                             <td>{transaction.id}</td>
                             <td>{transaction.code}</td>
                             <td>{transaction.amount}</td>
@@ -247,12 +287,12 @@ const PromoCodes = () => {
           <form method="dialog">
             <button className={`btn btn-sm btn-circle btn-ghost absolute ${isRTL ? 'left-2' : 'right-2'} top-2`}>✕</button>
           </form>
-          
+
           <div className={`flex items-center mb-6 text-primary ${isRTL ? 'flex-row-reverse' : ''}`}>
             <MdCardGiftcard className={`w-6 h-6 ${isRTL ? 'ml-2' : 'mr-2'}`} />
             <h3 className="font-bold text-xl">{t('redeem.modalTitle')}</h3>
           </div>
-          
+
           <div className="mb-6">
             <input
               type="text"
@@ -262,8 +302,27 @@ const PromoCodes = () => {
               className={`input input-bordered w-full bg-base-200 ${isRTL ? 'text-right' : 'text-left'}`}
               dir={isRTL ? 'rtl' : 'ltr'}
             />
-            
-            <ul className="text-base-content text-sm space-y-2 mb-4">
+
+            {/* Error and Success Messages */}
+            {redeemError && (
+              <div className="alert alert-error mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{redeemError}</span>
+              </div>
+            )}
+
+            {redeemSuccess && (
+              <div className="alert alert-success mt-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{redeemSuccess}</span>
+              </div>
+            )}
+
+            <ul className="text-base-content text-sm space-y-2 mb-4 mt-4">
               {[t('redeem.rules.1'), t('redeem.rules.2')].map((rule) => (
                 <li key={rule} className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <span className="badge badge-primary badge-xs mx-2"></span>
@@ -271,12 +330,17 @@ const PromoCodes = () => {
                 </li>
               ))}
             </ul>
-            
-            <button 
+
+            <button
               onClick={handleRedeemCode}
+              disabled={redeemLoading}
               className="btn btn-primary text-primary-content border-none w-full"
             >
-              {t('redeem.button')}
+              {redeemLoading ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                t('redeem.button')
+              )}
             </button>
           </div>
         </div>

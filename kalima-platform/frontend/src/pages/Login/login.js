@@ -58,7 +58,7 @@ const TeacherLogin = () => {
 
       const userRole = dashboardResult.data.data.userInfo.role;
       if (userRole === 'Admin' || userRole === 'SubAdmin') {
-        navigate('/dashboard/dashboards-for-admins');
+        navigate('/dashboard/admin-dashboard');
       } else if (userRole === 'Lecturer') {
         navigate('/dashboard/lecturer-dashboard');
       } else if (userRole === 'Student') {

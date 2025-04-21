@@ -3,6 +3,7 @@
 import { useTranslation } from "react-i18next"
 import { useEffect, useState } from "react"
 import { AssistantService } from "../../routes/assistants-services"
+import { BookOpen } from "lucide-react"
 
 export default function InstructorsList() {
   const { t, i18n } = useTranslation("dashboard")
@@ -48,8 +49,11 @@ export default function InstructorsList() {
 
   if (error) {
     return (
-      <div className="alert alert-error">
-        <span>{error}</span>
+      <div className="text-center py-12 space-y-4">
+        <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
+          <BookOpen className="h-12 w-12 text-primary" />
+        </div>
+        <h3 className="text-xl font-bold">{t("No assistants found")}</h3>
       </div>
     )
   }
