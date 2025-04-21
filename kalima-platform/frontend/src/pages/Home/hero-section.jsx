@@ -43,7 +43,7 @@ export function HeroSection() {
               {t("hero.description")}
             </p>
 
-            <Link to="/landing">
+            <Link to="/login">
               <button className="btn btn-lg bg-primary text-primary-content hover:bg-accent hover:text-accent-content rounded-full">
                 {t("hero.cta")}
                 <ArrowLeft className={`h-5 w-5 ${isRTL ? 'mr-2' : 'ml-2 rotate-180'}`}  />

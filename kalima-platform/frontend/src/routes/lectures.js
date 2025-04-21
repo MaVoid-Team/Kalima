@@ -13,7 +13,6 @@ export const getAllContainers = async () => {
         Authorization: `Bearer ${getToken()}`,
       },
     })
-
     return response.data
   } catch (error) {
     console.error("Error fetching containers:", error)
@@ -35,7 +34,27 @@ export const getAllContainersPublic = async () => {
     throw error
   }
 }
-
+//Function to purchase a container
+export const purchaseContainer = async (containerId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/purchases/container`, 
+      { containerId }, // Send containerId in the request body
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    console.log("Purchase container response:", response);
+    return response;
+    
+  } catch (error) {
+    console.error(`Error purchasing container ${containerId}:`, error)
+    throw error;
+  }
+}
 // Function to get a container by ID
 export const getContainerById = async (containerId) => {
   try {
@@ -53,6 +72,38 @@ export const getContainerById = async (containerId) => {
   }
 }
 
+export const getLectureAttachments = async (lectureId) => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      return {
+        status: "error",
+        message: "Authentication required",
+      };
+    }
+
+    const response = await axios.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return {
+      status: "success",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching lecture attachments:", error);
+
+    return {
+      status: "error",
+      message:
+        error.response?.data?.message || "Failed to fetch lecture attachments. Please try again later.",
+    };
+  }
+};
+
 export const getAllLecturesPublic = async () => {
   try {
     const response = await axios.get(`${API_URL}/lectures/public`, {
@@ -67,6 +118,39 @@ export const getAllLecturesPublic = async () => {
   }
 }
 
+export const createLecture = async (lectureData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating lecture:", error);
+    throw error;
+  }
+};
+export const createContainer = async (containerData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/containers`, containerData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error creating container:", error);
+    throw error;
+  }
+};
+
 export const getMyContainers = async () => {
   try {
     const response = await axios.get(`${API_URL}/containers/my-containers`, {
@@ -76,10 +160,16 @@ export const getMyContainers = async () => {
       },
     })
 
-    return response.data
+    return {
+      status: "success",
+      data: response.data.data
+    }
   } catch (error) {
     console.error("Error fetching my containers:", error)
-    throw error
+    return {
+      status: "error",
+      error: error.response?.data?.message || "Failed to fetch containers"
+    }
   }
 }
 
