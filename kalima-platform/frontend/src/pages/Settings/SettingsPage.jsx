@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import UserSidebar from "../../components/UserSidebar"
 import PageHeader from "./PageHeader"
 import PersonalInfoSection from "./PersonalInfoSection"
 import LanguageAppearanceSection from "./LanguageAppearanceSection"
@@ -62,9 +61,7 @@ function SettingsPage() {
 
   return (
       <div 
-      className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100 ${
-        sidebarOpen && !isMobile ? ` ${isRTL ? 'mr-52' : 'ml-52'} transition-all duration-500` : `mr-0`
-      }`} 
+      className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100`} 
       dir={isRTL ? 'ltr' : 'rtl'}
     >
       {/* Mobile Sidebar Toggle Button */}
@@ -79,7 +76,6 @@ function SettingsPage() {
         </button>
       </div>
       <div className="container mx-auto">
-        <UserSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
         {/* Main Content */}
         <div className={`flex-1 p-4 lg:p-8 md:pt-4 pt-16 ${isRTL ? 'text-right' : 'text-left'}`}>

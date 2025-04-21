@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
-import { getContainerById } from "../routes/lectures"
+import { getContainerById, purchaseContainer } from "../routes/lectures"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import {
@@ -12,8 +12,6 @@ import {
   FaMoneyBillWave,
   FaCalendarAlt,
   FaStickyNote,
-  FaPlayCircle,
-  FaClock,
 } from "react-icons/fa"
 
 const DetailItem = ({ label, value, icon }) => (
@@ -89,14 +87,18 @@ export default function CourseDetails() {
   const [loading, setLoading] = useState(true)
   const [lecturesLoading, setLecturesLoading] = useState(false)
   const [error, setError] = useState("")
+  const [purchaseLoading, setPurchaseLoading] = useState(false)
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false)
+  const [purchaseError, setPurchaseError] = useState("")
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         const result = await getContainerById(courseId)
+        console.log("fetched course:", result);
+        
         if (result?.status === "success") {
           setCourse(result.data)
-
           // After getting course data, fetch lectures for each child container
           if (result.data.children && result.data.children.length > 0) {
             await fetchLectures(result.data.children)
@@ -138,6 +140,28 @@ export default function CourseDetails() {
     }
   }
 
+const handlePurchase = async () => {
+  setPurchaseLoading(true)
+  setPurchaseError("")
+  setPurchaseSuccess(false)
+  
+  try {
+    const result = await purchaseContainer(courseId)
+    console.log("Purchase result:", result)
+    
+    if (result && (result.status === 200 || result.status === 201)) {
+      setPurchaseSuccess(true)
+    } else {
+      setPurchaseError("فشل في عملية الاشتراك")
+    }
+  } catch (err) {
+    console.error("Error purchasing course:", err)
+    setPurchaseError(err.response?.data?.message || "حدث خطأ أثناء الاشتراك")
+  } finally {
+    setPurchaseLoading(false)
+  }
+}
+
   const detailsBox = useMemo(
     () => (
       <div className="card bg-base-100 shadow-xl sticky top-6">
@@ -166,12 +190,31 @@ export default function CourseDetails() {
             />
           </div>
           <div className="card-actions mt-6">
-            <button className="btn btn-primary w-full">اشترك الآن</button>
+            {purchaseSuccess ? (
+              <div className="alert alert-success w-full">
+                <span>تم الاشتراك بنجاح!</span>
+              </div>
+            ) : (
+              <>
+                {purchaseError && (
+                  <div className="alert alert-error w-full mb-2">
+                    <span>{purchaseError}</span>
+                  </div>
+                )}
+                <button 
+                  className={`btn btn-primary w-full ${purchaseLoading ? 'loading' : ''}`}
+                  onClick={handlePurchase}
+                  disabled={purchaseLoading}
+                >
+                  {purchaseLoading ? 'جاري الاشتراك...' : 'اشترك الآن'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
     ),
-    [course],
+    [course, purchaseLoading, purchaseSuccess, purchaseError],
   )
 
   if (loading) return <LoadingSpinner />

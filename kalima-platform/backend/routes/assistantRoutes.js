@@ -5,12 +5,16 @@ const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
-router.use(verifyJWT, authController.verifyRoles("admin", "subadmin", "moderator"));
+router.use(verifyJWT, authController.verifyRoles("admin", "subadmin", "moderator", "lecturer", "assistant"));
 
 router
     .route("/")
     .get(assistantController.getAllAssistants)
     .post(assistantController.createAssistant);
+
+router
+    .route("/lecturer/:lecturerId")
+    .get(assistantController.getAssistantsByLecturer);
 
 router
     .route("/:id")

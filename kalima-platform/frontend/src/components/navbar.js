@@ -44,7 +44,7 @@ const NavBar = () => {
 
   const authItems = [
     { key: 'signup', path: '/register' },
-    { key: 'signin', path: '/landing' },
+    { key: 'signin', path: '/login' },
   ];
 
   return (

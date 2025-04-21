@@ -180,6 +180,12 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
       throw new AppError(`Invalid file type`, 404);
   }
 
-  await lecture.save();
+  try {
+    console.log(lecture)
+    await lecture.save();
+  } catch (error) {
+    await cloudinary.uploader.destroy(req.file.filename);
+    return res.status(201).json({ message: "Error creating attachment" });
+  }
   res.status(201).json({ message: "Attachment uploaded successfully" });
 });

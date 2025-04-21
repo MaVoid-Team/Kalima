@@ -1,31 +1,17 @@
 // components/Dashboard.jsx
 import { useState } from "react"
 import Hero from "./hero"
-import Charts from "./chartsSection"
 import StudentsSection from "./studentsSection"
-import AdminSidebar from "../../../components/AdminSidebar"
 import UserManagementTable from "./userManageTable"
 const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(true)
-  const isRTL = true // Assuming Arabic language based on RTL direction
-  
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
 
   return (
     <div className="mx-auto w-full max-w-full p-10 bg-base-100 min-h-screen bg-gradient-to-br " dir="rtl">
-      {/* Import the UserSidebar component */}
-      <AdminSidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
-      
-      {/* Main content with margin to accommodate sidebar */}
       <div 
-        className={`transition-all duration-300 space-y-8 ${
-          isOpen ? (isRTL ? 'mr-52' : 'ml-52') : 'ml-0 mr-0'
-        }`}
+        className={`transition-all duration-300 space-y-8`}
       >
           <Hero/>
-          <Charts/>
           <StudentsSection/>
           <UserManagementTable/>
 
