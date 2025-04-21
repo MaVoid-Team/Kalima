@@ -108,7 +108,7 @@ const LectureDisplay = () => {
             <li key={index} className="mt-2">
               <div className="flex gap-4">
                 <a
-                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  href={`/attachments/${attachment}`} // Replace with actual attachment URL
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
@@ -116,7 +116,7 @@ const LectureDisplay = () => {
                   عرض المرفق {index + 1}
                 </a>
                 <a
-                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  href={`/attachments/${attachment}`} // Replace with actual attachment URL
                   download
                   className="text-green-600 hover:underline"
                 >

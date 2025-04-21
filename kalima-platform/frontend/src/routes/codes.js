@@ -14,7 +14,7 @@ const API_URL = process.env.REACT_APP_BASE_URL;
 export const redeemPromoCode = async (code) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/codes/redeem`,
+      `${API_URL}/codes/redeem`,
       { code },
       {
         headers: {

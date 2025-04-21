@@ -37,7 +37,7 @@ export const getAllContainersPublic = async () => {
 //Function to purchase a container
 export const purchaseContainer = async (containerId) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/purchases/container`, 
+    const response = await axios.post(`${API_URL}/purchases/container`, 
       { containerId }, // Send containerId in the request body
       {
         withCredentials: true,
@@ -83,7 +83,7 @@ export const getLectureAttachments = async (lectureId) => {
       };
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/lectures/attachments/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -120,7 +120,7 @@ export const getAllLecturesPublic = async () => {
 
 export const createLecture = async (lectureData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
+    const response = await axios.post(`${API_URL}/lectures`, lectureData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export const createLecture = async (lectureData) => {
 };
 export const createContainer = async (containerData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/containers`, containerData, {
+    const response = await axios.post(`${API_URL}/containers`, containerData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',

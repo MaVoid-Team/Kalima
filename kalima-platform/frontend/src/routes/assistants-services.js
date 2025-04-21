@@ -30,7 +30,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
         
-        const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+        const response = await axios.get(`${API_URL}/users/me/dashboard`, {
           headers: {
             Authorization: `Bearer ${getToken()}`,
           },
@@ -53,7 +53,7 @@ export const AssistantService = {
         if (!isLoggedIn()) throw new Error("User not authenticated");
   
         const response = await axios.get(
-          `${API_URL}/api/v1/assistants/lecturer/${lecturerId}`,
+          `${API_URL}/assistants/lecturer/${lecturerId}`,
           {
             headers: {
               Authorization: `Bearer ${getToken()}`,

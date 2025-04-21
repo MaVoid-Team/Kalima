@@ -29,7 +29,7 @@ const AddCourseForm = () => {
     const fetchLecturers = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/v1/center-lecturer/${formData.centerId}`,
+          `${API_URL}/center-lecturer/${formData.centerId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -75,7 +75,7 @@ const AddCourseForm = () => {
         .replace(/\//g, '-');
 
       const response = await axios.post(
-        `${API_URL}/api/v1/centers/lessons`,
+        `${API_URL}/centers/lessons`,
         {
           ...formData,
           startTime: formattedDate,
