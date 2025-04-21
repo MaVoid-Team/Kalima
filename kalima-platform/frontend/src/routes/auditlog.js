@@ -1,49 +1,54 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
 
-// Base URL for API requests
 const API_URL = process.env.REACT_APP_BASE_URL;
 
-// Function to get all audit logs with pagination
 export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
   try {
     if (!isLoggedIn()) {
       throw new Error("User not authenticated");
     }
 
-    // Build query parameters
-    let queryParams = `page=${page}&limit=${limit}`;
-    
-    // Add any additional filters if provided
-    if (filters.userId) queryParams += `&userId=${filters.userId}`;
-    if (filters.role) queryParams += `&role=${filters.role}`;
-    if (filters.action) queryParams += `&action=${filters.action}`;
-    if (filters.resourceType) queryParams += `&resourceType=${filters.resourceType}`;
-    if (filters.status) queryParams += `&status=${filters.status}`;
-    if (filters.startDate) queryParams += `&startDate=${filters.startDate}`;
-    if (filters.endDate) queryParams += `&endDate=${filters.endDate}`;
+    // Corrected params with proper syntax
+    const transformedFilters = {
+      user: filters.user,
+      role: filters.role,
+      action: filters.action,
+      resource_type: filters.resource_type,
+      status: filters.status,
+      startDate: filters.startDate,
+      endDate: filters.endDate
+    };
 
-    const response = await axios.get(`${API_URL}/api/v1/audit-logs?${queryParams}`, {
+    const params = {
+      page,
+      limit,
+      ...Object.fromEntries(
+        Object.entries(transformedFilters).filter(([_, v]) => v !== "")
+      )
+    };
+
+    const token = getToken();
+    const response = await axios.get(`${API_URL}/api/v1/audit-logs`, {
+      params,
       withCredentials: true,
       headers: {
-        Authorization: `Bearer ${getToken()}`,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
     return {
       status: "success",
-      data: response.data
+      data: response.data.data
     };
   } catch (error) {
-    console.error("Error fetching audit logs:", error);
     return {
       status: "error",
-      error: error.response?.data?.message || "Failed to fetch audit logs"
+      error: error.response?.data?.message || error.message
     };
   }
 };
-
-// Function to get audit log by ID
 export const getAuditLogById = async (logId) => {
   try {
     if (!isLoggedIn()) {
@@ -54,6 +59,7 @@ export const getAuditLogById = async (logId) => {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
       },
     });
 
@@ -65,7 +71,7 @@ export const getAuditLogById = async (logId) => {
     console.error(`Error fetching audit log ${logId}:`, error);
     return {
       status: "error",
-      error: error.response?.data?.message || "Failed to fetch audit log"
+      error: error.response?.data?.message || error.message || "Failed to fetch audit log"
     };
   }
 };

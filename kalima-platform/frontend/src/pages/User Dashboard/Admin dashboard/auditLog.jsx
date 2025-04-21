@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { FiX, FiFileText, FiChevronDown, FiUser, FiEdit, FiRotateCw, FiSearch } from "react-icons/fi";
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from "react-icons/fa";
 import { getAuditLogs } from "../../../routes/auditlog";
-import { Link } from "lucide-react";
+import Link from "react-router-dom";
 
 const AuditLog = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // NOTE: keys now match server-side param names
   const [filters, setFilters] = useState({
-    userId: "",
+    user: "",
     role: "",
     action: "",
-    resourceType: "",
+    resource_type: "",
     status: "",
     startDate: "",
     endDate: ""
@@ -25,37 +26,60 @@ const AuditLog = () => {
     const fetchAuditLogs = async () => {
       setLoading(true);
       try {
-        const response = await getAuditLogs(page, limit, filters);
+        const params = { page, limit, ...Object.fromEntries(
+          Object.entries(filters).filter(([, v]) => v !== "")
+        )};
+        const response = await getAuditLogs(params.page, params.limit, params);
         if (response.status === "success") {
-          setLogs(response.data.data.logs || []);
+          setLogs(response.data.logs || []);
           setError(null);
         } else {
-          setError(response.error || "Failed to fetch audit logs");
+          setError(response.error);
           setLogs([]);
         }
-      } catch (err) {
-        setError("An error occurred while fetching audit logs");
-        console.error(err);
+      } catch (e) {
+        setError("Error fetching logs");
       } finally {
         setLoading(false);
       }
     };
-
     fetchAuditLogs();
   }, [page, limit, filters]);
 
-  // Handle filter changes
-  const handleFilterChange = (filterName, value) => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [filterName]: value
-    }));
-  };
+  useEffect(() => {
+    const fetch = async () => {
+      const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([,v]) => v)) };
+      const res = await getAuditLogs(page, limit, params);
+      if (res.status === "success") setLogs(res.data.logs);
+    };
+    fetch();
+  }, [page, filters ,limit]);
+  const handleFilterChange = (key, value) => setFilters(prev => ({ ...prev, [key]: value }));
+  const applyFilters = () => setPage(1);
 
-  // Apply filters
-  const applyFilters = () => {
-    setPage(1); // Reset to first page when applying new filters
-  };
+  // Prepare label text based on current selection
+  const userNameMap = logs.reduce((m, log) => {
+    if (log.user?.userId) m[log.user.userId] = log.user.name;
+    return m;
+  }, {});
+  const selectedUserLabel = filters.userId ? (userNameMap[filters.userId] || 'مستخدم غير معروف') : 'المستخدم';
+  const selectedRoleLabel = filters.role
+    ? (filters.role === 'Admin' ? 'مسؤول' : filters.role === 'Lecturer' ? 'معلم' : 'طالب')
+    : 'الصلاحية';
+  const selectedActionLabel = filters.action
+    ? (filters.action === 'read' ? 'قراءة' : filters.action === 'update' ? 'تعديل' : filters.action === 'delete' ? 'حذف' : 'إنشاء')
+    : 'العملية';
+  const selectedResourceLabel = filters.resourceType
+    ? (filters.resourceType === 'container' ? 'كورس'
+       : filters.resourceType === 'lecture' ? 'درس'
+       : filters.resourceType === 'user' ? 'مستخدم'
+       : 'جدول زمني')
+    : 'العنصر المتأثر';
+  const selectedStatusLabel = filters.status
+    ? (filters.status === 'success' ? 'نجاح' : 'فشل')
+    : 'الحالة'; 
+
+
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -143,83 +167,179 @@ const AuditLog = () => {
       
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6 justify-start">
-        <div className="dropdown dropdown-end">
-          <label tabIndex={0} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+  {/* User Filter */}
+  <div className="dropdown dropdown-end">
+          <label tabIndex={0}
+            className="btn btn-outline text-base-content rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
-            <span>المستخدم</span>
+            <span>{selectedUserLabel}</span>
           </label>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link onClick={() => handleFilterChange('userId', '')}>الكل</Link></li>
-            {/* You can populate this dynamically from unique users in logs */}
-            {Array.from(new Set(logs.map(log => log.user?.userId))).map((userId, index) => (
-              <li key={index}>
-                <Link onClick={() => handleFilterChange('userId', userId)}>
-                  {logs.find(log => log.user?.userId === userId)?.user?.name || userId}
-                </Link>
+            <li>
+              <button
+                className="w-full text-left"
+                onClick={() => handleFilterChange('userId', '')}
+              >
+                الكل
+              </button>
+            </li>
+            {Array.from(new Set(logs.filter(l => l.user?.userId).map(l => l.user.userId)))
+              .map((uid, i) => (
+                <li key={i}>
+                  <button
+                    className="w-full text-left"
+                    onClick={() => handleFilterChange('userId', uid)}
+                  >
+                    {userNameMap[uid]}
+                  </button>
+                </li>
+            ))}
+          </ul>
+        </div>
+
+  {/* Role Filter */}
+  <div className="dropdown dropdown-end">
+          <label tabIndex={1}
+            className="btn btn-outline text-base-content rounded-full min-w-[180px] flex justify-between">
+            <FiChevronDown className="h-5 w-5" />
+            <span>{selectedRoleLabel}</span>
+          </label>
+          <ul tabIndex={1} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li>
+              <button className="w-full text-left" onClick={() => handleFilterChange('role', '')}>
+                الكل
+              </button>
+            </li>
+            {['Admin','Lecturer','Student'].map((r, i) => (
+              <li key={i}>
+                <button
+                  className="w-full text-left"
+                  onClick={() => handleFilterChange('role', r)}
+                >
+                  {r === 'Admin' ? 'مسؤول' : r === 'Lecturer' ? 'معلم' : 'طالب'}
+                </button>
               </li>
             ))}
           </ul>
         </div>
-        
-        <div className="dropdown dropdown-end">
-          <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+
+  {/* Action Filter */}
+  <div className="dropdown dropdown-end">
+    <label
+      tabIndex={2}
+      className="btn btn-outline text-base-content rounded-full min-w-[180px] flex justify-between"
+    >
+      <FiChevronDown className="h-5 w-5" />
+      <span>{selectedActionLabel}</span>
+    </label>
+    <ul
+      tabIndex={2}
+      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+    >
+      <li>
+        <button className="w-full text-left" onClick={() => handleFilterChange('action', '')}>
+          الكل
+        </button>
+      </li>
+      {['read', 'update', 'delete', 'create'].map((act, i) => (
+        <li key={i}>
+          <button
+            className="w-full text-left"
+            onClick={() => handleFilterChange('action', act)}
+          >
+            {act === 'read' ? 'قراءة'
+              : act === 'update' ? 'تعديل'
+              : act === 'delete' ? 'حذف'
+              : 'إنشاء'}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  {/* Resource Type Filter */}
+  <div className="dropdown dropdown-end">
+          <label tabIndex={3}
+            className="btn btn-outline text-base-content rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
-            <span>الصلاحية</span>
-          </label>
-          <ul tabIndex={1} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link onClick={() => handleFilterChange('role', '')}>الكل</Link></li>
-            <li><Link onClick={() => handleFilterChange('role', 'Admin')}>مسؤول</Link></li>
-            <li><Link onClick={() => handleFilterChange('role', 'Lecturer')}>معلم</Link></li>
-            <li><Link onClick={() => handleFilterChange('role', 'Student')}>طالب</Link></li>
-          </ul>
-        </div>
-        
-        <div className="dropdown dropdown-end">
-          <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>الإجراء</span>
-          </label>
-          <ul tabIndex={2} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link onClick={() => handleFilterChange('action', '')}>الكل</Link></li>
-            <li><Link onClick={() => handleFilterChange('action', 'read')}>قراءة</Link></li>
-            <li><Link onClick={() => handleFilterChange('action', 'update')}>تعديل</Link></li>
-            <li><Link onClick={() => handleFilterChange('action', 'delete')}>حذف</Link></li>
-            <li><Link onClick={() => handleFilterChange('action', 'create')}>إنشاء</Link></li>
-          </ul>
-        </div>
-        
-        <div className="dropdown dropdown-end">
-          <label tabIndex={3} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>العنصر المتأثر</span>
+            <span>{selectedResourceLabel}</span>
           </label>
           <ul tabIndex={3} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link onClick={() => handleFilterChange('resourceType', '')}>الكل</Link></li>
-            <li><Link onClick={() => handleFilterChange('resourceType', 'container')}>كورس</Link></li>
-            <li><Link onClick={() => handleFilterChange('resourceType', 'lecture')}>درس</Link></li>
-            <li><Link onClick={() => handleFilterChange('resourceType', 'user')}>مستخدم</Link></li>
-            <li><Link onClick={() => handleFilterChange('resourceType', 'timetable')}>جدول زمني</Link></li>
+            <li>
+              <button className="w-full text-left" onClick={() => handleFilterChange('resourceType', '')}>
+                الكل
+              </button>
+            </li>
+            {['container','lecture','user','timetable'].map((type, i) => (
+              <li key={i}>
+                <button
+                  className="w-full text-left"
+                  onClick={() => handleFilterChange('resourceType', type)}
+                >
+                  {type === 'container' ? 'كورس'
+                    : type === 'lecture' ? 'درس'
+                    : type === 'user' ? 'مستخدم'
+                    : 'جدول زمني'}
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
-        
-        <div className="dropdown dropdown-end">
-          <label tabIndex={5} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>الحالة</span>
-          </label>
-          <ul tabIndex={5} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><Link onClick={() => handleFilterChange('status', '')}>الكل</Link></li>
-            <li><Link onClick={() => handleFilterChange('status', 'success')}>ناجح</Link></li>
-            <li><Link onClick={() => handleFilterChange('status', 'failed')}>فشل</Link></li>
-          </ul>
-        </div>
-        
-        <button className="btn btn-info text-white rounded-full gap-2" onClick={applyFilters}>
-          <FiRotateCw className="h-5 w-5" />
-          <span>تطبيق الفلتر</span>
+
+
+  {/* Status Filter */}
+  <div className="dropdown dropdown-end">
+    <label
+      tabIndex={5}
+      className="btn btn-outline text-base-content rounded-full min-w-[180px] flex justify-between"
+    >
+      <FiChevronDown className="h-5 w-5" />
+      <span>{selectedStatusLabel}</span>
+    </label>
+    <ul
+      tabIndex={5}
+      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+    >
+      <li>
+        <button className="w-full text-left" onClick={() => handleFilterChange('status', '')}>
+          الكل
         </button>
-      </div>
+      </li>
+      {['success','failed'].map((st, i) => (
+        <li key={i}>
+          <button
+            className="w-full text-left"
+            onClick={() => handleFilterChange('status', st)}
+          >
+            {st === 'success' ? 'ناجح' : 'فشل'}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  {/* Apply Filters Button */}
+  <button className="btn btn-info text-white rounded-full gap-2" onClick={applyFilters}>
+    <FiRotateCw className="h-5 w-5" />
+    <span>تطبيق الفلتر</span>
+  </button>
+</div>
       
+          {/* Date Filter */}
+            <div className="flex items-center gap-2">
+        <input
+          type="date"
+          className="input input-bordered"
+          onChange={(e) => handleFilterChange('startDate', e.target.value)}
+        />
+        <span>إلى</span>
+        <input
+          type="date"
+          className="input input-bordered"
+          onChange={(e) => handleFilterChange('endDate', e.target.value)}
+        />
+      </div>
+
       {/* Loading and Error States */}
       {loading && (
         <div className="flex justify-center my-8">
