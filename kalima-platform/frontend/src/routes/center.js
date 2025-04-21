@@ -16,7 +16,7 @@ export const getCenterTimetable = async (centerId) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/${centerId}/timetable`, {
+    const response = await axios.get(`${API_URL}/centers/${centerId}/timetable`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,

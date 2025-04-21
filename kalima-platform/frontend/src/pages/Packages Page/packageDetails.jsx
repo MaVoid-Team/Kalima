@@ -19,7 +19,7 @@ const PackageDetails = () => {
         } else {
             const fetchPackage = async () => {
                 try {
-                    const response = await fetch(`${API_URL}/api/v1/packages/${packageId}`, {
+                    const response = await fetch(`${API_URL}/packages/${packageId}`, {
                         headers: {
                             Authorization: `Bearer ${getToken()}`,
                         },

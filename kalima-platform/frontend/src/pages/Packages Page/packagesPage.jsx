@@ -18,7 +18,7 @@ const PackagesPage = () => {
     useEffect(() => {
         const fetchPackages = async () => {
             try {
-                const response = await fetch(`${API_URL}/api/v1/packages/`, {
+                const response = await fetch(`${API_URL}/packages/`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },

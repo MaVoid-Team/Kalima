@@ -141,7 +141,7 @@ export const getUserDashboard = async () => {
     }
     
     // The token is automatically added by the interceptor
-    const result = await handleRequest("get", "/api/v1/users/me/dashboard");
+    const result = await handleRequest("get", "/users/me/dashboard");
     return result;
   } catch (error) {
     console.error("Error fetching user dashboard:", error);
