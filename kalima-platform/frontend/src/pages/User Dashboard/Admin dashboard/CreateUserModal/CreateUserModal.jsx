@@ -1,4 +1,3 @@
-// CreateUserModal.jsx
 import React, { useState, useEffect } from "react";
 import { getAllLecturers } from "../../../../routes/fetch-users";
 import { getAllLevels } from "../../../../routes/levels";
@@ -7,6 +6,7 @@ import StudentForm from "./StudentForm";
 import ParentForm from "./ParentForm";
 import LecturerForm from "./LecturerForm";
 import AssistantForm from "./AssistantForm";
+import BulkCreateUsers from "./BulkCreateUsers";
 
 const CreateUserModal = ({ 
   isOpen, 
@@ -25,6 +25,7 @@ const CreateUserModal = ({
 
   const [userData, setUserData] = useState(initialUserState);
   const [formError, setFormError] = useState("");
+  const [isBulkMode, setIsBulkMode] = useState(false); // State to toggle between modes
   
   // State for dropdown data
   const [levels, setLevels] = useState([]);
@@ -37,8 +38,7 @@ const CreateUserModal = ({
     if (isOpen) {
       setUserData(initialUserState);
       setFormError("");
-      
-      // Fetch dropdown data when modal opens
+      setIsBulkMode(false); // Reset to single user mode
       fetchDropdownData();
     }
   }, [isOpen]);
@@ -47,7 +47,6 @@ const CreateUserModal = ({
   const fetchDropdownData = async () => {
     setLoadingDropdowns(true);
     try {
-      // Fetch levels
       const levelsResult = await getAllLevels();
       if (levelsResult.success) {
         setLevels(levelsResult.data.levels || []);
@@ -55,7 +54,6 @@ const CreateUserModal = ({
         console.error("Failed to fetch levels:", levelsResult.error);
       }
       
-      // Fetch subjects
       const subjectsResult = await getAllSubjects();
       if (subjectsResult.success) {
         setSubjects(subjectsResult.data.subjects || []);
@@ -63,7 +61,6 @@ const CreateUserModal = ({
         console.error("Failed to fetch subjects:", subjectsResult.error);
       }
       
-      // Fetch lecturers
       const lecturersResult = await getAllLecturers();
       if (lecturersResult.success) {
         setLecturers(lecturersResult.data || []);
@@ -94,13 +91,11 @@ const CreateUserModal = ({
     e.preventDefault();
     setFormError("");
 
-    // Basic validation
     if (userData.password !== userData.confirmPassword) {
       setFormError("كلمات المرور غير متطابقة");
       return;
     }
 
-    // Role-specific validation
     if (userData.role === "student" && !userData.level) {
       setFormError("الرجاء تحديد المستوى الدراسي");
       return;
@@ -116,16 +111,11 @@ const CreateUserModal = ({
       return;
     }
 
-    // Filter data based on role before submission
     const filteredData = filterDataByRole(userData);
-    
-    // Submit the filtered data
     onCreateUser(filteredData);
   };
 
-  // Function to filter data based on role
   const filterDataByRole = (data) => {
-    // Common fields for all roles
     const commonFields = {
       role: data.role,
       name: data.name,
@@ -135,14 +125,12 @@ const CreateUserModal = ({
       gender: data.gender
     };
 
-    // Add role-specific fields
     switch (data.role) {
       case "student":
         return {
           ...commonFields,
           level: data.level || undefined,
           phoneNumber: data.phoneNumber || undefined,
-          // Only add optional fields if they have values
           ...(data.sequencedId ? { sequencedId: data.sequencedId } : {}),
           ...(data.parentPhoneNumber ? { parentPhoneNumber: data.parentPhoneNumber } : {}),
           ...(data.hobbies && data.hobbies.length > 0 ? { hobbies: data.hobbies } : {}),
@@ -181,21 +169,40 @@ const CreateUserModal = ({
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-xl mb-4">إنشاء مستخدم جديد</h3>
-        
+        <h3 className="font-bold text-xl mb-4">
+          {isBulkMode ? "إنشاء مستخدمين بالجملة" : "إنشاء مستخدم جديد"}
+        </h3>
+
+        {/* Toggle between single and bulk user creation */}
+        <div className="tabs mb-4">
+          <button
+            className={`tab tab-bordered ${!isBulkMode ? "tab-active" : ""}`}
+            onClick={() => setIsBulkMode(false)}
+          >
+            إنشاء مستخدم واحد
+          </button>
+          <button
+            className={`tab tab-bordered ${isBulkMode ? "tab-active" : ""}`}
+            onClick={() => setIsBulkMode(true)}
+          >
+            إنشاء بالجملة
+          </button>
+        </div>
+
         {formError && (
           <div className="alert alert-error mb-4">
             <span>{formError}</span>
           </div>
         )}
         
-        {loadingDropdowns ? (
+        {isBulkMode ? (
+          <BulkCreateUsers />
+        ) : loadingDropdowns ? (
           <div className="flex justify-center my-8">
             <span className="loading loading-spinner loading-lg"></span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Basic Information - Common for all roles */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <label className="label">
@@ -290,7 +297,6 @@ const CreateUserModal = ({
               </div>
             </div>
 
-            {/* Role-specific forms */}
             {userData.role === "student" && (
               <StudentForm 
                 userData={userData} 
