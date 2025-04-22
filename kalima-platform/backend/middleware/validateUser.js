@@ -10,6 +10,8 @@ const assistantSchema = require("../validations/assistantValidation.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel.js");
+const moderatorSchema = require("../validations/moderatorValidation.js");
+const subadminSchema  = require("../validations/subAdminValidation.js");
 
 const roleSchemas = {
   teacher: teacherSchema,
@@ -17,6 +19,8 @@ const roleSchemas = {
   parent: parentSchema,
   lecturer: lecturerSchema,
   assistant: assistantSchema,
+  moderator: moderatorSchema,  
+  subadmin:  subadminSchema
 };
 
 const validateUser = catchAsync(async (req, res, next) => {
