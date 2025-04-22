@@ -1,23 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  ChevronLeft,
-  Image,
-  Video,
-  ChevronDown,
-  Plus,
-  PlusCircle,
-  Edit,
-  Trash2,
-  Edit2,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, Image, Video, ChevronDown, Plus, PlusCircle, Edit, Trash2, Edit2, ChevronRight, FolderPlus, FileText } from 'lucide-react';
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { createContainer, createLecture } from "../../routes/lectures";
 import { getAllSubjects } from "../../routes/courses";
 import { getAllLevels } from "../../routes/levels";
-import { getUserById } from "../../routes/fetch-users";
 import { getUserDashboard } from "../../routes/auth-services";
 
 function CourseCreationForm() {
@@ -32,7 +20,7 @@ function CourseCreationForm() {
     subject: "",
     duration: "",
     description: "",
-    objectives: "",
+    goal: "",
     courseType: "paid",
     priceFull: "",
     priceMonthly: "",
@@ -132,45 +120,50 @@ function CourseCreationForm() {
   const [courseVideo, setCourseVideo] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Lecture creation state
-  const [containerId, setContainerId] = useState(null);
-  const [monthLectures, setMonthLectures] = useState({
-    1: [],
-    2: [],
-    3: [],
-    4: [],
+  // Container hierarchy state
+  const [courseContainer, setCourseContainer] = useState(null);
+  
+  // Course structure state - this represents the unified course structure
+  const [courseStructure, setCourseStructure] = useState({
+    parent: null,
+    years: [],
+    terms: [],
+    months: [],
+    lectures: []
   });
+  
+  // New container/lecture form state
+  const [newYearName, setNewYearName] = useState("");
+  const [newTermName, setNewTermName] = useState("");
+  const [newMonthName, setNewMonthName] = useState("");
+  const [newLectureName, setNewLectureName] = useState("");
   const [newLectureLink, setNewLectureLink] = useState("");
+  const [selectedYearId, setSelectedYearId] = useState(null);
+  const [selectedTermId, setSelectedTermId] = useState(null);
+  const [selectedMonthId, setSelectedMonthId] = useState(null);
+  
+  // UI state
+  const [expandedItems, setExpandedItems] = useState({});
 
-  // Fetch all required data on component mount
+  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
-        // Fetch subjects
         const subjectsResponse = await getAllSubjects();
         setSubjects(subjectsResponse.data.subjects || []);
-        console.log(subjectsResponse.data.subjects);
-
-        // Fetch user dashboard to get teacher info
         const dashboardResponse = await getUserDashboard();
         const userData = dashboardResponse.data;
         const userId = userData?.data?.userInfo?.id;
-        console.log(userData?.data?.userInfo?.id);
-        setCreatedBy(userData?.data?.userInfo?.id);
-
-        // Set teacher data
+        setCreatedBy(userId);
         if (userData && userData?.userInfo) {
           setTeachers([{ _id: userId, name: userData.data.userInfo.name }]);
           setFormData((prev) => ({
             ...prev,
             teacherName: userData.userInfo.name,
-            teacher: userData.userInfo.id,
+            teacher: userId,
           }));
         }
-
-        
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err.message || "Failed to load data");
@@ -178,7 +171,6 @@ function CourseCreationForm() {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -190,136 +182,329 @@ function CourseCreationForm() {
     }));
   };
 
-  const handleAddLecture = (month) => {
-    if (!newLectureLink.trim()) return;
-
-    setMonthLectures((prev) => ({
-      ...prev,
-      [month]: [
-        ...prev[month],
-        {
-          videoLink: newLectureLink,
-          description: `Lecture ${prev[month].length + 1} for month ${month}`,
-        },
-      ],
-    }));
-
-    setNewLectureLink("");
-  };
-
-  const handleSubmitLectures = async () => {
-    setIsSubmitting(true);
-    try {
-      // Submit lectures for all months
-      for (const month in monthLectures) {
-        for (const lecture of monthLectures[month]) {
-          const lectureData = {
-            name: `${formData.courseName} - Month ${month}`,
-            type: "lecture",
-            lecture_type: "Regular",
-            createdBy: createdBy,
-            level: formData.gradeLevel,
-            teacherAllowed: true,
-            subject: formData.subject,
-            parent: containerId,
-            price:
-              formData.courseType === "paid"
-                ? Number(formData.priceFull) || 0
-                : 0,
-            description: lecture.description,
-            numberOfViews: 0,
-            videoLink: lecture.videoLink,
-            examLink: lecture.examLink || "", // default empty if not provided
-          };
-          console.log(lectureData);
-          await createLecture(lectureData);
-        }
-      }
-
-      alert(isRTL ? "تم إضافة المحاضرات بنجاح" : "Lectures added successfully");
-      // Reset form after successful submission
-      setMonthLectures({
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-      });
-    } catch (error) {
-      console.error("Error submitting lectures:", error);
-      alert(isRTL ? "حدث خطأ أثناء إضافة المحاضرات" : "Error adding lectures");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 1024 * 1024 * 1024) {
-      // 1GB limit
       setCourseImage(file);
     } else {
-      alert(
-        isRTL
-          ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت"
-          : "File size must be less than 1GB"
-      );
+      alert(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB");
     }
   };
 
-  // Handle video upload
   const handleVideoUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 1024 * 1024 * 1024) {
-      // 1GB limit
       setCourseVideo(file);
     } else {
-      alert(
-        isRTL
-          ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت"
-          : "File size must be less than 1GB"
-      );
+      alert(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB");
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const toggleExpand = (type, id) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [`${type}_${id}`]: !prev[`${type}_${id}`]
+    }));
+  };
 
+  // Create parent container
+  const handleCreateParentContainer = async (e) => {
+    e.preventDefault();
+    if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
+      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try {
-      // Prepare the data in the required format
-      const containerData = {
+      // Create Parent Container (Course)
+      const parentContainerData = {
         name: formData.courseName,
         type: "course",
+        createdBy: createdBy,
         level: formData.gradeLevel,
         subject: formData.subject,
         description: formData.description,
-        goal: formData.objectives
-          .split("\n")
-          .filter((line) => line.trim() !== ""),
-        price:
-          formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
-        teacher: formData.teacherName,
+        goal: formData.goal,
+        price: formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
+        teacher: formData.teacher,
         teacherAllowed: formData.privacy === "teacher",
-        duration: formData.duration,
-        accessType: formData.accessType,
-        createdBy: createdBy,
       };
-
-      console.log("Submitting data:", containerData);
-
-      // Call the API to create container first
-      const response = await createContainer(containerData);
-      setContainerId(response.data.container.id); // Save container ID for lecture creation
-
-      console.log("Course created successfully:", response);
-      alert(isRTL ? "تم إنشاء الكورس بنجاح" : "Course created successfully");
+      
+      const response = await createContainer(parentContainerData);
+      const container = response.data.container;
+      
+      setCourseContainer({
+        id: container.id,
+        name: container.name,
+        type: container.type,
+        level: container.level,
+        subject: container.subject
+      });
+      
+      setCourseStructure(prev => ({
+        ...prev,
+        parent: {
+          id: container.id,
+          name: container.name,
+          type: container.type
+        }
+      }));
+      
+      alert(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully");
     } catch (error) {
-      console.error("Error creating course:", error);
-      alert(isRTL ? "حدث خطأ أثناء إنشاء الكورس" : "Error creating course");
+      console.error("Error creating parent container:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء الحاوية الرئيسية" : "Error creating parent container");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Create year container
+  const handleCreateYearContainer = async (e) => {
+    e.preventDefault();
+    
+    if (!courseStructure.parent) {
+      alert(isRTL ? "يجب إنشاء الحاوية الرئيسية أولاً" : "Parent container must be created first");
+      return;
+    }
+    
+    if (!newYearName) {
+      alert(isRTL ? "يرجى إدخال اسم السنة" : "Please enter a year name");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const yearContainerData = {
+        name: newYearName,
+        type: "year",
+        createdBy: createdBy,
+        parent: courseStructure.parent.id, // Link to parent container
+        level: formData.gradeLevel,
+        subject: formData.subject,
+        price: formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
+        teacherAllowed: formData.privacy === "teacher",
+      };
+      
+      const response = await createContainer(yearContainerData);
+      const container = response.data.container;
+      
+      const newYear = {
+        id: container.id,
+        name: container.name,
+        parent: container.parent,
+        type: container.type
+      };
+      
+      setCourseStructure(prev => ({
+        ...prev,
+        years: [...prev.years, newYear]
+      }));
+      
+      setSelectedYearId(container.id);
+      setNewYearName("");
+      alert(isRTL ? "تم إنشاء حاوية السنة بنجاح" : "Year container created successfully");
+    } catch (error) {
+      console.error("Error creating year container:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء حاوية السنة" : "Error creating year container");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Create term container
+  const handleCreateTermContainer = async (e) => {
+    e.preventDefault();
+    
+    if (!selectedYearId) {
+      alert(isRTL ? "يرجى تحديد السنة أولاً" : "Please select a year first");
+      return;
+    }
+    
+    if (!newTermName) {
+      alert(isRTL ? "يرجى إدخال اسم الفصل الدراسي" : "Please enter a term name");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const termContainerData = {
+        name: newTermName,
+        type: "term",
+        createdBy: createdBy,
+        parent: selectedYearId, // Link to selected year container
+        level: formData.gradeLevel,
+        subject: formData.subject,
+        price: formData.courseType === "paid" ? Number(formData.priceMonthly) || 0 : 0,
+        teacherAllowed: formData.privacy === "teacher",
+      };
+      
+      const response = await createContainer(termContainerData);
+      const container = response.data.container;
+      
+      const newTerm = {
+        id: container.id,
+        name: container.name,
+        parent: container.parent,
+        type: container.type
+      };
+      
+      setCourseStructure(prev => ({
+        ...prev,
+        terms: [...prev.terms, newTerm]
+      }));
+      
+      setSelectedTermId(container.id);
+      setNewTermName("");
+      alert(isRTL ? "تم إنشاء حاوية الفصل الدراسي بنجاح" : "Term container created successfully");
+    } catch (error) {
+      console.error("Error creating term container:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء حاوية الفصل الدراسي" : "Error creating term container");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Create month container
+  const handleCreateMonthContainer = async (e) => {
+    e.preventDefault();
+    
+    if (!selectedTermId) {
+      alert(isRTL ? "يرجى تحديد الفصل الدراسي أولاً" : "Please select a term first");
+      return;
+    }
+    
+    if (!newMonthName) {
+      alert(isRTL ? "يرجى إدخال اسم الشهر" : "Please enter a month name");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const monthContainerData = {
+        name: newMonthName,
+        type: "month",
+        createdBy: createdBy,
+        parent: selectedTermId, // Link to selected term container
+        level: formData.gradeLevel,
+        subject: formData.subject,
+        price: formData.courseType === "paid" ? Number(formData.priceSession) || 0 : 0,
+        teacherAllowed: formData.privacy === "teacher",
+      };
+      
+      const response = await createContainer(monthContainerData);
+      const container = response.data.container;
+      
+      const newMonth = {
+        id: container.id,
+        name: container.name,
+        parent: container.parent,
+        type: container.type
+      };
+      
+      setCourseStructure(prev => ({
+        ...prev,
+        months: [...prev.months, newMonth]
+      }));
+      
+      setSelectedMonthId(container.id);
+      setNewMonthName("");
+      alert(isRTL ? "تم إنشاء حاوية الشهر بنجاح" : "Month container created successfully");
+    } catch (error) {
+      console.error("Error creating month container:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء حاوية الشهر" : "Error creating month container");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Create lecture
+  const handleCreateLecture = async (e) => {
+    e.preventDefault();
+    
+    if (!selectedMonthId) {
+      alert(isRTL ? "يرجى تحديد الشهر أولاً" : "Please select a month first");
+      return;
+    }
+    
+    if (!newLectureName || !newLectureLink) {
+      alert(isRTL ? "يرجى إدخال اسم المحاضرة ورابط الفيديو" : "Please enter lecture name and video link");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const lectureData = {
+        name: newLectureName,
+        type: "lecture",
+        lecture_type: "Revision",
+        createdBy: createdBy,
+        level: formData.gradeLevel,
+        teacherAllowed: formData.privacy === "teacher",
+        subject: formData.subject,
+        parent: selectedMonthId, // Link to selected month container
+        price: formData.courseType === "paid" ? Number(formData.priceSession) || 0 : 0,
+        description: `Lecture for ${newLectureName}`,
+        numberOfViews: 0,
+        videoLink: newLectureLink,
+        examLink: "",
+      };
+      
+      const response = await createLecture(lectureData);
+      const lecture = response.data.lecture;
+      
+      const newLecture = {
+        id: lecture.id,
+        name: lecture.name,
+        parent: lecture.parent,
+        type: lecture.type,
+        videoLink: lecture.videoLink
+      };
+      
+      setCourseStructure(prev => ({
+        ...prev,
+        lectures: [...prev.lectures, newLecture]
+      }));
+      
+      setNewLectureName("");
+      setNewLectureLink("");
+      alert(isRTL ? "تم إنشاء المحاضرة بنجاح" : "Lecture created successfully");
+    } catch (error) {
+      console.error("Error creating lecture:", error);
+      alert(isRTL ? "حدث خطأ أثناء إنشاء المحاضرة" : "Error creating lecture");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Helper function to get container by ID
+  const getContainerById = (id) => {
+    if (courseStructure.parent && courseStructure.parent.id === id) {
+      return courseStructure.parent;
+    }
+    
+    const year = courseStructure.years.find(y => y.id === id);
+    if (year) return year;
+    
+    const term = courseStructure.terms.find(t => t.id === id);
+    if (term) return term;
+    
+    const month = courseStructure.months.find(m => m.id === id);
+    if (month) return month;
+    
+    return null;
+  };
+
+  // Helper function to get container name
+  const getContainerName = (id) => {
+    const container = getContainerById(id);
+    return container ? container.name : "";
   };
 
   if (isLoading) {
@@ -363,7 +548,6 @@ function CourseCreationForm() {
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-between items-center mb-8 relative"
         >
-          {/* Back link */}
           <a
             href="#"
             className="flex items-center text-primary hover:text-primary-600 text-sm"
@@ -380,8 +564,6 @@ function CourseCreationForm() {
               </>
             )}
           </a>
-
-          {/* Title with line */}
           <div className="absolute inset-x-0 flex justify-center">
             <div className="flex items-center">
               <div className="w-16 h-px bg-secondary"></div>
@@ -394,23 +576,19 @@ function CourseCreationForm() {
         </motion.div>
 
         {/* Main Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleCreateParentContainer}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="bg-base-100 rounded-xl shadow-md p-6"
           >
-            {/* Basic Information Section */}
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-6 text-primary">
                 {isRTL ? "البيانات الاساسية" : "Basic Information"}
               </h2>
-
               <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-6">
-                {/* Left Column */}
                 <div className="space-y-6">
-                  {/* Course Name */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {isRTL ? "اسم الكورس" : "Course Name"}
@@ -429,8 +607,6 @@ function CourseCreationForm() {
                       required
                     />
                   </div>
-
-                  {/* Grade Level */}
                   <div className="relative">
                     <label className="block text-sm font-medium mb-1">
                       {isRTL ? "المرحلة الدراسية" : "Grade Level"}
@@ -452,13 +628,9 @@ function CourseCreationForm() {
                       ))}
                     </select>
                     <ChevronDown
-                      className={`h-4 w-4 absolute top-10 ${
-                        isRTL ? "left-3" : "right-3"
-                      } pointer-events-none`}
+                      className={`h-4 w-4 absolute top-10 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                     />
                   </div>
-
-                  {/* Subject */}
                   <div className="relative">
                     <label className="block text-sm font-medium mb-1">
                       {isRTL ? "المادة الدراسية" : "Subject"}
@@ -480,13 +652,9 @@ function CourseCreationForm() {
                       ))}
                     </select>
                     <ChevronDown
-                      className={`h-4 w-4 absolute top-10 ${
-                        isRTL ? "left-3" : "right-3"
-                      } pointer-events-none`}
+                      className={`h-4 w-4 absolute top-10 ${isRTL ? "left-3" : "right-3"} pointer-events-none`}
                     />
                   </div>
-
-                  {/* Duration */}
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {isRTL ? "مدة الكورس" : "Course Duration"}
@@ -504,7 +672,6 @@ function CourseCreationForm() {
                       className="w-full input input-bordered bg-base-200 placeholder-base-content/50"
                     />
                   </div>
-                  {/* Course Description */}
                   <div className="mb-8">
                     <label className="block text-sm font-medium mb-1">
                       {isRTL ? "وصف الكورس" : "Course Description"}
@@ -515,37 +682,32 @@ function CourseCreationForm() {
                       onChange={handleChange}
                       placeholder={
                         isRTL
-                          ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة. تشمل الدورة قواعد اللغة الإنجليزية والمفردات، والعمل على استخدام اللغة في المواقف اليومية."
-                          : "e.g., The course aims to improve learners' English language skills in reading and speaking. The course includes English grammar, vocabulary, and practice using the language in daily situations."
+                          ? "مثل: تهدف صف الدورة إلى تحسين مهارات المتعلمين في اللغة الإنجليزية من حيث القراءة والمحادثة..."
+                          : "e.g., The course aims to improve learners' English language skills in reading and speaking..."
                       }
                       rows="4"
                       className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
                     ></textarea>
                   </div>
-
-                  {/* Course Objectives */}
                   <div className="mb-8">
                     <label className="block text-sm font-medium mb-1">
-                      {isRTL ? "اهداف الكورس" : "Course Objectives"}
+                      {isRTL ? "هدف الكورس" : "Course Goal"}
                     </label>
                     <textarea
-                      name="objectives"
-                      value={formData.objectives}
+                      name="goal"
+                      value={formData.goal}
                       onChange={handleChange}
                       placeholder={
                         isRTL
-                          ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة، تعلم قواعد اللغة الأساسية، زيادة الثقة في استخدام اللغة الإنجليزية في الحياة اليومية."
-                          : "e.g., Improve reading, writing and speaking skills, learn basic grammar rules, increase confidence in using English in daily life."
+                          ? "مثل: تحسين مهارات القراءة والكتابة والمحادثة..."
+                          : "e.g., Improve reading, writing and speaking skills..."
                       }
                       rows="4"
                       className="w-full textarea textarea-bordered bg-base-200 placeholder-base-content/50"
                     ></textarea>
                   </div>
                 </div>
-
-                {/* Right Column */}
                 <div className="space-y-6">
-                  {/* Course Image Upload */}
                   <div>
                     <h2 className="block text-lg text-primary font-medium mb-2">
                       {isRTL ? "صورة الكورس" : "Course Image"}
@@ -567,18 +729,13 @@ function CourseCreationForm() {
                     </label>
                     {courseImage && (
                       <p className="text-sm mt-2 text-center">
-                        {isRTL ? "تم اختيار: " : "Selected: "}
-                        {courseImage.name}
+                        {isRTL ? "تم اختيار: " : "Selected: "} {courseImage.name}
                       </p>
                     )}
                   </div>
-
-                  {/* Course Video Upload */}
                   <div>
                     <h2 className="block text-lg text-primary font-medium mb-2">
-                      {isRTL
-                        ? "فيديو مقدمة الكورس"
-                        : "Course Introduction Video"}
+                      {isRTL ? "فيديو مقدمة الكورس" : "Course Introduction Video"}
                     </h2>
                     <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
                       <Video className="w-10 h-10 mb-2 text-primary" />
@@ -597,13 +754,10 @@ function CourseCreationForm() {
                     </label>
                     {courseVideo && (
                       <p className="text-sm mt-2 text-center">
-                        {isRTL ? "تم اختيار: " : "Selected: "}
-                        {courseVideo.name}
+                        {isRTL ? "تم اختيار: " : "Selected: "} {courseVideo.name}
                       </p>
                     )}
                   </div>
-
-                  {/* Course Type and Pricing */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div>
                       <h2 className="block text-lg text-primary font-medium mb-2">
@@ -633,76 +787,57 @@ function CourseCreationForm() {
                           <span>{isRTL ? "مجاني" : "Free"}</span>
                         </label>
                       </div>
-
                       {formData.courseType === "paid" && (
                         <div className="mt-6 space-y-4 mb-6">
                           <h2 className="block text-lg text-primary font-medium">
                             {isRTL ? "سعر الكورس" : "Course Price"}
                           </h2>
-                          {/* Full Course Price */}
                           <div>
                             <label className="block text-sm font-medium mb-1">
                               {isRTL ? "الكورس كامل" : "Full Course"}
                             </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                name="priceFull"
-                                value={formData.priceFull}
-                                onChange={handleChange}
-                                placeholder={
-                                  isRTL ? "الكورس كامل" : "Full Course"
-                                }
-                                className="input input-bordered bg-base-200 flex-1"
-                              />
-                            </div>
+                            <input
+                              type="text"
+                              name="priceFull"
+                              value={formData.priceFull}
+                              onChange={handleChange}
+                              placeholder={isRTL ? "الكورس كامل" : "Full Course"}
+                              className="input input-bordered bg-base-200 flex-1"
+                            />
                           </div>
-
-                          {/* Monthly Price */}
                           <div>
                             <label className="block text-sm font-medium mb-1">
                               {isRTL ? "سعر الشهر" : "Monthly Price"}
                             </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                name="priceMonthly"
-                                value={formData.priceMonthly}
-                                onChange={handleChange}
-                                placeholder={
-                                  isRTL ? "سعر الشهر" : "Monthly Price"
-                                }
-                                className="input input-bordered bg-base-200 flex-1"
-                              />
-                            </div>
+                            <input
+                              type="text"
+                              name="priceMonthly"
+                              value={formData.priceMonthly}
+                              onChange={handleChange}
+                              placeholder={isRTL ? "سعر الشهر" : "Monthly Price"}
+                              className="input input-bordered bg-base-200 flex-1"
+                            />
                           </div>
-
-                          {/* Session Price */}
                           <div>
                             <label className="block text-sm font-medium mb-1">
                               {isRTL ? "سعر الحصة" : "Session Price"}
                             </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                name="priceSession"
-                                value={formData.priceSession}
-                                onChange={handleChange}
-                                placeholder={
-                                  isRTL ? "سعر الحصة" : "Session Price"
-                                }
-                                className="input input-bordered bg-base-200 flex-1"
-                              />
-                            </div>
+                            <input
+                              type="text"
+                              name="priceSession"
+                              value={formData.priceSession}
+                              onChange={handleChange}
+                              placeholder={isRTL ? "سعر الحصة" : "Session Price"}
+                              className="input input-bordered bg-base-200 flex-1"
+                            />
                           </div>
                         </div>
                       )}
-                      {/* Access Validity */}
                       <div className="mb-6">
                         <h2 className="block text-primary text-lg font-medium mb-2">
                           {isRTL ? "صلاحية الوصول" : "Access Validity"}
                         </h2>
-                        <div className="flex gap-8  ">
+                        <div className="flex gap-8">
                           <label className="flex items-center gap-2">
                             <input
                               type="radio"
@@ -712,9 +847,7 @@ function CourseCreationForm() {
                               onChange={handleChange}
                               className="radio radio-primary"
                             />
-                            <span>
-                              {isRTL ? "التطبيق و المنصة" : "App and Platform"}
-                            </span>
+                            <span>{isRTL ? "التطبيق و المنصة" : "App and Platform"}</span>
                           </label>
                           <label className="flex items-center gap-2">
                             <input
@@ -729,13 +862,11 @@ function CourseCreationForm() {
                           </label>
                         </div>
                       </div>
-
-                      {/* Course Privacy */}
                       <div>
                         <h2 className="block text-primary text-lg font-medium mb-3">
                           {isRTL ? "خصوصية الكورس" : "Course Privacy"}
                         </h2>
-                        <div className="flex gap-8 ">
+                        <div className="flex gap-8">
                           <label className="flex items-center gap-2">
                             <input
                               type="radio"
@@ -745,9 +876,7 @@ function CourseCreationForm() {
                               onChange={handleChange}
                               className="radio radio-primary"
                             />
-                            <span>
-                              {isRTL ? "طالب / ولی امر" : "Student / Guardian"}
-                            </span>
+                            <span>{isRTL ? "طالب / ولی امر" : "Student / Guardian"}</span>
                           </label>
                           <label className="flex items-center gap-2">
                             <input
@@ -767,393 +896,437 @@ function CourseCreationForm() {
                 </div>
               </div>
             </div>
-
-            {/* Submit Button */}
             <div className="flex justify-center mt-8">
               <button
                 type="submit"
                 className="btn btn-primary px-8 py-3 text-lg"
-                disabled={isSubmitting}
+                disabled={isSubmitting || courseStructure.parent}
               >
                 {isSubmitting ? (
                   <span className="loading loading-spinner"></span>
-                ) : isRTL ? (
-                  "إنشاء الكورس"
+                ) : courseStructure.parent ? (
+                  isRTL ? "تم إنشاء الحاوية الرئيسية" : "Parent Container Created"
                 ) : (
-                  "Create Course"
+                  isRTL ? "إنشاء الحاوية الرئيسية" : "Create Parent Container"
                 )}
               </button>
             </div>
           </motion.div>
         </form>
 
-        {/* Curriculum Section - Added after the main form */}
-        <div className="mt-12">
-          <CurriculumSection
-            courseData={{
-              courseName: formData.courseName,
-              createdBy: createdBy,
-              gradeLevel: formData.gradeLevel,
-              subject: formData.subject,
-              privacy: formData.privacy,
-              priceFull: formData.priceFull,
-              _id: containerId,
-            }}
-            monthLectures={monthLectures}
-            setMonthLectures={setMonthLectures}
-            newLectureLink={newLectureLink}
-            setNewLectureLink={setNewLectureLink}
-            handleAddLecture={handleAddLecture}
-            handleSubmitLectures={handleSubmitLectures}
-            isSubmitting={isSubmitting}
-            isRTL={isRTL}
-          />
-        </div>
+        {/* Container Hierarchy Section */}
+        {courseStructure.parent && (
+          <div className="mt-12">
+            <div className="bg-base-100 rounded-xl shadow-md p-6">
+              <h2 className="text-lg font-bold mb-6 text-primary text-center">
+                {isRTL ? "هيكل المحتوى التعليمي" : "Educational Content Structure"}
+              </h2>
+              
+              {/* Parent Container Info */}
+              <div className="bg-base-200 p-4 rounded-lg mb-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-base font-medium">
+                    {isRTL ? "الحاوية الرئيسية" : "Parent Container"}
+                  </h3>
+                  <span className="badge badge-primary">{courseStructure.parent.name}</span>
+                </div>
+                <p className="text-sm mt-2">
+                  {isRTL ? "معرف الحاوية: " : "Container ID: "}
+                  <code className="text-xs bg-base-300 p-1 rounded">{courseStructure.parent.id}</code>
+                </p>
+              </div>
+              
+              {/* Course Structure Visualization */}
+              <div className="mb-6 bg-base-200 p-4 rounded-lg">
+                <h3 className="text-base font-medium mb-3 text-primary">
+                  {isRTL ? "هيكل الكورس" : "Course Structure"}
+                </h3>
+                <div className="pl-4 border-l-2 border-primary">
+                  <div className="mb-2">
+                    <span className="font-medium">{courseStructure.parent.name}</span> 
+                    <span className="text-xs text-base-content/70"> ({isRTL ? "الحاوية الرئيسية" : "Parent Container"})</span>
+                  </div>
+                  
+                  {courseStructure.years.length > 0 && (
+                    <div className="pl-4 border-l-2 border-secondary">
+                      {courseStructure.years.map(year => (
+                        <div key={year.id} className="mb-2">
+                          <div className="mb-1">
+                            <span className="font-medium">{year.name}</span>
+                            <span className="text-xs text-base-content/70"> ({isRTL ? "حاوية السنة" : "Year Container"})</span>
+                          </div>
+                          
+                          {courseStructure.terms.filter(term => term.parent === year.id).length > 0 && (
+                            <div className="pl-4 border-l-2 border-accent">
+                              {courseStructure.terms
+                                .filter(term => term.parent === year.id)
+                                .map(term => (
+                                  <div key={term.id} className="mb-2">
+                                    <div className="mb-1">
+                                      <span className="font-medium">{term.name}</span>
+                                      <span className="text-xs text-base-content/70"> ({isRTL ? "حاوية الفصل الدراسي" : "Term Container"})</span>
+                                    </div>
+                                    
+                                    {courseStructure.months.filter(month => month.parent === term.id).length > 0 && (
+                                      <div className="pl-4 border-l-2 border-info">
+                                        {courseStructure.months
+                                          .filter(month => month.parent === term.id)
+                                          .map(month => (
+                                            <div key={month.id} className="mb-2">
+                                              <div className="mb-1">
+                                                <span className="font-medium">{month.name}</span>
+                                                <span className="text-xs text-base-content/70"> ({isRTL ? "حاوية الشهر" : "Month Container"})</span>
+                                              </div>
+                                              
+                                              {courseStructure.lectures.filter(lecture => lecture.parent === month.id).length > 0 && (
+                                                <div className="pl-4 border-l-2 border-success">
+                                                  {courseStructure.lectures
+                                                    .filter(lecture => lecture.parent === month.id)
+                                                    .map(lecture => (
+                                                      <div key={lecture.id} className="mb-1">
+                                                        <FileText className="w-3 h-3 inline-block mr-1 text-primary" />
+                                                        <span>{lecture.name}</span>
+                                                      </div>
+                                                    ))}
+                                                </div>
+                                              )}
+                                            </div>
+                                          ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Year Container Section */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-base font-medium text-primary">
+                    {isRTL ? "إضافة حاوية السنة" : "Add Year Container"}
+                  </h3>
+                  <span className="badge badge-outline">
+                    {courseStructure.years.length} {isRTL ? "حاوية" : "containers"}
+                  </span>
+                </div>
+                
+                {/* Add Year Form */}
+                <form onSubmit={handleCreateYearContainer} className="mb-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newYearName}
+                      onChange={(e) => setNewYearName(e.target.value)}
+                      placeholder={isRTL ? "اسم السنة الجديدة" : "New year name"}
+                      className="input input-bordered flex-1"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        <>
+                          <FolderPlus className="w-4 h-4 mr-1" />
+                          {isRTL ? "إضافة" : "Add"}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+                
+                {/* Year Containers List */}
+                {courseStructure.years.length > 0 && (
+                  <div className="space-y-2">
+                    {courseStructure.years.map((year) => (
+                      <div key={year.id} className="bg-base-200 p-3 rounded-lg">
+                        <div 
+                          className="flex justify-between items-center cursor-pointer"
+                          onClick={() => toggleExpand('year', year.id)}
+                        >
+                          <div className="flex items-center">
+                            <ChevronDown 
+                              className={`w-4 h-4 mr-2 transition-transform ${expandedItems[`year_${year.id}`] ? 'rotate-180' : ''}`} 
+                            />
+                            <span>{year.name}</span>
+                          </div>
+                          <button 
+                            className="btn btn-xs btn-ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedYearId(year.id);
+                            }}
+                          >
+                            {selectedYearId === year.id ? (
+                              <span className="text-primary text-xs">✓ {isRTL ? "محدد" : "Selected"}</span>
+                            ) : (
+                              <span className="text-xs">{isRTL ? "تحديد" : "Select"}</span>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Term Container Form */}
+              <div className="mb-8">
+                <h3 className="text-base font-medium text-primary mb-4">
+                  {isRTL ? "إضافة فصل دراسي" : "Add Term Container"}
+                </h3>
+                
+                <form onSubmit={handleCreateTermContainer}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <input
+                        type="text"
+                        value={newTermName}
+                        onChange={(e) => setNewTermName(e.target.value)}
+                        placeholder={isRTL ? "اسم الفصل الدراسي" : "Term name"}
+                        className="input input-bordered w-full"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isSubmitting || !selectedYearId}
+                    >
+                      {isSubmitting ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        <>
+                          <FolderPlus className="w-4 h-4 mr-1" />
+                          {isRTL ? "إضافة فصل دراسي" : "Add Term"}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {!selectedYearId && (
+                    <p className="text-xs text-warning mt-2">
+                      {isRTL ? "يرجى تحديد سنة أولاً" : "Please select a year first"}
+                    </p>
+                  )}
+                </form>
+                
+                {/* Term Containers List */}
+                {selectedYearId && courseStructure.terms.filter(term => term.parent === selectedYearId).length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium mb-2">
+                      {isRTL ? "الفصول الدراسية في السنة المحددة" : "Terms in Selected Year"}
+                    </h4>
+                    {courseStructure.terms
+                      .filter(term => term.parent === selectedYearId)
+                      .map(term => (
+                        <div key={term.id} className="bg-base-200 p-3 rounded-lg">
+                          <div 
+                            className="flex justify-between items-center cursor-pointer"
+                            onClick={() => toggleExpand('term', term.id)}
+                          >
+                            <div className="flex items-center">
+                              <ChevronDown 
+                                className={`w-4 h-4 mr-2 transition-transform ${expandedItems[`term_${term.id}`] ? 'rotate-180' : ''}`} 
+                              />
+                              <span>{term.name}</span>
+                            </div>
+                            <button 
+                              className="btn btn-xs btn-ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTermId(term.id);
+                              }}
+                            >
+                              {selectedTermId === term.id ? (
+                                <span className="text-primary text-xs">✓ {isRTL ? "محدد" : "Selected"}</span>
+                              ) : (
+                                <span className="text-xs">{isRTL ? "تحديد" : "Select"}</span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Month Container Form */}
+              <div className="mb-8">
+                <h3 className="text-base font-medium text-primary mb-4">
+                  {isRTL ? "إضافة شهر" : "Add Month Container"}
+                </h3>
+                
+                <form onSubmit={handleCreateMonthContainer}>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <input
+                        type="text"
+                        value={newMonthName}
+                        onChange={(e) => setNewMonthName(e.target.value)}
+                        placeholder={isRTL ? "اسم الشهر" : "Month name"}
+                        className="input input-bordered w-full"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isSubmitting || !selectedTermId}
+                    >
+                      {isSubmitting ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        <>
+                          <FolderPlus className="w-4 h-4 mr-1" />
+                          {isRTL ? "إضافة شهر" : "Add Month"}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {!selectedTermId && (
+                    <p className="text-xs text-warning mt-2">
+                      {isRTL ? "يرجى تحديد فصل دراسي أولاً" : "Please select a term first"}
+                    </p>
+                  )}
+                </form>
+                
+                {/* Month Containers List */}
+                {selectedTermId && courseStructure.months.filter(month => month.parent === selectedTermId).length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium mb-2">
+                      {isRTL ? "الشهور في الفصل الدراسي المحدد" : "Months in Selected Term"}
+                    </h4>
+                    {courseStructure.months
+                      .filter(month => month.parent === selectedTermId)
+                      .map(month => (
+                        <div key={month.id} className="bg-base-200 p-3 rounded-lg">
+                          <div 
+                            className="flex justify-between items-center cursor-pointer"
+                            onClick={() => toggleExpand('month', month.id)}
+                          >
+                            <div className="flex items-center">
+                              <ChevronDown 
+                                className={`w-4 h-4 mr-2 transition-transform ${expandedItems[`month_${month.id}`] ? 'rotate-180' : ''}`} 
+                              />
+                              <span>{month.name}</span>
+                            </div>
+                            <button 
+                              className="btn btn-xs btn-ghost"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedMonthId(month.id);
+                              }}
+                            >
+                              {selectedMonthId === month.id ? (
+                                <span className="text-primary text-xs">✓ {isRTL ? "محدد" : "Selected"}</span>
+                              ) : (
+                                <span className="text-xs">{isRTL ? "تحديد" : "Select"}</span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Lecture Form */}
+              <div>
+                <h3 className="text-base font-medium text-primary mb-4">
+                  {isRTL ? "إضافة محاضرة" : "Add Lecture"}
+                </h3>
+                
+                <form onSubmit={handleCreateLecture}>
+                  <div className="grid grid-cols-1 gap-4">
+                    <input
+                      type="text"
+                      value={newLectureName}
+                      onChange={(e) => setNewLectureName(e.target.value)}
+                      placeholder={isRTL ? "اسم المحاضرة" : "Lecture name"}
+                      className="input input-bordered w-full"
+                      required
+                    />
+                    <input
+                      type="text"
+                      value={newLectureLink}
+                      onChange={(e) => setNewLectureLink(e.target.value)}
+                      placeholder={isRTL ? "رابط الفيديو" : "Video link"}
+                      className="input input-bordered w-full"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isSubmitting || !selectedMonthId}
+                    >
+                      {isSubmitting ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        <>
+                          <FileText className="w-4 h-4 mr-1" />
+                          {isRTL ? "إضافة محاضرة" : "Add Lecture"}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {!selectedMonthId && (
+                    <p className="text-xs text-warning mt-2">
+                      {isRTL ? "يرجى تحديد شهر أولاً" : "Please select a month first"}
+                    </p>
+                  )}
+                </form>
+                
+                {/* Lectures List */}
+                {selectedMonthId && courseStructure.lectures.filter(lecture => lecture.parent === selectedMonthId).length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium mb-2">
+                      {isRTL ? "المحاضرات في الشهر المحدد" : "Lectures in Selected Month"}
+                    </h4>
+                    {courseStructure.lectures
+                      .filter(lecture => lecture.parent === selectedMonthId)
+                      .map(lecture => (
+                        <div key={lecture.id} className="bg-base-200 p-3 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                              <FileText className="w-4 h-4 mr-2 text-primary" />
+                              <span>{lecture.name}</span>
+                            </div>
+                            <a 
+                              href={lecture.videoLink} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="btn btn-xs btn-ghost"
+                            >
+                              <Video className="w-3 h-3 mr-1" />
+                              <span className="text-xs">{isRTL ? "عرض" : "View"}</span>
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-const CurriculumSection = ({
-  courseData,
-  monthLectures,
-  setMonthLectures,
-  newLectureLink,
-  setNewLectureLink,
-  handleAddLecture,
-  handleSubmitLectures,
-  isSubmitting,
-  isRTL,
-}) => {
-  const [expandedCards, setExpandedCards] = useState({
-    curriculum1: false,
-    curriculum2: false,
-    curriculum3: false,
-  });
-  const [expandedMonths, setExpandedMonths] = useState({
-    card1: null,
-    card2: null,
-    card3: null,
-  });
-
-  const toggleCard = (card) => {
-    setExpandedCards((prev) => ({
-      ...prev,
-      [card]: !prev[card],
-    }));
-  };
-
-  const toggleMonth = (card, month) => {
-    setExpandedMonths((prev) => ({
-      ...prev,
-      [card]: prev[card] === month ? null : month,
-    }));
-  };
-
-  return (
-    <div className="flex justify-center w-full px-4 sm:px-6 lg:px-8">
-      <div
-        className="bg-base-100 p-4 sm:p-6 rounded-lg shadow-sm w-full max-w-4xl space-y-6"
-        dir={isRTL ? "rtl" : "ltr"}
-      >
-        {/* First Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "المنهج الدراسي" : "Curriculum"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL
-                ? "اضف حاوية لمحتوايات الكورس"
-                : "Add Course Content Container"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum1")}
-            >
-              {isRTL ? "اضف حاوية" : "Add to Container"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum1 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "حاوية الترم الاول" : "First Term Container"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {[1, 2, 3, 4].map((month) => (
-                  <li
-                    key={`card1-${month}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card1", month)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `الشهر ${
-                              month === 1
-                                ? "الاول"
-                                : month === 2
-                                ? "الثاني"
-                                : month === 3
-                                ? "الثالث"
-                                : "الرابع"
-                            }`
-                          : `Month ${month}`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card1 === month ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card1 === month && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300 space-y-3">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={newLectureLink}
-                            onChange={(e) => setNewLectureLink(e.target.value)}
-                            placeholder={
-                              isRTL ? "رابط المحاضرة" : "Lecture link"
-                            }
-                            className="input input-bordered flex-1"
-                          />
-                          <button
-                            onClick={() => handleAddLecture(month)}
-                            className="btn btn-primary"
-                          >
-                            {isRTL ? "إضافة" : "Add"}
-                          </button>
-                        </div>
-
-                        {monthLectures[month].length > 0 && (
-                          <div className="space-y-2">
-                            <h5 className="text-sm font-medium">
-                              {isRTL ? "المحاضرات المضافة" : "Added lectures"}
-                            </h5>
-                            <ul className="space-y-1">
-                              {monthLectures[month].map((lecture, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-center justify-between"
-                                >
-                                  <span className="text-sm truncate max-w-xs">
-                                    {lecture.videoLink}
-                                  </span>
-                                  <button
-                                    onClick={() =>
-                                      setMonthLectures((prev) => ({
-                                        ...prev,
-                                        [month]: prev[month].filter(
-                                          (_, i) => i !== idx
-                                        ),
-                                      }))
-                                    }
-                                    className="btn btn-ghost btn-xs"
-                                  >
-                                    <Trash2 className="w-3 h-3 text-error" />
-                                  </button>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-
-              {/* Submit button for all lectures */}
-              {(monthLectures[1].length > 0 ||
-                monthLectures[2].length > 0 ||
-                monthLectures[3].length > 0 ||
-                monthLectures[4].length > 0) && (
-                <div className="flex justify-center mt-4">
-                  <button
-                    onClick={handleSubmitLectures}
-                    disabled={isSubmitting}
-                    className="btn btn-primary"
-                  >
-                    {isSubmitting ? (
-                      <span className="loading loading-spinner"></span>
-                    ) : isRTL ? (
-                      "حفظ المحاضرات"
-                    ) : (
-                      "Save Lectures"
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Second Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "الملحقات" : "Attachments"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL ? "اضف ملحقات الكورس" : "Add Course Attachments"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum2")}
-            >
-              {isRTL ? "اضف ملحق" : "Add Attachment"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum2 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "ملحقات الكورس" : "Course Attachments"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {["PDF", "Video", "Audio", "Document"].map((type, index) => (
-                  <li
-                    key={`card2-${index}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card2", index)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `ملحق ${index + 1} (${type})`
-                          : `Attachment ${index + 1} (${type})`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card2 === index ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card2 === index && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
-                        <p className="text-xs sm:text-sm text-base-content/70">
-                          {isRTL ? "تفاصيل المرفق..." : "Attachment details..."}
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* Third Curriculum Card */}
-        <div className="space-y-4">
-          <h2 className="text-center text-lg font-semibold text-primary">
-            {isRTL ? "الامتحانات" : "Exams"}
-          </h2>
-          <div className="border-2 border-secondary rounded-xl bg-primary/30 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h3 className="text-base sm:text-lg font-medium text-base-content text-center sm:text-start">
-              {isRTL ? "اضف امتحانات الكورس" : "Add Course Exams"}
-            </h3>
-            <button
-              className="btn btn-primary gap-2 w-full sm:w-auto"
-              onClick={() => toggleCard("curriculum3")}
-            >
-              {isRTL ? "اضف امتحان" : "Add Exam"}
-              <PlusCircle className="w-4 h-4" />
-            </button>
-          </div>
-
-          {expandedCards.curriculum3 && (
-            <div className="bg-base-100 p-3 sm:p-4 rounded-lg shadow-inner space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                <h4 className="font-medium text-base-content text-center sm:text-start">
-                  {isRTL ? "امتحانات الكورس" : "Course Exams"}
-                </h4>
-                <div className="flex gap-2">
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Edit2 className="w-4 h-4 text-primary" />
-                  </button>
-                  <button className="btn btn-ghost btn-square btn-sm">
-                    <Trash2 className="w-4 h-4 text-error" />
-                  </button>
-                </div>
-              </div>
-
-              <ul className="space-y-2">
-                {["Midterm", "Final", "Quiz 1", "Quiz 2"].map((exam, index) => (
-                  <li
-                    key={`card3-${index}`}
-                    className="bg-base-200 rounded-lg overflow-hidden"
-                  >
-                    <div
-                      className="flex justify-between items-center p-2 sm:p-3 cursor-pointer hover:bg-base-300"
-                      onClick={() => toggleMonth("card3", index)}
-                    >
-                      <span className="text-sm sm:text-base text-base-content/80">
-                        {isRTL
-                          ? `امتحان ${index + 1} (${exam})`
-                          : `Exam ${index + 1} (${exam})`}
-                      </span>
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedMonths.card3 === index ? "rotate-180" : ""
-                        }`}
-                      />
-                    </div>
-
-                    {expandedMonths.card3 === index && (
-                      <div className="p-2 sm:p-3 bg-base-100 border-t border-base-300">
-                        <p className="text-xs sm:text-sm text-base-content/70">
-                          {isRTL ? "تفاصيل الامتحان..." : "Exam details..."}
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 function CoursesForm() {
   return (
     <div className="w-full overflow-x-hidden p-4 sm:p-8 md:p-14">
       <CourseCreationForm />
-      {/*<CurriculumSection />*/}
     </div>
   );
 }
