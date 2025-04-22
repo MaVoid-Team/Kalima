@@ -137,6 +137,23 @@ export const createUser = async (userData) => {
   }
 };
 
+export const bulkCreateUsers = async (formData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/users/accounts/bulk-create`, formData, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to bulk create users",
+    };
+  }
+};
+
 // --------END CREATE USER--------
 
 // --------START DELETE USER--------
