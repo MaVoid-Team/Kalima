@@ -4,24 +4,40 @@ import { Link } from 'react-router-dom';
 import { Navbar, Button } from 'react-daisyui';
 import ThemeSwitcher from './ThemeSwitcher';
 import LanguageSwitcher from './LanguageSwitcher';
+import { isLoggedIn, getUserDashboard } from '../routes/auth-services'; // Adjust the import path as necessary
 
 const NavBar = () => {
   const { t, i18n } = useTranslation('common');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const isAr = i18n.language === 'ar';
-  const navbarRef = useRef(null); 
-  const menuRef = useRef(null);   
+  const navbarRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (isLoggedIn()) {
+        const result = await getUserDashboard();
+        if (result.success) {
+          setUserRole(result.data.data.userInfo.role);
+        } else {
+          setUserRole(null);
+        }
+      } else {
+        setUserRole(null);
+      }
+    };
+    fetchDashboard();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-
       if (menuOpen && 
           !navbarRef.current?.contains(event.target) && 
           !menuRef.current?.contains(event.target)) {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('touchstart', handleClickOutside);
     return () => {
@@ -33,6 +49,23 @@ const NavBar = () => {
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
   }, [menuOpen]);
+
+  const getDashboardPath = (role) => {
+    switch (role) {
+      case 'Student':
+        return '/dashboard/student-dashboard/promo-codes';
+      case 'Lecturer':
+        return '/dashboard/lecturer-dashboard';
+      case 'Admin':
+      case 'Moderator':
+      case 'Subadmin':
+        return '/dashboard/admin-dashboard';
+      case 'Assistant':
+        return '/dashboard/assistant-dashboard';
+      default:
+        return '/';
+    }
+  };
 
   const navItems = [
     { key: 'homepage', path: '/' },
@@ -49,7 +82,6 @@ const NavBar = () => {
 
   return (
     <Navbar className="top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky" dir={isAr ? 'rtl' : 'ltr'}>
-      
       <div ref={navbarRef} className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
         <div className="flex items-center gap-4">
@@ -88,7 +120,7 @@ const NavBar = () => {
           </Link>
           
           {/* Desktop Navigation Items */}
-          <div className="hidden lg:flex  xl:gap-4  ml-4 rounded-2xl">
+          <div className="hidden lg:flex xl:gap-4 ml-4 rounded-2xl">
             {navItems.map((item) => (
               <Link
                 key={item.key}
@@ -98,7 +130,13 @@ const NavBar = () => {
                 {t(item.key)}
               </Link>
             ))}
-            <ThemeSwitcher />
+            {userRole ? (
+              <Link to={getDashboardPath(userRole)} className="btn btn-ghost rounded-2xl">
+                {t('dashboard')}
+              </Link>
+            ) : (
+              <ThemeSwitcher />
+            )}
             <LanguageSwitcher />
           </div>
         </div>
@@ -109,7 +147,7 @@ const NavBar = () => {
             <Link
               key={item.key}
               to={item.path}
-              className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'}  rounded-2xl`}
+              className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
             >
               {t(item.key)}
             </Link>
@@ -117,7 +155,7 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Mobile menu with ref */}
+      {/* Mobile menu */}
       {menuOpen && (
         <div
           ref={menuRef}
@@ -126,7 +164,7 @@ const NavBar = () => {
         >
           <div className="p-2 space-y-3 h-[calc(100vh-4rem)]">
             {/* Mobile menu header */}
-            <div className='gap-4 flex rounded-2xl'>
+            <div className="gap-4 flex rounded-2xl">
               <Button
                 color="ghost"
                 className="lg:hidden rounded-2xl"
@@ -169,9 +207,18 @@ const NavBar = () => {
             ))}
             
             <div className="divider" />
-            <ThemeSwitcher />
+            {userRole ? (
+              <Link
+                to={getDashboardPath(userRole)}
+                className="btn btn-ghost justify-start w-full rounded-2xl"
+                onClick={() => setMenuOpen(false)}
+              >
+                {t('dashboard')}
+              </Link>
+            ) : (
+              <ThemeSwitcher />
+            )}
             <LanguageSwitcher />
- 
             
             {authItems.map((item) => (
               <Link
