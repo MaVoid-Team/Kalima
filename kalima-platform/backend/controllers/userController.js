@@ -136,7 +136,6 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   switch (foundUser.role.toLowerCase()) {
     case "teacher":
-      // fix a bug here : replace runvalidators with runValidators
       user = await Teacher.findByIdAndUpdate(userId, updatedUser, {
         new: true,
         runValidators: true,
@@ -144,6 +143,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
+  
     case "student":
       user = await Student.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -152,6 +152,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
+  
     case "parent":
       user = await Parent.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -160,6 +161,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
+  
     case "lecturer":
       user = await Lecturer.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -168,14 +170,34 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
+  
     case "assistant":
       user = await Assistant.findByIdAndUpdate(userId, updatedUser, {
         new: true,
         runValidators: true,
       })
-        .select("-password")
+        .select(selectedFields)     
         .lean();
       break;
+  
+    case "moderator":
+      user = await Moderator.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
+      break;
+  
+    case "subadmin":
+      user = await SubAdmin.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
+      break;
+  
     default:
       return next(new AppError("Invalid role", 400));
   }
