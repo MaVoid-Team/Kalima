@@ -11,7 +11,7 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+console.log("Axios Base URL:", api.defaults.baseURL);
 // Request interceptor to add auth token to all requests
 api.interceptors.request.use(
   (config) => {
@@ -58,7 +58,8 @@ const handleRequest = async (method, url, data = {}, options = {}) => {
       success: true, 
       data: response.data,
       status: response.status,
-      headers: response.headers
+      headers: response.headers,
+      error: response.data.error
     };
   } catch (error) {
     console.error(`API Error (${method.toUpperCase()} ${url}):`, error.response || error);
@@ -66,7 +67,7 @@ const handleRequest = async (method, url, data = {}, options = {}) => {
     return {
       success: false,
       status: error.response?.status,
-      error: error.response?.data?.message || "Something went wrong",
+      error: data,
       details: error.response?.data || error.message
     };
   }
