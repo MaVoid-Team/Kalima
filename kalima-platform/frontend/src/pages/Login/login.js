@@ -156,6 +156,9 @@ const TeacherLogin = () => {
                 className="input input-bordered w-full" 
                 required
               />
+              <div>
+                <p>error: {error}</p>
+              </div>
               <label className="label">
                 <Link to="/forgot-password" className="label-text-alt link link-hover text-primary">
                   {t('forgotPassword', 'Forgot password?')}
