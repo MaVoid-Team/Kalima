@@ -1,238 +1,322 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { Search } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { getAllSubjects } from "../routes/courses";
-import { FilterDropdown } from "../../src/components/FilterDropdown";
-import { LoadingSpinner } from "../components/LoadingSpinner";
-import { ErrorAlert } from "../components/ErrorAlert";
-import { CourseCard } from "../components/CourseCard";
-import { motion, AnimatePresence } from "framer-motion";
-
-
-// Fake data for courses
-const fakeCourses = [
-  {
-    id: 3,
-    image: "/course-3.png",
-    title: "أساسيات الفيزياء",
-    subject: "فيزياء",
-    teacher: "أستاذة سارة",
-    grade: "الصف الأول الثانوي",
-    rating: 5,
-    stage: "المرحلة الثانوية",
-    type: "تدريبات",
-    status: "مجاني",
-  },
-];
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { Search } from "lucide-react"
+import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { getAllContainers } from "../routes/lectures"
+import { FilterDropdown } from "../../src/components/FilterDropdown"
+import { LoadingSpinner } from "../components/LoadingSpinner"
+import { ErrorAlert } from "../components/ErrorAlert"
+import { CourseCard } from "../components/CourseCard"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function CoursesPage() {
-  const [subjects, setSubjects] = useState([]);
-  const [filteredCourses, setFilteredCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const { t, i18n } = useTranslation("courses");
-  const isRTL = i18n.language === 'ar';
+  const [containers, setContainers] = useState([])
+  const [filteredContainers, setFilteredContainers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const { t, i18n } = useTranslation("courses")
+  const isRTL = i18n.language === "ar"
+
   // Filter states
-  const [selectedStage, setSelectedStage] = useState("");
-  const [selectedGrade, setSelectedGrade] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedCourseType, setSelectedCourseType] = useState("");
-  const [selectedCourseStatus, setSelectedCourseStatus] = useState("");
+  const [selectedStage, setSelectedStage] = useState("")
+  const [selectedGrade, setSelectedGrade] = useState("")
+  const [selectedTerm, setSelectedTerm] = useState("")
+  const [selectedSubject, setSelectedSubject] = useState("")
+  const [selectedCourseType, setSelectedCourseType] = useState("")
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
+  const [selectedPrice, setSelectedPrice] = useState("")
 
   useEffect(() => {
-    fetchSubjects();
-  }, []);
+    fetchContainers()
+  }, [])
 
-  // Fetch subjects from the API
-  const fetchSubjects = async () => {
-    setLoading(true);
+  const fetchContainers = async () => {
+    setLoading(true)
+    setError("")
     try {
-      const result = await getAllSubjects();
+      const result = await getAllContainers()
+      console.log("API Response:", result)
 
-      if (result.success && result.data?.data?.subjects?.length > 0) {
-        const subjectsData = result.data.data.subjects;
-        setSubjects(subjectsData);
-        setFilteredCourses(generateCourseData(subjectsData));
+      if (result.status === "success") {
+        setContainers(result.data.containers)
+        setFilteredContainers(result.data.containers)
       } else {
-        // If no data is fetched, use fake data
-        setFilteredCourses(fakeCourses);
+        setError(result.error || "Failed to fetch containers")
       }
     } catch (err) {
-      console.error("Error fetching subjects:", err);
-      setError("حدث خطأ أثناء تحميل البيانات");
-      // If there's an error, use fake data
-      setFilteredCourses(fakeCourses);
+      console.error("Error fetching containers:", err)
+      setError("حدث خطأ أثناء تحميل البيانات")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // Generate course data based on subjects from API
-  const generateCourseData = (subjectsData) => {
-    if (!subjectsData || subjectsData.length === 0) return fakeCourses;
+  // Generate course data based on containers from API
+  const generateCourseData = (containersData) => {
+    return containersData.map((container, index) => {
+      // Get the level name if available
+      const levelName = container.level?.name || ""
 
-    return subjectsData.map((subject, index) => {
-      // Determine stage based on subject's level array if available
-      let stage = "المرحلة الثانوية"; // Default
-      if (subject.level && subject.level.length > 0) {
-        const levelName = subject.level[0].name;
-        if (levelName === "Primary" || levelName === "Upper Primary") {
-          stage = "المرحلة الابتدائية";
-        } else if (levelName === "Middle") {
-          stage = "المرحلة الإعدادية";
+      // Map level name to stage in Arabic
+      let stage = "المرحلة الثانوية" // Default
+      if (levelName) {
+        switch (levelName) {
+          case "Primary":
+            stage = "المرحلة الابتدائية"
+            break
+          case "Middle":
+            stage = "المرحلة الإعدادية"
+            break
+          case "Upper Primary":
+            stage = "المرحلة الابتدائية العليا"
+            break
+          case "Higher Secondary":
+            stage = "المرحلة الثانوية"
+            break
+          default:
+            stage = "المرحلة الثانوية"
         }
-      } else {
-        // Fallback to the original logic if level is not available
-        stage =
-          index % 3 === 0
-            ? "المرحلة الابتدائية"
-            : index % 3 === 1
-            ? "المرحلة الإعدادية"
-            : "المرحلة الثانوية";
+      }
+
+      // Determine if course is free or paid
+      const isFree = container.price === 0
+      const status = isFree ? "مجاني" : "مدفوع"
+
+      // Map container type to course type in Arabic
+      let type = "شرح" // Default
+      switch (container.type) {
+        case "course":
+          type = "شرح"
+          break
+        case "year":
+          type = "سنة كاملة"
+          break
+        case "term":
+          type = "فصل دراسي"
+          break
+        case "month":
+          type = "شهر"
+          break
+        default:
+          type = container.type || "شرح"
       }
 
       return {
-        id: subject._id,
+        id: container._id,
         image: `/course-${(index % 6) + 1}.png`,
-        title: subject.name,
-        subject: subject.name,
-        teacher: `أستاذ ${subject.name}`,
-        grade: "الصف الأول",
-        rating: 4 + (index % 2) * 0.5,
+        title: container.name,
+        subject: container.subject?.name || "",
+        teacher: container.createdBy?.name || "مدرس غير محدد",
+        teacherRole: container.createdBy?.role || "محاضر",
+        grade: levelName,
+        rating: 4 + (index % 2) * 0.5, // Default rating
         stage: stage,
-        type: index % 3 === 0 ? "شرح" : index % 3 === 1 ? "مراجعة" : "تدريبات",
-        status: index % 2 === 0 ? "مجاني" : "مدفوع",
-      };
-    });
-  };
+        type: type,
+        status: status,
+        price: container.price || 0,
+        childrenCount: container.children?.length || 0,
+        containerType: container.type || "lecture",
+      }
+    })
+  }
 
-  // Apply filters to courses
+  // Apply filters to containers
   const applyFilters = useCallback(() => {
-    let filtered =
-      subjects.length > 0 ? generateCourseData(subjects) : fakeCourses;
+    // First, filter the raw container data based on selected criteria
+    let filtered = [...containers]
 
-    if (selectedStage) {
-      filtered = filtered.filter((course) => course.stage === selectedStage);
+    if (selectedSubject) {
+      filtered = filtered.filter((container) => container.subject?.name === selectedSubject)
     }
 
     if (selectedGrade) {
-      filtered = filtered.filter((course) => course.grade === selectedGrade);
-    }
-
-    if (selectedTerm) {
-      // Mock filter for term (not implemented in data)
-      filtered = filtered.filter(
-        (course) => course.term === selectedTerm || !course.term
-      );
-    }
-
-    if (selectedSubject) {
-      filtered = filtered.filter(
-        (course) => course.subject === selectedSubject
-      );
+      filtered = filtered.filter((container) => container.level?.name === selectedGrade)
     }
 
     if (selectedCourseType) {
-      filtered = filtered.filter(
-        (course) => course.type === selectedCourseType
-      );
+      // Map Arabic type back to API type
+      let apiType = "course"
+      switch (selectedCourseType) {
+        case "شرح":
+          apiType = "course"
+          break
+        case "سنة كاملة":
+          apiType = "year"
+          break
+        case "فصل دراسي":
+          apiType = "term"
+          break
+        case "شهر":
+          apiType = "month"
+          break
+        default:
+          apiType = selectedCourseType
+      }
+      filtered = filtered.filter((container) => container.type === apiType)
     }
 
     if (selectedCourseStatus) {
-      filtered = filtered.filter(
-        (course) => course.status === selectedCourseStatus
-      );
+      if (selectedCourseStatus === "مجاني") {
+        filtered = filtered.filter((container) => container.price === 0)
+      } else if (selectedCourseStatus === "مدفوع") {
+        filtered = filtered.filter((container) => container.price > 0)
+      }
     }
 
-    setFilteredCourses(filtered);
+    if (selectedPrice) {
+      const priceRange = selectedPrice.split("-")
+      if (priceRange.length === 2) {
+        const minPrice = Number.parseInt(priceRange[0])
+        const maxPrice = Number.parseInt(priceRange[1])
+        filtered = filtered.filter((container) => container.price >= minPrice && container.price <= maxPrice)
+      }
+    }
+
+    // Then convert the filtered containers to course data format
+    setFilteredContainers(filtered)
   }, [
     selectedStage,
     selectedGrade,
-    selectedTerm,
     selectedSubject,
     selectedCourseType,
     selectedCourseStatus,
-    subjects,
-  ]);
+    selectedPrice,
+    containers,
+  ])
 
   // Reset all filters
   const resetFilters = useCallback(() => {
-    setSelectedStage("");
-    setSelectedGrade("");
-    setSelectedTerm("");
-    setSelectedSubject("");
-    setSelectedCourseType("");
-    setSelectedCourseStatus("");
-    setFilteredCourses(
-      subjects.length > 0 ? generateCourseData(subjects) : fakeCourses
-    );
-  }, [subjects]);
+    setSelectedStage("")
+    setSelectedGrade("")
+    setSelectedTerm("")
+    setSelectedSubject("")
+    setSelectedCourseType("")
+    setSelectedCourseStatus("")
+    setSelectedPrice("")
+    setFilteredContainers(containers)
+  }, [containers])
 
-  // Memoize filtered courses to avoid recalculating on every render
-  const memoizedFilteredCourses = useMemo(
-    () => filteredCourses,
-    [filteredCourses]
-  );
+  // Memoize filtered courses
+  const memoizedFilteredCourses = useMemo(() => generateCourseData(filteredContainers), [filteredContainers])
+
+  // Get unique subjects for the subject filter
+  const subjectOptions = useMemo(() => {
+    const uniqueSubjects = new Set()
+    containers.forEach((container) => {
+      if (container.subject?.name) {
+        uniqueSubjects.add(container.subject.name)
+      }
+    })
+    return Array.from(uniqueSubjects).map((subject) => ({
+      label: subject,
+      value: subject,
+    }))
+  }, [containers])
+
+  // Get unique levels for the grade filter
+  const levelOptions = useMemo(() => {
+    const uniqueLevels = new Set()
+    containers.forEach((container) => {
+      if (container.level?.name) {
+        uniqueLevels.add(container.level.name)
+      }
+    })
+    return Array.from(uniqueLevels).map((level) => ({
+      label: level,
+      value: level,
+    }))
+  }, [containers])
+
+  // Course type options based on container types
+  const typeOptions = useMemo(() => {
+    const uniqueTypes = new Set()
+    containers.forEach((container) => {
+      if (container.type) {
+        uniqueTypes.add(container.type)
+      }
+    })
+
+    return Array.from(uniqueTypes).map((type) => {
+      let label = type
+      switch (type) {
+        case "course":
+          label = "شرح"
+          break
+        case "year":
+          label = "سنة كاملة"
+          break
+        case "term":
+          label = "فصل دراسي"
+          break
+        case "month":
+          label = "شهر"
+          break
+      }
+      return { label, value: label }
+    })
+  }, [containers])
+
+  // Price range options
+  const priceOptions = [
+    { label: "مجاني", value: "0-0" },
+    { label: "أقل من 500 جنيه", value: "1-500" },
+    { label: "500-1000 جنيه", value: "500-1000" },
+    { label: "أكثر من 1000 جنيه", value: "1000-10000" },
+  ]
 
   const filterOptions = [
     {
       label: t("filters.stage"),
       value: selectedStage,
       options: [
-        { label: t("stages.primary"), value: "primary" },
-        { label: t("stages.middle"), value: "middle" },
-        { label: t("stages.secondary"), value: "secondary" },
+        { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
+        { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
+        { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
+        { label: "المرحلة الابتدائية العليا", value: "المرحلة الابتدائية العليا" },
       ],
       onSelect: setSelectedStage,
     },
     {
       label: t("filters.grade"),
       value: selectedGrade,
-      options: [
-        { label: t("grades.first"), value: "first" },
-        { label: t("grades.second"), value: "second" },
-        { label: t("grades.third"), value: "third" },
-      ],
+      options: levelOptions,
       onSelect: setSelectedGrade,
     },
     {
-      label: t("filters.term"),
-      value: selectedTerm,
-      options: [
-        { label: t("terms.first"), value: "first" },
-        { label: t("terms.second"), value: "second" },
-      ],
-      onSelect: setSelectedTerm,
+      label: t("filters.subject"),
+      value: selectedSubject,
+      options: subjectOptions,
+      onSelect: setSelectedSubject,
     },
     {
       label: t("filters.type"),
       value: selectedCourseType,
-      options: [
-        { label: t("types.explanation"), value: "explanation" },
-        { label: t("types.review"), value: "review" },
-        { label: t("types.exercises"), value: "exercises" },
-      ],
+      options: typeOptions,
       onSelect: setSelectedCourseType,
     },
     {
       label: t("filters.status"),
       value: selectedCourseStatus,
       options: [
-        { label: t("status.free"), value: "free" },
-        { label: t("status.paid"), value: "paid" },
+        { label: "مجاني", value: "مجاني" },
+        { label: "مدفوع", value: "مدفوع" },
       ],
       onSelect: setSelectedCourseStatus,
     },
-  ];
+    {
+      label: t("filters.price") || "السعر",
+      value: selectedPrice,
+      options: priceOptions,
+      onSelect: setSelectedPrice,
+    },
+  ]
 
   return (
-    <div className="relative min-h-screen w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="relative min-h-screen w-full" dir={isRTL ? "rtl" : "ltr"}>
       {/* Background Pattern */}
-      <div className={`absolute top-0 ${isRTL ? 'left-0' : 'right-0'} w-2/3 h-screen pointer-events-none z-0`}>
+      <div className={`absolute top-0 ${isRTL ? "left-0" : "right-0"} w-2/3 h-screen pointer-events-none z-0`}>
         <div className="relative w-full h-full">
           <img
             src="/background-courses.png"
@@ -246,35 +330,28 @@ export default function CoursesPage() {
       {/* Main Content */}
       <div className="relative z-10">
         {/* Title Section */}
-        <div className={`container mx-auto px-4 pt-8 pb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <div className={`container mx-auto px-4 pt-8 pb-4 ${isRTL ? "text-right" : "text-left"}`}>
           <div className="relative inline-block">
             <p className="text-3xl font-bold text-primary md:mx-40">{t("title")}</p>
-            <img
-              src="/underline.png"
-              alt="underline"
-              className="object-contain"
-            />
+            <img src="/underline.png" alt="underline" className="object-contain" />
           </div>
         </div>
 
         {/* Search and Filters Section */}
         <div className="container mx-auto px-4 py-4">
-          <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'} mb-4`}>
-            <button
-              className="btn btn-outline btn-sm rounded-md mx-2"
-              onClick={resetFilters}
-            >
+          <div className={`flex justify-start`}>
+            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               {t("filters.reset")}
             </button>
-            <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <button className="btn btn-primary btn-sm rounded-md">
-                {t("search.options")}
-              </button>
+            <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <button className="btn btn-primary btn-sm rounded-md">{t("search.options")}</button>
               <Search className="h-6 w-6" />
             </div>
           </div>
 
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl ${isRTL ? 'ml-auto' : 'mr-auto'}`}>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl ${isRTL ? "ml-auto" : "mr-auto"} mt-4`}
+          >
             {filterOptions.map((filter) => (
               <FilterDropdown
                 key={filter.label}
@@ -289,7 +366,7 @@ export default function CoursesPage() {
 
           <div className="flex justify-center mt-6">
             <button
-              className={`btn btn-accent btn-md rounded-full px-8 ${isRTL ? 'flex-row-reverse' : ''}`}
+              className={`btn btn-accent btn-md rounded-full px-8 ${isRTL ? "flex-row-reverse" : ""}`}
               onClick={applyFilters}
             >
               <Search className="h-5 w-5 ml-2" />
@@ -300,22 +377,25 @@ export default function CoursesPage() {
 
         {/* Courses Section */}
         <div className="container mx-auto px-4 py-8">
-          <h2 className={`text-2xl font-bold text-center mb-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <h2 className={`text-2xl font-bold text-center mb-8 ${isRTL ? "text-right" : "text-left"}`}>
             {t("discover")}
           </h2>
 
           {loading ? (
             <LoadingSpinner />
           ) : error ? (
-            <ErrorAlert error={error} onRetry={fetchSubjects} />
+            <ErrorAlert error={error} onRetry={fetchContainers} />
           ) : memoizedFilteredCourses.length === 0 ? (
-            <div className={`text-center py-12 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
               <p className="text-lg">{t("noCourses")}</p>
-              {(selectedStage || selectedGrade || selectedTerm || selectedSubject || selectedCourseType || selectedCourseStatus) && (
-                <button
-                  className="btn btn-outline btn-sm mt-4"
-                  onClick={resetFilters}
-                >
+              {(selectedStage ||
+                selectedGrade ||
+                selectedTerm ||
+                selectedSubject ||
+                selectedCourseType ||
+                selectedCourseStatus ||
+                selectedPrice) && (
+                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
                   {t("filters.reset")}
                 </button>
               )}
@@ -331,13 +411,15 @@ export default function CoursesPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <CourseCard
-                      {...course}
-                      isRTL={isRTL}
-                      type={t(`types.${course.type}`)}
-                      status={t(`status.${course.status}`)}
-                      stage={t(`stages.${course.stage}`)}
-                    />
+                    <Link to={`/courses/${course.id}`}>
+                      <CourseCard
+                        {...course}
+                        isRTL={isRTL}
+                        childrenCount={course.childrenCount}
+                        teacherRole={course.teacherRole}
+                        status={course.status}
+                      />
+                    </Link>
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -346,5 +428,5 @@ export default function CoursesPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

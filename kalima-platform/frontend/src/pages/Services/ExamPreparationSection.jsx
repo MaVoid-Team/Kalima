@@ -1,8 +1,9 @@
 import React  from "react";
-
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const ExamPreparationSection = React.memo(({ isRTL }) => {
+  const navigate = useNavigate();
   return (
     <div className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 sm:py-16 px-4 sm:px-6 lg:px-8 rounded-xl mt-10">
       <div className="max-w-7xl mx-auto">
@@ -79,6 +80,9 @@ const ExamPreparationSection = React.memo(({ isRTL }) => {
                   className={`flex ${isRTL ? "justify-end" : "justify-start"}`}
                 >
                   <motion.button
+                    onClick={() => {
+                      navigate("/register");
+                    }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium text-white bg-black/20 hover:bg-black/30 border border-white/20 flex items-center gap-2 transition-all"
@@ -168,6 +172,9 @@ const ExamPreparationSection = React.memo(({ isRTL }) => {
                   className={`flex ${isRTL ? "justify-end" : "justify-start"}`}
                 >
                   <motion.button
+                    onClick={() => {
+                      navigate("/register");
+                    }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium text-white bg-black/20 hover:bg-black/30 border border-white/20 flex items-center gap-2 transition-all"

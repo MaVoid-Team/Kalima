@@ -9,7 +9,8 @@
       "grade": "Grade",
       "term": "Term",
       "type": "Course Type",
-      "status": "Course Status"
+      "status": "Course Status",
+      "subject": "Subject"
     },
     "stages": {
       "primary": "Primary Stage",

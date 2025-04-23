@@ -6,8 +6,8 @@ const LanguageCourseCard = React.memo(
     title,
     subtitle,
     rating = 0,
-    imageUrl = "/languagedetails.png",
-    buttonText = "View Details",
+    imageUrl = "/languagedetails.png"
+    // buttonText = "View Details",
   }) => {
     const stars = Array(5)
       .fill(0)
@@ -50,7 +50,7 @@ const LanguageCourseCard = React.memo(
               ))}
             </div>
             <div className="card-actions justify-end mt-4">
-              <button
+              {/* <button
                 className={`btn btn-primary btn-xs sm:btn-sm ${
                   isRTL ? "flex-row-reverse" : ""
                 }`}
@@ -76,7 +76,7 @@ const LanguageCourseCard = React.memo(
                     }
                   />
                 </svg>
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

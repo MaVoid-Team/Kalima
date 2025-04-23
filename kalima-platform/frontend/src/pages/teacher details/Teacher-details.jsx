@@ -1,11 +1,11 @@
-
 "use client"
 
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from "react"
 import { Clock, Loader } from "lucide-react"
-import { getUserById } from "../../routes/fetch-users"
 import { useParams } from "react-router-dom"
+import { getUserById } from "../../routes/fetch-users"
+import { getContainersByLecturerId } from "../../routes/lectures"
 
 // Separate component for the teacher information header
 const TeacherInfoHeader = () => {
@@ -26,30 +26,7 @@ const TeacherInfoHeader = () => {
 }
 
 // Separate component for the rating display
-const RatingDisplay = ({ rating = 4 }) => {
-  const { t } = useTranslation("teacherDetails");
-  
-  return (
-    <div className="border-[1px] rounded-lg flex flex-col">
-      <div className="text-center">
-        <h1 className="font-bold">{t('rating')} { rating }</h1>
-      </div>
-      <div className="rating">
-        {[...Array(5)].map((_, i) => (
-          <input
-            key={i}
-            type="radio"
-            name="rating"
-            className="mask mask-star-2 bg-warning"
-            checked={i < rating}
-            readOnly
-            aria-label={`${i + 1} star`}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
+
 
 const SectionHeader = ({ titleKey }) => {
   const { t } = useTranslation("teacherDetails");
@@ -63,28 +40,28 @@ const SectionHeader = ({ titleKey }) => {
     </div>
   )
 }
+
 // Course card component - Reduced size
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, index }) => {
   const { t, i18n } = useTranslation("teacherDetails");
   const isRTL = i18n.language === 'ar';
 
   return (
     <div className={`rounded-lg overflow-hidden border-2 border-warning bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 max-w-md relative ${isRTL ? 'text-right' : 'text-left'}`}>
-    <div className="relative">
-      <img
-        src={course.image || "/placeholder.svg"}
-        alt={course.title}
-        className="w-full h-36 object-cover" // Reduced height
-      />
-      {/* Added image at the left side */}
-      <div className="absolute left-2 bottom-[-70px]">
-        <img src="/Frame 81.png" alt="" className="h-13 w-13" />
+      <div className="relative">
+        <img
+          src={`/course-4.png`}
+          alt={course.title}
+          className="w-full h-36 object-cover"
+        />
+        <div className="absolute left-2 bottom-[-70px]">
+          <img src="/Frame 81.png" alt="" className="h-13 w-13" />
+        </div>
+        <div className="absolute right-64 bottom-[-30px]">
+          <img src="/teacher.png" alt="" className="h-13 w-13" />
+        </div>
       </div>
-      <div className="absolute right-24 bottom-[-33px]">
-        <img src="/teacher.png" alt="" className="h-13 w-13" />
-      </div>
-    </div>
-    <div className="p-3 text-right">
+      <div className="p-3 text-right">
         <h4 className="font-bold text-md mb-1">{course.title}</h4>
         <h5 className="text-sm">
           {course.subject}-{course.class}
@@ -97,26 +74,11 @@ const CourseCard = ({ course }) => {
             </div>
           </div>
         </div>
-        <div className="flex justify-end items-center gap-1 mb-1">
-          <span className="text-xs">
-        {t('duration')} : {course.duration}    
-          </span>
-          <div className="w-5 h-5 rounded-full bg-base-200 flex items-center justify-center">
-            <Clock className="h-2.5 w-2.5" />
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <button className="btn btn-md btn-primary rounded-full text-xs">
-            {t('viewDetails')}
-          </button>
-          <div className="flex">
-            <RatingDisplay rating={course.rating} />
-          </div>
-        </div>
       </div>
     </div>
   )
 }
+
 // Social media icons component
 const SocialMediaIcons = () => (
   <div className="flex flex-row gap-x-2 mt-9 justify-start ml-8 size-80">
@@ -166,66 +128,46 @@ const TeacherProfileImage = () => (
 export default function TeacherDetails() {
   const { t, i18n } = useTranslation("teacherDetails");
   const isRTL = i18n.language === 'ar';
-  const [teacher, setTeacher] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const { id } = useParams()
+  const [teacher, setTeacher] = useState(null);
+  const [containers, setContainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { userId } = useParams();
 
   useEffect(() => {
-    const fetchTeacherData = async () => {
-      setLoading(true)
-      try {
-        const teacherId = id || "67d3621ee038812431fec89b"
-        const result = await getUserById(teacherId)
+    const fetchData = async () => {
+      if (!userId) {
+        setError(t('error.invalid_user_id'));
+        setLoading(false);
+        return;
+      }
 
-        if (result.success) {
-          setTeacher(result.data)
+      setLoading(true);
+      try {
+        // Fetch teacher data
+        const teacherResult = await getUserById(userId);
+        
+        if (teacherResult.success && teacherResult.data) {
+          setTeacher(teacherResult.data);
+          
+          // Fetch containers for this lecturer
+          const containersData = await getContainersByLecturerId(userId);
+          if (containersData?.data?.containers) {
+            setContainers(containersData.data.containers);
+          }
         } else {
-          setError(t('error.failed'))
+          setError(teacherResult.error || t('error.failed'));
         }
       } catch (err) {
-        console.error("Error fetching teacher:", err)
-        setError(t('error.failed'))
+        console.error("Error fetching data:", err);
+        setError(t('error.failed'));
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchTeacherData()
-  }, [id, t])
+    };
 
-  // Sample courses data - this would ideally come from an API as well
-  const courses = [
-    {
-      id: 1,
-      image: "/course-1.png",
-      class: "الثاني",
-      subject: "كيمياء",
-      title: "أستاذ محمد",
-      grade: "الصف الثالث الثانوي",
-      rating: 5,
-      duration: 12,
-    },
-    {
-      id: 2,
-      image: "/course-2.png",
-      class: "الثاني",
-      subject: "لغة إنجليزية",
-      title: "أستاذ أحمد",
-      grade: "الصف الثاني الثانوي",
-      rating: 5,
-      duration: 10,
-    },
-    {
-      id: 3,
-      image: "/course-3.png",
-      class: "الثاني",
-      subject: "فيزياء",
-      title: "أستاذة سارة",
-      grade: "الصف الأول الثانوي",
-      rating: 5,
-      duration: 15,
-    },
-  ]
+    fetchData();
+  }, [userId, t]);
 
   if (loading) {
     return (
@@ -235,7 +177,7 @@ export default function TeacherDetails() {
           {t('error.loading')}
         </span>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -245,7 +187,7 @@ export default function TeacherDetails() {
           <p>{error}</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!teacher) {
@@ -255,7 +197,7 @@ export default function TeacherDetails() {
           <p>{t('error.notFound')}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -277,7 +219,6 @@ export default function TeacherDetails() {
             <h1 className="text-4xl font-bold mb-2">{teacher.name}</h1>
 
             <div className="flex flex-row justify-end gap-x-3 mt-4 mb-4">
-              <RatingDisplay />
               <div>
                 <h3 className="font-bold">
                   {t('subject')} {teacher.expertise}
@@ -316,12 +257,29 @@ export default function TeacherDetails() {
 
         {/* Card grid with higher z-index to appear above the dots */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto px-4 max-w-6xl">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
+          {containers.length > 0 ? (
+            containers.map((container) => (
+              <CourseCard 
+                key={container._id} 
+                course={{
+                  id: container._id,
+                  title: container.name,
+                  subject: container.subject?.name || 'Unknown Subject',
+                  class: container.level?.name || 'Unknown Level',
+                  grade: container.level?.name || 'Unknown Level',
+                  rating: 5,
+                  duration: 12,
+                  type: container.type,
+                }} 
+              />
+            ))
+          ) : (
+            <p className="col-span-3 text-center py-10">
+              {t('noCoursesAvailable')}
+            </p>
+          )}
         </div>
       </div>
     </section>
-  )
+  );
 }
-

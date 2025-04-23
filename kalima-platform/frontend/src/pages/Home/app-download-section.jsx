@@ -7,18 +7,18 @@ export function AppDownloadSection() {
   return (
     <div className="w-full px-4 sm:px-6 md:px-8 py-12">
       <section
-        className="border-primary border-2 rounded-full w-full max-w-5xl mx-auto p-4 sm:p-6 md:p-8"
+        className="border-yellow-500 border-4 rounded-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8"
         dir={isRTL ? "rtl" : "ltr"}
       >
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+          <div className="flex flex-row justify-between items-center">
             {/* Image Section - Order changes based on RTL */}
             <div className={`flex justify-center ${isRTL ? "md:order-1" : "md:order-2"}`}>
               <div className="relative">
                 <img
                   src="/qr-code.png"
                   alt="Mobile App"
-                  className="h-60 sm:h-70 md:h-80 object-contain hover:scale-110 transition-all duration-500"
+                  className="h-60 sm:h-70 md:h-80 object-contain md:hover:scale-150 animate-none transition-all duration-500"
                 />
                 <div
                   className={`absolute -top-4 ${isRTL ? "-right-4" : "-left-4"} w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 border-2 border-dashed border-primary rounded-full`}
@@ -31,14 +31,14 @@ export function AppDownloadSection() {
 
             {/* Text Content - Order changes based on RTL */}
             <div className={`${isRTL ? "text-right md:order-2" : "text-left md:order-1"}`}>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-6xl font-bold mb-2 sm:mb-4">
                 {t("appDownload.title")}
                 <span className="text-primary"> {t("appDownload.now")}</span>
               </h2>
-              <p className="mb-4 sm:mb-6 text-base-content/80 text-lg sm:text-xl md:text-2xl">
+              <p className="mb-4 sm:mb-6 text-base-content/80 sm:text-xl md:text-3xl mt-14 px-4">
                 {t("appDownload.content1")}
-                <span className="text-primary"> {t("appDownload.now")}</span> {t("appDownload.content2")}
-                <span className="text-primary"> {t("appDownload.everywhere")}</span>
+                <span className="text-primary text-3xl"> {t("appDownload.now")}</span> {t("appDownload.content2")}
+                <span className="text-primary text-3xl"> {t("appDownload.everywhere")}</span>
               </p>
             </div>
           </div>

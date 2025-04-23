@@ -1,50 +1,61 @@
-import axios from "axios";
+import axios from "axios"
 
-// Base URL from environment variable
-const API_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_BASE_URL
 
-// Configure axios with auth token
 const getAuthHeader = () => {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+  const token = localStorage.getItem("accessToken")
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
-// Get all subjects/courses
 export const getAllSubjects = async () => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/subjects/`, {
-      headers: getAuthHeader()
-    });
-    
+      headers: getAuthHeader(),
+    })
+
     return {
       success: true,
-      data: response.data
-    };
+      data: response.data.data.subjects, // Access the subjects array from the response
+    }
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 'Failed to fetch subjects'
-    };
+      error: error.response?.data?.message || "Failed to fetch subjects",
+    }
   }
-};
+}
 
-// Get a specific subject by ID
 export const getSubjectById = async (subjectId) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/subjects/${subjectId}`, {
-      headers: getAuthHeader()
-    });
-    
+      headers: getAuthHeader(),
+    })
+
     return {
       success: true,
-      data: response.data
-    };
+      data: response.data.data, // Access the data property from the response
+    }
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 'Failed to fetch subject'
-    };
+      error: error.response?.data?.message || "Failed to fetch subject",
+    }
   }
-};
+}
 
-// Additional course-related API functions can be added here
+export const getLecturesBySubject = async (subjectId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/lectures?subject=${subjectId}`, {
+      headers: getAuthHeader(),
+    })
+    return {
+      success: true,
+      data: response.data.data.lectures // Adjust based on your API response
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch lectures"
+    }
+  }
+}
