@@ -40,6 +40,9 @@ const revenueRouter = require("./routes/revenueRoutes");
 const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import pricing rule router
 connectDB();
 
+// Trust the first proxy hop (adjust '1' if you have more proxies)
+app.set('trust proxy', true);
+
 app.use(cors(corsOptions));
 
 app.use(express.json());
