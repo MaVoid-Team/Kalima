@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import { getContainerById, purchaseContainer } from "../routes/lectures"
+import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import {
@@ -83,6 +84,7 @@ const LectureSection = ({ month, lectures }) => (
 export default function CourseDetails() {
   const { courseId } = useParams()
   const [course, setCourse] = useState(null)
+  const [purchaseHistory, setPurchaseHistory] = useState([])
   const [lectures, setLectures] = useState({})
   const [loading, setLoading] = useState(true)
   const [lecturesLoading, setLecturesLoading] = useState(false)
@@ -90,6 +92,38 @@ export default function CourseDetails() {
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   const [purchaseSuccess, setPurchaseSuccess] = useState(false)
   const [purchaseError, setPurchaseError] = useState("")
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [courseResult, dashboardResult] = await Promise.all([
+          getContainerById(courseId),
+          getUserDashboard()
+        ])
+
+        if (courseResult?.status === "success") {
+          setCourse(courseResult.data)
+        }
+
+        if (dashboardResult?.success) {
+          setPurchaseHistory(dashboardResult.data.data.purchaseHistory || [])
+        }
+      } catch (err) {
+        setError("حدث خطأ غير متوقع")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [courseId])
+
+  const isPurchased = useMemo(() => {
+    return purchaseHistory.some(purchase => 
+      purchase.type === 'containerPurchase' &&
+      purchase.container?._id === courseId
+    )
+  }, [purchaseHistory, courseId])
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -140,28 +174,28 @@ export default function CourseDetails() {
     }
   }
 
-const handlePurchase = async () => {
-  setPurchaseLoading(true)
-  setPurchaseError("")
-  setPurchaseSuccess(false)
-  
-  try {
-    const result = await purchaseContainer(courseId)
-    console.log("Purchase result:", result)
+   const handlePurchase = async () => {
+    setPurchaseLoading(true)
+    setPurchaseError("")
     
-    if (result && (result.status === 200 || result.status === 201)) {
-      setPurchaseSuccess(true)
-    } else {
-      setPurchaseError("فشل في عملية الاشتراك")
+    try {
+      const result = await purchaseContainer(courseId)
+      if (result?.status === "success") {
+        // Refresh both course and purchase history
+        const [updatedCourse, dashboardResult] = await Promise.all([
+          getContainerById(courseId),
+          getUserDashboard()
+        ])
+        
+        setCourse(updatedCourse.data)
+        setPurchaseHistory(dashboardResult.data.data.purchaseHistory || [])
+      }
+    } catch (err) {
+      setPurchaseError(err.response?.data?.message || "حدث خطأ أثناء الاشتراك")
+    } finally {
+      setPurchaseLoading(false)
     }
-  } catch (err) {
-    console.error("Error purchasing course:", err)
-    setPurchaseError(err.response?.data?.message || "حدث خطأ أثناء الاشتراك")
-  } finally {
-    setPurchaseLoading(false)
   }
-}
-
   const detailsBox = useMemo(
     () => (
       <div className="card bg-base-100 shadow-xl sticky top-6">
@@ -169,31 +203,17 @@ const handlePurchase = async () => {
           <h2 className="card-title justify-center text-2xl mb-4">تفاصيل الكورس</h2>
           <div className="space-y-2">
             <DetailItem
-              icon={<FaChalkboardTeacher className="text-accent" />}
-              label="المدرس"
-              value={course?.createdBy?.name || "غير محدد"}
-            />
-            <DetailItem
-              icon={<FaBook className="text-accent" />}
-              label="المادة"
-              value={course?.subject?.name || "غير محدد"}
-            />
-            <DetailItem
-              icon={<FaGraduationCap className="text-accent" />}
-              label="الصف الدراسي"
-              value={course?.level?.name || "غير محدد"}
-            />
-            <DetailItem
               icon={<FaMoneyBillWave className="text-accent" />}
-              label="السعر"
-              value={`${course?.price || 0} جنيه`}
+              label="حالة الشراء"
+              value={isPurchased ? "مشتراة" : "غير مشتراة"}
             />
+            {/* ... other detail items ... */}
           </div>
           <div className="card-actions mt-6">
-            {purchaseSuccess ? (
-              <div className="alert alert-success w-full">
-                <span>تم الاشتراك بنجاح!</span>
-              </div>
+            {isPurchased ? (
+              <button className="btn btn-success w-full" disabled>
+                ✓ تم الشراء
+              </button>
             ) : (
               <>
                 {purchaseError && (
@@ -201,12 +221,12 @@ const handlePurchase = async () => {
                     <span>{purchaseError}</span>
                   </div>
                 )}
-                <button 
+                <button
                   className={`btn btn-primary w-full ${purchaseLoading ? 'loading' : ''}`}
                   onClick={handlePurchase}
                   disabled={purchaseLoading}
                 >
-                  {purchaseLoading ? 'جاري الاشتراك...' : 'اشترك الآن'}
+                  {course?.price === 0 ? "الحصول على الدورة مجانًا" : purchaseLoading ? 'جاري الاشتراك...' : 'اشترك الآن'}
                 </button>
               </>
             )}
@@ -214,7 +234,7 @@ const handlePurchase = async () => {
         </div>
       </div>
     ),
-    [course, purchaseLoading, purchaseSuccess, purchaseError],
+    [isPurchased, course, purchaseLoading, purchaseError]
   )
 
   if (loading) return <LoadingSpinner />
@@ -231,11 +251,16 @@ const handlePurchase = async () => {
           <div className="lg:w-2/3 space-y-8">
             {/* Course Header */}
             <div className="card bg-base-100 shadow-lg">
-              <div className="card-body">
+            <div className="card-body">
+              <div className="flex justify-between items-start">
                 <h1 className="card-title text-2xl md:text-3xl mb-4">{course?.name}</h1>
-                {course?.description && <p className="text-base-content/80">{course.description}</p>}
+                {course?.isPurchased && (
+                  <span className="badge badge-success badge-lg">مشتراة</span>
+                )}
               </div>
+              {course?.description && <p className="text-base-content/80">{course.description}</p>}
             </div>
+          </div>
 
             {/* Objectives Section */}
             {course?.objectives?.length > 0 && (
@@ -260,18 +285,22 @@ const handlePurchase = async () => {
                 <h2 className="card-title text-xl mb-4">محاضرات الدورة</h2>
 
                 {lecturesLoading ? (
-                  <div className="flex justify-center py-8">
-                    <LoadingSpinner />
-                  </div>
-                ) : Object.keys(lectures).length > 0 ? (
-                  <div className="space-y-4">
-                    {Object.entries(lectures).map(([month, monthLectures]) => (
-                      <LectureSection key={month} month={month} lectures={monthLectures} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-base-content/70">لا توجد محاضرات متاحة لهذه الدورة</div>
-                )}
+                <div className="flex justify-center py-8">
+                  <LoadingSpinner />
+                </div>
+              ) : course?.isPurchased ? (
+                <div className="space-y-4">
+                  {Object.entries(lectures).map(([month, monthLectures]) => (
+                    <LectureSection key={month} month={month} lectures={monthLectures} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-base-content/70">
+                  {course?.price > 0 
+                    ? "يرجى شراء الدورة لمشاهدة المحاضرات"
+                    : "سجّل الدخول للوصول إلى المحاضرات"}
+                </div>
+)}
               </div>
             </div>
 

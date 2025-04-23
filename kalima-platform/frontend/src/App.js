@@ -119,6 +119,7 @@ function App() {
             <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
             <Route path="/dashboard/coursesdashboard" element={<CoursesDashboard />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
+
           </Routes>
         </Suspense>
       </div>
