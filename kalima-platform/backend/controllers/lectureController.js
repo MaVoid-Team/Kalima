@@ -8,6 +8,9 @@ const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
 const Lecture = require("../models/LectureModel");
+const NotificationTemplate = require("../models/notificationTemplateModel");
+const Notification = require("../models/notification");
+const Student = require("../models/studentModel");
 
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
@@ -34,8 +37,8 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       numberOfViews,
     } = req.body;
 
-    await checkDoc(Level, level, session);
-    await checkDoc(Subject, subject, session);
+    const levelDoc = await checkDoc(Level, level, session);
+    const subjectDoc = await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
 
     const lecture = await Lecture.create(
@@ -66,11 +69,84 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       await parentContainer.save({ session });
     }
 
+    // Notification logic - now based on container hierarchy
+    let studentsNotified = 0;
+    const template = await NotificationTemplate.findOne({
+      type: "new_lecture",
+    }).session(session);
+
+    if (template && parent) {
+      // Get all ancestor containers up the hierarchy
+      const getAncestorContainers = async (containerId) => {
+        const containers = [];
+        let currentId = containerId;
+        
+        while (currentId) {
+          const container = await Container.findById(currentId).session(session);
+          if (!container) break;
+          containers.push(container);
+          currentId = container.parent;
+        }
+        
+        return containers;
+      };
+
+      const ancestorContainers = await getAncestorContainers(parent);
+      
+      // Find all students who are subscribed to any of these containers
+      const containerIds = ancestorContainers.map(c => c._id);
+      
+      const students = await Student.find({
+        subscribedContainers: { $in: containerIds },
+        $or: [{ lectureNotify: true }, { lectureNotify: { $exists: false } }],
+      }).session(session);
+
+      const io = req.app.get("io");
+      const notificationsToCreate = [];
+
+      await Promise.all(
+        students.map(async (student) => {
+          const notificationData = {
+            title: template.title,
+            message: template.message
+              .replace("{lecture}", name)
+              .replace("{subject}", subjectDoc.name),
+            type: "new_lecture",
+            relatedId: lecture[0]._id,
+          };
+
+          // Check if student is online
+          const isOnline = io.sockets.adapter.rooms.has(student._id.toString());
+          const isSent = isOnline;
+
+          
+          // Create notification
+          const notification = await Notification.create([{
+            userId: student._id,
+            ...notificationData,
+            isSent,
+          }], { session });
+
+          notificationsToCreate.push(notification[0]);
+
+          // Send immediately if online
+          if (isOnline) {
+            studentsNotified++;
+            io.to(student._id.toString()).emit("newLecture", {
+              ...notificationData,
+              notificationId: notification[0]._id,
+            });
+          }
+        })
+      );
+    }
+
     await session.commitTransaction();
     res.status(201).json({
       status: "success",
       data: {
         lecture: lecture[0],
+        studentsNotified,
       },
     });
   } catch (error) {
