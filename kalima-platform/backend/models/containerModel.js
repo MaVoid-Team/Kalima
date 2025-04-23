@@ -23,7 +23,10 @@ const containerSchema = new mongoose.Schema(
       ref: "Lecturer",
       required: true,
     },
-
+    teacherAllowed: {
+      type: Boolean,
+      required: true,
+    },
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Container",
@@ -31,6 +34,8 @@ const containerSchema = new mongoose.Schema(
     },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Container" }],
     price: { type: Number, default: 0 },
+    description: { type: String }, // Optional field for courses
+    goal: [{ type: String }],       // Optional field for courses as an array of strings
   },
   {
     toObject: { virtuals: true },
@@ -38,5 +43,6 @@ const containerSchema = new mongoose.Schema(
     discriminatorKey: "kind",
   }
 );
+
 
 module.exports = mongoose.model("Container", containerSchema);

@@ -32,12 +32,29 @@ const studentSchema = new mongoose.Schema(
     parent: { type: mongoose.Schema.Types.ObjectId, ref: "Parent" },
     // Array of lecturer-specific point balances
     lecturerPoints: [lecturerPointsSchema],
+    // General points balance
+    generalPoints: {
+      type: Number,
+      default: 0,
+    },
+
+    totalPoints: {
+      type: Number,
+      default: 0,
+    },
   },
+
   {
     timestamps: true,
+    // toJSON: { virtuals: true },
+    // toObject: { virtuals: true },
   }
 );
-
+// studentSchema.virtual("purchases", {
+//   ref: "Purchase",
+//   localField: "_id",
+//   foreignField: "student",
+// });
 // Helper method to get points balance for a specific lecturer
 studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(

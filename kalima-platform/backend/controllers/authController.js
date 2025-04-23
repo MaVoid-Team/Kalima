@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Container = require("../models/containerModel.js"); // Import the Container model
 
 // @route POST /auth/
 const login = catchAsync(async (req, res, next) => {
@@ -103,17 +104,49 @@ const logout = (req, res, next) => {
 };
 
 const verifyRoles = (...allowedRoles) => {
-  return (req, res, next) => {
-    const Role = req.user.role;
-    if (!req?.user.role) {
+  return async (req, res, next) => {
+    const Role = req.user.role?.toLowerCase();
+    if (!Role) {
       return next(new AppError("Unauthorized", 401));
     }
-    const rolesArray = [...allowedRoles];
-    if (!rolesArray.includes(req.user.role)) {
-      return next(new AppError(`Forbidden , you are a ${Role} you don't have access for this file`, 403));
+
+    const rolesArray = allowedRoles.map((role) => role.toLowerCase());
+    if (!rolesArray.includes(Role)) {
+      return next(new AppError(`Forbidden, you are a ${Role} and don't have access to this resource.`, 403));
     }
-    next();
+    next()
   };
+}
+
+// Middleware to optionally verify JWT
+// This middleware attempts to verify the JWT if provided, but continues either way
+const optionalJWT = async (req, res, next) => {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+
+  // If no auth header is provided, continue without authentication
+  if (!authHeader?.startsWith("Bearer ")) {
+    return next(); // Continue without authentication
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    // Try to verify token
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    
+    // If token is valid, set req.user
+    const currentUser = await User.findById(decoded.UserInfo.id).select("-password");
+    
+    if (currentUser) {
+      req.user = currentUser;
+    }
+  } catch (err) {
+    // If token verification fails, continue without setting req.user
+    // No error is thrown, the route will work as unauthenticated
+  }
+  
+  // Continue to the next middleware or route handler
+  next();
 };
 
-module.exports = { login, refresh, logout, verifyRoles };
+module.exports = { login, refresh, logout, verifyRoles, optionalJWT };

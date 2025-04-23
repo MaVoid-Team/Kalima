@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_BASE_URL
 
 // Create an axios instance with base URL
 const api = axios.create({
@@ -27,15 +27,18 @@ export const loginUser = async (credentials) => {
   const result = await handleRequest("post", "/api/v1/auth", credentials);
 
   if (result.success && result.data.accessToken) {
-    sessionStorage.setItem("accessToken", result.data.accessToken);
+    sessionStorage.setItem("authToken", result.data.accessToken);
   }
 
   return result;
 };
 
 // Auth Helpers
-export const getToken = () => sessionStorage.getItem("accessToken");
+export const getToken = () => sessionStorage.getItem("authToken");
 
 export const isLoggedIn = () => !!getToken();
 
-export const logoutUser = () => sessionStorage.removeItem("accessToken");
+export const logoutUser = () => {
+  sessionStorage.removeItem("authToken");
+  sessionStorage.clear();
+}

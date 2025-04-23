@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-
+import {useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const WelcomeSection = React.memo(({ isRTL, t }) => {
@@ -10,6 +10,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
     }),
     []
   );
+  const navigate = useNavigate();
 
   const fadeIn = (direction, type, delay, duration) => ({
     hidden: {
@@ -184,6 +185,9 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
           }`}
         >
           <motion.button
+            onClick={() => {
+              navigate("/register");
+            }}
             whileHover={{
               scale: 1.05,
               boxShadow: "0 10px 25px -5px rgba(var(--p), 0.2)",
@@ -214,6 +218,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
               )}
+              
             </svg>
           </motion.button>
         </motion.div>

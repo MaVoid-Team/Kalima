@@ -28,111 +28,13 @@ exports.getUserStats = catchAsync(async (req, res, next) => {
 
 exports.getStudentData = catchAsync(async (req, res, next) => {
   const { studentId } = req.params;
-  const student = await Student.aggregate([
-    { $match: { _id: new mongoose.Types.ObjectId(studentId) } },
-    {
-      $lookup: {
-        from: "users",
-        localField: "parent",
-        foreignField: "_id",
-        as: "parent",
-      },
-    },
-    {
-      $lookup: {
-        from: "purchases",
-        let: { stuId: "$_id" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$student", "$$stuId"] },
-            },
-          },
-          // Nested lookup to populate container and its nested fields
-          {
-            $lookup: {
-              from: "containers",
-              let: { containerId: "$container" },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: { $eq: ["$_id", "$$containerId"] },
-                  },
-                },
-                // Populate createdBy (Lecturer)
-                {
-                  $lookup: {
-                    from: "users",
-                    localField: "createdBy",
-                    foreignField: "_id",
-                    as: "createdBy",
-                  },
-                },
-                {
-                  $unwind: {
-                    path: "$createdBy",
-                    preserveNullAndEmptyArrays: true,
-                  },
-                },
-                // Populate subject (Subject)
-                {
-                  $lookup: {
-                    from: "subjects",
-                    localField: "subject",
-                    foreignField: "_id",
-                    as: "subject",
-                  },
-                },
-                {
-                  $unwind: {
-                    path: "$subject",
-                    preserveNullAndEmptyArrays: true,
-                  },
-                },
-                // Populate level (Level)
-                {
-                  $lookup: {
-                    from: "levels",
-                    localField: "level",
-                    foreignField: "_id",
-                    as: "level",
-                  },
-                },
-                {
-                  $unwind: { path: "$level", preserveNullAndEmptyArrays: true },
-                },
-                {
-                  $project: {
-                    _id: 1,
-                    name: 1,
-                    createdBy: { _id: 1, name: 1 },
-                    subject: { _id: 1, name: 1 },
-                    level: { _id: 1, name: 1 },
-                  },
-                },
-              ],
-              as: "container",
-            },
-          },
-          { $unwind: { path: "$container", preserveNullAndEmptyArrays: true } },
-          // populate lecturer on the purchase itself:
-          {
-            $lookup: {
-              from: "users",
-              let: { lecturerId: "$lecturer" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$lecturerId"] } } },
-                { $project: { _id: 1, name: 1 } },
-              ],
-              as: "lecturer",
-            },
-          },
-          { $unwind: { path: "$lecturer", preserveNullAndEmptyArrays: true } },
-        ],
-        as: "purchases",
-      },
-    },
-  ]);
+
+  const student = await Student.findById(studentId)
+    .populate("parent", "name email")
+    .populate("level", "name")
+    .populate("lecturerPoints.lecturer", "name")
+    .lean();
+
   if (!student) return next(new AppError("Couldn't find student.", 404));
   res.status(200).json({
     status: "success",
@@ -173,7 +75,8 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
   const container = await query
     .populate({ path: "subject", select: "name" })
     .populate({ path: "level", select: "name" })
-    .populate({ path: "createdBy", select: "name" });
+    .populate({ path: "createdBy", select: "name" })
+    .populate({ path: "children", select: "name" });
   if (!container.length)
     return next(new AppError("Couldn't find containers.", 404));
   res.status(200).json({

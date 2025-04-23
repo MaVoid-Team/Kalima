@@ -11,35 +11,56 @@ const purchaseSchema = new mongoose.Schema({
   lecturer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Lecturer",
-    required: true,
+    required: [
+      function () {
+        return this.type === "containerPurchase";
+      },
+      "Lecturer ID is required for specific codes",
+    ],
   },
   // Points amount purchased or container purchased
   points: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   // If this is a container purchase, reference it
   container: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Container",
-    required: false,
+    required: [
+      function () {
+        return this.type === "containerPurchase";
+      },
+      "Container ID is required for specific codes",
+    ],
+  },
+
+  package: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Package",
+    required: [
+      function () {
+        return this.type === "packagePurchase";
+      },
+      "package ID is required for specific codes",
+    ],
   },
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,
-    enum: ["pointPurchase", "containerPurchase"],
-    required: true
+    enum: ["pointPurchase", "containerPurchase", "packagePurchase"],
+    required: true,
   },
   // Additional details
   description: {
     type: String,
-    default: "Purchase"
+    default: "Purchase",
   },
   // When the purchase was made
-  purchasedAt: { 
-    type: Date, 
-    default: Date.now 
+  purchasedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

@@ -1,5 +1,7 @@
 const express = require("express");
 const levelController = require("../controllers/levelController");
+const verifyJWT = require("../middleware/verifyJWT");
+const authController = require("../controllers/authController");
 
 const router = express.Router();
 

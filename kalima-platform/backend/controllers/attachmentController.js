@@ -9,6 +9,7 @@ const configureCloudinary = require("../config/cloudinaryOptions");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const Lecturer = require("../models/lecturerModel");
 
 // You can configure storage options here
 // Would be changed once we have established cloud storage
@@ -70,7 +71,7 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
   res.setHeader("Content-Type", attachment.fileType);
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename="${attachment.fileName}"`,
+    `attachment; filename="${attachment.fileName}"`
   );
 
   file.data.pipe(res);
@@ -120,66 +121,79 @@ exports.deleteAttachment = catchAsync(async (req, res, next) => {
 });
 
 exports.createAttachment = catchAsync(async (req, res, next) => {
-  const { lectureId } = req.params;
-  const { type } = req.body;
-  const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
-
-  if (!mongoose.isValidObjectId(lectureId)) {
-    await fs.unlink(req.file.path);
-    throw new AppError(`Invalid Schema ID`, 404);
+  if (!req.file && !req.file.filename) {
+    return next(new AppError(`No file uploaded`, 404));
   }
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { lectureId } = req.params;
+    const { type } = req.body;
+    const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
 
-  const lecture = await Lecture.findById(lectureId);
+    if (!mongoose.isValidObjectId(lectureId)) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Invalid Schema ID`, 404);
+    }
 
-  if (!lecture) {
-    await cloudinary.uploader.destroy(req.file.filename);
-    throw new AppError(`Lecture not found`, 404);
-  }
+    const lecture = await Lecture.findById(lectureId).session(session);
+    if (!lecture) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Lecture not found`, 404);
+    }
 
-  if (!req.file) {
-    await cloudinary.uploader.destroy(req.file.filename);
-    throw new AppError(`No file uploaded`, 404);
-  }
-  if (!type) {
-    await cloudinary.uploader.destroy(req.file.filename);
-    throw new AppError(`No file type specified`, 404);
-  }
-  if (!validTypes.includes(type.toLowerCase())) {
-    await cloudinary.uploader.destroy(req.file.filename);
-    throw new AppError(`Invalid file type`, 404);
-  }
-
-  const attachment = new Attachment({
-    lectureId: lectureId,
-    type: type,
-    fileType: req.file.mimetype,
-    fileName: req.file.originalname,
-    filePath: req.file.path,
-    fileSize: req.file.size,
-    publicId: req.file.filename,
-    uploadedOn: new Date(),
-  });
-
-  const savedAttachment = await attachment.save();
-
-  switch (type.toLowerCase()) {
-    case "booklets":
-      lecture.attachments.booklets.push(savedAttachment._id);
-      break;
-    case "pdfsandimages":
-      lecture.attachments.pdfsandimages.push(savedAttachment._id);
-      break;
-    case "homeworks":
-      lecture.attachments.homeworks.push(savedAttachment._id);
-      break;
-    case "exams":
-      lecture.attachments.exams.push(savedAttachment._id);
-      break;
-    default:
+    if (!type) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`No file type specified`, 404);
+    }
+    if (!validTypes.includes(type.toLowerCase())) {
       await cloudinary.uploader.destroy(req.file.filename);
       throw new AppError(`Invalid file type`, 404);
-  }
+    }
 
-  await lecture.save();
-  res.status(201).json({ message: "Attachment uploaded successfully" });
+    const attachment = new Attachment({
+      lectureId: lectureId,
+      type: type,
+      fileType: req.file.mimetype,
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileSize: req.file.size,
+      publicId: req.file.filename,
+      uploadedOn: new Date(),
+    });
+
+    const savedAttachment = await attachment.save({ session });
+    if (!savedAttachment) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError("Error saving attachment", 500);
+    }
+    switch (type.toLowerCase()) {
+      case "booklets":
+        lecture.attachments.booklets.push(savedAttachment._id);
+        break;
+      case "pdfsandimages":
+        lecture.attachments.pdfsandimages.push(savedAttachment._id);
+        break;
+      case "homeworks":
+        lecture.attachments.homeworks.push(savedAttachment._id);
+        break;
+      case "exams":
+        lecture.attachments.exams.push(savedAttachment._id);
+        break;
+      default:
+        await cloudinary.uploader.destroy(req.file.filename);
+        throw new AppError(`Invalid file type`, 404);
+    }
+
+    await lecture.save({ session });
+    console.log("Attachment saved successfully", lecture);
+    await session.commitTransaction();
+    session.endSession();
+    res.status(201).json({ message: "Attachment uploaded successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    await cloudinary.uploader.destroy(req.file.filename);
+    return next(error);
+  }
 });
