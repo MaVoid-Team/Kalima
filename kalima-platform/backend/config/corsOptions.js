@@ -4,7 +4,9 @@ const allowedOrigins = require("./allowedOrigins");
 const corsOptions = {
   origin: allowedOrigins,
   credentials: true,
-  optionSuccessStatus: 200,
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 204,
 };
 
 module.exports = corsOptions;
