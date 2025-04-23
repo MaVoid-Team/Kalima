@@ -41,7 +41,7 @@ const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import prici
 connectDB();
 
 // Trust the first proxy hop (adjust '1' if you have more proxies)
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 app.use(cors(corsOptions));
 
