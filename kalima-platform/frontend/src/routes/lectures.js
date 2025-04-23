@@ -58,19 +58,32 @@ export const purchaseContainer = async (containerId) => {
 // Function to get a container by ID
 export const getContainerById = async (containerId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/${containerId}`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    if (!containerId) {
+      throw new Error("Missing container ID");
+    }
 
-    return response.data
+    const response = await axios.get(
+      `${API_URL}/api/v1/containers/${containerId}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    // Handle non-2xx status codes
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(response.data.message || "Request failed");
+    }
+
+    return response.data;
+
   } catch (error) {
-    console.error(`Error fetching container ${containerId}:`, error)
-    throw error
+    console.error(`Error fetching container ${containerId}:`, error);
+    throw error; // Propagate the error
   }
-}
+};
 
 export const getLectureAttachments = async (lectureId) => {
   try {
