@@ -47,7 +47,7 @@ const sendProdError = async(err, req, res) => {
     //unexpected error
     res.status(500).json({
       status: "Error",
-      message: "Something went wrong!",
+      message: "Something went wrong!" + err.message,
     });
   }
 };
