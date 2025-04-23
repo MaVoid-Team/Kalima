@@ -19,4 +19,4 @@ const attachmentSchema = new mongoose.Schema({
   uploadedOn: { type: Date, default: Date.now },
 });
 
-module.exports =  mongoose.model("Attachment", attachmentSchema);
+module.exports = mongoose.model("Attachment", attachmentSchema);
