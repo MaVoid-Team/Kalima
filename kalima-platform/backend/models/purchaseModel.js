@@ -63,5 +63,6 @@ const purchaseSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
+purchaseSchema.index({ student: 1 });
+purchaseSchema.index({ lecturer: 1 });
 module.exports = mongoose.model("Purchase", purchaseSchema);
