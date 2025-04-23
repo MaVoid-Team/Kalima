@@ -139,7 +139,7 @@ export const createUser = async (userData) => {
 
 export const bulkCreateUsers = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/users/accounts/bulk-create`, formData, {
+    const response = await axios.post(`${API_URL}/users/accounts/bulk-create`, formData, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "multipart/form-data",
