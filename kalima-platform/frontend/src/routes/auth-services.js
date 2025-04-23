@@ -134,15 +134,13 @@ export const logoutUser = async () => {
 
 // --- USER DATA API CALLS ---
 
-export const getUserDashboard = async () => {
+export const getUserDashboard = async (options = {}) => {
   try {
-    // Check if user is logged in
     if (!isLoggedIn()) {
       return { success: false, error: "Not authenticated" };
     }
     
-    // The token is automatically added by the interceptor
-    const result = await handleRequest("get", "/api/v1/users/me/dashboard");
+    const result = await handleRequest("get", "/api/v1/users/me/dashboard", {}, options);
     return result;
   } catch (error) {
     console.error("Error fetching user dashboard:", error);
@@ -152,7 +150,6 @@ export const getUserDashboard = async () => {
     };
   }
 };
-
 // --- AUTHENTICATED API HELPERS ---
 
 export const getAuthenticatedRequest = async (url, options = {}) => {
