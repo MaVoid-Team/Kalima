@@ -10,7 +10,10 @@ const Lecture = require("../models/LectureModel");
 const NotificationTemplate = require("../models/notificationTemplateModel");
 const Notification = require("../models/notification");
 const Student = require("../models/studentModel");
+const Purchase = require("../models/purchaseModel");
+const StudentLectureAccess = require("../models/studentLectureAccessModel");
 
+// Helper function to check if document exists
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
   if (!doc) {
@@ -19,6 +22,7 @@ const checkDoc = async (Model, id, session) => {
   return doc;
 };
 
+// Create Lecture Endpoint
 exports.createLecture = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -35,10 +39,10 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       examLink,
       description,
       numberOfViews,
-      lecture_type, // Add lecture_type
+      lecture_type,
     } = req.body;
 
-    // Basic validation for lecture_type (Mongoose enum validation also applies)
+    // Validate lecture type
     const allowedTypes = ["Free", "Paid", "Revision", "Teachers Only"];
     if (lecture_type && !allowedTypes.includes(lecture_type)) {
       throw new AppError(
@@ -47,10 +51,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       );
     }
 
+    // Check required documents exist
     const levelDoc = await checkDoc(Level, level, session);
     const subjectDoc = await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
 
+    // Create the lecture
     const lecture = await Lecture.create(
       [
         {
@@ -66,98 +72,119 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           examLink,
           description,
           numberOfViews,
-          lecture_type, // Add lecture_type here
+          lecture_type,
         },
       ],
       { session }
     );
 
+    // Add lecture to parent's children if parent exists
     if (parent) {
-      const parentContainer = await checkDoc(
-        Container,
-        req.body.parent,
-        session
-      );
+      const parentContainer = await checkDoc(Container, parent, session);
       parentContainer.children.push(lecture[0]._id);
       await parentContainer.save({ session });
     }
 
-    // Notification logic - now based on container hierarchy
+    // Notification logic - only for paid lectures
     let studentsNotified = 0;
-    const template = await NotificationTemplate.findOne({
-      type: "new_lecture",
-    }).session(session);
+    if (lecture_type === "Paid" && parent) {
+      // Get the container chain (all parent containers up the hierarchy)
+      const containerChainResult = await Container.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(parent) },
+        },
+        {
+          $graphLookup: {
+            from: "containers",
+            startWith: "$parent",
+            connectFromField: "parent",
+            connectToField: "_id",
+            as: "parentChain",
+          },
+        },
+      ]).session(session);
 
-    if (template && parent) {
-      // Get all ancestor containers up the hierarchy
-      const getAncestorContainers = async (containerId) => {
-        const containers = [];
-        let currentId = containerId;
+      // Extract all container IDs in the hierarchy (including the direct parent)
+      const containerIds = [
+        parent,
+        ...containerChainResult[0]?.parentChain.map(c => c._id) || []
+      ];
+      
+      // console.log("containerIds"+ containerIds);
+      // Find all purchases where container is in this hierarchy
+      const purchases = await Purchase.find({
+        container: { $in: containerIds },
+        type: "containerPurchase"
+      }).session(session);
 
-        while (currentId) {
-          const container = await Container.findById(currentId).session(
-            session
-          );
-          if (!container) break;
-          containers.push(container);
-          currentId = container.parent;
-        }
 
-        return containers;
-      };
+      // console.log("purchases"+ purchases);
 
-      const ancestorContainers = await getAncestorContainers(parent);
+      // Get unique student IDs from these purchases
+      const studentIds = [...new Set(purchases.map(p => p.student.toString()))];
 
-      // Find all students who are subscribed to any of these containers
-      const containerIds = ancestorContainers.map((c) => c._id);
+      // console.log("studentIds"+ studentIds);
 
+      // Find these students who want notifications
       const students = await Student.find({
-        subscribedContainers: { $in: containerIds },
+        _id: { $in: studentIds },
         $or: [{ lectureNotify: true }, { lectureNotify: { $exists: false } }],
       }).session(session);
 
-      const io = req.app.get("io");
-      const notificationsToCreate = [];
+      // console.log("students"+ students);
 
-      await Promise.all(
-        students.map(async (student) => {
-          const notificationData = {
-            title: template.title,
-            message: template.message
-              .replace("{lecture}", name)
-              .replace("{subject}", subjectDoc.name),
-            type: "new_lecture",
-            relatedId: lecture[0]._id,
-          };
+      // Get notification template
+      const template = await NotificationTemplate.findOne({
+        type: "new_subject",
+      }).session(session);
+      console.log("students"+ template);
 
-          // Check if student is online
-          const isOnline = io.sockets.adapter.rooms.has(student._id.toString());
-          const isSent = isOnline;
+      if (template && students.length > 0) {
+        const io = req.app.get("io");
+        const notificationsToCreate = [];
 
-          // Create notification
-          const notification = await Notification.create(
-            [
-              {
+        await Promise.all(
+          students.map(async (student) => {
+            // Create student lecture access record
+            
+
+            // Prepare notification data
+            const notificationData = {
+              title: template.title,
+              message: template.message
+                .replace("{lecture}", name)
+                .replace("{subject}", subjectDoc.name),
+              type: "new_lecture",
+              relatedId: lecture[0]._id,
+            };
+
+            // Check if student is online
+            const isOnline = io.sockets.adapter.rooms.has(student._id.toString());
+            const isSent = isOnline;
+
+            // Create notification
+            const notification = await Notification.create(
+              [{
                 userId: student._id,
                 ...notificationData,
                 isSent,
-              },
-            ],
-            { session }
-          );
+              }],
+              { session }
+            );
 
-          notificationsToCreate.push(notification[0]);
+            notificationsToCreate.push(notification[0]);
 
-          // Send immediately if online
-          if (isOnline) {
-            studentsNotified++;
-            io.to(student._id.toString()).emit("newLecture", {
-              ...notificationData,
-              notificationId: notification[0]._id,
-            });
-          }
-        })
-      );
+            // Send immediately if online
+            if (isOnline) {
+              studentsNotified++;
+              io.to(student._id.toString()).emit("newLecture", {
+                ...notificationData,
+                notificationId: notification[0]._id,
+              });
+            }
+          })
+        );
+      }
     }
 
     await session.commitTransaction();
@@ -174,6 +201,38 @@ exports.createLecture = catchAsync(async (req, res, next) => {
   } finally {
     session.endSession();
   }
+});
+
+// Get Lecture by ID
+exports.getLectureById = catchAsync(async (req, res, next) => {
+  const Role = req.user.role?.toLowerCase();
+  const container = await Lecture.findById(req.params.lectureId).populate([
+    { path: "createdBy", select: "name" },
+  ]);
+  
+  if (!container) return next(new AppError("Lecture not found", 404));
+  
+  if (Role === "teacher") {
+    if (!container.teacherAllowed) {
+      return res.status(200).json({
+        status: "restricted",
+        data: {
+          id: container._id,
+          name: container.name,
+          owner: container.createdBy.name || container.createdBy._id,
+          subject: container.subject.name || container.subject._id,
+          type: container.type,
+        },
+      });
+    }
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      container,
+    },
+  });
 });
 
 exports.getLectureById = catchAsync(async (req, res, next) => {
