@@ -15,7 +15,13 @@ const ContainersPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const result = await getUserDashboard()
+        const result = await getUserDashboard({
+          params: {
+            fields: 'userInfo,containers',
+            limit: 5,
+            type: 'course'
+          }
+        });
 
         if (result.success) {
           const { userInfo, containers = [], purchaseHistory = [] } = result.data.data
