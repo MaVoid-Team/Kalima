@@ -11,6 +11,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Lecturer = require("../models/lecturerModel");
+const { result } = require("lodash");
+const QueryFeatures = require("../utils/queryFeatures");
 
 // You can configure storage options here
 // Would be changed once we have established cloud storage
@@ -44,6 +46,23 @@ const storage = new CloudinaryStorage({
     }
     res.status(201).json(lecture.attachments);
   }));
+
+exports.getAllAttachments = catchAsync(async (req, res, next) => {
+  let query = Attachment.find({});
+  query = new QueryFeatures(query, req.query).filter().sort().paginate();
+  const attachments = await query.query
+    .populate("lectureId", "title description")
+    .populate("studentId", "name email")
+    .lean();
+
+  res.status(200).json({
+    status: "success",
+    result: attachments.length,
+    data: {
+      attachments,
+    },
+  });
+});
 
 exports.getAttachment = catchAsync(async (req, res, next) => {
   const { attachmentId } = req.params;
@@ -81,44 +100,6 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
     console.error("Stream error:", err);
     throw new AppError(`Error streaming file`, 500);
   });
-});
-
-exports.deleteAttachment = catchAsync(async (req, res, next) => {
-  const { attachmentId } = req.params;
-
-  if (!mongoose.isValidObjectId(attachmentId)) {
-    throw new AppError(`Invalid Schema ID`, 404);
-  }
-
-  const attachment = await Attachment.findByIdAndDelete(attachmentId).lean();
-  if (!attachment) {
-    throw new AppError(`Couldn't find attachment`, 404);
-  }
-
-  await cloudinary.uploader.destroy(attachment.publicId);
-
-  const lecture = await Lecture.findById(attachment.lectureId);
-
-  switch (attachment.type.toLowerCase()) {
-    case "booklets":
-      lecture.attachments.booklets.pull(attachment._id);
-      break;
-    case "pdfsandimages":
-      lecture.attachments.pdfsandimages.pull(attachment._id);
-      break;
-    case "homeworks":
-      lecture.attachments.homeworks.pull(attachment._id);
-      break;
-    case "exams":
-      lecture.attachments.exams.pull(attachment._id);
-      break;
-    default:
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError(`Invalid file type`, 404);
-  }
-
-  await lecture.save();
-  res.status(201).json({ message: "Attachment deleted successfully" });
 });
 
 exports.createAttachment = catchAsync(async (req, res, next) => {
@@ -197,4 +178,141 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
     await cloudinary.uploader.destroy(req.file.filename);
     return next(error);
   }
+});
+exports.uploadHomeWork = catchAsync(async (req, res, next) => {
+  if (!req.file && !req.file.filename) {
+    return next(new AppError(`No file uploaded`, 404));
+  }
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const { lectureId } = req.params;
+    const { type } = req.body;
+    if (!req.user || req.user.role !== "Student") {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`You are not authorized to upload homework`, 403);
+    }
+    // console.log("req.user", req.user);
+    if (!type || type !== "homeworks") {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Invalid file type`, 404);
+    }
+    // const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
+
+    if (!mongoose.isValidObjectId(lectureId)) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Invalid Schema ID`, 404);
+    }
+
+    const lecture = await Lecture.findById(lectureId).session(session);
+    if (!lecture) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError(`Lecture not found`, 404);
+    }
+
+    const attachment = new Attachment({
+      lectureId: lectureId,
+      studentId: req.user._id,
+      type: type,
+      fileType: req.file.mimetype,
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileSize: req.file.size,
+      publicId: req.file.filename,
+      uploadedOn: new Date(),
+    });
+
+    const savedAttachment = await attachment.save({ session });
+    if (!savedAttachment) {
+      await cloudinary.uploader.destroy(req.file.filename);
+      throw new AppError("Error saving attachment", 500);
+    }
+    await session.commitTransaction();
+    session.endSession();
+    res.status(201).json({
+      status: "success",
+      message: "Attachment uploaded successfully",
+      data: {
+        attachment: savedAttachment,
+      },
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    await cloudinary.uploader.destroy(req.file.filename);
+    return next(error);
+  }
+});
+exports.getAllHomeWork = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  let query = Attachment.find({
+    lectureId: lectureId,
+    studentId: { $ne: null },
+    type: "homeworks",
+  });
+
+  query = new QueryFeatures(query, req.query).filter().sort().paginate();
+  const attachments = await query.query
+    .populate("studentId", "name email")
+    .lean();
+
+  if (!attachments) {
+    throw new AppError(`No homework found`, 404);
+  }
+  res.status(200).json({
+    status: "success",
+    result: attachments.length,
+    data: {
+      attachments,
+    },
+  });
+});
+exports.deleteAttachment = catchAsync(async (req, res, next) => {
+  const { attachmentId } = req.params;
+
+  if (!mongoose.isValidObjectId(attachmentId)) {
+    return next(new AppError(`Invalid Schema ID`, 404));
+  }
+
+  const attachment = await Attachment.findById(attachmentId);
+  if (!attachment) {
+    return next(new AppError(`Couldn't find attachment`, 404));
+  }
+  if (req.user.role === "Student") {
+    if (attachment.studentId.toString() !== req.user._id.toString()) {
+      return next(
+        new AppError(`You are not authorized to delete this attachment`, 403)
+      );
+    }
+    await cloudinary.uploader.destroy(attachment.publicId);
+  } else {
+    await cloudinary.uploader.destroy(attachment.publicId);
+  }
+
+  if (!attachment.studentId) {
+    const lecture = await Lecture.findById(attachment.lectureId);
+
+    switch (attachment.type.toLowerCase()) {
+      case "booklets":
+        lecture.attachments.booklets.pull(attachment._id);
+        break;
+      case "pdfsandimages":
+        lecture.attachments.pdfsandimages.pull(attachment._id);
+        break;
+      case "homeworks":
+        lecture.attachments.homeworks.pull(attachment._id);
+        break;
+      case "exams":
+        lecture.attachments.exams.pull(attachment._id);
+        break;
+      default:
+        await cloudinary.uploader.destroy(req.file.filename);
+        return next(new AppError(`Invalid file type`, 404));
+    }
+
+    await lecture.save();
+  }
+  await attachment.deleteOne();
+
+  res.status(204).json({ message: "Attachment deleted successfully" });
 });
