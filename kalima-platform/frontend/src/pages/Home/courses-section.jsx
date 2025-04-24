@@ -20,6 +20,7 @@ export function CoursesSection() {
     setLoading(true)
     setError(null)
     try {
+      console.log("Fetching courses...")
       const result = await getAllContainers()
 
       if (result.status === "success") {

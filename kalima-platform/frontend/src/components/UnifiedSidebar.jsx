@@ -12,7 +12,8 @@ import {
   FaUserAlt,
   FaUserTie,
   FaUserGraduate,
-  FaUserShield
+  FaUserShield,
+  FaCalendar
 } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
@@ -108,6 +109,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('adminDashboard') || 'Admin Dashboard', 
         icon: <FaUserShield className="w-5 h-5" />, 
         path: '/dashboard/admin-dashboard' 
+      },
+      { 
+        id: 'center-dashboard', 
+        title: t('centerDashboard') || 'Center Dashboard', 
+        icon: <FaCalendar className="w-5 h-5" />, 
+        path: '/dashboard/center-dashboard' 
       },
       { 
         id: 'audit-log', 

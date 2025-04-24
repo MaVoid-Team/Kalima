@@ -157,7 +157,6 @@ const TeacherLogin = () => {
                 required
               />
               <div>
-                <p>error: {error}</p>
               </div>
               <label className="label">
                 <Link to="/forgot-password" className="label-text-alt link link-hover text-primary">
