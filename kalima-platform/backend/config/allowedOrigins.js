@@ -1,3 +1,8 @@
-const allowedOrigins = ["http://localhost:3000"]; // Add the server domain here.
+const allowedOrigins = [
+    'capacitor://localhost',
+    'http://localhost/',
+    'file://',
+    'https://kalima-edu.com/'
+];
 
 module.exports = allowedOrigins;
