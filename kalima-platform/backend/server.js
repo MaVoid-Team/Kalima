@@ -1,4 +1,7 @@
 require("dotenv").config();
+
+
+const mongoSanitize = require('express-mongo-sanitize');
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
@@ -44,8 +47,8 @@ connectDB();
 app.set('trust proxy', 1);
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
+app.use(mongoSanitize());
 app.use(cookieParser());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
