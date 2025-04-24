@@ -20,6 +20,11 @@ const cStudentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    center: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Center",
+      required: true,
+    },
   },
   { timestamps: true }
 );
