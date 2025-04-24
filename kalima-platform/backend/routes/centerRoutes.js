@@ -25,4 +25,7 @@ router
   .route("/lessons/:lessonId")
   .delete(authController.verifyRoles("Admin", "Lecturer", "Assistant"), centerController.deleteLesson);
 
+// new: GET /api/centers/:centerId/:type
+router.get("/:centerId/:type", centerController.getCenterDataById);
+
 module.exports = router;
