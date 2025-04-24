@@ -5,12 +5,13 @@ const QueryFeatures = require("../utils/queryFeatures");
 
 // Create a new student
 exports.createStudent = catchAsync(async (req, res, next) => {
-  const { name, phone, gender, parentPhoneNumber } = req.body;
+  const { name, phone, gender, parentPhoneNumber, center } = req.body;
   const newStudent = await cStudent.create({
     name,
     phone,
     gender,
     parentPhoneNumber,
+    center
   });
   if (!newStudent) {
     return next(new AppError("Failed to create student", 400));

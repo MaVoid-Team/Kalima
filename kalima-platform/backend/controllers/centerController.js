@@ -1,5 +1,7 @@
 const Center = require("../models/centerModel");
 const Lesson = require("../models/lessonModel");
+const Student = require("../models/center.studentModel");
+const Lecturer = require("../models/center.lecturerModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -117,5 +119,46 @@ exports.deleteLesson = catchAsync(async (req, res, next) => {
     status: "success",
     message: "Lesson deleted successfully",
     data: null,
+  });
+});
+
+exports.getCenterDataById = catchAsync(async (req, res, next) => {
+  const { centerId, type } = req.params;
+
+  // Validate centerId
+  if (!mongoose.Types.ObjectId.isValid(centerId)) {
+    return next(new AppError("Invalid Center ID.", 400));
+  }
+  const center = await Center.findById(centerId);
+  if (!center) {
+    return next(new AppError("Center not found.", 404));
+  }
+
+  // Select model based on type
+  let Model;
+  switch (type) {
+    case "lessons":
+      Model = Lesson;
+      break;
+    case "students":
+      Model = Student;
+      break;
+    case "lecturers":
+      Model = Lecturer;
+      break;
+    default:
+      return next(
+        new AppError(
+          "Invalid type. Use one of: lessons, students, lecturers.",
+          400
+        )
+      );
+  }
+
+  const items = await Model.find({ center: centerId });
+  res.status(200).json({
+    status: "success",
+    results: items.length,
+    data: items,
   });
 });
