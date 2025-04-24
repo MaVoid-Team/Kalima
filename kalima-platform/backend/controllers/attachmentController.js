@@ -1,3 +1,4 @@
+/* eslint-disable */
 const mongoose = require("mongoose");
 const Container = require("../models/containerModel");
 const Lecture = require("../models/LectureModel");

@@ -136,7 +136,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
 
       // Get notification template
       const template = await NotificationTemplate.findOne({
-        type: "new_subject",
+        type: "new_lecture",
       }).session(session);
       console.log("students" + template);
 
