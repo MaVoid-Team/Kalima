@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Phone, Book } from 'lucide-react';
 
-const LecturersList = ({ lecturers, isLoading }) => {
+const LecturersList = ({ lecturers, isLoading, error }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   
@@ -45,6 +45,10 @@ const LecturersList = ({ lecturers, isLoading }) => {
         <div className="flex justify-center py-8">
           <div className="loading loading-spinner loading-md"></div>
         </div>
+      ) : error ? (
+        <div className="alert alert-error">
+          <span>{error}</span>
+        </div>
       ) : filteredLecturers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredLecturers.map(lecturer => (
@@ -62,12 +66,18 @@ const LecturersList = ({ lecturers, isLoading }) => {
                     {isRTL ? "المواد" : "Subjects"}:
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {lecturer.subjects.map(subject => (
-                      <div key={subject._id} className="badge badge-primary gap-1">
-                        <Book className="w-3 h-3" />
-                        {subject.name}
-                      </div>
-                    ))}
+                    {lecturer.subjects && lecturer.subjects.length > 0 ? (
+                      lecturer.subjects.map(subject => (
+                        <div key={subject} className="badge badge-primary gap-1">
+                          <Book className="w-3 h-3" />
+                          {subject.substring(0, 8)}...
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-sm text-base-content/50">
+                        {isRTL ? "لا توجد مواد" : "No subjects"}
+                      </span>
+                    )}
                   </div>
                 </div>
                 

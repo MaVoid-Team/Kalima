@@ -3,6 +3,7 @@ import { useState } from "react"
 import Hero from "./hero"
 import StudentsSection from "./studentsSection"
 import UserManagementTable from "./userManageTable"
+import PromoCodeGenerator from "./PromoCodesGenerator"
 const AdminDashboard = () => {
   const [isOpen, setIsOpen] = useState(true)
 
@@ -12,7 +13,8 @@ const AdminDashboard = () => {
         className={`transition-all duration-300 space-y-8`}
       >
           <Hero/>
-          <StudentsSection/>
+          {/* <StudentsSection/> */}
+          <PromoCodeGenerator />
           <UserManagementTable/>
 
 

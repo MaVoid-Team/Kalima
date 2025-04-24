@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_BASE_URL
 
-const getAuthHeader = () => {
+export const getAuthHeader = () => {
   const token = localStorage.getItem("accessToken");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
@@ -66,13 +66,13 @@ export const getAllAssistants = async () => {
 
 export const getAllLecturers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/lecturer`, {
+    const response = await axios.get(`${API_URL}/api/v1/lecturers`, {
       headers: getAuthHeader(),
     });
 
     return {
       success: true,
-      data: response.data,
+      data: response.data.data
     };
   } catch (error) {
     console.error("API Error:", error);

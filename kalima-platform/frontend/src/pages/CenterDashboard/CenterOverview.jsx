@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { MapPin, Users, Calendar } from 'lucide-react';
+import { MapPin, Users, Calendar, BookOpen } from 'lucide-react';
 
-const CenterOverview = ({ center, lecturersCount }) => {
+const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   
@@ -27,7 +27,7 @@ const CenterOverview = ({ center, lecturersCount }) => {
         </div>
         
         <div className="flex flex-wrap gap-4">
-          <div className="stat bg-base-200 rounded-lg p-4 min-w-[150px]">
+          <div className="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
             <div className="stat-figure text-primary">
               <Users className="w-8 h-8" />
             </div>
@@ -35,7 +35,23 @@ const CenterOverview = ({ center, lecturersCount }) => {
             <div className="stat-value">{lecturersCount}</div>
           </div>
           
-          <div className="stat bg-base-200 rounded-lg p-4 min-w-[150px]">
+          <div className="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
+            <div className="stat-figure text-primary">
+              <Users className="w-8 h-8" />
+            </div>
+            <div className="stat-title">{isRTL ? "الطلاب" : "Students"}</div>
+            <div className="stat-value">{studentsCount}</div>
+          </div>
+          
+          <div className="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
+            <div className="stat-figure text-primary">
+              <BookOpen className="w-8 h-8" />
+            </div>
+            <div className="stat-title">{isRTL ? "الدروس" : "Lessons"}</div>
+            <div className="stat-value">{lessonsCount}</div>
+          </div>
+          
+          <div className="stat bg-base-200 rounded-lg p-4 min-w-[120px]">
             <div className="stat-figure text-primary">
               <Calendar className="w-8 h-8" />
             </div>
