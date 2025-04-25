@@ -10,6 +10,7 @@ import { getAllSubjects } from "../../routes/courses"
 import BasicInfoForm from "./basic-info-form"
 import ContainerCreationPanel from "./container-creation-panel"
 import CourseStructureVisualization from "./course-structure-visualization"
+import { Link } from "react-router-dom"
 
 function CourseCreationForm() {
   const { t, i18n } = useTranslation()
@@ -137,7 +138,7 @@ function CourseCreationForm() {
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-between items-center mb-8 relative"
         >
-          <a href="#" className="flex items-center text-primary hover:text-primary-600 text-sm">
+          <Link to={"/dashboard/lecturer-dashboard/"} className="flex items-center text-primary hover:text-primary-600 text-sm">
             {isRTL ? (
               <>
                 <ChevronRight className="h-4 w-4 mr-1" />
@@ -149,7 +150,7 @@ function CourseCreationForm() {
                 <span>{t("back")}</span>
               </>
             )}
-          </a>
+          </Link>
           <div className="absolute inset-x-0 flex justify-center">
             <div className="flex items-center">
               <div className="w-16 h-px bg-secondary"></div>
