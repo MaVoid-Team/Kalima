@@ -6,7 +6,7 @@ import LecturersList from "./LecturersList";
 import CourseList from "./CourseList";
 import ActivityTracker from "./ActivityTracker";
 import AddCourseForm from "./AddCourseForm";
-import PromoBanner from "./PromoBanner";
+import BarCodeScanner from "./QrScannerCard";
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
 
 const CenterDashboard = () => {
@@ -213,8 +213,12 @@ const CenterDashboard = () => {
               onAddCourse={handleAddCourse}
             />
           </div>
-          <div className="mb-8">
-            <PromoBanner />
+          <div>
+            <BarCodeScanner
+              centerId={selectedCenter._id}
+              centerName={selectedCenter.name}
+              isLoading={loading.lessons}
+              error={error.lessons} />
           </div>
           
           {/* Activity Tracker */}
