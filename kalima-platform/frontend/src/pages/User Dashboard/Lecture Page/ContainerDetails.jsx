@@ -81,7 +81,7 @@ const ContainerDetailsPage = () => {
   }
 
   return (
-      <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen p-8">
+      <div className="min-h-screen p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="flex items-center justify-between mb-8">
@@ -104,10 +104,10 @@ const ContainerDetailsPage = () => {
   
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
+        <div className="rounded-2xl shadow-sm p-8 mb-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{container.name}</h1>
-            <div className="flex items-center gap-4 text-gray-500">
+            <h1 className="text-3xl font-bold mb-2">{container.name}</h1>
+            <div className="flex items-center gap-4">
               <span className="flex items-center gap-2">
                 <FiFolder className="text-lg" />
                 {container.type}
@@ -124,7 +124,7 @@ const ContainerDetailsPage = () => {
             {container.children?.map(child => (
               <div 
                 key={child._id}
-                className="group relative bg-white rounded-xl border border-gray-200 hover:border-primary transition-all"
+                className="group relative rounded-xl"
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
@@ -135,11 +135,11 @@ const ContainerDetailsPage = () => {
                         <FiFolder className="text-primary text-xl" />
                       )}
                     </div>
-                    <h3 className="font-medium text-gray-900">{child.name}</h3>
+                    <h3 className="font-medium">{child.name}</h3>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm">
                       {child.kind || container.type}
                     </span>
                     <Link
@@ -160,8 +160,8 @@ const ContainerDetailsPage = () => {
 
           {container.children?.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-4xl mb-4 text-gray-300">📭</div>
-              <p className="text-gray-500">No content available in this container</p>
+              <div className="text-4xl mb-4">📭</div>
+              <p className="">No content available in this container</p>
             </div>
           )}
         </div>
