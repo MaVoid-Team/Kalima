@@ -1,152 +1,258 @@
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Camera, BookOpen, Download } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
+import BarcodeScannerComponent from 'react-webcam-barcode-scanner';
+import { Capacitor } from '@capacitor/core';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import axios from 'axios';
 
-const QrScannerCard = () => {
+const BarCodeScanner = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
+  const [scannedResult, setScannedResult] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState(null);
+  const [manualInput, setManualInput] = useState('');
+  const [showManualInput, setShowManualInput] = useState(false);
+  const isNative = Capacitor.isNativePlatform();
 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+      transition: { duration: 0.3 },
+    },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100
+      transition: { duration: 0.3 },
+    },
+  };
+
+  const requestPermissions = async () => {
+    try {
+      const permission = await BarcodeScanner.checkPermission({ force: true });
+      if (permission.granted) {
+        return true;
+      } else {
+        setError(isRTL ? 'تم رفض إذن الكاميرا' : 'Camera permission denied');
+        return false;
+      }
+    } catch (err) {
+      setError(isRTL ? 'فشل طلب إذن الكاميرا' : 'Failed to request camera permission');
+      return false;
+    }
+  };
+
+  const startNativeScan = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
+    try {
+      await BarcodeScanner.hideBackground();
+      document.body.classList.add('scanner-active');
+      const result = await BarcodeScanner.startScan();
+      document.body.classList.remove('scanner-active');
+
+      if (result.hasContent) {
+        setScannedResult(result.content);
+        await sendToApi(result.content);
+      } else {
+        setError(isRTL ? 'لم يتم العثور على رمز' : 'No barcode found');
+      }
+    } catch (err) {
+      setError(isRTL ? 'فشل المسح' : 'Scanning failed');
+    } finally {
+      setIsScanning(false);
+      await BarcodeScanner.showBackground();
+    }
+  };
+
+  const handleWebScan = (err, result) => {
+    if (result && result.text !== scannedResult) {
+      setScannedResult(result.text);
+      setIsScanning(false);
+      sendToApi(result.text);
+    }
+    if (err && err.name !== 'NotFoundError') {
+      setError(isRTL ? 'فشل مسح الرمز' : 'Failed to scan barcode');
+    }
+  };
+
+  const sendToApi = async (barcodeData) => {
+    try {
+      const response = await axios.post('/api/barcode', { barcode: barcodeData });
+      console.log('API response:', response.data);
+    } catch (err) {
+      setError(isRTL ? 'فشل إرسال البيانات إلى الخادم' : 'Failed to send data to server');
+    }
+  };
+
+  const toggleScan = async () => {
+    setError(null);
+    if (isScanning) {
+      setIsScanning(false);
+    } else {
+      setScannedResult(null);
+      setIsScanning(true);
+      if (isNative) {
+        await startNativeScan();
       }
     }
   };
 
+  useEffect(() => {
+    if (isNative && isScanning) {
+      document.body.classList.add('scanner-active');
+      return () => {
+        BarcodeScanner.showBackground();
+        document.body.classList.remove('scanner-active');
+      };
+    }
+  }, [isNative, isScanning]);
+
   return (
-    <motion.div 
-      className="bg-base-100 p-6 rounded-lg relative overflow-hidden max-w-md mx-auto"
+    <motion.div
+      className="bg-base-100 p-4 rounded-lg max-w-md mx-auto"
       dir={dir}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-full h-8 bg-primary/5"></div>
-      <div className="absolute bottom-2 left-0 w-full h-1 bg-primary/10"></div>
-      <div className="absolute bottom-4 left-0 w-full h-1 bg-primary/10"></div>
-      <div className="absolute bottom-6 left-0 w-full h-1 bg-primary/10"></div>
-
-      {/* Top Navigation */}
-      <motion.div 
-        className="flex justify-start mb-8"
-        variants={itemVariants}
-      >
-        <button className="flex items-center text-base-content/70 hover:text-base-content transition-colors">
-          <ArrowLeft className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          <span className="text-sm">{isRTL ? 'عرض الكل' : 'Show All'}</span>
-        </button>
-      </motion.div>
-
-      {/* QR Scanner Section */}
-      <div className="flex flex-col items-center mb-8">
-        {/* QR Scanner Button */}
-        <motion.button 
-          className="btn btn-primary rounded-lg px-6 py-3 mb-2 flex items-center"
+      {/* Scanner Section */}
+      <div className="flex flex-col items-center mb-6">
+        <motion.h2
+          className="text-xl font-bold text-base-content mb-4"
           variants={itemVariants}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
         >
-          <Camera className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          {isRTL ? 'مسح QR' : 'QR Scanner'}
+          {isRTL ? 'مسح الباركود' : 'Scan Barcode'}
+        </motion.h2>
+
+        {error && (
+          <motion.p
+            className="text-error mb-4 text-sm"
+            variants={itemVariants}
+          >
+            {error}
+          </motion.p>
+        )}
+
+        {!isScanning ? (
+          <motion.button
+            className="btn btn-primary rounded-lg px-6 py-2 flex items-center"
+            onClick={toggleScan}
+            variants={itemVariants}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Camera className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {isRTL ? 'بدء المسح' : 'Start Scanning'}
+          </motion.button>
+        ) : !isNative ? (
+          <>
+            <motion.div
+              className="relative w-full max-w-xs h-64 bg-base-200 rounded-lg overflow-hidden mt-4"
+              variants={itemVariants}
+            >
+              <BarcodeScannerComponent
+                width="100%"
+                height="100%"
+                onUpdate={handleWebScan}
+              />
+              <div className="absolute inset-0 border-4 border-primary/50 rounded-lg pointer-events-none"></div>
+            </motion.div>
+            <motion.button
+              className="btn btn-ghost mt-2"
+              onClick={toggleScan}
+              variants={itemVariants}
+            >
+              {isRTL ? 'إيقاف المسح' : 'Stop Scanning'}
+            </motion.button>
+          </>
+        ) : null}
+
+        {/* Manual input toggle button */}
+        <motion.button
+          className="btn btn-secondary mt-4"
+          onClick={() => setShowManualInput(!showManualInput)}
+          variants={itemVariants}
+        >
+          {showManualInput
+            ? (isRTL ? 'إخفاء الإدخال اليدوي' : 'Hide Manual Input')
+            : (isRTL ? 'الإدخال اليدوي' : 'Manual Input')}
         </motion.button>
-        
-        <motion.p 
-          className="text-base-content/50 mb-6 text-sm"
-          variants={itemVariants}
-        >
-          {isRTL ? 'اضغط هنا لمسح الكود' : 'Click here to scan code'}
-        </motion.p>
 
-        {/* Speech Bubble */}
-        <motion.div 
-          className={`
-            relative bg-base-100 border border-primary p-4 rounded-lg mb-4  
-            ${isRTL ? 'text-right' : 'text-left'}
-            before:content-[''] before:absolute before:top-full before:left-1/2 
-            before:-translate-x-1/2 before:w-4 before:h-4 before:bg-base-100 
-            before:border-b before:border-r before:border-primary before:rotate-45
-          `}
-          variants={itemVariants}
-        >
-          <p className="font-medium text-base-content">{isRTL ? 'الطالب محمد محمود' : 'Student: Mahmoud Mohamed'}</p>
-          <p className="text-base-content/70 text-sm mt-1">[المدفوع 1500 جنيه]</p>
-          <p className="text-base-content/70 text-sm mt-1">[وقت الدخول 4:15pm]</p>
-        </motion.div>
+        {/* Manual input field */}
+        {showManualInput && (
+          <motion.div
+            className="mt-4 w-full"
+            variants={itemVariants}
+          >
+            <input
+              type="text"
+              className="input input-bordered w-full mb-2"
+              placeholder={isRTL ? 'أدخل الرمز هنا' : 'Enter barcode here'}
+              value={manualInput}
+              onChange={(e) => setManualInput(e.target.value)}
+              dir={dir}
+            />
+            <button
+              className="btn btn-accent w-full"
+              onClick={() => {
+                if (manualInput.trim()) {
+                  setScannedResult(manualInput.trim());
+                  sendToApi(manualInput.trim());
+                  setShowManualInput(false);
+                }
+              }}
+            >
+              {isRTL ? 'إرسال' : 'Submit'}
+            </button>
+          </motion.div>
+        )}
 
-        {/* Register Entry Button */}
-        <motion.button 
-          className="btn btn-primary rounded-lg px-6 py-2 flex items-center"
-          variants={itemVariants}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <span className="w-2 h-2 bg-success rounded-lg mr-2"></span>
-          {isRTL ? 'تسجيل الدخول' : 'Register Entry'}
-        </motion.button>
+        {/* Scanned result */}
+        {scannedResult && (
+          <motion.div
+            className={`
+              bg-base-100 border border-primary p-3 rounded-lg mt-4 w-full
+              ${isRTL ? 'text-right' : 'text-left'}
+            `}
+            variants={itemVariants}
+          >
+            <p className="font-medium text-base-content">
+              {isRTL ? 'الرمز الممسوح' : 'Scanned Code'}: {scannedResult}
+            </p>
+          </motion.div>
+        )}
       </div>
 
       {/* Summary Card */}
-      <motion.div 
-        className="bg-base-200 rounded-lg p-6 border border-base-300"
+      <motion.div
+        className="bg-base-200 rounded-lg p-4 border border-base-300"
         variants={itemVariants}
       >
-        {/* Centered Header */}
-        <div className="flex flex-col items-center mb-4">
-          <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center mb-2">
-            <svg 
-              className="h-5 w-5 text-base-content" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h3 className="font-bold text-base-content">{isRTL ? 'ملخص الإيرادات' : 'Revenue Summary'}</h3>
+        <h3 className="font-bold text-base-content mb-2">
+          {isRTL ? 'ملخص الإيرادات' : 'Revenue Summary'}
+        </h3>
+        <div className={`${isRTL ? 'text-right' : 'text-left'} space-y-1`}>
+          <p className="text-base-content text-sm">
+            {isRTL ? '120 طالباً' : '120 students'}
+          </p>
+          <p className="text-base-content text-sm">
+            {isRTL ? 'إجمالي الإيرادات: 18000 جنيه' : 'Total revenue: 18000 EGP'}
+          </p>
         </div>
-
-        <div className={`flex items-center mb-3 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
-          <BookOpen className={`h-5 w-5 text-base-content/70 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          <p className="text-base-content">{isRTL ? 'درس الرياضيات - الصف الخامس' : 'Math Lesson - Grade 5'}</p>
-        </div>
-
-        <div className={`${isRTL ? 'text-right' : 'text-left'} space-y-2 mb-6`}>
-          <p className="text-base-content">{isRTL ? '120 طالباً' : '120 students'}</p>
-          <p className="text-base-content">{isRTL ? '150 جنيه' : '150 EGP'}</p>
-          <p className="font-medium text-base-content">{isRTL ? 'إجمالي الإيرادات 18000 جنيه' : 'Total revenue: 18000 EGP'}</p>
-        </div>
-
-        <motion.button 
-          className="btn btn-primary rounded-lg px-6 py-2 w-full flex items-center justify-center"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Download className={`h-5 w-5 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-          {isRTL ? 'تحميل التقرير' : 'Download Report'}
-        </motion.button>
       </motion.div>
     </motion.div>
   );
 };
 
-export default QrScannerCard;
+export default BarCodeScanner;
