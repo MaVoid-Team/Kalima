@@ -105,7 +105,7 @@ mongoose.connection.once("open", () => {
 
       if (pendingNotifications.length > 0) {
         pendingNotifications.forEach(async (notification) => {
-          socket.emit("newLecture", {
+          socket.emit("newHomework", {
             title: notification.title,
             message: notification.message,
             type: notification.type,
