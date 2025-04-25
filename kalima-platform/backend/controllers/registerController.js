@@ -40,15 +40,30 @@ const validatePassword = (password) => {
   }
 };
 
-const generateDefaultEmail = (name, phoneNumber) => {
+const validateEmailFormat = (name, phoneNumber, email) => {
   if (!phoneNumber || phoneNumber.length < 4) {
-    throw new AppError("Phone number must be at least 4 digits for email generation", 400);
+    return false;
   }
   
   const cleanName = name.replace(/\s+/g, '.').toLowerCase();
   const lastFourDigits = phoneNumber.slice(-4);
   
-  return `${cleanName}${lastFourDigits}@example.com`;
+  const expectedEmailPrefix = `${cleanName}${lastFourDigits}`;
+  
+  const providedEmailPrefix = email.split('@')[0].toLowerCase();
+  
+  return providedEmailPrefix === expectedEmailPrefix;
+};
+
+const getExpectedEmailFormat = (name, phoneNumber) => {
+  if (!phoneNumber || phoneNumber.length < 4) {
+    return null;
+  }
+  
+  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
+  const lastFourDigits = phoneNumber.slice(-4);
+  
+  return `${cleanName}${lastFourDigits}@[your-domain]`;
 };
 
 const registerNewUser = catchAsync(async (req, res, next) => {
@@ -74,21 +89,22 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   if (password !== confirmPassword) {
     return next(new AppError("Passwords do not match", 400));
   }
-
-  let finalEmail = email;
-  if (!email && phoneNumber) {
-    try {
-      finalEmail = generateDefaultEmail(name, phoneNumber);
-    } catch (error) {
-      return next(error);
+  if (!email) {
+    return next(new AppError("Email is required", 400));
+  }
+  
+  if (phoneNumber) {
+    const isEmailFormatValid = validateEmailFormat(name, phoneNumber, email);
+    if (!isEmailFormatValid) {
+      const expectedFormat = getExpectedEmailFormat(name, phoneNumber);
+      return next(new AppError(
+        `Email must follow the format: ${expectedFormat} where [your-domain] can be any valid domain`,
+        400
+      ));
     }
-  } else if (!email) {
-    return next(new AppError("Email is required when phone number is not provided", 400));
   }
 
-  finalEmail = finalEmail.toLowerCase().trim();
-
-  const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${finalEmail}$`, 'i') } });
+  const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
   if (duplicateEmail) {
     return next(
@@ -132,22 +148,17 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   const hashedPwd = await bcrypt.hash(password, 12);
 
-  const newUser = phoneNumber
-    ? {
-        name,
-        email: finalEmail,
-        phoneNumber,
-        password: hashedPwd,
-        children: childrenById,
-        ...userData,
-      }
-    : {
-        name,
-        email: finalEmail,
-        password: hashedPwd,
-        children: childrenById,
-        ...userData,
-      };
+  const newUser = {
+    name,
+    email: email.toLowerCase().trim(),
+    password: hashedPwd,
+    children: childrenById,
+    ...userData,
+  };
+  
+  if (phoneNumber) {
+    newUser.phoneNumber = phoneNumber;
+  }
 
   let user;
 
