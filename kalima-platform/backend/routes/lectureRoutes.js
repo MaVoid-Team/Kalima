@@ -2,14 +2,12 @@ const express = require("express");
 const lectureController = require("../controllers/lectureController");
 const attachmentController = require("../controllers/attachmentController");
 const verifyJWT = require("../middleware/verifyJWT");
-
+const authController = require("../controllers/authController");
 // Apply JWT verification middleware
 const router = express.Router();
 
 // New public route for non-sensitive lecture data
-router
-  .route("/public")
-  .get(lectureController.getAllLecturesPublic);
+router.route("/public").get(lectureController.getAllLecturesPublic);
 
 // Apply JWT verification middleware for subsequent routes
 router.use(verifyJWT);
@@ -30,7 +28,7 @@ router
   .get(attachmentController.getLectureAttachments)
   .post(
     attachmentController.upload.single("attachment"),
-    attachmentController.createAttachment,
+    attachmentController.createAttachment
   );
 
 router
@@ -45,6 +43,14 @@ router
 router
   .route("/lecturer/:lecturerId")
   .get(lectureController.getLecturerLectures);
+
+router
+  .route("/:lectureId/homework")
+  .get(attachmentController.getAllHomeWork)
+  .post(
+    attachmentController.upload.single("attachment"),
+    attachmentController.uploadHomeWork
+  );
 
 router.route("/update-parent").patch(lectureController.UpdateParentOfLecture);
 

@@ -8,6 +8,9 @@ const Level = require("../models/levelModel");
 const Subject = require("../models/subjectModel");
 const Lecturer = require("../models/lecturerModel");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
+const NotificationTemplate = require("../models/notificationTemplateModel");
+const Notification = require("../models/notification");
+const Student = require("../models/studentModel");
 
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
@@ -215,16 +218,20 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       description,
       goal,
     } = req.body;
-    await checkDoc(Level, level, session);
-    await checkDoc(Subject, subject, session);
-    await checkDoc(Lecturer, createdBy || req.user._id, session);
+    
+    // Check required documents exist
+    const levelDoc = await checkDoc(Level, level, session);
+    const subjectDoc = await checkDoc(Subject, subject, session);
+    const lecturerDoc = await checkDoc(Lecturer, createdBy || req.user._id, session);
 
+    // Validate required fields for course type
     if (type === "course" && (!description || !goal)) {
       return next(
         new AppError("Description and goal are required for course type.", 400)
       );
     }
 
+    // Create the container
     const container = await Container.create(
       [
         {
@@ -242,15 +249,102 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       ],
       { session }
     );
+
     // If this container has a parent, update the parent's children array
     if (parent) {
-      const parentContainer = await checkDoc(
-        Container,
-        req.body.parent,
-        session
-      );
+      const parentContainer = await checkDoc(Container, parent, session);
       parentContainer.children.push(container[0]._id);
       await parentContainer.save({ session });
+    }
+
+    // Notification logic - only for paid containers with parent
+    let studentsNotified = 0;
+    if (price > 0 && parent) {
+      // Get the container chain (all parent containers up the hierarchy)
+      const containerChainResult = await Container.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(parent) },
+        },
+        {
+          $graphLookup: {
+            from: "containers",
+            startWith: "$parent",
+            connectFromField: "parent",
+            connectToField: "_id",
+            as: "parentChain",
+          },
+        },
+      ]).session(session);
+
+      // Extract all container IDs in the hierarchy (including the direct parent)
+      const containerIds = [
+        parent,
+        ...containerChainResult[0]?.parentChain.map(c => c._id) || []
+      ];
+
+      // Find all purchases where container is in this hierarchy
+      const purchases = await Purchase.find({
+        container: { $in: containerIds },
+        type: "containerPurchase"
+      }).session(session);
+
+      // Get unique student IDs from these purchases
+      const studentIds = [...new Set(purchases.map(p => p.student.toString()))];
+
+      // Find these students who want notifications
+      const students = await Student.find({
+        _id: { $in: studentIds },
+        $or: [{ containerNotify: true }, { containerNotify: { $exists: false } }],
+      }).session(session);
+
+      // Get notification template
+      const template = await NotificationTemplate.findOne({
+        type: "new_container",
+      }).session(session);
+
+      if (template && students.length > 0) {
+        const io = req.app.get("io");
+        const notificationsToCreate = [];
+
+        await Promise.all(
+          students.map(async (student) => {
+            // Prepare notification data
+            const notificationData = {
+              title: template.title,
+              message: template.message
+                .replace("{container}", name)
+                .replace("{subject}", subjectDoc.name),
+              type: "new_container",
+              relatedId: container[0]._id,
+            };
+
+            // Check if student is online
+            const isOnline = io.sockets.adapter.rooms.has(student._id.toString());
+            const isSent = isOnline;
+
+            // Create notification
+            const notification = await Notification.create(
+              [{
+                userId: student._id,
+                ...notificationData,
+                isSent,
+              }],
+              { session }
+            );
+
+            notificationsToCreate.push(notification[0]);
+
+            // Send immediately if online
+            if (isOnline) {
+              studentsNotified++;
+              io.to(student._id.toString()).emit("newContainer", {
+                ...notificationData,
+                notificationId: notification[0]._id,
+              });
+            }
+          })
+        );
+      }
     }
 
     await session.commitTransaction();
@@ -258,6 +352,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       status: "success",
       data: {
         container: container[0],
+        studentsNotified,
       },
     });
   } catch (error) {

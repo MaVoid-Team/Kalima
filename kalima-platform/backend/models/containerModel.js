@@ -35,7 +35,7 @@ const containerSchema = new mongoose.Schema(
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Container" }],
     price: { type: Number, default: 0 },
     description: { type: String }, // Optional field for courses
-    goal: [{ type: String }],       // Optional field for courses as an array of strings
+    goal: [{ type: String }], // Optional field for courses as an array of strings
   },
   {
     toObject: { virtuals: true },
@@ -44,5 +44,7 @@ const containerSchema = new mongoose.Schema(
   }
 );
 
+containerSchema.index({ parent: 1 });
+containerSchema.index({ createdBy: 1 });
 
 module.exports = mongoose.model("Container", containerSchema);
