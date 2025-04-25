@@ -11,7 +11,46 @@ const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
-// @route POST /register/
+
+const validatePassword = (password) => {
+  const minLength = 8;
+  const maxLength = 30;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (password.length < minLength) {
+    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
+  }
+  if (password.length > maxLength) {
+    throw new AppError(`Password must be less than ${maxLength} characters`, 400);
+  }
+  if (!hasUpperCase) {
+    throw new AppError("Password must contain at least one uppercase letter", 400);
+  }
+  if (!hasLowerCase) {
+    throw new AppError("Password must contain at least one lowercase letter", 400);
+  }
+  if (!hasNumbers) {
+    throw new AppError("Password must contain at least one number", 400);
+  }
+  if (!hasSpecialChar) {
+    throw new AppError("Password must contain at least one special character", 400);
+  }
+};
+
+const generateDefaultEmail = (name, phoneNumber) => {
+  if (!phoneNumber || phoneNumber.length < 4) {
+    throw new AppError("Phone number must be at least 4 digits for email generation", 400);
+  }
+  
+  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
+  const lastFourDigits = phoneNumber.slice(-4);
+  
+  return `${cleanName}${lastFourDigits}@example.com`;
+};
+
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -25,8 +64,31 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   } = req.body;
   const phoneRequiredRoles = ["teacher", "parent", "student"];
 
-  // Checking duplicate.
-  const duplicateEmail = await User.findOne({ email });
+  // Validate password
+  try {
+    validatePassword(password);
+  } catch (error) {
+    return next(error);
+  }
+
+  if (password !== confirmPassword) {
+    return next(new AppError("Passwords do not match", 400));
+  }
+
+  let finalEmail = email;
+  if (!email && phoneNumber) {
+    try {
+      finalEmail = generateDefaultEmail(name, phoneNumber);
+    } catch (error) {
+      return next(error);
+    }
+  } else if (!email) {
+    return next(new AppError("Email is required when phone number is not provided", 400));
+  }
+
+  finalEmail = finalEmail.toLowerCase().trim();
+
+  const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${finalEmail}$`, 'i') } });
 
   if (duplicateEmail) {
     return next(
@@ -34,7 +96,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  // For the roles with phone login only.
   const duplicatePhone = await User.findOne({ phoneNumber });
   if (phoneRequiredRoles.includes(role.toLowerCase()) && duplicatePhone) {
     return next(
@@ -42,7 +103,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  // To allow sequenceId to be sent along side valid mongoode StudentId.
   const childrenById = [];
   if (!!children) {
     for (let id of children) {
@@ -75,7 +135,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   const newUser = phoneNumber
     ? {
         name,
-        email,
+        email: finalEmail,
         phoneNumber,
         password: hashedPwd,
         children: childrenById,
@@ -83,7 +143,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
     : {
         name,
-        email,
+        email: finalEmail,
         password: hashedPwd,
         children: childrenById,
         ...userData,
