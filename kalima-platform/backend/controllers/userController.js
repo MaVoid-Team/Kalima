@@ -16,7 +16,6 @@ const bcrypt = require("bcrypt");
 const handleCSV = require("../utils/upload files/handleCSV.js");
 const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
-const QueryFeatures = require("../utils/queryFeatures");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -328,14 +327,6 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
 /**
  * Get all data for the currently logged-in user (any role)
  * Includes user profile, balance information (for student/parent) and purchase history (for student/parent)
- * 
- * Query parameters supported:
- * - fields: Comma-separated list of fields to include (e.g., fields=userInfo,purchaseHistory)
- * - limit: Number of items per page for paginated results (default: 10)
- * - page: Page number for paginated results (default: 1)
- * - dateFrom: Filter purchases/activities from this date (YYYY-MM-DD)
- * - dateTo: Filter purchases/activities to this date (YYYY-MM-DD)
- * - sort: Field to sort by (e.g., sort=purchasedAt for purchases, default: -createdAt)
  *
  * Query parameters supported:
  * - fields: Comma-separated list of fields to include (e.g., fields=userInfo,purchaseHistory)
@@ -517,56 +508,6 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("student", "name")
           .lean();
 
-        responseData.pointPurchases = pointPurchases;
-      }
-      
-      // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
-      if (!fields || fields.includes('containers')) {
-        // Get lecturer-specific data (containers created by this lecturer)
-        let containerQuery = Container.find({ createdBy: userId })
-          .select("name type price subject level")
-          .populate("subject", "name")
-          .populate("level", "name");
-
-        // Apply query features for containers
-        const containerFeatures = new QueryFeatures(containerQuery, req.query)
-          .filter()
-          .sort()
-          .paginate();
-        containerQuery = containerFeatures.query;
-        const containers = await containerQuery.lean();
-        
-        responseData.containers = containers;
-      }
-      
-      // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
-      if (!fields || fields.includes('pointPurchases')) {
-        // Get point purchases made for this lecturer's content
-        let purchaseQuery = Purchase.find({ lecturer: userId });
-        
-        // Add date filtering if provided
-        if (req.query.dateFrom || req.query.dateTo) {
-          const dateFilter = {};
-          if (req.query.dateFrom) {
-            dateFilter.purchasedAt = { $gte: new Date(req.query.dateFrom) };
-          }
-          if (req.query.dateTo) {
-            dateFilter.purchasedAt = { ...dateFilter.purchasedAt, $lte: new Date(req.query.dateTo) };
-          }
-          purchaseQuery = purchaseQuery.find(dateFilter);
-        }
-        
-        // Apply query features for purchases
-        const purchaseFeatures = new QueryFeatures(purchaseQuery, req.query)
-          .filter()
-          .sort()
-          .paginate();
-        purchaseQuery = purchaseFeatures.query;
-        
-        const pointPurchases = await purchaseQuery
-          .populate("student", "name")
-          .lean();
-        
         responseData.pointPurchases = pointPurchases;
       }
       break;
