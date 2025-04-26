@@ -93,6 +93,73 @@
       "of": "من"
     },
     "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا المستخدم؟",
-    "NA": "غير متوفر"
+    "NA": "غير متوفر",
+
+    "auditlog": {
+      "title": "سجل العمليات",
+      "subtitle": "عرض وتتبع جميع الأنشطة على النظام",
+      "search": "البحث في سجل العمليات...",
+      "noRecords": "لا توجد سجلات متاحة",
+      
+      "filters": {
+        "all": "الكل",
+        "user": "المستخدم",
+        "role": "الصلاحية",
+        "action": "الإجراء",
+        "resource": "العنصر",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "to": "إلى",
+        "apply": "تطبيق الفلتر"
+      },
+      
+      "columns": {
+        "user": "المستخدم",
+        "role": "الصلاحية",
+        "action": "الإجراء",
+        "resource": "العنصر",
+        "datetime": "التاريخ والوقت",
+        "status": "الحالة"
+      },
+      
+      "roles": {
+        "admin": "مسؤول",
+        "lecturer": "معلم",
+        "student": "طالب"
+      },
+      
+      "actions": {
+        "create": "إنشاء",
+        "read": "قراءة",
+        "update": "تعديل",
+        "delete": "حذف"
+      },
+      
+      "resources": {
+        "container": "كورس",
+        "lecture": "درس",
+        "user": "مستخدم",
+        "timetable": "جدول زمني",
+        "center": "مركز" 
+      },
+      "idDisplay": "ID: {{id}}",
+      
+      "status": {
+        "success": "ناجح",
+        "pending": "قيد الانتظار",
+        "failed": "فشل",
+        "unknown": "غير معروف"
+      },
+      
+      "errors": {
+        "fetch": "فشل تحميل سجلات التدقيق",
+        "general": "حدث خطأ"
+      },
+      
+      "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+      }
+    }
     }
   }

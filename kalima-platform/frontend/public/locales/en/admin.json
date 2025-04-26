@@ -56,7 +56,7 @@
     "specific": "Specific",
     "general": "General",
     "copy": "Copy",
-    
+
     "filters": {
       "name": "Name",
       "phone": "Phone Number",
@@ -93,7 +93,73 @@
       "of": "of"
     },
     "confirmDelete": "Are you sure you want to delete this user?",
-    "NA": "N/A"
+    "NA": "N/A",
+
+    "auditlog": {
+      "title": "Audit Log",
+      "subtitle": "View and track all system activities",
+      "search": "Search audit logs...",
+      "noRecords": "No records available",
+      
+      "filters": {
+        "all": "All",
+        "user": "User",
+        "role": "Role",
+        "action": "Action",
+        "resource": "Resource",
+        "status": "Status",
+        "date": "Date",
+        "to": "to",
+        "apply": "Apply Filters"
+      },
+      
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "action": "Action",
+        "resource": "Resource",
+        "datetime": "Date/Time",
+        "status": "Status"
+      },
+      
+      "roles": {
+        "admin": "Admin",
+        "lecturer": "Lecturer",
+        "student": "Student"
+      },
+      
+      "actions": {
+        "create": "Create",
+        "read": "Read",
+        "update": "Update",
+        "delete": "Delete"
+      },
+      
+      "resources": {
+        "container": "Course",
+        "lecture": "Lesson",
+        "user": "User",
+        "timetable": "Schedule",
+        "center": "Center"
+      },
+      "idDisplay": "ID: {{id}}",
+      "status": {
+        "success": "Success",
+        "pending": "Pending",
+        "failed": "Failed",
+        "unknown": "Unknown"
+      },
+      
+      "errors": {
+        "fetch": "Failed to load audit logs",
+        "general": "An error occurred"
+      },
+      
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      }
+    }
    
   }
   } 
