@@ -11,7 +11,7 @@ export const getAllCenters = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/`, {
+    const response = await axios.get(`${API_URL}/centers/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ export const getCenterDataByType = async (centerId, type) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/centers/${centerId}/${type}`, {
+    const response = await axios.get(`${API_URL}/centers/${centerId}/${type}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -158,7 +158,7 @@ export const addNewLesson = async (lessonData) => {
     formattedData.duration = parseInt(formattedData.duration);
 
     const response = await axios.post(
-      `${API_URL}/api/v1/centers/lessons`,
+      `${API_URL}/centers/lessons`,
       formattedData,
       {
         withCredentials: true,
