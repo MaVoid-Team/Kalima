@@ -25,12 +25,14 @@ export const CourseCard = ({
   ))
 
   const formatPrice = () => {
+    if (typeof price !== 'number') return t('priceUnavailable') 
     if (price === 0) return t('free')
     const formattedNumber = price.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : 'en-US')
-    return i18n.language === 'ar' 
+    return i18n.language === 'ar'
       ? `${formattedNumber} ${t('currency')}`
       : `${t('currency')} ${formattedNumber}`
   }
+  
 
   return (
     <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all h-full" dir={isRTL ? "rtl" : "ltr"}>

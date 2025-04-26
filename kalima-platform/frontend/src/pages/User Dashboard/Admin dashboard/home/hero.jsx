@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { getAllLecturers, getAllAssistants, getAllParents, getAllStudents } from '../../../../routes/fetch-users';
+import { useTranslation } from 'react-i18next';
 
 const Hero = () => {
+  const { t, i18n } = useTranslation('admin');
   const [lecturers, setLecturers] = useState([]);
   const [assistants, setAssistants] = useState([]);
   const [parents, setParents] = useState([]);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isRTL = i18n.language === 'ar'; 
+  const dir = isRTL ? 'rtl' : 'ltr';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +56,7 @@ const Hero = () => {
 
   return (
     <div className="mx-auto p-6 w-full font-[Cairo]">
-      <h1 className="text-3xl font-bold mb-8 text-right">صفحة الأدمن</h1>
+    <h1 className={`text-3xl font-bold mb-8 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
 
       {error && (
         <div className="alert alert-error mb-6">
@@ -60,12 +64,12 @@ const Hero = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" dir="rtl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" dir={dir}>
         {/* Students Card */}
         <div className="card bg-[#f3e8ff] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
           <div className="card-body p-6 flex-row justify-between items-center">
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-purple-900">الطلاب</h2>
+              <h2 className="text-2xl font-bold text-purple-900">{t('admin.students')}</h2>
               <p className="text-3xl font-bold text-purple-900">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -84,7 +88,7 @@ const Hero = () => {
         <div className="card bg-[#e8f4ff] rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all max-w-md">
           <div className="card-body p-6 flex-row justify-between items-center">
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-blue-700">المعلمين</h2>
+              <h2 className="text-2xl font-bold text-blue-700">{t('admin.teachers')}</h2>
               <p className="text-3xl font-bold text-blue-700">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -103,7 +107,7 @@ const Hero = () => {
         <div className="card bg-[#ffece5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
           <div className="card-body p-6 flex-row justify-between items-center">
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-orange-700">المساعدين</h2>
+              <h2 className="text-2xl font-bold text-orange-700">{t('admin.assistants')}</h2>
               <p className="text-3xl font-bold text-orange-700">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
@@ -122,7 +126,7 @@ const Hero = () => {
         <div className="card bg-[#e8fce5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
           <div className="card-body p-6 flex-row justify-between items-center">
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-green-700">أولياء الأمور</h2>
+              <h2 className="text-2xl font-bold text-green-700">{t('admin.parents')}</h2>
               <p className="text-3xl font-bold text-green-700">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>

@@ -3,27 +3,27 @@ import { useTranslation } from "react-i18next";
 import { Phone, Book } from 'lucide-react';
 
 const LecturersList = ({ lecturers, isLoading, error }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const filteredLecturers = lecturers.filter(lecturer => 
     lecturer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   return (
     <div className="bg-base-100 rounded-lg shadow-lg p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-xl font-bold">
-          {isRTL ? "المحاضرين" : "Lecturers"}
+          {t('lecturersList.title')}
         </h2>
         
         <div className="flex gap-2">
           <div className="relative">
             <input
               type="text"
-              placeholder={isRTL ? "البحث عن محاضر" : "Search lecturer"}
+              placeholder={t('lecturersList.searchPlaceholder')}
               className="input input-bordered w-full md:w-64"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -36,7 +36,7 @@ const LecturersList = ({ lecturers, isLoading, error }) => {
           </div>
           
           <button className="btn btn-primary">
-            {isRTL ? "إضافة محاضر" : "Add Lecturer"}
+            {t('lecturersList.addLecturer')}
           </button>
         </div>
       </div>
@@ -63,7 +63,7 @@ const LecturersList = ({ lecturers, isLoading, error }) => {
                 
                 <div className="mt-2">
                   <div className="text-sm font-medium mb-1">
-                    {isRTL ? "المواد" : "Subjects"}:
+                    {t('lecturersList.subjects')}:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {lecturer.subjects && lecturer.subjects.length > 0 ? (
@@ -75,7 +75,7 @@ const LecturersList = ({ lecturers, isLoading, error }) => {
                       ))
                     ) : (
                       <span className="text-sm text-base-content/50">
-                        {isRTL ? "لا توجد مواد" : "No subjects"}
+                        {t('lecturersList.noSubjects')}
                       </span>
                     )}
                   </div>
@@ -83,7 +83,7 @@ const LecturersList = ({ lecturers, isLoading, error }) => {
                 
                 <div className="card-actions justify-end mt-4">
                   <button className="btn btn-sm btn-outline">
-                    {isRTL ? "عرض التفاصيل" : "View Details"}
+                    {t('lecturersList.viewDetails')}
                   </button>
                 </div>
               </div>
@@ -92,7 +92,7 @@ const LecturersList = ({ lecturers, isLoading, error }) => {
         </div>
       ) : (
         <div className="text-center py-8 text-base-content/70">
-          {isRTL ? "لا يوجد محاضرين" : "No lecturers found"}
+          {t('lecturersList.noLecturers')}
         </div>
       )}
     </div>
