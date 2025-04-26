@@ -6,7 +6,7 @@ import { getAllLevels} from "../../routes/levels";
 import { getAllSubjects } from "../../routes/courses";
 
 const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
-  const { t, i18n } = useTranslation("center");
+  const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   
   const [filters, setFilters] = useState({
@@ -20,18 +20,15 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
   const [mappedLessons, setMappedLessons] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
 
-  // Fetch subjects and levels for name mapping
   useEffect(() => {
     const fetchData = async () => {
       setDataLoading(true);
       try {
-        // Fetch subjects
         const subjectsResponse = await getAllSubjects();
         if (subjectsResponse.success) {
           setSubjects(subjectsResponse.data.subjects || []);
         }
         
-        // Fetch levels
         const levelsResponse = await getAllLevels();
         if (levelsResponse.success) {
           setLevels(levelsResponse.data.levels || []);
@@ -45,34 +42,26 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
     
     fetchData();
   }, []);
-  
-  // Map IDs to names when data is available
+
   useEffect(() => {
     if (!lessons || dataLoading || isLoading) return;
     
-    // Create lookup maps for faster access
     const subjectMap = new Map(subjects.map(subject => [subject._id, subject.name]));
     const levelMap = new Map(levels.map(level => [level._id, level.name]));
     const lecturerMap = new Map(lecturers.map(lecturer => [lecturer._id, lecturer.name]));
     
-    // Map lessons with names instead of IDs
     const mapped = lessons.map((lesson, index) => {
       const startTime = new Date(lesson.startTime);
-      let endTime;
-      
-      if (lesson.duration) {
-        endTime = new Date(startTime.getTime() + lesson.duration * 60000);
-      } else {
-        // Default duration of 60 minutes if not specified
-        endTime = new Date(startTime.getTime() + 60 * 60000);
-      }
+      let endTime = lesson.duration ? 
+        new Date(startTime.getTime() + lesson.duration * 60000) :
+        new Date(startTime.getTime() + 60 * 60000);
       
       return {
         id: lesson._id,
         subject: subjectMap.get(lesson.subject) || lesson.subject,
         subjectId: lesson.subject,
         session: (index + 1).toString(),
-        type: isRTL ? "محاضرة" : "Lecture",
+        type: t('courseCard.types.lecture'),
         room: "N/A",
         time: `${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
         date: startTime.toLocaleDateString(),
@@ -86,33 +75,27 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
     });
     
     setMappedLessons(mapped);
-  }, [lessons, subjects, levels, lecturers, dataLoading, isLoading, isRTL]);
+  }, [lessons, subjects, levels, lecturers, dataLoading, isLoading, t]);
 
-  // Extract unique subjects, lecturers, and levels for filters from the mapped data
   const uniqueSubjects = [...new Set(mappedLessons.map(lesson => lesson.subject))];
   const uniqueLecturers = [...new Set(mappedLessons.map(lesson => lesson.teacher.name))];
   const uniqueLevels = [...new Set(mappedLessons.map(lesson => lesson.teacher.group))];
 
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value
-    }));
+    setFilters(prev => ({ ...prev, [filterName]: value }));
   };
 
   const filteredLessons = mappedLessons.filter(lesson => {
-    const matchesSubject = !filters.subject || lesson.subject === filters.subject;
-    const matchesLecturer = !filters.lecturer || lesson.teacher.name === filters.lecturer;
-    const matchesLevel = !filters.level || lesson.teacher.group === filters.level;
-
-    return matchesSubject && matchesLecturer && matchesLevel;
+    return (!filters.subject || lesson.subject === filters.subject) &&
+           (!filters.lecturer || lesson.teacher.name === filters.lecturer) &&
+           (!filters.level || lesson.teacher.group === filters.level);
   });
 
   return (
     <div className="bg-base-100 rounded-lg shadow-lg p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-xl font-bold">
-          {isRTL ? "الدورات والمحاضرات" : "Courses & Lectures"}
+          {t('courseList.title')}
         </h2>
         
         <div className="flex flex-wrap gap-2">
@@ -121,7 +104,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
             value={filters.level}
             onChange={(e) => handleFilterChange("level", e.target.value)}
           >
-            <option value="">{isRTL ? "جميع المستويات" : "All Levels"}</option>
+            <option value="">{t('filters.allLevels')}</option>
             {uniqueLevels.map(level => (
               <option key={level} value={level}>{level}</option>
             ))}
@@ -132,7 +115,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
             value={filters.lecturer}
             onChange={(e) => handleFilterChange("lecturer", e.target.value)}
           >
-            <option value="">{isRTL ? "جميع المحاضرين" : "All Lecturers"}</option>
+            <option value="">{t('filters.allLecturers')}</option>
             {uniqueLecturers.map(lecturer => (
               <option key={lecturer} value={lecturer}>{lecturer}</option>
             ))}
@@ -143,7 +126,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
             onClick={onAddCourse}
           >
             <PlusCircle className="w-5 h-5 mr-1" />
-            {isRTL ? "إضافة محاضرة" : "Add Lecture"}
+            {t('courseList.addLecture')}
           </button>
         </div>
       </div>
@@ -164,7 +147,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         </div>
       ) : (
         <div className="text-center py-8 text-base-content/70">
-          {isRTL ? "لا توجد محاضرات" : "No lessons found"}
+          {t('courseList.noLessons')}
         </div>
       )}
     </div>

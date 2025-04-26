@@ -2,13 +2,13 @@ import { useTranslation } from "react-i18next";
 import { MapPin, Users, Calendar, BookOpen } from 'lucide-react';
 
 const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   
   // Format date to be more readable
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', {
+    return new Intl.DateTimeFormat(i18n.language, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -31,7 +31,7 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
             <div className="stat-figure text-primary">
               <Users className="w-8 h-8" />
             </div>
-            <div className="stat-title">{isRTL ? "المحاضرين" : "Lecturers"}</div>
+            <div className="stat-title">{t('centerOverview.lecturers')}</div>
             <div className="stat-value">{lecturersCount}</div>
           </div>
           
@@ -39,7 +39,7 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
             <div className="stat-figure text-primary">
               <Users className="w-8 h-8" />
             </div>
-            <div className="stat-title">{isRTL ? "الطلاب" : "Students"}</div>
+            <div className="stat-title">{t('centerOverview.students')}</div>
             <div className="stat-value">{studentsCount}</div>
           </div>
           
@@ -47,7 +47,7 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
             <div className="stat-figure text-primary">
               <BookOpen className="w-8 h-8" />
             </div>
-            <div className="stat-title">{isRTL ? "الدروس" : "Lessons"}</div>
+            <div className="stat-title">{t('centerOverview.courses')}</div>
             <div className="stat-value">{lessonsCount}</div>
           </div>
           
@@ -55,7 +55,7 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
             <div className="stat-figure text-primary">
               <Calendar className="w-8 h-8" />
             </div>
-            <div className="stat-title">{isRTL ? "تاريخ الإنشاء" : "Created"}</div>
+            <div className="stat-title">{t('centerOverview.created')}</div>
             <div className="stat-desc text-base font-medium">{formatDate(center.createdAt)}</div>
           </div>
         </div>
@@ -65,10 +65,10 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
       
       <div className="flex justify-end gap-2">
         <button className="btn btn-outline btn-sm">
-          {isRTL ? "تعديل المركز" : "Edit Center"}
+          {t('centerOverview.editCenter')}
         </button>
         <button className="btn btn-primary btn-sm">
-          {isRTL ? "إضافة محاضر" : "Add Lecturer"}
+          {t('centerOverview.addLecturer')}
         </button>
       </div>
     </div>

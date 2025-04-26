@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const CenterSelector = ({ centers, selectedCenter, onCenterChange }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,7 @@ const CenterSelector = ({ centers, selectedCenter, onCenterChange }) => {
   return (
     <div className="bg-base-100 rounded-lg shadow-lg p-4">
       <h2 className="text-xl font-bold mb-4">
-        {isRTL ? "اختر المركز" : "Select Center"}
+        {t('centerSelector.selectCenter')}
       </h2>
       
       <div className="relative">
@@ -26,7 +26,7 @@ const CenterSelector = ({ centers, selectedCenter, onCenterChange }) => {
           onClick={toggleDropdown}
         >
           <span>
-            {selectedCenter ? selectedCenter.name : isRTL ? "اختر مركزًا" : "Select a center"}
+            {selectedCenter ? selectedCenter.name : t('centerSelector.selectPlaceholder')}
           </span>
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -55,7 +55,7 @@ const CenterSelector = ({ centers, selectedCenter, onCenterChange }) => {
               
               {centers.length === 0 && (
                 <li className="px-4 py-2 text-base-content/70">
-                  {isRTL ? "لا توجد مراكز متاحة" : "No centers available"}
+                  {t('centerSelector.noCenters')}
                 </li>
               )}
             </ul>
