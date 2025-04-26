@@ -277,7 +277,7 @@ export const getLectureById = async (lectureId) => {
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/containers/${containerId}`, {
+    const response = await axios.delete(`${API_URL}/containers/${containerId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
