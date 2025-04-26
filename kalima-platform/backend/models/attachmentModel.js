@@ -6,6 +6,11 @@ const attachmentSchema = new mongoose.Schema({
     ref: "Lecture",
     required: true,
   },
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Student",
+    required: false,
+  },
   type: {
     type: String,
     enum: ["booklets", "pdfsandimages", "homeworks", "exams"],
@@ -18,5 +23,7 @@ const attachmentSchema = new mongoose.Schema({
   publicId: { type: String, required: true },
   uploadedOn: { type: Date, default: Date.now },
 });
+attachmentSchema.index({ lectureId: 1, type: 1 });
+attachmentSchema.index({ studentId: 1, type: 1 });
 
-module.exports =  mongoose.model("Attachment", attachmentSchema);
+module.exports = mongoose.model("Attachment", attachmentSchema);
