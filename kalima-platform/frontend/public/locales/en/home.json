@@ -71,21 +71,77 @@
       "expertise": "Expertise",
       "experience": "Years Experience",
       "gradeLevels": "All Grade Levels"
+    },
+    "subjects": {
+      "artificial intelligence": "Artificial Intelligence",  
+      "math": "Mathematics",
+      "science": "Science",
+      "english": "English",
+      "arabic": "Arabic",
+      "history": "History",
+      "geography": "Geography",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology"
     }
+    
   },
   "courses": {
-    "title": "Our Courses",
-    "heading": "Browse All ",
-    "platform": "Our Courses",
-    "viewAll": "View All Courses",
-    "duration": " study hours",
-    "viewDetails": "View Details",
-    "rating": "Rating",
+    "title": "Educational Courses",
+    "heading": "Discover All Courses on ",
+    "platform": "Our Platform",
+    "grades": {
+      "default": "First Grade",
+      "primary": "First Primary Grade",
+      "middle": "First Preparatory Grade",
+      "upperPrimary": "Fourth Primary Grade",
+      "higherSecondary": "First Secondary Grade"
+    },
+    "status": {
+      "paid": "Paid",
+      "free": "Free"
+    },
+    "currency": "EGP",
+    "containsContent": "Contains {{count}} sub-content",
+    "roles": {
+      "lecturer": "Lecturer"
+    },
+    "types": {
+      "explanation": "Explanation",
+      "year": "Year",
+      "month": "Month",
+      "term": "Term"
+    },
+    "teacherFallback": "Teacher {{name}}",
     "errors": {
-      "loading": "Loading courses...",
       "failed": "Failed to load courses",
-      "retry": "Try Again"
-    }
-
+      "loading": "Loading...",
+      "retry": "Retry"
+    },
+    "viewAll": "View All"
+  },
+  "titleFallback": "Course Title",
+  "teacherFallback": "Unknown Teacher",
+  "roleFallback": "Lecturer",
+  "free": "Free",
+  "paid": "Paid",
+  "currency": "EGP",
+  "lessonsCount": "Contains {{count}} lessons",
+  "duration": "{{count}} {{unit}}",
+  "units": {
+    "month": "month",
+    "year": "year",
+    "term": "term"
+  },
+  "types": {
+    "course": "Course",
+    "explanation": "Explanation",
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "Experienced lecturer in computer science.": "Experienced lecturer in computer science.",
+  "buttons":{
+    "viewAll":  "View All",
+    "viewDetails":  "View Details"
   }
 }
