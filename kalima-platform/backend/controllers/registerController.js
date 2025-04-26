@@ -11,7 +11,61 @@ const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
-// @route POST /register/
+
+const validatePassword = (password) => {
+  const minLength = 8;
+  const maxLength = 30;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (password.length < minLength) {
+    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
+  }
+  if (password.length > maxLength) {
+    throw new AppError(`Password must be less than ${maxLength} characters`, 400);
+  }
+  if (!hasUpperCase) {
+    throw new AppError("Password must contain at least one uppercase letter", 400);
+  }
+  if (!hasLowerCase) {
+    throw new AppError("Password must contain at least one lowercase letter", 400);
+  }
+  if (!hasNumbers) {
+    throw new AppError("Password must contain at least one number", 400);
+  }
+  if (!hasSpecialChar) {
+    throw new AppError("Password must contain at least one special character", 400);
+  }
+};
+
+const validateEmailFormat = (name, phoneNumber, email) => {
+  if (!phoneNumber || phoneNumber.length < 4) {
+    return false;
+  }
+  
+  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
+  const lastFourDigits = phoneNumber.slice(-4);
+  
+  const expectedEmailPrefix = `${cleanName}${lastFourDigits}`;
+  
+  const providedEmailPrefix = email.split('@')[0].toLowerCase();
+  
+  return providedEmailPrefix === expectedEmailPrefix;
+};
+
+const getExpectedEmailFormat = (name, phoneNumber) => {
+  if (!phoneNumber || phoneNumber.length < 4) {
+    return null;
+  }
+  
+  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
+  const lastFourDigits = phoneNumber.slice(-4);
+  
+  return `${cleanName}${lastFourDigits}@[your-domain]`;
+};
+
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -25,8 +79,32 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   } = req.body;
   const phoneRequiredRoles = ["teacher", "parent", "student"];
 
-  // Checking duplicate.
-  const duplicateEmail = await User.findOne({ email });
+  // Validate password
+  try {
+    validatePassword(password);
+  } catch (error) {
+    return next(error);
+  }
+
+  if (password !== confirmPassword) {
+    return next(new AppError("Passwords do not match", 400));
+  }
+  if (!email) {
+    return next(new AppError("Email is required", 400));
+  }
+  
+  if (phoneNumber) {
+    const isEmailFormatValid = validateEmailFormat(name, phoneNumber, email);
+    if (!isEmailFormatValid) {
+      const expectedFormat = getExpectedEmailFormat(name, phoneNumber);
+      return next(new AppError(
+        `Email must follow the format: ${expectedFormat} where [your-domain] can be any valid domain`,
+        400
+      ));
+    }
+  }
+
+  const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
   if (duplicateEmail) {
     return next(
@@ -34,7 +112,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  // For the roles with phone login only.
   const duplicatePhone = await User.findOne({ phoneNumber });
   if (phoneRequiredRoles.includes(role.toLowerCase()) && duplicatePhone) {
     return next(
@@ -42,7 +119,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     );
   }
 
-  // To allow sequenceId to be sent along side valid mongoode StudentId.
   const childrenById = [];
   if (!!children) {
     for (let id of children) {
@@ -72,22 +148,17 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   const hashedPwd = await bcrypt.hash(password, 12);
 
-  const newUser = phoneNumber
-    ? {
-        name,
-        email,
-        phoneNumber,
-        password: hashedPwd,
-        children: childrenById,
-        ...userData,
-      }
-    : {
-        name,
-        email,
-        password: hashedPwd,
-        children: childrenById,
-        ...userData,
-      };
+  const newUser = {
+    name,
+    email: email.toLowerCase().trim(),
+    password: hashedPwd,
+    children: childrenById,
+    ...userData,
+  };
+  
+  if (phoneNumber) {
+    newUser.phoneNumber = phoneNumber;
+  }
 
   let user;
 
