@@ -1,130 +1,102 @@
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const API_URL = process.env.REACT_APP_BASE_URL;
 const TOKEN_KEY = "accessToken";
 
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-console.log("Axios Base URL:", api.defaults.baseURL);
-// Request interceptor to add auth token to all requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error("Request interceptor error:", error);
-    return Promise.reject(error);
-  }
-);
+// --- AUTH API CALLS ---
 
-// Response interceptor to handle common errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle 401 Unauthorized errors
-    if (error.response && error.response.status === 401) {
-      console.error("Authentication error:", error.response.data);
-      // You could trigger a logout or token refresh here
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Enhanced request handler with better error details
-const handleRequest = async (method, url, data = {}, options = {}) => {
+export const registerUser = async (userData) => {
   try {
-    const config = {
-      ...options,
-    };
-    
-    let response;
-    if (method === "get" || method === "delete") {
-      response = await api[method](url, config);
-    } else {
-      response = await api[method](url, data, config);
-    }
-    
-    return { 
-      success: true, 
+    const response = await axios.post(`${API_URL}/api/v1/register`, userData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return {
+      success: true,
       data: response.data,
       status: response.status,
       headers: response.headers,
-      error: response.data.error
     };
   } catch (error) {
-    console.error(`API Error (${method.toUpperCase()} ${url}):`, error.response || error);
-    
     return {
       success: false,
       status: error.response?.status,
-      error: data,
-      details: error.response?.data || error.message
+      error: error.response?.data?.message || error.message || "Registration failed",
+      details: error.response?.data,
     };
   }
-};
-
-// --- AUTH API CALLS ---
-
-export const registerUser = (userData) => {
-  return handleRequest("post", "/register", userData);
 };
 
 export const loginUser = async (credentials) => {
   try {
-    const result = await handleRequest("post", "/auth", credentials);
+    const response = await axios.post(`${API_URL}/auth`, credentials, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
 
-    if (result.success && result.data.accessToken) {
-      // Store token
-      setToken(result.data.accessToken);
-      
-      // Log successful login
-      console.log("Login successful, token stored");
-      if (result.data.user) {
-        localStorage.setItem("user", JSON.stringify(result.data.user));
+    if (response.data.accessToken) {
+      setToken(response.data.accessToken);
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+        headers: response.headers,
+      };
     } else {
-      console.error("Login failed:", result.error);
+      return {
+        success: false,
+        error: response.data.error || "Login failed: No access token received",
+        details: response.data,
+      };
     }
-
-    return result;
   } catch (error) {
-    console.error("Login error:", error);
-    return {
-      success: false,
-      error: "Login process failed"
-    };
+    if (error.response) {
+      return {
+        success: false,
+        status: error.response.status,
+        error: error.response.data?.message || "Login failed",
+        details: error.response.data,
+      };
+    } else if (error.request) {
+      return {
+        success: false,
+        error: "No response from server. Please check your internet connection.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "An error occurred during login. Please try again.",
+      };
+    }
   }
 };
 
 export const logoutUser = async () => {
   try {
     const token = getToken();
-
     if (token) {
-      // Make a POST request to logout endpoint (no credentials needed)
-      await handleRequest("post", "/auth/logout");
+      await axios.post(
+        `${API_URL}/auth/logout`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     }
-
-    // Clear all auth-related data
     clearAuthData();
-
     return { success: true };
   } catch (error) {
-    console.error("Logout error:", error);
-
-    // Still clear local data even if server logout fails
     clearAuthData();
-
     return {
       success: false,
       error: "Logout failed on server, but local session was cleared",
@@ -139,33 +111,146 @@ export const getUserDashboard = async (options = {}) => {
     if (!isLoggedIn()) {
       return { success: false, error: "Not authenticated" };
     }
-    
-    const result = await handleRequest("get", "/users/me/dashboard", {}, options);
-    return result;
-  } catch (error) {
-    console.error("Error fetching user dashboard:", error);
+    const token = getToken();
+    const response = await axios.get(`${API_URL}/users/me/dashboard`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
     return {
-      success: false,
-      error: "Failed to fetch dashboard data"
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
     };
+  } catch (error) {
+    if (error.response) {
+      return {
+        success: false,
+        status: error.response.status,
+        error: error.response.data?.message || "Failed to fetch dashboard data",
+        details: error.response.data,
+      };
+    } else if (error.request) {
+      return {
+        success: false,
+        error: "No response from server. Please check your internet connection.",
+      };
+    } else {
+      return {
+        success: false,
+        error: "An error occurred while fetching dashboard data.",
+      };
+    }
   }
 };
+
 // --- AUTHENTICATED API HELPERS ---
 
 export const getAuthenticatedRequest = async (url, options = {}) => {
-  return handleRequest("get", url, {}, options);
+  try {
+    const token = getToken();
+    const response = await axios.get(`${API_URL}${url}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Request failed",
+      details: error.response?.data,
+    };
+  }
 };
 
 export const postAuthenticatedRequest = async (url, data = {}, options = {}) => {
-  return handleRequest("post", url, data, options);
+  try {
+    const token = getToken();
+    const response = await axios.post(`${API_URL}${url}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Request failed",
+      details: error.response?.data,
+    };
+  }
 };
 
 export const putAuthenticatedRequest = async (url, data = {}, options = {}) => {
-  return handleRequest("put", url, data, options);
+  try {
+    const token = getToken();
+    const response = await axios.put(`${API_URL}${url}`, data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Request failed",
+      details: error.response?.data,
+    };
+  }
 };
 
 export const deleteAuthenticatedRequest = async (url, options = {}) => {
-  return handleRequest("delete", url, {}, options);
+  try {
+    const token = getToken();
+    const response = await axios.delete(`${API_URL}${url}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    });
+    return {
+      success: true,
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      status: error.response?.status,
+      error: error.response?.data?.message || error.message || "Request failed",
+      details: error.response?.data,
+    };
+  }
 };
 
 // --- AUTH HELPERS ---
@@ -185,21 +270,19 @@ export const removeToken = () => localStorage.removeItem(TOKEN_KEY);
 export const clearAuthData = () => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem("user");
-  // Clear any other auth-related data you might be storing
 };
 
 export const isLoggedIn = () => {
   const token = getToken();
   if (!token) return false;
   
-  // Check if token is expired
   try {
     const decodedToken = decodeToken(token);
     const currentTime = Date.now() / 1000;
     
     if (decodedToken.exp && decodedToken.exp < currentTime) {
       console.warn("Token has expired");
-      removeToken(); // Clean up expired token
+      removeToken();
       return false;
     }
     
@@ -210,10 +293,8 @@ export const isLoggedIn = () => {
   }
 };
 
-// Safer token decoding
 export const decodeToken = (token) => {
   try {
-    // If you added jwt-decode:
     return jwtDecode(token);
   } catch (error) {
     console.error("Error decoding token:", error);
@@ -227,16 +308,13 @@ export const getUserFromToken = () => {
 
   try {
     const decodedToken = decodeToken(token);
-    
-    // Check if token is expired
     const currentTime = Date.now() / 1000;
     if (decodedToken.exp && decodedToken.exp < currentTime) {
       console.warn("Token has expired");
-      removeToken(); // Clean up expired token
+      removeToken();
       return null;
     }
     
-    // Return user data from token (excluding exp, iat, etc.)
     const { exp, iat, nbf, jti, ...userData } = decodedToken;
     return userData;
   } catch (error) {
@@ -245,12 +323,10 @@ export const getUserFromToken = () => {
   }
 };
 
-// Check if user has specific role
 export const hasRole = (role) => {
   const user = getUserFromToken();
   if (!user || !user.role) return false;
   
-  // Handle both string roles and array of roles
   if (Array.isArray(user.role)) {
     return user.role.includes(role);
   }
@@ -258,7 +334,6 @@ export const hasRole = (role) => {
   return user.role === role;
 };
 
-// Debug helper
 export const debugAuthState = () => {
   const token = getToken();
   const isLoggedInStatus = isLoggedIn();

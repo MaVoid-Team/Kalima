@@ -43,11 +43,26 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
+  // useEffect(() => {
+  //   const handleContextMenu = (e) => e.preventDefault();
+  //   const disableDrag = () => {
+  //     document.querySelectorAll("img").forEach((img) => {
+  //       img.setAttribute("draggable", "false");
+  //     });
+  //   };
+
+  //   document.addEventListener("contextmenu", handleContextMenu);
+  //   disableDrag(); // On mount
+
+  //   return () => {
+  //     document.removeEventListener("contextmenu", handleContextMenu);
+  //   };
+  // }, []);
+
   useEffect(() => {
     // Show sidebar on any route that starts with "/dashboard/"
     const isDashboardRoute = location.pathname.startsWith('/dashboard/')
     setShowSidebar(isDashboardRoute)
-    
     // You can keep or modify this based on your needs
     setShowUserNavbar(isDashboardRoute)
   }, [location.pathname])

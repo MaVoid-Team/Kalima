@@ -9,38 +9,99 @@ const ContainersPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
 
-  // Fetch all data
+  // Fetch data with pagination
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
+        
+        // Request all purchase history items without filtering by type
+        // This ensures we get all container types and can filter on the client
         const result = await getUserDashboard({
           params: {
-            fields: 'userInfo,containers',
-            limit: 5,
-            type: 'course'
+            fields: 'userInfo,containers,purchaseHistory',
+            limit: 100, // Request a large number to get all items
+            page: 1 // Always start from page 1 to get everything
           }
         });
 
+        console.log("Dashboard data:", result.data.data);
+
         if (result.success) {
-          const { userInfo, containers = [], purchaseHistory = [] } = result.data.data
+          const { userInfo } = result.data.data
           setUserRole(userInfo.role)
 
           if (userInfo.role === 'Lecturer') {
-            // For lecturers: show all their containers
-            setContainers(containers)
+            // For lecturers: containers are directly in the response
+            const { containers = [] } = result.data.data
+            
+            // Filter for course-type containers only
+            const courseContainers = containers.filter(container => container.type === 'course')
+            
+            // Apply client-side pagination
+            const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage)
+            setContainers(paginatedContainers)
+            
+            // Calculate total pages
+            setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1)
           } else {
-            // For students: show unique purchased containers
-            const purchasedContainers = purchaseHistory
-              .filter(p => p.type === 'containerPurchase' && p.container)
-              .map(p => p.container)
-              // Remove duplicates based on container._id
+            // For students: containers are in purchaseHistory
+            const { purchaseHistory = [] } = result.data.data
+            
+            console.log("Purchase history:", purchaseHistory);
+
+            // Process all container purchases
+            const allPurchasedContainers = purchaseHistory
+              .filter(p => p.type === 'containerPurchase')
+              .map(p => {
+                // If container is just an ID string
+                if (typeof p.container === 'string') {
+                  return {
+                    _id: p.container,
+                    name: p.description ? p.description.replace('Purchased container ', '').split(' for ')[0] : 'Unknown',
+                    type: 'course', // Assume course since we're on the courses page
+                    lecturer: p.lecturer,
+                    purchasedAt: p.purchasedAt,
+                    purchaseId: p._id,
+                    price: p.points || 0
+                  };
+                }
+                
+                // If container is a full object
+                return {
+                  ...p.container,
+                  lecturer: p.lecturer,
+                  purchasedAt: p.purchasedAt,
+                  purchaseId: p._id
+                };
+              });
+            
+            console.log("All purchased containers:", allPurchasedContainers);
+            
+            // Filter for course-type containers only
+            const courseContainers = allPurchasedContainers
+              .filter(container => container.type === 'course')
+              // Remove duplicates based on _id
               .filter((container, index, self) =>
                 index === self.findIndex(c => c._id === container._id)
-              )
+              );
             
-            setContainers(purchasedContainers)
+            console.log("Course containers:", courseContainers);
+            
+            // Apply client-side pagination
+            const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage)
+            console.log("Paginated containers:", paginatedContainers);
+            
+            setContainers(paginatedContainers)
+            
+            // Calculate total pages
+            setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1)
           }
         } else {
           setError("Failed to load data")
@@ -54,7 +115,26 @@ const ContainersPage = () => {
     }
 
     fetchData()
-  }, [])
+  }, [currentPage, itemsPerPage])
+
+  // Apply pagination to an array
+  const applyPagination = (items, page, limit) => {
+    const startIndex = (page - 1) * limit
+    return items.slice(startIndex, startIndex + limit)
+  }
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value))
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
 
   if (loading) {
     return (
@@ -90,8 +170,21 @@ const ContainersPage = () => {
   return (
     <div className="container mx-auto p-4" dir="rtl">
       <h1 className="text-3xl font-bold mb-6">
-        {userRole === 'Lecturer' ? 'الحاويات الخاصة بك' : 'الحاويات المشتراة'}
+        {userRole === 'Lecturer' ? 'الدورات الخاصة بك' : 'الدورات المشتراة'}
       </h1>
+
+      {/* Items per page selector */}
+      <div className="flex justify-end mb-4">
+        <select 
+          className="select select-bordered select-sm" 
+          value={itemsPerPage} 
+          onChange={handleItemsPerPageChange}
+        >
+          <option value={5}>5 لكل صفحة</option>
+          <option value={10}>10 لكل صفحة</option>
+          <option value={20}>20 لكل صفحة</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {containers.map(container => (
@@ -106,8 +199,31 @@ const ContainersPage = () => {
                 {container.level?.name && (
                   <div className="badge badge-secondary">{container.level.name}</div>
                 )}
-                <div className="badge badge-accent">{container.type}</div>
+                <div className="badge badge-accent">{container.type || 'course'}</div>
               </div>
+              
+              {/* Show price for lecturer view */}
+              {userRole === 'Lecturer' && (
+                <p className="text-sm">
+                  السعر: {container.price} نقطة
+                </p>
+              )}
+              
+              {/* Show lecturer name for student view */}
+              {userRole === 'Student' && container.lecturer && (
+                <p className="text-sm">
+                  المدرس: {typeof container.lecturer === 'string' 
+                    ? container.lecturer 
+                    : container.lecturer.name || 'Unknown'}
+                </p>
+              )}
+              
+              {/* Show purchase date for student view */}
+              {userRole === 'Student' && container.purchasedAt && (
+                <p className="text-sm opacity-75">
+                  تاريخ الشراء: {new Date(container.purchasedAt).toLocaleDateString('ar-EG')}
+                </p>
+              )}
 
               <div className="card-actions justify-end mt-4">
                 {userRole === 'Lecturer' ? (
@@ -138,9 +254,42 @@ const ContainersPage = () => {
           </svg>
           <span>
             {userRole === 'Lecturer' 
-              ? 'لا توجد حاويات متاحة حالياً.' 
-              : 'لم تقم بشراء أي حاويات بعد.'}
+              ? 'لا توجد دورات متاحة حالياً.' 
+              : 'لم تقم بشراء أي دورات بعد.'}
           </span>
+        </div>
+      )}
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            <button 
+              className="join-item btn"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              السابق
+            </button>
+            
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                className={`join-item btn ${currentPage === index + 1 ? 'btn-active' : ''}`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            
+            <button 
+              className="join-item btn"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              التالي
+            </button>
+          </div>
         </div>
       )}
     </div>

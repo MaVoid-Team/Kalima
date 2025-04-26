@@ -89,3 +89,6 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+.scanner-active {
+  background: transparent !important;
+}
