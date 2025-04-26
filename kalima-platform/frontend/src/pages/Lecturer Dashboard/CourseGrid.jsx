@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import { User, BookOpen, Star, Heart, Edit, Eye, Clock, Users, FileText } from "lucide-react"
+import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText } from "lucide-react"
 import { Link } from "react-router-dom"
-import { getMyContainers } from "../../routes/lectures"
-import Pagination from "../../components/Pagination" // Make sure to adjust the import path
+import { getMyContainers, deleteContainerById } from "../../routes/lectures"
+import Pagination from "../../components/Pagination"
 
 export default function CourseGrid() {
   const { t, i18n } = useTranslation("dashboard")
@@ -13,7 +13,6 @@ export default function CourseGrid() {
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [favorites, setFavorites] = useState({})
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 3 // Set to 3 courses per page as requested
 
@@ -40,9 +39,30 @@ export default function CourseGrid() {
     }
   }, [])
 
+  const handleDeleteContainer = async (containerId) => {
+    if (!window.confirm(t("confirmDeleteContainer"))) {
+      return;
+    }
+    try {
+      setLoading(true); // Optional: Show loading state
+      const result = await deleteContainerById(containerId);
+      if (result.status === "success") {
+        fetchContainers(); // Refresh the container list
+      } else {
+        setError(result.message || t("failedToDeleteContainer"));
+      }
+    } catch (err) {
+      console.error("Error deleting container:", err);
+      setError(t("errorDeletingContainer"));
+    } finally {
+      setLoading(false); // Optional: Reset loading state
+    }
+  };
+
   useEffect(() => {
     fetchContainers()
   }, [fetchContainers])
+
 
   // Get current containers for the current page
   const indexOfLastItem = currentPage * itemsPerPage
@@ -51,15 +71,6 @@ export default function CourseGrid() {
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
-
-  // Toggle favorite status
-  const toggleFavorite = (id) => {
-    setFavorites((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }))
-    // Here you would typically make an API call to update the favorite status
-  }
 
   // Get container type in Arabic
   const getContainerTypeArabic = (type) => {
@@ -130,7 +141,7 @@ export default function CourseGrid() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t("courseManagement")}</h2>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary btn-sm rounded-full">
+          <button className="btn btn-primary btn-base rounded-xl">
             <span>{t("addNewCourse")}</span>
           </button>
         </Link>
@@ -159,15 +170,6 @@ export default function CourseGrid() {
                       alt={container.name}
                       className="w-full h-full object-cover"
                     />
-                    <button
-                      className="absolute top-2 right-2 btn btn-circle btn-sm bg-base-100/80 hover:bg-base-100"
-                      onClick={() => toggleFavorite(container._id)}
-                    >
-                      <Heart
-                        className={`h-4 w-4 ${favorites[container._id] ? "fill-primary text-primary" : "text-base-content/70"
-                          }`}
-                      />
-                    </button>
                     {container.price > 0 && (
                       <div className="absolute bottom-2 left-2 bg-primary text-white px-2 py-1 rounded-md text-sm font-medium">
                         {container.price} جنيه
@@ -225,6 +227,13 @@ export default function CourseGrid() {
                           {t("view")}
                         </button>
                       </Link>
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => handleDeleteContainer(container._id)}
+                        disabled={loading}
+                      >
+                        Delete Container
+                      </button>
                     </div>
                   </div>
                 </div>
