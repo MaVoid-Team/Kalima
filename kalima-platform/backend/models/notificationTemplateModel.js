@@ -6,7 +6,7 @@ const notificationTemplateSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      enum: ["new_subject"]
+      enum: ["new_subject", "new_lecture", "new_container", "new_homework"]
     },
     title: {
       type: String,

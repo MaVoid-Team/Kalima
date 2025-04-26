@@ -41,6 +41,7 @@ const lessonRouter = require("./routes/lessonRoutes.js");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const revenueRouter = require("./routes/revenueRoutes");
 const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import pricing rule router
+const attachmentRouter = require("./routes/attachmentRoutes.js");
 connectDB();
 
 // Trust the first proxy hop (adjust '1' if you have more proxies)
@@ -78,6 +79,7 @@ app.use("/api/v1/center-student", cStudentRouter);
 app.use("/api/v1/lessons", lessonRouter);
 app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/revenue", revenueRouter);
+app.use("/api/v1/attachments", attachmentRouter);
 app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule router
 
 mongoose.connection.once("open", () => {
@@ -109,7 +111,7 @@ mongoose.connection.once("open", () => {
 
       if (pendingNotifications.length > 0) {
         pendingNotifications.forEach(async (notification) => {
-          socket.emit("notification", {
+          socket.emit("newHomework", {
             title: notification.title,
             message: notification.message,
             type: notification.type,

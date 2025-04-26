@@ -41,6 +41,7 @@ const validateUser = catchAsync(async (req, res, next) => {
   req.body = updatedBody
   req.body.password = password
   req.body.role = role
+  req.body.confirmPassword = confirmPassword // Add confirmPassword back to the request body
 
   /* Depending if the request was a patch to update a user
   A copy of the schema is made with optional fields.  */
