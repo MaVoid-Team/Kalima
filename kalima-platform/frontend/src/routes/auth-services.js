@@ -8,7 +8,7 @@ const TOKEN_KEY = "accessToken";
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/register`, userData, {
+    const response = await axios.post(`${API_URL}/register`, userData, {
       headers: {
         "Content-Type": "application/json",
       },
