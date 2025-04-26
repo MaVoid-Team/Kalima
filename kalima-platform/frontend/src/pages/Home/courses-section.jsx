@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Link } from "react-router-dom"
 import { CourseCard } from "../../components/CourseCard"
 import { getAllContainers } from "../../routes/lectures"
+import { getAllLecturers } from "../../routes/fetch-users"
 
 export function CoursesSection() {
   const { t, i18n } = useTranslation("home")
@@ -14,55 +15,59 @@ export function CoursesSection() {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [lecturers, setLecturers] = useState([])
 
-  // Fetch courses from the API
   const fetchCourses = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const result = await getAllContainers()
+      const [containersResult, lecturersResult] = await Promise.all([
+        getAllContainers(),
+        getAllLecturers(),
+      ])
 
-      if (result.status === "success") {
-        const containersData = result.data.containers
+      if (containersResult.status === "success" && lecturersResult.success) {
+        const containersData = containersResult.data.containers
+        const lecturersList = lecturersResult.data
+        setLecturers(lecturersList)
+
         setCourses(
           containersData.map((container, index) => {
-            // Determine grade based on container's level if available
-            let grade = "الصف الأول" // Default value
+            const lecturer = lecturersList.find(
+              (lect) => lect._id === container.createdBy
+            )
+
+            let grade = "الصف الأول"
             if (container.level) {
               const levelName = container.level.name
-              if (levelName === "Primary") {
-                grade = "الصف الأول الابتدائي"
-              } else if (levelName === "Middle") {
-                grade = "الصف الأول الإعدادي"
-              } else if (levelName === "Upper Primary") {
-                grade = "الصف الرابع الابتدائي"
-              } else if (levelName === "Higher Secondary") {
-                grade = "الصف الأول الثانوي"
-              }
+              if (levelName === "Primary") grade = "الصف الأول الابتدائي"
+              else if (levelName === "Middle") grade = "الصف الأول الإعدادي"
+              else if (levelName === "Upper Primary") grade = "الصف الرابع الابتدائي"
+              else if (levelName === "Higher Secondary") grade = "الصف الأول الثانوي"
             }
 
             return {
               id: container._id,
-              image: `/course-${(index % 6) + 1}.png`, // Cycle through available images
+              image: `/course-${(index % 6) + 1}.png`,
               title: container.name,
               subject: container.subject?.name || "",
-              teacher: container.createdBy?.name || `أستاذ ${container.name}`,
-              teacherRole: container.createdBy?.role || "محاضر",
-              grade: grade,
-              rating: 4 + (index % 2) * 0.5, // Alternate between 4 and 4.5
-              duration: 12 + index, // Mock duration
+              teacher: lecturer?.name || `أستاذ ${container.name}`,
+              teacherRole: lecturer?.role || "محاضر",
+              grade,
+              rating: 4 + (index % 2) * 0.5,
+              duration: 12 + index,
               status: container.price > 0 ? "مدفوع" : "مجاني",
               price: container.price || 0,
               childrenCount: container.children?.length || 0,
               type: container.type === "course" ? "شرح" : container.type,
             }
-          }),
+          })
         )
       } else {
-        setError(result.error || t("courses.errors.failed"))
+        setError(t("courses.errors.failed"))
       }
     } catch (err) {
-      console.error("Error fetching courses:", err)
+      console.error("Error fetching courses or lecturers:", err)
       setError(t("courses.errors.failed"))
     } finally {
       setLoading(false)

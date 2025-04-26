@@ -1,34 +1,44 @@
-import { Users } from 'lucide-react'
+import { useTranslation } from "react-i18next";
 
 const CourseCard = ({ course }) => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  
   return (
-    <div className="relative bg-base-200 rounded-3xl mb-4 overflow-hidden">
-      {/* Teal accent on the right side */}
-      <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+    <div className="bg-base-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-r-4 border-primary">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-base-content/70">
+            {isRTL ? `الحصة ${course.session}` : `Session ${course.session}`}
+          </span>
+          <h3 className="text-lg font-bold">{course.subject}</h3>
+        </div>
+        <span className="text-sm text-base-content/70">
+          {isRTL ? "محاضرة" : course.type}
+        </span>
+        <div className="mt-1 text-sm">
+          {course.time}
+          {course.date && <span className="ml-2">{course.date}</span>}
+        </div>
+      </div>
       
-      <div className="flex flex-col md:flex-row justify-between p-4">
-        {/* Left side - Teacher info */}
-        <div className="text-right md:text-left">
-          <h3 className="font-medium text-lg">{course.teacher.name}</h3>
-          <p className="text-sm text-base-content/70">{course.teacher.email}</p>
-          <div className="flex items-center mt-2">
-            <span className="text-sm">{course.teacher.group}</span>
-            <Users className="w-4 h-4 mr-1" />
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">
+            {isRTL ? "المحاضر" : "Lecturer"}
+          </span>
+          <span className="text-base font-bold">{course.teacher.name}</span>
         </div>
         
-        {/* Right side - Course info */}
-        <div className="text-right mt-4 md:mt-0">
-          <div className="flex items-center justify-end">
-            <h3 className="font-medium text-lg">{course.subject}</h3>
-            <span className="badge">{`الحصة ${course.session}`}</span>
-          </div>
-          <p className="text-sm text-base-content/70">{course.type}</p>
-          <p className="text-sm font-medium mt-1 text-base-content/80">{course.time}</p>
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">
+            {isRTL ? "المستوى" : "Level"}
+          </span>
+          <span className="text-base font-bold">{course.teacher.group}</span>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseCard
+export default CourseCard;

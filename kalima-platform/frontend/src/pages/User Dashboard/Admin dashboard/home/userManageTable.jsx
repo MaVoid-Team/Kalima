@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users";
 import { useTranslation } from "react-i18next";
-import { FaFilter, FaSync } from "react-icons/fa";
+import { FaFilter, FaSync, FaWhatsapp } from "react-icons/fa";
 import Pagination from "../../../../components/Pagination"; // Import the Pagination component
 import CreateUserModal from "../CreateUserModal/CreateUserModal"; // Import the CreateUserModal component
 
@@ -18,6 +18,12 @@ const UserManagementTable = () => {
     status: ""
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [whatsappModal, setWhatsappModal] = useState({
+    isOpen: false,
+    phoneNumber: "",
+    userName: ""
+  });
+  const [whatsappMessage, setWhatsappMessage] = useState("");
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -130,6 +136,45 @@ const UserManagementTable = () => {
     }
   };
 
+  // Open WhatsApp modal
+  const openWhatsappModal = (phoneNumber, userName) => {
+    if (!phoneNumber) {
+      alert("لا يوجد رقم هاتف لهذا المستخدم");
+      return;
+    }
+    
+    setWhatsappModal({
+      isOpen: true,
+      phoneNumber,
+      userName
+    });
+    setWhatsappMessage("");
+  };
+
+  // Send WhatsApp message
+  const sendWhatsappMessage = () => {
+    // Format phone number (remove any non-digit characters and ensure it starts with country code)
+    let formattedNumber = whatsappModal.phoneNumber.replace(/\D/g, '');
+    
+    // If number doesn't start with country code, add Egypt's code (+20)
+    if (!formattedNumber.startsWith('2')) {
+      formattedNumber = '2' + formattedNumber;
+    }
+    
+    // Create WhatsApp URL with phone number and message
+    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank');
+    
+    // Close the modal
+    setWhatsappModal({
+      isOpen: false,
+      phoneNumber: "",
+      userName: ""
+    });
+  };
+
   // Get current users for pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -239,7 +284,18 @@ const UserManagementTable = () => {
                 <td className="py-4">{getStatus(user)}</td>
                 <td className="py-4">{getRoleLabel(user.role)}</td>
                 <td className="py-4">{user.phoneNumber || "N/A"}</td>
-                <td className="py-4">{user.name}</td>
+                <td className="py-4 flex items-center gap-2">
+                  {user.name}
+                  {user.phoneNumber && (
+                    <button 
+                      className="btn btn-circle btn-xs btn-success"
+                      onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
+                      title="إرسال رسالة واتساب"
+                    >
+                      <FaWhatsapp className="text-white" />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -267,6 +323,39 @@ const UserManagementTable = () => {
         onCreateUser={handleCreateUser}
         error={error}
       />
+
+      {/* WhatsApp Message Modal */}
+      {whatsappModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full" dir="rtl">
+            <h3 className="text-xl font-bold mb-4">إرسال رسالة واتساب</h3>
+            <p className="mb-2">إرسال رسالة إلى: <span className="font-bold">{whatsappModal.userName}</span></p>
+            <p className="mb-4">رقم الهاتف: <span className="font-bold">{whatsappModal.phoneNumber}</span></p>
+            
+            <textarea
+              className="textarea textarea-bordered w-full h-32 mb-4"
+              placeholder="اكتب رسالتك هنا..."
+              value={whatsappMessage}
+              onChange={(e) => setWhatsappMessage(e.target.value)}
+            ></textarea>
+            
+            <div className="flex justify-end gap-2">
+              <button 
+                className="btn btn-ghost"
+                onClick={() => setWhatsappModal({isOpen: false, phoneNumber: "", userName: ""})}
+              >
+                إلغاء
+              </button>
+              <button 
+                className="btn btn-success gap-2"
+                onClick={sendWhatsappMessage}
+              >
+                <FaWhatsapp /> إرسال
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

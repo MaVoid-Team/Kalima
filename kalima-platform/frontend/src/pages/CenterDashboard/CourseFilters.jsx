@@ -1,4 +1,3 @@
-// CourseFilters.jsx
 "use client"
 import { useState } from "react";
 import { Users } from "lucide-react";
@@ -6,6 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) => {
   const [activeTab, setActiveTab] = useState("department");
+  const [filters, setFilters] = useState({
+    department: "",
+    group: "",
+    semester: "",
+    teacher: "",
+  });
   const { t } = useTranslation("center");
 
   const semesters = isRTL 
@@ -14,7 +19,21 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    onFilterChange(); // Reset filters when changing tabs
+    // Reset all filters when changing tabs
+    const resetFilters = {
+      department: "",
+      group: "",
+      semester: "",
+      teacher: "",
+    };
+    setFilters(resetFilters);
+    onFilterChange(resetFilters);
+  };
+
+  const handleFilterChange = (key, value) => {
+    const updatedFilters = { ...filters, [key]: value };
+    setFilters(updatedFilters);
+    onFilterChange(updatedFilters);
   };
 
   return (
@@ -51,7 +70,8 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
             </label>
             <select
               className="select select-bordered w-full bg-base-200"
-              onChange={(e) => onFilterChange('department', e.target.value)}
+              value={filters.department}
+              onChange={(e) => handleFilterChange('department', e.target.value)}
             >
               <option value="">{t('filters.select_section')}</option>
               <option value="math">{t('subjects.math')}</option>
@@ -66,7 +86,8 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
             </label>
             <select
               className="select select-bordered w-full bg-base-200"
-              onChange={(e) => onFilterChange('group', e.target.value)}
+              value={filters.group}
+              onChange={(e) => handleFilterChange('group', e.target.value)}
             >
               <option value="">{t('filters.select_group')}</option>
               {groups.map(group => (
@@ -85,8 +106,10 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
           {groups.map((group) => (
             <div
               key={group}
-              className="card bg-base-200 hover:bg-base-300 cursor-pointer p-4 text-center"
-              onClick={() => onFilterChange('group', group)}
+              className={`card bg-base-200 hover:bg-base-300 cursor-pointer p-4 text-center ${
+                filters.group === group ? 'bg-primary/10 border-2 border-primary' : ''
+              }`}
+              onClick={() => handleFilterChange('group', group)}
             >
               <h3 className="font-medium">
                 {isRTL ? `المجموعة ${group}` : `Group ${group}`}
@@ -102,8 +125,10 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
           {teachers.map((teacher) => (
             <div
               key={teacher.name}
-              className="bg-base-200 p-4 rounded-md cursor-pointer hover:bg-base-300"
-              onClick={() => onFilterChange('teacher', teacher.name)}
+              className={`bg-base-200 p-4 rounded-md cursor-pointer hover:bg-base-300 ${
+                filters.teacher === teacher.name ? 'bg-primary/10 border-2 border-primary' : ''
+              }`}
+              onClick={() => handleFilterChange('teacher', teacher.name)}
             >
               <div className={isRTL ? 'text-right' : 'text-left'}>
                 <h3 className="font-medium text-lg">
@@ -127,8 +152,10 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
           {semesters.map((semester) => (
             <div
               key={semester}
-              className="card bg-base-200 hover:bg-base-300 cursor-pointer p-4 text-center"
-              onClick={() => onFilterChange('semester', semester)}
+              className={`card bg-base-200 hover:bg-base-300 cursor-pointer p-4 text-center ${
+                filters.semester === semester ? 'bg-primary/10 border-2 border-primary' : ''
+              }`}
+              onClick={() => handleFilterChange('semester', semester)}
             >
               <h3 className="font-medium">{semester}</h3>
             </div>

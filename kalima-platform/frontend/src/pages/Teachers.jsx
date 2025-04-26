@@ -30,17 +30,15 @@ export default function Teachers() {
     try {
       const result = await getAllLecturers();
       if (result.success) {
-        const lecturers = result.data
-          .filter((user) => user.role === "Lecturer")
-          .map((lecturer) => ({
-            id: lecturer._id,
-            image: "/course-1.png",
-            name: lecturer.name,
-            subject: lecturer.expertise || t('defaultSubject'),
-            experience: lecturer.bio || t('defaultExperience'),
-            grade: t('allGrades'),
-            rating: 5,
-          }));
+        const lecturers = result.data.map((lecturer) => ({
+          id: lecturer._id,
+          image: "/course-1.png",
+          name: lecturer.name,
+          subject: lecturer.expertise || t('defaultSubject'),
+          experience: lecturer.bio || t('defaultExperience'),
+          grade: t('allGrades'),
+          rating: 5,
+        }));
         setTeachers(lecturers);
         setFilteredTeachers(lecturers);
       } else {
@@ -53,6 +51,7 @@ export default function Teachers() {
       setLoading(false);
     }
   };
+
   const loadMoreTeachers = () => {
     setVisibleTeachers(filteredTeachers.length);
   };
@@ -94,6 +93,15 @@ export default function Teachers() {
     return [...filteredTeachers].sort((a, b) => a.name.localeCompare(b.name));
   }, [filteredTeachers]);
 
+  // Dynamically generate subject filter options from teachers' expertise
+  const subjectOptions = useMemo(() => {
+    const uniqueExpertise = [...new Set(teachers.map((teacher) => teacher.subject))];
+    return uniqueExpertise.map((expertise) => ({
+      label: expertise,
+      value: expertise,
+    }));
+  }, [teachers]);
+
   // Filter options for المرحلة الدراسية and المادة
   const filterOptions = [
     {
@@ -109,17 +117,13 @@ export default function Teachers() {
     {
       label: t('filters.subject'),
       value: selectedSubject,
-      options: [
-        { label: t('subjects.math'), value: "math" },
-        { label: t('subjects.physics'), value: "physics" },
-        { label: t('subjects.chemistry'), value: "chemistry" },
-      ],
+      options: subjectOptions,
       onSelect: setSelectedSubject,
     },
   ];
 
   return (
-    <div className="relative min-h-screen w-full" >
+    <div className="relative min-h-screen w-full">
       {/* Background Pattern */}
       <div className="absolute top-0 left-0 w-2/3 h-screen pointer-events-none z-0">
         <div className="relative w-full h-full">
@@ -173,7 +177,7 @@ export default function Teachers() {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl ${isRTL ? 'ml-auto' : 'mr-auto'} `}>
+          <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl ${isRTL ? 'ml-auto' : 'mr-auto'}`}>
             {filterOptions.map((filter) => (
               <FilterDropdown
                 key={filter.label}
