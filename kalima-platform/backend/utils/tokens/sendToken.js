@@ -11,7 +11,7 @@ const sendToken = async (user, res) => {
   const accessToken = generateAccessToken(userId, userRole);
   const refreshToken = generateRefreshToken(userId, userRole);
 
-  // await RefreshToken.deleteMany({ user: userId });
+  await RefreshToken.deleteMany({ user: userId });
   await RefreshToken.create({
     user: userId,
     token: refreshToken,
