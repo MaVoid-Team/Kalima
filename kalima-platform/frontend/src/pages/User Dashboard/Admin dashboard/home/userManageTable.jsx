@@ -6,7 +6,9 @@ import Pagination from "../../../../components/Pagination"; // Import the Pagina
 import CreateUserModal from "../CreateUserModal/CreateUserModal"; // Import the CreateUserModal component
 
 const UserManagementTable = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation('admin');
+  const isRTL = i18n.language === "ar";
+  const dir = isRTL ? "rtl" : "ltr";
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,10 +44,10 @@ const UserManagementTable = () => {
         setUsers(result.data);
         setFilteredUsers(result.data);
       } else {
-        setError(result.error);
+        setError(t('admin.errors.fetchUsers'));
       }
     } catch (error) {
-      setError("Failed to fetch users");
+      setError(t('admin.errors.fetchUsers'));
     } finally {
       setLoading(false);
     }
@@ -58,64 +60,33 @@ const UserManagementTable = () => {
     setCurrentPage(1);
   }, [filters, users]);
 
+  useEffect(() => { applyFilters(); setCurrentPage(1); }, [filters, users]);
+
   const applyFilters = () => {
-    let filtered = users;
-
-    if (filters.name) {
-      filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(filters.name.toLowerCase())
-      );
-    }
-
-    if (filters.phone) {
-      filtered = filtered.filter(user => 
-        user.phoneNumber?.includes(filters.phone)
-      );
-    }
-
-    if (filters.role) {
-      filtered = filtered.filter(user => 
-        user.role.toLowerCase() === filters.role.toLowerCase()
-      );
-    }
-
-    if (filters.status) {
-      filtered = filtered.filter(user => 
-        getStatus(user) === filters.status
-      );
-    }
-
+    const filtered = users.filter(user => 
+      (!filters.name || user.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+      (!filters.phone || user.phoneNumber?.includes(filters.phone)) &&
+      (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
+      (!filters.status || getStatus(user) === filters.status)
+    );
     setFilteredUsers(filtered);
   };
 
-  const getRoleLabel = (role) => {
-    const roles = {
-      student: "طالب",
-      parent: "ولي أمر",
-      lecturer: "معلم",
-      teacher: "معلم",
-      assistant: "مساعد",
-      admin: "أدمن"
-    };
-    return roles[role.toLowerCase()] || role;
-  };
+  const getRoleLabel = (role) => t(`admin.roles.${role.toLowerCase()}`);
 
   const getStatus = (user) => {
-    if (!user.phoneNumber) return "بيانات ناقصة";
-    if (user.role === "student" && !user.level) return "بيانات ناقصة";
-    return "صالح";
+    if (!user.phoneNumber) return t('admin.status.missingData');
+    if (user.role === "student" && !user.level) return t('admin.status.missingData');
+    return t('admin.status.valid');
   };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    if (!window.confirm(t('admin.confirmDelete'))) return;
     
     try {
       const result = await deleteUser(userId);
-      if (result.success) {
-        setUsers(prev => prev.filter(u => u._id !== userId));
-      } else {
-        throw new Error(result.error);
-      }
+      if (result.success) setUsers(prev => prev.filter(u => u._id !== userId));
+      else setError(result.error);
     } catch (error) {
       setError(error.message);
     }
@@ -202,22 +173,21 @@ const UserManagementTable = () => {
   }
 
   return (
-    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir="rtl">
-      <h1 className="text-3xl font-bold mb-8 text-right">سجل الاجراءات</h1>
-      
-      {/* Filter Controls */}
+    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir={dir}>
+      <h1 className={`text-3xl font-bold mb-8 ${dir === "rtl" ? "text-right" : "text-left"} `}>{t('admin.userManagement.title')}</h1>
+
       <div className="flex flex-wrap gap-4 mb-8 justify-between">
         <div className="flex gap-4">
           <input
             type="text"
-            placeholder="الاسم"
+            placeholder={t('admin.filters.name')}
             className="input input-bordered"
             value={filters.name}
             onChange={e => setFilters({...filters, name: e.target.value})}
           />
           <input
             type="text"
-            placeholder="رقم الهاتف"
+            placeholder={t('admin.filters.phone')}
             className="input input-bordered"
             value={filters.phone}
             onChange={e => setFilters({...filters, phone: e.target.value})}
@@ -227,25 +197,25 @@ const UserManagementTable = () => {
             value={filters.role}
             onChange={e => setFilters({...filters, role: e.target.value})}
           >
-            <option value="">كل الأنواع</option>
-            <option value="student">طالب</option>
-            <option value="parent">ولي أمر</option>
-            <option value="lecturer">معلم</option>
+            <option value="">{t('admin.filters.allTypes')}</option>
+            {['student', 'parent', 'lecturer'].map(role => (
+              <option key={role} value={role}>{t(`admin.roles.${role}`)}</option>
+            ))}
           </select>
           <select
             className="select select-bordered"
             value={filters.status}
             onChange={e => setFilters({...filters, status: e.target.value})}
           >
-            <option value="">كل الحالات</option>
-            <option value="صالح">صالح</option>
-            <option value="بيانات ناقصة">بيانات ناقصة</option>
+            <option value="">{t('admin.filters.allStatus')}</option>
+            <option value={t('admin.status.valid')}>{t('admin.status.valid')}</option>
+            <option value={t('admin.status.missingData')}>{t('admin.status.missingData')}</option>
           </select>
         </div>
 
         <div className="flex gap-4">
           <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-            إنشاء مستخدم جديد
+            {t('admin.userManagement.createUser')}
           </button>
           <button className="btn btn-ghost" onClick={fetchUsers}>
             <FaSync />
@@ -253,109 +223,62 @@ const UserManagementTable = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="w-full overflow-auto">
+      <div className="w-full overflow-auto" dir={`${dir === "rtl" ? "ltr" : "rtl"}`}  >
         <table className="w-full">
           <thead>
-            <tr className="text-right">
-              <th className="pb-4 text-lg font-medium">الإجراءات</th>
-              <th className="pb-4 text-lg font-medium">الحالة</th>
-              <th className="pb-4 text-lg font-medium">نوع الحساب</th>
-              <th className="pb-4 text-lg font-medium">رقم الهاتف</th>
-              <th className="pb-4 text-lg font-medium">الاسم</th>
+            <tr className={`${dir === "rtl" ? "text-right" : "text-left"}`}>
+              {['actions', 'status', 'accountType', 'phone', 'name'].map(header => (
+                <th key={header} className="pb-4 text-lg font-medium">
+                  {t(`admin.table.${header}`)}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody dir={`${dir === "rtl" ? "ltr" : "rtl"}`}>
             {currentUsers.map((user) => (
-              <tr key={user._id} className="border-t border-none">
+              <tr key={user._id} className={`${dir === "rtl" ? "text-right" : "text-left"} border-t border-none `}>
                 <td className="py-4">
-                  <div className="flex items-center gap-3">
+                  <div className={`flex items-center ${dir === "rtl" ? "justify-end" : "justify-end"} mx-auto gap-3`}>
                     <button 
                       className="btn btn-error btn-xs"
                       onClick={() => handleDelete(user._id)}
                     >
-                      حذف
+                      {t('admin.actions.delete')}
                     </button>
                     <button className="btn btn-warning btn-xs">
-                      تعديل
+                      {t('admin.actions.edit')}
                     </button>
                   </div>
                 </td>
                 <td className="py-4">{getStatus(user)}</td>
                 <td className="py-4">{getRoleLabel(user.role)}</td>
-                <td className="py-4">{user.phoneNumber || "N/A"}</td>
-                <td className="py-4 flex items-center gap-2">
-                  {user.name}
-                  {user.phoneNumber && (
-                    <button 
-                      className="btn btn-circle btn-xs btn-success"
-                      onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
-                      title="إرسال رسالة واتساب"
-                    >
-                      <FaWhatsapp className="text-white" />
-                    </button>
-                  )}
-                </td>
+                <td className="py-4">{user.phoneNumber || t('admin.NA')}</td>
+                <td className="py-4">{user.name}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination Component */}
       <Pagination 
         currentPage={currentPage}
         totalItems={filteredUsers.length}
         itemsPerPage={usersPerPage}
         onPageChange={handlePageChange}
         labels={{
-          previous: "السابق",
-          next: "التالي",
-          showing: "عرض",
-          of: "من"
+          previous: t('admin.pagination.previous'),
+          next: t('admin.pagination.next'),
+          showing: t('admin.pagination.showing'),
+          of: t('admin.pagination.of')
         }}
       />
 
-      {/* Create User Modal Component */}
       <CreateUserModal 
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreateUser={handleCreateUser}
         error={error}
       />
-
-      {/* WhatsApp Message Modal */}
-      {whatsappModal.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full" dir="rtl">
-            <h3 className="text-xl font-bold mb-4">إرسال رسالة واتساب</h3>
-            <p className="mb-2">إرسال رسالة إلى: <span className="font-bold">{whatsappModal.userName}</span></p>
-            <p className="mb-4">رقم الهاتف: <span className="font-bold">{whatsappModal.phoneNumber}</span></p>
-            
-            <textarea
-              className="textarea textarea-bordered w-full h-32 mb-4"
-              placeholder="اكتب رسالتك هنا..."
-              value={whatsappMessage}
-              onChange={(e) => setWhatsappMessage(e.target.value)}
-            ></textarea>
-            
-            <div className="flex justify-end gap-2">
-              <button 
-                className="btn btn-ghost"
-                onClick={() => setWhatsappModal({isOpen: false, phoneNumber: "", userName: ""})}
-              >
-                إلغاء
-              </button>
-              <button 
-                className="btn btn-success gap-2"
-                onClick={sendWhatsappMessage}
-              >
-                <FaWhatsapp /> إرسال
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
