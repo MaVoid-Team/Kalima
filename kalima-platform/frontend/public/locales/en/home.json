@@ -143,5 +143,6 @@
   "buttons":{
     "viewAll":  "View All",
     "viewDetails":  "View Details"
-  }
+  },
+  "priceUnavailable": "N/A"
 }
