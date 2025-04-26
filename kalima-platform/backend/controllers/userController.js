@@ -16,10 +16,6 @@ const bcrypt = require("bcrypt");
 const handleCSV = require("../utils/upload files/handleCSV.js");
 const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
-<<<<<<< HEAD
-const Lecture = require("../models/LectureModel.js");
-=======
->>>>>>> backend
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -344,17 +340,10 @@ const getMyData = catchAsync(async (req, res, next) => {
   // Get user ID from authenticated user
   const userId = req.user._id;
   const userRole = req.user.role;
-<<<<<<< HEAD
-  
-  // Parse field selection (if provided)
-  const fields = req.query.fields ? req.query.fields.split(',') : null;
-  
-=======
 
   // Parse field selection (if provided)
   const fields = req.query.fields ? req.query.fields.split(",") : null;
 
->>>>>>> backend
   // Common response data
   let responseData = {
     userInfo: {
@@ -391,11 +380,6 @@ const getMyData = catchAsync(async (req, res, next) => {
         hobbies: student.hobbies,
         faction: student.faction,
       };
-<<<<<<< HEAD
-      
-=======
-
->>>>>>> backend
       // Get student purchases, redeemed codes, and lecture access (with query params)
       if (
         !fields ||
@@ -439,11 +423,6 @@ const getMyData = catchAsync(async (req, res, next) => {
         children: parent.children,
         generalPoints: parent.generalPoints || 0,
       };
-<<<<<<< HEAD
-      
-=======
-
->>>>>>> backend
       // Get parent purchases, redeemed codes, and lecture access (with query params)
       if (
         !fields ||
@@ -476,11 +455,6 @@ const getMyData = catchAsync(async (req, res, next) => {
         bio: lecturer.bio,
         expertise: lecturer.expertise,
       };
-<<<<<<< HEAD
-      
-=======
-
->>>>>>> backend
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
       if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
@@ -594,11 +568,6 @@ const getMyData = catchAsync(async (req, res, next) => {
         return next(new AppError("User not found", 404));
       }
   }
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> backend
   // Filter out fields that weren't requested (if fields parameter was provided)
   if (fields) {
     const filteredResponse = {};
@@ -609,11 +578,6 @@ const getMyData = catchAsync(async (req, res, next) => {
     });
     responseData = filteredResponse;
   }
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> backend
   res.status(200).json({
     status: "success",
     data: responseData,
@@ -621,11 +585,6 @@ const getMyData = catchAsync(async (req, res, next) => {
 });
 
 // Helper function to get additional data for students and parents
-<<<<<<< HEAD
-const getStudentParentAdditionalData = async (userId, responseData, pointsBalances, queryParams = {}) => {
-  const fields = queryParams.fields ? queryParams.fields.split(',') : null;
-  
-=======
 const getStudentParentAdditionalData = async (
   userId,
   responseData,
@@ -634,7 +593,6 @@ const getStudentParentAdditionalData = async (
 ) => {
   const fields = queryParams.fields ? queryParams.fields.split(",") : null;
 
->>>>>>> backend
   // Only include purchase history if requested or no specific fields were requested
   if (!fields || fields.includes("purchaseHistory")) {
     // Get all types of purchases for the user
