@@ -4,7 +4,7 @@ import { FileText, Clock, Star } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 function TeacherCard({ teacher }) {
-  const { t, i18n } = useTranslation("teachers");
+  const { t, i18n } = useTranslation("home");
   const isRTL = i18n.language === 'ar';
   const navigate = useNavigate();
 
@@ -21,11 +21,11 @@ function TeacherCard({ teacher }) {
           className="w-full h-48 object-cover"
         />
         <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} bg-primary text-white text-xs px-2 py-1 rounded-full`}>
-          {teacher.subject.toLowerCase()}
+          {t(`teachers.subjects.${teacher.subject.toLowerCase()}`)}
         </div>
       </div>
       <div className="p-4">
-        <h4 className={`font-bold text-lg mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <h4 className={`font-bold text-lg mb-2 text-left`}>
           {teacher.name}
         </h4>
         
@@ -35,7 +35,7 @@ function TeacherCard({ teacher }) {
           <div className="w-6 h-6 rounded-full bg-base-200 flex items-center justify-center">
             <Clock className="h-3 w-3" />
           </div>
-          <span className="text-sm">{teacher.experience}</span>
+          <span className="text-sm">{t(`${teacher.experience}`)}</span>
         </div>
 
         {/* Grade */}
