@@ -11,15 +11,12 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
     semester: "",
     teacher: "",
   });
-  const { t } = useTranslation("center");
+  const { t } = useTranslation("centerDashboard");
 
-  const semesters = isRTL 
-    ? ["الفصل الأول", "الفصل الثاني", "الفصل الصيفي"] 
-    : ["First Semester", "Second Semester", "Summer Semester"];
+  const semesters = t('filters.semesters', { returnObjects: true });
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    // Reset all filters when changing tabs
     const resetFilters = {
       department: "",
       group: "",
@@ -39,7 +36,7 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
   return (
     <div className="rounded-lg p-4 shadow-sm bg-base-100">
       <h2 className={`${isRTL ? "text-end" : "text-start"} text-xl font-bold text-base-content mb-4`}>
-        {isRTL ? 'جدول الحصص' : 'Class Schedule'}
+        {t('schedule.title')}
       </h2>
 
       {/* Filter Tabs */}
@@ -74,9 +71,9 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
               onChange={(e) => handleFilterChange('department', e.target.value)}
             >
               <option value="">{t('filters.select_section')}</option>
-              <option value="math">{t('subjects.math')}</option>
-              <option value="science">{t('subjects.science')}</option>
-              <option value="arabic">{t('subjects.arabic')}</option>
+              {Object.entries(t('subjects', { returnObjects: true })).map(([key, value]) => (
+                <option key={key} value={key}>{value}</option>
+              ))}
             </select>
           </div>
 
@@ -92,7 +89,7 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
               <option value="">{t('filters.select_group')}</option>
               {groups.map(group => (
                 <option key={group} value={group}>
-                  {isRTL ? `المجموعة ${group}` : `Group ${group}`}
+                  {t('filters.group_label', { group })}
                 </option>
               ))}
             </select>
@@ -112,7 +109,7 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
               onClick={() => handleFilterChange('group', group)}
             >
               <h3 className="font-medium">
-                {isRTL ? `المجموعة ${group}` : `Group ${group}`}
+                {t('filters.group_label', { group })}
               </h3>
             </div>
           ))}
@@ -132,11 +129,11 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
             >
               <div className={isRTL ? 'text-right' : 'text-left'}>
                 <h3 className="font-medium text-lg">
-                  {isRTL ? `أ/ ${teacher.name}` : `${teacher.name}`}
+                  {t('teacher.name_format', { name: teacher.name })}
                 </h3>
                 <div className={`flex items-center mt-2 ${isRTL ? 'justify-end' : 'justify-start'}`}>
                   <span className="text-sm">
-                    {isRTL ? `المجموعة ${teacher.group}` : `Group ${teacher.group}`}
+                    {t('filters.group_label', { group: teacher.group })}
                   </span>
                   <Users className={`w-4 h-4 ${isRTL ? 'mr-1' : 'ml-1'}`} />
                 </div>
@@ -149,9 +146,9 @@ const CourseFilters = ({ teachers = [], groups = [], onFilterChange, isRTL }) =>
       {/* Semester Filter */}
       {activeTab === 'semester' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {semesters.map((semester) => (
+          {semesters.map((semester, index) => (
             <div
-              key={semester}
+              key={index}
               className={`card bg-base-200 hover:bg-base-300 cursor-pointer p-4 text-center ${
                 filters.semester === semester ? 'bg-primary/10 border-2 border-primary' : ''
               }`}

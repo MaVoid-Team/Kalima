@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { PlusCircle, ChevronDown, X } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import { addNewLesson } from "../../routes/center";
-import {  getAllSubjects } from "../../routes/courses";
+import { getAllSubjects } from "../../routes/courses";
 import { getAllLevels } from "../../routes/levels";
 
 const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdded }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   const dir = isRTL ? "rtl" : "ltr";
   
@@ -27,7 +27,6 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
     levels: true,
     subjects: true
   });
-  
   // Fetch levels and subjects
   useEffect(() => {
     const fetchData = async () => {
@@ -78,11 +77,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
     setError("");
 
     try {
-      // Format date to YYYY-MM-DD
-      const formattedDate = new Date(formData.startTime)
-        .toISOString()
-        .split('T')[0];
-
+      const formattedDate = new Date(formData.startTime).toISOString().split('T')[0];
       const payload = {
         subject: formData.subject,
         lecturer: formData.lecturer,
@@ -92,14 +87,10 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
         centerId: formData.centerId
       };
 
-      // Use the new addNewLesson function
       const response = await addNewLesson(payload);
 
       if (response.status === "success") {
-        // Show success message
-        alert(isRTL ? "تم إضافة الدرس بنجاح" : "Lesson added successfully");
-        
-        // Reset form
+        alert(t('addCourseForm.successMessage'));
         setFormData({
           subject: "",
           lecturer: "",
@@ -108,21 +99,13 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           duration: "60",
           centerId: selectedCenter?._id || ""
         });
-        
-        // Notify parent component
-        if (onCourseAdded) {
-          onCourseAdded();
-        }
-        
-        // Close modal
-        if (onClose) {
-          onClose();
-        }
+        if (onCourseAdded) onCourseAdded();
+        if (onClose) onClose();
       } else {
-        throw new Error(response.message || (isRTL ? "حدث خطأ أثناء إضافة الدرس" : "Error adding lesson"));
+        throw new Error(response.message || t('addCourseForm.errors.general'));
       }
     } catch (err) {
-      setError(err.message || (isRTL ? "حدث خطأ أثناء إضافة الدرس" : "Error adding lesson"));
+      setError(err.message || t('addCourseForm.errors.general'));
       console.error("Error adding lesson:", err);
     } finally {
       setLoading(false);
@@ -143,7 +126,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
       <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-base-100 p-4 border-b border-base-200 flex justify-between items-center">
           <h2 className="text-xl font-bold">
-            {isRTL ? "إضافة درس جديد" : "Add New Lesson"}
+            {t('addCourseForm.title')}
           </h2>
           <button 
             type="button" 
@@ -155,7 +138,6 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
         </div>
 
         <form onSubmit={handleSubmit} className="p-4">
-          {/* Error Messages */}
           {error && (
             <div className="alert alert-error mb-4">
               <span>{error}</span>
@@ -166,7 +148,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "المادة" : "Subject"}
+                {t('addCourseForm.labels.subject')}
               </span>
             </label>
             <div className="relative">
@@ -180,7 +162,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                   onChange={handleChange}
                   required
                 >
-                  <option value="">{isRTL ? "اختر المادة" : "Select Subject"}</option>
+                  <option value="">{t('addCourseForm.selectPlaceholder.subject')}</option>
                   {subjects.map((subject) => (
                     <option key={subject._id} value={subject._id}>
                       {subject.name}
@@ -188,9 +170,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                   ))}
                 </select>
               )}
-              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${
-                isRTL ? "left-3" : "right-3"
-              }`} />
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
 
@@ -198,7 +178,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "المحاضر" : "Lecturer"}
+                {t('addCourseForm.labels.lecturer')}
               </span>
             </label>
             <div className="relative">
@@ -209,16 +189,14 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                 onChange={handleChange}
                 required
               >
-                <option value="">{isRTL ? "اختر المحاضر" : "Select Lecturer"}</option>
+                <option value="">{t('addCourseForm.selectPlaceholder.lecturer')}</option>
                 {lecturers.map((lecturer) => (
                   <option key={lecturer._id} value={lecturer._id}>
                     {lecturer.name}
                   </option>
                 ))}
               </select>
-              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${
-                isRTL ? "left-3" : "right-3"
-              }`} />
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
 
@@ -226,7 +204,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "المستوى" : "Level"}
+                {t('addCourseForm.labels.level')}
               </span>
             </label>
             <div className="relative">
@@ -240,7 +218,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                   onChange={handleChange}
                   required
                 >
-                  <option value="">{isRTL ? "اختر المستوى" : "Select Level"}</option>
+                  <option value="">{t('addCourseForm.selectPlaceholder.level')}</option>
                   {levels.map((level) => (
                     <option key={level._id} value={level._id}>
                       {level.name}
@@ -248,9 +226,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
                   ))}
                 </select>
               )}
-              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${
-                isRTL ? "left-3" : "right-3"
-              }`} />
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
 
@@ -258,7 +234,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "تاريخ البدء" : "Start Date"}
+                {t('addCourseForm.labels.startDate')}
               </span>
             </label>
             <input
@@ -275,7 +251,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           <div className="form-control mb-6">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "المدة (دقائق)" : "Duration (minutes)"}
+                {t('addCourseForm.labels.duration')}
               </span>
             </label>
             <input
@@ -298,12 +274,12 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
             {loading ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                {isRTL ? "جاري الحفظ..." : "Saving..."}
+                {t('addCourseForm.saving')}
               </>
             ) : (
               <>
                 <PlusCircle className="w-5 h-5" />
-                {isRTL ? "إضافة الدرس" : "Add Lesson"}
+                {t('addCourseForm.submitButton')}
               </>
             )}
           </button>

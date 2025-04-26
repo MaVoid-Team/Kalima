@@ -130,6 +130,6 @@
   "buttons":{
     "viewAll": "عرض الكل",
     "viewDetails": "عرض التفاصيل"
-  }
-  
+  },
+  "priceUnavailable": "السعر غير متاح"
 }

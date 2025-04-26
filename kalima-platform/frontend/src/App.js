@@ -8,6 +8,7 @@ import { isMobile } from "./utils/isMobile"
 import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
 import UnifiedSidebar from "./components/UnifiedSidebar"
 import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
+import { useTranslation } from "react-i18next"
 
 
 // Lazy load components
@@ -42,6 +43,8 @@ function App() {
   const [showUserNavbar, setShowUserNavbar] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const {i18n} = useTranslation()
+  const isRTL = i18n.language === 'ar'
 
   // useEffect(() => {
   //   const handleContextMenu = (e) => e.preventDefault();
@@ -85,7 +88,7 @@ function App() {
 
       <div 
         className={`transition-all duration-300 ${
-          showSidebar && sidebarOpen ? 'md:mr-52' : 'ml-0'
+          showSidebar && sidebarOpen ? (isRTL ? 'md:mr-52' : 'md:ml-52') : 'ml-0'
         }`}
       >
         <Suspense fallback={<LoadingSpinner fullScreen />}>
@@ -132,7 +135,7 @@ function App() {
             <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
             <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetails />} />
             <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
-            <Route path="/dashboard/coursesdashboard" element={<CoursesDashboard />} />
+            <Route path="/dashboard/courses-dashboard" element={<CoursesDashboard />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
 
           </Routes>

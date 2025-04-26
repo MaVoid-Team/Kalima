@@ -5,7 +5,7 @@ import { generatePromoCodes } from "../../../../routes/codes";
 import { getAllLecturers } from "../../../../routes/fetch-users";
 
 const PromoCodeGenerator = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('admin');
   const isRTL = i18n.language === "ar";
   const dir = isRTL ? "rtl" : "ltr";
   
@@ -22,8 +22,7 @@ const PromoCodeGenerator = () => {
     lecturerId: "",
     type: "general"
   });
-  
-  // Fetch lecturers
+
   useEffect(() => {
     const fetchLecturers = async () => {
       try {
@@ -31,139 +30,118 @@ const PromoCodeGenerator = () => {
         const response = await getAllLecturers();
         
         if (response.success) {
-          // Make sure we're accessing the data correctly based on the API response structure
           setLecturers(Array.isArray(response.data) ? response.data : []);
         } else {
-          setError(isRTL ? "فشل في جلب المحاضرين" : "Failed to fetch lecturers");
+          setError(t('admin.errors.fetchLecturers'));
         }
       } catch (err) {
         console.error("Error fetching lecturers:", err);
-        setError(isRTL ? "فشل في جلب المحاضرين" : "Failed to fetch lecturers");
+        setError(t('admin.errors.fetchLecturers'));
       } finally {
         setLoading(false);
       }
     };
     
     fetchLecturers();
-  }, [isRTL]);
-  
+  }, [t]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
     if (name === "type" && value === "general") {
-      // Reset lecturer ID when switching to general type
-      setFormData({
-        ...formData,
-        [name]: value,
-        lecturerId: ""
-      });
+      setFormData(prev => ({ ...prev, [name]: value, lecturerId: "" }));
     } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
-  
+
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: parseInt(value) || 0
-    });
+    setFormData(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setGeneratedCodes([]);
-    
-    // Validate form
+
     if (formData.pointsAmount <= 0) {
-      setError(isRTL ? "يجب أن تكون قيمة النقاط أكبر من صفر" : "Points amount must be greater than zero");
+      setError(t('admin.errors.pointsError'));
       return;
     }
     
     if (formData.numOfCodes <= 0) {
-      setError(isRTL ? "يجب أن يكون عدد الأكواد أكبر من صفر" : "Number of codes must be greater than zero");
+      setError(t('admin.errors.codesError'));
       return;
     }
     
     if (formData.type === "specific" && !formData.lecturerId) {
-      setError(isRTL ? "يرجى اختيار محاضر" : "Please select a lecturer");
+      setError(t('admin.errors.lecturerRequired'));
       return;
     }
-    
+
     try {
       setLoading(true);
-      
-      // Prepare JSON payload
       const payload = {
         pointsAmount: formData.pointsAmount,
         numOfCodes: formData.numOfCodes,
         type: formData.type
       };
       
-      // Add lecturerId only if type is specific
       if (formData.type === "specific") {
         payload.lecturerId = formData.lecturerId;
       }
-      
-      // Pass the payload directly to generatePromoCodes
+
       const response = await generatePromoCodes(payload);
       
       if (response.status === "success") {
-        setSuccess(isRTL ? "تم إنشاء أكواد الخصم بنجاح" : "Promo codes generated successfully");
+        setSuccess(t('admin.success.codesGenerated'));
         setGeneratedCodes(response.data.codes || []);
       } else {
-        setError(response.message || (isRTL ? "فشل في إنشاء أكواد الخصم" : "Failed to generate promo codes"));
+        setError(response.message || t('admin.errors.generationFailed'));
       }
     } catch (err) {
       console.error("Error generating promo codes:", err);
-      setError(err.message || (isRTL ? "فشل في إنشاء أكواد الخصم" : "Failed to generate promo codes"));
+      setError(t('admin.errors.generationFailed'));
     } finally {
       setLoading(false);
     }
   };
-  
+
   const copyToClipboard = (code, index) => {
     navigator.clipboard.writeText(code).then(() => {
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
     });
   };
-  
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8" dir={dir}>
       <div className="flex items-center gap-2 mb-6">
         <Ticket className="text-primary w-6 h-6" />
-        <h2 className="text-xl font-bold">
-          {isRTL ? "إنشاء أكواد ترويجية" : "Generate Promo Codes"}
-        </h2>
+        <h2 className="text-xl font-bold">{t('admin.generatePromoCodes')}</h2>
       </div>
-      
+
       {error && (
         <div className="alert alert-error mb-4 flex items-center gap-2">
           <AlertCircle className="w-5 h-5" />
           <span>{error}</span>
         </div>
       )}
-      
+
       {success && (
         <div className="alert alert-success mb-4 flex items-center gap-2">
           <Check className="w-5 h-5" />
           <span>{success}</span>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {/* Points Amount */}
           <div className="form-control">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "قيمة النقاط" : "Points Amount"}
+                {t('admin.form.pointsAmount')}
               </span>
             </label>
             <input
@@ -176,12 +154,11 @@ const PromoCodeGenerator = () => {
               required
             />
           </div>
-          
-          {/* Number of Codes */}
+
           <div className="form-control">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "عدد الأكواد" : "Number of Codes"}
+                {t('admin.form.numCodes')}
               </span>
             </label>
             <input
@@ -195,12 +172,11 @@ const PromoCodeGenerator = () => {
               required
             />
           </div>
-          
-          {/* Code Type */}
+
           <div className="form-control">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "نوع الكود" : "Code Type"}
+                {t('admin.form.codeType')}
               </span>
             </label>
             <select
@@ -210,16 +186,15 @@ const PromoCodeGenerator = () => {
               onChange={handleChange}
               required
             >
-              <option value="general">{isRTL ? "عام" : "General"}</option>
-              <option value="specific">{isRTL ? "محدد لمحاضر" : "Specific to Lecturer"}</option>
+              <option value="general">{t('admin.form.general')}</option>
+              <option value="specific">{t('admin.form.specific')}</option>
             </select>
           </div>
-          
-          {/* Lecturer Selection (only if type is specific) */}
+
           <div className="form-control">
             <label className="label">
               <span className="label-text font-medium">
-                {isRTL ? "المحاضر" : "Lecturer"}
+                {t('admin.form.lecturer')}
               </span>
             </label>
             <select
@@ -230,7 +205,7 @@ const PromoCodeGenerator = () => {
               disabled={formData.type !== "specific"}
               required={formData.type === "specific"}
             >
-              <option value="">{isRTL ? "اختر محاضر" : "Select Lecturer"}</option>
+              <option value="">{t('admin.form.lecturerPlaceholder')}</option>
               {lecturers.map((lecturer) => (
                 <option key={lecturer._id} value={lecturer._id}>
                   {lecturer.name}
@@ -239,7 +214,7 @@ const PromoCodeGenerator = () => {
             </select>
           </div>
         </div>
-        
+
         <button
           type="submit"
           className="btn btn-primary"
@@ -248,29 +223,28 @@ const PromoCodeGenerator = () => {
           {loading ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
-              {isRTL ? "جاري الإنشاء..." : "Generating..."}
+              {t('admin.generating')}
             </>
           ) : (
-            isRTL ? "إنشاء الأكواد" : "Generate Codes"
+            t('admin.generateCodes')
           )}
         </button>
       </form>
-      
-      {/* Generated Codes */}
+
       {generatedCodes.length > 0 && (
         <div className="mt-6">
           <h3 className="text-lg font-bold mb-3">
-            {isRTL ? "الأكواد المنشأة" : "Generated Codes"}
+            {t('admin.generatedCodes')}
           </h3>
           <div className="overflow-x-auto">
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th>{isRTL ? "الرقم" : "#"}</th>
-                  <th>{isRTL ? "كود الخصم" : "Promo Code"}</th>
-                  <th>{isRTL ? "النقاط" : "Points"}</th>
-                  <th>{isRTL ? "النوع" : "Type"}</th>
-                  <th>{isRTL ? "الإجراءات" : "Actions"}</th>
+                  <th>{t('admin.promoTable.number')}</th>
+                  <th>{t('admin.promoTable.code')}</th>
+                  <th>{t('admin.promoTable.points')}</th>
+                  <th>{t('admin.promoTable.type')}</th>
+                  <th>{t('admin.promoTable.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -278,13 +252,15 @@ const PromoCodeGenerator = () => {
                   <tr key={code.code || index}>
                     <td>{index + 1}</td>
                     <td>
-                      <code className="bg-base-200 px-2 py-1 rounded">{code.code}</code>
+                      <code className="bg-base-200 px-2 py-1 rounded">
+                        {code.code}
+                      </code>
                     </td>
                     <td>{code.pointsAmount || formData.pointsAmount}</td>
                     <td>
                       {formData.type === "specific" 
-                        ? (isRTL ? "محدد" : "Specific") 
-                        : (isRTL ? "عام" : "General")}
+                        ? t('admin.specific') 
+                        : t('admin.general')}
                     </td>
                     <td>
                       <button
@@ -297,9 +273,7 @@ const PromoCodeGenerator = () => {
                         ) : (
                           <Copy className="w-4 h-4" />
                         )}
-                        <span className="sr-only">
-                          {isRTL ? "نسخ" : "Copy"}
-                        </span>
+                        <span className="sr-only">{t('admin.copy')}</span>
                       </button>
                     </td>
                   </tr>
