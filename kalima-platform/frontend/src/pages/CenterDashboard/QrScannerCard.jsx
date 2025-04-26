@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
-import BarcodeScannerComponent from 'react-webcam-barcode-scanner';
+import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import axios from 'axios';
