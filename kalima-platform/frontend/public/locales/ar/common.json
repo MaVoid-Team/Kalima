@@ -28,5 +28,9 @@
   "logout": "تسجيل الخروج",
   "dashboardTitle": "لوحة القيادة",
   "toggleSidebar": "تبديل القائمة الجانبية",
-  "myPage": "صفحتي"
+  "myPage": "صفحتي",
+  "adminDashboard"  : "لوحة تحكم المسؤول",
+  "centerDashboard"  : "لوحة تحكم المركز",
+  "auditLog": "سجل التدقيق",
+  "myDashboard": "لوحة التحكم"
   }
