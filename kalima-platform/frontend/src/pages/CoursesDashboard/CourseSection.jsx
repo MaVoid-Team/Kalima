@@ -2,72 +2,23 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
+
 function CourseSection() {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("coursesDashboard");
   const isRTL = i18n.language === "ar";
 
-  // Course categories data with real image icons
+  // Category IDs and static data
   const categories = [
-    {
-      id: 1,
-      name: { ar: "الكيمياء", en: "Chemistry" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2695/2695395.png",
-      count: 38,
-    },
-    {
-      id: 2,
-      name: { ar: "الرعاية الصحية", en: "Healthcare" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2964/2964300.png",
-      count: 38,
-    },
-    {
-      id: 3,
-      name: { ar: "علم النفس", en: "Psychology" },
-      icon: "https://cdn-icons-png.flaticon.com/512/3048/3048127.png",
-      count: 38,
-    },
-    {
-      id: 4,
-      name: { ar: "اللغة العربية", en: "Arabic" },
-      icon: "https://cdn-icons-png.flaticon.com/512/3898/3898082.png",
-      count: 38,
-    },
-    {
-      id: 5,
-      name: { ar: "الفيزياء", en: "Physics" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2933/2933245.png",
-      count: 38,
-    },
-    {
-      id: 6,
-      name: { ar: "اللغات", en: "Languages" },
-      icon: "https://cdn-icons-png.flaticon.com/512/3899/3899618.png",
-      count: 38,
-    },
-    {
-      id: 7,
-      name: { ar: "الفلسفة", en: "Philosophy" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2936/2936886.png",
-      count: 38,
-    },
-    {
-      id: 8,
-      name: { ar: "التاريخ", en: "History" },
-      icon: "https://cdn-icons-png.flaticon.com/512/3424/3424655.png",
-      count: 38,
-    },
-    {
-      id: 9,
-      name: { ar: "الاقتصاد", en: "Economics" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2936/2936881.png",
-      count: 38,
-    },
-    {
-      id: 10,
-      name: { ar: "الرياضيات", en: "Mathematics" },
-      icon: "https://cdn-icons-png.flaticon.com/512/2936/2936883.png",
-      count: 38,
-    },
+    { id: 1, icon: "https://cdn-icons-png.flaticon.com/512/2695/2695395.png" },
+    { id: 2, icon: "https://cdn-icons-png.flaticon.com/512/2964/2964300.png" },
+    { id: 3, icon: "https://cdn-icons-png.flaticon.com/512/3048/3048127.png" },
+    { id: 4, icon: "https://cdn-icons-png.flaticon.com/512/3898/3898082.png" },
+    { id: 5, icon: "https://cdn-icons-png.flaticon.com/512/2933/2933245.png" },
+    { id: 6, icon: "https://cdn-icons-png.flaticon.com/512/3899/3899618.png" },
+    { id: 7, icon: "https://cdn-icons-png.flaticon.com/512/2936/2936886.png" },
+    { id: 8, icon: "https://cdn-icons-png.flaticon.com/512/3424/3424655.png" },
+    { id: 9, icon: "https://cdn-icons-png.flaticon.com/512/2936/2936881.png" },
+    { id: 10, icon: "https://cdn-icons-png.flaticon.com/512/2936/2936883.png" }
   ];
 
   return (
@@ -76,7 +27,6 @@ function CourseSection() {
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="container mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
-        {/* Section Header - Matches the reference image style */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -84,21 +34,18 @@ function CourseSection() {
           className="mb-8 md:mb-12"
         >
           <h2 className="text-xl md:text-3xl font-bold text-base-content mb-1 md:mb-2">
-            {isRTL ? "أهم الكورسات" : "Featured Courses"}
+            {t("courseSection.sectionTitle")}
           </h2>
           <div className="flex items-center gap-2 md:gap-3">
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
               <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
             <p className="text-base-content/70 text-sm md:text-lg">
-              {isRTL
-                ? "استكشف كورساتنا الشائعة"
-                : "Explore our popular courses"}
+              {t("courseSection.sectionSubtitle")}
             </p>
           </div>
         </motion.div>
 
-        {/* Courses Grid with enhanced animations */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-6">
           {categories.map((category, index) => (
             <motion.div
@@ -123,16 +70,16 @@ function CourseSection() {
               >
                 <img
                   src={category.icon}
-                  alt={isRTL ? category.name.ar : category.name.en}
+                  alt={t(`courseSection.categories.${category.id}`)}
                   className="w-full h-full object-contain"
                   loading="lazy"
                 />
               </motion.div>
               <h3 className="font-bold text-base-content mb-1 text-sm sm:text-base md:text-lg">
-                {isRTL ? category.name.ar : category.name.en}
+                {t(`courseSection.categories.${category.id}`)}
               </h3>
               <p className="text-xs sm:text-sm text-base-content/70">
-                {category.count} {isRTL ? "كورس" : "Courses"}
+                38 {t("courseSection.courseCount")}
               </p>
             </motion.div>
           ))}
