@@ -24,7 +24,8 @@ module.exports = {
     },
   },
   },
-  plugins: [require("daisyui")],
+  plugins: [require("daisyui", "@tailwindcss/postcss"),
+  ],
   daisyui: {
     themes: [
       {light: { 
