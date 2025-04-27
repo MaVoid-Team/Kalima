@@ -4,7 +4,7 @@ const Joi = require("joi");
 const userValidation = Joi.object({
   name: Joi.string().trim().required(),
   gender: Joi.string().valid("male", "female").insensitive().required(), // Please add more to not get canceled on twitter.
-  email: Joi.string().email().required(),
+  email: Joi.string().required(), // Removed .email() validation to allow any email format
   address: Joi.object({
     city: Joi.string().required(),
     governorate: Joi.string().required(),
