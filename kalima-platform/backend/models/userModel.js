@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema(
     address: addressSchema,
     referralSource: String,
     password: { type: String, required: true }, // Added password field
-    passwordChangedAt:Date
+    passwordChangedAt: Date,
+    isEmailVerified: { type: Boolean, default: false }
   },
   {
     discriminatorKey: "role", // Sets the name of the discriminator identifier filed.
