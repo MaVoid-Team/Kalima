@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getLectureById } from "../../../routes/lectures"
+// Import Video.js styles
+import "video.js/dist/video-js.css"
 
 const LectureDisplay = () => {
   const { lectureId } = useParams()
@@ -10,6 +12,10 @@ const LectureDisplay = () => {
   const [lecture, setLecture] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [playbackProgress, setPlaybackProgress] = useState(0)
+  const videoRef = useRef(null)
+  const playerRef = useRef(null)
+  const lastUpdateTimeRef = useRef(0)
 
   useEffect(() => {
     const fetchLecture = async () => {
@@ -32,6 +38,101 @@ const LectureDisplay = () => {
 
     fetchLecture()
   }, [lectureId])
+
+  // Extract YouTube embed ID to validate YouTube URL
+  const getYouTubeEmbedId = (url) => {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+    const match = url.match(regex)
+    return match ? match[1] : null
+  }
+
+  // Initialize Video.js player with YouTube support and resume functionality
+  useEffect(() => {
+    if (!videoRef.current || !lecture?.videoLink) return
+
+    // Dynamically import Video.js and videojs-youtube
+    Promise.all([
+      import("video.js"),
+      import("videojs-youtube")
+    ]).then(([videojs]) => {
+      const VideoJs = videojs.default
+
+      playerRef.current = VideoJs(videoRef.current, {
+        controls: true,
+        autoplay: false,
+        preload: "auto",
+        fluid: true,
+        techOrder: ["youtube", "html5"],
+        sources: [
+          {
+            src: lecture.videoLink,
+            type: getYouTubeEmbedId(lecture.videoLink) ? "video/youtube" : "video/mp4",
+          },
+        ],
+        youtube: { ytControls: 0 }, // Disable native YouTube controls
+      })
+
+      // Load saved playback position after metadata is loaded
+      const savedTime = localStorage.getItem(`lecture_${lectureId}_playback_time`)
+      if (savedTime && !isNaN(savedTime)) {
+        playerRef.current.on("loadedmetadata", () => {
+          playerRef.current.currentTime(parseFloat(savedTime))
+        })
+      }
+
+      // Track playback progress and save position
+      playerRef.current.on("timeupdate", () => {
+        const currentTime = playerRef.current.currentTime()
+        const duration = playerRef.current.duration()
+        const now = Date.now()
+
+        // Update progress for display
+        if (duration > 0) {
+          const progress = (currentTime / duration) * 100
+          setPlaybackProgress(progress)
+        }
+
+        // Save playback position every 5 seconds to avoid excessive writes
+        if (now - lastUpdateTimeRef.current >= 5000) {
+          localStorage.setItem(`lecture_${lectureId}_playback_time`, currentTime.toString())
+          lastUpdateTimeRef.current = now
+        }
+      })
+
+      // Save position on pause or end
+      playerRef.current.on("pause", () => {
+        const currentTime = playerRef.current.currentTime()
+        localStorage.setItem(`lecture_${lectureId}_playback_time`, currentTime.toString())
+      })
+
+      playerRef.current.on("ended", () => {
+        // Clear saved time when video ends
+        localStorage.removeItem(`lecture_${lectureId}_playback_time`)
+        setPlaybackProgress(100)
+      })
+
+      // Handle player errors
+      playerRef.current.on("error", () => {
+        setError("Failed to load video. Please check the video link.")
+      })
+    }).catch((err) => {
+      console.error("Failed to load Video.js or YouTube plugin:", err)
+      setError("Failed to initialize video player.")
+    })
+
+    // Cleanup on unmount
+    return () => {
+      if (playerRef.current) {
+        // Save final position before cleanup
+        const currentTime = playerRef.current.currentTime()
+        if (currentTime > 0) {
+          localStorage.setItem(`lecture_${lectureId}_playback_time`, currentTime.toString())
+        }
+        playerRef.current.dispose()
+        playerRef.current = null
+      }
+    }
+  }, [lecture?.videoLink, lectureId])
 
   if (loading) {
     return (
@@ -87,15 +188,6 @@ const LectureDisplay = () => {
     )
   }
 
-  // Extract YouTube embed ID from video link
-  const getYouTubeEmbedId = (url) => {
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
-    const match = url.match(regex)
-    return match ? match[1] : null
-  }
-
-  const youtubeEmbedId = getYouTubeEmbedId(lecture.videoLink)
-
   // Render attachments with view and download links
   const renderAttachments = (attachmentType, attachments) => {
     if (!attachments || attachments.length === 0) return null
@@ -108,7 +200,7 @@ const LectureDisplay = () => {
             <li key={index} className="mt-2">
               <div className="flex gap-4">
                 <a
-                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  href={`/api/v1/attachments/${attachment}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
@@ -116,7 +208,7 @@ const LectureDisplay = () => {
                   عرض المرفق {index + 1}
                 </a>
                 <a
-                  href={`/api/v1/attachments/${attachment}`} // Replace with actual attachment URL
+                  href={`/api/v1/attachments/${attachment}`}
                   download
                   className="text-green-600 hover:underline"
                 >
@@ -140,19 +232,22 @@ const LectureDisplay = () => {
       </button>
       <h1 className="text-3xl font-bold mb-6">{lecture.name}</h1>
 
-      {/* Video Embed */}
-      {youtubeEmbedId ? (
+      {/* Video.js Player */}
+      {lecture.videoLink ? (
         <div className="mb-6">
-          <iframe
-            width="100%"
-            height="400"
-            src={`https://www.youtube.com/embed/${youtubeEmbedId}`}
-            title={lecture.name}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="rounded-lg"
-          ></iframe>
+          <video
+            ref={videoRef}
+            className="video-js vjs-default-skin vjs-big-play-centered rounded-lg"
+            style={{ width: "100%", height: "400px" }}
+          ></video>
+          <div className="mt-2">
+            <p>Playback Progress: {playbackProgress.toFixed(2)}%</p>
+            <progress
+              className="progress progress-primary w-full"
+              value={playbackProgress}
+              max="100"
+            ></progress>
+          </div>
         </div>
       ) : (
         <div className="alert alert-warning mb-6">
