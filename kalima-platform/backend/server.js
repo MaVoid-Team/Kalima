@@ -40,7 +40,7 @@ const cStudentRouter = require("./routes/center.studentRoutes.js");
 const lessonRouter = require("./routes/lessonRoutes.js");
 const attendanceRouter = require("./routes/attendanceRoutes");
 const revenueRouter = require("./routes/revenueRoutes");
-const pricingRuleRouter = require("./routes/pricingRuleRoutes"); // Import pricing rule router
+const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
 connectDB();
 
@@ -56,6 +56,8 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/api/v1/register", require("./routes/registerRoutes.js"));
 app.use("/api/v1/auth", require("./routes/authRoutes.js"));
+app.use("/api/v1/password-reset", require("./routes/passwordResetRoutes.js")); // Add password reset routes
+app.use("/api/v1/otp", require("./utils/emailVerification/otpRoutes.js"));
 app.use("/api/v1/containers", auditLogger, containerRouter);
 app.use("/api/v1/lectures", lectureRouter);
 app.use("/api/v1/users", userRouter);
