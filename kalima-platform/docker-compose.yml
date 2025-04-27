@@ -7,7 +7,7 @@ services:
       - "8088:80"
       - "4448:443"
     environment:
-      - REACT_APP_BASE_URL=${REACT_APP_BASE_URL}
+      - VITE_API_URL=${VITE_API_URL}
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
@@ -30,6 +30,8 @@ services:
       - CLOUDINARY_NAME=${CLOUDINARY_NAME}
       - CLOUDINARY_KEY=${CLOUDINARY_KEY}
       - CLOUDINARY_SECRET=${CLOUDINARY_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
     networks:
       - app-network
 
