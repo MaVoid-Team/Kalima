@@ -4,6 +4,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
       <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
       {/* Parent Phone */}
       <div className="relative pb-5 form-control ">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.parentPhone')}</span>
         </label>
@@ -21,10 +22,12 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             {t(errors.parentPhoneNumber)}
           </span>
         )}
+        </div>
       </div>
 
       {/* Email */}
       <div className="relative pb-5 form-control ">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.email')}</span>
         </label>
@@ -41,10 +44,12 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             {t(errors.email)}
           </span>
         )}
+        </div>
       </div>
       
       {/* Password */}
       <div className="relative pb-5 form-control ">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.password')}</span>
         </label>
@@ -61,10 +66,12 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             {t('validation.passwordRequirements')}
           </span>
         )}
+        </div>
       </div>
 
       {/* Confirm Password - Added field */}
       <div className="relative pb-5 form-control ">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.confirmPassword')}</span>
         </label>
@@ -81,6 +88,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             {t(errors.confirmPassword)}
           </span>
         )}
+        </div>
       </div>
     </div>
   );

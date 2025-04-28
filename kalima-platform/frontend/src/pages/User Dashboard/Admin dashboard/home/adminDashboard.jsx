@@ -82,8 +82,8 @@ const AdminDashboard = () => {
 
         {/* WhatsApp Modal */}
         {whatsappModal.isOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full" dir={dir}>
+          <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center z-50">
+            <div className=" bg-base-300 p-6 rounded-lg shadow-lg max-w-md w-full" dir={dir}>
               <h3 className="text-xl font-bold mb-4">{t('admin.whatsappModal.title')}</h3>
               <div className="mb-4">
                 <label className="block mb-2 font-medium">{t('admin.whatsappModal.phoneLabel')}</label>

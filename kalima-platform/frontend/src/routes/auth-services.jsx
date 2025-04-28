@@ -78,6 +78,58 @@ export const loginUser = async (credentials) => {
   }
 };
 
+export const requestPasswordReset = async (email) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/password-reset/request`, {
+      email
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const verifyOtp = async (email, otp) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/password-reset/verify-otp`, {
+      email,
+      otp
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetPassword = async (resetToken, password, confirmPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/password-reset/reset`, {
+      resetToken,
+      password,
+      confirmPassword
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const logoutUser = async () => {
   try {
     const token = getToken();

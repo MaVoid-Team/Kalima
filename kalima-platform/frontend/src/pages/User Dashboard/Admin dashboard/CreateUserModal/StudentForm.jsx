@@ -19,6 +19,7 @@ const StudentForm = ({ userData, handleChange, levels }) => {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
+          <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">المستوى الدراسي</span>
           </label>
@@ -36,9 +37,11 @@ const StudentForm = ({ userData, handleChange, levels }) => {
               </option>
             ))}
           </select>
+          </div>
         </div>
 
         <div className="form-control">
+          <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">رقم الهاتف</span>
           </label>
@@ -50,11 +53,13 @@ const StudentForm = ({ userData, handleChange, levels }) => {
             onChange={handleChange}
             required
           />
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
+          <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">الرقم التسلسلي (اختياري)</span>
           </label>
@@ -65,10 +70,12 @@ const StudentForm = ({ userData, handleChange, levels }) => {
             value={userData.sequencedId || ""}
             onChange={handleChange}
           />
+          </div>
         </div>
 
         <div className="form-control">
-          <label className="label">
+          <div className="flex flex-col gap-4">
+              <label className="label">
             <span className="label-text">رقم هاتف ولي الأمر (اختياري)</span>
           </label>
           <input
@@ -78,6 +85,7 @@ const StudentForm = ({ userData, handleChange, levels }) => {
             value={userData.parentPhoneNumber || ""}
             onChange={handleChange}
           />
+          </div>
         </div>
       </div>
 

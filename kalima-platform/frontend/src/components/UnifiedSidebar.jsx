@@ -248,9 +248,9 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         {userData && (
           <div className="p-4 border-b border-base-300">
             <div className="flex items-center gap-3">
-              <div className="avatar placeholder">
+              <div className="avatar avatar-placeholder">
                 <div className="bg-neutral text-neutral-content rounded-full w-8">
-                  <span className="text-xs">{userData.name.charAt(0)}</span>
+                  <span className="text-xs">{userData.name.charAt(0) + userData.name.charAt(1)}</span>
                 </div>
               </div>
               <div>
@@ -290,7 +290,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                   to={item.path}
                   className={`flex items-center justify-between py-3 px-4 hover:bg-base-200 transition-colors ${
                     location.pathname === item.path 
-                      ? `text-primary ${isRTL ? 'border-r-4' : 'border-l-4'} border-primary bg-primary bg-opacity-10` 
+                      ? `text-primary ${isRTL ? 'border-r-4' : 'border-l-4'} border-primary bg-primary/20 bg-opacity-10` 
                       : 'text-base-content'
                   }`}
                   onClick={(e) => {

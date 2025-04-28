@@ -11,7 +11,8 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
         
         {/* Email Field */}
         <div className="form-control">
-            <label className="label">
+          <div className="flex flex-col gap-2">
+          <label className="label">
                 <span className="label-text">{t('form.email')}</span>
             </label>
             <input
@@ -24,10 +25,12 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 required
             />
             {errors.email && <span className="text-error text-sm mt-1">{t(errors.email)}</span>}
+          </div>
         </div>
 
         {/* Password Field */}
         <div className="form-control">
+            <div className="flex flex-col gap-2">
             <label className="label">
                 <span className="label-text">{t('form.password')}</span>
             </label>
@@ -40,10 +43,12 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 required
             />
             {errors.password && <span className="text-error text-sm mt-1">{t(errors.password)}</span>}
+            </div>
         </div>
         
         {/* Confirm Password Field */}
         <div className="form-control">
+            <div className="flex flex-col gap-2">
             <label className="label">
                 <span className="label-text">{t('form.confirmPassword')}</span>
             </label>
@@ -56,10 +61,12 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 required
             />
             {errors.confirmPassword && <span className="text-error text-sm mt-1">{t(errors.confirmPassword)}</span>}
+            </div>
         </div>
         
         {/* Optional Level Field */}
         <div className="form-control">
+            <div className="flex flex-col gap-2">
             <label className="label">
                 <span className="label-text">{t('form.level')} ({t('form.optional')})</span>
             </label>
@@ -75,6 +82,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 <option value="Third Secondary">Third Secondary</option>
                 {/* Add more options as needed */}
             </select>
+            </div>
         </div>
         
         <p className="text-lg font-semibold mt-6">{t('form.childrenSequenceIds')}</p>
@@ -82,6 +90,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
         
         {safeChildren.slice(0, childrenCount).map((child, i) => (
           <div key={i} className="form-control">
+            <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text">{t('form.childSequenceId')} #{i + 1}</span>
             </label>
@@ -94,6 +103,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
               required={i === 0} // At least one child is required
             />
             {errors.children?.[i] && <span className="text-error text-sm mt-1">{t(errors.children[i])}</span>}
+            </div>
           </div>
         ))}
   

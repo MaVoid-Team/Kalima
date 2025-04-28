@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users";
 import { useTranslation } from "react-i18next";
-import { FaFilter, FaSync, FaWhatsapp } from "react-icons/fa";
-import Pagination from "../../../../components/Pagination"; // Import the Pagination component
-import CreateUserModal from "../CreateUserModal/CreateUserModal"; // Import the CreateUserModal component
+import { FaSync, FaWhatsapp } from "react-icons/fa";
+import Pagination from "../../../../components/Pagination";
+import CreateUserModal from "../CreateUserModal/CreateUserModal";
 
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation('admin');
@@ -53,14 +53,11 @@ const UserManagementTable = () => {
     }
   };
 
-  // Filter users whenever filters or users change
+  // Apply filters when filters or users change
   useEffect(() => {
     applyFilters();
-    // Reset to first page when filters change
     setCurrentPage(1);
   }, [filters, users]);
-
-  useEffect(() => { applyFilters(); setCurrentPage(1); }, [filters, users]);
 
   const applyFilters = () => {
     const filtered = users.filter(user => 
@@ -85,8 +82,11 @@ const UserManagementTable = () => {
     
     try {
       const result = await deleteUser(userId);
-      if (result.success) setUsers(prev => prev.filter(u => u._id !== userId));
-      else setError(result.error);
+      if (result.success) {
+        setUsers(prev => prev.filter(u => u._id !== userId));
+      } else {
+        setError(result.error);
+      }
     } catch (error) {
       setError(error.message);
     }
@@ -110,7 +110,7 @@ const UserManagementTable = () => {
   // Open WhatsApp modal
   const openWhatsappModal = (phoneNumber, userName) => {
     if (!phoneNumber) {
-      alert("لا يوجد رقم هاتف لهذا المستخدم");
+      alert(t('admin.noPhoneNumber'));
       return;
     }
     
@@ -124,21 +124,15 @@ const UserManagementTable = () => {
 
   // Send WhatsApp message
   const sendWhatsappMessage = () => {
-    // Format phone number (remove any non-digit characters and ensure it starts with country code)
     let formattedNumber = whatsappModal.phoneNumber.replace(/\D/g, '');
     
-    // If number doesn't start with country code, add Egypt's code (+20)
     if (!formattedNumber.startsWith('2')) {
       formattedNumber = '2' + formattedNumber;
     }
     
-    // Create WhatsApp URL with phone number and message
     const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-    
-    // Open WhatsApp in a new tab
     window.open(whatsappUrl, '_blank');
     
-    // Close the modal
     setWhatsappModal({
       isOpen: false,
       phoneNumber: "",
@@ -146,12 +140,11 @@ const UserManagementTable = () => {
     });
   };
 
-  // Get current users for pagination
+  // Pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
-  // Handle page change from Pagination component
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -174,10 +167,11 @@ const UserManagementTable = () => {
 
   return (
     <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir={dir}>
-      <h1 className={`text-3xl font-bold mb-8 ${dir === "rtl" ? "text-right" : "text-left"} `}>{t('admin.userManagement.title')}</h1>
+      <h1 className={`text-3xl font-bold mb-8 ${isRTL ? "text-right" : "text-left"}`}>{t('admin.userManagement.title')}</h1>
 
-      <div className="flex flex-wrap gap-4 mb-8 justify-between">
-        <div className="flex gap-4">
+      {/* Filters and Actions */}
+      <div className="flex flex-wrap gap-4 mb-8 justify-between items-center">
+        <div className="flex gap-4 flex-wrap">
           <input
             type="text"
             placeholder={t('admin.filters.name')}
@@ -223,10 +217,11 @@ const UserManagementTable = () => {
         </div>
       </div>
 
-      <div className="w-full overflow-auto" dir={`${dir === "rtl" ? "ltr" : "rtl"}`}  >
-        <table className="w-full">
+      {/* Users Table */}
+      <div className="w-full overflow-auto">
+        <table className="table w-full">
           <thead>
-            <tr className={`${dir === "rtl" ? "text-right" : "text-left"}`}>
+            <tr className={`${isRTL ? "text-right" : "text-left"}`}>
               {['actions', 'status', 'accountType', 'phone', 'name'].map(header => (
                 <th key={header} className="pb-4 text-lg font-medium">
                   {t(`admin.table.${header}`)}
@@ -234,19 +229,25 @@ const UserManagementTable = () => {
               ))}
             </tr>
           </thead>
-          <tbody dir={`${dir === "rtl" ? "ltr" : "rtl"}`}>
+          <tbody>
             {currentUsers.map((user) => (
-              <tr key={user._id} className={`${dir === "rtl" ? "text-right" : "text-left"} border-t border-none `}>
+              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
                 <td className="py-4">
-                  <div className={`flex items-center ${dir === "rtl" ? "justify-end" : "justify-end"} mx-auto gap-3`}>
+                  <div className={`flex items-center ${isRTL ? "justify-end" : "justify-start"} gap-2`}>
+                    {user.phoneNumber && (
+                      <button 
+                        className="btn btn-success btn-xs"
+                        onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
+                        title={t('admin.actions.whatsapp')}
+                      >
+                        <FaWhatsapp />
+                      </button>
+                    )}
                     <button 
                       className="btn btn-error btn-xs"
                       onClick={() => handleDelete(user._id)}
                     >
                       {t('admin.actions.delete')}
-                    </button>
-                    <button className="btn btn-warning btn-xs">
-                      {t('admin.actions.edit')}
                     </button>
                   </div>
                 </td>
@@ -260,6 +261,7 @@ const UserManagementTable = () => {
         </table>
       </div>
 
+      {/* Pagination */}
       <Pagination 
         currentPage={currentPage}
         totalItems={filteredUsers.length}
@@ -273,12 +275,38 @@ const UserManagementTable = () => {
         }}
       />
 
+      {/* Create User Modal */}
       <CreateUserModal 
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreateUser={handleCreateUser}
         error={error}
       />
+
+      {/* WhatsApp Modal */}
+      {whatsappModal.isOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box" dir={dir}>
+            <h3 className="font-bold text-lg">
+              {t('admin.whatsappModal.title', { name: whatsappModal.userName })}
+            </h3>
+            <textarea
+              className="textarea textarea-bordered w-full mt-4"
+              placeholder={t('admin.whatsappModal.placeholder')}
+              value={whatsappMessage}
+              onChange={(e) => setWhatsappMessage(e.target.value)}
+            ></textarea>
+            <div className="modal-action">
+              <button className="btn btn-ghost" onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", userName: "" })}>
+                {t('admin.whatsappModal.cancel')}
+              </button>
+              <button className="btn btn-primary" onClick={sendWhatsappMessage} disabled={!whatsappMessage.trim()}>
+                {t('admin.whatsappModal.send')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
