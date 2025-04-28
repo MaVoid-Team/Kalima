@@ -1,70 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaWallet, FaInfoCircle, FaBars, FaTicketAlt } from 'react-icons/fa';
+import { FaWallet, FaInfoCircle, FaBars, FaTicketAlt, FaVideo } from 'react-icons/fa';
 import { MdCardGiftcard } from 'react-icons/md';
 import { getUserDashboard } from '../../routes/auth-services';
-import { redeemPromoCode } from '../../routes/codes'; // Import the redeem function
+import { redeemPromoCode } from '../../routes/codes';
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation('promoCodes');
   const isRTL = i18n.language === 'ar';
   const [transactions, setTransactions] = useState([]);
   const [pointsBalances, setPointsBalances] = useState([]);
+  const [lectureAccess, setLectureAccess] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [redeemCode, setRedeemCode] = useState('');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [redeemLoading, setRedeemLoading] = useState(false); // Added loading state for redeem
-  const [redeemError, setRedeemError] = useState(null); // Added error state for redeem
-  const [redeemSuccess, setRedeemSuccess] = useState(null); // Added success state for redeem
+  const [redeemLoading, setRedeemLoading] = useState(false);
+  const [redeemError, setRedeemError] = useState(null);
+  const [redeemSuccess, setRedeemSuccess] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
 
-  // Fetch user data on component mount and when redeem is successful
+  // Fetch user data on mount and after successful redemption
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
+      setFetchError(null);
       try {
         const result = await getUserDashboard();
-
         if (result.success) {
-          const { userInfo, pointsBalances, redeemedCodes } = result.data.data || {};
+          const { userInfo, pointsBalances, redeemedCodes, purchaseHistory, lectureAccess } = result.data.data || {};
 
-          // Set total points
-          if (userInfo) {
-            setBalance(userInfo.totalPoints || 0);
-          } else {
-            console.error("userInfo is undefined in the response.");
-          }
+          // Set general points as balance
+          setBalance(userInfo?.totalPoints || 0);
 
-          // Map redeemed codes to transactions
-          const mappedTransactions = (redeemedCodes || []).map((code, index) => {
-            const lecturer = pointsBalances?.find(
-              (balance) => balance.lecturer._id === code.lecturerId
-            );
-            return {
-              id: index + 1,
-              code: code.code,
-              amount: code.pointsAmount,
-              instructorName: lecturer ? lecturer.lecturer.name : "N/A",
-              createdAt: new Date(code.redeemedAt).toLocaleDateString(),
-            };
-          });
+          // Map redeemed codes and purchase history to transactions
+          const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
+            id: `code-${index + 1}`,
+            type: t('table.types.codeRedemption'),
+            code: code.code,
+            amount: code.pointsAmount,
+            instructorName: code.lecturerId 
+              ? (pointsBalances?.find(b => b.lecturer?._id === code.lecturerId)?.lecturer?.name || 'N/A')
+              : t('generalPoints'),
+            createdAt: new Date(code.redeemedAt).toLocaleDateString(),
+          }));
 
-          setTransactions(mappedTransactions);
+          const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
+            id: `purchase-${index + 1}`,
+            type: t('table.types.containerPurchase'),
+            code: purchase.description,
+            amount: purchase.points,
+            instructorName: purchase.lecturer?.name || 'N/A',
+            createdAt: new Date(purchase.purchasedAt).toLocaleDateString(),
+          }));
+
+          const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
+          setTransactions(combinedTransactions);
           setPointsBalances(pointsBalances || []);
+          setLectureAccess(lectureAccess || []);
         } else {
-          console.error("Failed to load dashboard data:", result.error);
+          setFetchError(result.error || t('errors.fetchFailed'));
         }
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        setFetchError(t('errors.fetchFailed'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, [redeemSuccess]); // Add redeemSuccess as dependency to refetch data after successful redemption
+  }, [redeemSuccess, t]);
 
+  // Handle screen size changes for mobile sidebar
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
@@ -93,7 +104,6 @@ const PromoCodes = () => {
 
     try {
       const result = await redeemPromoCode(redeemCode);
-      
       if (result.success) {
         setRedeemSuccess(t('redeem.success'));
         setRedeemCode('');
@@ -111,12 +121,12 @@ const PromoCodes = () => {
   return (
     <div className="min-h-screen bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Main Content */}
-      <div className={`transition-all duration-300`}>
+      <div className="transition-all duration-300">
         {/* Header */}
         <div className="bg-base-100 p-4 flex items-center justify-between top-0 z-10 mt-10">
-          <div className="flex-1 flex items-center justify-center ">
+          <div className="flex-1 flex items-center justify-center">
             <h1 className="text-xl font-bold text-primary px-1">{t('title')}</h1>
-            <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
+            <img src="/Line 5.png" alt={t('decorativeAlt')} className="inline-block" />
           </div>
           <img
             src="/waves.png"
@@ -133,6 +143,13 @@ const PromoCodes = () => {
             </button>
           )}
         </div>
+
+        {/* Error Display */}
+        {fetchError && (
+          <div className="alert alert-error max-w-md mx-auto mt-4">
+            <span>{fetchError}</span>
+          </div>
+        )}
 
         {/* Page Content */}
         <div className="p-6 relative">
@@ -202,7 +219,9 @@ const PromoCodes = () => {
                 {pointsBalances.map((balance, index) => (
                   <div key={index} className="card bg-base-200 shadow-md">
                     <div className="card-body">
-                      <h3 className="card-title">{balance.lecturer.name}</h3>
+                      <h3 className="card-title">
+                        {balance.lecturer ? balance.lecturer.name : t('generalPoints')}
+                      </h3>
                       <p className="text-2xl font-bold">{balance.points} {t('balance.currency')}</p>
                     </div>
                   </div>
@@ -226,15 +245,15 @@ const PromoCodes = () => {
                 <h2 className={`card-title text-primary inline-block px-2 pb-2`}>
                   {t('transactions.title')}
                 </h2>
-                <img src="/Line 5.png" alt={t('decorativeAlt')} className=" inline-block " />
+                <img src="/Line 5.png" alt={t('decorativeAlt')} className="inline-block" />
               </div>
 
               {/* Table */}
               <div className="overflow-x-auto rounded-2xl">
                 <table className="table w-full">
                   <thead className="bg-primary/20 mt-10">
-                    <tr className='text-center'>
-                      {[t('table.id'), t('table.code'), t('table.amount'), t('table.teacher'), t('table.created')].map((header) => (
+                    <tr className="text-center">
+                      {[t('table.id'), t('table.type'), t('table.code'), t('table.amount'), t('table.teacher'), t('table.created')].map((header) => (
                         <th key={header} className="text-primary">{header}</th>
                       ))}
                     </tr>
@@ -243,9 +262,10 @@ const PromoCodes = () => {
                   <tbody>
                     {!loading ? (
                       transactions.length > 0 ? (
-                        transactions.map((transaction, index) => (
-                          <tr key={index} className="hover:bg-base-200 text-center">
+                        transactions.map((transaction) => (
+                          <tr key={transaction.id} className="hover:bg-base-200 text-center">
                             <td>{transaction.id}</td>
+                            <td>{transaction.type}</td>
                             <td>{transaction.code}</td>
                             <td>{transaction.amount}</td>
                             <td>{transaction.instructorName}</td>
@@ -254,7 +274,7 @@ const PromoCodes = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="5" className="text-center py-16 bg-primary/20">
+                          <td colSpan="6" className="text-center py-16 bg-primary/20">
                             <div className="flex flex-col items-center justify-center text-base-content opacity-60">
                               <div className="bg-primary bg-opacity-20 p-4 rounded-full mb-4">
                                 <FaInfoCircle className="w-8 h-8 text-primary" />
@@ -266,7 +286,7 @@ const PromoCodes = () => {
                       )
                     ) : (
                       <tr>
-                        <td colSpan="5" className="text-center py-16 bg-primary/20">
+                        <td colSpan="6" className="text-center py-16 bg-primary/20">
                           <div className="flex flex-col items-center justify-center">
                             <span className="loading loading-dots loading-lg"></span>
                           </div>
