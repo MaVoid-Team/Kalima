@@ -2,14 +2,12 @@
 
 import { Suspense, lazy, useEffect, useState } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 import NavBar from "./components/navbar"
 import { LoadingSpinner } from "./components/LoadingSpinner"
 import { isMobile } from "./utils/isMobile"
-import MobileOnly from "./pages/User Dashboard/Lecture Page/mobileOnly"
 import UnifiedSidebar from "./components/UnifiedSidebar"
-import AssistantPage from "./pages/User Dashboard/assistantPage/assistantPage"
 import { useTranslation } from "react-i18next"
-
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home/Home"))
@@ -27,7 +25,6 @@ const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
 const Services = lazy(() => import("./pages/Services/Services"))
 const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
-// const LecturePage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturePage"))
 const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
 const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
@@ -43,34 +40,21 @@ const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
 
 function App() {
   const location = useLocation()
-  const [showUserNavbar, setShowUserNavbar] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const {i18n} = useTranslation()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
-  // useEffect(() => {
-  //   const handleContextMenu = (e) => e.preventDefault();
-  //   const disableDrag = () => {
-  //     document.querySelectorAll("img").forEach((img) => {
-  //       img.setAttribute("draggable", "false");
-  //     });
-  //   };
-
-  //   document.addEventListener("contextmenu", handleContextMenu);
-  //   disableDrag(); // On mount
-
-  //   return () => {
-  //     document.removeEventListener("contextmenu", handleContextMenu);
-  //   };
-  // }, []);
-
   useEffect(() => {
-    // Show sidebar on any route that starts with "/dashboard/"
     const isDashboardRoute = location.pathname.startsWith('/dashboard/')
     setShowSidebar(isDashboardRoute)
-    // You can keep or modify this based on your needs
-    setShowUserNavbar(isDashboardRoute)
+    
+    // Set initial sidebar state based on device
+    if (isMobile()) {
+      setSidebarOpen(false) // Start closed on mobile
+    } else {
+      setSidebarOpen(true) // Start open on desktop
+    }
   }, [location.pathname])
 
   const toggleSidebar = () => {
@@ -78,15 +62,46 @@ function App() {
   }
 
   return (
-    <div className="App">
-       <NavBar />
+    <div className={`App ${isRTL ? 'rtl' : 'ltr'}`}>
+      <NavBar 
+        showSidebarToggle={showSidebar} 
+        onSidebarToggle={toggleSidebar} 
+        isSidebarOpen={sidebarOpen}
+      />
 
-      {/* Render the unified sidebar on dashboard routes */}
       {showSidebar && (
-        <UnifiedSidebar 
-          isOpen={sidebarOpen} 
-          toggleSidebar={toggleSidebar} 
-        />
+        <>
+          <UnifiedSidebar 
+            isOpen={sidebarOpen} 
+            toggleSidebar={toggleSidebar}
+            isRTL={isRTL}
+          />
+          
+          {/* Unified Toggle Button for all devices */}
+          <button
+            id="sidebar-toggle"
+            className={`fixed top-20 ${
+              isRTL ? 'right-0' : 'left-0'
+            } z-40 bg-primary text-base-content p-2 ${
+              isRTL ? 'rounded-r-md' : 'rounded-l-md'
+            } shadow-md transition-transform duration-300 ease-in-out ${
+              sidebarOpen ? 'md:block' : 'block'
+            }`}
+            style={{ 
+              transform: sidebarOpen 
+                ? `translateX(${isRTL ? '-13rem' : '13rem'})`
+                : 'translateX(0)',
+            }}
+            onClick={toggleSidebar}
+            aria-label="Toggle Sidebar"
+          >
+            {sidebarOpen ? (
+              <FaChevronRight className={`w-4 h-4 ${!isRTL && 'rotate-180'}`} />
+            ) : (
+              <FaChevronLeft className={`w-4 h-4 ${!isRTL && 'rotate-180'}`} />
+            )}
+          </button>
+        </>
       )}
 
       <div 
@@ -113,14 +128,12 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/courses/:courseId" element={<CourseDetails />} />
             <Route path="/lectures" element={<LecturesPage />} />
-            {/* <Route path="/lectures/:lectureId" element={<LecturePage />} /> */}
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/teacher-details/:userId" element={<TeacherDetails />} />
             <Route path="package-details/:packageId" element={<PackageDetails />} />
             <Route path="/packages" element={<PackagesPage />} />
             <Route path="/packages" element={<PackagesPage />} /> 
             <Route path="/package-details/:packageId" element={<PackageDetails />} />
-
 
             {/* User Dashboard Routes */}
             <Route path="/dashboard/student-dashboard/lecture-page" element={<ContainersPage />} />
@@ -130,7 +143,8 @@ function App() {
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
-            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
+            <Route path="/dashboard/assistant-page" element={<UserDashboard />} />
+            
             {/* Admin Routes */}
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
@@ -143,13 +157,12 @@ function App() {
             <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
             <Route path="/dashboard/courses-dashboard" element={<CoursesDashboard />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
-
           </Routes>
         </Suspense>
       </div>
 
       {/* Only show footer on public routes */}
-      {!showUserNavbar && (
+      {!showSidebar && (
         <footer className="bg-base-200 p-4">
           <Footer />
         </footer>
