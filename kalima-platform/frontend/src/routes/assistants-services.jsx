@@ -1,11 +1,12 @@
 import  axios  from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
+import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL
 export const AssistantService = {
     // Fetch all assistants
     getAssistants: async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/assistants/`)
+        const response = await api.get(`${API_URL}/api/v1/assistants/`)
   
         if (response.data.status === "success") {
           return {
@@ -19,10 +20,7 @@ export const AssistantService = {
           }
         }
       } catch (error) {
-        return {
-          success: false,
-          error: error.message || "An error occurred while fetching assistants",
-        }
+        return `An error occurred while fetching assistants: ${error.message}`
       }
     },
 
@@ -30,7 +28,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
         
-        const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+        const response = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
           headers: {
             Authorization: `Bearer ${getToken()}`,
           },
@@ -41,10 +39,7 @@ export const AssistantService = {
           data: response.data.data.userInfo
         };
       } catch (error) {
-        return {
-          success: false,
-          error: error.response?.data?.message || "Failed to fetch user data"
-        };
+        return `Failed to fetch user data: ${error.message}`
       }
     },
   
@@ -52,7 +47,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
   
-        const response = await axios.get(
+        const response = await api.get(
           `${API_URL}/api/v1/assistants/lecturer/${lecturerId}`,
           {
             headers: {
@@ -66,10 +61,7 @@ export const AssistantService = {
           data: response.data.data.assistants
         };
       } catch (error) {
-        return {
-          success: false,
-          error: error.response?.data?.message || "Failed to fetch assistants"
-        };
+        return `Failed to fetch assistants: ${error.message}`
       }
     }
   };

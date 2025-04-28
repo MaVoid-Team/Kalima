@@ -1,5 +1,6 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const TOKEN_KEY = "accessToken";
@@ -86,7 +87,7 @@ const isTokenNearExpiry = (token) => {
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/register`, userData, {
+    const response = await api.post(`${API_URL}/api/v1/register`, userData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -98,18 +99,19 @@ export const registerUser = async (userData) => {
       headers: response.headers,
     };
   } catch (error) {
-    return {
-      success: false,
-      status: error.response?.status,
-      error: error.response?.data?.message || error.message || "Registration failed",
-      details: error.response?.data,
-    };
+    // return {
+    //   success: false,
+    //   status: error.response?.status,
+    //   error: error.response?.data?.message || error.message || "Registration failed",
+    //   details: error.response?.data,
+    // };
+    return `Registration failed: ${error.message}`
   }
 };
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/auth`, credentials, {
+    const response = await api.post(`${API_URL}/api/v1/auth`, credentials, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -135,24 +137,25 @@ export const loginUser = async (credentials) => {
       };
     }
   } catch (error) {
-    if (error.response) {
-      return {
-        success: false,
-        status: error.response.status,
-        error: error.response.data?.message || "Login failed",
-        details: error.response.data,
-      };
-    } else if (error.request) {
-      return {
-        success: false,
-        error: "No response from server. Please check your internet connection.",
-      };
-    } else {
-      return {
-        success: false,
-        error: "An error occurred during login. Please try again.",
-      };
-    }
+    // if (error.response) {
+    //   return {
+    //     success: false,
+    //     status: error.response.status,
+    //     error: error.response.data?.message || "Login failed",
+    //     details: error.response.data,
+    //   };
+    // } else if (error.request) {
+    //   return {
+    //     success: false,
+    //     error: "No response from server. Please check your internet connection.",
+    //   };
+    // } else {
+    //   return {
+    //     success: false,
+    //     error: "An error occurred during login. Please try again.",
+    //   };
+    // }
+    return `Login failed: ${error.message}`
   }
 };
 
@@ -211,7 +214,7 @@ export const logoutUser = async () => {
   try {
     const token = getToken();
     if (token) {
-      await axios.post(
+      await api.post(
         `${API_URL}/api/v1/auth/logout`,
         {},
         {
@@ -301,7 +304,7 @@ export const getUserDashboard = async ({ page = 1, limit = 10 } = {}) => {
       return { success: false, error: "Not authenticated" };
     }
     const token = getToken();
-    let response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+    const response = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -402,7 +405,7 @@ export const getUserDashboard = async ({ page = 1, limit = 10 } = {}) => {
 export const getAuthenticatedRequest = async (url, options = {}) => {
   try {
     const token = getToken();
-    const response = await axios.get(`${API_URL}${url}`, {
+    const response = await api.get(`${API_URL}${url}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -482,13 +485,14 @@ export const getAuthenticatedRequest = async (url, options = {}) => {
       error: error.response?.data?.message || error.message || "Request failed",
       details: error.response?.data,
     };
+    return `Request failed: ${error.message}`
   }
 };
 
 export const postAuthenticatedRequest = async (url, data = {}, options = {}) => {
   try {
     const token = getToken();
-    const response = await axios.post(`${API_URL}${url}`, data, {
+    const response = await api.post(`${API_URL}${url}`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -568,13 +572,14 @@ export const postAuthenticatedRequest = async (url, data = {}, options = {}) => 
       error: error.response?.data?.message || error.message || "Request failed",
       details: error.response?.data,
     };
+    return `Request failed: ${error.message}`
   }
 };
 
 export const putAuthenticatedRequest = async (url, data = {}, options = {}) => {
   try {
     const token = getToken();
-    const response = await axios.put(`${API_URL}${url}`, data, {
+    const response = await api.put(`${API_URL}${url}`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -654,13 +659,14 @@ export const putAuthenticatedRequest = async (url, data = {}, options = {}) => {
       error: error.response?.data?.message || error.message || "Request failed",
       details: error.response?.data,
     };
+    return `Request failed: ${error.message}`
   }
 };
 
 export const deleteAuthenticatedRequest = async (url, options = {}) => {
   try {
     const token = getToken();
-    const response = await axios.delete(`${API_URL}${url}`, {
+    const response = await api.delete(`${API_URL}${url}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -740,6 +746,7 @@ export const deleteAuthenticatedRequest = async (url, options = {}) => {
       error: error.response?.data?.message || error.message || "Request failed",
       details: error.response?.data,
     };
+    return `Request failed: ${error.message}`
   }
 };
 
@@ -788,9 +795,8 @@ export const isLoggedIn = async () => {
 
     return true;
   } catch (error) {
-    console.error("Error checking token validity:", error);
-    clearAuthData();
-    return false;
+    clearAuthData()
+    return `Error checking token validity: ${error.message}`
   }
 };
 
@@ -798,8 +804,7 @@ export const decodeToken = (token) => {
   try {
     return jwtDecode(token);
   } catch (error) {
-    console.error("Error decoding token:", error);
-    return {};
+    return `Error decoding token: ${error.message}`
   }
 };
 
@@ -818,8 +823,7 @@ export const getUserFromToken = () => {
     const { exp, iat, nbf, jti, ...userData } = decodedToken;
     return userData;
   } catch (error) {
-    console.error("Error extracting user from token:", error);
-    return null;
+    return `Error extracting user from token: ${error.message}`
   }
 };
 

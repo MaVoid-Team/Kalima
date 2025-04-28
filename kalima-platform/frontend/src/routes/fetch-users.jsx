@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -9,7 +10,7 @@ export const getAuthHeader = () => {
 // --------START FETCHING USERS--------
 export const getAllStudents = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/student`, {
+    const response = await api.get(`${API_URL}/api/v1/users/role/student`, {
       headers: getAuthHeader(),
     });
 
@@ -19,16 +20,13 @@ export const getAllStudents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch students",
-    };
+    return `Failed to fetch students: ${error.message}`
   }
 };
 
 export const getAllParents = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/parent`, {
+    const response = await api.get(`${API_URL}/api/v1/users/role/parent`, {
       headers: getAuthHeader(),
     });
 
@@ -38,16 +36,13 @@ export const getAllParents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch parents",
-    };
+    return `Failed to fetch parents : ${error.message}`
   }
 };
 
 export const getAllAssistants = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/role/assistant`, {
+    const response = await api.get(`${API_URL}/api/v1/users/role/assistant`, {
       headers: getAuthHeader(),
     });
 
@@ -57,16 +52,13 @@ export const getAllAssistants = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch assistants",
-    };
+    return `Failed to fetch assistants: ${error.message}`
   }
 };
 
 export const getAllLecturers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lecturers`, {
+    const response = await api.get(`${API_URL}/api/v1/lecturers`, {
       headers: getAuthHeader(),
     });
 
@@ -76,16 +68,13 @@ export const getAllLecturers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lecturers",
-    };
+    return `Failed to fetch lecturers: ${error.message}`
   }
 };
 
 export const getUserById = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/${userId}`, {
+    const response = await api.get(`${API_URL}/api/v1/users/${userId}`, {
       headers: getAuthHeader(),
     });
 
@@ -95,16 +84,13 @@ export const getUserById = async (userId) => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch user",
-    };
+    return `Failed to fetch user : ${error.message}`
   }
 };
 
 export const getAllUsers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/`, {
+    const response = await api.get(`${API_URL}/api/v1/users/`, {
       headers: getAuthHeader(),
     });
 
@@ -114,10 +100,7 @@ export const getAllUsers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch users",
-    };
+    return `Failed to fetch users: ${error.message}`
   }
 };
 // --------END FETCHING USERS--------
@@ -125,21 +108,18 @@ export const getAllUsers = async () => {
 // --------START CREATE USER--------
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/users/`, userData, {
+    const response = await api.post(`${API_URL}/api/v1/users/`, userData, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to create user",
-    };
+    return `Failed to create user: ${error.message}`
   }
 };
 
 export const bulkCreateUsers = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/users/accounts/bulk-create`, formData, {
+    const response = await api.post(`${API_URL}/api/v1/users/accounts/bulk-create`, formData, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "multipart/form-data",
@@ -147,10 +127,7 @@ export const bulkCreateUsers = async (formData) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to bulk create users",
-    };
+    return `Failed to bulk create users: ${error.message}`
   }
 };
 
@@ -159,15 +136,12 @@ export const bulkCreateUsers = async (formData) => {
 // --------START DELETE USER--------
 export const deleteUser = async (userId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/users/${userId}`, {
+    const response = await api.delete(`${API_URL}/api/v1/users/${userId}`, {
       headers: getAuthHeader(),
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to delete user",
-    };
+    return `Failed to delete user: ${error.message}`
   }
 };
 // --------END DELETE USER--------

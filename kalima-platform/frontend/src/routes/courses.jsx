@@ -1,4 +1,5 @@
 import axios from "axios"
+import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeader = () => {
@@ -8,7 +9,7 @@ const getAuthHeader = () => {
 
 export const getAllSubjects = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/subjects/`, {
+    const response = await api.get(`${API_URL}/api/v1/subjects/`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -18,17 +19,13 @@ export const getAllSubjects = async () => {
       data: response.data.data, // This will contain the subjects array
     };
   } catch (error) {
-    console.error("Error fetching subjects:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch subjects",
-    };
+    return `Failed to fetch subjects: ${error.message}`
   }
 };
 
 export const getSubjectById = async (subjectId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/subjects/${subjectId}`, {
+    const response = await api.get(`${API_URL}/api/v1/subjects/${subjectId}`, {
       headers: getAuthHeader(),
     })
 
@@ -37,16 +34,13 @@ export const getSubjectById = async (subjectId) => {
       data: response.data.data, // Access the data property from the response
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch subject",
-    }
+    return `Failed to fetch subject: ${error.message}`
   }
 }
 
 export const getLecturesBySubject = async (subjectId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures?subject=${subjectId}`, {
+    const response = await api.get(`${API_URL}/api/v1/lectures?subject=${subjectId}`, {
       headers: getAuthHeader(),
     })
     return {
@@ -54,9 +48,6 @@ export const getLecturesBySubject = async (subjectId) => {
       data: response.data.data.lectures // Adjust based on your API response
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lectures"
-    }
+    return `Failed to fetch lectures : ${error.message}`
   }
 }
