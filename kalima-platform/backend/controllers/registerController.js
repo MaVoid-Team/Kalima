@@ -40,32 +40,6 @@ const validatePassword = (password) => {
   }
 };
 
-const validateEmailFormat = (name, phoneNumber, email) => {
-  if (!phoneNumber || phoneNumber.length < 4) {
-    return false;
-  }
-  
-  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
-  const lastFourDigits = phoneNumber.slice(-4);
-  
-  const expectedEmailPrefix = `${cleanName}${lastFourDigits}`;
-  
-  const providedEmailPrefix = email.split('@')[0].toLowerCase();
-  
-  return providedEmailPrefix === expectedEmailPrefix;
-};
-
-const getExpectedEmailFormat = (name, phoneNumber) => {
-  if (!phoneNumber || phoneNumber.length < 4) {
-    return null;
-  }
-  
-  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
-  const lastFourDigits = phoneNumber.slice(-4);
-  
-  return `${cleanName}${lastFourDigits}@[your-domain]`;
-};
-
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -93,17 +67,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(new AppError("Email is required", 400));
   }
   
-  if (phoneNumber) {
-    const isEmailFormatValid = validateEmailFormat(name, phoneNumber, email);
-    if (!isEmailFormatValid) {
-      const expectedFormat = getExpectedEmailFormat(name, phoneNumber);
-      return next(new AppError(
-        `Email must follow the format: ${expectedFormat} where [your-domain] can be any valid domain`,
-        400
-      ));
-    }
-  }
-
   const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
   if (duplicateEmail) {
@@ -153,6 +116,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     email: email.toLowerCase().trim(),
     password: hashedPwd,
     children: childrenById,
+    isEmailVerified: true, // Set users to already verified by default
     ...userData,
   };
   
@@ -196,7 +160,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   if (user) {
     return res
       .status(201)
-      .json({ message: `User created successfully with name ${name}.` });
+      .json({ 
+        message: `User created successfully with name ${name}.`
+      });
   } else {
     return next(new AppError("Invalid user data received", 400));
   }
