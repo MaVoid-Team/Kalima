@@ -4,6 +4,7 @@ import React from "react";
 const AssistantForm = ({ userData, handleChange, lecturers }) => {
   return (
     <div className="form-control">
+      <div className="flex flex-col gap-4">
       <label className="label">
         <span className="label-text">المعلم المسؤول</span>
       </label>
@@ -21,6 +22,7 @@ const AssistantForm = ({ userData, handleChange, lecturers }) => {
           </option>
         ))}
       </select>
+      </div>
     </div>
   );
 };

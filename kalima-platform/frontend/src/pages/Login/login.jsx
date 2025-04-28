@@ -95,7 +95,7 @@ const TeacherLogin = () => {
           </p>
           
           {/* Tabs */}
-          <div className="tabs tabs-boxed mb-6">
+          <div className="tabs tabs-border mb-6">
             <button 
               className={`tab ${activeTab === 'phone_tab' ? 'tab-active' : ''}`}
               onClick={() => setActiveTab('phone_tab')}

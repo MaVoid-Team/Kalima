@@ -116,7 +116,7 @@ const PromoCodeGenerator = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8" dir={dir}>
+    <div className="rounded-lg shadow-md p-6 mb-8" dir={dir}>
       <div className="flex items-center gap-2 mb-6">
         <Ticket className="text-primary w-6 h-6" />
         <h2 className="text-xl font-bold">{t('admin.generatePromoCodes')}</h2>
@@ -139,7 +139,8 @@ const PromoCodeGenerator = () => {
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="form-control">
-            <label className="label">
+              <div className=" flex flex-col items-start gap-2">
+              <label className="label">
               <span className="label-text font-medium">
                 {t('admin.form.pointsAmount')}
               </span>
@@ -153,9 +154,11 @@ const PromoCodeGenerator = () => {
               min="1"
               required
             />
+              </div>
           </div>
 
           <div className="form-control">
+            <div className=" flex flex-col items-start gap-2">
             <label className="label">
               <span className="label-text font-medium">
                 {t('admin.form.numCodes')}
@@ -171,6 +174,7 @@ const PromoCodeGenerator = () => {
               max="100"
               required
             />
+            </div>
           </div>
 
           <div className="form-control">
