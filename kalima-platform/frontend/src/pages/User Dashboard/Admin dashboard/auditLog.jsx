@@ -197,7 +197,7 @@ const AuditLog = () => {
         </div>
 
         {/* Action Filter */}
-        <div className="dropdown dropdown-end bg-base-100 z-50">
+        <div className="dropdown dropdown-end bg-base-100">
           <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.action || t('admin.auditlog.filters.action')}</span>

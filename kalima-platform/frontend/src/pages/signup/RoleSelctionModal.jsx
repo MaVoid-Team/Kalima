@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ChevronRight, GraduationCap, Users, BookOpen } from "lucide-react"
+import { ChevronRight, GraduationCap, Users, BookOpen, X } from "lucide-react"
+import {useNavigate} from "react-router-dom"
 
 // Role icons and colors mapping
 const roleConfig = {
@@ -25,8 +26,12 @@ const roleConfig = {
 
 export default function RoleSelectionModal({ onSelectRole, t }) {
   const [hoveredRole, setHoveredRole] = useState(null)
-
+  const navigate = useNavigate()
   // Animation variants
+  const handleNavigateBack = () => {
+    navigate(-1)
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -57,6 +62,9 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-secondary/10 rounded-full -ml-12 -mb-12"></div>
+        <div className="btn btn-circle btn-sm absolute top-4 left-4">
+          <X onClick={handleNavigateBack}/>
+        </div>
 
         <div className="px-6 py-8">
           <motion.h3
