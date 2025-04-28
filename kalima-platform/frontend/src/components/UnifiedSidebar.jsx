@@ -28,6 +28,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
   // Fetch user data on mount
   useEffect(() => {
     const fetchUserData = async () => {
