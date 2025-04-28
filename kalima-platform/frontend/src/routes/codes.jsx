@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL;
  */
 export const redeemPromoCode = async (code) => {
   try {
-    const response = await axios.post(
+    const response = await api.post(
       `${API_URL}/api/v1/codes/redeem`,
       { code },
       {
@@ -26,16 +27,17 @@ export const redeemPromoCode = async (code) => {
     );
     return { success: true, data: response.data };
   } catch (error) {
-    if (error.response) {
-      // Server responded with a status outside 2xx
-      return { success: false, error: error.response.data.message || 'Redemption failed' };
-    } else if (error.request) {
-      // No response received from server
-      return { success: false, error: 'No response from server' };
-    } else {
-      // Error in request setup
-      return { success: false, error: 'Request setup error' };
-    }
+    // if (error.response) {
+    //   // Server responded with a status outside 2xx
+    //   return { success: false, error: error.response.data.message || 'Redemption failed' };
+    // } else if (error.request) {
+    //   // No response received from server
+    //   return { success: false, error: 'No response from server' };
+    // } else {
+    //   // Error in request setup
+    //   return { success: false, error: 'Request setup error' };
+    // }
+    return `Redemption failed:${error.message}`
   }
 };
 
@@ -58,7 +60,7 @@ export const generatePromoCodes = async (data) => {
       throw new Error("Lecturer ID is required for specific promo codes");
     }
 
-    const response = await axios.post(
+    const response = await api.post(
       `${API_URL}/api/v1/codes`,
       data,
       {
@@ -83,10 +85,6 @@ export const generatePromoCodes = async (data) => {
       };
     }
   } catch (error) {
-    console.error("Error generating promo codes:", error);
-    return {
-      status: "error",
-      message: error.response?.data?.message || error.message || "Failed to generate promo codes"
-    };
+    return `Failed to generate promo codes: ${error.message}`
   }
 };

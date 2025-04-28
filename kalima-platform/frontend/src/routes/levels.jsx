@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper function to get auth headers
@@ -9,7 +10,7 @@ const getAuthHeader = () => {
 
 export const getAllLevels = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/levels/`, {
+    const response = await api.get(`${API_URL}/api/v1/levels/`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -19,10 +20,6 @@ export const getAllLevels = async () => {
       data: response.data.data, // This will contain the levels array
     };
   } catch (error) {
-    console.error("Error fetching levels:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch levels",
-    };
+    return `Error fetching levels: ${error.message}`
   }
 };

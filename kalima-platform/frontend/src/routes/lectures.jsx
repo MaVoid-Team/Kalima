@@ -1,12 +1,13 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Function to get all containers
 export const getAllContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers`, {
+    const response = await api.get(`${API_URL}/api/v1/containers`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -14,29 +15,27 @@ export const getAllContainers = async () => {
     })
     return response.data
   } catch (error) {
-    console.error("Error fetching containers:", error)
-    throw error
+    return `Error fetching containers: ${error.message}`
   }
 }
 
 // Function to get all containers
 export const getAllContainersPublic = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/public`, {
+    const response = await api.get(`${API_URL}/api/v1/containers/public`, {
       withCredentials: true,
 
     })
 
     return response.data
   } catch (error) {
-    console.error("Error fetching containers:", error)
-    throw error
+    return `Error fetching containers: ${error.message}`
   }
 }
 //Function to purchase a container
 export const purchaseContainer = async (containerId) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/purchases/container`, 
+    const response = await api.post(`${API_URL}/api/v1/purchases/container`, 
       { containerId }, // Send containerId in the request body
       {
         withCredentials: true,
@@ -50,8 +49,7 @@ export const purchaseContainer = async (containerId) => {
     return response;
     
   } catch (error) {
-    console.error(`Error purchasing container ${containerId}:`, error)
-    throw error;
+    return `Error purchasing container : ${error.message}`
   }
 }
 // Function to get a container by ID
@@ -61,7 +59,7 @@ export const getContainerById = async (containerId) => {
       throw new Error("Missing container ID");
     }
 
-    const response = await axios.get(
+    const response = await api.get(
       `${API_URL}/api/v1/containers/${containerId}`,
       {
         withCredentials: true,
@@ -79,8 +77,7 @@ export const getContainerById = async (containerId) => {
     return response.data;
 
   } catch (error) {
-    console.error(`Error fetching container ${containerId}:`, error);
-    throw error; // Propagate the error
+    return `Error fetching container : ${error.message}`
   }
 };
 
@@ -95,7 +92,7 @@ export const getLectureAttachments = async (lectureId) => {
       };
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
+    const response = await api.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -106,33 +103,26 @@ export const getLectureAttachments = async (lectureId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error fetching lecture attachments:", error);
-
-    return {
-      status: "error",
-      message:
-        error.response?.data?.message || "Failed to fetch lecture attachments. Please try again later.",
-    };
+    return `Failed to fetch lecture attachments. Please try again later : ${error.message}`
   }
 };
 
 export const getAllLecturesPublic = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
+    const response = await api.get(`${API_URL}/api/v1/lectures/public`, {
       withCredentials: true,
       auth: `Bearer ${getToken()}`,
     })
     return response.data
   }
   catch (error) {
-    console.error("Error fetching lectures:", error)
-    throw error
+    return `Error fetching lectures: ${error.message}`
   }
 }
 
 export const createLecture = async (lectureData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
+    const response = await api.post(`${API_URL}/api/v1/lectures`, lectureData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -142,13 +132,12 @@ export const createLecture = async (lectureData) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error creating lecture:", error);
-    throw error;
+    return `Error creating lecture: ${error.message}`
   }
 };
 export const createContainer = async (containerData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/containers`, containerData, {
+    const response = await api.post(`${API_URL}/api/v1/containers`, containerData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -158,14 +147,13 @@ export const createContainer = async (containerData) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error creating container:", error);
-    throw error;
+    return `Error creating container: ${error.message}`
   }
 };
 
 export const getMyContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/my-containers`, {
+    const response = await api.get(`${API_URL}/api/v1/containers/my-containers`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -178,33 +166,27 @@ export const getMyContainers = async () => {
     }
   } catch (error) {
     console.error("Error fetching my containers:", error)
-    return {
-      status: "error",
-      error: error.response?.data?.message || "Failed to fetch containers"
-    }
+    return `Failed to fetch containers : ${error.message}`
   }
 }
 
 // Function to get all lectures
 export const getAllLectures = async () => {
   try {
-    const response = await axios.get(`${API_URL}`, {withCredentials: true,
+    const response = await api.get(`${API_URL}`, {withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },});
     return response.data;
   } catch (error) {
     console.error("Error fetching lectures:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lectures",
-    };
+    return `Failed to fetch lectures : ${error.message}`
   }
 };
 
 export const getContainersByLecturerId = async (lecturerId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/containers/lecturer/${lecturerId}`, {
+    const response = await api.get(`${API_URL}/api/v1/containers/lecturer/${lecturerId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -212,8 +194,7 @@ export const getContainersByLecturerId = async (lecturerId) => {
     });
     return response.data;
   } catch (error) {
-    console.error(`Error fetching containers for lecturer ${lecturerId}:`, error);
-    throw error;
+    return `Error fetching containers for lecturer ${lecturerId}: ${error.message}`;
   }
 };
 
@@ -246,8 +227,7 @@ export const getLecturesByContainerId = async (containerId) => {
 
     return { data: { lectures } }
   } catch (error) {
-    console.error(`Error fetching lectures for container ${containerId}:`, error)
-    throw error
+    return `Error fetching lectures for container ${containerId}: ${error.message}`;
   }
 }
 
@@ -255,7 +235,7 @@ export const getLecturesByContainerId = async (containerId) => {
 // Function to get a lecture by ID
 export const getLectureById = async (lectureId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/${lectureId}`, {
+    const response = await api.get(`${API_URL}/api/v1/lectures/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -266,17 +246,14 @@ export const getLectureById = async (lectureId) => {
       data: response.data.data, // Access the data property from the response
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lecture",
-    }
+    return error.message;
   }
 }
 
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/containers/${containerId}`, {
+    const response = await api.delete(`${API_URL}/api/v1/containers/${containerId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -286,7 +263,6 @@ export const deleteContainerById = async (containerId) => {
     }
     return response.data
   } catch (error) {
-    alert(`Error deleting container ${containerId}:`, error)
-    throw error
+    return `Error deleting container ${containerId}: ${error.message}`;
   }
 }
