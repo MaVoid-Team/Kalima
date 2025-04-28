@@ -249,6 +249,7 @@ const NavBar = () => {
                     {t(item.key)}
                   </Link>
                 ))}
+                
               </div>
             </div>
           </div>
