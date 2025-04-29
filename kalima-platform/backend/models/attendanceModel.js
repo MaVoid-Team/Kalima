@@ -61,6 +61,14 @@ const attendanceSchema = new mongoose.Schema(
       ref: "User", // Refers to the base User model (Assistant/Admin)
       required: true,
     },
+    isBookletPurchased: {
+      type: Boolean,
+      default: false,
+    },
+    isNotGroup: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
