@@ -12,6 +12,8 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     studentId,
     lessonId,
     paymentType,
+    isBookletPurchased,
+    isNotGroup
   } = req.body;
   const recordedById = req.user._id;
   if (!studentId || !lessonId || !paymentType) {
@@ -72,6 +74,8 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     amountPaid: 0,
     sessionsPaidFor: 0,
     sessionsRemaining: 0,
+    isBookletPurchased: isBookletPurchased || false,
+    isNotGroup: isNotGroup || false,
   };
 
   if (paymentType === "daily") {
@@ -120,6 +124,11 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     attendanceData.amountPaid = 0;
   } else {
     return next(new AppError("Invalid payment type.", 400));
+  }
+
+  // Add booklet price to total if purchased
+  if (attendanceData.isBookletPurchased && lesson.bookletPrice) {
+    attendanceData.amountPaid += lesson.bookletPrice;
   }
 
   console.log("DEBUG: Final attendanceData before create:", attendanceData); // Added console log
