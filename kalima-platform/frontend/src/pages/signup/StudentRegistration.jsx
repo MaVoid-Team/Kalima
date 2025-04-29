@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RoleSelectionModal from './RoleSelctionModal';
 
-const apiUrl = process.env.REACT_APP_BASE_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 const hobbiesList = [
   { id: 1, name: 'reading', img: '/hobbies/reading.jpg' },
   { id: 2, name: 'sports', img: '/hobbies/sports.jpg' },

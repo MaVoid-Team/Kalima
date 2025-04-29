@@ -4,6 +4,7 @@ import React from "react";
 const ParentForm = ({ userData, handleChange }) => {
   return (
     <div className="form-control">
+      <div className="flex flex-col gap-4">
       <label className="label">
         <span className="label-text">رقم الهاتف</span>
       </label>
@@ -15,6 +16,7 @@ const ParentForm = ({ userData, handleChange }) => {
         onChange={handleChange}
         required
       />
+      </div>
     </div>
   );
 };

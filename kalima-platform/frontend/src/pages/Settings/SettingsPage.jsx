@@ -34,22 +34,6 @@ function SettingsPage() {
       confirmPassword: "",
     })
   }, [t])
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    checkIfMobile()
-    window.addEventListener("resize", checkIfMobile)
-
-    return () => {
-      window.removeEventListener("resize", checkIfMobile)
-    }
-  }, [])
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen)
-  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -64,17 +48,6 @@ function SettingsPage() {
       className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen bg-base-100`} 
       dir={isRTL ? 'ltr' : 'rtl'}
     >
-      {/* Mobile Sidebar Toggle Button */}
-      <div className={`md:hidden fixed top-16 ${isRTL ? 'left-4' : 'right-4'} z-50`}>
-        <button
-          id="sidebar-toggle"
-          className="btn btn-circle btn-primary"
-          onClick={toggleSidebar}
-          aria-label={t('toggleSidebar')}
-        >
-          <FaBars className="w-5 h-5" />
-        </button>
-      </div>
       <div className="container mx-auto">
 
         {/* Main Content */}
