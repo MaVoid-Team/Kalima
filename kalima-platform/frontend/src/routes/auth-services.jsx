@@ -38,7 +38,7 @@ refreshAxiosInstance.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url === `${API_URL}/api/v1/auth/refresh`
+      originalRequest.url === `${API_URL}/auth/refresh`
     ) {
       clearAuthData();
       processQueue(new Error("Token refresh failed"));
@@ -162,7 +162,7 @@ export const loginUser = async (credentials) => {
 export const requestPasswordReset = async (email) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/password-reset/request`,
+      `${API_URL}/password-reset/request`,
       { email },
       {
         headers: {
@@ -179,7 +179,7 @@ export const requestPasswordReset = async (email) => {
 export const verifyOtp = async (email, otp) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/password-reset/verify-otp`,
+      `${API_URL}/password-reset/verify-otp`,
       { email, otp },
       {
         headers: {
@@ -196,7 +196,7 @@ export const verifyOtp = async (email, otp) => {
 export const resetPassword = async (resetToken, password, confirmPassword) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/password-reset/reset`,
+      `${API_URL}/password-reset/reset`,
       { resetToken, password, confirmPassword },
       {
         headers: {
@@ -256,7 +256,7 @@ export const refreshToken = async () => {
       return { success: false, error: "No token available" };
     }
     const response = await refreshAxiosInstance.post(
-      `${API_URL}/api/v1/auth/refresh`,
+      `${API_URL}/auth/refresh`,
       {},
       {
         headers: {
@@ -325,7 +325,7 @@ export const getUserDashboard = async ({ page = 1, limit = 10 } = {}) => {
           failedQueue.push({ resolve, reject });
         })
           .then((newToken) => {
-            return axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+            return axios.get(`${API_URL}/users/me/dashboard`, {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${newToken}`,
@@ -349,7 +349,7 @@ export const getUserDashboard = async ({ page = 1, limit = 10 } = {}) => {
         const refreshResult = await refreshToken();
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken);
-          const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+          const response = await axios.get(`${API_URL}/users/me/dashboard`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
