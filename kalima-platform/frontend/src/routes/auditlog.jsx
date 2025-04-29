@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -43,10 +44,7 @@ export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
       data: response.data.data
     };
   } catch (error) {
-    return {
-      status: "error",
-      error: error.response?.data?.message || error.message
-    };
+    return `error: ${error.message}`
   }
 };
 export const getAuditLogById = async (logId) => {
@@ -68,10 +66,6 @@ export const getAuditLogById = async (logId) => {
       data: response.data
     };
   } catch (error) {
-    console.error(`Error fetching audit log ${logId}:`, error);
-    return {
-      status: "error",
-      error: error.response?.data?.message || error.message || "Failed to fetch audit log"
-    };
+    return `Error fetching audit log ${logId}: ${error.message}`
   }
 };

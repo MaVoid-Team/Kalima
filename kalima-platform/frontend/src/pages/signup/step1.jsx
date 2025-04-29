@@ -16,6 +16,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
 
       {/* Common fields */}
       <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.fullName')}</span>
         </label>
@@ -31,10 +32,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
             {t(errors.fieldName)}
           </span>
         )}
-              
+        
+        </div>      
       </div>
 
       <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.gender')}</span>
         </label>
@@ -49,9 +52,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
           <option value="male">{t('gender.male')}</option>
           <option value="female">{t('gender.female')}</option>
         </select>
+        </div>
       </div>
 
       <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.phoneNumber')}</span>
         </label>
@@ -67,12 +72,14 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
       {t(errors.fieldName)}
     </span>
   )}
+        </div>
       </div>
 
       {/* Student-specific fields */}
       {role === 'student' && (
         <>
           <div className="form-control relative pb-5">
+            <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text">{t('form.grade')}</span>
             </label>
@@ -95,9 +102,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
               {t(errors.fieldName)}
             </span>
           )}
-              </div>
-
-         
+            </div>
+            </div>
         </> 
       )}
     </div>

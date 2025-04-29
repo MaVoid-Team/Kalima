@@ -1,4 +1,5 @@
 import axios from "axios";
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,10 +20,7 @@ export const getAllStudents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch students",
-    };
+    return `Failed to fetch students: ${error.message}`
   }
 };
 
@@ -38,10 +36,7 @@ export const getAllParents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch parents",
-    };
+    return `Failed to fetch parents : ${error.message}`
   }
 };
 
@@ -57,10 +52,7 @@ export const getAllAssistants = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch assistants",
-    };
+    return `Failed to fetch assistants: ${error.message}`
   }
 };
 
@@ -76,10 +68,7 @@ export const getAllLecturers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lecturers",
-    };
+    return `Failed to fetch lecturers: ${error.message}`
   }
 };
 
@@ -95,10 +84,7 @@ export const getUserById = async (userId) => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch user",
-    };
+    return `Failed to fetch user : ${error.message}`
   }
 };
 
@@ -114,10 +100,7 @@ export const getAllUsers = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch users",
-    };
+    return `Failed to fetch users: ${error.message}`
   }
 };
 // --------END FETCHING USERS--------
@@ -130,10 +113,7 @@ export const createUser = async (userData) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to create user",
-    };
+    return `Failed to create user: ${error.message}`
   }
 };
 
@@ -147,10 +127,7 @@ export const bulkCreateUsers = async (formData) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to bulk create users",
-    };
+    return `Failed to bulk create users: ${error.message}`
   }
 };
 
@@ -164,10 +141,7 @@ export const deleteUser = async (userId) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to delete user",
-    };
+    return `Failed to delete user: ${error.message}`
   }
 };
 // --------END DELETE USER--------

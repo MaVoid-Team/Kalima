@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { getToken, isLoggedIn } from './auth-services';
+import api from '../services/errorHandling';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,20 +41,21 @@ export const updateUser = async (userId, updateData) => {
       data: response.data
     };
   } catch (error) {
-    console.error("Error updating user:", error);
+    // console.error("Error updating user:", error);
     
-    // Log more detailed error information for debugging
-    if (error.response) {
-      console.error("Error response data:", error.response.data);
-      console.error("Error response status:", error.response.status);
-    }
+    // // Log more detailed error information for debugging
+    // if (error.response) {
+    //   console.error("Error response data:", error.response.data);
+    //   console.error("Error response status:", error.response.status);
+    // }
 
-    // Return appropriate error message
-    return {
-      success: false,
-      error: error.response?.data?.message || 
-             "Failed to update user information. Please try again."
-    };
+    // // Return appropriate error message
+    // return {
+    //   success: false,
+    //   error: error.response?.data?.message || 
+    //          "Failed to update user information. Please try again."
+    // };
+    return `Error updating user: ${error.message}`
   }
 };
 
@@ -83,11 +85,6 @@ export const updateCurrentUser = async (updateData) => {
     // Call the updateUser function with the retrieved ID and the updated data that includes the role
     return updateUser(userId, updatedData);
   } catch (error) {
-    console.error("Error updating current user:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || 
-             "Failed to update user information. Please try again."
-    };
+    return `Error updating current user: ${error.message}`
   }
 };

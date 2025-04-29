@@ -55,9 +55,9 @@ export const CourseCard = ({
         </div>
         
         <div className="flex items-center mt-2">
-          <div className="avatar placeholder">
+          <div className="avatar avatar-placeholder">
             <div className="bg-neutral text-neutral-content rounded-full w-8">
-              <span>{teacher?.[0] || '?'}</span>
+              <span>{teacher?.[0] + teacher?.[1] || '?'}</span>
             </div>
           </div>
           <div className={isRTL ? 'mr-2' : 'ml-2'}>

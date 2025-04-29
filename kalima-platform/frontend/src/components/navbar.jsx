@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import ThemeSwitcher from './ThemeSwitcher';
 import LanguageSwitcher from './LanguageSwitcher';
-import { isLoggedIn, getUserDashboard } from '../routes/auth-services'; // Adjust the import path as necessary
+import { isLoggedIn, getUserDashboard, logoutUser } from '../routes/auth-services';
 
 const NavBar = () => {
   const { t, i18n } = useTranslation('common');
@@ -13,20 +12,36 @@ const NavBar = () => {
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      if (isLoggedIn()) {
+  const fetchUserRole = async () => {
+    if (isLoggedIn()) {
+      try {
         const result = await getUserDashboard();
         if (result.success) {
           setUserRole(result.data.data.userInfo.role);
         } else {
           setUserRole(null);
         }
-      } else {
+      } catch (err) {
         setUserRole(null);
+        console.error(err);
       }
+    } else {
+      setUserRole(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserRole();
+
+    // Listen for login status changes
+    const handleStorageChange = () => {
+      fetchUserRole();
     };
-    fetchDashboard();
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -48,6 +63,16 @@ const NavBar = () => {
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
   }, [menuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      setUserRole(null);
+      setMenuOpen(false);
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   const getDashboardPath = (role) => {
     switch (role) {
@@ -128,12 +153,10 @@ const NavBar = () => {
                 {t(item.key)}
               </Link>
             ))}
-            {userRole ? (
+            {userRole && (
               <Link to={getDashboardPath(userRole)} className="btn btn-ghost rounded-2xl">
                 {t('dashboard')}
               </Link>
-            ) : (
-              <ThemeSwitcher />
             )}
             <LanguageSwitcher />
           </div>
@@ -141,19 +164,28 @@ const NavBar = () => {
 
         {/* Auth buttons - Desktop */}
         <div className="flex-none hidden lg:flex gap-2 ml-4">
-          {authItems.map((item) => (
-            <Link
-              key={item.key}
-              to={item.path}
-              className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
+          {userRole ? (
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline rounded-2xl"
             >
-              {t(item.key)}
-            </Link>
-          ))}
+              {t('logout')}
+            </button>
+          ) : (
+            authItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
+              >
+                {t(item.key)}
+              </Link>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Mobile menu - Drawer style for latest daisyUI */}
+      {/* Mobile menu - Drawer style */}
       {menuOpen && (
         <>
           {/* Backdrop overlay */}
@@ -230,25 +262,29 @@ const NavBar = () => {
               <div className="divider"></div>
               
               <div className="flex flex-col gap-2">
-                {!userRole && (
-                  <div className="mb-2">
-                    <ThemeSwitcher />
-                  </div>
-                )}
                 <div className="mb-4">
                   <LanguageSwitcher />
                 </div>
                 
-                {authItems.map((item) => (
-                  <Link
-                    key={item.key}
-                    to={item.path}
-                    className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} w-full justify-start`}
-                    onClick={() => setMenuOpen(false)}
+                {userRole ? (
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-outline w-full justify-start"
                   >
-                    {t(item.key)}
-                  </Link>
-                ))}
+                    {t('logout')}
+                  </button>
+                ) : (
+                  authItems.map((item) => (
+                    <Link
+                      key={item.key}
+                      to={item.path}
+                      className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} w-full justify-start`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {t(item.key)}
+                    </Link>
+                  ))
+                )}
               </div>
             </div>
           </div>

@@ -174,15 +174,15 @@ const CreateUserModal = ({
         </h3>
 
         {/* Toggle between single and bulk user creation */}
-        <div className="tabs mb-4">
+        <div className="tabs tabs-border mb-4">
           <button
-            className={`tab tab-bordered ${!isBulkMode ? "tab-active" : ""}`}
+            className={`tab ${!isBulkMode ? "tab-active" : ""}`}
             onClick={() => setIsBulkMode(false)}
           >
             إنشاء مستخدم واحد
           </button>
           <button
-            className={`tab tab-bordered ${isBulkMode ? "tab-active" : ""}`}
+            className={`tab ${isBulkMode ? "tab-active" : ""}`}
             onClick={() => setIsBulkMode(true)}
           >
             إنشاء بالجملة
@@ -205,6 +205,7 @@ const CreateUserModal = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
+                <div className="flex flex-col gap-2">
                 <label className="label">
                   <span className="label-text">نوع الحساب</span>
                 </label>
@@ -220,9 +221,11 @@ const CreateUserModal = ({
                   <option value="lecturer">معلم</option>
                   <option value="assistant">مساعد</option>
                 </select>
+                </div>
               </div>
 
               <div className="form-control">
+                <div className="flex flex-col gap-2">
                 <label className="label">
                   <span className="label-text">الجنس</span>
                 </label>
@@ -236,10 +239,12 @@ const CreateUserModal = ({
                   <option value="male">ذكر</option>
                   <option value="female">أنثى</option>
                 </select>
+                </div>
               </div>
             </div>
 
             <div className="form-control">
+              <div className="flex flex-col gap-2">
               <label className="label">
                 <span className="label-text">الاسم</span>
               </label>
@@ -251,9 +256,11 @@ const CreateUserModal = ({
                 onChange={handleChange}
                 required
               />
+              </div>
             </div>
 
             <div className="form-control">
+              <div className="flex flex-col gap-2">
               <label className="label">
                 <span className="label-text">البريد الإلكتروني</span>
               </label>
@@ -265,10 +272,12 @@ const CreateUserModal = ({
                 onChange={handleChange}
                 required
               />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
+                <div className="flex flex-col gap-2">
                 <label className="label">
                   <span className="label-text">كلمة المرور</span>
                 </label>
@@ -280,9 +289,11 @@ const CreateUserModal = ({
                   onChange={handleChange}
                   required
                 />
+                </div>
               </div>
 
               <div className="form-control">
+                <div className="flex flex-col gap-2">
                 <label className="label">
                   <span className="label-text">تأكيد كلمة المرور</span>
                 </label>
@@ -294,6 +305,7 @@ const CreateUserModal = ({
                   onChange={handleChange}
                   required
                 />
+                </div>
               </div>
             </div>
 

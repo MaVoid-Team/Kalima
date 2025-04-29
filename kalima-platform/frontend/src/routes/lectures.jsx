@@ -1,5 +1,6 @@
 import axios from "axios"
 import { getToken, isLoggedIn } from "./auth-services"
+import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,8 +15,7 @@ export const getAllContainers = async () => {
     })
     return response.data
   } catch (error) {
-    console.error("Error fetching containers:", error)
-    throw error
+    return `Error fetching containers: ${error.message}`
   }
 }
 
@@ -29,8 +29,7 @@ export const getAllContainersPublic = async () => {
 
     return response.data
   } catch (error) {
-    console.error("Error fetching containers:", error)
-    throw error
+    return `Error fetching containers: ${error.message}`
   }
 }
 //Function to purchase a container
@@ -50,8 +49,7 @@ export const purchaseContainer = async (containerId) => {
     return response;
     
   } catch (error) {
-    console.error(`Error purchasing container ${containerId}:`, error)
-    throw error;
+    return `Error purchasing container : ${error.message}`
   }
 }
 // Function to get a container by ID
@@ -79,8 +77,7 @@ export const getContainerById = async (containerId) => {
     return response.data;
 
   } catch (error) {
-    console.error(`Error fetching container ${containerId}:`, error);
-    throw error; // Propagate the error
+    return `Error fetching container : ${error.message}`
   }
 };
 
@@ -106,13 +103,7 @@ export const getLectureAttachments = async (lectureId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error fetching lecture attachments:", error);
-
-    return {
-      status: "error",
-      message:
-        error.response?.data?.message || "Failed to fetch lecture attachments. Please try again later.",
-    };
+    return `Failed to fetch lecture attachments. Please try again later : ${error.message}`
   }
 };
 
@@ -125,8 +116,7 @@ export const getAllLecturesPublic = async () => {
     return response.data
   }
   catch (error) {
-    console.error("Error fetching lectures:", error)
-    throw error
+    return `Error fetching lectures: ${error.message}`
   }
 }
 
@@ -142,8 +132,7 @@ export const createLecture = async (lectureData) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error creating lecture:", error);
-    throw error;
+    return `Error creating lecture: ${error.message}`
   }
 };
 export const createContainer = async (containerData) => {
@@ -158,8 +147,7 @@ export const createContainer = async (containerData) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error creating container:", error);
-    throw error;
+    return `Error creating container: ${error.message}`
   }
 };
 
@@ -178,27 +166,21 @@ export const getMyContainers = async () => {
     }
   } catch (error) {
     console.error("Error fetching my containers:", error)
-    return {
-      status: "error",
-      error: error.response?.data?.message || "Failed to fetch containers"
-    }
+    return `Failed to fetch containers : ${error.message}`
   }
 }
 
 // Function to get all lectures
 export const getAllLectures = async () => {
   try {
-    const response = await axios.get(`${API_URL}`, {withCredentials: true,
+    const response = await api.get(`${API_URL}`, {withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },});
     return response.data;
   } catch (error) {
     console.error("Error fetching lectures:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lectures",
-    };
+    return `Failed to fetch lectures : ${error.message}`
   }
 };
 
@@ -212,8 +194,7 @@ export const getContainersByLecturerId = async (lecturerId) => {
     });
     return response.data;
   } catch (error) {
-    console.error(`Error fetching containers for lecturer ${lecturerId}:`, error);
-    throw error;
+    return `Error fetching containers for lecturer ${lecturerId}: ${error.message}`;
   }
 };
 
@@ -246,8 +227,7 @@ export const getLecturesByContainerId = async (containerId) => {
 
     return { data: { lectures } }
   } catch (error) {
-    console.error(`Error fetching lectures for container ${containerId}:`, error)
-    throw error
+    return `Error fetching lectures for container ${containerId}: ${error.message}`;
   }
 }
 
@@ -266,10 +246,7 @@ export const getLectureById = async (lectureId) => {
       data: response.data.data, // Access the data property from the response
     }
   } catch (error) {
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch lecture",
-    }
+    return error.message;
   }
 }
 
@@ -286,7 +263,6 @@ export const deleteContainerById = async (containerId) => {
     }
     return response.data
   } catch (error) {
-    alert(`Error deleting container ${containerId}:`, error)
-    throw error
+    return `Error deleting container ${containerId}: ${error.message}`;
   }
 }

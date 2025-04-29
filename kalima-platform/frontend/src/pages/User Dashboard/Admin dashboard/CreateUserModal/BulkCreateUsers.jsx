@@ -70,6 +70,7 @@ const BulkCreateUsers = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="form-control">
+          <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">Account Type</span>
           </label>
@@ -87,9 +88,11 @@ const BulkCreateUsers = () => {
             <option value="assistant">Assistants</option>
             <option value="moderator">Moderators</option>
           </select>
+          </div>
         </div>
 
         <div className="form-control">
+          <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">Upload CSV File</span>
           </label>
@@ -101,6 +104,7 @@ const BulkCreateUsers = () => {
             onChange={handleFileChange}
             required
           />
+          </div>
         </div>
 
         <div className="form-control mt-4">

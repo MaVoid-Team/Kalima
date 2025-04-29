@@ -29,7 +29,8 @@ const LecturerForm = ({ userData, handleChange, subjects }) => {
   return (
     <>
       <div className="form-control">
-        <label className="label">
+       <div className="flex flex-col gap-4">
+       <label className="label">
           <span className="label-text">المواد الدراسية</span>
         </label>
         <div className="flex gap-2">
@@ -55,6 +56,7 @@ const LecturerForm = ({ userData, handleChange, subjects }) => {
           >
             إضافة
           </button>
+       </div>
         </div>
         
         {selectedSubjects.length > 0 && (
@@ -76,8 +78,9 @@ const LecturerForm = ({ userData, handleChange, subjects }) => {
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-4">
         <label className="label">
-          <span className="label-text">نبذة شخصية (اختياري)</span>
+          <span className="label-text">نبذة شخصية</span>
         </label>
         <textarea
           name="bio"
@@ -86,11 +89,13 @@ const LecturerForm = ({ userData, handleChange, subjects }) => {
           onChange={handleChange}
           rows="3"
         ></textarea>
+        </div>
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-4">
         <label className="label">
-          <span className="label-text">التخصص (اختياري)</span>
+          <span className="label-text">التخصص</span>
         </label>
         <input
           type="text"
@@ -99,6 +104,7 @@ const LecturerForm = ({ userData, handleChange, subjects }) => {
           value={userData.expertise || ""}
           onChange={handleChange}
         />
+        </div>
       </div>
     </>
   );

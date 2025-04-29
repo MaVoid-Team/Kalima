@@ -4,6 +4,7 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
   return (
     <div className="space-y-4">
       <div className="form-control">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t("form.email")}</span>
         </label>
@@ -16,9 +17,11 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
           required
         />
         {errors.email && <span className="text-error text-sm mt-1">{t("validation.email")}</span>}
+        </div>
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t("form.password")}</span>
         </label>
@@ -31,9 +34,11 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
           required
         />
         {errors.password && <span className="text-error text-sm mt-1">{t("validation.password")}</span>}
+        </div>
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t("form.validatepassword")}</span>
         </label>
@@ -46,9 +51,11 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
           required
         />
         {errors.confirmPassword && <span className="text-error text-sm mt-1">{t("validation.passwordMatch")}</span>}
+        </div>
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t("form.bio")}</span>
         </label>
@@ -64,9 +71,11 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
             {formData.bio?.length === 0 ? t("validation.required") : t("validation.bioMinimum")}
           </span>
         )}
+        </div>
       </div>
 
       <div className="form-control">
+        <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t("form.expertise")}</span>
         </label>
@@ -79,6 +88,7 @@ export default function StepLecturer({ formData, handleInputChange, t, errors })
           required
         />
         {errors.expertise && <span className="text-error text-sm mt-1">{t("validation.required")}</span>}
+        </div>
       </div>
     </div>
   )
