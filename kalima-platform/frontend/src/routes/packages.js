@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchPackages = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/v1/packages/`, {
+        const response = await axios.get(`${API_URL}/packages/`, {
             headers: {
                 Authorization: `Bearer ${getToken()}`,
             },
