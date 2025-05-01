@@ -7,6 +7,12 @@ const attendanceSchema = new mongoose.Schema(
       ref: "cStudent", // Refers to the base User model
       required: true,
     },
+    // Add studentSequencedId as a dedicated field for direct querying
+    studentSequencedId: {
+      type: Number,
+      required: true,
+      index: true // Add an index for faster lookups
+    },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
@@ -77,18 +83,23 @@ const attendanceSchema = new mongoose.Schema(
 
 // Index to efficiently find the latest multi-session payment for a student/lecturer/subject/level
 attendanceSchema.index({
-  student: 1,
+  studentSequencedId: 1, // Use sequencedId instead of student ID
   lecturer: 1,
   subject: 1,
   level: 1,
   paymentType: 1,
   attendanceDate: -1,
 });
+
+// Index for querying by student sequenced ID and lesson
+attendanceSchema.index({ studentSequencedId: 1, lesson: 1 });
+
+// Other existing indexes
 // Index for querying attendance by lesson and date
 attendanceSchema.index({ lesson: 1, attendanceDate: 1 });
 // Index for querying by center and date
 attendanceSchema.index({ center: 1, attendanceDate: 1 });
-// Index for querying by student and lesson
+// Index for querying by student and lesson (keep for backward compatibility)
 attendanceSchema.index({ student: 1, lesson: 1 }, { unique: true });
 
 const Attendance = mongoose.model("Attendance", attendanceSchema);
