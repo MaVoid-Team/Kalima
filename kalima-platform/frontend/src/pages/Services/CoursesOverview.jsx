@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-const CoursesSection = React.memo(
+const CoursesOverviews = React.memo(
   ({ isRTL = false, imageUrl = "/education-banner.png" }) => {
     const content = useMemo(
       () => ({
@@ -63,4 +63,4 @@ const CoursesSection = React.memo(
     );
   }
 );
-export default CoursesSection;
+export default CoursesOverviews;
