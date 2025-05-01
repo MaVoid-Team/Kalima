@@ -220,7 +220,7 @@ const UserManagementTable = () => {
       <div className="w-full overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr className={`${isRTL ? "text-end" : "text-start"}`}>
+            <tr className={`${isRTL ? "text-right" : "text-left"}`}>
               {['name', 'phone', 'accountType', 'status', 'actions'].map(header => (
                 <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
                   {t(`admin.table.${header}`)}
@@ -230,13 +230,13 @@ const UserManagementTable = () => {
           </thead>
           <tbody>
             {currentUsers.map((user) => (
-              <tr key={user._id} className={`${isRTL ? "text-end" : "text-start"} border-t`}>
+              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
                 <td className="py-4 whitespace-nowrap">{user.name}</td>
                 <td className="py-4 whitespace-nowrap">{user.phoneNumber || t('admin.NA')}</td>
                 <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
                 <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
                 <td className="py-4 whitespace-nowrap">
-                  <div className={`flex items-center gap-2 ${isRTL ? "justify-end" : "justify-start"}`}>
+                  <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
                     {user.phoneNumber && (
                       <button
                         className="btn btn-success btn-xs"
