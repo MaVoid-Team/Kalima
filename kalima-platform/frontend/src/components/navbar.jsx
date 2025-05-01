@@ -110,6 +110,9 @@ const NavBar = () => {
         {/* Left side - Logo and navigation items */}
         <div className="flex items-center gap-4">
           {/* Mobile menu button */}
+          <div>
+            
+          </div>
           <button
             className="btn btn-ghost lg:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -202,10 +205,10 @@ const NavBar = () => {
           >
             <div className="p-4 space-y-4 h-full">
               {/* Mobile menu header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-around mb-6">
                 <Link to="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
                   <img 
-                    src="/kalima.jpg" 
+                    src="/Kalima.jpg" 
                     alt="Logo" 
                     className="w-10 h-10 rounded-full"
                   />
