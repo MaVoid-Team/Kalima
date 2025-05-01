@@ -102,4 +102,17 @@ router
     containerController.getContainerRevenue
   );
 
+// Get lecturer revenue per month from container sales
+router
+  .get(
+    "/:lecturerId/monthly-revenue",
+    authController.verifyRoles(
+      "Admin",
+      "Sub-Admin",
+      "Moderator",
+      "Lecturer"
+    ),
+    containerController.getLecturerRevenueByMonth
+  );
+
 module.exports = router;

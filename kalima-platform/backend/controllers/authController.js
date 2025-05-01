@@ -48,6 +48,7 @@ const login = catchAsync(async (req, res, next) => {
     );
   }
 
+  // The check for existing tokens is now handled in sendToken function
   await sendToken(foundUser, res);
 });
 

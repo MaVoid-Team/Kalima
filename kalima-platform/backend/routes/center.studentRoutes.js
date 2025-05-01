@@ -13,4 +13,8 @@ router
   .patch(cStudentController.updateStudent)
   .delete(cStudentController.deleteStudent);
 
+router
+  .route("/sequenced/:sequencedId")
+  .get(cStudentController.getStudentBySequencedId);
+
 module.exports = router;
