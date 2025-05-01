@@ -1,6 +1,6 @@
 const cStudent = require("../models/center.studentModel");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const cParent = require("../models/center.parentModel"); // Import parent model
 

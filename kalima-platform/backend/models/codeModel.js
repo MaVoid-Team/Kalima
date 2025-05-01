@@ -4,11 +4,11 @@ const codeSchema = new mongoose.Schema({
   code: {
     type: String,
     required: true,
-    unique: true,
+    unique: true,  // This already creates an index
   },
   type: {
     type: String,
-    enum: ["general", "specific"],
+    enum: ["general", "specific", "promo"],
     required: true,
   },
   pointsAmount: {
@@ -37,10 +37,8 @@ const codeSchema = new mongoose.Schema({
   redeemedAt: {
     type: Date,
     default: null,
-  },
+  }
 });
-
-codeSchema.indexes({ code: 1 });
 
 codeSchema.methods.generateCode = function () {
   const objectIdHex = this._id.toString();
