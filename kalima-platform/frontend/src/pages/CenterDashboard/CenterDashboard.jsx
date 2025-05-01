@@ -8,8 +8,8 @@ import LecturersList from "./LecturersList";
 import CourseList from "./CourseList";
 import ActivityTracker from "./ActivityTracker";
 import AddCourseForm from "./AddCourseForm";
-import BarcodeScannerAndroid from "./BarcodeScannerMobile"; // Import the Android component
-import QrScannerCard from "./QrScannerCard"; // Assuming this is your existing desktop scanner component
+import BarcodeScannerAndroid from "./BarcodeScannerMobile";
+import QrScannerCard from "./QrScannerCard";
 
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
 

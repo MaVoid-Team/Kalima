@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { FaSync, FaWhatsapp } from "react-icons/fa";
 import Pagination from "../../../../components/Pagination";
 import CreateUserModal from "../CreateUserModal/CreateUserModal";
-
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation('admin');
   const isRTL = i18n.language === "ar";
@@ -26,7 +25,7 @@ const UserManagementTable = () => {
     userName: ""
   });
   const [whatsappMessage, setWhatsappMessage] = useState("");
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
@@ -60,7 +59,7 @@ const UserManagementTable = () => {
   }, [filters, users]);
 
   const applyFilters = () => {
-    const filtered = users.filter(user => 
+    const filtered = users.filter(user =>
       (!filters.name || user.name.toLowerCase().includes(filters.name.toLowerCase())) &&
       (!filters.phone || user.phoneNumber?.includes(filters.phone)) &&
       (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
@@ -79,7 +78,7 @@ const UserManagementTable = () => {
 
   const handleDelete = async (userId) => {
     if (!window.confirm(t('admin.confirmDelete'))) return;
-    
+
     try {
       const result = await deleteUser(userId);
       if (result.success) {
@@ -113,7 +112,7 @@ const UserManagementTable = () => {
       alert(t('admin.noPhoneNumber'));
       return;
     }
-    
+
     setWhatsappModal({
       isOpen: true,
       phoneNumber,
@@ -125,14 +124,14 @@ const UserManagementTable = () => {
   // Send WhatsApp message
   const sendWhatsappMessage = () => {
     let formattedNumber = whatsappModal.phoneNumber.replace(/\D/g, '');
-    
+
     if (!formattedNumber.startsWith('2')) {
       formattedNumber = '2' + formattedNumber;
     }
-    
+
     const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, '_blank');
-    
+
     setWhatsappModal({
       isOpen: false,
       phoneNumber: "",
@@ -166,7 +165,7 @@ const UserManagementTable = () => {
   }
 
   return (
-    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-slate-100" dir={dir}>
+    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-primary" dir={dir}>
       <h1 className={`text-3xl font-bold mb-8 ${isRTL ? "text-right" : "text-left"}`}>{t('admin.userManagement.title')}</h1>
 
       {/* Filters and Actions */}
@@ -177,19 +176,19 @@ const UserManagementTable = () => {
             placeholder={t('admin.filters.name')}
             className="input input-bordered"
             value={filters.name}
-            onChange={e => setFilters({...filters, name: e.target.value})}
+            onChange={e => setFilters({ ...filters, name: e.target.value })}
           />
           <input
             type="text"
             placeholder={t('admin.filters.phone')}
             className="input input-bordered"
             value={filters.phone}
-            onChange={e => setFilters({...filters, phone: e.target.value})}
+            onChange={e => setFilters({ ...filters, phone: e.target.value })}
           />
           <select
             className="select select-bordered"
             value={filters.role}
-            onChange={e => setFilters({...filters, role: e.target.value})}
+            onChange={e => setFilters({ ...filters, role: e.target.value })}
           >
             <option value="">{t('admin.filters.allTypes')}</option>
             {['student', 'parent', 'lecturer'].map(role => (
@@ -199,7 +198,7 @@ const UserManagementTable = () => {
           <select
             className="select select-bordered"
             value={filters.status}
-            onChange={e => setFilters({...filters, status: e.target.value})}
+            onChange={e => setFilters({ ...filters, status: e.target.value })}
           >
             <option value="">{t('admin.filters.allStatus')}</option>
             <option value={t('admin.status.valid')}>{t('admin.status.valid')}</option>
@@ -218,12 +217,12 @@ const UserManagementTable = () => {
       </div>
 
       {/* Users Table */}
-      <div className="w-full overflow-auto">
+      <div className="w-full overflow-x-auto">
         <table className="table w-full">
           <thead>
             <tr className={`${isRTL ? "text-right" : "text-left"}`}>
-              {['actions', 'status', 'accountType', 'phone', 'name'].map(header => (
-                <th key={header} className="pb-4 text-lg font-medium">
+              {['name', 'phone', 'accountType', 'status', 'actions'].map(header => (
+                <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
                   {t(`admin.table.${header}`)}
                 </th>
               ))}
@@ -232,10 +231,14 @@ const UserManagementTable = () => {
           <tbody>
             {currentUsers.map((user) => (
               <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
-                <td className="py-4">
-                  <div className={`flex items-center ${isRTL ? "justify-end" : "justify-start"} gap-2`}>
+                <td className="py-4 whitespace-nowrap">{user.name}</td>
+                <td className="py-4 whitespace-nowrap">{user.phoneNumber || t('admin.NA')}</td>
+                <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
+                <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
+                <td className="py-4 whitespace-nowrap">
+                  <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
                     {user.phoneNumber && (
-                      <button 
+                      <button
                         className="btn btn-success btn-xs"
                         onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
                         title={t('admin.actions.whatsapp')}
@@ -243,7 +246,7 @@ const UserManagementTable = () => {
                         <FaWhatsapp />
                       </button>
                     )}
-                    <button 
+                    <button
                       className="btn btn-error btn-xs"
                       onClick={() => handleDelete(user._id)}
                     >
@@ -251,18 +254,15 @@ const UserManagementTable = () => {
                     </button>
                   </div>
                 </td>
-                <td className="py-4">{getStatus(user)}</td>
-                <td className="py-4">{getRoleLabel(user.role)}</td>
-                <td className="py-4">{user.phoneNumber || t('admin.NA')}</td>
-                <td className="py-4">{user.name}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
+
       {/* Pagination */}
-      <Pagination 
+      <Pagination
         currentPage={currentPage}
         totalItems={filteredUsers.length}
         itemsPerPage={usersPerPage}
@@ -276,7 +276,7 @@ const UserManagementTable = () => {
       />
 
       {/* Create User Modal */}
-      <CreateUserModal 
+      <CreateUserModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreateUser={handleCreateUser}

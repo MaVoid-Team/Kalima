@@ -179,7 +179,7 @@ const AuditLog = () => {
         </div>
 
         {/* Role Filter */}
-        <div className="dropdown dropdown-end bg-base-100 z-50">
+        <div className="dropdown dropdown-end bg-base-100">
           <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.role || t('admin.auditlog.filters.role')}</span>
@@ -253,64 +253,71 @@ const AuditLog = () => {
 
       {/* Logs Table */}
       {!loading && !error && (
-        <div className="overflow-x-auto">
-          <table className={`table w-full`}>
-            <thead>
-              <tr>
-                {['user', 'role', 'action', 'resource', 'datetime', 'status'].map(header => (
-                  <th key={header} className={`${isRTL ? 'text-right' : 'text-left'} `}>
-                    {t(`admin.auditlog.columns.${header}`)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {logs.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-8">
-                    {t('admin.auditlog.noRecords')}
-                  </td>
-                </tr>
-              ) : (
-                logs.map(log => (
-                  <tr key={log._id} className="hover">
-                    <td>{log.user?.name || t('admin.auditlog.status.unknown')}</td>
-                    <td>{translateRole(log.user?.role)}</td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        {getActionIcon(log.action)}
-                        {translateAction(log.action)}
-                      </div>
-                    </td>
-                    <td className="py-4">
-                    {log.resource?.type && (
-                      <div className="flex items-center justify-start gap-2">
-                        <span>
-                        {t(`admin.auditlog.resources.${log.resource.type}`)}
-                        {log.resource.id && ` (${t('admin.auditlog.idDisplay', { id: log.resource.id })})`}
-                      </span>
-                      </div>
-                    )}
-                    </td>
-                    <td>
-                      <div className="flex flex-col">
-                        <span>{formatDate(log.timestamp)}</span>
-                        <span>{formatTime(log.timestamp)}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(log.status)}
-                        {translateStatus(log.status)}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+  <div className="overflow-x-auto">
+    <table className="table w-full">
+      <thead>
+        <tr>
+          {['user', 'action', 'datetime'].map(header => (
+            <th key={header} className={`${isRTL ? 'text-right' : 'text-left'} text-sm`}>
+              {t(`admin.auditlog.columns.${header}`)}
+            </th>
+          ))}
+          {['role', 'resource', 'status'].map(header => (
+            <th key={header} className={`${isRTL ? 'text-right' : 'text-left'} text-sm hidden sm:table-cell`}>
+              {t(`admin.auditlog.columns.${header}`)}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {logs.length === 0 ? (
+          <tr>
+            <td colSpan="6" className="text-center py-8 text-sm">
+              {t('admin.auditlog.noRecords')}
+            </td>
+          </tr>
+        ) : (
+          logs.map(log => (
+            <tr key={log._id} className="hover">
+              <td className="text-sm py-2">{log.user?.name || t('admin.auditlog.status.unknown')}</td>
+              <td className="text-sm py-2">
+                <div className="flex items-center gap-2">
+                  {getActionIcon(log.action)}
+                  {translateAction(log.action)}
+                </div>
+              </td>
+              <td className="text-sm py-2">
+                <div className="flex flex-col">
+                  <span>{formatDate(log.timestamp)}</span>
+                  <span>{formatTime(log.timestamp)}</span>
+                </div>
+              </td>
+              <td className="text-sm py-2 hidden sm:table-cell">
+                {translateRole(log.user?.role)}
+              </td>
+              <td className="text-sm py-2 hidden sm:table-cell">
+                {log.resource?.type ? (
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {t(`admin.auditlog.resources.${log.resource.type}`)}
+                      {log.resource.id && ` (${t('admin.auditlog.idDisplay', { id: log.resource.id })})`}
+                    </span>
+                  </div>
+                ) : '-'}
+              </td>
+              <td className="text-sm py-2 hidden sm:table-cell">
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(log.status)}
+                  {translateStatus(log.status)}
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+)}
 
       {/* Pagination */}
       {!loading && !error && logs.length > 0 && (
