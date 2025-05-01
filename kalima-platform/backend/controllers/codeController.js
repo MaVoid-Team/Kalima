@@ -10,8 +10,17 @@ const Lecturer = require("../models/lecturerModel");
 // restricted to admin-center-lectural
 const createCodes = catchAsync(async (req, res, next) => {
   const { pointsAmount, numOfCodes, type, lecturerId } = req.body;
-  if (!pointsAmount || !numOfCodes || !type) {
-    return next(new AppError("All fields are required"));
+  if (!numOfCodes || !type) {
+    return next(new AppError("Code type and number of codes are required"));
+  }
+  
+  // For promo codes, we'll set a very large point amount (e.g., 1,000,000) 
+  // so users can purchase anything they want
+  const actualPointsAmount = type === "promo" ? 1000000 : pointsAmount;
+  
+  // Validate pointsAmount for non-promo codes
+  if (type !== "promo" && !pointsAmount) {
+    return next(new AppError("Points amount is required for non-promo codes"));
   }
 
   let lecturer = null;
@@ -28,7 +37,7 @@ const createCodes = catchAsync(async (req, res, next) => {
   const newCodes = [];
   for (let i = 0; i < numOfCodes; i++) {
     const codeDoc = new Code({
-      pointsAmount,
+      pointsAmount: actualPointsAmount,
       type,
       lecturerId: lecturer ? lecturer._id : null,
     });
@@ -109,7 +118,7 @@ const deleteCodes = catchAsync(async (req, res, next) => {
 const redeemCode = catchAsync(async (req, res, next) => {
   const { code } = req.body;
   if (!code) {
-    return next(new AppError("Code and Lecturer Id are required fields", 400));
+    return next(new AppError("Code is required", 400));
   }
 
   const session = await mongoose.startSession();
@@ -126,25 +135,76 @@ const redeemCode = catchAsync(async (req, res, next) => {
       );
     }
 
-    const currentUser = await User.findById(req.user._id).session(session);
-    if (!currentUser) {
+    // Instead of directly using User model, we need to find the user based on their role
+    let currentUser;
+    
+    // First, find the base user to get the role
+    const baseUser = await User.findById(req.user._id).session(session);
+    if (!baseUser) {
       await session.abortTransaction();
       return next(new AppError("User not found", 404));
     }
-    //specific type for lecturer
-    // add points to the specific lecturer's balance
-    if (isExistCode.type === "specific") {
+    
+    // Find the user in the appropriate model based on role
+    if (baseUser.role === 'Student') {
+      const Student = require('../models/studentModel');
+      currentUser = await Student.findById(req.user._id).session(session);
+      
+      // For promo codes, check if the student already has an active promo
+      if (isExistCode.type === "promo" && currentUser.hasPromoCode) {
+        await session.abortTransaction();
+        return next(new AppError("You already have an active promo code", 400));
+      }
+    } else if (baseUser.role === 'Parent') {
+      const Parent = require('../models/parentModel');
+      currentUser = await Parent.findById(req.user._id).session(session);
+    } else {
+      // If not a student or parent, use the base user model
+      currentUser = baseUser;
+    }
+    
+    if (!currentUser) {
+      await session.abortTransaction();
+      return next(new AppError("User profile not found", 404));
+    }
+
+    // Handle different code types
+    let responseMessage;
+    
+    if (isExistCode.type === "promo") {
+      // For promo codes: Mark the user as having a promo code
+      if (currentUser.hasPromoCode !== undefined) {
+        currentUser.hasPromoCode = true;
+        currentUser.hasUsedPromoCode = false; // Reset this flag if they're redeeming a new promo code
+        
+        // Store promo points separately instead of adding to general points
+        currentUser.promoPoints = isExistCode.pointsAmount;
+      }
+      
+      responseMessage = "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
+    } else if (isExistCode.type === "specific") {
+      // For specific lecturer codes: Add points to the specific lecturer's balance
+      if (!isExistCode.lecturerId) {
+        await session.abortTransaction();
+        return next(new AppError("This code is not properly configured", 500));
+      }
+      
       currentUser.addLecturerPoints(
         isExistCode.lecturerId,
         isExistCode.pointsAmount
       );
+      
+      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points for this lecturer`;
     } else {
-      //type is general
-      // add points to the general points balance
-      currentUser.generalPoints += isExistCode.pointsAmount;
+      // For general codes: Add points to the general points balance
+      currentUser.generalPoints = (currentUser.generalPoints || 0) + isExistCode.pointsAmount;
+      
+      responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general points`;
     }
+    
     await currentUser.save({ session });
 
+    // Mark the code as redeemed
     await Code.findOneAndUpdate(
       { code },
       {
@@ -157,9 +217,10 @@ const redeemCode = catchAsync(async (req, res, next) => {
     await session.commitTransaction();
     res.status(200).json({
       status: "success",
-      message: `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points`,
+      message: responseMessage,
     });
   } catch (error) {
+    console.error("Error redeeming code:", error);
     if (session.inTransaction()) {
       await session.abortTransaction();
     }
