@@ -30,4 +30,9 @@ router
     attendanceController.deleteAttendance
   );
 
+router.route("/student/:studentSequencedId").get(
+  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view specific student attendance
+  attendanceController.getAttendance
+);
+
 module.exports = router;

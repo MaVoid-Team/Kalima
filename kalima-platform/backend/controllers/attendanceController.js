@@ -156,7 +156,7 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
 
 // Get attendance by student sequenced ID
 exports.getAttendance = catchAsync(async (req, res, next) => {
-  const { studentSequencedId } = req.query;
+  const { studentSequencedId } = req.params;
   
   // If no sequencedId provided, require it
   if (!studentSequencedId) {
