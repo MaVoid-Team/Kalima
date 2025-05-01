@@ -739,3 +739,127 @@ exports.getContainerRevenue = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get lecturer revenue by month from container sales
+exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
+  const { lecturerId } = req.params;
+  const { startDate, endDate } = req.query;
+  
+  if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
+    return next(new AppError("Invalid lecturer ID format", 400));
+  }
+
+  // Build date filters
+  let dateFilter = {};
+  if (startDate || endDate) {
+    dateFilter = {};
+    if (startDate) {
+      dateFilter.$gte = new Date(startDate);
+    }
+    if (endDate) {
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999); // Include the whole end day
+      dateFilter.$lte = endOfDay;
+    }
+  }
+
+  // Aggregate pipeline to calculate revenue by month
+  const monthlyRevenue = await Purchase.aggregate([
+    {
+      $match: {
+        lecturer: new mongoose.Types.ObjectId(lecturerId),
+        type: "containerPurchase",
+        ...(Object.keys(dateFilter).length > 0 && { purchasedAt: dateFilter }),
+      }
+    },
+    {
+      $lookup: {
+        from: "containers",
+        localField: "container",
+        foreignField: "_id",
+        as: "containerDetails"
+      }
+    },
+    {
+      $unwind: "$containerDetails"
+    },
+    {
+      $project: {
+        year: { $year: "$purchasedAt" },
+        month: { $month: "$purchasedAt" },
+        revenue: "$containerDetails.price",
+        container: "$containerDetails._id",
+        containerName: "$containerDetails.name"
+      }
+    },
+    {
+      $group: {
+        _id: {
+          year: "$year",
+          month: "$month"
+        },
+        totalRevenue: { $sum: "$revenue" },
+        purchaseCount: { $sum: 1 },
+        containers: {
+          $addToSet: {
+            id: "$container",
+            name: "$containerName"
+          }
+        }
+      }
+    },
+    {
+      $sort: {
+        "_id.year": 1,
+        "_id.month": 1
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        year: "$_id.year",
+        month: "$_id.month",
+        totalRevenue: 1,
+        purchaseCount: 1,
+        containers: 1,
+        monthName: {
+          $let: {
+            vars: {
+              monthsInString: [
+                "", "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ]
+            },
+            in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] }
+          }
+        }
+      }
+    }
+  ]);
+
+  // Check if lecturer exists
+  const lecturer = await Lecturer.findById(lecturerId);
+  if (!lecturer && monthlyRevenue.length === 0) {
+    return next(new AppError("Lecturer not found or has no revenue data", 404));
+  }
+
+  // Calculate overall total revenue
+  const overallTotal = monthlyRevenue.reduce((sum, month) => sum + month.totalRevenue, 0);
+  const overallPurchaseCount = monthlyRevenue.reduce((sum, month) => sum + month.purchaseCount, 0);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      lecturer: lecturer ? {
+        id: lecturer._id,
+        name: lecturer.name
+      } : "Unknown lecturer",
+      monthlyRevenue,
+      summary: {
+        totalRevenue: overallTotal,
+        totalPurchases: overallPurchaseCount,
+        monthsWithRevenue: monthlyRevenue.length
+      }
+    }
+  });
+});

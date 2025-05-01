@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-
+const parentRoutes = require('./routes/parentRoutes');
 const mongoSanitize = require('express-mongo-sanitize');
 const express = require("express");
 const morgan = require("morgan");
@@ -42,6 +42,8 @@ const attendanceRouter = require("./routes/attendanceRoutes");
 const revenueRouter = require("./routes/revenueRoutes");
 const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
+const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
+const reportRouter = require("./routes/reportRoutes.js");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -53,7 +55,7 @@ if (process.env.NODE_ENV === "development") {
 }
 app.use("/api/v1/register", require("./routes/registerRoutes.js"));
 app.use("/api/v1/auth", require("./routes/authRoutes.js"));
-app.use("/api/v1/password-reset", require("./routes/passwordResetRoutes.js")); // Add password reset routes
+app.use("/api/v1/password-reset", require("./routes/passwordResetRoutes.js"));
 app.use("/api/v1/otp", require("./utils/emailVerification/otpRoutes.js"));
 app.use("/api/v1/containers", auditLogger, containerRouter);
 app.use("/api/v1/lectures", lectureRouter);
@@ -80,6 +82,9 @@ app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/revenue", revenueRouter);
 app.use("/api/v1/attachments", attachmentRouter);
 app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule router
+app.use('/api/v1/parents', parentRoutes);
+app.use('/api/v1/groupedLessons', groupedLessonsRouter);
+app.use('/api/v1/reports', reportRouter); // Mount report router
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
