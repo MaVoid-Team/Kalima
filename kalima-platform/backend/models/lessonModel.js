@@ -33,6 +33,10 @@ const lessonSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  courseOrmonth: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "groupedLessons",
+  },
 }, {
   timestamps: true,
 });
