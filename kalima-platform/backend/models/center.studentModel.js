@@ -9,16 +9,17 @@ const cStudentSchema = new mongoose.Schema(
     phone: {
       type: String,
       unique: true,
-      required: true,
+      required: false,
     },
     gender: {
       type: String,
       enum: ["male", "female"],
       required: true,
     },
-    parentPhoneNumber: {
-      type: String,
-      required: true,
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'cParent',
+      required: true
     },
     center: {
       type: mongoose.Schema.Types.ObjectId,
