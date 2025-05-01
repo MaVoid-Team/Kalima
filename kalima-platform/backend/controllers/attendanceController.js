@@ -277,6 +277,77 @@ exports.getAttendanceById = catchAsync(async (req, res, next) => {
   });
 });
 
+// Update attendance with exam results
+exports.updateExamResults = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { 
+    examScore, 
+    examMaxScore, 
+    examPassThreshold, 
+    examStatus, 
+    examDate, 
+    examNotes 
+  } = req.body;
+
+  // Validate required fields
+  if (!examScore && examScore !== 0) {
+    return next(new AppError('Exam score is required', 400));
+  }
+  
+  if (!examMaxScore && examMaxScore !== 0) {
+    return next(new AppError('Maximum exam score is required', 400));
+  }
+  
+  if (!examStatus) {
+    return next(new AppError('Exam status is required', 400));
+  }
+
+  // Check if attendance record exists
+  const attendanceRecord = await Attendance.findById(id);
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  // Update the attendance record with exam results
+  const updatedAttendance = await Attendance.findByIdAndUpdate(
+    id,
+    {
+      examScore,
+      examMaxScore,
+      examPassThreshold: examPassThreshold || examMaxScore / 2, // Default to 50% if not provided
+      examStatus,
+      examDate: examDate || new Date(),
+      examNotes
+    },
+    {
+      new: true,
+      runValidators: true
+    }
+  ).populate([
+    { path: 'student', select: 'name sequencedId' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
+
+  // Format response to emphasize sequencedId
+  const formattedRecord = updatedAttendance.toObject();
+  if (formattedRecord.student) {
+    formattedRecord.student = {
+      sequencedId: formattedRecord.student.sequencedId,
+      name: formattedRecord.student.name
+    };
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      attendance: formattedRecord
+    }
+  });
+});
+
 // Delete an attendance record (unchanged)
 exports.deleteAttendance = catchAsync(async (req, res, next) => {
   const attendanceRecord = await Attendance.findByIdAndDelete(req.params.id);
