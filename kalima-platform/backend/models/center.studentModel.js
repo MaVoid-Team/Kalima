@@ -30,9 +30,10 @@ const cStudentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add sequenced ID plugin
+// Add sequenced ID plugin with a unique counter name
 cStudentSchema.plugin(mongooseSequence, {
-  inc_field: "sequencedId",
+  inc_field: "center_students_seq",
+  id: "center_students_seq", // Add this line to use a unique counter name
   startAt: 4000000, // Starting at 4 million to differentiate from regular student IDs
 });
 
