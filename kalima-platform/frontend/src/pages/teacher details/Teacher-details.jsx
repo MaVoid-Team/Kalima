@@ -42,7 +42,7 @@ const CourseCard = ({ course, index }) => {
   const isRTL = i18n.language === 'ar';
 
   return (
-    <div className={`rounded-lg overflow-hidden border-2 border-warning bg-slate-50 z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 w-full max-w-md mx-auto relative ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`rounded-lg overflow-hidden border-2 border-warning z-10 hover:scale-105 hover:shadow-xl shadow-lg duration-500 w-full max-w-md mx-auto relative ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="relative">
         <img
           src={`/course-4.png`}
@@ -52,8 +52,8 @@ const CourseCard = ({ course, index }) => {
         <div className="absolute left-2 bottom-[-70px]">
           <img src="/Frame 81.png" alt="" className="h-12 w-12" />
         </div>
-        <div className="absolute right-4 sm:right-16 bottom-[-30px]">
-          <img src="/teacher.png" alt="" className="h-12 w-12" />
+        <div className="flex flex-row gap-x-2 absolute right-2 bottom-[-100px]">
+          <img src="/teacher.png" alt="" className="h-6 w-6" />
         </div>
       </div>
       <div className="p-3 text-right">
@@ -62,7 +62,7 @@ const CourseCard = ({ course, index }) => {
           {course.subject}-{course.class}
         </h5>
         <div className="flex justify-end">
-          <div className="flex items-start justify-evenly gap-1 mb-2 bg-[#E0F5F5] rounded-xl w-36 mt-2">
+          <div className="flex items-start justify-evenly gap-1 mb-2 rounded-xl w-36 mt-2">
             <h4 className="text-xs">{course.grade}</h4>
             <div className="w-5 h-5 rounded-full bg-transparent flex items-start justify-evenly">
               <img src="/school.png" alt="" />
