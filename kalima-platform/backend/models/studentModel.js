@@ -37,11 +37,25 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
     totalPoints: {
       type: Number,
       default: 0,
     },
+    // Flag for tracking if a promo code has been used
+    hasPromoCode: {
+      type: Boolean,
+      default: false
+    },
+    // Track if the promo code has been used for a purchase
+    hasUsedPromoCode: {
+      type: Boolean,
+      default: false
+    },
+    // Track promo code points separately
+    promoPoints: {
+      type: Number,
+      default: 0
+    }
   },
 
   {

@@ -66,7 +66,7 @@ export default function StudentRegistration() {
   const getStepErrors = (step) => {
     const errors = {};
     const { role } = formData;
-    const phoneRegex = /^\+?[1-9]\d{7,14}$/;
+    const phoneRegex = /^\+?[0-9]\d{7,14}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     // Make password validation less strict to allow testing
     const passwordRegex = /^.{4,}$/; // At least 4 characters
@@ -239,7 +239,7 @@ export default function StudentRegistration() {
       const url = `${apiUrl}/register`;
       const response = await axios.post(url, payload);
       console.log('Registration successful:', response.data);
-      navigate('/landing', { state: { message: t('registrationSuccess') } });
+      navigate('/login', { state: { message: t('registrationSuccess') } });
     } catch (error) {
       console.error('Registration failed:', error.response?.data || error.message);
       // You might want to show an error message to the user here

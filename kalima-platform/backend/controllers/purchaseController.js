@@ -295,22 +295,67 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     }
 
     // Check if user has enough points for this lecturer
-    const currentPoints = userModel.getLecturerPointsBalance(lecturerId);
+    const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
+    const generalPoints = userModel.generalPoints || 0;
+    const promoPoints = userModel.promoPoints || 0;
+    
+    // Log points balances for debugging
+    console.log(`User ID: ${userId}`);
+    console.log(`Lecturer points: ${lecturerPoints}`);
+    console.log(`General points: ${generalPoints}`);
+    console.log(`Promo points: ${promoPoints}`);
+    console.log(`Points required: ${pointsRequired}`);
+    console.log(`Has promo code: ${userModel.hasPromoCode}`);
+    console.log(`Has used promo code: ${userModel.hasUsedPromoCode}`);
 
-    if (currentPoints < pointsRequired) {
+    let purchaseType = '';
+    let isPromoCodePurchase = false;
+    
+    // First try to use lecturer-specific points
+    if (lecturerPoints >= pointsRequired) {
+      // Deduct from lecturer points
+      const success = userModel.useLecturerPoints(lecturerId, pointsRequired);
+      
+      if (!success) {
+        await session.abortTransaction();
+        return next(new AppError("Failed to deduct lecturer points", 500));
+      }
+      
+      purchaseType = 'Lecturer points';
+    } 
+    // If lecturer points aren't enough, check if user has an unused promo code
+    else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
+      // Mark the promo code as used 
+      userModel.hasUsedPromoCode = true;
+      
+      // Calculate how many promo points would remain after this purchase
+      const promoPointsUsed = pointsRequired;
+      const remainingPromoPoints = promoPoints - promoPointsUsed;
+      
+      // Set promoPoints to 0 to remove all promo points
+      userModel.promoPoints = 0;
+      
+      // Add a log for points deduction
+      console.log(`Removing all promo points. Used: ${promoPointsUsed}, Removed additional: ${remainingPromoPoints}`);
+      
+      purchaseType = 'Promo code (one-time use)';
+      isPromoCodePurchase = true;
+    }
+    // If no promo code, try using general points
+    else if (generalPoints >= pointsRequired) {
+      // Deduct from general points
+      userModel.generalPoints -= pointsRequired;
+      purchaseType = 'General points';
+    } 
+    // If neither has enough points
+    else {
+      await session.abortTransaction();
       return next(
         new AppError(
-          `Not enough points. Required: ${pointsRequired}, Available: ${currentPoints}`,
+          `Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`,
           400
         )
       );
-    }
-
-    // Deduct points
-    const success = userModel.useLecturerPoints(lecturerId, pointsRequired);
-
-    if (!success) {
-      return next(new AppError("Failed to deduct points", 500));
     }
 
     await userModel.save({ session });
@@ -321,14 +366,22 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         {
           student: userId,
           lecturer: lecturerId,
-          points: pointsRequired,
+          points: isPromoCodePurchase ? 0 : pointsRequired, // No points charged for promo purchase
           container: containerId,
-          type: "containerPurchase",
-          description: `Purchased container ${container.name} for ${pointsRequired} points`,
+          type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
+          description: `Purchased container ${container.name} ${isPromoCodePurchase ? 'using promotional code' : `for ${pointsRequired} points using ${purchaseType}`}`,
         },
       ],
       { session }
     );
+    
+    // Grant access if it's a lecture
+    if (container.kind === "Lecture") {
+      await studentLectureAccess.create(
+        [{ student: userId, lecture: containerId }],
+        { session }
+      );
+    }
 
     await session.commitTransaction();
 
@@ -336,7 +389,10 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       status: "success",
       data: {
         purchase: purchase[0],
-        remainingPoints: userModel.getLecturerPointsBalance(lecturerId),
+        remainingLecturerPoints: userModel.getLecturerPointsBalance(lecturerId),
+        remainingGeneralPoints: userModel.generalPoints,
+        usedPointsType: purchaseType,
+        promoUsed: isPromoCodePurchase
       },
     });
   } catch (error) {
@@ -517,13 +573,23 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
 
   // Get points balances
   pointsBalances = userModel.lecturerPoints || [];
+  const generalPoints = userModel.generalPoints || 0;
+  const promoPoints = userModel.promoPoints || 0;
+  const hasPromoCode = userModel.hasPromoCode || false;
 
+  // Log points balances for debugging
+  console.log(`User ${userModel.name} general points: ${generalPoints}`);
+  console.log(`User ${userModel.name} promo points: ${promoPoints}`);
+  
   res.status(200).json({
     status: "success",
     data: {
       userId,
       user: userModel.name,
       userRole: userModel.role || userModel.constructor.modelName,
+      generalPoints: generalPoints,
+      promoPoints: promoPoints,
+      hasActivePromoCode: hasPromoCode && !userModel.hasUsedPromoCode,
       pointsBalances,
     },
   });

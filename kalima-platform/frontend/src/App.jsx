@@ -10,7 +10,6 @@ import UnifiedSidebar from "./components/UnifiedSidebar"
 import { useTranslation } from "react-i18next"
 
 // Lazy load components
-const Home = lazy(() => import("./pages/Home/Home"))
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
 const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
 const CourseDetails = lazy(() => import("./pages/CourseDetails"))
@@ -112,10 +111,9 @@ function App() {
         <Suspense fallback={<LoadingSpinner fullScreen />}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Services />} />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/teachers" element={<Teachers />} />
-            <Route path="/services" element={<Services />} />
             
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
