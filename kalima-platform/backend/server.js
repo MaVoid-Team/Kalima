@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-
+const parentRoutes = require('./routes/parentRoutes');
 const mongoSanitize = require('express-mongo-sanitize');
 const express = require("express");
 const morgan = require("morgan");
@@ -42,6 +42,7 @@ const attendanceRouter = require("./routes/attendanceRoutes");
 const revenueRouter = require("./routes/revenueRoutes");
 const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
+const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
 connectDB();
 
 app.use(cors(corsOptions));
@@ -80,6 +81,8 @@ app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/revenue", revenueRouter);
 app.use("/api/v1/attachments", attachmentRouter);
 app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule router
+app.use('/api/v1/parents', parentRoutes);
+app.use('/api/v1/groupedLessons', groupedLessonsRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
