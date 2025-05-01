@@ -56,6 +56,28 @@ exports.getStudentById = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get student by sequenced ID
+exports.getStudentBySequencedId = catchAsync(async (req, res, next) => {
+  const { sequencedId } = req.params;
+  
+  if (!sequencedId) {
+    return next(new AppError("Sequenced ID is required", 400));
+  }
+  
+  const student = await cStudent.findOne({ sequencedId });
+  
+  if (!student) {
+    return next(new AppError("Student not found", 404));
+  }
+  
+  res.status(200).json({
+    status: "success",
+    data: {
+      student,
+    },
+  });
+});
+
 // Update a student by ID
 exports.updateStudent = catchAsync(async (req, res, next) => {
   const updatedStudent = await cStudent.findByIdAndUpdate(
