@@ -75,6 +75,29 @@ const attendanceSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // New exam result fields
+    examScore: {
+      type: Number,
+      min: 0
+    },
+    examMaxScore: {
+      type: Number,
+      min: 0
+    },
+    examPassThreshold: {
+      type: Number,
+      min: 0
+    },
+    examStatus: {
+      type: String,
+      enum: ["passed", "failed", "absent", "pending"],
+    },
+    examDate: {
+      type: Date
+    },
+    examNotes: {
+      type: String
+    }
   },
   {
     timestamps: true,
