@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mongooseSequence = require("mongoose-sequence")(mongoose);
 
 const cStudentSchema = new mongoose.Schema(
   {
@@ -29,5 +30,11 @@ const cStudentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Add sequenced ID plugin
+cStudentSchema.plugin(mongooseSequence, {
+  inc_field: "sequencedId",
+  startAt: 4000000, // Starting at 4 million to differentiate from regular student IDs
+});
 
 module.exports = mongoose.model("cStudent", cStudentSchema);
