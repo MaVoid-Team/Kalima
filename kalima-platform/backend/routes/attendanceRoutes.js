@@ -16,7 +16,7 @@ router
   )
   .get(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view lists
-    attendanceController.getAttendance
+    attendanceController.getAllAttendance
   );
 
 router
@@ -24,6 +24,10 @@ router
   .get(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view specific record
     attendanceController.getAttendanceById
+  )
+  .patch(
+    authController.verifyRoles("Assistant", "Admin", "Sub-Admin"), // Roles allowed to update attendance
+    attendanceController.updateAttendance
   )
   .delete(
     authController.verifyRoles("Admin", "Sub-Admin"), // Roles allowed to delete

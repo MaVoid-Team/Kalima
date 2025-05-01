@@ -64,7 +64,7 @@ exports.getStudentBySequencedId = catchAsync(async (req, res, next) => {
     return next(new AppError("Sequenced ID is required", 400));
   }
   
-  const student = await cStudent.findOne({ sequencedId });
+  const student = await cStudent.findOne({ center_students_seq : sequencedId });
   
   if (!student) {
     return next(new AppError("Student not found", 404));

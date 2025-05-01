@@ -43,6 +43,14 @@ const attendanceSchema = new mongoose.Schema(
       default: Date.now,
       required: true,
     },
+    // New fields for attendance duration tracking
+    leaveTime: {
+      type: Date
+    },
+    attendanceDuration: {
+      type: Number, // Duration in minutes
+      min: 0
+    },
     paymentType: {
       type: String,
       enum: ["daily", "multi-session", "unpaid"],

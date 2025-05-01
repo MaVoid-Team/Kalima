@@ -35,7 +35,7 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
   }
 
   // Find student by sequenced ID only
-  const student = await cStudent.findOne({ sequencedId: studentSequencedId }).lean();
+  const student = await cStudent.findOne({ center_students_seq: studentSequencedId }).lean();
   if (!student) {
     return next(new AppError(`Student with Sequenced ID ${studentSequencedId} not found.`, 404));
   }
@@ -66,7 +66,7 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
   // Prepare attendance data
   let attendanceData = {
     student: student._id, // We still store MongoDB ID internally
-    studentSequencedId: student.sequencedId, // But we also store sequencedId for easier lookup
+    studentSequencedId: student.center_students_seq, // But we also store sequencedId for easier lookup
     lesson: lessonId,
     center: lesson.center,
     lecturer: lesson.lecturer,
@@ -88,7 +88,7 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
   } else if (paymentType === "multi-session") {
     // Find the latest multi-session record for this student by sequencedId
     const latestMultiSessionRecord = await Attendance.findOne({
-      studentSequencedId: student.sequencedId, // Use sequencedId for lookup
+      studentSequencedId: student.center_students_seq, // Use sequencedId for lookup
       lecturer: lesson.lecturer,
       subject: lesson.subject,
       level: lesson.level,
@@ -145,7 +145,7 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
       attendance: {
         ...newAttendance.toObject(),
         student: {
-          sequencedId: student.sequencedId,
+          center_students_seq: student.center_students_seq,
           name: student.name
         }
       },
@@ -174,7 +174,7 @@ exports.getAttendance = catchAsync(async (req, res, next) => {
   .paginate();
   
   const attendanceRecords = await features.query.populate([
-    { path: 'student', select: 'name sequencedId' },
+    { path: 'student', select: 'name center_students_seq' },
     { path: 'lesson', select: 'startTime' },
     { path: 'lecturer', select: 'name' },
     { path: 'recordedBy', select: 'name' },
@@ -188,7 +188,7 @@ exports.getAttendance = catchAsync(async (req, res, next) => {
     const recordObj = record.toObject();
     if (recordObj.student) {
       recordObj.student = {
-        sequencedId: recordObj.student.sequencedId,
+        center_students_seq: recordObj.student.center_students_seq,
         name: recordObj.student.name
       };
     }
@@ -214,7 +214,7 @@ exports.getAllAttendance = catchAsync(async (req, res, next) => {
     .paginate();
 
   const attendanceRecords = await features.query.populate([
-    { path: 'student', select: 'name sequencedId' },
+    { path: 'student', select: 'name center_students_seq' },
     { path: 'lesson', select: 'startTime' },
     { path: 'lecturer', select: 'name' },
     { path: 'recordedBy', select: 'name' },
@@ -228,7 +228,7 @@ exports.getAllAttendance = catchAsync(async (req, res, next) => {
     const recordObj = record.toObject();
     if (recordObj.student) {
       recordObj.student = {
-        sequencedId: recordObj.student.sequencedId,
+        center_students_seq: recordObj.student.center_students_seq,
         name: recordObj.student.name
       };
     }
@@ -247,7 +247,7 @@ exports.getAllAttendance = catchAsync(async (req, res, next) => {
 // Get an attendance record by ID
 exports.getAttendanceById = catchAsync(async (req, res, next) => {
   const attendanceRecord = await Attendance.findById(req.params.id).populate([
-    { path: 'student', select: 'name sequencedId' },
+    { path: 'student', select: 'name center_students_seq' },
     { path: 'lesson', select: 'startTime' },
     { path: 'lecturer', select: 'name' },
     { path: 'recordedBy', select: 'name' },
@@ -264,7 +264,7 @@ exports.getAttendanceById = catchAsync(async (req, res, next) => {
   const formattedRecord = attendanceRecord.toObject();
   if (formattedRecord.student) {
     formattedRecord.student = {
-      sequencedId: formattedRecord.student.sequencedId,
+      center_students_seq: formattedRecord.student.center_students_seq,
       name: formattedRecord.student.name
     };
   }
@@ -297,10 +297,6 @@ exports.updateExamResults = catchAsync(async (req, res, next) => {
   if (!examMaxScore && examMaxScore !== 0) {
     return next(new AppError('Maximum exam score is required', 400));
   }
-  
-  if (!examStatus) {
-    return next(new AppError('Exam status is required', 400));
-  }
 
   // Check if attendance record exists
   const attendanceRecord = await Attendance.findById(id);
@@ -324,7 +320,7 @@ exports.updateExamResults = catchAsync(async (req, res, next) => {
       runValidators: true
     }
   ).populate([
-    { path: 'student', select: 'name sequencedId' },
+    { path: 'student', select: 'name center_students_seq' },
     { path: 'lesson', select: 'startTime' },
     { path: 'lecturer', select: 'name' },
     { path: 'subject', select: 'name' },
@@ -335,10 +331,78 @@ exports.updateExamResults = catchAsync(async (req, res, next) => {
   const formattedRecord = updatedAttendance.toObject();
   if (formattedRecord.student) {
     formattedRecord.student = {
-      sequencedId: formattedRecord.student.sequencedId,
+      center_students_seq: formattedRecord.student.center_students_seq,
       name: formattedRecord.student.name
     };
   }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      attendance: formattedRecord
+    }
+  });
+});
+
+// Update attendance record with leave time and calculate duration
+exports.updateAttendance = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  
+  // Check if attendance record exists
+  const attendanceRecord = await Attendance.findById(id);
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  // Use current server time as leave time
+  const parsedLeaveTime = new Date();
+
+  // Ensure leave time is after attendance date
+  const attendanceDate = new Date(attendanceRecord.attendanceDate);
+  if (parsedLeaveTime < attendanceDate) {
+    return next(new AppError('System time is earlier than attendance time, please check your system clock', 400));
+  }
+
+  // Calculate duration in minutes
+  const durationInMs = parsedLeaveTime - attendanceDate;
+  const durationInMinutes = Math.round(durationInMs / (1000 * 60));
+
+  // Update the attendance record
+  const updatedAttendance = await Attendance.findByIdAndUpdate(
+    id,
+    {
+      leaveTime: parsedLeaveTime,
+      attendanceDuration: durationInMinutes
+    },
+    {
+      new: true,
+      runValidators: true
+    }
+  ).populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'recordedBy', select: 'name' },
+    { path: 'center', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
+
+  // Format response to emphasize sequencedId
+  const formattedRecord = updatedAttendance.toObject();
+  if (formattedRecord.student) {
+    formattedRecord.student = {
+      center_students_seq: formattedRecord.student.center_students_seq,
+      name: formattedRecord.student.name
+    };
+  }
+
+  // Add formatted duration to the response for easier reading
+  const hours = Math.floor(durationInMinutes / 60);
+  const minutes = durationInMinutes % 60;
+  formattedRecord.formattedDuration = hours > 0 
+    ? `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`
+    : `${minutes} minute${minutes !== 1 ? 's' : ''}`;
 
   res.status(200).json({
     status: 'success',
