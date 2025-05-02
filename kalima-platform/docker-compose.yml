@@ -4,8 +4,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8088:80"
-      - "4448:443"
+      # - "8088:80"
+      - "80:80"
+      # - "4448:443"
+      - "443:443"
     environment:
       - VITE_API_URL=${VITE_API_URL}
     volumes:
