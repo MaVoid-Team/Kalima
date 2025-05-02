@@ -32,5 +32,6 @@
   "adminDashboard"  : "Admin Dashboard",
   "centerDashboard"  : "Center Dashboard",
   "auditLog": "Audit Log",
-  "myDashboard": "My Dashboard"
+  "myDashboard": "My Dashboard",
+  "Packages": "Packages"
 }

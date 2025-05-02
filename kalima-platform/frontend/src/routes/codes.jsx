@@ -88,3 +88,25 @@ export const generatePromoCodes = async (data) => {
     return `Failed to generate promo codes: ${error.message}`
   }
 };
+export const getPromoCodes = async (filters = {}) => {
+  try {
+    const queryParams = new URLSearchParams({
+      limit: 100,
+      type: 'promo',
+      ...filters
+    });
+
+    const response = await api.get(`${API_URL}/api/v1/codes?${queryParams.toString()}`, {
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+
+    const promoCodes = response.data?.data?.codes || [];
+    return { success: true, data: promoCodes };
+  } catch (error) {
+    return { success: false, error: error.message || 'Failed to fetch promo codes' };
+  }
+};
