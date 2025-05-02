@@ -1,7 +1,7 @@
 const mongoose = require('mongoose'); 
 const Course = require('../models/groupedLessonsModel'); 
 const Lesson = require('../models/lessonModel'); 
-const AppError = require("../utils/AppError"); 
+const AppError = require("../utils/appError"); 
 const catchAsync = require('../utils/catchAsync'); 
 
 
