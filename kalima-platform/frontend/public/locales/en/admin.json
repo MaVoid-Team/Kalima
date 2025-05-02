@@ -66,6 +66,7 @@
     "roles": {
       "student": "Student",
       "parent": "Parent",
+      "lecturers": "Lecturer",
       "lecturer": "Lecturer",
       "teacher": "Teacher",
       "assistant": "Assistant",
@@ -160,8 +161,38 @@
         "next": "Next"
       }
     }
-   
+  },
+    "promoCodes": {
+      "title": "Promo Codes Management",
+      "code": "Promo Code",
+      "points": "Points",
+      "status": "Status",
+      "redeemedAt": "Redeemed At",
+      "redeemedBy": "Redeemed By",
+      "noCodes": "No promo codes found"
+    },
+    "filters": {
+      "allStatuses": " All Statuses",
+      "redeemed": " Redeemed",
+      "active": " Active",
+      "redeemedBy": "Redeemed By",
+      "apply":  "Apply Filters"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of"
+    },
+    "status": {
+      "redeemed": "Redeemed",
+      "active": "Active"
+    },
+    "errors": {
+      "fetchPromo": "Failed to fetch promo codes"
+    }
   }
-  } 
+   
+  
     
   

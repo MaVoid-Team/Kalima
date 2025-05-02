@@ -15,7 +15,7 @@ const PromoCodeGenerator = () => {
   const [success, setSuccess] = useState("");
   const [generatedCodes, setGeneratedCodes] = useState([]);
   const [copiedIndex, setCopiedIndex] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     pointsAmount: 1000,
     numOfCodes: 3,
