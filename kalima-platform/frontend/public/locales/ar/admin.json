@@ -66,6 +66,7 @@
     "roles": {
       "student": "طالب",
       "parent": "ولي أمر",
+      "lecturers": "معلم",
       "lecturer": "معلم",
       "teacher": "معلم",
       "assistant": "مساعد",
@@ -161,5 +162,34 @@
         "next": "التالي"
       }
     }
+    },
+    "promoCodes": {
+      "title": "إدارة الأكواد الترويجية",
+      "code": " كود الخصم",
+      "points": " النقاط",
+      "status": " الحالة",
+      "redeemedAt": "تم استرداده في",
+      "redeemedBy": "تم الاسترداد بواسطة",
+      "noCodes": "لم يتم العثور على أكواد ترويجية"
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "redeemed": "مسترد",
+      "active": "نشط",
+      "redeemedBy": "تم استرداده بواسطة",
+      "apply": "تطبيق"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "page": "صفحة",
+      "of": "من"
+    },
+    "status": {
+      "redeemed": "مسترد",
+      "active": "نشط"
+    },
+    "errors": {
+      "fetchPromo": "فشل في جلب الأكواد الترويجية"
     }
   }

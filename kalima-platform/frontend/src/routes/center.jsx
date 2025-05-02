@@ -175,3 +175,217 @@ export const addNewLesson = async (lessonData) => {
     return `Failed to add new lesson:${error.message}`
   }
 };
+
+export const getAllParents = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.get(`${API_URL}/api/v1/parents`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data.data.parents,
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return `Failed to fetch parents: ${error.message}`;
+  }
+};
+
+// Send report per lesson
+export const sendLessonReport = async (reportData) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.post(
+      `${API_URL}/api/v1/reports/lesson`,
+      reportData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return `Failed to send lesson report: ${error.message}`;
+  }
+};
+
+// Send report per month
+export const sendMonthReport = async (reportData) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.post(
+      `${API_URL}/api/v1/reports/month`,
+      reportData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return `Failed to send month report: ${error.message}`;
+  }
+};
+
+// Send report per course
+export const sendCourseReport = async (reportData) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.post(
+      `${API_URL}/api/v1/reports/course`,
+      reportData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return `Failed to send course report: ${error.message}`;
+  }
+};
+
+export const getAllAttendance = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.get(`${API_URL}/api/v1/attendance`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data.data.attendance || [],
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return {
+      status: "error",
+      message: `Failed to fetch attendance: ${error.message}`,
+    };
+  }
+};
+
+
+export const getLessonById = async (lessonId) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error("Authentication token is required");
+    }
+
+    const response = await api.get(`${API_URL}/api/v1/lessons/${lessonId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.data && response.data.status === "success") {
+      return {
+        status: "success",
+        data: response.data.data.lesson,
+      };
+    } else {
+      console.error("Unexpected API response structure:", response.data);
+      return {
+        status: "error",
+        message: "Unexpected API response structure",
+      };
+    }
+  } catch (error) {
+    return {
+      status: "error",
+      message: `Failed to fetch lesson: ${error.message}`,
+    };
+  }
+};
