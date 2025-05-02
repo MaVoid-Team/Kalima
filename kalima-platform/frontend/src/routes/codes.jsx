@@ -96,7 +96,7 @@ export const getPromoCodes = async (filters = {}) => {
       ...filters
     });
 
-    const response = await api.get(`${API_URL}/api/v1/codes?${queryParams.toString()}`, {
+    const response = await api.get(`${API_URL}/codes?${queryParams.toString()}`, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
