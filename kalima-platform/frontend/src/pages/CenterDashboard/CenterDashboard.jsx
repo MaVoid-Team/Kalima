@@ -13,7 +13,7 @@ import QrScannerCard from "./QrScannerCard";
 // import ReportsSection from "./Reports";
 
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
-import RevenueGenerator from "./revenue";
+import RevenueGenerator from "./Revenue";
 
 const CenterDashboard = () => {
   const { t, i18n } = useTranslation("centerDashboard");
