@@ -6,12 +6,14 @@ import CenterSelector from "./CenterSelector";
 import CenterOverview from "./CenterOverview";
 import LecturersList from "./LecturersList";
 import CourseList from "./CourseList";
-import ActivityTracker from "./ActivityTracker";
+// import ActivityTracker from "./ActivityTracker";
 import AddCourseForm from "./AddCourseForm";
 import BarcodeScannerAndroid from "./BarcodeScannerMobile";
 import QrScannerCard from "./QrScannerCard";
+// import ReportsSection from "./Reports";
 
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
+import RevenueGenerator from "./revenue";
 
 const CenterDashboard = () => {
   const { t, i18n } = useTranslation("centerDashboard");
@@ -233,6 +235,9 @@ const CenterDashboard = () => {
               }}
             />
           </div>
+          <div className="mb-8">
+              <RevenueGenerator />
+          </div>
 
           {/* Conditional Rendering for Barcode Scanner */}
           {selectedCenter && (
@@ -305,8 +310,19 @@ const CenterDashboard = () => {
               onAddCourse={handleAddCourse}
             />
           </div>
+          {/* <div className="mb-8">
+            <ReportsSection
+              students={students}
+              lessons={lessons}
+              selectedCenter={selectedCenter}
+              translations={{
+                title: t('reportsSection.title'),
+                generateReport: t('reportsSection.generateReport'),
+                noReports: t('reportsSection.noReports')
+              }} />
+          </div> */}
 
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <ActivityTracker
               students={students}
               isLoading={loading.students}
@@ -320,7 +336,7 @@ const CenterDashboard = () => {
                 }
               }}
             />
-          </div>
+          </div> */}
 
           <AddCourseForm
             isOpen={isAddCourseModalOpen}

@@ -4,6 +4,7 @@ import UserManagementTable from "./userManageTable";
 import PromoCodeGenerator from "./PromoCodesGenerator";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
+import PromoCodesTable from "./PromoCodesTable";
 
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation('admin');
@@ -56,8 +57,9 @@ const AdminDashboard = () => {
       <div className="transition-all duration-300 space-y-8">
         <Hero />
         <PromoCodeGenerator />
+        <PromoCodesTable />
         <UserManagementTable />
-
+        
         <div className="flex justify-center items-center pb-36 max-sm:pt-20 rounded-3xl">
           <a target="_blank" href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0" 
              rel="noreferrer">
