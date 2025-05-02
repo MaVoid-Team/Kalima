@@ -136,7 +136,7 @@ const NavBar = () => {
           {/* Logo */}
           <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
             <img 
-              src="/Kalima.jpg" 
+              src="/Kalima.png" 
               alt="Logo" 
               className="w-10 h-10 rounded-full"
             />
@@ -208,7 +208,7 @@ const NavBar = () => {
               <div className="flex items-center justify-around mb-6">
                 <Link to="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
                   <img 
-                    src="/Kalima.jpg" 
+                    src="/Kalima.png" 
                     alt="Logo" 
                     className="w-10 h-10 rounded-full"
                   />
