@@ -32,5 +32,6 @@
   "adminDashboard"  : "لوحة تحكم المسؤول",
   "centerDashboard"  : "لوحة تحكم المركز",
   "auditLog": "سجل التدقيق",
-  "myDashboard": "لوحة التحكم"
+  "myDashboard": "لوحة التحكم",
+  "Packages": "الباقات"
   }
