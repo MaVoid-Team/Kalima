@@ -1,8 +1,33 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { getLessonById } from "../../routes/center";
 
 const CourseCard = ({ course }) => {
   const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
+  const navigate = useNavigate();
+
+  const handleShowDetails = async () => {
+    // Check if course has a valid ID (try both _id and id)
+    const lessonId =  course.id;
+    if (!lessonId) {
+      console.error("Course ID is undefined:", course);
+      alert(t('courseCard.errors.invalidLessonId')); // Show user-friendly error
+      return;
+    }
+
+    try {
+      const response = await getLessonById(lessonId);
+      if (response.status === "success") {
+        navigate(`/dashboard/center-dashboard/lesson-details/${lessonId}`, { state: { lesson: response.data } });
+      } else {
+        throw new Error(response.message || "Failed to fetch lesson details");
+      }
+    } catch (error) {
+      console.error("Error fetching lesson details:", error);
+      alert(t('courseCard.errors.fetchLessonFailed', { message: error.message }));
+    }
+  };
 
   return (
     <div className="bg-base-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-r-4 border-primary">
@@ -37,6 +62,13 @@ const CourseCard = ({ course }) => {
           <span className="text-base font-bold">{course.teacher.group}</span>
         </div>
       </div>
+
+      <button
+        className="btn btn-primary"
+        onClick={handleShowDetails}
+      >
+        {t('courseCard.showDetails')}
+      </button>
     </div>
   );
 };
