@@ -2,23 +2,23 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
   return (
     <div className="space-y-4">
       <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
+
       {/* Parent Phone */}
-      <div className="relative pb-5 form-control ">
+      <div className="form-control">
         <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.parentPhone')}</span>
         </label>
         <input
-          type="number"
+          type="tel" // Changed to type="tel" for better phone number input
           name="parentPhoneNumber"
           className={`input input-bordered ${errors.parentPhoneNumber ? 'input-error animate-shake' : ''}`}
-          value={formData.parentPhoneNumber}
+          value={formData.parentPhoneNumber || ''}
           onChange={handleInputChange}
           required
         />
-        
         {errors.parentPhoneNumber && (
-          <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
+          <span className="text-error text-sm mt-1">
             {t(errors.parentPhoneNumber)}
           </span>
         )}
@@ -26,7 +26,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
       </div>
 
       {/* Email */}
-      <div className="relative pb-5 form-control ">
+      <div className="form-control">
         <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.email')}</span>
@@ -35,20 +35,20 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
           type="email"
           name="email"
           className={`input input-bordered ${errors.email ? 'input-error animate-shake' : ''}`}
-          value={formData.email}
+          value={formData.email || ''}
           onChange={handleInputChange}
           required
         />
         {errors.email && (
-          <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
+          <span className="text-error text-sm mt-1">
             {t(errors.email)}
           </span>
         )}
         </div>
       </div>
-      
+
       {/* Password */}
-      <div className="relative pb-5 form-control ">
+      <div className="form-control">
         <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.password')}</span>
@@ -57,7 +57,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
           type="password"
           name="password"
           className={`input input-bordered ${errors.password ? 'input-error animate-shake' : ''}`}
-          value={formData.password}
+          value={formData.password || ''}
           onChange={handleInputChange}
           required
         />
@@ -69,8 +69,8 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
         </div>
       </div>
 
-      {/* Confirm Password - Added field */}
-      <div className="relative pb-5 form-control ">
+      {/* Confirm Password */}
+      <div className="form-control">
         <div className="flex flex-col gap-2">
         <label className="label">
           <span className="label-text">{t('form.confirmPassword')}</span>
