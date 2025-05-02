@@ -12,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const getRevenueSummary = async () => {
   try {
     const response = await api.get(
-      `${API_URL}/revenue/`,
+      `${API_URL}/api/v1/revenue/`,
       {
         withCredentials: true,
         headers: { Authorization: `Bearer ${getToken()}` }
@@ -32,7 +32,7 @@ export const getRevenueSummary = async () => {
 export const getRevenueBreakdown = async () => {
   try {
     const response = await api.get(
-      `${API_URL}/revenue/breakdown`,
+      `${API_URL}/api/v1/revenue/breakdown`,
       {
         withCredentials: true,
         headers: { Authorization: `Bearer ${getToken()}` }

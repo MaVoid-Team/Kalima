@@ -183,7 +183,7 @@ export const getAllParents = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/parents`, {
+    const response = await api.get(`${API_URL}/api/v1/parents`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -217,7 +217,7 @@ export const sendLessonReport = async (reportData) => {
     }
 
     const response = await api.post(
-      `${API_URL}/reports/lesson`,
+      `${API_URL}/api/v1/reports/lesson`,
       reportData,
       {
         withCredentials: true,
@@ -254,7 +254,7 @@ export const sendMonthReport = async (reportData) => {
     }
 
     const response = await api.post(
-      `${API_URL}/reports/month`,
+      `${API_URL}/api/v1/reports/month`,
       reportData,
       {
         withCredentials: true,
@@ -291,7 +291,7 @@ export const sendCourseReport = async (reportData) => {
     }
 
     const response = await api.post(
-      `${API_URL}/reports/course`,
+      `${API_URL}/api/v1/reports/course`,
       reportData,
       {
         withCredentials: true,
@@ -326,7 +326,7 @@ export const getAllAttendance = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/attendance`, {
+    const response = await api.get(`${API_URL}/api/v1/attendance`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -362,7 +362,7 @@ export const getLessonById = async (lessonId) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/lessons/${lessonId}`, {
+    const response = await api.get(`${API_URL}/api/v1/lessons/${lessonId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
