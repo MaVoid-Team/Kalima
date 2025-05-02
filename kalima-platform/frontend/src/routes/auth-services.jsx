@@ -298,7 +298,7 @@ export const refreshToken = async () => {
 
 // --- USER DATA API CALLS ---
 
-export const getUserDashboard = async ({ page = 1, limit = 10 } = {}) => {
+export const getUserDashboard = async ({ page = 1, limit = 100 } = {}) => {
   try {
     if (!isLoggedIn()) {
       return { success: false, error: "Not authenticated" };

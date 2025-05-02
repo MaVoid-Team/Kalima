@@ -68,8 +68,12 @@ export default function StudentRegistration() {
     const { role } = formData;
     const phoneRegex = /^\+?[0-9]\d{7,14}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    // Make password validation less strict to allow testing
-    const passwordRegex = /^.{4,}$/; // At least 4 characters
+    // Updated password validation:
+    // - At least 8 characters
+    // - At least one uppercase letter
+    // - At least one lowercase letter
+    // - At least one special character
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
     
     if (step === 1) {
       if (!formData.fullName?.trim()) errors.fullName = 'validation.required';
@@ -83,21 +87,21 @@ export default function StudentRegistration() {
     }
   
     if (step === 2) {
-      // Email validation - make it less strict for testing
+      // Email validation
       if (!formData.email) {
         errors.email = 'validation.required';
-      }
-      // Simple email format check
-      else if (!formData.email.includes('@')) {
+      } else if (!emailRegex.test(formData.email)) {
         errors.email = 'validation.emailFormat';
       }
       
-      // Password validation - make it less strict for testing
+      // Password validation
       if (!formData.password) {
         errors.password = 'validation.required';
+      } else if (!passwordRegex.test(formData.password)) {
+        errors.password = 'validation.passwordRequirements';
       }
       
-      // Only check confirmPassword if password is provided
+      // Confirm Password validation
       if (formData.password && !formData.confirmPassword) {
         errors.confirmPassword = 'validation.required';
       } else if (formData.password && formData.password !== formData.confirmPassword) {
@@ -107,15 +111,12 @@ export default function StudentRegistration() {
       if (role === 'student') {
         if (!formData.parentPhoneNumber) {
           errors.parentPhoneNumber = 'validation.required';
+        } else if (!phoneRegex.test(formData.parentPhoneNumber)) {
+          errors.parentPhoneNumber = 'validation.phoneFormat';
         }
-        // Make phone validation less strict for testing
-        // else if (!phoneRegex.test(formData.parentPhoneNumber)) {
-        //   errors.parentPhoneNumber = 'validation.phoneFormat';
-        // }
       }
       
       if (role === 'parent') {
-        // Validate at least one child ID is provided
         if (!formData.children[0]?.trim()) {
           errors.children = { 0: 'validation.required' };
         }
@@ -142,7 +143,6 @@ export default function StudentRegistration() {
   const handleNext = () => {
     const stepErrors = getStepErrors(currentStep);
     
-    // Add debugging for step 2
     if (currentStep === 2) {
       console.log('Attempting to navigate from step 2 to 3');
       console.log('Validation errors:', stepErrors);
@@ -181,7 +181,6 @@ export default function StudentRegistration() {
   const handleSubmit = async () => {
     let payload;
     
-    // Base payload structure based on role
     switch(formData.role) {
       case 'student':
         payload = {
@@ -189,14 +188,14 @@ export default function StudentRegistration() {
           name: formData.fullName,
           email: formData.email,
           password: formData.password,
-          confirmPassword: formData.confirmPassword, // Convert to number
-          level: formData.grade, // Using grade as level for students
+          confirmPassword: formData.confirmPassword,
+          level: formData.grade,
           hobbies: formData.hobbies.map(id => 
             hobbiesList.find(hobby => hobby.id === id)?.name || ''
-          ).filter(name => name !== ''), // Filter out any undefined values
+          ).filter(name => name !== ''),
           parentPhoneNumber: formData.parentPhoneNumber,
           phoneNumber: formData.phoneNumber,
-          faction: formData.faction || "Alpha", // Default or from form
+          faction: formData.faction || "Alpha",
           gender: formData.gender
         };
         break;
@@ -204,13 +203,12 @@ export default function StudentRegistration() {
       case 'parent':
         payload = {
           role: 'parent',
-          // Use the children array directly - these are already sequence IDs
           children: formData.children.filter(c => c.trim() !== ''),
           name: formData.fullName,
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
-          level: formData.level || "", // Optional for parent
+          level: formData.level || "",
           phoneNumber: formData.phoneNumber,
           gender: formData.gender
         };
@@ -242,7 +240,7 @@ export default function StudentRegistration() {
       navigate('/login', { state: { message: t('registrationSuccess') } });
     } catch (error) {
       console.error('Registration failed:', error.response?.data || error.message);
-      // You might want to show an error message to the user here
+      setErrors({ submit: 'registrationFailed' });
     }
   };
 
@@ -287,7 +285,6 @@ export default function StudentRegistration() {
         />
       </div>
 
-      {/* Desktop Image */}
       <div className="w-1/3 relative sm:block hidden">
         <img 
           src="/registration-image.png" 
@@ -321,6 +318,12 @@ export default function StudentRegistration() {
               }}
               t={t}
             />
+          )}
+          
+          {errors.submit && (
+            <div className="alert alert-error mb-4">
+              <span>{t(errors.submit)}</span>
+            </div>
           )}
           
           {renderStepContent()}
