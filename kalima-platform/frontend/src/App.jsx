@@ -36,6 +36,7 @@ const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
 const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
 const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
 const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
+const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
 
 function App() {
   const location = useLocation()
@@ -132,6 +133,7 @@ function App() {
             <Route path="/packages" element={<PackagesPage />} />
             <Route path="/packages" element={<PackagesPage />} /> 
             <Route path="/package-details/:packageId" element={<PackageDetails />} />
+            <Route path="/dashboard/center-dashboard/lesson-details/:id" element={<LessonDetailsSection />} />
 
             {/* User Dashboard Routes */}
             <Route path="/dashboard/student-dashboard/lecture-page" element={<ContainersPage />} />
