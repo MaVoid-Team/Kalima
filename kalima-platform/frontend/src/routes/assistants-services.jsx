@@ -70,7 +70,7 @@ export const AssistantService = {
     try {
       if (!isLoggedIn()) throw new Error("User not authenticated");
 
-      const response = await api.post(`${API_URL}/api/v1/assistants`, data, {
+      const response = await api.post(`${API_URL}/assistants`, data, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },

@@ -48,7 +48,7 @@ export const getRevenueBreakdown = async () => {
 export const getLecturerMonthlyRevenue = async (lecturerId) => {
   try {
     const response = await api.get(
-      `${API_URL}/api/v1/containers/${lecturerId}/monthly-revenue`,
+      `${API_URL}/containers/${lecturerId}/monthly-revenue`,
       {
         withCredentials: true,
         headers: { Authorization: `Bearer ${getToken()}` }

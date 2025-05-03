@@ -87,7 +87,7 @@ export const generatePromoCodes = async (data) => {
     }
 
     const response = await api.post(
-      `${API_URL}/api/v1/codes`,
+      `${API_URL}/codes`,
       payload,
       {
         headers: {
