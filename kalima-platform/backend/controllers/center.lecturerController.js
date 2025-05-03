@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
-const CLecturer = require("../models/center.studentModel");
+const CLecturer = require("../models/center.lecturerModel");
 const Center = require("../models/centerModel");
 const Subject = require("../models/subjectModel");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 
 exports.createLecturer = catchAsync(async (req, res, next) => {
