@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { bulkCreateUsers } from "../../../../routes/fetch-users";
 
 const BulkCreateUsers = () => {
-  const [accountType, setAccountType] = useState("student");
+  const [accountType, setAccountType] = useState("");
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");

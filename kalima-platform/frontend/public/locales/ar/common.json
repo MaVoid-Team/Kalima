@@ -18,6 +18,20 @@
     "student": "طالب",
     "logoAlt": "شعار كلمة"
   },
+  "gradeLevels": {
+      "Primary": "المرحلة الابتدائية",
+      "Middle": "المرحلة المتوسطة",
+      "Upper Primary": "المرحلة الابتدائية العليا",
+      "Higher Secondary": "المرحلة الثانوية",
+      "Fourth Elementary": "الصف الرابع الابتدائي",
+      "First Primary": "الصف الأول الابتدائي",
+      "Second Primary": " الصف الثاني الابتدائي",
+      "Third Primary": "الصف الثالث الابتدائي",
+      "Second Secondary": "الصف الثاني الثانوي",
+      "First Secondary": "الصف الأول الثانوي",
+      "Third Secondary": "الصف الثالث الثانوي"
+
+    },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",
@@ -33,5 +47,6 @@
   "centerDashboard"  : "لوحة تحكم المركز",
   "auditLog": "سجل التدقيق",
   "myDashboard": "لوحة التحكم",
-  "Packages": "الباقات"
+  "Packages": "الباقات",
+  "select": "اختر"
   }

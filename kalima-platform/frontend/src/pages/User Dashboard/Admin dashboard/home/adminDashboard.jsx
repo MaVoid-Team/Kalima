@@ -5,6 +5,7 @@ import PromoCodeGenerator from "./PromoCodesGenerator";
 import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
 import PromoCodesTable from "./PromoCodesTable";
+import LecturerRevenue from "./LecturerRevenue";
 
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation('admin');
@@ -56,6 +57,7 @@ const AdminDashboard = () => {
     <div className="mx-auto w-full max-w-full p-10 bg-base-100 min-h-screen bg-gradient-to-br" dir={dir}>
       <div className="transition-all duration-300 space-y-8">
         <Hero />
+        <LecturerRevenue />
         <PromoCodeGenerator />
         <PromoCodesTable />
         <UserManagementTable />

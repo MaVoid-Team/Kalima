@@ -7,6 +7,8 @@
       "parents": "Parents",
       "sendOffer": "Send Your Offer Now!",
       "generatePromoCodes": "Generate Promo Codes",
+      "promo": "Promo Code",
+      "discount": "Discount",
       "errors": {
         "fetchLecturers": "Failed to fetch lecturers",
         "pointsError": "Points amount must be greater than zero",
@@ -26,7 +28,8 @@
         "general": "General",
         "specific": "Specific to Lecturer",
         "lecturer": "Lecturer",
-        "lecturerPlaceholder": "Select Lecturer"
+        "lecturerPlaceholder": "Select Lecturer",
+        "promo": "Promo Code"
       },
       "userManagement": {
         "title": "User Actions Log",
@@ -51,7 +54,8 @@
       "code": "Promo Code",
       "points": "Points",
       "type": "Type",
-      "actions": "Actions"
+      "actions": "Actions",
+      "discount": "Discount"
     },
     "specific": "Specific",
     "general": "General",

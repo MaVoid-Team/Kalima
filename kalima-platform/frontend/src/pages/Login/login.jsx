@@ -4,12 +4,13 @@ import TeacherReviews from './TeacherReviews';
 import WaveBackground from './WaveBackground';
 import { loginUser, getUserDashboard } from '../../routes/auth-services';
 import { Link, useNavigate } from 'react-router-dom';
-
+import { Eye, EyeOff } from 'lucide-react';
 const TeacherLogin = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const [activeTab, setActiveTab] = useState('email_tab');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     phoneNumber: '',
@@ -80,9 +81,7 @@ const TeacherLogin = () => {
       <WaveBackground />
       
       {/* Left side - Teacher Reviews */}
-      <div className="w-full md:w-1/2 z-10">
-        <TeacherReviews />
-      </div>
+     
       
       {/* Right side - Login Form */}
       <div className="w-full md:w-1/2 p-6 flex justify-center items-center z-0">
@@ -95,19 +94,20 @@ const TeacherLogin = () => {
           </p>
           
           {/* Tabs */}
-          <div className="tabs tabs-border mb-6">
-            <button 
-              className={`tab ${activeTab === 'phone_tab' ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab('phone_tab')}
-            >
-              {t('phoneTab', 'Phone')}
-            </button>
+          <div className="tabs tabs-border mb-6"> 
             <button 
               className={`tab ${activeTab === 'email_tab' ? 'tab-active' : ''}`}
               onClick={() => setActiveTab('email_tab')}
             >
               {t('emailTab', 'Email')}
             </button>
+            <button 
+              className={`tab ${activeTab === 'phone_tab' ? 'tab-active' : ''}`}
+              onClick={() => setActiveTab('phone_tab')}
+            >
+              {t('phoneTab', 'Phone')}
+            </button>
+           
           </div>
           
           <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -144,26 +144,36 @@ const TeacherLogin = () => {
             )}
             
             <div className="form-control mb-6">
-              <label className="label">
-                <span className="label-text">{t('passwordLabel', 'Password')}</span>
-              </label>
-              <input 
-                type="password" 
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                placeholder="••••••••" 
-                className="input input-bordered w-full" 
-                required
-              />
-              <div>
-              </div>
-              <label className="label">
-                <Link to="/forgot-password" className="label-text-alt link link-hover text-primary">
-                  {t('forgotPassword', 'Forgot password?')}
-                </Link>
-              </label>
-            </div>
+                    <label className="label">
+                      <span className="label-text">{t('passwordLabel', 'Password')}</span>
+                    </label>
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        placeholder="••••••••" 
+                        className="input input-bordered w-full pr-12" 
+                        required
+                      />
+                      <button
+                        type="button"
+                        className={`absolute top-1/2 ${isRTL ? 'left-3' : 'right-3'} -translate-y-1/2 z-10 text-gray-500`}
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+
+                    <label className="label">
+                      <Link to="/forgot-password" className="label-text-alt link link-hover text-primary">
+                        {t('forgotPassword', 'Forgot password?')}
+                      </Link>
+                    </label>
+                  </div>
+            
             
             {error && (
               <div className="alert alert-error mb-4">
@@ -189,6 +199,10 @@ const TeacherLogin = () => {
             </div>
           </form>
         </div>
+      </div>
+      
+       <div className="w-full md:w-1/2 z-10">
+        <TeacherReviews />
       </div>
     </div>
   );

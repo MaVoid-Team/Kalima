@@ -73,9 +73,8 @@ export default function BarcodeScanner({ centerId, centerName, onScanSuccess, tr
             onScanSuccess(detectedBarcode.text, detectedBarcode.format || detectedBarcode.type);
         }
 
-        // Optionally stop scanning after detection
-        // You might want to stop scanning here or let the dashboard decide based on the result
-        // stopScanningAndReset();
+        
+        stopScanningAndReset();
 
       } else {
          setLastResult(translations?.noBarcodeDetected || 'No barcode detected.');

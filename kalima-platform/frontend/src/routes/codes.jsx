@@ -47,22 +47,48 @@ export const generatePromoCodes = async (data) => {
       throw new Error("Promo code data is required");
     }
 
-    // Validate required fields
-    const requiredFields = ['pointsAmount', 'numOfCodes', 'type'];
+    // Validate required fields for all types
+    const requiredFields = ['numOfCodes', 'type'];
     for (const field of requiredFields) {
       if (!data[field]) {
         throw new Error(`${field} is required`);
       }
     }
 
-    // If type is specific, lecturerId is required
+    // Validate type is one of the allowed values
+    const allowedTypes = ['general', 'specific', 'promo'];
+    if (!allowedTypes.includes(data.type)) {
+      throw new Error(`Invalid type. Must be one of: ${allowedTypes.join(', ')}`);
+    }
+
+    // Validate type-specific requirements
     if (data.type === "specific" && !data.lecturerId) {
       throw new Error("Lecturer ID is required for specific promo codes");
     }
 
-    const response = await axios.post(
-      `${API_URL}/codes`,
-      data,
+    if (data.type !== "promo" && !data.pointsAmount) {
+      throw new Error("Points amount is required for non-promo codes");
+    }
+
+    // Prepare the payload based on type
+    const payload = {
+      numOfCodes: data.numOfCodes,
+      type: data.type
+    };
+
+    // Only include pointsAmount if not promo type
+    if (data.type !== "promo") {
+      payload.pointsAmount = data.pointsAmount;
+    }
+
+    // Only include lecturerId if specific type
+    if (data.type === "specific") {
+      payload.lecturerId = data.lecturerId;
+    }
+
+    const response = await api.post(
+      `${API_URL}/api/v1/codes`,
+      payload,
       {
         headers: {
           ...getAuthHeader(),
@@ -85,7 +111,10 @@ export const generatePromoCodes = async (data) => {
       };
     }
   } catch (error) {
-    return `Failed to generate promo codes: ${error.message}`
+    return {
+      status: "error",
+      message: `Failed to generate promo codes: ${error.message}`
+    };
   }
 };
 export const getPromoCodes = async (filters = {}) => {
