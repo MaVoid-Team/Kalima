@@ -65,3 +65,22 @@ export const AssistantService = {
       }
     }
   };
+
+  export const CreateAssistant = async (data) => {
+    try {
+      if (!isLoggedIn()) throw new Error("User not authenticated");
+
+      const response = await api.post(`${API_URL}/api/v1/assistants`, data, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+
+      return {
+        success: true,
+        data: response.data.data.assistant
+      };
+    } catch (error) {
+      return `Failed to create assistant: ${error.message}`
+    }
+  }

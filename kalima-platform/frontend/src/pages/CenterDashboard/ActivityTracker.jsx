@@ -38,6 +38,7 @@ const ActivityTracker = ({ lessonId, students }) => {
 
   // Format date based on locale
   const formatDate = (date) => {
+    if (!date) return "-";
     return new Intl.DateTimeFormat(i18n.language, {
       month: "short",
       day: "numeric",
@@ -49,23 +50,6 @@ const ActivityTracker = ({ lessonId, students }) => {
 
   return (
     <div className="bg-base-100 rounded-lg shadow-lg p-4 md:p-6" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="bg-secondary p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div>
-            <p className="text-xl text-base-content">
-              {t("activityTracker.header.title")}
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button className="btn btn-sm btn-primary">
-            {t("activityTracker.buttons.sendNotifications")}
-          </button>
-          <button className="btn btn-sm btn-primary">
-            {t("activityTracker.buttons.publishResults")}
-          </button>
-        </div>
-      </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
@@ -103,21 +87,18 @@ const ActivityTracker = ({ lessonId, students }) => {
           <table className="table w-full">
             <thead>
               <tr className="border-b border-base-200">
-                <th className={isRTL ? "text-right" : "text-left"}>
-                  {t("activityTracker.columns.studentName")}
-                </th>
-                <th className={isRTL ? "text-right" : "text-left"}>
-                  {t("activityTracker.columns.passFail")}
-                </th>
-                <th className={isRTL ? "text-right" : "text-left"}>
-                  {t("activityTracker.columns.score")}
-                </th>
-                <th className={isRTL ? "text-right" : "text-left"}>
-                  {t("activityTracker.columns.timeSpent")}
-                </th>
-                <th className={isRTL ? "text-right" : "text-left"}>
-                  {t("activityTracker.columns.submissionTime")}
-                </th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.studentId")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.lessonStartTime")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.centerName")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.lecturerName")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.subject")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.level")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.attendanceDate")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.bookletPurchased")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.paymentType")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.amountPaid")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.sessionsPaidFor")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.sessionsRemaining")}</th>
               </tr>
             </thead>
             <tbody>
@@ -126,50 +107,22 @@ const ActivityTracker = ({ lessonId, students }) => {
                   key={attendance._id}
                   className="hover:bg-base-200 border-b border-base-200"
                 >
+                  <td>{attendance.studentSequencedId}</td>
+                  <td>{formatDate(attendance.lesson.startTime)}</td>
+                  <td>{attendance.center.name}</td>
+                  <td>{attendance.lecturer.name}</td>
+                  <td>{attendance.subject.name}</td>
+                  <td>{attendance.level.name}</td>
+                  <td>{formatDate(attendance.attendanceDate)}</td>
                   <td>
-                    <div className="flex items-center gap-2">
-                      <div className="avatar">
-                        <div className="w-8 rounded-full">
-                          <img
-                            src={`https://randomuser.me/api/portraits/${
-                              attendance.student.gender === "female"
-                                ? "women"
-                                : "men"
-                            }/${attendance.student.center_students_seq % 20 + 1}.jpg`}
-                            alt={attendance.student.name}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "https://www.gravatar.com/avatar/?d=mp";
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <span>{attendance.student.name}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        attendance.examStatus === "passed"
-                          ? "badge-success"
-                          : "badge-error"
-                      }`}
-                    >
-                      {t(
-                        `activityTracker.status.${
-                          attendance.examStatus === "passed" ? "pass" : "fail"
-                        }`
-                      )}
+                    <span className={`badge ${attendance.isBookletPurchased ? "badge-success" : "badge-error"}`}>
+                      {attendance.isBookletPurchased ? t("activityTracker.status.yes") : t("activityTracker.status.no")}
                     </span>
                   </td>
-                  <td>
-                    {attendance.examScore}/{attendance.examMaxScore || 100}
-                  </td>
-                  <td>
-                    {attendance.attendanceDuration || 0}{" "}
-                    {t("activityTracker.time.minutes")}
-                  </td>
-                  <td>{formatDate(attendance.attendanceDate)}</td>
+                  <td>{attendance.paymentType}</td>
+                  <td>{attendance.amountPaid}</td>
+                  <td>{attendance.sessionsPaidFor}</td>
+                  <td>{attendance.sessionsRemaining}</td>
                 </tr>
               ))}
             </tbody>
