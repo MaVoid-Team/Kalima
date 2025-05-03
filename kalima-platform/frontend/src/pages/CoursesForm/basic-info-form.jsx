@@ -200,7 +200,7 @@ function BasicInfoForm({
                 </h2>
                 <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
                   <ImageIcon className="w-10 h-10 mb-2 text-primary" />
-                  <span className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
+                  <span className="btn text-primary btn-sm btn-ghost border-primary border-2 mb-2">
                     {isRTL ? "اضف صورة" : "Add Image"}
                   </span>
                   <p className="text-xs text-base-content/50">{isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}</p>
@@ -218,7 +218,7 @@ function BasicInfoForm({
                 </h2>
                 <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
                   <Video className="w-10 h-10 mb-2 text-primary" />
-                  <span className="btn text-primary btn-sm btn-ghost border border-primary border-2 mb-2">
+                  <span className="btn text-primary btn-sm btn-ghost border-primary border-2 mb-2">
                     {isRTL ? "اضف فيديو" : "Add Video"}
                   </span>
                   <p className="text-xs text-base-content/50">{isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}</p>

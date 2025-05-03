@@ -66,13 +66,13 @@ export default function LecturerDashboard() {
           </section>
 
           {/* Course Categories Section */}
-          <section className="mb-16">
+          {/* <section className="mb-16">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">{t("top_categories")}</h2>
               <span className="text-sm text-base-content/70">{t("most_popular")}</span>
             </div>
-            {/* <CourseCategories /> */}
-          </section>
+            {/* <CourseCategories />
+          </section> */}
 
           {/* Featured Courses Section */}
           {/* <section className="mb-16">

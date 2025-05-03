@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import CourseCard from "./CourseCard";
-import { getAllLevels} from "../../routes/levels";
+import { getAllLevels } from "../../routes/levels";
 import { getAllSubjects } from "../../routes/courses";
 
 const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
@@ -19,6 +19,8 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
   const [levels, setLevels] = useState([]);
   const [mappedLessons, setMappedLessons] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,6 +77,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
     });
     
     setMappedLessons(mapped);
+    setCurrentPage(1); // Reset to first page when lessons change
   }, [lessons, subjects, levels, lecturers, dataLoading, isLoading, t]);
 
   const uniqueSubjects = [...new Set(mappedLessons.map(lesson => lesson.subject))];
@@ -83,6 +86,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const filteredLessons = mappedLessons.filter(lesson => {
@@ -90,6 +94,19 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
            (!filters.lecturer || lesson.teacher.name === filters.lecturer) &&
            (!filters.level || lesson.teacher.group === filters.level);
   });
+
+  // Pagination logic
+  const totalItems = filteredLessons.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedLessons = filteredLessons.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="bg-base-100 rounded-lg shadow-lg p-6">
@@ -139,15 +156,50 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         <div className="alert alert-error">
           <span>{error}</span>
         </div>
-      ) : filteredLessons.length > 0 ? (
+      ) : paginatedLessons.length > 0 ? (
         <div className="space-y-4">
-          {filteredLessons.map(lesson => (
+          {paginatedLessons.map(lesson => (
             <CourseCard key={lesson.id} course={lesson} />
           ))}
         </div>
       ) : (
         <div className="text-center py-8 text-base-content/70">
           {t('courseList.noLessons')}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-6 gap-2">
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronRight className="w-5 h-5" />
+            previous
+          </button>
+          
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(page => (
+              <button
+                key={page}
+                className={`btn btn-sm ${currentPage === page ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+          
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            next
+            <ChevronLeft className="w-5 h-5" />
+          </button>
         </div>
       )}
     </div>

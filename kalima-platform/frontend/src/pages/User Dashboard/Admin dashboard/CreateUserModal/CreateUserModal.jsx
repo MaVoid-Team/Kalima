@@ -159,6 +159,10 @@ const CreateUserModal = ({
           assignedLecturer: data.assignedLecturer || undefined
         };
       
+      case "subadmin":
+      case "moderator":
+        return commonFields;
+      
       default:
         return commonFields;
     }
@@ -216,10 +220,12 @@ const CreateUserModal = ({
                   onChange={handleChange}
                   required
                 >
+                  <option value="subadmin">مدير فرعي</option>
+                  <option value="moderator">مشرف</option>
+                  <option value="assistant">مساعد</option>
                   <option value="student">طالب</option>
                   <option value="parent">ولي أمر</option>
                   <option value="lecturer">معلم</option>
-                  <option value="assistant">مساعد</option>
                 </select>
                 </div>
               </div>
@@ -310,34 +316,16 @@ const CreateUserModal = ({
             </div>
 
             {userData.role === "student" && (
-              <StudentForm 
-                userData={userData} 
-                handleChange={handleChange} 
-                levels={levels} 
-              />
+              <StudentForm userData={userData} handleChange={handleChange} levels={levels} />
             )}
-
             {userData.role === "parent" && (
-              <ParentForm 
-                userData={userData} 
-                handleChange={handleChange} 
-              />
+              <ParentForm userData={userData} handleChange={handleChange} />
             )}
-
             {userData.role === "lecturer" && (
-              <LecturerForm 
-                userData={userData} 
-                handleChange={handleChange} 
-                subjects={subjects} 
-              />
+              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} />
             )}
-
             {userData.role === "assistant" && (
-              <AssistantForm 
-                userData={userData} 
-                handleChange={handleChange} 
-                lecturers={lecturers} 
-              />
+              <AssistantForm userData={userData} handleChange={handleChange} lecturers={lecturers} />
             )}
 
             <div className="modal-action">

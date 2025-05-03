@@ -124,7 +124,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
                 ) : (
                   gradeLevels.map(level => (
                     <option key={level.value} value={level.value}>
-                      {t(`gradeLevels.${level.label}`)}
+                   {t(`gradeLevels.${level.label}`)}
                     </option>
                   ))
                 )}

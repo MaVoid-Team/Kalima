@@ -62,15 +62,6 @@ const CenterOverview = ({ center, lecturersCount, studentsCount, lessonsCount })
       </div>
       
       <div className="divider"></div>
-      
-      <div className="flex justify-end gap-2">
-        <button className="btn btn-outline btn-sm">
-          {t('centerOverview.editCenter')}
-        </button>
-        <button className="btn btn-primary btn-sm">
-          {t('centerOverview.addLecturer')}
-        </button>
-      </div>
     </div>
   );
 };

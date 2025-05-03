@@ -57,7 +57,8 @@ export default function StudentRegistration() {
     children: [''],
     // Lecturer-specific
     bio: '',
-    expertise: ''
+    expertise: '',
+    subject:[],
   });
   const [errors, setErrors] = useState({});
 
@@ -68,13 +69,11 @@ export default function StudentRegistration() {
     const { role } = formData;
     const phoneRegex = /^\+?[0-9]\d{7,14}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    // Updated password validation:
-    // - At least 8 characters
-    // - At least one uppercase letter
-    // - At least one lowercase letter
-    // - At least one special character
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-    
+
+    // const passwordRegex = /^.{8}$/;
+      // const passwordRegex = /^(?=.*[!@#$%^&*])(?=.*[A-Z])[A-Za-z\d!@#$%^&*]{8,}$/;
+      
+     
     if (step === 1) {
       if (!formData.fullName?.trim()) errors.fullName = 'validation.required';
       if (!formData.gender) errors.gender = 'validation.required';
@@ -97,10 +96,9 @@ export default function StudentRegistration() {
       // Password validation
       if (!formData.password) {
         errors.password = 'validation.required';
-      } else if (!passwordRegex.test(formData.password)) {
-        errors.password = 'validation.passwordRequirements';
       }
       
+
       // Confirm Password validation
       if (formData.password && !formData.confirmPassword) {
         errors.confirmPassword = 'validation.required';
@@ -208,7 +206,7 @@ export default function StudentRegistration() {
           email: formData.email,
           password: formData.password,
           confirmPassword: formData.confirmPassword,
-          level: formData.level || "",
+          // level: formData.level || "",
           phoneNumber: formData.phoneNumber,
           gender: formData.gender
         };
@@ -223,7 +221,8 @@ export default function StudentRegistration() {
           confirmPassword: formData.confirmPassword,
           bio: formData.bio,
           expertise: formData.expertise,
-          gender: formData.gender
+          gender: formData.gender,
+          subject: formData.subject,
         };
         break;
         
