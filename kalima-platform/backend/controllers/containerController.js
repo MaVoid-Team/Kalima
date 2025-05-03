@@ -11,33 +11,6 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const NotificationTemplate = require("../models/notificationTemplateModel");
 const Notification = require("../models/notification");
 const Student = require("../models/studentModel");
-const multer = require("multer");
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const configureCloudinary = require("../config/cloudinaryOptions");
-
-// Configure Cloudinary for container images
-configureCloudinary();
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "container-images",
-  },
-});
-
-// Set up multer for container image uploads
-exports.uploadContainerImage = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for images
-  fileFilter: (req, file, cb) => {
-    // Only allow image files
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new AppError('Please upload only images', 400), false);
-    }
-  }
-}).single('image');
 
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
@@ -253,40 +226,27 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 
     // Validate required fields for course type
     if (type === "course" && (!description || !goal)) {
-      // Clean up any uploaded image if validation fails
-      if (req.file && req.file.filename) {
-        await cloudinary.uploader.destroy(req.file.filename);
-      }
       return next(
         new AppError("Description and goal are required for course type.", 400)
       );
     }
 
-    // Create container data with optional image if provided
-    const containerData = {
-      name,
-      type,
-      price: price || 0,
-      level,
-      teacherAllowed,
-      subject,
-      parent,
-      createdBy: createdBy || req.user._id,
-      description: type === "course" ? description : undefined,
-      goal: type === "course" ? goal : undefined,
-    };
-    
-    // Add image data if an image was uploaded
-    if (req.file) {
-      containerData.image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
-    }
-
     // Create the container
     const container = await Container.create(
-      [containerData],
+      [
+        {
+          name,
+          type,
+          price: price || 0,
+          level,
+          teacherAllowed,
+          subject,
+          parent,
+          createdBy: createdBy || req.user._id,
+          description: type === "course" ? description : undefined,
+          goal: type === "course" ? goal : undefined,
+        },
+      ],
       { session }
     );
 
@@ -397,10 +357,6 @@ exports.createContainer = catchAsync(async (req, res, next) => {
     });
   } catch (error) {
     await session.abortTransaction();
-    // Clean up any uploaded image if there was an error
-    if (req.file && req.file.filename) {
-      await cloudinary.uploader.destroy(req.file.filename);
-    }
     return next(error);
   } finally {
     session.endSession();
@@ -431,12 +387,9 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid container ID format.", 400));
   }
 
-  // Fetch the container with enhanced population
+  // Fetch the container
   const container = await Container.findById(containerId).populate([
-    { 
-      path: "children", 
-      select: "name type level subject image price description goal" 
-    },
+    { path: "children", select: "name" },
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
@@ -444,32 +397,6 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 
   if (!container) {
     return next(new AppError("Container not found.", 404));
-  }
-  
-  // Add image inheritance logic - if no image, check parents
-  let inheritedImage = null;
-  let inheritedFrom = null;
-  
-  // Only look for parent images if this container doesn't have its own image
-  if (!container.image || !container.image.url) {
-    // Start with the current container's parent
-    let currentParentId = container.parent;
-    
-    // Keep searching up the parent chain until we find an image or reach the top
-    while (currentParentId) {
-      const parentContainer = await Container.findById(currentParentId);
-      if (!parentContainer) break;
-      
-      // If this parent has an image, use it
-      if (parentContainer.image && parentContainer.image.url) {
-        inheritedImage = parentContainer.image;
-        inheritedFrom = parentContainer._id;
-        break;
-      }
-      
-      // Move up to the next parent
-      currentParentId = parentContainer.parent;
-    }
   }
 
   // Role-specific logic for authenticated users
@@ -487,22 +414,11 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
       });
     }
   }
-  
-  // Convert to plain object so we can add inherited image info
-  const responseData = container.toObject ? container.toObject() : { ...container };
-  
-  // Add inherited image info to the response if applicable
-  if (inheritedImage) {
-    responseData.inheritedImage = {
-      image: inheritedImage,
-      inheritedFrom: inheritedFrom
-    };
-  }
 
   // Default response for all roles and unauthenticated users
   return res.status(200).json({
     status: "success",
-    data: responseData,
+    data: container,
   });
 });
 
@@ -619,28 +535,14 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, description, goal, removeImage } = req.body;
+  const { name, type, price, level, subject, description, goal } = req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    // Find the container first to check if it exists and to get the current image (if any)
-    const container = await Container.findById(req.params.containerId).session(session);
-    if (!container) {
-      // If container not found and there's an uploaded image, clean it up
-      if (req.file && req.file.filename) {
-        await cloudinary.uploader.destroy(req.file.filename);
-      }
-      throw new AppError("No container found with that ID", 404);
-    }
-
     let obj = { name, type, price };
 
     if (type === "course") {
       if (!description || !goal) {
-        // Clean up uploaded image if validation fails
-        if (req.file && req.file.filename) {
-          await cloudinary.uploader.destroy(req.file.filename);
-        }
         return next(
           new AppError(
             "Description and goal are required for course type.",
@@ -660,29 +562,6 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       const levelDoc = await checkDoc(Level, level, session);
       obj.level = levelDoc._id;
     }
-    
-    // Handle image operations
-    if (removeImage === 'true' || removeImage === true) {
-      // Delete existing image if present
-      if (container.image && container.image.publicId) {
-        await cloudinary.uploader.destroy(container.image.publicId);
-      }
-      // Set image field to undefined to remove it
-      obj.image = undefined;
-    } 
-    else if (req.file) {
-      // New image uploaded - update the image field
-      // First delete any existing image
-      if (container.image && container.image.publicId) {
-        await cloudinary.uploader.destroy(container.image.publicId);
-      }
-      // Then set the new image
-      obj.image = {
-        url: req.file.path,
-        publicId: req.file.filename
-      };
-    }
-
     const updatedContainer = await Container.findByIdAndUpdate(
       req.params.containerId,
       obj,
@@ -694,9 +573,11 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
     ).populate([
       { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
-      { path: "subject", select: "name" },
-      { path: "level", select: "name" },
     ]);
+
+    if (!updatedContainer) {
+      throw new AppError("No container found with that ID", 404);
+    }
 
     await session.commitTransaction();
     res.status(200).json({
@@ -707,10 +588,6 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
     });
   } catch (error) {
     await session.abortTransaction();
-    // Clean up uploaded image if there was an error
-    if (req.file && req.file.filename) {
-      await cloudinary.uploader.destroy(req.file.filename);
-    }
     return next(error);
   } finally {
     session.endSession();
@@ -756,17 +633,8 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
     }
     await session.commitTransaction();
 
-    // Re-fetch the updated container with properly populated children
-    const updatedContainer = await Container.findById(containerId).populate([
-      { 
-        path: "children",
-        select: "name type level subject image price description goal" 
-      },
-      { path: "subject", select: "name" },
-      { path: "level", select: "name" },
-      { path: "createdBy", select: "name" },
-    ]);
-    
+    // Re-fetch the updated container to return in the response
+    const updatedContainer = await Container.findById(containerId);
     res
       .status(200)
       .json({ status: "success", data: { container: updatedContainer } });
