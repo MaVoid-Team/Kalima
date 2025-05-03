@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { getAllLevels } from '../../routes/levels'; // Adjust the import path based on your project structure
-
+import { Eye, EyeOff } from 'lucide-react';
 export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange }) {
     const [childrenCount, setChildrenCount] = useState(1);
     const [gradeLevels, setGradeLevels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
@@ -59,41 +60,68 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
 
             {/* Password Field */}
             <div className="form-control">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.password')}</span>
-                    </label>
-                    <input
-                        type="password"
-                        name="password"
-                        className={`input input-bordered ${errors.password ? 'input-error animate-shake' : ''}`}
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    {errors.password && <span className="text-error text-sm mt-1">{t(errors.password)}</span>}
-                </div>
+          <div className="flex flex-col gap-2">
+            <label className="label">
+              <span className="label-text">{t('form.password')}</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                className={`input input-bordered0 pr-12 ${errors.password ? 'input-error animate-shake' : ''}`}
+                value={formData.password || ''}
+                onChange={handleInputChange}
+                required
+              />
+              <button
+                type="button"
+                className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                onClick={() => setShowPassword((prev) => !prev)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
+            {errors.password && (
+              <span className="text-error text-sm mt-1">
+                {t('validation.passwordRequirements')}
+              </span>
+            )}
+          </div>
+        </div>
+      {/* Confirm Password */}
+      <div className="form-control relative">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t('form.confirmPassword')}</span>
+          </label>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              className={`input input-bordered pr-10 ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+              value={formData.confirmPassword || ''}
+              onChange={handleInputChange}
+              required
+            />
+            <button
+              type="button"
+              className="absolute top-1/2 right-3 -translate-y-1/2  z-10 text-gray-500"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.confirmPassword && (
+            <span className="text-error text-sm mt-1">
+              {t(errors.confirmPassword)}
+            </span>
+          )}
+        </div>
+      </div>
 
-            {/* Confirm Password Field */}
-            <div className="form-control">
-                <div className="flex flex-col gap-2">
-                    <label className="label">
-                        <span className="label-text">{t('form.confirmPassword')}</span>
-                    </label>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        className={`input input-bordered ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
-                        value={formData.confirmPassword || ''}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    {errors.confirmPassword && <span className="text-error text-sm mt-1">{t(errors.confirmPassword)}</span>}
-                </div>
-            </div>
-
-            {/* Optional Level Field */}
+            {/* Optional Level Field
             <div className="form-control">
                 <div className="flex flex-col gap-2">
                     <label className="label">
@@ -101,7 +129,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </label>
                     <select
                         name="level"
-                        className={`select select-bordered w-full ${errors.level ? 'select-error animate-shake' : ''}`}
+                        className={`select select-bordered  ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
                         disabled={loading || error}
@@ -125,7 +153,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </select>
                     {errors.level && <span className="text-error text-sm mt-1">{t(errors.level)}</span>}
                 </div>
-            </div>
+            </div> */}
 
             <p className="text-lg font-semibold mt-6">{t('form.childrenSequenceIds')}</p>
             <p className="text-sm text-gray-500">{t('form.childrenSequenceIdsHelp')}</p>

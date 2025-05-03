@@ -1,6 +1,6 @@
 {
   "studentRegister": "  تسجيل الطالب", 
-  "parentRegister": "تسجيل الوالد",
+  "parentRegister": "تسجيل ولي الأمر",
   "lecturerRegister" : "تسجيل المحاضر",
     "steps": {
       "personalInfo": "المعلومات الأساسية",
@@ -19,7 +19,7 @@
       "bio": "نبذة عنك",
       "expertise": "الخبرات",
       "phoneNumber": "الهاتف الشخصي",
-      "parentPhone": "هاتف الوالد",
+      "parentPhone": "هاتف ولي الأمر",
       "email": "البريد الإلكتروني",
       "address": "العنوان",
       "selectGender": "اختر الجنس",
@@ -34,8 +34,8 @@
       "uploadAvatar": "رفع صورة شخصية",
       "hobbies": "الهوايات",
       "personalDetails": "البيانات الشخصية",
-      "parentDetails": "بيانات الوالدين",
-      "schoolDetails" : "تفاصيل المدرسة والدراسة",
+      "parentDetails": "بيانات ولي الأمرين",
+      "schoolDetails" : "تفاصيل المدرسة ولي الأمرراسة",
       "password": "كلمة المرور",
       "confirmPassword": "تاكيد كلمة المرور",
       "childrenDetails": "تفاصيل الأبناء",
@@ -45,7 +45,11 @@
       "childrenSequenceIds"  : "رقم تسلسل الأبناء",
       "level" : "المستوى",
       "optional" : "اختياري",
-      "selectLevel" : "اختر المستوى"
+      "selectLevel" : "اختر المستوى",
+      "validatepassword": "تاكيد كلمة المرور",
+     "subject" : "المادة",
+     "subjectPlaceholder" : "اكتب المادة",
+     "children" : "ابناء"
 
 
 
@@ -80,19 +84,22 @@
     },
     "role" : { 
       "student": "طالب",
-      "parent": "والد",
+      "parent": "ولي الأمر",
       "lecturer" : "محاضر"
      },
      "gradeLevels": {
-      "Grade 4": "الصف الرابع",
-      "Grade 5": "الصف الخامس",   
-      "Grade 6": "الصف السادس", 
-      "First Preparatory": "الصف الأول الإعدادي",
-      "Second Preparatory": "الصف الثاني الإعدادي",
-      "Third Preparatory": "الصف الثالث الأعدادي", 
-      "First Secondary": "الصف الأول الثانوي",  
+      "Primary": "المرحلة الابتدائية",
+      "Middle": "المرحلة المتوسطة",
+      "Upper Primary": "المرحلة الابتدائية العليا",
+      "Higher Secondary": "المرحلة الثانوية",
+      "Fourth Elementary": "الصف الرابع الابتدائي",
+      "First Primary": "الصف الأول الابتدائي",
+      "Second Primary": " الصف الثاني الابتدائي",
+      "Third Primary": "الصف الثالث الابتدائي",
       "Second Secondary": "الصف الثاني الثانوي",
+      "First Secondary": "الصف الأول الثانوي",
       "Third Secondary": "الصف الثالث الثانوي"
+
     },
     "roleSelection": {
      "title": "اختر دورك",
@@ -104,6 +111,7 @@
       "validation": {
         "required": "هذا الحقل مطلوب",
         "passwordRequirements": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+        "passwordMismatch" : "كلمة المرور وتأكيد كلمة المرور لا تتطابق",
         "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
         "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
         "hobbies": "اختر هوايتان على الأقل",

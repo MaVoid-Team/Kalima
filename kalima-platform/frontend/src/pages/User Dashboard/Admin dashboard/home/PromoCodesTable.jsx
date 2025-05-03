@@ -172,7 +172,7 @@ const PromoCodesTable = () => {
               <div className="text-center py-4">{t('promoCodes.noCodes')}</div>
             )}
 
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center mt-4 sm:w-1/2 mx-auto gap-2">
               <button
                 className="btn btn-outline"
                 onClick={handlePreviousPage}
