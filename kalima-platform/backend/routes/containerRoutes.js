@@ -56,16 +56,15 @@ router.patch(
   containerController.UpdateChildOfContainer
 );
 
-// Create containers - with image upload support
+// Create containers
 router
   .route("/")
   .post(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
-    containerController.uploadContainerImage, // Add image upload middleware
     containerController.createContainer
   );
 
-// Operations on a specific container by ID - with image upload support for updates
+// Operations on a specific container by ID
 router
   .route("/:containerId")
   .patch(
@@ -76,7 +75,6 @@ router
       "Lecturer",
       "Assistant"
     ),
-    containerController.uploadContainerImage, // Add image upload middleware
     containerController.updateContainer
   )
   .delete(
