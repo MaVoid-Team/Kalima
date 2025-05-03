@@ -7,6 +7,8 @@
       "parents": "أولياء الأمور",
       "generatePromoCodes": "إنشاء أكواد ترويجية",
       "sendOffer": "ارسل عرضك الان!",
+      "promo": "كود خاص",
+      "discount": "خصم",
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
         "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
@@ -25,6 +27,7 @@
         "codeType": "نوع الكود",
         "general": "عام",
         "specific": "محدد لمحاضر",
+        "promo": "كود خاص",
         "lecturer": "المحاضر",
         "lecturerPlaceholder": "اختر محاضر"
       },
@@ -51,7 +54,8 @@
       "code": "كود الخصم",
       "points": "النقاط",
       "type": "النوع",
-      "actions": "الإجراءات"
+      "actions": "الإجراءات",
+      "discount": "الخصم"
     },
         "specific": "محدد",
             "general": "عام",

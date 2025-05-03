@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Capacitor } from '@capacitor/core'; // Import Capacitor
 
 import CenterSelector from "./CenterSelector";
 import CenterOverview from "./CenterOverview";
@@ -8,8 +7,6 @@ import LecturersList from "./LecturersList";
 import CourseList from "./CourseList";
 // import ActivityTracker from "./ActivityTracker";
 import AddCourseForm from "./AddCourseForm";
-import BarcodeScannerAndroid from "./BarcodeScannerMobile";
-import QrScannerCard from "./QrScannerCard";
 // import ReportsSection from "./Reports";
 
 import { getAllCenters, getCenterDataByType } from "../../routes/center";
@@ -39,7 +36,6 @@ const CenterDashboard = () => {
   });
 
   // Determine if running on Android native platform
-  const isAndroidNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
   useEffect(() => {
     const fetchCenters = async () => {
@@ -170,21 +166,7 @@ const CenterDashboard = () => {
   };
 
   // You might want to add a handler here for when a barcode is scanned by either component
-  const handleBarcodeScanned = (barcodeData) => {
-      console.log("Barcode Scanned in Dashboard:", barcodeData);
-      // Implement your logic here, e.g.,
-      // - Validate the barcode data
-      // - Find the corresponding student/entity
-      // - Record attendance or perform other actions
-      // You'll likely need selectedCenter._id here
-      if (selectedCenter) {
-          console.log(`Processing barcode ${barcodeData} for center ${selectedCenter._id}`);
-          // Add your API call or state update logic
-      } else {
-          console.warn("Barcode scanned but no center is selected.");
-      }
-      // Potentially show a success/error message to the user
-  };
+ 
 
 
   if (loading.centers && !selectedCenter) {
@@ -238,50 +220,6 @@ const CenterDashboard = () => {
           <div className="mb-8">
               <RevenueGenerator />
           </div>
-
-          {/* Conditional Rendering for Barcode Scanner */}
-          {selectedCenter && (
-            <div className="mb-8">
-              {isAndroidNative ? (
-                <BarcodeScannerAndroid
-                  centerId={selectedCenter._id}
-                  centerName={selectedCenter.name}
-                  // Pass translations specific to the barcode scanner
-                  translations={{
-                    title: t('barCodeScanner.title'),
-                    startButton: t('barCodeScanner.startButton'), // Add specific keys if needed
-                    scanning: t('barCodeScanner.scanning'),
-                    resultLabel: t('barCodeScanner.resultLabel'),
-                    noBarcodeDetected: t('barCodeScanner.noBarcodeDetected'),
-                    permissionWarning: t('barCodeScanner.permissionWarning'),
-                    grantPermission: t('barCodeScanner.grantPermission'),
-                    scanError: t('barCodeScanner.scanError'),
-                    scanInstructions: t('barCodeScanner.scanInstructions')
-                    // Add other scanner-specific translation keys
-                  }}
-                   // You might want to add an onScanSuccess prop to handle the result in the dashboard
-                   // onScanSuccess={handleBarcodeScanned}
-                />
-              ) : (
-                // Render the existing QrScannerCard for desktop/web
-                <QrScannerCard
-                  centerId={selectedCenter._id}
-                  centerName={selectedCenter.name}
-                  // Pass relevant props to QrScannerCard
-                  isLoading={loading.lessons} // Still passing lessons loading as per original, consider if needed
-                  error={error.lessons && t(error.lessons)} // Still passing lessons error as per original
-                  translations={{
-                     title: t('qrScannerCard.title'), // Assuming different keys for QR scanner
-                     instructions: t('qrScannerCard.instructions'),
-                     // Add other QR scanner-specific translation keys
-                  }}
-                  // Assuming QrScannerCard also has an onScanSuccess prop
-                  // onScanSuccess={handleBarcodeScanned}
-                />
-              )}
-            </div>
-          )}
-           {/* End Conditional Rendering */}
 
 
           <div className="mb-8">

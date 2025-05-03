@@ -47,8 +47,13 @@ const PromoCodeGenerator = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "type" && value === "general") {
-      setFormData(prev => ({ ...prev, [name]: value, lecturerId: "" }));
+    if (name === "type") {
+      // Reset lecturerId when changing to general or promo type
+      const newFormData = { ...formData, [name]: value };
+      if (value !== "specific") {
+        newFormData.lecturerId = "";
+      }
+      setFormData(newFormData);
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -65,7 +70,7 @@ const PromoCodeGenerator = () => {
     setSuccess("");
     setGeneratedCodes([]);
 
-    if (formData.pointsAmount <= 0) {
+    if (formData.type !== "promo" && formData.pointsAmount <= 0) {
       setError(t('admin.errors.pointsError'));
       return;
     }
@@ -83,11 +88,16 @@ const PromoCodeGenerator = () => {
     try {
       setLoading(true);
       const payload = {
-        pointsAmount: formData.pointsAmount,
         numOfCodes: formData.numOfCodes,
         type: formData.type
       };
       
+      // Only include pointsAmount if not promo type
+      if (formData.type !== "promo") {
+        payload.pointsAmount = formData.pointsAmount;
+      }
+      
+      // Only include lecturerId if specific type
       if (formData.type === "specific") {
         payload.lecturerId = formData.lecturerId;
       }
@@ -139,41 +149,42 @@ const PromoCodeGenerator = () => {
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="form-control">
-              <div className=" flex flex-col items-start gap-2">
+            <div className="flex flex-col items-start gap-2">
               <label className="label">
-              <span className="label-text font-medium">
-                {t('admin.form.pointsAmount')}
-              </span>
-            </label>
-            <input
-              type="number"
-              name="pointsAmount"
-              className="input input-bordered"
-              value={formData.pointsAmount}
-              onChange={handleNumberChange}
-              min="1"
-              required
-            />
-              </div>
+                <span className="label-text font-medium">
+                  {t('admin.form.pointsAmount')}
+                </span>
+              </label>
+              <input
+                type="number"
+                name="pointsAmount"
+                className="input input-bordered"
+                value={formData.pointsAmount}
+                onChange={handleNumberChange}
+                min="1"
+                disabled={formData.type === "promo"}
+                required={formData.type !== "promo"}
+              />
+            </div>
           </div>
 
           <div className="form-control">
-            <div className=" flex flex-col items-start gap-2">
-            <label className="label">
-              <span className="label-text font-medium">
-                {t('admin.form.numCodes')}
-              </span>
-            </label>
-            <input
-              type="number"
-              name="numOfCodes"
-              className="input input-bordered"
-              value={formData.numOfCodes}
-              onChange={handleNumberChange}
-              min="1"
-              max="100"
-              required
-            />
+            <div className="flex flex-col items-start gap-2">
+              <label className="label">
+                <span className="label-text font-medium">
+                  {t('admin.form.numCodes')}
+                </span>
+              </label>
+              <input
+                type="text"
+                name="numOfCodes"
+                className="input input-bordered"
+                value={formData.numOfCodes}
+                onChange={handleNumberChange}
+                min="1"
+                max="100"
+                required
+              />
             </div>
           </div>
 
@@ -192,6 +203,7 @@ const PromoCodeGenerator = () => {
             >
               <option value="general">{t('admin.form.general')}</option>
               <option value="specific">{t('admin.form.specific')}</option>
+              <option value="promo">{t('admin.form.promo')}</option>
             </select>
           </div>
 
@@ -246,7 +258,7 @@ const PromoCodeGenerator = () => {
                 <tr>
                   <th>{t('admin.promoTable.number')}</th>
                   <th>{t('admin.promoTable.code')}</th>
-                  <th>{t('admin.promoTable.points')}</th>
+                  <th>{formData.type === "promo" ? t('admin.promoTable.discount') : t('admin.promoTable.points')}</th>
                   <th>{t('admin.promoTable.type')}</th>
                   <th>{t('admin.promoTable.actions')}</th>
                 </tr>
@@ -260,10 +272,16 @@ const PromoCodeGenerator = () => {
                         {code.code}
                       </code>
                     </td>
-                    <td>{code.pointsAmount || formData.pointsAmount}</td>
+                    <td>
+                      {formData.type === "promo" 
+                        ? t('admin.discount') 
+                        : (code.pointsAmount || formData.pointsAmount)}
+                    </td>
                     <td>
                       {formData.type === "specific" 
                         ? t('admin.specific') 
+                        : formData.type === "promo"
+                        ? t('admin.promo')
                         : t('admin.general')}
                     </td>
                     <td>

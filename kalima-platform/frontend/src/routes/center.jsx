@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "./auth-services";
+import { getToken, isLoggedIn } from "./auth-services";
 import api from "../services/errorHandling";
 
 // Use the correct API URL format
@@ -386,6 +386,58 @@ export const getLessonById = async (lessonId) => {
     return {
       status: "error",
       message: `Failed to fetch lesson: ${error.message}`,
+    };
+  }
+};
+
+export const recordAttendance = async (attendanceData) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error('Not authenticated');
+    }
+    const token = getToken();
+    const response = await axios.post(`${API_URL}/api/v1/attendance`, attendanceData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message || 'Attendance recorded successfully',
+    };
+  } catch (error) {
+    console.error('Error recording attendance:', error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Failed to record attendance',
+    };
+  }
+};
+
+export const createLecturer = async (lecturerData) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error('Not authenticated');
+    }
+    const response = await api.post(`${API_URL}/api/v1/center-lecturer/`, lecturerData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message || 'Lecturer created successfully',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || 'Failed to create lecturer',
     };
   }
 };
