@@ -73,8 +73,19 @@ const fetchLecturers = async () => {
       setLoading(false);
     }
   };
+  const resetFilters = useCallback(() => {
+    setSelectedStage("");
+    setSelectedGrade("");
+    setSelectedTerm("");
+    setSelectedSubject("");
+    setSelectedCourseType("");
+    setSelectedCourseStatus("");
+    setSelectedPrice("");
+    setFilteredContainers(containers);
+  }, [containers]);
 
-  const generateCourseData = (containersData) =>
+
+    const generateCourseData = (containersData) =>
     containersData.map((container, index) => {
       const levelName = container.level?.name || "";
   
@@ -91,6 +102,27 @@ const fetchLecturers = async () => {
           break;
         case "Higher Secondary":
           stage = "المرحلة الثانوية";
+          break;
+        case "Fourth Elementary":
+          stage = "الصف الرابع الابتدائي";
+          break;
+        case "First Primary":
+          stage = "الصف الأول الابتدائي";
+          break;
+        case "Second Primary":
+          stage = "الصف الثاني الابتدائي";
+          break;
+        case "Third Primary":
+          stage = "الصف الثالث الابتدائي";
+          break;
+        case "First Secondary":
+          stage = "الصف الأول الثانوي";
+          break;
+        case "Second Secondary":
+          stage = "الصف الثاني الثانوي";
+          break;
+        case "Third Secondary":
+          stage = "الصف الثالث الثانوي";
           break;
       }
   
@@ -135,71 +167,97 @@ const fetchLecturers = async () => {
         containerType: container.type || "lecture",
       };
     });
-
-  const applyFilters = useCallback(() => {
-    let filtered = [...containers];
-
-    if (selectedSubject) {
-      filtered = filtered.filter((c) => c.subject?.name === selectedSubject);
-    }
-
-    if (selectedGrade) {
-      filtered = filtered.filter((c) => c.level?.name === selectedGrade);
-    }
-
-    if (selectedCourseType) {
-      let apiType = "course";
-      switch (selectedCourseType) {
-        case "شرح":
-          apiType = "course";
-          break;
-        case "سنة كاملة":
-          apiType = "year";
-          break;
-        case "فصل دراسي":
-          apiType = "term";
-          break;
-        case "شهر":
-          apiType = "month";
-          break;
-        default:
-          apiType = selectedCourseType;
+   
+    const applyFilters = useCallback(() => {
+      let filtered = [...containers];
+    
+      // Handle selectedStage filter
+      if (selectedStage) {
+        filtered = filtered.filter((container) => {
+          const levelName = container.level?.name || "";
+          let stage;
+          switch (levelName) {
+            case "Primary":
+            case "Fourth Elementary":
+            case "First Primary":
+            case "Second Primary":
+            case "Third Primary":
+              stage = "المرحلة الابتدائية";
+              break;
+            case "Middle":
+            case "Upper Primary":
+              stage = "المرحلة الإعدادية";
+              break;
+            case "Higher Secondary":
+            case "First Secondary":
+            case "Second Secondary":
+            case "Third Secondary":
+              stage = "المرحلة الثانوية";
+              break;
+            default:
+              stage = "";
+          }
+          return stage === selectedStage;
+        });
       }
-      filtered = filtered.filter((c) => c.type === apiType);
-    }
-
-    if (selectedCourseStatus) {
-      filtered = filtered.filter((c) =>
-        selectedCourseStatus === "مجاني" ? c.price === 0 : c.price > 0
-      );
-    }
-
-    if (selectedPrice) {
-      const [min, max] = selectedPrice.split("-").map(Number);
-      filtered = filtered.filter((c) => c.price >= min && c.price <= max);
-    }
-
-    setFilteredContainers(filtered);
-  }, [
-    selectedGrade,
-    selectedSubject,
-    selectedCourseType,
-    selectedCourseStatus,
-    selectedPrice,
-    containers,
-  ]);
-
-  const resetFilters = useCallback(() => {
-    setSelectedStage("");
-    setSelectedGrade("");
-    setSelectedTerm("");
-    setSelectedSubject("");
-    setSelectedCourseType("");
-    setSelectedCourseStatus("");
-    setSelectedPrice("");
-    setFilteredContainers(containers);
-  }, [containers]);
-
+    
+      if (selectedSubject) {
+        filtered = filtered.filter((c) => c.subject?.name === selectedSubject);
+      }
+    
+      if (selectedGrade) {
+        filtered = filtered.filter((c) => c.level?.name === selectedGrade);
+      }
+    
+      if (selectedCourseType) {
+        let apiType = "course";
+        switch (selectedCourseType) {
+          case "شرح":
+            apiType = "course";
+            break;
+          case "سنة كاملة":
+            apiType = "year";
+            break;
+          case "فصل دراسي":
+            apiType = "term";
+            break;
+          case "شهر":
+            apiType = "month";
+            break;
+          default:
+            apiType = selectedCourseType;
+        }
+        filtered = filtered.filter((c) => c.type === apiType);
+      }
+    
+      if (selectedCourseStatus) {
+        filtered = filtered.filter((c) => {
+          const price = c.price || 0;
+          return selectedCourseStatus === "مجاني" ? price === 0 : price > 0;
+        });
+      }
+    
+      if (selectedPrice) {
+        const [min, max] = selectedPrice.split("-").map(Number);
+        filtered = filtered.filter((c) => {
+          const price = c.price || 0;
+          return price >= min && price <= max;
+        });
+      }
+    
+      setFilteredContainers(filtered);
+    }, [
+      selectedStage,
+      selectedGrade,
+      selectedSubject,
+      selectedCourseType,
+      selectedCourseStatus,
+      selectedPrice,
+      containers,
+    ]);
+    useEffect(() => {
+      applyFilters();
+    }, [applyFilters]);
   const memoizedFilteredCourses = useMemo(
     () => generateCourseData(filteredContainers),
     [filteredContainers]
@@ -212,33 +270,29 @@ const fetchLecturers = async () => {
   }, [containers]);
 
   const levelOptions = useMemo(() => {
-    const unique = new Set();
-    containers.forEach((c) => c.level?.name && unique.add(c.level.name));
-    return [...unique].map((l) => ({ label: l, value: l }));
-  }, [containers]);
-
-  const typeOptions = useMemo(() => {
-    const unique = new Set();
-    containers.forEach((c) => c.type && unique.add(c.type));
-    return [...unique].map((type) => {
-      let label = type;
-      switch (type) {
-        case "course":
-          label = "شرح";
-          break;
-        case "year":
-          label = "سنة كاملة";
-          break;
-        case "term":
-          label = "فصل دراسي";
-          break;
-        case "month":
-          label = "شهر";
-          break;
-      }
-      return { label, value: label };
-    });
-  }, [containers]);
+  const unique = new Set();
+  containers.forEach((c) => {
+    if (c.level?.name) {
+      // Map raw API values to display names
+      const displayName = {
+        "Primary": "المرحلة الابتدائية",
+        "Middle": "المرحلة الإعدادية",
+        "Upper Primary": "المرحلة الابتدائية العليا",
+        "Higher Secondary": "المرحلة الثانوية",
+        "Fourth Elementary": "الصف الرابع الابتدائي",
+        "First Primary": "الصف الأول الابتدائي",
+        "Second Primary": "الصف الثاني الابتدائي",
+        "Third Primary": "الصف الثالث الابتدائي",
+        "First Secondary": "الصف الأول الثانوي",
+        "Second Secondary": "الصف الثاني الثانوي",
+        "Third Secondary": "الصف الثالث الثانوي",
+      }[c.level.name] || c.level.name;
+      
+      unique.add(displayName);
+    }
+  });
+  return [...unique].map((l) => ({ label: l, value: l }));
+}, [containers]);
 
   const priceOptions = [
     { label: "مجاني", value: "0-0" },
@@ -246,35 +300,60 @@ const fetchLecturers = async () => {
     { label: "500-1000 جنيه", value: "500-1000" },
     { label: "أكثر من 1000 جنيه", value: "1000-10000" },
   ];
-
+  const typeOptions = useMemo(() => {
+    const unique = new Set();
+    containers.forEach((c) => {
+      if (c.type) {
+        const arabicType = {
+          course: "شرح",
+          year: "سنة كاملة",
+          term: "فصل دراسي",
+          month: "شهر"
+        }[c.type] || c.type;
+        
+        unique.add(arabicType);
+      }
+    });
+    return [...unique].map((type) => ({ label: type, value: type }));
+  }, [containers]);
+  
   const filterOptions = [
     {
       label: t("filters.stage"),
       value: selectedStage,
       options: [
+        { label: t("filters.all"), value: "" },
         { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
         { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
         { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
-        { label: "المرحلة الابتدائية العليا", value: "المرحلة الابتدائية العليا" },
       ],
       onSelect: setSelectedStage,
     },
     {
       label: t("filters.grade"),
       value: selectedGrade,
-      options: levelOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...levelOptions,
+      ],
       onSelect: setSelectedGrade,
     },
     {
       label: t("filters.subject"),
       value: selectedSubject,
-      options: subjectOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...subjectOptions,
+      ],
       onSelect: setSelectedSubject,
     },
     {
       label: t("filters.type"),
       value: selectedCourseType,
-      options: typeOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...typeOptions, // Now properly defined
+      ],
       onSelect: setSelectedCourseType,
     },
     {
@@ -333,6 +412,7 @@ const fetchLecturers = async () => {
                 label={filter.label}
                 options={filter.options}
                 selectedValue={filter.value}
+                placeholder={t("filters.select")}
                 onSelect={filter.onSelect}
                 isRTL={isRTL}
               />
