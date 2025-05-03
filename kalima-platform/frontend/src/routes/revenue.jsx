@@ -44,3 +44,19 @@ export const getRevenueBreakdown = async () => {
     throw error;
   }
 };
+
+export const getLecturerMonthlyRevenue = async (lecturerId) => {
+  try {
+    const response = await api.get(
+      `${API_URL}/api/v1/containers/${lecturerId}/monthly-revenue`,
+      {
+        withCredentials: true,
+        headers: { Authorization: `Bearer ${getToken()}` }
+      }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching lecturer monthly revenue:", error);
+    throw error;
+  }
+};

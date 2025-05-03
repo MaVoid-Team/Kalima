@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { getLectureById } from "../../../routes/lectures"
+import { getLectureById, getLectureAttachments, downloadAttachmentById } from "../../../routes/lectures"
 // Import Video.js styles
 import "video.js/dist/video-js.css"
 
@@ -12,6 +12,12 @@ const LectureDisplay = () => {
   const [lecture, setLecture] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [attachments, setAttachments] = useState({
+    exams: [],
+    booklets: [],
+    homeworks: [],
+    pdfsandimages: [],
+  })
   const [playbackProgress, setPlaybackProgress] = useState(0)
   const videoRef = useRef(null)
   const playerRef = useRef(null)
@@ -36,7 +42,21 @@ const LectureDisplay = () => {
       }
     }
 
+    const fetchAttachments = async () => {
+      try {
+        const result = await getLectureAttachments(lectureId)
+        if (result.status === "success") {
+          setAttachments(result.data)
+        } else {
+          console.error("Failed to fetch attachments:", result.message)
+        }
+      } catch (err) {
+        console.error("Error fetching attachments:", err)
+      }
+    }
+
     fetchLecture()
+    fetchAttachments()
   }, [lectureId])
 
   // Extract YouTube embed ID to validate YouTube URL
@@ -192,28 +212,38 @@ const LectureDisplay = () => {
   const renderAttachments = (attachmentType, attachments) => {
     if (!attachments || attachments.length === 0) return null
 
+    const handleDownload = async (attachmentId) => {
+      try {
+        await downloadAttachmentById(attachmentId)
+      } catch (err) {
+        setError(`Failed to download attachment: ${err.message}`)
+      }
+    }
+
     return (
       <div className="mt-4">
         <h3 className="text-lg font-semibold">{attachmentType}</h3>
         <ul className="list-disc pl-5">
           {attachments.map((attachment, index) => (
-            <li key={index} className="mt-2">
-              <div className="flex gap-4">
-                <a
-                  href={`/api/v1/attachments/${attachment}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  عرض المرفق {index + 1}
-                </a>
-                <a
-                  href={`/api/v1/attachments/${attachment}`}
-                  download
-                  className="text-green-600 hover:underline"
-                >
-                  تحميل
-                </a>
+            <li key={attachment._id} className="mt-2">
+              <div className="flex gap-4 items-center">
+                <span className="text-gray-600">{attachment.fileName}</span>
+                <div className="flex gap-2">
+                  <a
+                    href={attachment.filePath}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    عرض
+                  </a>
+                  <button
+                    onClick={() => handleDownload(attachment._id)}
+                    className="text-green-600 hover:underline"
+                  >
+                    تحميل
+                  </button>
+                </div>
               </div>
             </li>
           ))}
@@ -271,14 +301,14 @@ const LectureDisplay = () => {
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title">المرفقات</h2>
-          {renderAttachments("الامتحانات", lecture.attachments.exams)}
-          {renderAttachments("الكتيبات", lecture.attachments.booklets)}
-          {renderAttachments("الواجبات", lecture.attachments.homeworks)}
-          {renderAttachments("ملفات PDF وصور", lecture.attachments.pdfsandimages)}
-          {(lecture.attachments.exams.length === 0 &&
-            lecture.attachments.booklets.length === 0 &&
-            lecture.attachments.homeworks.length === 0 &&
-            lecture.attachments.pdfsandimages.length === 0) && (
+          {renderAttachments("الامتحانات", attachments.exams)}
+          {renderAttachments("الكتيبات", attachments.booklets)}
+          {renderAttachments("الواجبات", attachments.homeworks)}
+          {renderAttachments("ملفات PDF وصور", attachments.pdfsandimages)}
+          {(attachments.exams.length === 0 &&
+            attachments.booklets.length === 0 &&
+            attachments.homeworks.length === 0 &&
+            attachments.pdfsandimages.length === 0) && (
             <p>لا توجد مرفقات متاحة.</p>
           )}
         </div>

@@ -4,8 +4,8 @@ import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { motion } from "framer-motion"
-import { getUserDashboard} from "../../routes/auth-services"
-import {getAllLevels} from "../../routes/levels"
+import { getUserDashboard } from "../../routes/auth-services"
+import { getAllLevels } from "../../routes/levels"
 import { getAllSubjects } from "../../routes/courses"
 import BasicInfoForm from "./basic-info-form"
 import ContainerCreationPanel from "./container-creation-panel"
@@ -53,28 +53,33 @@ function CourseCreationForm() {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        
+
         // Fetch levels from API
-        const levelsResponse = await getAllLevels();
+        const levelsResponse = await getAllLevels()
         if (levelsResponse.data && levelsResponse.data.levels) {
-          setLevels(levelsResponse.data.levels);
+          setLevels(levelsResponse.data.levels)
+        } else {
+          console.error("Failed to fetch levels:", levelsResponse)
         }
 
         // Fetch subjects from API
-        const subjectsResponse = await getAllSubjects();
-        if (subjectsResponse.data && subjectsResponse.data.subjects) {
-          setSubjects(subjectsResponse.data.subjects);
+        const subjectsResponse = await getAllSubjects()
+        if (subjectsResponse.success && subjectsResponse.data) {
+          setSubjects(subjectsResponse.data) // Corrected to directly use subjectsResponse.data
+        } else {
+          console.error("Failed to fetch subjects:", subjectsResponse.error)
         }
 
+        // Fetch user dashboard data
         const dashboardResponse = await getUserDashboard()
         const userData = dashboardResponse.data
         const userId = userData?.data?.userInfo?.id
         setCreatedBy(userId)
-        if (userData && userData?.userInfo) {
+        if (userData && userData?.data?.userInfo) {
           setTeachers([{ _id: userId, name: userData.data.userInfo.name }])
           setFormData((prev) => ({
             ...prev,
-            teacherName: userData.userInfo.name,
+            teacherName: userData.data.userInfo.name,
             teacher: userId,
           }))
         }

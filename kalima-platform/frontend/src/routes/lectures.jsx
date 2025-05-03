@@ -103,10 +103,45 @@ export const getLectureAttachments = async (lectureId) => {
       data: response.data,
     };
   } catch (error) {
-    return `Failed to fetch lecture attachments. Please try again later : ${error.message}`
+    return `Failed to fetch lecture attachments. Please try again later : ${error.message}`;
   }
 };
 
+
+export const downloadAttachmentById = async (attachmentId) => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      throw new Error("Authentication required");
+    }
+
+    const response = await api.get(`${API_URL}/api/v1/lectures/attachment/${attachmentId}/file`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      responseType: "blob", // Important for handling binary data (PDF)
+    });
+
+    // Create a blob URL and trigger download
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `attachment_${attachmentId}.pdf`); // Default filename
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return {
+      status: "success",
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error downloading attachment:", error);
+    throw new Error(`Failed to download attachment: ${error.message}`);
+  }
+};
 export const getAllLecturesPublic = async () => {
   try {
     const response = await api.get(`${API_URL}/api/v1/lectures/public`, {
@@ -266,3 +301,27 @@ export const deleteContainerById = async (containerId) => {
     return `Error deleting container ${containerId}: ${error.message}`;
   }
 }
+
+export const createLectureAttachment = async (lectureId, attachmentData) => {
+  try {
+    const formData = new FormData();
+    formData.append("type", attachmentData.type);
+    formData.append("attachment", attachmentData.attachment);
+
+    const response = await api.post(
+      `${API_URL}/api/v1/lectures/attachments/${lectureId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading lecture attachment:", error);
+    throw error;
+  }
+};

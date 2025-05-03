@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
-import { getContainerById, createContainer, createLecture } from "../../../routes/lectures"
+import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { FiBook, FiFolder, FiArrowLeft, FiPlus, FiX } from "react-icons/fi"
+import { FiBook, FiFolder, FiArrowLeft, FiPlus, FiX, FiPaperclip } from "react-icons/fi"
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
@@ -23,6 +23,7 @@ const ContainerDetailsPage = () => {
   const [newPrice, setNewPrice] = useState(0)
   const [newVideoLink, setNewVideoLink] = useState("")
   const [newLectureType, setNewLectureType] = useState("Revision")
+  const [attachmentFile, setAttachmentFile] = useState(null)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
 
@@ -124,6 +125,15 @@ const ContainerDetailsPage = () => {
         throw new Error(response.message || `Failed to create ${childType}`)
       }
 
+      // If it's a lecture and there's an attachment, upload it
+      if (childType === 'lecture' && attachmentFile) {
+        const attachmentData = {
+          type: "homework",
+          attachment: attachmentFile,
+        }
+        await createLectureAttachment(response.data._id, attachmentData)
+      }
+
       // Refetch container to update UI
       await fetchContainer()
 
@@ -134,6 +144,7 @@ const ContainerDetailsPage = () => {
       setNewPrice(0)
       setNewVideoLink("")
       setNewLectureType("Revision")
+      setAttachmentFile(null)
     } catch (err) {
       setCreationError(err.message)
       console.error('Creation error details:', {
@@ -249,7 +260,7 @@ const ContainerDetailsPage = () => {
 
                   <div className="flex items-center justify-between">
                     <span className="text-sm">
-                      {child.type || container.type}
+                      {childType || container.type}
                     </span>
                     <Link
                       to={
@@ -387,6 +398,23 @@ const ContainerDetailsPage = () => {
                     <option value="Revision">Revision</option>
                     <option value="Paid">Paid</option>
                   </select>
+                </div>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
+                    <span className="label-text">Attach Homework (Optional, .pdf only)</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      onChange={(e) => setAttachmentFile(e.target.files[0])}
+                      className="input input-bordered w-full"
+                      accept=".pdf"
+                    />
+                    <FiPaperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+                  </div>
+                  {attachmentFile && (
+                    <p className="mt-2 text-sm text-base-content/70">Selected file: {attachmentFile.name}</p>
+                  )}
                 </div>
               </>
             )}
