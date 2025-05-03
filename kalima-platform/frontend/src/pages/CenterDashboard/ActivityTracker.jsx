@@ -87,18 +87,18 @@ const ActivityTracker = ({ lessonId, students }) => {
           <table className="table w-full">
             <thead>
               <tr className="border-b border-base-200">
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.studentId")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.lessonStartTime")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.centerName")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.lecturerName")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.subject")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.level")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.attendanceDate")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.bookletPurchased")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.paymentType")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.amountPaid")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.sessionsPaidFor")}</th>
-                <th className={isRTL ? "text-right" : "text-left"}>{t("activityTracker.columns.sessionsRemaining")}</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Student ID</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Lesson Start Time</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Center Name</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Lecturer Name</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Subject</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Level</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Attendance Date</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Booklet Purchased</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Payment Type</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Amount Paid</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Sessions Paid For</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Remaining Sessions</th>
               </tr>
             </thead>
             <tbody>

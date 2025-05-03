@@ -134,13 +134,13 @@ export default function InstructorsList() {
     <div className="p-4 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">{t("Assistants")}</h2>
-        <button 
+        {/* <button 
           onClick={() => setShowAddModal(true)}
           className="btn btn-primary gap-2"
         >
           <Plus size={18} />
           {t("Add Assistant")}
-        </button>
+        </button> */}
       </div>
 
       {assistants.length === 0 ? (

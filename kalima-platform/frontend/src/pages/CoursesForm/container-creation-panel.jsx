@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { FolderPlus, FileText } from "lucide-react"
-import { createContainer, createLecture } from "../../routes/lectures"
+import { useState, useEffect } from "react"
+import { FolderPlus, FileText, Paperclip } from "lucide-react"
+import { createContainer, createLecture, createLectureAttachment } from "../../routes/lectures"
+import { getAllSubjects } from "../../routes/courses"
 import ContainerList from "./container-list"
 
 // Container types
@@ -20,10 +21,29 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [containerType, setContainerType] = useState(CONTAINER_TYPES.YEAR)
   const [selectedParentId, setSelectedParentId] = useState(courseStructure.parent?.id || null)
   const [lectureLink, setLectureLink] = useState("")
+  const [attachmentFile, setAttachmentFile] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [subjects, setSubjects] = useState([])
 
   // UI state
   const [expandedItems, setExpandedItems] = useState({})
+
+  // Fetch subjects on mount
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const subjectsResponse = await getAllSubjects()
+        if (subjectsResponse.success && subjectsResponse.data.subjects) {
+          setSubjects(subjectsResponse.data.subjects)
+        } else {
+          console.error(subjectsResponse.error)
+        }
+      } catch (error) {
+        console.error("Error fetching subjects:", error)
+      }
+    }
+    fetchSubjects()
+  }, [])
 
   const toggleExpand = (type, id) => {
     setExpandedItems((prev) => ({
@@ -32,7 +52,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     }))
   }
 
-  // Create container
+  // Create container or lecture
   const handleCreateContainer = async (e) => {
     e.preventDefault()
 
@@ -49,18 +69,6 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     setIsSubmitting(true)
 
     try {
-      const containerData = {
-        name: containerName,
-        type: containerType === CONTAINER_TYPES.LECTURE ? CONTAINER_TYPES.COURSE : containerType,
-        createdBy: createdBy,
-        parent: selectedParentId,
-        level: formData.gradeLevel,
-        subject: formData.subject,
-        price: formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
-        teacherAllowed: formData.privacy === "teacher",
-      }
-
-      // If it's a lecture, use createLecture API
       if (containerType === CONTAINER_TYPES.LECTURE) {
         if (!lectureLink) {
           alert(isRTL ? "يرجى إدخال رابط المحاضرة" : "Please enter a lecture link")
@@ -84,8 +92,18 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           examLink: "",
         }
 
+        // Create the lecture
         const response = await createLecture(lectureData)
         const lecture = response.data.lecture
+
+        // If there's an attachment, upload it
+        if (attachmentFile) {
+          const attachmentData = {
+            type: "homework",
+            attachment: attachmentFile,
+          }
+          await createLectureAttachment(lecture.id, attachmentData)
+        }
 
         const newLecture = {
           id: lecture.id,
@@ -93,6 +111,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           parent: lecture.parent,
           type: lecture.type,
           videoLink: lecture.videoLink,
+          attachment: attachmentFile ? { type: "homework", name: attachmentFile.name } : null,
         }
 
         updateCourseStructure({
@@ -101,6 +120,17 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         })
       } else {
         // For regular containers
+        const containerData = {
+          name: containerName,
+          type: containerType === CONTAINER_TYPES.LECTURE ? CONTAINER_TYPES.COURSE : containerType,
+          createdBy: createdBy,
+          parent: selectedParentId,
+          level: formData.gradeLevel,
+          subject: formData.subject,
+          price: formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
+          teacherAllowed: formData.privacy === "teacher",
+        }
+
         const response = await createContainer(containerData)
         const container = response.data.container
 
@@ -119,6 +149,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
 
       setContainerName("")
       setLectureLink("")
+      setAttachmentFile(null)
       alert(
         isRTL
           ? `تم إنشاء ${containerType === CONTAINER_TYPES.LECTURE ? "المحاضرة" : "الحاوية"} بنجاح`
@@ -211,18 +242,61 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           />
         </div>
 
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">{isRTL ? "الموضوع" : "Subject"}</label>
+          <select
+            value={formData.subject || ""}
+            onChange={(e) => {
+              updateCourseStructure({ ...courseStructure, formData: { ...formData, subject: e.target.value } })
+            }}
+            className="w-full select select-bordered bg-base-200"
+            required
+          >
+            <option value="" disabled>
+              {isRTL ? "اختر الموضوع" : "Select subject"}
+            </option>
+            {subjects.map((subject) => (
+              <option key={subject._id} value={subject._id}>
+                {subject.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {containerType === CONTAINER_TYPES.LECTURE && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">{isRTL ? "رابط المحاضرة" : "Lecture Link"}</label>
-            <input
-              type="text"
-              value={lectureLink}
-              onChange={(e) => setLectureLink(e.target.value)}
-              placeholder={isRTL ? "رابط الفيديو" : "Video link"}
-              className="w-full input input-bordered bg-base-200"
-              required={containerType === CONTAINER_TYPES.LECTURE}
-            />
-          </div>
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">{isRTL ? "رابط المحاضرة" : "Lecture Link"}</label>
+              <input
+                type="text"
+                value={lectureLink}
+                onChange={(e) => setLectureLink(e.target.value)}
+                placeholder={isRTL ? "رابط الفيديو" : "Video link"}
+                className="w-full input input-bordered bg-base-200"
+                required={containerType === CONTAINER_TYPES.LECTURE}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                {isRTL ? "إرفاق واجب (اختياري، .pdf فقط)" : "Attach Homework (Optional, .pdf only)"}
+              </label>
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={(e) => setAttachmentFile(e.target.files[0])}
+                  className="file-input file-input-bordered w-full bg-base-200"
+                  accept=".pdf"
+                />
+                <Paperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+              </div>
+              {attachmentFile && (
+                <p className="mt-2 text-sm text-base-content/70">
+                  {isRTL ? "الملف المختار:" : "Selected file:"} {attachmentFile.name}
+                </p>
+              )}
+            </div>
+          </>
         )}
 
         <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
