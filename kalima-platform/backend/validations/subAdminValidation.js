@@ -14,6 +14,14 @@ module.exports = Joi.object({
     .min(8)
     .required(),
 
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('password'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Confirm password is required'
+    }),
+
   gender: Joi.string()
     .valid("male", "female")
     .required(),
