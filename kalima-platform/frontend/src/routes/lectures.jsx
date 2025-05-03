@@ -116,7 +116,7 @@ export const downloadAttachmentById = async (attachmentId) => {
       throw new Error("Authentication required");
     }
 
-    const response = await api.get(`${API_URL}/lectures/attachment/${attachmentId}/file`, {
+    const response = await axios.get(`${API_URL}/lectures/attachment/${attachmentId}/file`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -208,7 +208,7 @@ export const getMyContainers = async () => {
 // Function to get all lectures
 export const getAllLectures = async () => {
   try {
-    const response = await api.get(`${API_URL}`, {withCredentials: true,
+    const response = await axios.get(`${API_URL}`, {withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },});
@@ -308,7 +308,7 @@ export const createLectureAttachment = async (lectureId, attachmentData) => {
     formData.append("type", attachmentData.type);
     formData.append("attachment", attachmentData.attachment);
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/lectures/attachments/${lectureId}`,
       formData,
       {

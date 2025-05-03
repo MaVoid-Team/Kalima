@@ -86,7 +86,7 @@ export const generatePromoCodes = async (data) => {
       payload.lecturerId = data.lecturerId;
     }
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/codes`,
       payload,
       {

@@ -11,7 +11,7 @@ const API_URL = import.meta.env.VITE_API_URL;
  */
 export const getRevenueSummary = async () => {
   try {
-    const response = await api.get(
+    const response = await axios.get(
       `${API_URL}/revenue/`,
       {
         withCredentials: true,
@@ -31,7 +31,7 @@ export const getRevenueSummary = async () => {
  */
 export const getRevenueBreakdown = async () => {
   try {
-    const response = await api.get(
+    const response = await axios.get(
       `${API_URL}/revenue/breakdown`,
       {
         withCredentials: true,
@@ -47,7 +47,7 @@ export const getRevenueBreakdown = async () => {
 
 export const getLecturerMonthlyRevenue = async (lecturerId) => {
   try {
-    const response = await api.get(
+    const response = await axios.get(
       `${API_URL}/containers/${lecturerId}/monthly-revenue`,
       {
         withCredentials: true,
