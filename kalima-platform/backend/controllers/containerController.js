@@ -634,6 +634,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
     }
 
     let obj = { name, type, price };
+    let unsetObj = {};
 
     if (type === "course") {
       if (!description || !goal) {
@@ -667,8 +668,8 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       if (container.image && container.image.publicId) {
         await cloudinary.uploader.destroy(container.image.publicId);
       }
-      // Set image field to undefined to remove it
-      obj.image = undefined;
+      // Properly remove image field using $unset
+      unsetObj.image = "";
     } 
     else if (req.file) {
       // New image uploaded - update the image field
@@ -683,9 +684,15 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       };
     }
 
+    // Update using both $set and $unset operators if needed
+    const updateOptions = {
+      $set: obj,
+      ...(Object.keys(unsetObj).length > 0 ? { $unset: unsetObj } : {})
+    };
+
     const updatedContainer = await Container.findByIdAndUpdate(
       req.params.containerId,
-      obj,
+      updateOptions,
       {
         new: true,
         runValidators: true,
