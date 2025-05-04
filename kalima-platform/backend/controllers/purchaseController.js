@@ -268,7 +268,11 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
 
     // Find user model
     let userModel;
-
+    if (req.user.role === "Teacher" && container.teacherAllowed === false) {
+      return next(
+        new AppError("You are not allowed to purchase this container", 400)
+      );
+    }
     // Try finding as Student
     userModel = await Student.findById(userId).session(session);
 
@@ -276,7 +280,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     if (!userModel) {
       userModel = await Parent.findById(userId).session(session);
     }
-
+    if (!userModel) {
+      userModel = await Teacher.findById(userId).session(session);
+    }
     // If still not found, check standard User model to determine role
     if (!userModel) {
       const baseUser = await User.findById(userId).session(session);
@@ -408,6 +414,12 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
       select: "name",
     });
   }
+  if (!userModel) {
+    userModel = await Teacher.findById(userId).populate({
+      path: "lecturerPoints.lecturer",
+      select: "name",
+    });
+  }
 
   // If still not found, check standard User model
   if (!userModel) {
@@ -486,6 +498,12 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
   // If not found, try as Parent
   if (!userModel) {
     userModel = await Parent.findById(userId).populate({
+      path: "lecturerPoints.lecturer",
+      select: "name subject",
+    });
+  }
+  if (!userModel) {
+    userModel = await Teacher.findById(userId).populate({
       path: "lecturerPoints.lecturer",
       select: "name subject",
     });

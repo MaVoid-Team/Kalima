@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-
+const QueryFeatures = require("../utils/queryFeatures");
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   const access = await StudentLectureAccess.create(req.body);
   res.status(201).json({
@@ -26,7 +26,13 @@ exports.getStudentLectureAccess = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllStudentLectureAccess = catchAsync(async (req, res, next) => {
-  const accesses = await StudentLectureAccess.find().populate([
+  let query = StudentLectureAccess.find();
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+  query = features.query;
+  const accesses = await query.populate([
     { path: "student", select: "name" },
     { path: "lecture", select: "name videoLink" },
   ]);
