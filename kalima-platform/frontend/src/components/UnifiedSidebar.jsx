@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
+import { Edit } from 'lucide-react';
 
 const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
@@ -123,6 +124,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         icon: <MdDashboard className="w-5 h-5" />, 
         path: '/dashboard/admin-dashboard/audit-log' 
       },
+      { 
+        id: 'create', 
+        title: t('Create') || 'Create', 
+        icon: <Edit className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/create'
+      }
     ];
 
     // Lecturer-specific menu items
