@@ -144,7 +144,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     case "student":
       user = await Student.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -153,7 +153,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     case "parent":
       user = await Parent.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -162,7 +162,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     case "lecturer":
       user = await Lecturer.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -171,16 +171,16 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     case "assistant":
       user = await Assistant.findByIdAndUpdate(userId, updatedUser, {
         new: true,
         runValidators: true,
       })
-        .select(selectedFields)     
+        .select(selectedFields)
         .lean();
       break;
-  
+
     case "moderator":
       user = await Moderator.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -189,7 +189,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     case "subadmin":
       user = await SubAdmin.findByIdAndUpdate(userId, updatedUser, {
         new: true,
@@ -198,7 +198,7 @@ const updateUser = catchAsync(async (req, res, next) => {
         .select(selectedFields)
         .lean();
       break;
-  
+
     default:
       return next(new AppError("Invalid role", 400));
   }
@@ -327,7 +327,7 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
 /**
  * Get all data for the currently logged-in user (any role)
  * Includes user profile, balance information (for student/parent) and purchase history (for student/parent)
- * 
+ *
  * Query parameters supported:
  * - fields: Comma-separated list of fields to include (e.g., fields=userInfo,purchaseHistory)
  * - limit: Number of items per page for paginated results (default: 10)
@@ -340,10 +340,10 @@ const getMyData = catchAsync(async (req, res, next) => {
   // Get user ID from authenticated user
   const userId = req.user._id;
   const userRole = req.user.role;
-  
+
   // Parse field selection (if provided)
-  const fields = req.query.fields ? req.query.fields.split(',') : null;
-  
+  const fields = req.query.fields ? req.query.fields.split(",") : null;
+
   // Common response data
   let responseData = {
     userInfo: {
@@ -351,25 +351,25 @@ const getMyData = catchAsync(async (req, res, next) => {
       name: req.user.name,
       email: req.user.email,
       role: userRole,
-    }
+    },
   };
-  
+
   // Role-specific data retrieval
-  switch(userRole) {
+  switch (userRole) {
     case "Student":
       // Find student with all related data
       const student = await Student.findById(userId)
         .populate("level", "name")
         .populate({
           path: "lecturerPoints.lecturer",
-          select: "name subject expertise"
+          select: "name subject expertise",
         })
         .lean();
-      
+
       if (!student) {
         return next(new AppError("Student not found", 404));
       }
-      
+
       // Add student-specific fields
       responseData.userInfo = {
         ...responseData.userInfo,
@@ -378,67 +378,88 @@ const getMyData = catchAsync(async (req, res, next) => {
         generalPoints: student.generalPoints || 0,
         totalPoints: student.totalPoints || 0,
         hobbies: student.hobbies,
-        faction: student.faction
+        faction: student.faction,
       };
-      
+
       // Get student purchases, redeemed codes, and lecture access (with query params)
-      if (!fields || fields.includes('purchaseHistory') || fields.includes('redeemedCodes') || 
-          fields.includes('lectureAccess') || fields.includes('pointsBalances') || fields.includes('purchasedFeatures')) {
-        responseData = await getStudentParentAdditionalData(userId, responseData, student.lecturerPoints || [], req.query);
+      if (
+        !fields ||
+        fields.includes("purchaseHistory") ||
+        fields.includes("redeemedCodes") ||
+        fields.includes("lectureAccess") ||
+        fields.includes("pointsBalances") ||
+        fields.includes("purchasedFeatures")
+      ) {
+        responseData = await getStudentParentAdditionalData(
+          userId,
+          responseData,
+          student.lecturerPoints || [],
+          req.query
+        );
       }
       break;
-      
+
     case "Parent":
       // Find parent with all related data
       const parent = await Parent.findById(userId)
         .populate({
           path: "children",
-          select: "name level sequencedId"
+          select: "name level sequencedId",
         })
         .populate({
           path: "lecturerPoints.lecturer",
-          select: "name subject expertise"
+          select: "name subject expertise",
         })
         .lean();
-      
+
       if (!parent) {
         return next(new AppError("Parent not found", 404));
       }
-      
+
       // Add parent-specific fields
       responseData.userInfo = {
         ...responseData.userInfo,
         phoneNumber: parent.phoneNumber,
         level: parent.level,
         children: parent.children,
-        generalPoints: parent.generalPoints || 0
+        generalPoints: parent.generalPoints || 0,
       };
-      
+
       // Get parent purchases, redeemed codes, and lecture access (with query params)
-      if (!fields || fields.includes('purchaseHistory') || fields.includes('redeemedCodes') || 
-          fields.includes('lectureAccess') || fields.includes('pointsBalances') || fields.includes('purchasedFeatures')) {
-        responseData = await getStudentParentAdditionalData(userId, responseData, parent.lecturerPoints || [], req.query);
+      if (
+        !fields ||
+        fields.includes("purchaseHistory") ||
+        fields.includes("redeemedCodes") ||
+        fields.includes("lectureAccess") ||
+        fields.includes("pointsBalances") ||
+        fields.includes("purchasedFeatures")
+      ) {
+        responseData = await getStudentParentAdditionalData(
+          userId,
+          responseData,
+          parent.lecturerPoints || [],
+          req.query
+        );
       }
       break;
-      
+
     case "Lecturer":
       // Find lecturer with relevant data
-      const lecturer = await Lecturer.findById(userId)
-        .lean();
-      
+      const lecturer = await Lecturer.findById(userId).lean();
+
       if (!lecturer) {
         return next(new AppError("Lecturer not found", 404));
       }
-      
+
       // Add lecturer-specific fields
       responseData.userInfo = {
         ...responseData.userInfo,
         bio: lecturer.bio,
-        expertise: lecturer.expertise
+        expertise: lecturer.expertise,
       };
-      
+
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
-      if (!fields || fields.includes('containers')) {
+      if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
         let containerQuery = Container.find({ createdBy: userId })
           .select("name type price subject level")
@@ -452,15 +473,15 @@ const getMyData = catchAsync(async (req, res, next) => {
           .paginate();
         containerQuery = containerFeatures.query;
         const containers = await containerQuery.lean();
-        
+
         responseData.containers = containers;
       }
-      
+
       // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
-      if (!fields || fields.includes('pointPurchases')) {
+      if (!fields || fields.includes("pointPurchases")) {
         // Get point purchases made for this lecturer's content
         let purchaseQuery = Purchase.find({ lecturer: userId });
-        
+
         // Add date filtering if provided
         if (req.query.dateFrom || req.query.dateTo) {
           const dateFilter = {};
@@ -468,36 +489,37 @@ const getMyData = catchAsync(async (req, res, next) => {
             dateFilter.purchasedAt = { $gte: new Date(req.query.dateFrom) };
           }
           if (req.query.dateTo) {
-            dateFilter.purchasedAt = { ...dateFilter.purchasedAt, $lte: new Date(req.query.dateTo) };
+            dateFilter.purchasedAt = {
+              ...dateFilter.purchasedAt,
+              $lte: new Date(req.query.dateTo),
+            };
           }
           purchaseQuery = purchaseQuery.find(dateFilter);
         }
-        
+
         // Apply query features for purchases
         const purchaseFeatures = new QueryFeatures(purchaseQuery, req.query)
           .filter()
           .sort()
           .paginate();
         purchaseQuery = purchaseFeatures.query;
-        
+
         const pointPurchases = await purchaseQuery
           .populate("student", "name")
           .lean();
-        
+
         responseData.pointPurchases = pointPurchases;
       }
       break;
-      
+
     case "Teacher":
       // Find teacher with relevant data
-      const teacher = await Teacher.findById(userId)
-        .populate("school", "name")
-        .lean();
-      
+      const teacher = await Teacher.findById(userId).lean();
+
       if (!teacher) {
         return next(new AppError("Teacher not found", 404));
       }
-      
+
       // Add teacher-specific fields
       responseData.userInfo = {
         ...responseData.userInfo,
@@ -505,81 +527,100 @@ const getMyData = catchAsync(async (req, res, next) => {
         subject: teacher.subject,
         level: teacher.level,
         faction: teacher.faction,
-        school: teacher.school
+        school: teacher.school,
       };
+
+      // Get student purchases, redeemed codes, and lecture access (with query params)
+      if (
+        !fields ||
+        fields.includes("purchaseHistory") ||
+        fields.includes("redeemedCodes") ||
+        fields.includes("lectureAccess") ||
+        fields.includes("pointsBalances") ||
+        fields.includes("purchasedFeatures")
+      ) {
+        responseData = await getStudentParentAdditionalData(
+          userId,
+          responseData,
+          teacher.lecturerPoints || [],
+          req.query
+        );
+      }
+
       break;
-      
+
     case "Admin":
     case "SubAdmin":
     case "Moderator":
       // For admin roles, just return basic profile info
-      const admin = await User.findById(userId)
-        .select("-password")
-        .lean();
-      
+      const admin = await User.findById(userId).select("-password").lean();
+
       if (!admin) {
         return next(new AppError("User not found", 404));
       }
-      
+
       // No additional fields needed for admin roles
       break;
-      
+
     case "Assistant":
       // Find assistant with related lecturer
       const assistant = await Assistant.findById(userId)
         .populate("assignedLecturer", "name expertise")
         .lean();
-      
+
       if (!assistant) {
         return next(new AppError("Assistant not found", 404));
       }
-      
+
       // Add assistant-specific fields
       responseData.userInfo = {
         ...responseData.userInfo,
-        assignedLecturer: assistant.assignedLecturer
+        assignedLecturer: assistant.assignedLecturer,
       };
       break;
-      
+
     default:
       // For any other role, return basic user info
-      const user = await User.findById(userId)
-        .select("-password")
-        .lean();
-      
+      const user = await User.findById(userId).select("-password").lean();
+
       if (!user) {
         return next(new AppError("User not found", 404));
       }
   }
-  
+
   // Filter out fields that weren't requested (if fields parameter was provided)
   if (fields) {
     const filteredResponse = {};
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (responseData[field]) {
         filteredResponse[field] = responseData[field];
       }
     });
     responseData = filteredResponse;
   }
-  
+
   res.status(200).json({
     status: "success",
-    data: responseData
+    data: responseData,
   });
 });
 
 // Helper function to get additional data for students and parents
-const getStudentParentAdditionalData = async (userId, responseData, pointsBalances, queryParams = {}) => {
-  const fields = queryParams.fields ? queryParams.fields.split(',') : null;
-  
+const getStudentParentAdditionalData = async (
+  userId,
+  responseData,
+  pointsBalances,
+  queryParams = {}
+) => {
+  const fields = queryParams.fields ? queryParams.fields.split(",") : null;
+
   // Only include purchase history if requested or no specific fields were requested
-  if (!fields || fields.includes('purchaseHistory')) {
+  if (!fields || fields.includes("purchaseHistory")) {
     // Get all types of purchases for the user
     let purchaseQuery = Purchase.find({
-      student: userId
+      student: userId,
     });
-    
+
     // Add date filtering if provided
     if (queryParams.dateFrom || queryParams.dateTo) {
       const dateFilter = {};
@@ -587,29 +628,32 @@ const getStudentParentAdditionalData = async (userId, responseData, pointsBalanc
         dateFilter.purchasedAt = { $gte: new Date(queryParams.dateFrom) };
       }
       if (queryParams.dateTo) {
-        dateFilter.purchasedAt = { ...dateFilter.purchasedAt, $lte: new Date(queryParams.dateTo) };
+        dateFilter.purchasedAt = {
+          ...dateFilter.purchasedAt,
+          $lte: new Date(queryParams.dateTo),
+        };
       }
       purchaseQuery = purchaseQuery.find(dateFilter);
     }
-    
+
     // Apply query features for purchases
     const purchaseFeatures = new QueryFeatures(purchaseQuery, queryParams)
       .filter()
       .sort()
       .paginate();
     purchaseQuery = purchaseFeatures.query;
-    
+
     // Add relevant populated fields
     const purchaseHistory = await purchaseQuery
       .populate([
         { path: "container", select: "name type price" },
         { path: "lecturer", select: "name expertise" },
-        { path: "package", select: "name type price description" }
+        { path: "package", select: "name type price description" },
       ])
       .lean();
-    
+
     responseData.purchaseHistory = purchaseHistory;
-    
+
     // Get total count of purchases for pagination info
     const totalPurchases = await Purchase.countDocuments({ student: userId });
     responseData.paginationInfo = {
@@ -617,93 +661,100 @@ const getStudentParentAdditionalData = async (userId, responseData, pointsBalanc
         totalCount: totalPurchases,
         page: parseInt(queryParams.page) || 1,
         limit: parseInt(queryParams.limit) || 10,
-        totalPages: Math.ceil(totalPurchases / (parseInt(queryParams.limit) || 10))
-      }
+        totalPages: Math.ceil(
+          totalPurchases / (parseInt(queryParams.limit) || 10)
+        ),
+      },
     };
   }
-  
+
   // Only include redeemed codes if requested or no specific fields were requested
-  if (!fields || fields.includes('redeemedCodes')) {
+  if (!fields || fields.includes("redeemedCodes")) {
     let codesQuery = Code.find({
       redeemedBy: userId,
-      isRedeemed: true
+      isRedeemed: true,
     });
-    
+
     // Apply query features for codes
     const codesFeatures = new QueryFeatures(codesQuery, queryParams)
       .filter()
       .sort()
       .paginate();
     codesQuery = codesFeatures.query;
-    
+
     const redeemedCodes = await codesQuery.lean();
     responseData.redeemedCodes = redeemedCodes;
-    
+
     // Get total count of redeemed codes for pagination info
-    const totalCodes = await Code.countDocuments({ 
+    const totalCodes = await Code.countDocuments({
       redeemedBy: userId,
-      isRedeemed: true 
+      isRedeemed: true,
     });
-    
+
     if (!responseData.paginationInfo) responseData.paginationInfo = {};
     responseData.paginationInfo.redeemedCodes = {
       totalCount: totalCodes,
       page: parseInt(queryParams.page) || 1,
       limit: parseInt(queryParams.limit) || 10,
-      totalPages: Math.ceil(totalCodes / (parseInt(queryParams.limit) || 10))
+      totalPages: Math.ceil(totalCodes / (parseInt(queryParams.limit) || 10)),
     };
   }
-  
+
   // Only include lecture access if requested or no specific fields were requested
-  if (!fields || fields.includes('lectureAccess')) {
+  if (!fields || fields.includes("lectureAccess")) {
     let lectureAccessQuery = StudentLectureAccess.find({
-      student: userId
+      student: userId,
     });
-    
+
     // Apply query features for lecture access
-    const lectureAccessFeatures = new QueryFeatures(lectureAccessQuery, queryParams)
+    const lectureAccessFeatures = new QueryFeatures(
+      lectureAccessQuery,
+      queryParams
+    )
       .filter()
       .sort()
       .paginate();
     lectureAccessQuery = lectureAccessFeatures.query;
-    
+
     const lectureAccess = await lectureAccessQuery
       .populate({
         path: "lecture",
-        select: "name videoLink description numberOfViews"
+        select: "name videoLink description numberOfViews",
       })
       .lean();
-    
+
     responseData.lectureAccess = lectureAccess;
-    
+
     // Get total count of lecture access entries for pagination info
-    const totalLectureAccess = await StudentLectureAccess.countDocuments({ 
-      student: userId
+    const totalLectureAccess = await StudentLectureAccess.countDocuments({
+      student: userId,
     });
-    
+
     if (!responseData.paginationInfo) responseData.paginationInfo = {};
     responseData.paginationInfo.lectureAccess = {
       totalCount: totalLectureAccess,
       page: parseInt(queryParams.page) || 1,
       limit: parseInt(queryParams.limit) || 10,
-      totalPages: Math.ceil(totalLectureAccess / (parseInt(queryParams.limit) || 10))
+      totalPages: Math.ceil(
+        totalLectureAccess / (parseInt(queryParams.limit) || 10)
+      ),
     };
   }
-  
+
   // Always include points balances as they're small
-  if (!fields || fields.includes('pointsBalances')) {
+  if (!fields || fields.includes("pointsBalances")) {
     responseData.pointsBalances = pointsBalances;
   }
-  
+
   // Calculate feature flags based on data
-  if (!fields || fields.includes('purchasedFeatures')) {
+  if (!fields || fields.includes("purchasedFeatures")) {
     const purchasedLectureTypes = new Set();
-    
+
     // If we have purchase history, use it to determine purchased features
     if (responseData.purchaseHistory) {
-      responseData.purchaseHistory.forEach(purchase => {
-        if (purchase.container && purchase.container.type === 'lecture') {
-          purchasedLectureTypes.add('lecture');
+      responseData.purchaseHistory.forEach((purchase) => {
+        if (purchase.container && purchase.container.type === "lecture") {
+          purchasedLectureTypes.add("lecture");
         }
       });
     }
@@ -711,21 +762,21 @@ const getStudentParentAdditionalData = async (userId, responseData, pointsBalanc
     else {
       const purchaseTypes = await Purchase.find({
         student: userId,
-        'container.type': 'lecture'
+        "container.type": "lecture",
       })
-      .limit(1)
-      .lean();
-      
+        .limit(1)
+        .lean();
+
       if (purchaseTypes.length > 0) {
-        purchasedLectureTypes.add('lecture');
+        purchasedLectureTypes.add("lecture");
       }
     }
-    
+
     responseData.purchasedFeatures = {
-      hasLectures: purchasedLectureTypes.size > 0
+      hasLectures: purchasedLectureTypes.size > 0,
     };
   }
-  
+
   return responseData;
 };
 
