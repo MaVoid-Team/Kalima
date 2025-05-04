@@ -33,8 +33,8 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     const fetchSubjects = async () => {
       try {
         const subjectsResponse = await getAllSubjects()
-        if (subjectsResponse.success && subjectsResponse.data.subjects) {
-          setSubjects(subjectsResponse.data.subjects)
+        if (subjectsResponse.success && subjectsResponse.data) {
+          setSubjects(subjectsResponse.data)
         } else {
           console.error(subjectsResponse.error)
         }
