@@ -10,7 +10,7 @@ router.use(verifyJWT, authController.verifyRoles("admin", "subadmin", "moderator
 router
     .route("/")
     .get(assistantController.getAllAssistants)
-    .post(assistantController.createAssistant);
+    .post(assistantController.uploadAssistantPhoto ,assistantController.createAssistant);
 
 router
     .route("/lecturer/:lecturerId")
