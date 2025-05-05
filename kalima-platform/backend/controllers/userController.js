@@ -207,11 +207,21 @@ const updateUser = catchAsync(async (req, res, next) => {
 });
 
 const deleteUser = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findByIdAndDelete(req.params.userId)
-    .select("-password")
-    .lean();
+  const foundUser = await User.findById(req.params.userId).select("-password");
+
   if (!foundUser) return next(new AppError("User not found", 404));
-  res.json(foundUser);
+  if (
+    req.user.role === "SubAdmin" &&
+    (foundUser.role === "Admin" || foundUser.role === "SubAdmin")
+  ) {
+    return next(new AppError("You are not allowed to delete this user", 403));
+  }
+
+  await foundUser.deleteOne();
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });
 
 // we ahould make a validation for newPassword field here
@@ -380,6 +390,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         hobbies: student.hobbies,
         faction: student.faction,
       };
+
       // Get student purchases, redeemed codes, and lecture access (with query params)
       if (
         !fields ||
@@ -423,6 +434,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         children: parent.children,
         generalPoints: parent.generalPoints || 0,
       };
+
       // Get parent purchases, redeemed codes, and lecture access (with query params)
       if (
         !fields ||
@@ -454,7 +466,9 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         bio: lecturer.bio,
         expertise: lecturer.expertise,
+        expertise: lecturer.expertise,
       };
+
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
       if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
@@ -511,9 +525,7 @@ const getMyData = catchAsync(async (req, res, next) => {
 
     case "Teacher":
       // Find teacher with relevant data
-      const teacher = await Teacher.findById(userId)
-        .populate("school", "name")
-        .lean();
+      const teacher = await Teacher.findById(userId).lean();
 
       if (!teacher) {
         return next(new AppError("Teacher not found", 404));
@@ -528,6 +540,24 @@ const getMyData = catchAsync(async (req, res, next) => {
         faction: teacher.faction,
         school: teacher.school,
       };
+
+      // Get student purchases, redeemed codes, and lecture access (with query params)
+      if (
+        !fields ||
+        fields.includes("purchaseHistory") ||
+        fields.includes("redeemedCodes") ||
+        fields.includes("lectureAccess") ||
+        fields.includes("pointsBalances") ||
+        fields.includes("purchasedFeatures")
+      ) {
+        responseData = await getStudentParentAdditionalData(
+          userId,
+          responseData,
+          teacher.lecturerPoints || [],
+          req.query
+        );
+      }
+
       break;
 
     case "Admin":
@@ -568,6 +598,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         return next(new AppError("User not found", 404));
       }
   }
+
   // Filter out fields that weren't requested (if fields parameter was provided)
   if (fields) {
     const filteredResponse = {};
@@ -578,6 +609,7 @@ const getMyData = catchAsync(async (req, res, next) => {
     });
     responseData = filteredResponse;
   }
+
   res.status(200).json({
     status: "success",
     data: responseData,

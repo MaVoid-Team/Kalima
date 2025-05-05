@@ -24,7 +24,7 @@ router.post(
 // Purchase a container with lecturer-specific points
 router.post(
   "/container",
-  authController.verifyRoles("Student", "Parent"),
+  authController.verifyRoles("Student", "Parent", "Teacher"),
   purchaseController.purchaseContainerWithPoints
 );
 // Purchase a package with General points
@@ -58,7 +58,7 @@ router.get(
 // Get current user's points balance with a specific lecturer
 router.get(
   "/lecturer/:lecturerId/balance",
-  authController.verifyRoles("Student", "Parent"),
+  authController.verifyRoles("Student", "Parent", "Teacher"),
   purchaseController.getLecturerPointsBalance
 );
 
@@ -72,7 +72,7 @@ router.get(
 // Get current user's purchases
 router.get(
   "/history",
-  authController.verifyRoles("Student", "Parent"),
+  authController.verifyRoles("Student", "Parent", "Teacher"),
   purchaseController.getPurchasesByUser
 );
 
