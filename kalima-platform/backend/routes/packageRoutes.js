@@ -21,10 +21,10 @@ router
   .route("/")
   .post(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), packageController.createPackage);
 
-router.patch("/:id/points", authController.verifyRoles("Admin", "SubAdmin"), packageController.managePackagePoints);
+router.patch("/:id/points", authController.verifyRoles("Admin", "SubAdmin", "Moderator"), packageController.managePackagePoints);
 router
   .route("/:id")
-  .patch(authController.verifyRoles("Admin", "SubAdmin"), packageController.updatePackage)
-  .delete(authController.verifyRoles("Admin", "SubAdmin"), packageController.deletePackage);
+  .patch(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), packageController.updatePackage)
+  .delete(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), packageController.deletePackage);
 
 module.exports = router;
