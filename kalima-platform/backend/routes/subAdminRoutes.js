@@ -8,14 +8,14 @@ const router = express.Router();
 router.use(verifyJWT, authController.verifyRoles("admin"));
 
 router
-    .route("/")
-    .post(subAdminController.createSubAdmin)
-    .get(subAdminController.getAllSubAdmins);
+  .route("/")
+  .post(subAdminController.createSubAdmin)
+  .get(subAdminController.getAllSubAdmins);
 
 router
-    .route("/:id")
-    .get(subAdminController.getSubAdminById)
-    .patch(subAdminController.updateSubAdmin)
-    .delete(subAdminController.deleteSubAdmin);
+  .route("/:id")
+  .get(subAdminController.getSubAdminById)
+  .patch(subAdminController.updateSubAdmin)
+  .delete(subAdminController.deleteSubAdmin);
 
 module.exports = router;

@@ -1,9 +1,38 @@
 const mongoose = require("mongoose");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
+const StudentExamSubmission = require("../models/studentExamSubmissionModel");
+const Lecture = require("../models/LectureModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const QueryFeatures = require("../utils/queryFeatures");
 
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
+  const { student, lecture } = req.body;
+
+  // Check if the lecture requires an exam
+  const lectureDoc = await Lecture.findById(lecture).populate("examConfig");
+  if (!lectureDoc) {
+    return next(new AppError("Lecture not found", 404));
+  }
+
+  // If lecture requires an exam, verify that student has passed it
+  if (lectureDoc.requiresExam) {
+    const examSubmission = await StudentExamSubmission.findOne({
+      student,
+      lecture,
+      passed: true,
+    });
+
+    if (!examSubmission) {
+      return next(
+        new AppError(
+          "You must pass the exam before accessing this lecture",
+          403
+        )
+      );
+    }
+  }
+
   const access = await StudentLectureAccess.create(req.body);
   res.status(201).json({
     status: "success",
@@ -26,7 +55,13 @@ exports.getStudentLectureAccess = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllStudentLectureAccess = catchAsync(async (req, res, next) => {
-  const accesses = await StudentLectureAccess.find().populate([
+  let query = StudentLectureAccess.find();
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+  query = features.query;
+  const accesses = await query.populate([
     { path: "student", select: "name" },
     { path: "lecture", select: "name videoLink" },
   ]);
@@ -63,5 +98,58 @@ exports.deleteStudentLectureAccess = catchAsync(async (req, res, next) => {
   res.status(204).json({
     status: "success",
     data: null,
+  });
+});
+
+// New function to check if a student can access a lecture
+exports.checkLectureAccess = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  const studentId = req.user._id;
+
+  // Get the lecture
+  const lecture = await Lecture.findById(lectureId).populate("examConfig");
+  if (!lecture) {
+    return next(new AppError("Lecture not found", 404));
+  }
+
+  // Check if lecture requires an exam
+  if (lecture.requiresExam) {
+    // Verify student has passed the exam
+    const examSubmission = await StudentExamSubmission.findOne({
+      student: studentId,
+      lecture: lectureId,
+      passed: true,
+    });
+
+    // If no passing exam submission, provide exam information
+    if (!examSubmission) {
+      return res.status(403).json({
+        status: "restricted",
+        message: "You must pass the exam before accessing this lecture",
+        data: {
+          requiresExam: true,
+          examUrl: lecture.examConfig ? lecture.examConfig.formUrl : null,
+          passingThreshold:
+            lecture.passingThreshold ||
+            (lecture.examConfig
+              ? lecture.examConfig.defaultPassingThreshold
+              : 60),
+        },
+      });
+    }
+  }
+
+  // If exam is passed or not required, check standard access permissions
+  // Rest of your existing access control logic would go here
+
+  // For now, return success and indicate exam is passed
+  res.status(200).json({
+    status: "success",
+    message: "Access granted",
+    data: {
+      hasAccess: true,
+      requiresExam: lecture.requiresExam,
+      examPassed: lecture.requiresExam ? true : undefined,
+    },
   });
 });
