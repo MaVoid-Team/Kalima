@@ -10,7 +10,10 @@
       "term": "Term",
       "type": "Course Type",
       "status": "Course Status",
-      "subject": "Subject"
+      "subject": "Subject",
+      "price": "Course Price",
+      "select" : "Select",
+      "all" : "All"
     },
     "stages": {
       "primary": "Primary Stage",

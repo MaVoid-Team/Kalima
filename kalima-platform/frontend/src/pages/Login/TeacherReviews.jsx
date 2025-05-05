@@ -4,27 +4,27 @@ import { FaQuoteLeft, FaQuoteRight, FaChevronLeft, FaChevronRight, FaTimes, FaCh
 
 const reviews = [
   {
-    name: 'Dr. James Wilson',
+    name: 'Dr. Ahmed El-Sayed',
     review: 'This platform has revolutionized my teaching methods. The interactive tools and resources have made my lessons more engaging for students.',
-    image: 'https://i.pravatar.cc/150?img=11',
+    image: 'https://i.pravatar.cc/150?img=59',
     fullReview: `As an educator for over 15 years, I've tried many teaching platforms, but this one stands out. The analytics help me understand student progress, and the customizable curriculum tools let me tailor content to different learning styles. My student engagement has increased dramatically since implementing these resources in my classroom.`
   },
   {
-    name: 'Prof. Maria Rodriguez',
+    name: 'Prof. Fatima Al-Mansoori',
     review: 'The assessment tools have saved me countless hours of grading while providing better insights into student performance.',
-    image: 'https://i.pravatar.cc/150?img=12',
+    image: 'https://i.pravatar.cc/150?img=49',
     fullReview: `The automated grading system is incredibly accurate and gives me detailed analytics on where students are struggling. I can now spend more time providing targeted support rather than manually grading assignments. The platform also makes it easy to create differentiated assessments for students with varying abilities.`
   },
   {
-    name: 'Dr. Robert Chen',
+    name: 'Dr. Omar Khaled',
     review: 'Collaboration with other educators has never been easier. We share resources and best practices seamlessly.',
-    image: 'https://i.pravatar.cc/150?img=13',
+    image: 'https://i.pravatar.cc/150?img=17',
     fullReview: `The teacher community feature has connected me with educators worldwide. We regularly exchange lesson plans, discuss teaching strategies, and support each other through challenges. This collaborative environment has significantly improved my professional development and classroom effectiveness.`
   },
   {
-    name: 'Prof. Aisha Johnson',
+    name: 'Prof. Sara Al-Hamadi',
     review: 'The parent communication tools have strengthened the home-school connection and improved student outcomes.',
-    image: 'https://i.pravatar.cc/150?img=14',
+    image: 'https://i.pravatar.cc/150?img=30',
     fullReview: `Parents now have real-time access to their child's progress, upcoming assignments, and classroom announcements. This transparency has increased parental involvement and support at home. The translation feature has been particularly valuable for communicating with my diverse parent community.`
   }
 ];

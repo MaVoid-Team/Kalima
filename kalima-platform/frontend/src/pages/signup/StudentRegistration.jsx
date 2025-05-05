@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RoleSelectionModal from './RoleSelctionModal';
 
-const apiUrl = process.env.REACT_APP_BASE_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 const hobbiesList = [
   { id: 1, name: 'reading', img: '/hobbies/reading.jpg' },
   { id: 2, name: 'sports', img: '/hobbies/sports.jpg' },
@@ -22,7 +22,7 @@ const hobbiesList = [
   { id: 6, name: 'cooking', img: '/hobbies/cooking.jpg' },
   { id: 7, name: 'photography', img: '/hobbies/photography.jpg' },
   { id: 8, name: 'dancing', img: '/hobbies/dancing.jpg' },
-  { id: 9, name: 'technology', img: '/hobbies/technology.jpg' },
+  { id: 9, name: 'technology', img: '/hobbies propagetechnology.jpg' },
 ];
 
 const totalSteps = {
@@ -40,123 +40,125 @@ export default function StudentRegistration() {
   const [role, setRole] = useState('student');
   const [formData, setFormData] = useState({
     role: 'student',
-    // Common fields
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
     phoneNumber: '',
     gender: '',
-    // Student-specific
-    faction: 'Alpha', // Default faction
+    faction: 'Alpha',
     grade: '',
-    level: '', // Used for both student and parent
+    level: '',
     hobbies: [],
     parentPhoneNumber: '',
-    // Parent-specific
     children: [''],
-    // Lecturer-specific
     bio: '',
-    expertise: ''
+    expertise: '',
+    subject: [],
   });
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
 
-  useEffect(() => setErrors({}), [currentStep]);
+  useEffect(() => {
+    setErrors({});
+    setApiError(null);
+  }, [currentStep]);
 
   const getStepErrors = (step) => {
     const errors = {};
     const { role } = formData;
-    const phoneRegex = /^\+?[1-9]\d{7,14}$/;
+    const phoneRegex = /^\+?[0-9]\d{7,14}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    // Make password validation less strict to allow testing
-    const passwordRegex = /^.{4,}$/; // At least 4 characters
-    
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d!@#$%^&*]{6,}$/;
+
     if (step === 1) {
-      if (!formData.fullName?.trim()) errors.fullName = 'validation.required';
-      if (!formData.gender) errors.gender = 'validation.required';
+      if (!formData.fullName?.trim()) errors.fullName = 'Full name is required';
+      if (!formData.gender) errors.gender = 'Gender is required';
       if (!formData.phoneNumber) {
-        errors.phoneNumber = 'validation.required';
+        errors.phoneNumber = 'Phone number is required';
       } else if (!phoneRegex.test(formData.phoneNumber)) {
-        errors.phoneNumber = 'validation.phoneFormat';
+        errors.phoneNumber = 'Invalid phone number format';
       }
-      if (role === 'student' && !formData.grade) errors.grade = 'validation.required';
+      if (role === 'student' && !formData.grade) {
+        errors.grade = 'Grade is required';
+      }
     }
-  
+
     if (step === 2) {
-      // Email validation - make it less strict for testing
       if (!formData.email) {
-        errors.email = 'validation.required';
+        errors.email = 'Email is required';
+      } else if (!emailRegex.test(formData.email)) {
+        errors.email = 'Invalid email format';
       }
-      // Simple email format check
-      else if (!formData.email.includes('@')) {
-        errors.email = 'validation.emailFormat';
-      }
-      
-      // Password validation - make it less strict for testing
+
       if (!formData.password) {
-        errors.password = 'validation.required';
+        errors.password = 'Password is required';
+      } else if (!passwordRegex.test(formData.password)) {
+        errors.password = 'Password must be at least 6 characters, include one uppercase and one lowercase letter';
       }
-      
-      // Only check confirmPassword if password is provided
-      if (formData.password && !formData.confirmPassword) {
-        errors.confirmPassword = 'validation.required';
-      } else if (formData.password && formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = 'validation.passwordMismatch';
+
+      if (!formData.confirmPassword) {
+        errors.confirmPassword = 'Confirm password is required';
+      } else if (formData.password !== formData.confirmPassword) {
+        errors.confirmPassword = 'Passwords do not match';
       }
-      
+
       if (role === 'student') {
         if (!formData.parentPhoneNumber) {
-          errors.parentPhoneNumber = 'validation.required';
+          errors.parentPhoneNumber = 'Parent phone number is required';
+        } else if (!phoneRegex.test(formData.parentPhoneNumber)) {
+          errors.parentPhoneNumber = 'Invalid parent phone number format';
         }
-        // Make phone validation less strict for testing
-        // else if (!phoneRegex.test(formData.parentPhoneNumber)) {
-        //   errors.parentPhoneNumber = 'validation.phoneFormat';
-        // }
       }
-      
+
       if (role === 'parent') {
-        // Validate at least one child ID is provided
         if (!formData.children[0]?.trim()) {
-          errors.children = { 0: 'validation.required' };
+          errors.children = { 0: 'At least one child sequence ID is required' };
+        } else {
+          formData.children.forEach((child, index) => {
+            if (child && !/^\d+$/.test(child.trim())) {
+              errors.children = errors.children || {};
+              errors.children[index] = 'Child sequence ID must be numeric';
+            }
+          });
         }
       }
-      
+
       if (role === 'lecturer') {
-        if (!formData.bio?.trim()) errors.bio = 'validation.required';
-        if (!formData.expertise?.trim()) errors.expertise = 'validation.required';
+        if (!formData.bio?.trim()) errors.bio = 'Bio is required';
+        if (!formData.expertise?.trim()) errors.expertise = 'Expertise is required';
+        if (!formData.subject?.length) errors.subject = 'At least one subject is required';
       }
     }
-  
+
     return errors;
   };
-  
+
   const toggleHobby = (hobbyId) => {
-    setFormData(prev => ({
-      ...prev,
-      hobbies: prev.hobbies.includes(hobbyId)
-        ? prev.hobbies.filter(id => id !== hobbyId)
-        : [...prev.hobbies, hobbyId]
-    }));
+    try {
+      setFormData(prev => ({
+        ...prev,
+        hobbies: prev.hobbies.includes(hobbyId)
+          ? prev.hobbies.filter(id => id !== hobbyId)
+          : [...prev.hobbies, hobbyId]
+      }));
+      setErrors(prev => ({ ...prev, hobbies: undefined }));
+    } catch (error) {
+      console.error('Error toggling hobby:', error);
+      setApiError('Failed to update hobby selection');
+    }
   };
-  
+
   const handleNext = () => {
     const stepErrors = getStepErrors(currentStep);
     
-    // Add debugging for step 2
-    if (currentStep === 2) {
-      console.log('Attempting to navigate from step 2 to 3');
-      console.log('Validation errors:', stepErrors);
-      console.log('Current form data:', formData);
-    }
-    
     if (Object.keys(stepErrors).length > 0) {
-      console.log('Navigation blocked due to validation errors:', stepErrors);
       setErrors(stepErrors);
+      setApiError('Please correct the errors in the form before proceeding');
       return;
     }
-    
+
     if (currentStep < totalSteps[formData.role]) {
-      console.log(`Moving from step ${currentStep} to ${currentStep + 1}`);
       setCurrentStep(prev => prev + 1);
     } else {
       handleSubmit();
@@ -164,116 +166,170 @@ export default function StudentRegistration() {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? e.target.checked : value
-    }));
-    setErrors(prev => ({ ...prev, [name]: false }));
+    try {
+      const { name, value, type } = e.target;
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? e.target.checked : value
+      }));
+      setErrors(prev => ({ ...prev, [name]: undefined }));
+    } catch (error) {
+      console.error('Error handling input change:', error);
+      setApiError('Failed to process input');
+    }
   };
 
   const handleChildrenChange = (index, value) => {
-    const newChildren = [...formData.children];
-    newChildren[index] = value;
-    setFormData(prev => ({ ...prev, children: newChildren }));
-  };
-  
-  const handleSubmit = async () => {
-    let payload;
-    
-    // Base payload structure based on role
-    switch(formData.role) {
-      case 'student':
-        payload = {
-          role: 'student',
-          name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword, // Convert to number
-          level: formData.grade, // Using grade as level for students
-          hobbies: formData.hobbies.map(id => 
-            hobbiesList.find(hobby => hobby.id === id)?.name || ''
-          ).filter(name => name !== ''), // Filter out any undefined values
-          parentPhoneNumber: formData.parentPhoneNumber,
-          phoneNumber: formData.phoneNumber,
-          faction: formData.faction || "Alpha", // Default or from form
-          gender: formData.gender
-        };
-        break;
-        
-      case 'parent':
-        payload = {
-          role: 'parent',
-          // Use the children array directly - these are already sequence IDs
-          children: formData.children.filter(c => c.trim() !== ''),
-          name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          level: formData.level || "", // Optional for parent
-          phoneNumber: formData.phoneNumber,
-          gender: formData.gender
-        };
-        break;
-        
-      case 'lecturer':
-        payload = {
-          role: 'lecturer',
-          name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          confirmPassword: formData.confirmPassword,
-          bio: formData.bio,
-          expertise: formData.expertise,
-          gender: formData.gender
-        };
-        break;
-        
-      default:
-        console.error('Invalid role');
-        return;
-    }
-
     try {
-      console.log('Sending payload:', payload);
+      const newChildren = [...formData.children];
+      newChildren[index] = value;
+      setFormData(prev => ({ ...prev, children: newChildren }));
+      setErrors(prev => ({
+        ...prev,
+        children: { ...prev.children, [index]: undefined }
+      }));
+    } catch (error) {
+      console.error('Error handling children change:', error);
+      setApiError('Failed to update child sequence ID');
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setApiError(null);
+      setErrors({});
+      let payload;
+
+      switch (formData.role) {
+        case 'student':
+          payload = {
+            role: 'student',
+            name: formData.fullName.trim(),
+            email: formData.email.toLowerCase().trim(),
+            password: formData.password,
+            confirmPassword: formData.confirmPassword,
+            level: formData.grade,
+            hobbies: formData.hobbies.map(id => 
+              hobbiesList.find(hobby => hobby.id === id)?.name || ''
+            ).filter(name => name !== ''),
+            parentPhoneNumber: formData.parentPhoneNumber,
+            phoneNumber: formData.phoneNumber,
+            faction: formData.faction || "Alpha",
+            gender: formData.gender
+          };
+          break;
+
+        case 'parent':
+          payload = {
+            role: 'parent',
+            children: formData.children.filter(c => c.trim() !== ''),
+            name: formData.fullName.trim(),
+            email: formData.email.toLowerCase().trim(),
+            password: formData.password,
+            confirmPassword: formData.confirmPassword,
+            phoneNumber: formData.phoneNumber,
+            gender: formData.gender
+          };
+          break;
+
+        case 'lecturer':
+          payload = {
+            role: 'lecturer',
+            name: formData.fullName.trim(),
+            email: formData.email.toLowerCase().trim(),
+            password: formData.password,
+            confirmPassword: formData.confirmPassword,
+            bio: formData.bio.trim(),
+            expertise: formData.expertise.trim(),
+            gender: formData.gender,
+            subject: formData.subject,
+          };
+          break;
+
+        default:
+          throw new Error('Invalid role selected');
+      }
+
       const url = `${apiUrl}/api/v1/register`;
       const response = await axios.post(url, payload);
-      console.log('Registration successful:', response.data);
-      navigate('/landing', { state: { message: t('registrationSuccess') } });
+      navigate('/login', { 
+        state: { message: 'Registration successful' } 
+      });
     } catch (error) {
-      console.error('Registration failed:', error.response?.data || error.message);
-      // You might want to show an error message to the user here
+      console.error('Registration failed:', error);
+      let errorMessage = 'Registration failed';
+      let fieldErrors = {};
+
+      if (error.response) {
+        const { status, data } = error.response;
+        switch (status) {
+          case 400:
+            errorMessage = 'Invalid data provided';
+            if (data.errors) {
+              // Assuming server returns errors in format: { field: message }
+              fieldErrors = Object.keys(data.errors).reduce((acc, key) => {
+                acc[key] = data.errors[key];
+                return acc;
+              }, {});
+            }
+            break;
+          case 409:
+            errorMessage = 'Email already exists';
+            fieldErrors.email = 'This email is already registered';
+            break;
+          case 500:
+            errorMessage = 'Server error occurred';
+            break;
+          default:
+            errorMessage = 'Unexpected error occurred';
+        }
+      } else if (error.request) {
+        errorMessage = 'Network error: Unable to reach the server';
+      } else {
+        errorMessage = 'Error: ' + error.message;
+      }
+
+      setApiError(errorMessage);
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+      }
     }
   };
 
   const renderStepContent = () => {
-    const { role } = formData;
-    
-    switch(role) {
-      case 'student':
-        switch(currentStep) {
-          case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
-          case 2: return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
-          case 3: return <Step3 formData={formData} toggleHobby={toggleHobby} t={t} hobbiesList={hobbiesList} errors={errors} />;
-          case 4: return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} />;
-          default: return null;
-        }
-      case 'parent':
-        switch(currentStep) {
-          case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
-          case 2: return <StepParent formData={formData} handleChildrenChange={handleChildrenChange} handleInputChange={handleInputChange} t={t} errors={errors} />;
-          case 3: return <Step4 formData={formData} t={t} />;
-          default: return null;
-        }
-      case 'lecturer':
-        switch(currentStep) {
-          case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
-          case 2: return <StepLecturer formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
-          case 3: return <Step4 formData={formData} t={t} />;
-          default: return null;
-        }
-      default:
-        return null;
+    try {
+      const { role } = formData;
+      
+      switch (role) {
+        case 'student':
+          switch (currentStep) {
+            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
+            case 2: return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
+            case 3: return <Step3 formData={formData} toggleHobby={toggleHobby} t={t} hobbiesList={hobbiesList} errors={errors} />;
+            case 4: return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} />;
+            default: return null;
+          }
+        case 'parent':
+          switch (currentStep) {
+            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
+            case 2: return <StepParent formData={formData} handleChildrenChange={handleChildrenChange} handleInputChange={handleInputChange} t={t} errors={errors} />;
+            case 3: return <Step4 formData={formData} t={t} />;
+            default: return null;
+          }
+        case 'lecturer':
+          switch (currentStep) {
+            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
+            case 2: return <StepLecturer formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
+            case 3: return <Step4 formData={formData} t={t} />;
+            default: return null;
+          }
+        default:
+          return null;
+      }
+    } catch (error) {
+      console.error('Error rendering step content:', error);
+      setApiError('Failed to render form content');
+      return null;
     }
   };
 
@@ -287,7 +343,6 @@ export default function StudentRegistration() {
         />
       </div>
 
-      {/* Desktop Image */}
       <div className="w-1/3 relative sm:block hidden">
         <img 
           src="/registration-image.png" 
@@ -314,13 +369,44 @@ export default function StudentRegistration() {
           {showRoleModal && (
             <RoleSelectionModal 
               onSelectRole={(selectedRole) => {
-                setRole(selectedRole);
-                setFormData(prev => ({ ...prev, role: selectedRole }));
-                setShowRoleModal(false);
-                setRoleLocked(true);
+                try {
+                  setRole(selectedRole);
+                  setFormData(prev => ({ ...prev, role: selectedRole }));
+                  setShowRoleModal(false);
+                  setRoleLocked(true);
+                } catch (error) {
+                  console.error('Error selecting role:', error);
+                  setApiError('Failed to select role');
+                }
               }}
               t={t}
             />
+          )}
+          
+          {apiError && (
+            <div className="alert alert-error mb-4 animate-fade-in">
+              <div className="flex flex-col">
+                <span>{apiError}</span>
+                {Object.keys(errors).length > 0 && (
+                  <ul className="list-disc list-inside mt-2">
+                    {Object.entries(errors).map(([field, message]) => (
+                      typeof message === 'string' && (
+                        <li key={field}>{field}: {message}</li>
+                      )
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <button 
+                className="btn btn-sm btn-ghost"
+                onClick={() => {
+                  setApiError(null);
+                  setErrors({});
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
           )}
           
           {renderStepContent()}

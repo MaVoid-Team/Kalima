@@ -15,6 +15,9 @@ const verifyJWT = async (req, res, next) => {
   try {
     decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return next(new AppError("Access token expired", 401));
+    }
     return next(new AppError("Forbidden", 403));
   }
 
@@ -39,7 +42,7 @@ const verifyJWT = async (req, res, next) => {
       )
     );
   }
-//logging the logged in user's information
+  //logging the logged in user's information
   req.user = currentUser;
   // console.log("Authenticated User:", {
   //   id: req.user._id.toString(), // 67e4b08442290f1d7b5eaeb8

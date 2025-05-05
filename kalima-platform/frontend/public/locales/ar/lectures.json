@@ -1,0 +1,38 @@
+{
+  "title": "المحاضرات",
+  "discover": "اكتشف أحدث المحاضرات",
+  "showLectures": "عرض المحاضرات",
+  "noLectures": "لا توجد محاضرات مطابقة للفلاتر المحددة.",
+  "filters": {
+    "reset": "إعادة تعيين الفلاتر",
+    "stage": "دور المحاضر",
+    "grade": "الصف",
+    "subject": "المادة",
+    "status": "الحالة",
+    "stages": {
+      "lecturer": "محاضر",
+      "professor": "أستاذ"
+    },
+    "statuses": {
+      "free": "مجاني",
+      "paid": "مدفوع"
+    }
+  },
+  "search": {
+    "options": "خيارات البحث"
+  },
+  "levels": {
+  "Primary": "الابتدائية",
+  "Middle": "المتوسطة",
+  "Upper Primary": "الابتدائية العليا",
+  "Higher Secondary": "الثانوية العليا",
+  "Fourth Elementary": "الابتدائي الرابع",
+  "First Primary": "الأول الابتدائي",
+  "Second Primary": "الثاني الابتدائي",
+  "Third Primary": "الثالث الابتدائي",
+  "First Secondary": "الأول الثانوي",
+  "Second Secondary": "الثاني الثانوي",
+  "Third Secondary": "الثالث الثانوي"
+}
+
+}

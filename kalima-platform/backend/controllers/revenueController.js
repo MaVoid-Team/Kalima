@@ -43,22 +43,58 @@ exports.calculateRevenue = catchAsync(async (req, res, next) => {
   const revenueResult = await Attendance.aggregate([
     { $match: matchStage },
     {
+      $lookup: {
+        from: "lessons",
+        localField: "lesson",
+        foreignField: "_id",
+        as: "lessonData"
+      }
+    },
+    {
+      $addFields: {
+        bookletAmount: {
+          $cond: [
+            "$isBookletPurchased",
+            { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
+            0
+          ]
+        },
+        lessonAmount: {
+          $subtract: ["$amountPaid", { 
+            $cond: [
+              "$isBookletPurchased",
+              { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
+              0
+            ] 
+          }]
+        }
+      }
+    },
+    {
       $group: {
         _id: null, // Group all matched documents together
-        totalRevenue: { $sum: "$amountPaid" },
+        totalLessonRevenue: { $sum: "$lessonAmount" },
+        totalBookletRevenue: { $sum: "$bookletAmount" },
         totalAttendancesPaid: { $sum: 1 } // Count attendances where payment occurred
       },
     },
     {
       $project: {
         _id: 0, // Exclude the default _id field
-        totalRevenue: 1,
+        totalLessonRevenue: 1,
+        totalBookletRevenue: 1,
+        totalRevenue: { $add: ["$totalLessonRevenue", "$totalBookletRevenue"] },
         totalAttendancesPaid: 1
       }
     }
   ]);
 
-  const result = revenueResult[0] || { totalRevenue: 0, totalAttendancesPaid: 0 }; // Default if no results
+  const result = revenueResult[0] || { 
+    totalRevenue: 0, 
+    totalLessonRevenue: 0,
+    totalBookletRevenue: 0,
+    totalAttendancesPaid: 0 
+  }; // Default if no results
 
   res.status(200).json({
     status: "success",
@@ -72,34 +108,63 @@ exports.calculateRevenueBreakdown = catchAsync(async (req, res, next) => {
   const revenueResult = await Attendance.aggregate([
     { $match: matchStage },
     {
+      $lookup: {
+        from: "lessons",
+        localField: "lesson",
+        foreignField: "_id",
+        as: "lessonData"
+      }
+    },
+    {
+      $addFields: {
+        bookletAmount: {
+          $cond: [
+            "$isBookletPurchased",
+            { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
+            0
+          ]
+        }
+      }
+    },
+    {
       $group: {
-        _id: "$paymentType", // Group by payment type
+        _id: {
+          paymentType: "$paymentType",
+          bookletPurchased: "$isBookletPurchased"
+        },
         totalRevenue: { $sum: "$amountPaid" },
-        count: { $sum: 1 } // Count attendances for this payment type where payment occurred
+        totalBookletRevenue: { $sum: "$bookletAmount" },
+        count: { $sum: 1 }
       },
     },
     {
       $project: {
-        _id: 0, // Exclude the default _id field
-        paymentType: "$_id",
+        _id: 0,
+        paymentType: "$_id.paymentType",
+        bookletPurchased: "$_id.bookletPurchased",
         totalRevenue: 1,
+        totalBookletRevenue: 1,
+        totalLessonRevenue: { $subtract: ["$totalRevenue", "$totalBookletRevenue"] },
         count: 1
       }
     },
-    { $sort: { paymentType: 1 } } // Optional: sort by payment type
+    { $sort: { paymentType: 1, bookletPurchased: 1 } }
   ]);
 
-   // Calculate overall total
-   const overallTotal = revenueResult.reduce((sum, item) => sum + item.totalRevenue, 0);
-   const overallCount = revenueResult.reduce((sum, item) => sum + item.count, 0);
-
+  // Calculate overall total
+  const overallTotal = revenueResult.reduce((sum, item) => sum + item.totalRevenue, 0);
+  const overallCount = revenueResult.reduce((sum, item) => sum + item.count, 0);
+  const overallBookletRevenue = revenueResult.reduce((sum, item) => sum + item.totalBookletRevenue, 0);
+  const overallLessonRevenue = revenueResult.reduce((sum, item) => sum + item.totalLessonRevenue, 0);
 
   res.status(200).json({
     status: "success",
     data: {
-        breakdown: revenueResult,
-        overallTotalRevenue: overallTotal,
-        overallAttendancesPaid: overallCount
+      breakdown: revenueResult,
+      overallTotalRevenue: overallTotal,
+      overallLessonRevenue: overallLessonRevenue,
+      overallBookletRevenue: overallBookletRevenue,
+      overallAttendancesPaid: overallCount
     },
   });
 });

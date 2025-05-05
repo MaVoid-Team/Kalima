@@ -1,274 +1,458 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { getContainerById } from "../../../routes/lectures"
-import { BookOpen, FileText } from "lucide-react"
+import { Link, useParams, useNavigate } from "react-router-dom"
+import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
+import { getUserDashboard } from "../../../routes/auth-services"
+import { FiBook, FiFolder, FiArrowLeft, FiPlus, FiX, FiPaperclip } from "react-icons/fi"
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
+  const navigate = useNavigate()
   const [container, setContainer] = useState(null)
-  const [childContainers, setChildContainers] = useState([])
-  const [subjectName, setSubjectName] = useState("Unknown Subject")
-  const [levelName, setLevelName] = useState("Unknown Level")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const navigate = useNavigate()
+  const [userRole, setUserRole] = useState(null)
+  const [userId, setUserId] = useState(null)
+  
+  // Creation modal state
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [newItemName, setNewItemName] = useState("")
+  const [newDescription, setNewDescription] = useState("")
+  const [newGoal, setNewGoal] = useState("")
+  const [newPrice, setNewPrice] = useState(0)
+  const [newVideoLink, setNewVideoLink] = useState("")
+  const [newLectureType, setNewLectureType] = useState("Revision")
+  const [attachmentFile, setAttachmentFile] = useState(null)
+  const [creationLoading, setCreationLoading] = useState(false)
+  const [creationError, setCreationError] = useState("")
+
+  // Fetch container data
+  const fetchContainer = async () => {
+    try {
+      const response = await getContainerById(containerId)
+      if (response.status === 'success') {
+        setContainer(response.data)
+      } else {
+        setError("Failed to load container details")
+      }
+    } catch (err) {
+      setError(err.message || "Failed to load data. Please try again later.")
+    }
+  }
 
   useEffect(() => {
-    const fetchContainerAndChildren = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
-
-        // Fetch container details
-        const containerResult = await getContainerById(containerId)
-        console.log("Container data:", containerResult.data)
-
-        if (containerResult.status !== "success") {
-          throw new Error("Failed to fetch container details")
+        const dashRes = await getUserDashboard()
+        if (!dashRes.success) {
+          setError("Failed to load user info")
+          return
         }
 
-        const containerData = containerResult.data
-        setContainer(containerData)
-
-        // Fetch subject and level details if they're just IDs
-        if (
-          typeof containerData.subject === "string" ||
-          (typeof containerData.subject === "object" && !containerData.subject?.name)
-        ) {
-          try {
-            // This would be a separate API call to get subject details
-            // For now, we'll use a placeholder
-            setSubjectName("Unknown Subject")
-          } catch (err) {
-            console.error("Error fetching subject:", err)
-          }
-        } else if (containerData.subject?.name) {
-          setSubjectName(containerData.subject.name)
-        }
-
-        if (
-          typeof containerData.level === "string" ||
-          (typeof containerData.level === "object" && !containerData.level?.name)
-        ) {
-          try {
-            // This would be a separate API call to get level details
-            // For now, we'll use a placeholder
-            setLevelName("Unknown Level")
-          } catch (err) {
-            console.error("Error fetching level:", err)
-          }
-        } else if (containerData.level?.name) {
-          setLevelName(containerData.level.name)
-        }
-
-        // Fetch child containers if available
-        if (containerData.children && containerData.children.length > 0) {
-          const childIds = containerData.children.map((child) =>
-            typeof child === "string" ? child : child._id || child.id,
-          )
-
-          if (childIds.length > 0) {
-            try {
-              // This would be a batch fetch of child containers
-              // For now, we'll use the children data directly
-              setChildContainers(containerData.children)
-            } catch (err) {
-              console.error("Error fetching child containers:", err)
-            }
-          }
-        }
-
-        setLoading(false)
+        const { userInfo } = dashRes.data.data
+        setUserRole(userInfo.role)
+        setUserId(userInfo._id)
+        await fetchContainer()
       } catch (err) {
-        setError("Failed to load container details. Please try again later.")
+        setError(err.message || "Failed to load data. Please try again later.")
+      } finally {
         setLoading(false)
-        console.error("Error:", err)
       }
     }
 
-    if (containerId) {
-      fetchContainerAndChildren()
-    }
+    fetchData()
   }, [containerId])
 
-  const handleChildClick = (childId) => {
-    navigate(`/container-details/${childId}`)
+  const getAllowedChildType = () => {
+    if (!container) return null
+    switch (container.type.toLowerCase()) {
+      case 'course': return 'year'
+      case 'year': return 'term'
+      case 'term': return 'month'
+      case 'month': return 'lecture'
+      default: return null
+    }
   }
 
-  // Get container type in Arabic
-  const getContainerTypeArabic = (type) => {
-    switch (type) {
-      case "course":
-        return "كورس"
-      case "year":
-        return "سنة دراسية"
-      case "term":
-        return "فصل دراسي"
-      case "month":
-        return "شهر"
-      case "lecture":
-        return "محاضرة"
-      default:
-        return type
+  const handleCreateItem = async (e) => {
+    e.preventDefault()
+    setCreationLoading(true)
+    setCreationError("")
+
+    try {
+      const childType = getAllowedChildType()
+      if (!childType) throw new Error("Invalid container type for creation")
+      if (!newItemName) throw new Error("Name is required")
+
+      // Common fields for both containers and lectures
+      const baseData = {
+        name: newItemName,
+        parent: containerId,
+        createdBy: userId,
+        level: container.level?._id,
+        subject: container.subject?._id,
+        teacherAllowed: true,
+        price: Number(newPrice) || 0,
+      }
+
+      let response
+      if (childType === 'lecture') {
+        if (!newVideoLink) throw new Error("Video link is required for lectures")
+        const lectureData = {
+          ...baseData,
+          type: 'lecture',
+          description: newDescription || `Lecture for ${newItemName}`,
+          numberOfViews: 0,
+          videoLink: newVideoLink,
+          lecture_type: newLectureType,
+        }
+        response = await createLecture(lectureData)
+      } else {
+        if (!newDescription) throw new Error("Description is required for containers")
+        if (!newGoal) throw new Error("Goal is required for containers")
+        const containerData = {
+          ...baseData,
+          type: childType,
+          description: newDescription,
+          goal: newGoal,
+        }
+        response = await createContainer(containerData)
+      }
+
+      if (response.status !== 'success') {
+        throw new Error(response.message || `Failed to create ${childType}`)
+      }
+
+      // If it's a lecture and there's an attachment, upload it
+      if (childType === 'lecture' && attachmentFile) {
+        const attachmentData = {
+          type: "homework",
+          attachment: attachmentFile,
+        }
+        await createLectureAttachment(response.data._id, attachmentData)
+      }
+
+      // Refetch container to update UI
+      await fetchContainer()
+
+      setShowCreateModal(false)
+      setNewItemName("")
+      setNewDescription("")
+      setNewGoal("")
+      setNewPrice(0)
+      setNewVideoLink("")
+      setNewLectureType("Revision")
+      setAttachmentFile(null)
+    } catch (err) {
+      setCreationError(err.message)
+      console.error('Creation error details:', {
+        error: err,
+        containerId,
+        childType,
+        newItemName,
+        newDescription,
+        newGoal,
+        newPrice,
+        newVideoLink,
+        newLectureType,
+      })
+    } finally {
+      setCreationLoading(false)
     }
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg text-primary"></div>
-      </div>
-    )
-  }
-
-  if (error || !container) {
-    return (
-      <div className="flex justify-center items-center min-h-screen p-4">
-        <div className="alert alert-error">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{error || "Container not found"}</span>
+      <div className="animate-pulse space-y-6 p-8">
+        <div className="h-8 bg-base-200 rounded w-1/4 mb-6"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-base-200 rounded-lg p-6 shadow-sm">
+              <div className="h-6 bg-base-200 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-base-200 rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-base-200 rounded w-1/3"></div>
+            </div>
+          ))}
         </div>
       </div>
     )
   }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="max-w-md text-center">
+          <div className="text-red-500 text-4xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <Link 
+            to={userRole === 'Lecturer' ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
+            className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
+          >
+            <FiArrowLeft /> Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const childType = getAllowedChildType()
+  const creationLabel = childType === 'lecture' ? 'Lecture' : `${childType?.charAt(0).toUpperCase() + childType?.slice(1)}`
 
   return (
-    <div className="container mx-auto p-4" dir="rtl">
-      {/* Container Header */}
-      <div className="bg-base-100 rounded-lg shadow-lg p-6 mb-8">
-        <h1 className="text-3xl font-bold mb-4">{container.name}</h1>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          <div className="badge badge-primary">{subjectName}</div>
-          <div className="badge badge-secondary">{levelName}</div>
-          <div className="badge badge-outline">{getContainerTypeArabic(container.type)}</div>
-          {container.teacherAllowed && <div className="badge badge-success">مسموح للمعلمين</div>}
-        </div>
-
-        {container.description && (
-          <div className="bg-base-200 p-4 rounded-md mb-4">
-            <h3 className="font-bold mb-2">الوصف:</h3>
-            <p className="text-base-content">{container.description}</p>
-          </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6">
-          <div className="flex items-center gap-3">
-            <div className="avatar placeholder">
-              <div className="bg-primary text-primary-content rounded-full w-12 h-12 flex items-center justify-center">
-                <span className="text-lg">{container.createdBy?.name?.charAt(0) || "?"}</span>
-              </div>
-            </div>
-            <div>
-              <p className="font-medium text-lg">{container.createdBy?.name || "Unknown"}</p>
-              <p className="text-sm text-base-content/70">{container.createdBy?.role || "Unknown"}</p>
-            </div>
-          </div>
-
+    <div className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
+          >
+            <span className="text-lg">←</span>
+            <span className="font-medium">Back to Dashboard</span>
+          </button>
           <div className="flex items-center gap-4">
-            {container.price > 0 ? (
-              <div className="bg-primary/10 text-primary px-4 py-2 rounded-full">
-                <span className="font-bold text-lg">{container.price}</span> جنيه
-              </div>
-            ) : (
-              <div className="bg-success/10 text-success px-4 py-2 rounded-full">
-                <span className="font-bold text-lg">مجاني</span>
+            {container.points > 0 && (
+              <div className="bg-primary/30 px-4 py-2 rounded-full flex items-center gap-2">
+                <span className="text-lg">🏅</span>
+                <span className="font-medium">{container.points} Points</span>
               </div>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Container Children/Content */}
-      <div className="bg-base-100 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <FileText className="h-6 w-6 text-primary" />
-          المحتويات ({childContainers.length})
-        </h2>
-
-        {childContainers.length === 0 ? (
-          <div className="alert alert-info">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="stroke-current shrink-0 w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>لا يوجد محتوى متاح في هذا الكورس حاليا.</span>
+        {/* Main Content */}
+        <div className="rounded-2xl shadow-sm p-8 mb-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">{container.name}</h1>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-2">
+                <FiFolder className="text-lg" />
+                {container.type}
+              </span>
+              <span className="flex items-center gap-2">
+                <FiBook className="text-lg" />
+                {container.subject?.name}
+              </span>
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {childContainers.map((child) => (
-              <div
-                key={child._id || child.id}
-                className="card bg-base-200 hover:bg-base-300 transition-colors shadow-md hover:shadow-lg cursor-pointer"
-                onClick={() => handleChildClick(child._id || child.id)}
+
+          {/* Content Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {container.children?.map(child => (
+              <div 
+                key={child._id}
+                className="group relative rounded-xl"
               >
-                <div className="card-body">
-                  <h3 className="card-title text-lg">{child.name}</h3>
-
-                  {child.type && (
-                    <div className="mt-2">
-                      <span className="badge badge-sm">{getContainerTypeArabic(child.type)}</span>
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                      {childType === 'lecture' ? (
+                        <FiBook className="text-primary text-xl" />
+                      ) : (
+                        <FiFolder className="text-primary text-xl" />
+                      )}
                     </div>
-                  )}
+                    <h3 className="font-medium">{child.name}</h3>
+                  </div>
 
-                  <div className="card-actions justify-end mt-4">
-                    <button className="btn btn-primary btn-sm">عرض المحتوى</button>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">
+                      {childType || container.type}
+                    </span>
+                    <Link
+                      to={
+                        userRole === 'Lecturer'
+                          ? `/dashboard/lecturer-dashboard/${childType === 'lecture' ? 'lecture-display' : 'container-details'}/${child._id}`
+                          : `/dashboard/student-dashboard/${childType === 'lecture' ? 'lecture-display' : 'container-details'}/${child._id}`
+                      }
+                      className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
+                    >
+                      View Details →
+                    </Link>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {container.children?.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-4">📭</div>
+              <p className="">No content available in this container</p>
+            </div>
+          )}
+        </div>
+
+        {/* Lecturer Actions */}
+        {userRole === 'Lecturer' && childType && (
+          <div className="flex gap-4 justify-end">
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="btn btn-primary px-6 py-3 rounded-full flex items-center gap-2"
+            >
+              <FiPlus className="text-lg" />
+              Add {creationLabel}
+            </button>
+          </div>
         )}
       </div>
 
-      {/* Parent Container Info (if available) */}
-      {container.parent && (
-        <div className="mt-8 bg-base-100 rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold mb-4">جزء من:</h2>
-          <div
-            className="flex items-center gap-3 p-4 bg-base-200 rounded-lg cursor-pointer hover:bg-base-300 transition-colors"
-            onClick={() =>
-              navigate(
-                `/container-details/${typeof container.parent === "string" ? container.parent : container.parent._id || container.parent.id}`,
-              )
-            }
-          >
-            <div className="bg-primary/10 p-2 rounded-full">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">
-                {typeof container.parent === "string" ? "الكورس الأساسي" : container.parent.name || "الكورس الأساسي"}
-              </p>
-              <p className="text-sm text-base-content/70">
-                {typeof container.parent === "string" ? "" : getContainerTypeArabic(container.parent.type) || ""}
-              </p>
-            </div>
+      {/* DaisyUI Modal */}
+      <div className={`modal ${showCreateModal && 'modal-open'}`}>
+        <div className="modal-box max-w-md">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold">Create New {creationLabel}</h3>
+            <button 
+              onClick={() => setShowCreateModal(false)}
+              className="btn btn-sm btn-circle btn-ghost"
+            >
+              <FiX className="w-5 h-5" />
+            </button>
           </div>
+          
+          <form onSubmit={handleCreateItem}>
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder={`Enter ${creationLabel} name`}
+                className="input input-bordered w-full"
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text">Description</span>
+              </label>
+              <textarea
+                placeholder={`Enter ${creationLabel} description`}
+                className="textarea textarea-bordered w-full"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                required={childType !== 'lecture'}
+              />
+            </div>
+
+            {childType !== 'lecture' && (
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text">Goal</span>
+                </label>
+                <textarea
+                  placeholder={`Enter ${creationLabel} goal`}
+                  className="textarea textarea-bordered w-full"
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text">Price</span>
+              </label>
+              <input
+                type="number"
+                placeholder="Enter price"
+                className="input input-bordered w-full"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                min="0"
+                required
+              />
+            </div>
+
+            {childType === 'lecture' && (
+              <>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
+                    <span className="label-text">Video URL</span>
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="Enter video link"
+                    className="input input-bordered w-full"
+                    value={newVideoLink}
+                    onChange={(e) => setNewVideoLink(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
+                    <span className="label-text">Lecture Type</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={newLectureType}
+                    onChange={(e) => setNewLectureType(e.target.value)}
+                  >
+                    <option value="Revision">Revision</option>
+                    <option value="Paid">Paid</option>
+                  </select>
+                </div>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
+                    <span className="label-text">Attach Homework (Optional, .pdf only)</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      onChange={(e) => setAttachmentFile(e.target.files[0])}
+                      className="input input-bordered w-full"
+                      accept=".pdf"
+                    />
+                    <FiPaperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+                  </div>
+                  {attachmentFile && (
+                    <p className="mt-2 text-sm text-base-content/70">Selected file: {attachmentFile.name}</p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {creationError && (
+              <div className="alert alert-error mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{creationError}</span>
+              </div>
+            )}
+
+            <div className="modal-action">
+              <button 
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setShowCreateModal(false)}
+                disabled={creationLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="btn btn-primary"
+                disabled={creationLoading}
+              >
+                {creationLoading ? (
+                  <>
+                    <span className="loading loading-spinner"></span>
+                    Creating...
+                  </>
+                ) : 'Create'}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+      </div>
     </div>
   )
 }

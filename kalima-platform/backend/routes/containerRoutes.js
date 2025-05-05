@@ -21,8 +21,7 @@ router.get(
 // Get container by ID - works with or without authentication
 // Note: This handles /my-containers as a special case for authenticated lecturers
 router.get(
-  "/:containerId",
-  authController.optionalJWT,  // Apply optional JWT middleware
+  "/:containerId", authController.optionalJWT,  // Apply optional JWT middleware
   containerController.getContainerById
 );
 
@@ -56,15 +55,16 @@ router.patch(
   containerController.UpdateChildOfContainer
 );
 
-// Create containers
+// Create containers - with image upload support
 router
   .route("/")
   .post(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Lecturer", "Assistant"),
+    containerController.uploadContainerImage, // Add image upload middleware
     containerController.createContainer
   );
 
-// Operations on a specific container by ID
+// Operations on a specific container by ID - with image upload support for updates
 router
   .route("/:containerId")
   .patch(
@@ -75,6 +75,7 @@ router
       "Lecturer",
       "Assistant"
     ),
+    containerController.uploadContainerImage, // Add image upload middleware
     containerController.updateContainer
   )
   .delete(
@@ -101,6 +102,19 @@ router
       "Parent"
     ),
     containerController.getContainerRevenue
+  );
+
+// Get lecturer revenue per month from container sales
+router
+  .get(
+    "/:lecturerId/monthly-revenue",
+    authController.verifyRoles(
+      "Admin",
+      "Sub-Admin",
+      "Moderator",
+      "Lecturer"
+    ),
+    containerController.getLecturerRevenueByMonth
   );
 
 module.exports = router;

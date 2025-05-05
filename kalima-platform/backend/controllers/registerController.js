@@ -13,57 +13,11 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 
 const validatePassword = (password) => {
-  const minLength = 8;
-  const maxLength = 30;
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumbers = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-  if (password.length < minLength) {
-    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
-  }
-  if (password.length > maxLength) {
-    throw new AppError(`Password must be less than ${maxLength} characters`, 400);
-  }
-  if (!hasUpperCase) {
-    throw new AppError("Password must contain at least one uppercase letter", 400);
-  }
-  if (!hasLowerCase) {
-    throw new AppError("Password must contain at least one lowercase letter", 400);
-  }
-  if (!hasNumbers) {
-    throw new AppError("Password must contain at least one number", 400);
-  }
-  if (!hasSpecialChar) {
-    throw new AppError("Password must contain at least one special character", 400);
-  }
-};
-
-const validateEmailFormat = (name, phoneNumber, email) => {
-  if (!phoneNumber || phoneNumber.length < 4) {
-    return false;
-  }
+  const requiredLength = 8;
   
-  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
-  const lastFourDigits = phoneNumber.slice(-4);
-  
-  const expectedEmailPrefix = `${cleanName}${lastFourDigits}`;
-  
-  const providedEmailPrefix = email.split('@')[0].toLowerCase();
-  
-  return providedEmailPrefix === expectedEmailPrefix;
-};
-
-const getExpectedEmailFormat = (name, phoneNumber) => {
-  if (!phoneNumber || phoneNumber.length < 4) {
-    return null;
+  if (password.length !== requiredLength) {
+    throw new AppError(`Password must be exactly ${requiredLength} characters long`, 400);
   }
-  
-  const cleanName = name.replace(/\s+/g, '.').toLowerCase();
-  const lastFourDigits = phoneNumber.slice(-4);
-  
-  return `${cleanName}${lastFourDigits}@[your-domain]`;
 };
 
 const registerNewUser = catchAsync(async (req, res, next) => {
@@ -93,17 +47,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     return next(new AppError("Email is required", 400));
   }
   
-  if (phoneNumber) {
-    const isEmailFormatValid = validateEmailFormat(name, phoneNumber, email);
-    if (!isEmailFormatValid) {
-      const expectedFormat = getExpectedEmailFormat(name, phoneNumber);
-      return next(new AppError(
-        `Email must follow the format: ${expectedFormat} where [your-domain] can be any valid domain`,
-        400
-      ));
-    }
-  }
-
   const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
   if (duplicateEmail) {
@@ -153,6 +96,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     email: email.toLowerCase().trim(),
     password: hashedPwd,
     children: childrenById,
+    isEmailVerified: true, // Set users to already verified by default
     ...userData,
   };
   
@@ -196,7 +140,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   if (user) {
     return res
       .status(201)
-      .json({ message: `User created successfully with name ${name}.` });
+      .json({ 
+        message: `User created successfully with name ${name}.`
+      });
   } else {
     return next(new AppError("Invalid user data received", 400));
   }

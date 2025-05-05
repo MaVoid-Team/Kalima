@@ -3,105 +3,96 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const Container = require("../models/containerModel.js"); // Import the Container model
+const Container = require("../models/containerModel.js");
+const { generateAccessToken } = require("../utils/tokens/generateTokens.js");
+const { sendToken } = require("../utils/tokens/sendToken.js");
+const RefreshToken = require("../models/refreshTokenModel.js");
 
-// @route POST /auth/
 const login = catchAsync(async (req, res, next) => {
   const { email, phoneNumber, password } = req.body;
 
-  // Assisning the roles that can only login with a phone number.
-  const phoneRequiredRoles = ["teacher", "parent", "student"]
-
-  // For the different methods of login.
   if (!((email && password) || (phoneNumber && password))) {
-    return next(new AppError("Please provide either email and password or phone number and password.", 400));
+    return next(
+      new AppError(
+        "Please provide either email and password or phone number and password.",
+        400
+      )
+    );
   }
 
-  const foundUser = email ? await User.findOne({ email }) : await User.findOne({ phoneNumber })
+  const foundUser = email
+    ? await User.findOne({ email })
+    : await User.findOne({ phoneNumber });
 
   if (!foundUser) {
-    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
+    return next(
+      new AppError(
+        `Couldn't find a user with this ${
+          email ? "email" : "phone number"
+        } and password.`,
+        400
+      )
+    );
   }
-
 
   const match = await bcrypt.compare(password, foundUser.password);
 
   if (!match) {
-    return next(new AppError(`Couldn't find a user with this ${email ? "email" : "phone number"} and password.`, 400));
+    return next(
+      new AppError(
+        `Couldn't find a user with this ${
+          email ? "email" : "phone number"
+        } and password.`,
+        400
+      )
+    );
   }
 
-  const accessToken = jwt.sign(
-    {
-      UserInfo: { id: foundUser._id, role: foundUser.role },
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "90d" }, // Time should be changed in production
-  );
+  // The check for existing tokens is now handled in sendToken function
+  await sendToken(foundUser, res);
+});
 
-  const refreshToken = jwt.sign(
-    { id: foundUser._id, },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1000s" }, // Time should be changed in production
-  );
+const refresh = catchAsync(async (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1];
+  if (!token) {
+    return next(new AppError("Access token required", 401));
+  }
+  const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {
+    ignoreExpiration: true,
+  });
+  const userId = decoded.UserInfo.id;
+  const userRole = decoded.UserInfo.role;
 
-  res.cookie("jwt", refreshToken, {
-    httpOnly: true,
-    sameSite: "none", // Allow cross-site.
-    secure: true,
-    maxAge: 300000 * 1000, // Should be set to match the Refresh Token age.
+  const refreshToken = await RefreshToken.findOne({
+    user: userId,
   });
 
-  return res.json({ accessToken });
-});
+  const currentUserRefreshToken = refreshToken.token;
 
-// @route GET /auth/refresh
-const refresh = catchAsync(async (req, res, next) => {
-  const cookies = req.cookies;
-  if (!cookies?.jwt) {
-    return next(new AppError("Unauthorized attempt.", 401));
-  }
-
-  const refreshToken = cookies.jwt;
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    catchAsync(async (err, decoded) => {
-      if (err) {
-        return next(new AppError("Forbidden", 401));
-      }
-
-      const foundUser = await User.findOne({ _id: decoded.id });
-
-      if (!foundUser) {
-        return next(new AppError("Couldn't find a user with this username or password.", 400));
-      }
-
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            id: foundUser._id,
-            role: foundUser.role,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "90d" }, // Time should be changed in production
+  let decodedRefreshToken;
+  try {
+    decodedRefreshToken = jwt.verify(
+      currentUserRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+  } catch (err) {
+    if (err.name === "TokenExpiredError" || !decodedRefreshToken) {
+      await RefreshToken.deleteOne({ user: userId });
+      return next(
+        new AppError("Refresh token is expired, plese login again", 401)
       );
+    }
+  }
 
-      res.json({ accessToken });
-    }),
-  );
+  const newAccessToken = generateAccessToken(userId, userRole);
+
+  return res.status(200).json({ accessToken: newAccessToken });
 });
 
-// @route POST /auth/logout
-// To clear cookie incase one exists.
-const logout = (req, res, next) => {
-  const cookies = req.cookies;
-  if (!cookies?.jwt) {
-    return next(new AppError("Unauthorized attempt.", 401));
-  }
-  res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
-  res.json({ message: "Cookies cleared." });
-};
+const logout = catchAsync(async (req, res, next) => {
+  await RefreshToken.deleteMany({ user: req.user._id });
+  return res.json({ message: "Logged out successfully" });
+});
 
 const verifyRoles = (...allowedRoles) => {
   return async (req, res, next) => {
@@ -112,11 +103,16 @@ const verifyRoles = (...allowedRoles) => {
 
     const rolesArray = allowedRoles.map((role) => role.toLowerCase());
     if (!rolesArray.includes(Role)) {
-      return next(new AppError(`Forbidden, you are a ${Role} and don't have access to this resource.`, 403));
+      return next(
+        new AppError(
+          `Forbidden, you are a ${Role} and don't have access to this resource.`,
+          403
+        )
+      );
     }
-    next()
+    next();
   };
-}
+};
 
 // Middleware to optionally verify JWT
 // This middleware attempts to verify the JWT if provided, but continues either way
@@ -133,10 +129,12 @@ const optionalJWT = async (req, res, next) => {
   try {
     // Try to verify token
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    
+
     // If token is valid, set req.user
-    const currentUser = await User.findById(decoded.UserInfo.id).select("-password");
-    
+    const currentUser = await User.findById(decoded.UserInfo.id).select(
+      "-password"
+    );
+
     if (currentUser) {
       req.user = currentUser;
     }
@@ -144,7 +142,7 @@ const optionalJWT = async (req, res, next) => {
     // If token verification fails, continue without setting req.user
     // No error is thrown, the route will work as unauthenticated
   }
-  
+
   // Continue to the next middleware or route handler
   next();
 };
