@@ -10,6 +10,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 const Package = require("../models/packageModel");
+const QueryFeatures = require("../utils/queryFeatures");
 // updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
@@ -408,7 +409,13 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
  * Get all purchases
  */
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-  const purchases = await Purchase.find().populate([
+  let query = Purchase.find()
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+  query = features.query;
+  const purchases = await query.populate([
     "container",
     "lecturer",
     "student",

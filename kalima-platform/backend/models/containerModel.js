@@ -36,6 +36,10 @@ const containerSchema = new mongoose.Schema(
     price: { type: Number, default: 0 },
     description: { type: String }, // Optional field for courses
     goal: [{ type: String }], // Optional field for courses as an array of strings
+    image: {
+      url: { type: String },
+      publicId: { type: String }
+    }, // Container image (stored in top-level containers)
   },
   {
     toObject: { virtuals: true },
@@ -43,6 +47,16 @@ const containerSchema = new mongoose.Schema(
     discriminatorKey: "kind",
   }
 );
+
+// Create virtual to get image from parent if not available
+containerSchema.virtual('containerImage').get(function() {
+  // If container has its own image, return it
+  if (this.image && this.image.url) {
+    return this.image;
+  }
+  // Otherwise, it will inherit from parent (handled in the controller)
+  return null;
+});
 
 containerSchema.index({ parent: 1 });
 containerSchema.index({ createdBy: 1 });

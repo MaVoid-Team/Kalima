@@ -25,6 +25,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "attachments",
+    resource_type: "auto", // Allow all file types including documents, images, videos, and archives
   },
 });
 
