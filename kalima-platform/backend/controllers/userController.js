@@ -456,6 +456,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         bio: lecturer.bio,
         expertise: lecturer.expertise,
+        expertise: lecturer.expertise,
       };
 
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included

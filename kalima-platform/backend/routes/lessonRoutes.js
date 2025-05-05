@@ -1,7 +1,11 @@
 const express = require("express");
 const lessonController = require("../controllers/lessonController");
+const verifyJWT = require('../middleware/verifyJWT');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
+
+router.use(verifyJWT, authController.verifyRoles('Admin', 'SubAdmin', 'Moderator', 'Assistant', 'Lecturer'));
 
 router
   .route("/")

@@ -1,102 +1,140 @@
-const ActivityTracker = () => {
-    const activities = [
-      {
-        id: 1,
-        student: "أحمد محمد",
-        avatar: "/placeholder.svg?height=40&width=40",
-        course: "الرياضيات",
-        activity: "أكمل الاختبار",
-        score: "90/100",
-        date: "15 دقيقة",
-        status: "مكتمل",
-      },
-      {
-        id: 2,
-        student: "سارة أحمد",
-        avatar: "/placeholder.svg?height=40&width=40",
-        course: "العلوم",
-        activity: "سلم الواجب",
-        score: "45/50",
-        date: "ساعة",
-        status: "مكتمل",
-      },
-      {
-        id: 3,
-        student: "محمد علي",
-        avatar: "/placeholder.svg?height=40&width=40",
-        course: "اللغة العربية",
-        activity: "حضر المحاضرة",
-        score: "-",
-        date: "ساعتين",
-        status: "حاضر",
-      },
-      {
-        id: 4,
-        student: "نورا حسن",
-        avatar: "/placeholder.svg?height=40&width=40",
-        course: "الفيزياء",
-        activity: "غائب عن الاختبار",
-        score: "0/100",
-        date: "يوم",
-        status: "غائب",
-      },
-    ]
-  
-    return (
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <button className="btn btn-sm btn-outline">عرض الكل</button>
-          <h2 className="text-xl font-bold text-right">النشاط الأخير</h2>
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { getAllAttendance } from "../../routes/center";
+
+const ActivityTracker = ({ lessonId, students }) => {
+  const { t, i18n } = useTranslation("centerDashboard");
+  const isRTL = i18n.language === "ar";
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getAllAttendance();
+        if (response.status === "success") {
+          // Filter attendance records for the specific lesson
+          const filteredAttendance = response.data.filter(
+            (attendance) => attendance.lesson._id === lessonId
+          );
+          setAttendanceData(filteredAttendance);
+        } else {
+          throw new Error(response.message || "Failed to fetch attendance data");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (lessonId) {
+      fetchAttendance();
+    }
+  }, [lessonId]);
+
+  // Format date based on locale
+  const formatDate = (date) => {
+    if (!date) return "-";
+    return new Intl.DateTimeFormat(i18n.language, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(date));
+  };
+
+  return (
+    <div className="bg-base-100 rounded-lg shadow-lg p-4 md:p-6" dir={isRTL ? "rtl" : "ltr"}>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div>
+            <div className="flex items-center gap-x-2 mt-1">
+              <span className="text-xl font-bold text-base-content">
+                {t("activityTracker.statusCounts.present", {
+                  count: attendanceData.filter(
+                    (a) => a.examStatus === "passed"
+                  ).length,
+                })}
+              </span>
+              <span className="text-sm text-base-content">
+                {t("activityTracker.statusCounts.absent", {
+                  count: attendanceData.filter(
+                    (a) => !a.examStatus || a.examStatus !== "passed"
+                  ).length,
+                })}
+              </span>
+            </div>
+          </div>
         </div>
-  
-        <div className="overflow-x-auto">
+      </div>
+
+      <div className="overflow-x-auto">
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="loading loading-spinner loading-md"></div>
+          </div>
+        ) : error ? (
+          <div className="alert alert-error">
+            <span>{error}</span>
+          </div>
+        ) : attendanceData.length > 0 ? (
           <table className="table w-full">
             <thead>
-              <tr>
-                <th className="text-right">الحالة</th>
-                <th className="text-right">الدرجة</th>
-                <th className="text-right">منذ</th>
-                <th className="text-right">النشاط</th>
-                <th className="text-right">المادة</th>
-                <th className="text-right">الطالب</th>
+              <tr className="border-b border-base-200">
+                <th className={isRTL ? "text-right" : "text-left"}>Student ID</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Lesson Start Time</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Center Name</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Lecturer Name</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Subject</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Level</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Attendance Date</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Booklet Purchased</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Payment Type</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Amount Paid</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Sessions Paid For</th>
+                <th className={isRTL ? "text-right" : "text-left"}>Remaining Sessions</th>
               </tr>
             </thead>
             <tbody>
-              {activities.map((activity) => (
-                <tr key={activity.id}>
+              {attendanceData.map((attendance) => (
+                <tr
+                  key={attendance._id}
+                  className="hover:bg-base-200 border-b border-base-200"
+                >
+                  <td>{attendance.studentSequencedId}</td>
+                  <td>{formatDate(attendance.lesson.startTime)}</td>
+                  <td>{attendance.center.name}</td>
+                  <td>{attendance.lecturer.name}</td>
+                  <td>{attendance.subject.name}</td>
+                  <td>{attendance.level.name}</td>
+                  <td>{formatDate(attendance.attendanceDate)}</td>
                   <td>
-                    <span
-                      className={`badge ${
-                        activity.status === "مكتمل"
-                          ? "badge-success"
-                          : activity.status === "حاضر"
-                            ? "badge-info"
-                            : "badge-error"
-                      }`}
-                    >
-                      {activity.status}
+                    <span className={`badge ${attendance.isBookletPurchased ? "badge-success" : "badge-error"}`}>
+                      {attendance.isBookletPurchased ? t("activityTracker.status.yes") : t("activityTracker.status.no")}
                     </span>
                   </td>
-                  <td>{activity.score}</td>
-                  <td>{activity.date}</td>
-                  <td>{activity.activity}</td>
-                  <td>{activity.course}</td>
-                  <td className="flex items-center gap-2">
-                    <span>{activity.student}</span>
-                    <div className="avatar">
-                      <div className="w-8 rounded-full">
-                        <img src={activity.avatar || "/placeholder.svg"} alt={activity.student} />
-                      </div>
-                    </div>
-                  </td>
+                  <td>{attendance.paymentType}</td>
+                  <td>{attendance.amountPaid}</td>
+                  <td>{attendance.sessionsPaidFor}</td>
+                  <td>{attendance.sessionsRemaining}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        ) : (
+          <div className="text-center py-8 text-base-content/70">
+            {t("activityTracker.noResults")}
+          </div>
+        )}
       </div>
-    )
-  }
-  
-  export default ActivityTracker
-  
+    </div>
+  );
+};
+
+export default ActivityTracker;

@@ -3,15 +3,17 @@ import { useTranslation } from "react-i18next";
 
 import { motion } from "framer-motion";
 
-import { AppDownloadSection } from "../Home/app-download-section";
+import { AppDownloadSection } from "./app-download-section";
 import WelcomeSection from "./WelcomeSection";
 import BenefitsSection from "./BenefitsSection";
 import AboutSection from "./AboutSection";
 import ServicesGrid from "./ServicesGrid";
 import ExamPreparationSection from "./ExamPreparationSection";
-import CoursesSection from "./CoursesSection";
+import CoursesOverviews from "./CoursesOverview";
 import LanguageBooks from "./LanguageBooks";
 import TestimonialsSection from "./TestimonialsSection";
+import { TeachersSection } from "./teachers-section";
+import { CoursesSection } from "./courses-section";
 
 // Utility functions
 const staggerContainer = (staggerChildren, delayChildren) => ({
@@ -96,6 +98,8 @@ const Services = () => {
         <ServicesGrid isRTL={isRTL} />
         <ExamPreparationSection isRTL={isRTL} />
         <CoursesSection isRTL={isRTL} />
+        <TeachersSection isRTL={isRTL} />
+        <CoursesOverviews isRTL={isRTL} />
         <LanguageBooks books={books1} isRTL={isRTL} />
         <LanguageBooks books={books} isRTL={isRTL} />
         <LanguageBooks books={books2} isRTL={isRTL} />

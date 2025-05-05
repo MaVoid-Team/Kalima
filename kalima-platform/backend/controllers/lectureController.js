@@ -40,6 +40,10 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       description,
       numberOfViews,
       lecture_type,
+      // New exam requirement fields
+      requiresExam,
+      examConfig,
+      passingThreshold
     } = req.body;
 
     // Validate lecture type
@@ -55,6 +59,14 @@ exports.createLecture = catchAsync(async (req, res, next) => {
     const levelDoc = await checkDoc(Level, level, session);
     const subjectDoc = await checkDoc(Subject, subject, session);
     await checkDoc(Lecturer, createdBy || req.user._id, session);
+
+    // Validate exam config if requires exam is true
+    if (requiresExam && !examConfig) {
+      throw new AppError(
+        "Exam configuration is required when requiresExam is true", 
+        400
+      );
+    }
 
     // Create the lecture
     const lecture = await Lecture.create(
@@ -73,6 +85,10 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           description,
           numberOfViews,
           lecture_type,
+          // Add exam requirement fields
+          requiresExam: requiresExam || false,
+          examConfig,
+          passingThreshold
         },
       ],
       { session }
@@ -110,29 +126,22 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         ...(containerChainResult[0]?.parentChain.map((c) => c._id) || []),
       ];
 
-      // console.log("containerIds"+ containerIds);
       // Find all purchases where container is in this hierarchy
       const purchases = await Purchase.find({
         container: { $in: containerIds },
         type: "containerPurchase",
       }).session(session);
 
-      // console.log("purchases"+ purchases);
-
       // Get unique student IDs from these purchases
       const studentIds = [
         ...new Set(purchases.map((p) => p.student.toString())),
       ];
-
-      // console.log("studentIds"+ studentIds);
 
       // Find these students who want notifications
       const students = await Student.find({
         _id: { $in: studentIds },
         $or: [{ lectureNotify: true }, { lectureNotify: { $exists: false } }],
       }).session(session);
-
-      // console.log("students"+ students);
 
       // Get notification template
       const template = await NotificationTemplate.findOne({
@@ -377,8 +386,13 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     examLink,
     description,
     numberOfViews,
-    lecture_type, // Add lecture_type
+    lecture_type,
+    // New exam requirement fields
+    requiresExam,
+    examConfig,
+    passingThreshold
   } = req.body;
+  
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -389,7 +403,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       videoLink,
       description,
       numberOfViews,
-      lecture_type, // Add lecture_type
+      lecture_type,
+      teacherAllowed
     };
 
     // Basic validation for lecture_type (Mongoose enum validation also applies)
@@ -401,6 +416,29 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
           400
         );
       }
+    }
+
+    // Handle exam requirement fields
+    if (requiresExam !== undefined) {
+      obj.requiresExam = requiresExam;
+      
+      // If requiresExam is true, examConfig is required
+      if (requiresExam && !examConfig && !await Lecture.findById(req.params.lectureId).select('examConfig').lean().then(doc => doc.examConfig)) {
+        throw new AppError(
+          "Exam configuration is required when requiresExam is true", 
+          400
+        );
+      }
+    }
+    
+    // Only update examConfig if provided
+    if (examConfig) {
+      obj.examConfig = examConfig;
+    }
+    
+    // Only update passingThreshold if provided
+    if (passingThreshold !== undefined) {
+      obj.passingThreshold = passingThreshold;
     }
 
     if (subject) {
@@ -420,8 +458,8 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         session,
       }
     ).populate([
-      //   { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
+      { path: "examConfig", select: "name formUrl defaultPassingThreshold" }, // Populate exam config
     ]);
 
     if (!updatedContainer) {

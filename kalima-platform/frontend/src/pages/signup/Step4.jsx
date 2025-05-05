@@ -35,6 +35,7 @@ export default function Step4({ formData, t, hobbiesList }) {
             <>
               <ReviewItem label={t('form.bio')} value={formData.bio} />
               <ReviewItem label={t('form.expertise')} value={formData.expertise} />
+              <ReviewItem label={t('form.subject')} value={formData.subject.join(', ')} />
             </>
           )}
 

@@ -1,55 +1,61 @@
 const Attendance = require("../models/attendanceModel");
 const Lesson = require("../models/lessonModel");
-// const User = require("../models/userModel"); // Assuming Student is derived from User
-const PricingRule = require("../models/pricingRuleModel"); // Import PricingRule
+const PricingRule = require("../models/pricingRuleModel");
 const AppError = require("../utils/appError");
-const cStudent = require("../models/center.studentModel"); // Assuming Student is derived from User
+const cStudent = require("../models/center.studentModel");
 const catchAsync = require("../utils/catchAsync");
 const QueryFeatures = require("../utils/queryFeatures");
+const mongoose = require("mongoose");
 
+// Record attendance using student sequenced ID only
 exports.recordAttendance = catchAsync(async (req, res, next) => {
   const {
-    studentId,
+    studentSequencedId,  // Only accept sequenced ID for student identification
     lessonId,
     paymentType,
+    isBookletPurchased,
+    isNotGroup
   } = req.body;
+  
   const recordedById = req.user._id;
-  if (!studentId || !lessonId || !paymentType) {
-    return next(
-      new AppError("Student ID, Lesson ID, and Payment Type are required.", 400)
-    );
+  
+  // Validate student sequenced ID
+  if (!studentSequencedId) {
+    return next(new AppError("Student Sequenced ID is required.", 400));
+  }
+  
+  if (!lessonId || !paymentType) {
+    return next(new AppError("Lesson ID and Payment Type are required.", 400));
   }
 
-  // --- Validation ---
-  const lesson = await Lesson.findById(lessonId).lean(); // Use lean for read-only
+  // Find the lesson
+  const lesson = await Lesson.findById(lessonId).lean();
   if (!lesson) {
     return next(new AppError("Lesson not found.", 404));
   }
 
-  const student = await cStudent.findById(studentId).lean();
+  // Find student by sequenced ID only
+  const student = await cStudent.findOne({ center_students_seq: studentSequencedId }).lean();
   if (!student) {
-    return next(new AppError("Student not found.", 404));
+    return next(new AppError(`Student with Sequenced ID ${studentSequencedId} not found.`, 404));
   }
 
-  // --- Check for Existing Attendance for this specific lesson instance ---
-  const existingAttendance = await Attendance.findOne({ student: studentId, lesson: lessonId });
+  // Check for existing attendance
+  const existingAttendance = await Attendance.findOne({ student: student._id, lesson: lessonId });
   if (existingAttendance) {
-      return next(new AppError("Student attendance already recorded for this specific lesson.", 409)); // 409 Conflict
+    return next(new AppError("Student attendance already recorded for this specific lesson.", 409));
   }
-  // --- End Check ---
 
-  // --- Find Applicable Pricing Rule ---
-  // Find center-specific rule first, then fall back to global rule (center: null)
+  // Find applicable pricing rule
   const pricingRule = await PricingRule.findOne({
     lecturer: lesson.lecturer,
     subject: lesson.subject,
     level: lesson.level,
-    $or: [{ center: lesson.center }, { center: null }], // Check center-specific then global
-  }).sort({ center: -1 }); // Prioritize center-specific rule (-1 puts non-null first)
+    $or: [{ center: lesson.center }, { center: null }],
+  }).sort({ center: -1 });
 
   if (!pricingRule && paymentType !== 'unpaid') {
-      // Allow 'unpaid' even without a rule, but require a rule for 'daily' or 'multi-session'
-      return next(new AppError("No pricing rule found for this lesson combination. Cannot record paid attendance.", 404));
+    return next(new AppError("No pricing rule found for this lesson combination. Cannot record paid attendance.", 404));
   }
 
   // Use default 0 if no rule found and type is unpaid, otherwise use rule prices
@@ -57,10 +63,10 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
   const lessonMultiSessionPrice = pricingRule ? pricingRule.multiSessionPrice : 0;
   const lessonMultiSessionCount = pricingRule ? pricingRule.multiSessionCount : 1;
 
-
-  // --- Attendance Logic ---
+  // Prepare attendance data
   let attendanceData = {
-    student: studentId,
+    student: student._id, // We still store MongoDB ID internally
+    studentSequencedId: student.center_students_seq, // But we also store sequencedId for easier lookup
     lesson: lessonId,
     center: lesson.center,
     lecturer: lesson.lecturer,
@@ -72,49 +78,41 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     amountPaid: 0,
     sessionsPaidFor: 0,
     sessionsRemaining: 0,
+    isBookletPurchased: isBookletPurchased || false,
+    isNotGroup: isNotGroup || false,
   };
 
+  // Handle payment type specific logic
   if (paymentType === "daily") {
     attendanceData.amountPaid = lessonDailyPrice;
   } else if (paymentType === "multi-session") {
-    // Step 1: Find the absolute latest multi-session record for this student/conceptual lesson
+    // Find the latest multi-session record for this student by sequencedId
     const latestMultiSessionRecord = await Attendance.findOne({
-      student: studentId,
+      studentSequencedId: student.center_students_seq, // Use sequencedId for lookup
       lecturer: lesson.lecturer,
       subject: lesson.subject,
       level: lesson.level,
       paymentType: "multi-session",
-      // Removed sessionsRemaining > 0 from here to find the latest regardless of status
-    }).sort({ attendanceDate: -1 }); // Get the very latest record
+    }).sort({ attendanceDate: -1 });
 
-    // Step 2: Check if that record exists AND has sessions remaining
     if (latestMultiSessionRecord && latestMultiSessionRecord.sessionsRemaining > 0) {
-      // Active package found, use an existing session
-      console.log(`DEBUG: Found active package, remaining: ${latestMultiSessionRecord.sessionsRemaining}`); // Added console log
+      // Use existing session
       attendanceData.amountPaid = 0;
       attendanceData.sessionsPaidFor = 0;
       attendanceData.sessionsRemaining = latestMultiSessionRecord.sessionsRemaining - 1;
     } else {
-      // No active package found (either never existed or latest one is depleted)
-      // A NEW payment is required.
-      console.log(`DEBUG: No active package found or latest depleted. Creating new payment.`); // Added console log
-      const finalAmountPaid = lessonMultiSessionPrice;
-      const finalSessionsPaidFor = lessonMultiSessionCount;
-
-      if (!pricingRule) { // Double check pricing rule exists before using its values
-           return next(new AppError("Cannot process multi-session payment without a valid pricing rule.", 404));
+      // New payment required
+      if (!pricingRule) {
+        return next(new AppError("Cannot process multi-session payment without a valid pricing rule.", 404));
       }
-      if (finalSessionsPaidFor <= 0) {
-        return next(
-          new AppError("Pricing rule's multi-session count must be positive.", 400)
-        );
+      
+      if (lessonMultiSessionCount <= 0) {
+        return next(new AppError("Pricing rule's multi-session count must be positive.", 400));
       }
 
-      // Record the new payment amount and reset the session counter
-      attendanceData.amountPaid = finalAmountPaid;
-      attendanceData.sessionsPaidFor = finalSessionsPaidFor;
-      // Consume the first session of the new package
-      attendanceData.sessionsRemaining = finalSessionsPaidFor - 1;
+      attendanceData.amountPaid = lessonMultiSessionPrice;
+      attendanceData.sessionsPaidFor = lessonMultiSessionCount;
+      attendanceData.sessionsRemaining = lessonMultiSessionCount - 1;
     }
   } else if (paymentType === "unpaid") {
     attendanceData.amountPaid = 0;
@@ -122,95 +120,308 @@ exports.recordAttendance = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid payment type.", 400));
   }
 
-  console.log("DEBUG: Final attendanceData before create:", attendanceData); // Added console log
-  const newAttendance = await Attendance.create(attendanceData);
-
-  // Determine payment status for the response
-  let paymentStatus = 'unknown';
-  if (attendanceData.paymentType === 'unpaid') {
-      paymentStatus = 'unpaid';
-  } else if (attendanceData.amountPaid > 0) {
-      // This covers both daily payments and the initial multi-session payment
-      paymentStatus = 'paid';
-  } else if (attendanceData.paymentType === 'multi-session' && attendanceData.amountPaid === 0) {
-      // This covers using a pre-paid session from a multi-session package
-      paymentStatus = 'session_used';
+  // Add booklet price if purchased
+  if (attendanceData.isBookletPurchased && lesson.bookletPrice) {
+    attendanceData.amountPaid += lesson.bookletPrice;
   }
 
+  // Create attendance record
+  const newAttendance = await Attendance.create(attendanceData);
+
+  // Determine payment status for response
+  let paymentStatus = 'unknown';
+  if (attendanceData.paymentType === 'unpaid') {
+    paymentStatus = 'unpaid';
+  } else if (attendanceData.amountPaid > 0) {
+    paymentStatus = 'paid';
+  } else if (attendanceData.paymentType === 'multi-session' && attendanceData.amountPaid === 0) {
+    paymentStatus = 'session_used';
+  }
+
+  // Focus response on sequencedId instead of MongoDB ID
   res.status(201).json({
     status: "success",
     data: {
-      attendance: newAttendance,
-      paymentStatus: paymentStatus // Add payment status to the response
+      attendance: {
+        ...newAttendance.toObject(),
+        student: {
+          center_students_seq: student.center_students_seq,
+          name: student.name
+        }
+      },
+      paymentStatus,
     },
   });
 });
 
-// Generic function to get attendance records with filtering/sorting/pagination
+// Get attendance by student sequenced ID
 exports.getAttendance = catchAsync(async (req, res, next) => {
-    const features = new QueryFeatures(Attendance.find(), req.query)
-      .filter()
-      .sort()
-      .paginate();
-
-    // Populate related fields for better readability
-    const attendanceRecords = await features.query.populate([
-        { path: 'student', select: 'name sequencedId' },
-        { path: 'lesson', select: 'startTime' }, // Lesson no longer has price fields
-        { path: 'lecturer', select: 'name' },
-        { path: 'recordedBy', select: 'name' },
-        { path: 'center', select: 'name' },
-        { path: 'subject', select: 'name' },
-        { path: 'level', select: 'name' }
-    ]);
-
-    // Optional: Could fetch applicable pricing rule for each record here if needed for display
-
-    res.status(200).json({
-        status: 'success',
-        results: attendanceRecords.length,
-        data: {
-            attendance: attendanceRecords
-        }
-    });
+  const { studentSequencedId } = req.params;
+  
+  // If no sequencedId provided, require it
+  if (!studentSequencedId) {
+    return next(new AppError('Student sequenced ID is required', 400));
+  }
+  
+  // Find attendance records directly by sequencedId 
+  // (after we add the field to the attendanceModel)
+  const features = new QueryFeatures(
+    Attendance.find({ studentSequencedId }),
+    req.query
+  )
+  .filter()
+  .sort()
+  .paginate();
+  
+  const attendanceRecords = await features.query.populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'recordedBy', select: 'name' },
+    { path: 'center', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
+  
+  // Format response to emphasize sequencedId
+  const formattedRecords = attendanceRecords.map(record => {
+    const recordObj = record.toObject();
+    if (recordObj.student) {
+      recordObj.student = {
+        center_students_seq: recordObj.student.center_students_seq,
+        name: recordObj.student.name
+      };
+    }
+    return recordObj;
+  });
+  
+  res.status(200).json({
+    status: 'success',
+    results: attendanceRecords.length,
+    data: {
+      studentSequencedId,
+      attendance: formattedRecords
+    }
+  });
 });
 
+// Get all attendance records
+exports.getAllAttendance = catchAsync(async (req, res, next) => {
+  // Standard attendance query processing
+  const features = new QueryFeatures(Attendance.find(), req.query)
+    .filter()
+    .sort()
+    .paginate();
 
+  const attendanceRecords = await features.query.populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'recordedBy', select: 'name' },
+    { path: 'center', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
+
+  // Format response to emphasize sequencedId
+  const formattedRecords = attendanceRecords.map(record => {
+    const recordObj = record.toObject();
+    if (recordObj.student) {
+      recordObj.student = {
+        center_students_seq: recordObj.student.center_students_seq,
+        name: recordObj.student.name
+      };
+    }
+    return recordObj;
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: formattedRecords.length,
+    data: {
+      attendance: formattedRecords
+    }
+  });
+});
+
+// Get an attendance record by ID
 exports.getAttendanceById = catchAsync(async (req, res, next) => {
-    const attendanceRecord = await Attendance.findById(req.params.id).populate([
-        { path: 'student', select: 'name sequencedId' },
-        { path: 'lesson', select: 'startTime' }, // Lesson no longer has price fields
-        { path: 'lecturer', select: 'name' },
-        { path: 'recordedBy', select: 'name' },
-        { path: 'center', select: 'name' },
-        { path: 'subject', select: 'name' },
-        { path: 'level', select: 'name' }
-    ]);
+  const attendanceRecord = await Attendance.findById(req.params.id).populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'recordedBy', select: 'name' },
+    { path: 'center', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
 
-    if (!attendanceRecord) {
-        return next(new AppError('No attendance record found with that ID', 404));
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  // Format response to emphasize sequencedId
+  const formattedRecord = attendanceRecord.toObject();
+  if (formattedRecord.student) {
+    formattedRecord.student = {
+      center_students_seq: formattedRecord.student.center_students_seq,
+      name: formattedRecord.student.name
+    };
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      attendance: formattedRecord
     }
-
-     // Optional: Could fetch applicable pricing rule here if needed for display
-
-    res.status(200).json({
-        status: 'success',
-        data: {
-            attendance: attendanceRecord
-        }
-    });
+  });
 });
 
-// deleteAttendance remains the same
-exports.deleteAttendance = catchAsync(async (req, res, next) => {
-    const attendanceRecord = await Attendance.findByIdAndDelete(req.params.id);
+// Update attendance with exam results
+exports.updateExamResults = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { 
+    examScore, 
+    examMaxScore, 
+    examPassThreshold, 
+    examStatus, 
+    examDate, 
+    examNotes 
+  } = req.body;
 
-    if (!attendanceRecord) {
-        return next(new AppError('No attendance record found with that ID', 404));
+  // Validate required fields
+  if (!examScore && examScore !== 0) {
+    return next(new AppError('Exam score is required', 400));
+  }
+  
+  if (!examMaxScore && examMaxScore !== 0) {
+    return next(new AppError('Maximum exam score is required', 400));
+  }
+
+  // Check if attendance record exists
+  const attendanceRecord = await Attendance.findById(id);
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  // Update the attendance record with exam results
+  const updatedAttendance = await Attendance.findByIdAndUpdate(
+    id,
+    {
+      examScore,
+      examMaxScore,
+      examPassThreshold: examPassThreshold || examMaxScore / 2, // Default to 50% if not provided
+      examStatus,
+      examDate: examDate || new Date(),
+      examNotes
+    },
+    {
+      new: true,
+      runValidators: true
     }
+  ).populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
 
-    res.status(204).json({
-        status: 'success',
-        data: null
-    });
+  // Format response to emphasize sequencedId
+  const formattedRecord = updatedAttendance.toObject();
+  if (formattedRecord.student) {
+    formattedRecord.student = {
+      center_students_seq: formattedRecord.student.center_students_seq,
+      name: formattedRecord.student.name
+    };
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      attendance: formattedRecord
+    }
+  });
+});
+
+// Update attendance record with leave time and calculate duration
+exports.updateAttendance = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  
+  // Check if attendance record exists
+  const attendanceRecord = await Attendance.findById(id);
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  // Use current server time as leave time
+  const parsedLeaveTime = new Date();
+
+  // Ensure leave time is after attendance date
+  const attendanceDate = new Date(attendanceRecord.attendanceDate);
+  if (parsedLeaveTime < attendanceDate) {
+    return next(new AppError('System time is earlier than attendance time, please check your system clock', 400));
+  }
+
+  // Calculate duration in minutes
+  const durationInMs = parsedLeaveTime - attendanceDate;
+  const durationInMinutes = Math.round(durationInMs / (1000 * 60));
+
+  // Update the attendance record
+  const updatedAttendance = await Attendance.findByIdAndUpdate(
+    id,
+    {
+      leaveTime: parsedLeaveTime,
+      attendanceDuration: durationInMinutes
+    },
+    {
+      new: true,
+      runValidators: true
+    }
+  ).populate([
+    { path: 'student', select: 'name center_students_seq' },
+    { path: 'lesson', select: 'startTime' },
+    { path: 'lecturer', select: 'name' },
+    { path: 'recordedBy', select: 'name' },
+    { path: 'center', select: 'name' },
+    { path: 'subject', select: 'name' },
+    { path: 'level', select: 'name' }
+  ]);
+
+  // Format response to emphasize sequencedId
+  const formattedRecord = updatedAttendance.toObject();
+  if (formattedRecord.student) {
+    formattedRecord.student = {
+      center_students_seq: formattedRecord.student.center_students_seq,
+      name: formattedRecord.student.name
+    };
+  }
+
+  // Add formatted duration to the response for easier reading
+  const hours = Math.floor(durationInMinutes / 60);
+  const minutes = durationInMinutes % 60;
+  formattedRecord.formattedDuration = hours > 0 
+    ? `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`
+    : `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      attendance: formattedRecord
+    }
+  });
+});
+
+// Delete an attendance record (unchanged)
+exports.deleteAttendance = catchAsync(async (req, res, next) => {
+  const attendanceRecord = await Attendance.findByIdAndDelete(req.params.id);
+
+  if (!attendanceRecord) {
+    return next(new AppError('No attendance record found with that ID', 404));
+  }
+
+  res.status(204).json({
+    status: 'success',
+    data: null
+  });
 });

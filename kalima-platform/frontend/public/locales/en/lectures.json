@@ -1,0 +1,36 @@
+{
+  "title": "Lectures",
+  "discover": "Discover Our Latest Lectures",
+  "showLectures": "Show Lectures",
+  "noLectures": "No lectures found matching the selected filters.",
+  "filters": {
+    "reset": "Reset Filters",
+    "stage": "Instructor Role",
+    "grade": "Grade",
+    "subject": "Subject",
+    "status": "Status",
+    "stages": {
+      "lecturer": "Lecturer",
+      "professor": "Professor"
+    },
+    "statuses": {
+      "free": "Free",
+      "paid": "Paid"
+    }
+  },
+  "search": {
+    "options": "Search Options"
+  },
+  "levels": {
+  "Primary": "Primary",
+  "Middle": "Middle",
+  "Upper Primary": "Upper Primary",
+  "Higher Secondary": "Higher Secondary",
+  "Fourth Elementary": "Fourth Elementary",
+  "First Primary": "First Primary",
+  "Second Primary": "Second Primary",
+  "Third Primary": "Third Primary",
+  "First Secondary": "First Secondary",
+  "Second Secondary": "Second Secondary",
+  "Third Secondary": "Third Secondary"
+}
