@@ -1,0 +1,199 @@
+{
+    "admin": {
+      "pageTitle": "صفحة الأدمن",
+      "students": "الطلاب",
+      "teachers": "المعلمين",
+      "assistants": "المساعدين",
+      "parents": "أولياء الأمور",
+      "generatePromoCodes": "إنشاء أكواد ترويجية",
+      "sendOffer": "ارسل عرضك الان!",
+      "promo": "كود خاص",
+      "discount": "خصم",
+      "errors": {
+        "fetchLecturers": "فشل في جلب المحاضرين",
+        "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
+        "codesError": "يجب أن يكون عدد الأكواد أكبر من صفر",
+        "phoneRequired": "يرجى إدخال رقم الهاتف",
+        "lecturerRequired": "يرجى اختيار محاضر",
+        "generationFailed": "فشل في إنشاء أكواد الخصم",
+        "fetchUsers": "فشل في جلب المستخدمين"
+      },
+      "success": {
+        "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
+      },
+      "form": {
+        "pointsAmount": "قيمة النقاط",
+        "numCodes": "عدد الأكواد",
+        "codeType": "نوع الكود",
+        "general": "عام",
+        "specific": "محدد لمحاضر",
+        "promo": "كود خاص",
+        "lecturer": "المحاضر",
+        "lecturerPlaceholder": "اختر محاضر"
+      },
+      "userManagement": {
+        "title": "سجل الاجراءات",
+        "createUser": "إنشاء مستخدم جديد",
+        "delete": "حذف",
+        "edit": "تعديل"
+      },
+      "whatsappModal": {
+        "title": "إرسال عرض عبر واتساب",
+        "phoneLabel": "رقم الهاتف",
+        "phonePlaceholder": "ادخل رقم الهاتف",
+        "messageLabel": "الرسالة (اختياري)",
+        "messagePlaceholder": "اكتب رسالتك هنا...",
+        "cancel": "إلغاء",
+        "send": "إرسال"
+      },
+      "generating": "جاري الإنشاء...",
+    "generateCodes": "إنشاء الأكواد",
+    "generatedCodes": "الأكواد المنشأة",
+    "promoTable": {
+      "number": "الرقم",
+      "code": "كود الخصم",
+      "points": "النقاط",
+      "type": "النوع",
+      "actions": "الإجراءات",
+      "discount": "الخصم"
+    },
+        "specific": "محدد",
+            "general": "عام",
+            "copy": "نسخ",
+            
+    "filters": {
+      "name": "الاسم",
+      "phone": "رقم الهاتف",
+      "allTypes": "كل الأنواع",
+      "allStatus": "كل الحالات"
+    },
+    "roles": {
+      "student": "طالب",
+      "parent": "ولي أمر",
+      "lecturers": "معلم",
+      "lecturer": "معلم",
+      "teacher": "معلم",
+      "assistant": "مساعد",
+      "admin": "أدمن"
+    },
+    "status": {
+      "valid": "صالح",
+      "missingData": "بيانات ناقصة"
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "status": "الحالة",
+      "accountType": "نوع الحساب",
+      "phone": "رقم الهاتف",
+      "name": "الاسم"
+    },
+    "actions": {
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "showing": "عرض",
+      "of": "من"
+    },
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا المستخدم؟",
+    "NA": "غير متوفر",
+
+    "auditlog": {
+      "title": "سجل العمليات",
+      "subtitle": "عرض وتتبع جميع الأنشطة على النظام",
+      "search": "البحث في سجل العمليات...",
+      "noRecords": "لا توجد سجلات متاحة",
+      
+      "filters": {
+        "all": "الكل",
+        "user": "المستخدم",
+        "role": "الصلاحية",
+        "action": "الإجراء",
+        "resource": "العنصر",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "to": "إلى",
+        "apply": "تطبيق الفلتر"
+      },
+      
+      "columns": {
+        "user": "المستخدم",
+        "role": "الصلاحية",
+        "action": "الإجراء",
+        "resource": "العنصر",
+        "datetime": "التاريخ والوقت",
+        "status": "الحالة"
+      },
+      
+      "roles": {
+        "admin": "مسؤول",
+        "lecturer": "معلم",
+        "student": "طالب"
+      },
+      
+      "actions": {
+        "create": "إنشاء",
+        "read": "قراءة",
+        "update": "تعديل",
+        "delete": "حذف"
+      },
+      
+      "resources": {
+        "container": "كورس",
+        "lecture": "درس",
+        "user": "مستخدم",
+        "timetable": "جدول زمني",
+        "center": "مركز" 
+      },
+      "idDisplay": "ID: {{id}}",
+      
+      "status": {
+        "success": "ناجح",
+        "pending": "قيد الانتظار",
+        "failed": "فشل",
+        "unknown": "غير معروف"
+      },
+      
+      "errors": {
+        "fetch": "فشل تحميل سجلات التدقيق",
+        "general": "حدث خطأ"
+      },
+      
+      "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+      }
+    }
+    },
+    "promoCodes": {
+      "title": "إدارة الأكواد الترويجية",
+      "code": " كود الخصم",
+      "points": " النقاط",
+      "status": " الحالة",
+      "redeemedAt": "تم استرداده في",
+      "redeemedBy": "تم الاسترداد بواسطة",
+      "noCodes": "لم يتم العثور على أكواد ترويجية"
+    },
+    "filters": {
+      "allStatuses": "كل الحالات",
+      "redeemed": "مسترد",
+      "active": "نشط",
+      "redeemedBy": "تم استرداده بواسطة",
+      "apply": "تطبيق"
+    },
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي",
+      "page": "صفحة",
+      "of": "من"
+    },
+    "status": {
+      "redeemed": "مسترد",
+      "active": "نشط"
+    },
+    "errors": {
+      "fetchPromo": "فشل في جلب الأكواد الترويجية"
+    }
+  }

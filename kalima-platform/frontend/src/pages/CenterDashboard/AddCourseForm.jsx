@@ -1,103 +1,292 @@
-import { Plus } from "lucide-react"
+import { useState, useEffect } from "react";
+import { PlusCircle, ChevronDown, X } from 'lucide-react';
+import { useTranslation } from "react-i18next";
+import { addNewLesson } from "../../routes/center";
+import { getAllSubjects } from "../../routes/courses";
+import { getAllLevels } from "../../routes/levels";
 
-const AddCourseForm = () => {
+const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdded }) => {
+  const { t, i18n } = useTranslation("centerDashboard");
+  const isRTL = i18n.language === "ar";
+  const dir = isRTL ? "rtl" : "ltr";
+  
+  const [formData, setFormData] = useState({
+    subject: "",
+    lecturer: "",
+    level: "",
+    startTime: "",
+    duration: "60",
+    centerId: selectedCenter?._id || ""
+  });
+
+  const [levels, setLevels] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [dataLoading, setDataLoading] = useState({
+    levels: true,
+    subjects: true
+  });
+  // Fetch levels and subjects
+  useEffect(() => {
+    const fetchData = async () => {
+      // Fetch levels
+      try {
+        setDataLoading(prev => ({ ...prev, levels: true }));
+        const levelsResponse = await getAllLevels();
+        if (levelsResponse.success) {
+          setLevels(levelsResponse.data.levels || []);
+        } else {
+          console.error("Error fetching levels:", levelsResponse.error);
+        }
+      } catch (err) {
+        console.error("Error fetching levels:", err);
+      } finally {
+        setDataLoading(prev => ({ ...prev, levels: false }));
+      }
+      
+      // Fetch subjects
+      try {
+        setDataLoading(prev => ({ ...prev, subjects: true }));
+        const subjectsResponse = await getAllSubjects();
+        if (subjectsResponse.success) {
+          setSubjects(subjectsResponse.data.subjects || []);
+        } else {
+          console.error("Error fetching subjects:", subjectsResponse.error);
+        }
+      } catch (err) {
+        console.error("Error fetching subjects:", err);
+      } finally {
+        setDataLoading(prev => ({ ...prev, subjects: false }));
+      }
+    };
+
+    if (isOpen) {
+      fetchData();
+      // Update centerId when selectedCenter changes
+      setFormData(prev => ({
+        ...prev,
+        centerId: selectedCenter?._id || ""
+      }));
+    }
+  }, [isOpen, selectedCenter]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const formattedDate = new Date(formData.startTime).toISOString().split('T')[0];
+      const payload = {
+        subject: formData.subject,
+        lecturer: formData.lecturer,
+        level: formData.level,
+        startTime: formattedDate,
+        duration: parseInt(formData.duration),
+        centerId: formData.centerId
+      };
+
+      const response = await addNewLesson(payload);
+
+      if (response.status === "success") {
+        alert(t('addCourseForm.successMessage'));
+        setFormData({
+          subject: "",
+          lecturer: "",
+          level: "",
+          startTime: "",
+          duration: "60",
+          centerId: selectedCenter?._id || ""
+        });
+        if (onCourseAdded) onCourseAdded();
+        if (onClose) onClose();
+      } else {
+        throw new Error(response.message || t('addCourseForm.errors.general'));
+      }
+    } catch (err) {
+      setError(err.message || t('addCourseForm.errors.general'));
+      console.error("Error adding lesson:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className=" rounded-lg shadow-sm">
-      {/* Header */}
-      <div className="flex justify-end p-4 rounded-t-lg">
-        <div className="flex items-center justify-center">
-          <div className="font-medium btn btn-primary">إضافة كورس جديد
-          <Plus className="ml-2 w-5 h-5" />
-          </div>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" dir={dir}>
+      <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-base-100 p-4 border-b border-base-200 flex justify-between items-center">
+          <h2 className="text-xl font-bold">
+            {t('addCourseForm.title')}
+          </h2>
+          <button 
+            type="button" 
+            className="btn btn-ghost btn-sm btn-circle" 
+            onClick={onClose}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-      </div>
 
-      {/* Course Title Input */}
-      <div className="p-4">
-        <input
-          type="text"
-          placeholder="...اكتب عنوان الكورس هنا"
-          className="input input-bordered w-full bg-primary text-white placeholder:text-white h-14 text-right p-10"
-        />
-      </div>
+        <form onSubmit={handleSubmit} className="p-4">
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>{error}</span>
+            </div>
+          )}
 
-      {/* Three Column Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-        <div>
-          <div className="flex items-center justify-end mb-2">
-            <span className="font-medium">الفئة</span>
-            <span className="text-primary font-bold ml-2">•</span>
-          </div>
-          <div className="dropdown dropdown-top dropdown-end w-full">
-            <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-              <span>▼</span>
-              <span>اللغة الألمانية</span>
+          {/* Subject Selection */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text font-medium">
+                {t('addCourseForm.labels.subject')}
+              </span>
+            </label>
+            <div className="relative">
+              {dataLoading.subjects ? (
+                <div className="skeleton h-12 w-full rounded-lg"></div>
+              ) : (
+                <select
+                  name="subject"
+                  className="select select-bordered w-full"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">{t('addCourseForm.selectPlaceholder.subject')}</option>
+                  {subjects.map((subject) => (
+                    <option key={subject._id} value={subject._id}>
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
-        </div>
 
-        <div>
-          <div className="flex items-center justify-end mb-2">
-            <span className="font-medium">المحاضر</span>
-            <span className="text-primary font-bold ml-2">•</span>
-          </div>
-          <div className="dropdown dropdown-top dropdown-end w-full">
-            <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-              <span>▼</span>
-              <span>أبناء علي</span>
+          {/* Lecturer Selection */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text font-medium">
+                {t('addCourseForm.labels.lecturer')}
+              </span>
+            </label>
+            <div className="relative">
+              <select
+                name="lecturer"
+                className="select select-bordered w-full"
+                value={formData.lecturer}
+                onChange={handleChange}
+                required
+              >
+                <option value="">{t('addCourseForm.selectPlaceholder.lecturer')}</option>
+                {lecturers.map((lecturer) => (
+                  <option key={lecturer._id} value={lecturer._id}>
+                    {lecturer.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
-        </div>
 
-        <div>
-          <div className="flex items-center justify-end mb-2">
-            <span className="font-medium">السعر</span>
-            <span className="text-primary font-bold ml-2">•</span>
-          </div>
-          <div className="dropdown dropdown-top dropdown-end w-full">
-            <div tabIndex={0} role="button" className="btn btn-outline w-full justify-between">
-              <span>▼</span>
-              <span>250</span>
+          {/* Level Selection */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text font-medium">
+                {t('addCourseForm.labels.level')}
+              </span>
+            </label>
+            <div className="relative">
+              {dataLoading.levels ? (
+                <div className="skeleton h-12 w-full rounded-lg"></div>
+              ) : (
+                <select
+                  name="level"
+                  className="select select-bordered w-full"
+                  value={formData.level}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">{t('addCourseForm.selectPlaceholder.level')}</option>
+                  {levels.map((level) => (
+                    <option key={level._id} value={level._id}>
+                      {level.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <ChevronDown className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/70 ${isRTL ? "left-3" : "right-3"}`} />
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Education Level */}
-      <div className="p-4">
-        <div className="text-right mb-2 font-medium">المستوى</div>
-        <div className="flex flex-wrap gap-4 justify-end">
-          <button className="btn btn-outline min-w-[120px]">الثانوية</button>
-          <button className="btn btn-outline min-w-[120px]">الإعدادية</button>
-          <button className="btn btn-outline min-w-[120px]">الابتدائية</button>
-        </div>
-      </div>
+          {/* Start Date */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text font-medium">
+                {t('addCourseForm.labels.startDate')}
+              </span>
+            </label>
+            <input
+              name="startTime"
+              type="date"
+              className="input input-bordered w-full"
+              value={formData.startTime}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      {/* Course Description */}
-      <div className="p-4">
-        <div className="text-right mb-2 font-medium">وصف الكورس</div>
-        <textarea
-          className="textarea textarea-bordered w-full h-32 text-right"
-          placeholder="اكتب وصف الكورس هنا..."
-          defaultValue="هذا الكورس مصمم للمبتدئين الذين يرغبون في تعلم أساسيات قوي في التحدث والقراءة وفهم اللغة الألمانية. بنهاية الكورس، سيتمكن الطالب من التواصل بثقة في المواقف اليومية."
-        ></textarea>
-      </div>
+          {/* Duration */}
+          <div className="form-control mb-6">
+            <label className="label">
+              <span className="label-text font-medium">
+                {t('addCourseForm.labels.duration')}
+              </span>
+            </label>
+            <input
+              name="duration"
+              type="number"
+              min="30"
+              className="input input-bordered w-full"
+              value={formData.duration}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      {/* What Will Students Learn */}
-      <div className="p-4">
-        <div className="text-right mb-2 font-medium">ما الذي سيتعلمه الطالب؟</div>
-        <input
-          type="text"
-          placeholder="مهارات التحدث"
-          className="input input-bordered w-full text-right mb-4"
-          defaultValue="مهارات التحدث"
-        />
-        <div className="flex justify-end">
-          <button className="btn btn-outline min-w-[120px]">الابتدائية</button>
-        </div>
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            className="btn btn-primary w-full"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                {t('addCourseForm.saving')}
+              </>
+            ) : (
+              <>
+                <PlusCircle className="w-5 h-5" />
+                {t('addCourseForm.submitButton')}
+              </>
+            )}
+          </button>
+        </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AddCourseForm
+export default AddCourseForm;

@@ -44,6 +44,11 @@ const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
 const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
 const reportRouter = require("./routes/reportRoutes.js");
+// New routes for exam and homework functionality
+const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
+const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
+const assistantHomeworkRouter = require("./routes/assistantHomeworkRoutes.js");
+
 connectDB();
 
 app.use(cors(corsOptions));
@@ -85,6 +90,10 @@ app.use("/api/v1/pricing-rules", pricingRuleRouter); // Mount pricing rule route
 app.use('/api/v1/parents', parentRoutes);
 app.use('/api/v1/groupedLessons', groupedLessonsRouter);
 app.use('/api/v1/reports', reportRouter); // Mount report router
+// Add new routes for exam and homework functionality
+app.use("/api/v1/exam-configs", ExamConfigRouter);
+app.use("/api/v1/exam-submissions", studentExamSubmissionRouter);
+app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");

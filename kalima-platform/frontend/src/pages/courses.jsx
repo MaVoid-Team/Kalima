@@ -1,299 +1,359 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react"
-import { Search } from "lucide-react"
-import { Link } from "react-router-dom"
-import { useTranslation } from "react-i18next"
-import { getAllContainers } from "../routes/lectures"
-import { FilterDropdown } from "../../src/components/FilterDropdown"
-import { LoadingSpinner } from "../components/LoadingSpinner"
-import { ErrorAlert } from "../components/ErrorAlert"
-import { CourseCard } from "../components/CourseCard"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+
+import { getAllContainers } from "../routes/lectures";
+import { FilterDropdown } from "../../src/components/FilterDropdown";
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { ErrorAlert } from "../components/ErrorAlert";
+import { CourseCard } from "../components/CourseCard";
+import { getAllLecturers } from "../routes/fetch-users";
 
 export default function CoursesPage() {
-  const [containers, setContainers] = useState([])
-  const [filteredContainers, setFilteredContainers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const { t, i18n } = useTranslation("courses")
-  const isRTL = i18n.language === "ar"
+  const [containers, setContainers] = useState([]);
+  const [filteredContainers, setFilteredContainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const { t, i18n } = useTranslation("courses");
+  const isRTL = i18n.language === "ar";
 
   // Filter states
-  const [selectedStage, setSelectedStage] = useState("")
-  const [selectedGrade, setSelectedGrade] = useState("")
-  const [selectedTerm, setSelectedTerm] = useState("")
-  const [selectedSubject, setSelectedSubject] = useState("")
-  const [selectedCourseType, setSelectedCourseType] = useState("")
-  const [selectedCourseStatus, setSelectedCourseStatus] = useState("")
-  const [selectedPrice, setSelectedPrice] = useState("")
+  const [selectedStage, setSelectedStage] = useState("");
+  const [selectedGrade, setSelectedGrade] = useState("");
+  const [selectedTerm, setSelectedTerm] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedCourseType, setSelectedCourseType] = useState("");
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState("");
+  const [lecturers, setLecturers] = useState([]);
+
+useEffect(() => {
+  fetchContainers();
+  fetchLecturers();
+}, []);
+
+const fetchLecturers = async () => {
+  try {
+    const result = await getAllLecturers();
+    if (result.success) {
+      setLecturers(result.data);
+    } else {
+      console.error("Failed to fetch lecturers:", result.error);
+    }
+  } catch (err) {
+    console.error("Error fetching lecturers:", err);
+  }
+};
 
   useEffect(() => {
-    fetchContainers()
-  }, [])
+    fetchContainers();
+  }, []);
 
   const fetchContainers = async () => {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
     try {
-      const result = await getAllContainers()
-      console.log("API Response:", result)
-
+      const result = await getAllContainers();
+      console.log("API Response:", result);
       if (result.status === "success") {
-        setContainers(result.data.containers)
-        setFilteredContainers(result.data.containers)
+        setContainers(result.data.containers);
+        setFilteredContainers(result.data.containers);
       } else {
-        setError(result.error || "Failed to fetch containers")
+        setError(result.error || "Failed to fetch containers");
       }
     } catch (err) {
-      console.error("Error fetching containers:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
+      console.error("Error fetching containers:", err);
+      setError("حدث خطأ أثناء تحميل البيانات");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+  const resetFilters = useCallback(() => {
+    setSelectedStage("");
+    setSelectedGrade("");
+    setSelectedTerm("");
+    setSelectedSubject("");
+    setSelectedCourseType("");
+    setSelectedCourseStatus("");
+    setSelectedPrice("");
+    setFilteredContainers(containers);
+  }, [containers]);
 
-  // Generate course data based on containers from API
-  const generateCourseData = (containersData) => {
-    return containersData.map((container, index) => {
-      // Get the level name if available
-      const levelName = container.level?.name || ""
 
-      // Map level name to stage in Arabic
-      let stage = "المرحلة الثانوية" // Default
-      if (levelName) {
-        switch (levelName) {
-          case "Primary":
-            stage = "المرحلة الابتدائية"
-            break
-          case "Middle":
-            stage = "المرحلة الإعدادية"
-            break
-          case "Upper Primary":
-            stage = "المرحلة الابتدائية العليا"
-            break
-          case "Higher Secondary":
-            stage = "المرحلة الثانوية"
-            break
-          default:
-            stage = "المرحلة الثانوية"
-        }
+    const generateCourseData = (containersData) =>
+    containersData.map((container, index) => {
+      const levelName = container.level?.name || "";
+  
+      let stage = "المرحلة الثانوية";
+      switch (levelName) {
+        case "Primary":
+          stage = "المرحلة الابتدائية";
+          break;
+        case "Middle":
+          stage = "المرحلة الإعدادية";
+          break;
+        case "Upper Primary":
+          stage = "المرحلة الابتدائية العليا";
+          break;
+        case "Higher Secondary":
+          stage = "المرحلة الثانوية";
+          break;
+        case "Fourth Elementary":
+          stage = "الصف الرابع الابتدائي";
+          break;
+        case "First Primary":
+          stage = "الصف الأول الابتدائي";
+          break;
+        case "Second Primary":
+          stage = "الصف الثاني الابتدائي";
+          break;
+        case "Third Primary":
+          stage = "الصف الثالث الابتدائي";
+          break;
+        case "First Secondary":
+          stage = "الصف الأول الثانوي";
+          break;
+        case "Second Secondary":
+          stage = "الصف الثاني الثانوي";
+          break;
+        case "Third Secondary":
+          stage = "الصف الثالث الثانوي";
+          break;
       }
-
-      // Determine if course is free or paid
-      const isFree = container.price === 0
-      const status = isFree ? "مجاني" : "مدفوع"
-
-      // Map container type to course type in Arabic
-      let type = "شرح" // Default
+  
+      const isFree = container.price === 0;
+      const status = isFree ? "مجاني" : "مدفوع";
+  
+      let type = "شرح";
       switch (container.type) {
         case "course":
-          type = "شرح"
-          break
+          type = "شرح";
+          break;
         case "year":
-          type = "سنة كاملة"
-          break
+          type = "سنة كاملة";
+          break;
         case "term":
-          type = "فصل دراسي"
-          break
+          type = "فصل دراسي";
+          break;
         case "month":
-          type = "شهر"
-          break
+          type = "شهر";
+          break;
         default:
-          type = container.type || "شرح"
+          type = container.type || "شرح";
       }
-
+  
+      const teacherId = container.createdBy?._id || container.createdBy;
+      const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId);
+  
       return {
         id: container._id,
         image: `/course-${(index % 6) + 1}.png`,
         title: container.name,
         subject: container.subject?.name || "",
-        teacher: container.createdBy?.name || "مدرس غير محدد",
-        teacherRole: container.createdBy?.role || "محاضر",
+        teacher: matchedLecturer?.name || "مدرس غير محدد",
+        teacherRole: matchedLecturer?.role || "محاضر",
         grade: levelName,
-        rating: 4 + (index % 2) * 0.5, // Default rating
-        stage: stage,
-        type: type,
-        status: status,
+        rating: 4 + (index % 2) * 0.5,
+        stage,
+        type,
+        status,
         price: container.price || 0,
         childrenCount: container.children?.length || 0,
         containerType: container.type || "lecture",
+      };
+    });
+   
+    const applyFilters = useCallback(() => {
+      let filtered = [...containers];
+    
+      // Handle selectedStage filter
+      if (selectedStage) {
+        filtered = filtered.filter((container) => {
+          const levelName = container.level?.name || "";
+          let stage;
+          switch (levelName) {
+            case "Primary":
+            case "Fourth Elementary":
+            case "First Primary":
+            case "Second Primary":
+            case "Third Primary":
+              stage = "المرحلة الابتدائية";
+              break;
+            case "Middle":
+            case "Upper Primary":
+              stage = "المرحلة الإعدادية";
+              break;
+            case "Higher Secondary":
+            case "First Secondary":
+            case "Second Secondary":
+            case "Third Secondary":
+              stage = "المرحلة الثانوية";
+              break;
+            default:
+              stage = "";
+          }
+          return stage === selectedStage;
+        });
       }
-    })
-  }
-
-  // Apply filters to containers
-  const applyFilters = useCallback(() => {
-    // First, filter the raw container data based on selected criteria
-    let filtered = [...containers]
-
-    if (selectedSubject) {
-      filtered = filtered.filter((container) => container.subject?.name === selectedSubject)
-    }
-
-    if (selectedGrade) {
-      filtered = filtered.filter((container) => container.level?.name === selectedGrade)
-    }
-
-    if (selectedCourseType) {
-      // Map Arabic type back to API type
-      let apiType = "course"
-      switch (selectedCourseType) {
-        case "شرح":
-          apiType = "course"
-          break
-        case "سنة كاملة":
-          apiType = "year"
-          break
-        case "فصل دراسي":
-          apiType = "term"
-          break
-        case "شهر":
-          apiType = "month"
-          break
-        default:
-          apiType = selectedCourseType
+    
+      if (selectedSubject) {
+        filtered = filtered.filter((c) => c.subject?.name === selectedSubject);
       }
-      filtered = filtered.filter((container) => container.type === apiType)
-    }
-
-    if (selectedCourseStatus) {
-      if (selectedCourseStatus === "مجاني") {
-        filtered = filtered.filter((container) => container.price === 0)
-      } else if (selectedCourseStatus === "مدفوع") {
-        filtered = filtered.filter((container) => container.price > 0)
+    
+      if (selectedGrade) {
+        filtered = filtered.filter((c) => c.level?.name === selectedGrade);
       }
-    }
-
-    if (selectedPrice) {
-      const priceRange = selectedPrice.split("-")
-      if (priceRange.length === 2) {
-        const minPrice = Number.parseInt(priceRange[0])
-        const maxPrice = Number.parseInt(priceRange[1])
-        filtered = filtered.filter((container) => container.price >= minPrice && container.price <= maxPrice)
+    
+      if (selectedCourseType) {
+        let apiType = "course";
+        switch (selectedCourseType) {
+          case "شرح":
+            apiType = "course";
+            break;
+          case "سنة كاملة":
+            apiType = "year";
+            break;
+          case "فصل دراسي":
+            apiType = "term";
+            break;
+          case "شهر":
+            apiType = "month";
+            break;
+          default:
+            apiType = selectedCourseType;
+        }
+        filtered = filtered.filter((c) => c.type === apiType);
       }
-    }
+    
+      if (selectedCourseStatus) {
+        filtered = filtered.filter((c) => {
+          const price = c.price || 0;
+          return selectedCourseStatus === "مجاني" ? price === 0 : price > 0;
+        });
+      }
+    
+      if (selectedPrice) {
+        const [min, max] = selectedPrice.split("-").map(Number);
+        filtered = filtered.filter((c) => {
+          const price = c.price || 0;
+          return price >= min && price <= max;
+        });
+      }
+    
+      setFilteredContainers(filtered);
+    }, [
+      selectedStage,
+      selectedGrade,
+      selectedSubject,
+      selectedCourseType,
+      selectedCourseStatus,
+      selectedPrice,
+      containers,
+    ]);
+    useEffect(() => {
+      applyFilters();
+    }, [applyFilters]);
+  const memoizedFilteredCourses = useMemo(
+    () => generateCourseData(filteredContainers),
+    [filteredContainers]
+  );
 
-    // Then convert the filtered containers to course data format
-    setFilteredContainers(filtered)
-  }, [
-    selectedStage,
-    selectedGrade,
-    selectedSubject,
-    selectedCourseType,
-    selectedCourseStatus,
-    selectedPrice,
-    containers,
-  ])
-
-  // Reset all filters
-  const resetFilters = useCallback(() => {
-    setSelectedStage("")
-    setSelectedGrade("")
-    setSelectedTerm("")
-    setSelectedSubject("")
-    setSelectedCourseType("")
-    setSelectedCourseStatus("")
-    setSelectedPrice("")
-    setFilteredContainers(containers)
-  }, [containers])
-
-  // Memoize filtered courses
-  const memoizedFilteredCourses = useMemo(() => generateCourseData(filteredContainers), [filteredContainers])
-
-  // Get unique subjects for the subject filter
   const subjectOptions = useMemo(() => {
-    const uniqueSubjects = new Set()
-    containers.forEach((container) => {
-      if (container.subject?.name) {
-        uniqueSubjects.add(container.subject.name)
-      }
-    })
-    return Array.from(uniqueSubjects).map((subject) => ({
-      label: subject,
-      value: subject,
-    }))
-  }, [containers])
+    const unique = new Set();
+    containers.forEach((c) => c.subject?.name && unique.add(c.subject.name));
+    return [...unique].map((s) => ({ label: s, value: s }));
+  }, [containers]);
 
-  // Get unique levels for the grade filter
   const levelOptions = useMemo(() => {
-    const uniqueLevels = new Set()
-    containers.forEach((container) => {
-      if (container.level?.name) {
-        uniqueLevels.add(container.level.name)
-      }
-    })
-    return Array.from(uniqueLevels).map((level) => ({
-      label: level,
-      value: level,
-    }))
-  }, [containers])
+  const unique = new Set();
+  containers.forEach((c) => {
+    if (c.level?.name) {
+      // Map raw API values to display names
+      const displayName = {
+        "Primary": "المرحلة الابتدائية",
+        "Middle": "المرحلة الإعدادية",
+        "Upper Primary": "المرحلة الابتدائية العليا",
+        "Higher Secondary": "المرحلة الثانوية",
+        "Fourth Elementary": "الصف الرابع الابتدائي",
+        "First Primary": "الصف الأول الابتدائي",
+        "Second Primary": "الصف الثاني الابتدائي",
+        "Third Primary": "الصف الثالث الابتدائي",
+        "First Secondary": "الصف الأول الثانوي",
+        "Second Secondary": "الصف الثاني الثانوي",
+        "Third Secondary": "الصف الثالث الثانوي",
+      }[c.level.name] || c.level.name;
+      
+      unique.add(displayName);
+    }
+  });
+  return [...unique].map((l) => ({ label: l, value: l }));
+}, [containers]);
 
-  // Course type options based on container types
-  const typeOptions = useMemo(() => {
-    const uniqueTypes = new Set()
-    containers.forEach((container) => {
-      if (container.type) {
-        uniqueTypes.add(container.type)
-      }
-    })
-
-    return Array.from(uniqueTypes).map((type) => {
-      let label = type
-      switch (type) {
-        case "course":
-          label = "شرح"
-          break
-        case "year":
-          label = "سنة كاملة"
-          break
-        case "term":
-          label = "فصل دراسي"
-          break
-        case "month":
-          label = "شهر"
-          break
-      }
-      return { label, value: label }
-    })
-  }, [containers])
-
-  // Price range options
   const priceOptions = [
     { label: "مجاني", value: "0-0" },
     { label: "أقل من 500 جنيه", value: "1-500" },
     { label: "500-1000 جنيه", value: "500-1000" },
     { label: "أكثر من 1000 جنيه", value: "1000-10000" },
-  ]
-
+  ];
+  const typeOptions = useMemo(() => {
+    const unique = new Set();
+    containers.forEach((c) => {
+      if (c.type) {
+        const arabicType = {
+          course: "شرح",
+          year: "سنة كاملة",
+          term: "فصل دراسي",
+          month: "شهر"
+        }[c.type] || c.type;
+        
+        unique.add(arabicType);
+      }
+    });
+    return [...unique].map((type) => ({ label: type, value: type }));
+  }, [containers]);
+  
   const filterOptions = [
     {
       label: t("filters.stage"),
       value: selectedStage,
       options: [
+        { label: t("filters.all"), value: "" },
         { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
         { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
         { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
-        { label: "المرحلة الابتدائية العليا", value: "المرحلة الابتدائية العليا" },
       ],
       onSelect: setSelectedStage,
     },
     {
       label: t("filters.grade"),
       value: selectedGrade,
-      options: levelOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...levelOptions,
+      ],
       onSelect: setSelectedGrade,
     },
     {
       label: t("filters.subject"),
       value: selectedSubject,
-      options: subjectOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...subjectOptions,
+      ],
       onSelect: setSelectedSubject,
     },
     {
       label: t("filters.type"),
       value: selectedCourseType,
-      options: typeOptions,
+      options: [
+        { label: t("filters.all"), value: "" },
+        ...typeOptions, // Now properly defined
+      ],
       onSelect: setSelectedCourseType,
     },
     {
@@ -311,11 +371,10 @@ export default function CoursesPage() {
       options: priceOptions,
       onSelect: setSelectedPrice,
     },
-  ]
+  ];
 
   return (
     <div className="relative min-h-screen w-full" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Background Pattern */}
       <div className={`absolute top-0 ${isRTL ? "left-0" : "right-0"} w-2/3 h-screen pointer-events-none z-0`}>
         <div className="relative w-full h-full">
           <img
@@ -327,9 +386,7 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="relative z-10">
-        {/* Title Section */}
         <div className={`container mx-auto px-4 pt-8 pb-4 ${isRTL ? "text-right" : "text-left"}`}>
           <div className="relative inline-block">
             <p className="text-3xl font-bold text-primary md:mx-40">{t("title")}</p>
@@ -337,7 +394,6 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        {/* Search and Filters Section */}
         <div className="container mx-auto px-4 py-4">
           <div className={`flex justify-start`}>
             <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
@@ -349,15 +405,14 @@ export default function CoursesPage() {
             </div>
           </div>
 
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl ${isRTL ? "ml-auto" : "mr-auto"} mt-4`}
-          >
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl ${isRTL ? "ml-auto" : "mr-auto"} mt-4`}>
             {filterOptions.map((filter) => (
               <FilterDropdown
                 key={filter.label}
                 label={filter.label}
                 options={filter.options}
                 selectedValue={filter.value}
+                placeholder={t("filters.select")}
                 onSelect={filter.onSelect}
                 isRTL={isRTL}
               />
@@ -375,7 +430,6 @@ export default function CoursesPage() {
           </div>
         </div>
 
-        {/* Courses Section */}
         <div className="container mx-auto px-4 py-8">
           <h2 className={`text-2xl font-bold text-center mb-8 ${isRTL ? "text-right" : "text-left"}`}>
             {t("discover")}
@@ -388,13 +442,7 @@ export default function CoursesPage() {
           ) : memoizedFilteredCourses.length === 0 ? (
             <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
               <p className="text-lg">{t("noCourses")}</p>
-              {(selectedStage ||
-                selectedGrade ||
-                selectedTerm ||
-                selectedSubject ||
-                selectedCourseType ||
-                selectedCourseStatus ||
-                selectedPrice) && (
+              {(selectedStage || selectedGrade || selectedTerm || selectedSubject || selectedCourseType || selectedCourseStatus || selectedPrice) && (
                 <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
                   {t("filters.reset")}
                 </button>
@@ -412,13 +460,7 @@ export default function CoursesPage() {
                     transition={{ duration: 0.5 }}
                   >
                     <Link to={`/courses/${course.id}`}>
-                      <CourseCard
-                        {...course}
-                        isRTL={isRTL}
-                        childrenCount={course.childrenCount}
-                        teacherRole={course.teacherRole}
-                        status={course.status}
-                      />
+                      <CourseCard {...course} isRTL={isRTL} />
                     </Link>
                   </motion.div>
                 ))}
@@ -428,5 +470,5 @@ export default function CoursesPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

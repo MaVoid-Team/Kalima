@@ -1,13 +1,205 @@
 "use client"
+import { useState, useEffect } from "react"
 import SectionHeader from "./SectionHeader"
 import { useTranslation } from "react-i18next"
+import { getUserDashboard } from "../../routes/auth-services"
+import { updateCurrentUser } from "../../routes/update-user"
 
-function PersonalInfoSection({ formData, handleInputChange }) {
+function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
+  
+  // State for user data
+  const [userData, setUserData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  
+  // States for editing
+  const [isEditing, setIsEditing] = useState({
+    fullName: false,
+    phoneNumber: false,
+    email: false
+  })
+  
+  // Form data for editing
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+    email: ''
+  })
+
+  // State for update status
+  const [updateStatus, setUpdateStatus] = useState({
+    loading: false,
+    success: false,
+    error: null,
+    field: null
+  })
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true)
+      try {
+        const result = await getUserDashboard()
+        if (result.success) {
+          const userInfo = result.data.data.userInfo
+          setUserData(userInfo)
+          
+          // Initialize form data with user info
+          setFormData({
+            fullName: userInfo.name || '',
+            phoneNumber: userInfo.phoneNumber || '',
+            email: userInfo.email || ''
+          })
+        } else {
+          setError(result.error || "Failed to fetch user data")
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error)
+        setError("An error occurred while fetching your information")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [])
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  // Toggle edit mode for a field
+  const toggleEdit = (field) => {
+    setIsEditing(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }))
+    
+    // Reset form data to current user data if canceling edit
+    if (isEditing[field]) {
+      setFormData(prev => ({
+        ...prev,
+        [field === 'fullName' ? 'fullName' : field]: 
+          field === 'fullName' ? userData?.name : userData?.[field] || ''
+      }))
+    }
+  }
+
+  // Handle save changes
+  const handleSave = async (field) => {
+    // Set update status to loading
+    setUpdateStatus({
+      loading: true,
+      success: false,
+      error: null,
+      field
+    })
+
+    try {
+      // Map form field names to API field names
+      const fieldMapping = {
+        fullName: 'name',
+        phoneNumber: 'phoneNumber',
+        email: 'email'
+      }
+
+      // Create update data object with the correct field name
+      const updateData = {
+        [fieldMapping[field]]: formData[field]
+      }
+
+      // Call the update API
+      const result = await updateCurrentUser(updateData)
+
+      if (result.success) {
+        // Update local userData state
+        setUserData(prev => ({
+          ...prev,
+          [fieldMapping[field]]: formData[field]
+        }))
+
+        // Set success status
+        setUpdateStatus({
+          loading: false,
+          success: true,
+          error: null,
+          field
+        })
+
+        // Exit edit mode
+        toggleEdit(field)
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setUpdateStatus(prev => ({
+            ...prev,
+            success: false,
+            field: null
+          }))
+        }, 3000)
+      } else {
+        // Set error status
+        setUpdateStatus({
+          loading: false,
+          success: false,
+          error: result.error || "Failed to update",
+          field
+        })
+      }
+    } catch (error) {
+      console.error("Error updating user data:", error)
+      setUpdateStatus({
+        loading: false,
+        success: false,
+        error: "An unexpected error occurred",
+        field
+      })
+    }
+  }
 
   // Get all translations under personalInfo namespace
   const personalInfo = t('personalInfo', { returnObjects: true })
+
+  if (loading) {
+    return (
+      <div className="mb-8">
+        <SectionHeader title={personalInfo.title} />
+        <div className="card bg-base-100 shadow-sm">
+          <div className="card-body flex items-center justify-center p-8">
+            <div className="loading loading-spinner loading-lg text-primary"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="mb-8">
+        <SectionHeader title={personalInfo.title} />
+        <div className="card bg-base-100 shadow-sm">
+          <div className="card-body">
+            <div className="alert alert-error">
+              <span>{error}</span>
+              <button 
+                className="btn btn-sm btn-outline" 
+                onClick={() => window.location.reload()}
+              >
+                {t('retry')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="mb-8">
@@ -18,6 +210,11 @@ function PersonalInfoSection({ formData, handleInputChange }) {
             {personalInfo.subtitle}
           </h3>
 
+          {/* User Role Badge */}
+          <div className="mb-4 flex justify-end">
+            <div className="badge badge-primary badge-lg">{userData?.role}</div>
+          </div>
+
           {/* Full Name Field */}
           <div className="form-control mb-4">
             <label className={`label justify-end`}>
@@ -26,19 +223,48 @@ function PersonalInfoSection({ formData, handleInputChange }) {
               </span>
             </label>
             <div className={`flex gap-4 ${isRTL ? 'flex-row' : 'flex-row-reverse'}`}>
-              <button className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}>
-                {personalInfo.buttons.edit}
-              </button>
+              {isEditing.fullName ? (
+                <div className={`flex gap-2 ${isRTL ? '' : 'order-last'}`}>
+                  <button 
+                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === 'fullName' ? 'loading' : ''}`}
+                    onClick={() => handleSave('fullName')}
+                    disabled={updateStatus.loading}
+                  >
+                    {personalInfo.buttons.save}
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-outline" 
+                    onClick={() => toggleEdit('fullName')}
+                    disabled={updateStatus.loading && updateStatus.field === 'fullName'}
+                  >
+                    {personalInfo.buttons.cancel}
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}
+                  onClick={() => toggleEdit('fullName')}
+                >
+                  {personalInfo.buttons.edit}
+                </button>
+              )}
               <input
                 type="text"
                 name="fullName"
-                value={formData.fullName}
+                value={isEditing.fullName ? formData.fullName : userData?.name || ''}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.fullName}
                 className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
                 dir={isRTL ? 'rtl' : 'ltr'}
+                readOnly={!isEditing.fullName}
               />
             </div>
+            {updateStatus.field === 'fullName' && updateStatus.error && (
+              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+            )}
+            {updateStatus.field === 'fullName' && updateStatus.success && (
+              <div className="mt-2 text-success text-sm">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>
+            )}
           </div>
 
           {/* Phone Number Field */}
@@ -49,19 +275,48 @@ function PersonalInfoSection({ formData, handleInputChange }) {
               </span>
             </label>
             <div className={`flex gap-4 ${isRTL ? 'flex-row' : 'flex-row-reverse'}`}>
-              <button className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}>
-                {personalInfo.buttons.edit}
-              </button>
+              {isEditing.phoneNumber ? (
+                <div className={`flex gap-2 ${isRTL ? '' : 'order-last'}`}>
+                  <button 
+                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === 'phoneNumber' ? 'loading' : ''}`}
+                    onClick={() => handleSave('phoneNumber')}
+                    disabled={updateStatus.loading}
+                  >
+                    {personalInfo.buttons.save}
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-outline" 
+                    onClick={() => toggleEdit('phoneNumber')}
+                    disabled={updateStatus.loading && updateStatus.field === 'phoneNumber'}
+                  >
+                    {personalInfo.buttons.cancel}
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}
+                  onClick={() => toggleEdit('phoneNumber')}
+                >
+                  {personalInfo.buttons.edit}
+                </button>
+              )}
               <input
                 type="text"
                 name="phoneNumber"
-                value={formData.phoneNumber}
+                value={isEditing.phoneNumber ? formData.phoneNumber : userData?.phoneNumber || ''}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.phoneNumber}
                 className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
                 dir={isRTL ? 'rtl' : 'ltr'}
+                readOnly={!isEditing.phoneNumber}
               />
             </div>
+            {updateStatus.field === 'phoneNumber' && updateStatus.error && (
+              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+            )}
+            {updateStatus.field === 'phoneNumber' && updateStatus.success && (
+              <div className="mt-2 text-success text-sm">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>
+            )}
           </div>
 
           {/* Email Field */}
@@ -72,20 +327,81 @@ function PersonalInfoSection({ formData, handleInputChange }) {
               </span>
             </label>
             <div className={`flex gap-4 ${isRTL ? 'flex-row' : 'flex-row-reverse'}`}>
-              <button className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}>
-                {personalInfo.buttons.edit}
-              </button>
+              {isEditing.email ? (
+                <div className={`flex gap-2 ${isRTL ? '' : 'order-last'}`}>
+                  <button 
+                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === 'email' ? 'loading' : ''}`}
+                    onClick={() => handleSave('email')}
+                    disabled={updateStatus.loading}
+                  >
+                    {personalInfo.buttons.save}
+                  </button>
+                  <button 
+                    className="btn btn-sm btn-outline" 
+                    onClick={() => toggleEdit('email')}
+                    disabled={updateStatus.loading && updateStatus.field === 'email'}
+                  >
+                    {personalInfo.buttons.cancel}
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className={`btn btn-sm ${isRTL ? '' : 'order-last'}`}
+                  onClick={() => toggleEdit('email')}
+                >
+                  {personalInfo.buttons.edit}
+                </button>
+              )}
               <input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={isEditing.email ? formData.email : userData?.email || ''}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
                 className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
                 dir={isRTL ? 'rtl' : 'ltr'}
+                readOnly={!isEditing.email}
               />
             </div>
+            {updateStatus.field === 'email' && updateStatus.error && (
+              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+            )}
+            {updateStatus.field === 'email' && updateStatus.success && (
+              <div className="mt-2 text-success text-sm">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>
+            )}
           </div>
+
+          {/* Student-specific fields */}
+          {userData?.role === 'Student' && userData?.level && (
+            <div className="form-control mb-4">
+              <label className={`label justify-end`}>
+                <span className="label-text">
+                  {personalInfo.labels.level || 'Level'}
+                </span>
+              </label>
+              <input
+                type="text"
+                value={userData.level.name || ''}
+                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                readOnly
+              />
+            </div>
+          )}
+
+          {/* Points display for students */}
+          {userData?.role === 'Student' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div className="stat bg-base-200 rounded-box">
+                <div className="stat-title">{personalInfo.labels.generalPoints || 'General Points'}</div>
+                <div className="stat-value">{userData.generalPoints || 0}</div>
+              </div>
+              <div className="stat bg-base-200 rounded-box">
+                <div className="stat-title">{personalInfo.labels.totalPoints || 'Total Points'}</div>
+                <div className="stat-value">{userData.totalPoints || 0}</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
