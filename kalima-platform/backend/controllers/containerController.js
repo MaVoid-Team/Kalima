@@ -31,13 +31,13 @@ exports.uploadContainerImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for images
   fileFilter: (req, file, cb) => {
     // Only allow image files
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new AppError('Please upload only images', 400), false);
+      cb(new AppError("Please upload only images", 400), false);
     }
-  }
-}).single('image');
+  },
+}).single("image");
 
 const checkDoc = async (Model, id, session) => {
   const doc = await Model.findById(id).session(session);
@@ -245,11 +245,15 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       description,
       goal,
     } = req.body;
-    
+
     // Check required documents exist
     const levelDoc = await checkDoc(Level, level, session);
     const subjectDoc = await checkDoc(Subject, subject, session);
-    const lecturerDoc = await checkDoc(Lecturer, createdBy || req.user._id, session);
+    const lecturerDoc = await checkDoc(
+      Lecturer,
+      createdBy || req.user._id,
+      session
+    );
 
     // Validate required fields for course type
     if (type === "course" && (!description || !goal)) {
@@ -275,20 +279,17 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       description: type === "course" ? description : undefined,
       goal: type === "course" ? goal : undefined,
     };
-    
+
     // Add image data if an image was uploaded
     if (req.file) {
       containerData.image = {
         url: req.file.path,
-        publicId: req.file.filename
+        publicId: req.file.filename,
       };
     }
 
     // Create the container
-    const container = await Container.create(
-      [containerData],
-      { session }
-    );
+    const container = await Container.create([containerData], { session });
 
     // If this container has a parent, update the parent's children array
     if (parent) {
@@ -319,22 +320,27 @@ exports.createContainer = catchAsync(async (req, res, next) => {
       // Extract all container IDs in the hierarchy (including the direct parent)
       const containerIds = [
         parent,
-        ...containerChainResult[0]?.parentChain.map(c => c._id) || []
+        ...(containerChainResult[0]?.parentChain.map((c) => c._id) || []),
       ];
 
       // Find all purchases where container is in this hierarchy
       const purchases = await Purchase.find({
         container: { $in: containerIds },
-        type: "containerPurchase"
+        type: "containerPurchase",
       }).session(session);
 
       // Get unique student IDs from these purchases
-      const studentIds = [...new Set(purchases.map(p => p.student.toString()))];
+      const studentIds = [
+        ...new Set(purchases.map((p) => p.student.toString())),
+      ];
 
       // Find these students who want notifications
       const students = await Student.find({
         _id: { $in: studentIds },
-        $or: [{ containerNotify: true }, { containerNotify: { $exists: false } }],
+        $or: [
+          { containerNotify: true },
+          { containerNotify: { $exists: false } },
+        ],
       }).session(session);
 
       // Get notification template
@@ -359,16 +365,20 @@ exports.createContainer = catchAsync(async (req, res, next) => {
             };
 
             // Check if student is online
-            const isOnline = io.sockets.adapter.rooms.has(student._id.toString());
+            const isOnline = io.sockets.adapter.rooms.has(
+              student._id.toString()
+            );
             const isSent = isOnline;
 
             // Create notification
             const notification = await Notification.create(
-              [{
-                userId: student._id,
-                ...notificationData,
-                isSent,
-              }],
+              [
+                {
+                  userId: student._id,
+                  ...notificationData,
+                  isSent,
+                },
+              ],
               { session }
             );
 
@@ -414,14 +424,19 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   if (!containerId) {
     return next(new AppError("Container ID is required.", 400));
   }
-  
+
   // Special case handling for "my-containers" path
   if (containerId === "my-containers") {
     // Only authenticated users with role Lecturer can access this resource
     if (!req.user || req.user.role !== "Lecturer") {
-      return next(new AppError("Please log in as a lecturer to access your containers.", 401));
+      return next(
+        new AppError(
+          "Please log in as a lecturer to access your containers.",
+          401
+        )
+      );
     }
-    
+
     // Forward to the getMyContainers function
     return exports.getMyContainers(req, res, next);
   }
@@ -433,9 +448,9 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 
   // Fetch the container with enhanced population
   const container = await Container.findById(containerId).populate([
-    { 
-      path: "children", 
-      select: "name type level subject image price description goal" 
+    {
+      path: "children",
+      select: "name type level subject image price description goal",
     },
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
@@ -445,28 +460,28 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   if (!container) {
     return next(new AppError("Container not found.", 404));
   }
-  
+
   // Add image inheritance logic - if no image, check parents
   let inheritedImage = null;
   let inheritedFrom = null;
-  
+
   // Only look for parent images if this container doesn't have its own image
   if (!container.image || !container.image.url) {
     // Start with the current container's parent
     let currentParentId = container.parent;
-    
+
     // Keep searching up the parent chain until we find an image or reach the top
     while (currentParentId) {
       const parentContainer = await Container.findById(currentParentId);
       if (!parentContainer) break;
-      
+
       // If this parent has an image, use it
       if (parentContainer.image && parentContainer.image.url) {
         inheritedImage = parentContainer.image;
         inheritedFrom = parentContainer._id;
         break;
       }
-      
+
       // Move up to the next parent
       currentParentId = parentContainer.parent;
     }
@@ -487,15 +502,17 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
       });
     }
   }
-  
+
   // Convert to plain object so we can add inherited image info
-  const responseData = container.toObject ? container.toObject() : { ...container };
-  
+  const responseData = container.toObject
+    ? container.toObject()
+    : { ...container };
+
   // Add inherited image info to the response if applicable
   if (inheritedImage) {
     responseData.inheritedImage = {
       image: inheritedImage,
-      inheritedFrom: inheritedFrom
+      inheritedFrom: inheritedFrom,
     };
   }
 
@@ -509,12 +526,23 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
 exports.getAllContainers = catchAsync(async (req, res, next) => {
   // Create base query
   let query = Container.find();
-  
-  // If user is not authenticated (not logged in), exclude lecture containers
   if (!req.user) {
-    query = query.where('type').ne('lecture');
+    if (req.query.type && req.query.type.toLowerCase() === "lecture") {
+      // Remove the type filter if it's lecture
+      delete req.query.type;
+    }
+    query = query.where("type").ne("lecture");
   }
-
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+  query = features.query;
+  // If user is not authenticated (not logged in), exclude lecture containers
+  // if (!req.user) {
+  //   query = query.where("type").ne("lecture");
+  //   console.log("User not authenticated, excluding lecture containers.");
+  // }
   // Fetch containers based on the query
   const containers = await query.populate();
 
@@ -619,12 +647,15 @@ exports.getMyContainers = catchAsync(async (req, res, next) => {
 });
 
 exports.updateContainer = catchAsync(async (req, res, next) => {
-  const { name, type, price, level, subject, description, goal, removeImage } = req.body;
+  const { name, type, price, level, subject, description, goal, removeImage } =
+    req.body;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     // Find the container first to check if it exists and to get the current image (if any)
-    const container = await Container.findById(req.params.containerId).session(session);
+    const container = await Container.findById(req.params.containerId).session(
+      session
+    );
     if (!container) {
       // If container not found and there's an uploaded image, clean it up
       if (req.file && req.file.filename) {
@@ -661,17 +692,16 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       const levelDoc = await checkDoc(Level, level, session);
       obj.level = levelDoc._id;
     }
-    
+
     // Handle image operations
-    if (removeImage === 'true' || removeImage === true) {
+    if (removeImage === "true" || removeImage === true) {
       // Delete existing image if present
       if (container.image && container.image.publicId) {
         await cloudinary.uploader.destroy(container.image.publicId);
       }
       // Properly remove image field using $unset
       unsetObj.image = "";
-    } 
-    else if (req.file) {
+    } else if (req.file) {
       // New image uploaded - update the image field
       // First delete any existing image
       if (container.image && container.image.publicId) {
@@ -680,14 +710,14 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
       // Then set the new image
       obj.image = {
         url: req.file.path,
-        publicId: req.file.filename
+        publicId: req.file.filename,
       };
     }
 
     // Update using both $set and $unset operators if needed
     const updateOptions = {
       $set: obj,
-      ...(Object.keys(unsetObj).length > 0 ? { $unset: unsetObj } : {})
+      ...(Object.keys(unsetObj).length > 0 ? { $unset: unsetObj } : {}),
     };
 
     const updatedContainer = await Container.findByIdAndUpdate(
@@ -765,15 +795,15 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
 
     // Re-fetch the updated container with properly populated children
     const updatedContainer = await Container.findById(containerId).populate([
-      { 
+      {
         path: "children",
-        select: "name type level subject image price description goal" 
+        select: "name type level subject image price description goal",
       },
       { path: "subject", select: "name" },
       { path: "level", select: "name" },
       { path: "createdBy", select: "name" },
     ]);
-    
+
     res
       .status(200)
       .json({ status: "success", data: { container: updatedContainer } });
@@ -883,7 +913,7 @@ exports.getContainerRevenue = catchAsync(async (req, res, next) => {
 exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
   const { lecturerId } = req.params;
   const { startDate, endDate } = req.query;
-  
+
   if (!mongoose.Types.ObjectId.isValid(lecturerId)) {
     return next(new AppError("Invalid lecturer ID format", 400));
   }
@@ -909,18 +939,18 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
         lecturer: new mongoose.Types.ObjectId(lecturerId),
         type: "containerPurchase",
         ...(Object.keys(dateFilter).length > 0 && { purchasedAt: dateFilter }),
-      }
+      },
     },
     {
       $lookup: {
         from: "containers",
         localField: "container",
         foreignField: "_id",
-        as: "containerDetails"
-      }
+        as: "containerDetails",
+      },
     },
     {
-      $unwind: "$containerDetails"
+      $unwind: "$containerDetails",
     },
     {
       $project: {
@@ -928,30 +958,30 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
         month: { $month: "$purchasedAt" },
         revenue: "$containerDetails.price",
         container: "$containerDetails._id",
-        containerName: "$containerDetails.name"
-      }
+        containerName: "$containerDetails.name",
+      },
     },
     {
       $group: {
         _id: {
           year: "$year",
-          month: "$month"
+          month: "$month",
         },
         totalRevenue: { $sum: "$revenue" },
         purchaseCount: { $sum: 1 },
         containers: {
           $addToSet: {
             id: "$container",
-            name: "$containerName"
-          }
-        }
-      }
+            name: "$containerName",
+          },
+        },
+      },
     },
     {
       $sort: {
         "_id.year": 1,
-        "_id.month": 1
-      }
+        "_id.month": 1,
+      },
     },
     {
       $project: {
@@ -965,15 +995,26 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
           $let: {
             vars: {
               monthsInString: [
-                "", "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-              ]
+                "",
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ],
             },
-            in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] }
-          }
-        }
-      }
-    }
+            in: { $arrayElemAt: ["$$monthsInString", "$_id.month"] },
+          },
+        },
+      },
+    },
   ]);
 
   // Check if lecturer exists
@@ -983,22 +1024,30 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
   }
 
   // Calculate overall total revenue
-  const overallTotal = monthlyRevenue.reduce((sum, month) => sum + month.totalRevenue, 0);
-  const overallPurchaseCount = monthlyRevenue.reduce((sum, month) => sum + month.purchaseCount, 0);
+  const overallTotal = monthlyRevenue.reduce(
+    (sum, month) => sum + month.totalRevenue,
+    0
+  );
+  const overallPurchaseCount = monthlyRevenue.reduce(
+    (sum, month) => sum + month.purchaseCount,
+    0
+  );
 
   res.status(200).json({
     status: "success",
     data: {
-      lecturer: lecturer ? {
-        id: lecturer._id,
-        name: lecturer.name
-      } : "Unknown lecturer",
+      lecturer: lecturer
+        ? {
+            id: lecturer._id,
+            name: lecturer.name,
+          }
+        : "Unknown lecturer",
       monthlyRevenue,
       summary: {
         totalRevenue: overallTotal,
         totalPurchases: overallPurchaseCount,
-        monthsWithRevenue: monthlyRevenue.length
-      }
-    }
+        monthsWithRevenue: monthlyRevenue.length,
+      },
+    },
   });
 });
