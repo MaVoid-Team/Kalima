@@ -71,20 +71,65 @@
       "expertise": "التخصص",
       "experience": "سنوات الخبرة",
       "gradeLevels": "جميع المراحل"
+    },
+    "subjects": {
+      "math": "رياضيات",
+      "science": "علوم",
+      "english": "إنجليزي",
+      "arabic": "عربي",
+      "history": "تاريخ",
+      "geography": "جغرافيا",
+      "physics": "فيزياء",
+      "chemistry": "كيمياء",
+      "biology": "أحياء",
+      "artificial intelligence": "ذكاء اصطناعي"
     }
   },
   "courses": {
-    "title": "كورساتنا",
-    "heading": "شوف كل الكورسات ",
-    "platform": "بتاعتنا",
-    "viewAll": "عرض الكورسات",
-    "duration": " ساعة دراسية",
-    "viewDetails": "عرض التفاصيل",
-    "rating": "التقييم",
+    "title": "الدورات التعليمية",
+    "heading": "اكتشف جميع الدورات على ",
+    "platform": "منصتنا",
+    "grades": {
+      "default": "الصف الأول",
+      "primary": "الصف الأول الابتدائي",
+      "middle": "الصف الأول الإعدادي",
+      "upperPrimary": "الصف الرابع الابتدائي",
+      "higherSecondary": "الصف الأول الثانوي"
+    },
+   "status": {
+      "paid": "مدفوع",
+      "free": "مجاني"
+    },
+    "currency": "جنيه",
+    "containsContent": "يحتوي على {{count}} محتوى فرعي",
+    "roles": {
+      "lecturer": "محاضر"
+    },
+    "types": {
+      "explanation": "شرح",
+      "month": "شهر",
+      "year": "سنة",
+      "term": "ترم"
+    },
+    "teacherFallback": "أستاذ {{name}}",
     "errors": {
-      "loading": "جاري تحميل الكورسات...",
-      "failed": "حدث خطأ أثناء تحميل البيانات",
+      "failed": "فشل تحميل الدورات",
+      "loading": "جاري التحميل...",
       "retry": "إعادة المحاولة"
-    }
-  }
+    },
+    "viewAll": "عرض الكل"
+  },
+  "titleFallback": "عنوان الدورة",
+  "teacherFallback": "معلّم غير معروف",
+  "roleFallback": "محاضر",
+  "free": "مجاني",
+  "paid": "مدفوع",
+  "currency": "جنيه",
+  "lessonsCount": "  يحتوي علي عدد {{count}} دروس ",
+  "Experienced lecturer in computer science.": "محاضر ذو خبرة في علوم الحاسوب.",
+  "buttons":{
+    "viewAll": "عرض الكل",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "priceUnavailable": "السعر غير متاح"
 }

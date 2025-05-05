@@ -44,7 +44,11 @@
     "childrenSequenceIds" : "Children Sequence IDs",
     "level" : "Level",
     "optional" : "Optional",
-    "selectLevel" : "Select Level"
+    "selectLevel" : "Select Level",
+    "validatepassword": "Confirm Password",
+    "subject" : "Subject",
+    "subjectPlaceholder" : "Enter Subject",
+    "children" : "Children"
   
   },
   "gender": {
@@ -80,17 +84,20 @@
     "parent": "Parent",
     "lecturer": "Lecturer"
   },
-  "gradeLevels": {
-    "Grade 4": "Grade 4",
-    "Grade 5": "Grade 5",
-    "Grade 6": "Grade 6",
-    "First Preparatory": "First Preparatory",
-    "Second Preparatory": "Second Preparatory",
-    "Third Preparatory": "Third Preparatory",
-    "First Secondary": "First Secondary",
-    "Second Secondary": "Second Secondary",
-    "Third Secondary": "Third Secondary"
-  },
+ "gradeLevels": {
+      "Primary": "Primary",
+      "Middle": "Middle",
+      "Upper Primary":  "Upper Primary",
+      "Higher Secondary":  "Higher Secondary",
+      "Fourth Elementary": "Fourth Elementary",
+      "First Primary": "First Primary",
+      "Second Primary": "Second Primary",
+      "Third Primary": "Third Primary",
+      "First Secondary": "First Secondary",
+      "Second Secondary": "Second Secondary",
+      "Third Secondary": "Third Secondary"
+
+    },
   "roleSelection": {
     "title": "Choose your role",
     "description": "Select the role that best describes you",
@@ -101,6 +108,7 @@
   "validation": {
     "required": "This field is required",
     "passwordRequirements": "Password must contain at least 8 characters",
+    "passwordMismatch" : "Passwords do not match",
     "phoneFormat": "Invalid phone number format",
     "emailFormat": "Invalid email format",
     "hobbies": "Select at least 2 hobbies",

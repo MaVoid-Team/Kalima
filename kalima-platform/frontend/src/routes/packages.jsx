@@ -1,0 +1,63 @@
+import axios from 'axios';
+import { getToken } from "./auth-services";
+import { isLoggedIn } from "./auth-services";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+export const fetchPackages = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/api/v1/packages/`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data.data.packages;
+    } catch (error) {
+        console.error('Error fetching packages:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch packages';
+        throw new Error(errorMessage);
+    }
+};
+
+export const createPackage = async (packageData) => {
+    try {
+      if (!isLoggedIn()) {
+        throw new Error('Not authenticated');
+      }
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/packages/`, packageData, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message || 'Package created successfully',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to create package',
+      };
+    }
+  };
+
+  export const fetchPackageById = async (packageId) => {
+    try {
+        const response = await axios.get(`${API_URL}/api/v1/packages/${packageId}`, {
+            headers: {
+                Authorization: `Bearer ${getToken()}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data.data.package;
+    } catch (error) {
+        console.error('Error fetching package by ID:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch package';
+        throw new Error(errorMessage);
+    }
+};

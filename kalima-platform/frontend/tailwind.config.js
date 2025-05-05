@@ -24,7 +24,8 @@ module.exports = {
     },
   },
   },
-  plugins: [require("daisyui")],
+  plugins: [require("@tailwindcss/postcss"),
+  ],
   daisyui: {
     themes: [
       {light: { 
@@ -42,33 +43,6 @@ module.exports = {
         "neutral": "#1F2937",    // Neutral color
         "base-100": "#333333",   // Base background color
       }},           
-      "cupcake",
-      "bumblebee",
-      "emerald",
-      "corporate",
-      "synthwave",
-      "retro",
-      "cyberpunk",
-      "valentine",
-      "halloween",
-      "garden",
-      "forest",
-      "aqua",
-      "lofi",
-      "pastel",
-      "fantasy",
-      "wireframe",
-      "black",
-      "luxury",
-      "dracula",
-      "cmyk",
-      "autumn",
-      "business",
-      "acid",
-      "lemonade",
-      "night",
-      "coffee",         
-      "winter",
     ],
   
     base: true,         
