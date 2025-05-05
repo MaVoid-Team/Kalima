@@ -16,7 +16,7 @@ const CourseCard = ({ course }) => {
     const fetchSubjects = async () => {
       const response = await getAllSubjects();
       if (response.success) {
-        setSubjects(response.data || []);
+        setSubjects(response.data);
       } else {
         setSubjectError(response.error);
       }

@@ -230,6 +230,7 @@ const ContainersPage = () => {
                   <Link 
                     to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
                     className="btn btn-primary"
+                    state={{ userRole: 'Lecturer' }}
                   >
                     عرض التفاصيل
                   </Link>
@@ -237,6 +238,7 @@ const ContainersPage = () => {
                   <Link 
                     to={`/dashboard/student-dashboard/container-details/${container._id}`} 
                     className="btn btn-primary"
+                    state={{ userRole: 'Student' }}
                   >
                     عرض التفاصيل
                   </Link>
