@@ -25,6 +25,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [subjects, setSubjects] = useState([])
   const [numberOfViews, setNumberOfViews] = useState(0)
+  const [lecturePrice, setLecturePrice] = useState(0)
 
   // UI state
   const [expandedItems, setExpandedItems] = useState({})
@@ -86,7 +87,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           teacherAllowed: formData.privacy === "teacher",
           subject: formData.subject,
           parent: selectedParentId,
-          price: formData.courseType === "paid" ? Number(formData.priceSession) || 0 : 0,
+          price: formData.courseType === "paid" && lecturePrice,
           description: `Lecture for ${containerName}`,
           numberOfViews: numberOfViews,
           videoLink: lectureLink,
@@ -267,6 +268,17 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         {containerType === CONTAINER_TYPES.LECTURE && (
           <>
             <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                {isRTL ? "سعر المحاضرة" : "Lecture Price"}
+              </label>
+              <input
+                type="number"
+                value={lecturePrice}
+                onChange={(e) => setLecturePrice(e.target.value)}
+                placeholder={isRTL ? "سعر المحاضرة" : "Lecture price"}
+                className="w-full input input-bordered bg-base-200"
+                required={formData.courseType === "paid"}
+              />
               <label className="block text-sm font-medium mb-1">{isRTL ? "رابط المحاضرة" : "Lecture Link"}</label>
               <input
                 type="text"
