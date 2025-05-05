@@ -37,6 +37,7 @@ const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
 const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
 const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
 const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
+const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
 
 function App() {
   const location = useLocation()
@@ -148,6 +149,7 @@ function App() {
             {/* Admin Routes */}
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
+            <Route path="/dashboard/admin-dashboard/create" element={<AdminCreate />} />
             
             {/* Lecturer Routes */}
             <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />

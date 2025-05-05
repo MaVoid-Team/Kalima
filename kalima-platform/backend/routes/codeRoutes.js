@@ -25,6 +25,9 @@ router.route("/:id").get(codeController.getCodeById);
 
 router
   .route("/redeem")
-  .post(authController.verifyRoles("Student"), codeController.redeemCode);
+  .post(
+    authController.verifyRoles("Student", "Parent", "Teacher"),
+    codeController.redeemCode
+  );
 
 module.exports = router;

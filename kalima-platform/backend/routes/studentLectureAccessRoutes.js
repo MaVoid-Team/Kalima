@@ -1,7 +1,13 @@
 const express = require("express");
-const studentLectureAccessController = require("../controllers/studentLectureAccessController");
-
 const router = express.Router();
+const studentLectureAccessController = require("../controllers/studentLectureAccessController");
+const verifyJWT = require("../middleware/verifyJWT");
+
+
+router.use(verifyJWT);
+
+router.route("/check/:lectureId")
+  .get(studentLectureAccessController.checkLectureAccess);
 
 router
   .route("/")

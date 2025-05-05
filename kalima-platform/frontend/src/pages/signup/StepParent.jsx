@@ -1,32 +1,37 @@
 import { useState, useEffect } from "react";
-import { getAllLevels } from '../../routes/levels'; // Adjust the import path based on your project structure
+import { getAllLevels } from '../../routes/levels';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange }) {
     const [childrenCount, setChildrenCount] = useState(1);
     const [gradeLevels, setGradeLevels] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
+    const [apiError, setApiError] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
     useEffect(() => {
         const fetchLevels = async () => {
             try {
+                setLoading(true);
+                setApiError(null);
                 const response = await getAllLevels();
+                
                 if (response.success) {
                     const levels = response.data.levels.map(level => ({
                         value: level._id,
                         label: level.name
                     }));
                     setGradeLevels(levels);
-                    setLoading(false);
                 } else {
-                    setError(response);
-                    setLoading(false);
+                    throw new Error(response.message || 'Failed to fetch grade levels');
                 }
             } catch (err) {
-                setError('Failed to fetch grade levels');
+                setApiError(err.message || 'An unexpected error occurred while fetching grade levels');
+            } finally {
                 setLoading(false);
             }
         };
@@ -34,8 +39,24 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
         fetchLevels();
     }, []);
 
+    const renderErrorMessage = (errorKey) => {
+        if (!errors[errorKey]) return null;
+        return (
+            <span className="text-error text-sm mt-1 animate-fade-in">
+                {t(errors[errorKey]) || t('validation.genericError')}
+            </span>
+        );
+    };
+
     return (
         <div className="space-y-4">
+            {/* Global API Error Display */}
+            {apiError && (
+                <div className="alert alert-error animate-fade-in">
+                    <span>{t('errors.apiError')}: {apiError}</span>
+                </div>
+            )}
+
             <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
 
             {/* Email Field */}
@@ -48,12 +69,12 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         type="email"
                         name="email"
                         className={`input input-bordered ${errors.email ? 'input-error animate-shake' : ''}`}
-                        value={formData.email}
+                        value={formData.email || ''}
                         onChange={handleInputChange}
                         placeholder="email@example.com"
                         required
                     />
-                    {errors.email && <span className="text-error text-sm mt-1">{t(errors.email)}</span>}
+                    {renderErrorMessage('email')}
                 </div>
             </div>
 
@@ -63,33 +84,53 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     <label className="label">
                         <span className="label-text">{t('form.password')}</span>
                     </label>
-                    <input
-                        type="password"
-                        name="password"
-                        className={`input input-bordered ${errors.password ? 'input-error animate-shake' : ''}`}
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    {errors.password && <span className="text-error text-sm mt-1">{t(errors.password)}</span>}
+                    <div className="relative">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            className={`input input-bordered pr-12 ${errors.password ? 'input-error animate-shake' : ''}`}
+                            value={formData.password || ''}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                            onClick={() => setShowPassword(prev => !prev)}
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+                    {renderErrorMessage('password')}
                 </div>
             </div>
 
-            {/* Confirm Password Field */}
-            <div className="form-control">
+            {/* Confirm Password */}
+            <div className="form-control relative">
                 <div className="flex flex-col gap-2">
                     <label className="label">
                         <span className="label-text">{t('form.confirmPassword')}</span>
                     </label>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        className={`input input-bordered ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
-                        value={formData.confirmPassword || ''}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    {errors.confirmPassword && <span className="text-error text-sm mt-1">{t(errors.confirmPassword)}</span>}
+                    <div className="relative">
+                        <input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            name="confirmPassword"
+                            className={`input input-bordered pr-10 ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+                            value={formData.confirmPassword || ''}
+                            onChange={handleInputChange}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                            onClick={() => setShowConfirmPassword(prev => !prev)}
+                            tabIndex={-1}
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+                    {renderErrorMessage('confirmPassword')}
                 </div>
             </div>
 
@@ -101,17 +142,17 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                     </label>
                     <select
                         name="level"
-                        className={`select select-bordered w-full ${errors.level ? 'select-error animate-shake' : ''}`}
+                        className={`select select-bordered ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
-                        disabled={loading || error}
+                        disabled={loading || !!apiError}
                     >
                         <option value="">{t('form.selectLevel')}</option>
                         {loading ? (
                             <option value="" disabled>
                                 {t('form.loading')}
                             </option>
-                        ) : error ? (
+                        ) : apiError ? (
                             <option value="" disabled>
                                 {t('form.errorLoadingLevels')}
                             </option>
@@ -123,7 +164,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                             ))
                         )}
                     </select>
-                    {errors.level && <span className="text-error text-sm mt-1">{t(errors.level)}</span>}
+                    {renderErrorMessage('level')}
                 </div>
             </div>
 
@@ -142,9 +183,13 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                             value={child || ''}
                             onChange={(e) => handleChildrenChange(i, e.target.value)}
                             placeholder="333"
-                            required={i === 0} // At least one child is required
+                            required={i === 0}
                         />
-                        {errors.children?.[i] && <span className="text-error text-sm mt-1">{t(errors.children[i])}</span>}
+                        {errors.children?.[i] && (
+                            <span className="text-error text-sm mt-1 animate-fade-in">
+                                {t(errors.children[i]) || t('validation.invalidSequenceId')}
+                            </span>
+                        )}
                     </div>
                 </div>
             ))}
@@ -153,6 +198,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                 type="button"
                 className="btn btn-sm btn-outline"
                 onClick={() => setChildrenCount(prev => prev + 1)}
+                disabled={childrenCount >= 10} // Reasonable limit
             >
                 {t('buttons.addAnotherChild')}
             </button>
