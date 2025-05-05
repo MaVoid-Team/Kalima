@@ -86,7 +86,7 @@ export const generatePromoCodes = async (data) => {
       payload.lecturerId = data.lecturerId;
     }
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/codes`,
       payload,
       {
@@ -125,7 +125,7 @@ export const getPromoCodes = async (filters = {}) => {
       ...filters
     });
 
-    const response = await api.get(`${API_URL}/codes?${queryParams.toString()}`, {
+    const response = await axios.get(`${API_URL}/codes?${queryParams.toString()}`, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
