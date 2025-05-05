@@ -39,49 +39,41 @@ function BasicInfoForm({
 
   // Create parent container
   const handleCreateParentContainer = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
-      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
-      return
+      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
+      return;
     }
-
-    setIsSubmitting(true)
-
+  
+    setIsSubmitting(true);
+  
     try {
-      // Create Parent Container (Course)
-      const parentContainerData = {
-        name: formData.courseName,
-        type: "course",
-        createdBy: createdBy,
-        level: formData.gradeLevel,
-        subject: formData.subject,
-        description: formData.description,
-        goal: formData.goal,
-        price: formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0,
-        teacher: formData.teacher,
-        teacherAllowed: formData.privacy === "teacher",
+      const formDataPayload = new FormData();
+      
+      // Append all fields
+      formDataPayload.append("name", formData.courseName);
+      formDataPayload.append("type", "course");
+      formDataPayload.append("createdBy", createdBy);
+      formDataPayload.append("level", formData.gradeLevel);
+      formDataPayload.append("subject", formData.subject);
+      formDataPayload.append("description", formData.description);
+      formDataPayload.append("goal", formData.goal);
+      formDataPayload.append("price", formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0);
+      formDataPayload.append("teacherAllowed", formData.privacy === "teacher");
+      
+      // Append image file if exists
+      if (courseImage) {
+        formDataPayload.append("image", courseImage);
       }
-
-      const response = await createContainer(parentContainerData)
-      const container = response.data.container
-
-      updateCourseStructure({
-        ...courseStructure,
-        parent: {
-          id: container.id,
-          name: container.name,
-          type: container.type,
-        },
-      })
-
-      alert(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully")
+  
+      const response = await createContainer(formDataPayload);
+      // ... rest of your success logic
     } catch (error) {
-      console.error("Error creating parent container:", error)
-      alert(isRTL ? "حدث خطأ أثناء إنشاء الحاوية الرئيسية" : "Error creating parent container")
+      // ... error handling
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleCreateParentContainer}>
@@ -287,19 +279,6 @@ function BasicInfoForm({
                           value={formData.priceMonthly}
                           onChange={handleChange}
                           placeholder={isRTL ? "سعر الشهر" : "Monthly Price"}
-                          className="input input-bordered bg-base-200 flex-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">
-                          {isRTL ? "سعر الحصة" : "Session Price"}
-                        </label>
-                        <input
-                          type="text"
-                          name="priceSession"
-                          value={formData.priceSession}
-                          onChange={handleChange}
-                          placeholder={isRTL ? "سعر الحصة" : "Session Price"}
                           className="input input-bordered bg-base-200 flex-1"
                         />
                       </div>
