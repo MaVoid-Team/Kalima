@@ -34,22 +34,36 @@ const PromoCodes = () => {
 
           const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
             id: `code-${index + 1}`,
-            type: t('table.types.codeRedemption'),
+            type: "Code Redemption",
             code: code.code,
             amount: code.pointsAmount,
             instructorName: code.lecturerId
               ? (pointsBalances?.find(b => b.lecturer?._id === code.lecturerId)?.lecturer?.name || 'N/A')
               : t('generalPoints'),
-            createdAt: new Date(code.redeemedAt).toLocaleDateString(),
+              createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              }),
           }));
 
           const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
             id: `purchase-${index + 1}`,
-            type: t('table.types.containerPurchase'),
+            type: "Course Purchase",
             code: purchase.description,
             amount: purchase.points,
             instructorName: purchase.lecturer?.name || 'N/A',
-            createdAt: new Date(purchase.purchasedAt).toLocaleDateString(),
+            createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            }),
           }));
 
           const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
@@ -224,7 +238,7 @@ const PromoCodes = () => {
                   <thead className="bg-primary/20">
                     <tr className="text-center">
                       <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px] hidden sm:table-cell">{t('table.id')}</th>
-                      <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px] hidden sm:table-cell">{t('table.type')}</th>
+                      <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px] hidden sm:table-cell">Transaction type</th>
                       <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px] hidden sm:table-cell">{t('table.code')}</th>
                       <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px]">{t('table.amount')}</th>
                       <th className="text-primary text-xs sm:text-sm md:text-sm px-1 sm:px-2 md:px-4 max-w-[80px] sm:max-w-[100px] md:max-w-[150px]">{t('table.teacher')}</th>
@@ -279,7 +293,7 @@ const PromoCodes = () => {
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
-                      {t('pagination.previous')}
+                      Previous
                     </button>
                     {[...Array(totalPages).keys()].map((_, index) => {
                       const page = index + 1;
@@ -298,7 +312,7 @@ const PromoCodes = () => {
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      {t('pagination.next')}
+                      Next
                     </button>
                   </div>
                 </div>

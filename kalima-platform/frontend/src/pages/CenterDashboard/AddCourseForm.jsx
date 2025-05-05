@@ -50,7 +50,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
         setDataLoading(prev => ({ ...prev, subjects: true }));
         const subjectsResponse = await getAllSubjects();
         if (subjectsResponse.success) {
-          setSubjects(subjectsResponse.data.subjects || []);
+          setSubjects(subjectsResponse.data);
         } else {
           console.error("Error fetching subjects:", subjectsResponse.error);
         }

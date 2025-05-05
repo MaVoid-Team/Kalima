@@ -24,6 +24,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
   const [attachmentFile, setAttachmentFile] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [subjects, setSubjects] = useState([])
+  const [numberOfViews, setNumberOfViews] = useState(0)
 
   // UI state
   const [expandedItems, setExpandedItems] = useState({})
@@ -87,7 +88,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           parent: selectedParentId,
           price: formData.courseType === "paid" ? Number(formData.priceSession) || 0 : 0,
           description: `Lecture for ${containerName}`,
-          numberOfViews: 0,
+          numberOfViews: numberOfViews,
           videoLink: lectureLink,
           examLink: "",
         }
@@ -274,6 +275,17 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
                 placeholder={isRTL ? "رابط الفيديو" : "Video link"}
                 className="w-full input input-bordered bg-base-200"
                 required={containerType === CONTAINER_TYPES.LECTURE}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">{isRTL ? "عدد المشاهدات" : "Number of Views"}</label>
+              <input
+                type="number"
+                value={numberOfViews}
+                onChange={(e) => setNumberOfViews(e.target.value)}
+                placeholder={isRTL ? "عدد المشاهدات" : "Number of views"}
+                className="w-full input input-bordered bg-base-200"
+                required
               />
             </div>
 

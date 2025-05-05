@@ -113,7 +113,16 @@ export const createUser = async (userData) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return `Failed to create user: ${error.message}`
+    if (error.response && error.response.data) {
+      return {
+        success: false,
+        error: error.response.data.message || error.response.data.error || `Failed to create user: ${error.message}`,
+      };
+    }
+    return {
+      success: false,
+      error: `Failed to create user: ${error.message}`,
+    };
   }
 };
 

@@ -26,6 +26,7 @@ const ContainerDetailsPage = () => {
   const [attachmentFile, setAttachmentFile] = useState(null)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
+  const [numberOfViews, setNumberOfViews] = useState(0)
 
   // Fetch container data
   const fetchContainer = async () => {
@@ -104,7 +105,7 @@ const ContainerDetailsPage = () => {
           ...baseData,
           type: 'lecture',
           description: newDescription || `Lecture for ${newItemName}`,
-          numberOfViews: 0,
+          numberOfViews: numberOfViews,
           videoLink: newVideoLink,
           lecture_type: newLectureType,
         }
@@ -388,6 +389,19 @@ const ContainerDetailsPage = () => {
                 </div>
                 <div className="form-control w-full mb-4">
                   <label className="label">
+                    <span className="label-text">Number of Views</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Enter number of views"
+                    className="input input-bordered w-full"
+                    value={numberOfViews}
+                    onChange={(e) => setNumberOfViews(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
                     <span className="label-text">Lecture Type</span>
                   </label>
                   <select
@@ -396,7 +410,7 @@ const ContainerDetailsPage = () => {
                     onChange={(e) => setNewLectureType(e.target.value)}
                   >
                     <option value="Revision">Revision</option>
-                    <option value="Paid">Paid</option>
+                    <option value="Paid">Normal</option>
                   </select>
                 </div>
                 <div className="form-control w-full mb-4">
