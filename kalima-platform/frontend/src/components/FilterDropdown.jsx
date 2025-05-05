@@ -1,6 +1,9 @@
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 export function FilterDropdown({ label, options, selectedValue, onSelect }) {
+  const { t } = useTranslation("common");
+
   const handleSelect = (value) => {
     onSelect(value);
     document.activeElement?.blur();
@@ -13,7 +16,7 @@ export function FilterDropdown({ label, options, selectedValue, onSelect }) {
       </label>
       <div className="dropdown dropdown-end w-full">
         <div tabIndex={0} role="button" className="btn w-full justify-between">
-          <span>{selectedValue || "Select"}</span>
+          <span>{selectedValue || t("select")}</span>
           <ChevronDown className="h-4 w-4" />
         </div>
         <ul
@@ -37,3 +40,4 @@ export function FilterDropdown({ label, options, selectedValue, onSelect }) {
     </div>
   );
 }
+

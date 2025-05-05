@@ -7,10 +7,23 @@ const lectureSchema = new mongoose.Schema({
   description: { type: String },
   numberOfViews: { type: Number, default: 3 },
   teacherAllowed: { type: Boolean, required: true },
-  lecture_type: { // New field
+  lecture_type: { 
     type: String,
     enum: ['Free', 'Paid', 'Revision', 'Teachers Only'],
     required: [true, 'A lecture must have a type'],
+  },
+  requiresExam: {
+    type: Boolean,
+    default: false
+  },
+  examConfig: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "LecturerExamConfig"
+  },
+  passingThreshold: {
+    type: Number,
+    min: 0,
+    max: 100,
   },
   attachments: {
     booklets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],

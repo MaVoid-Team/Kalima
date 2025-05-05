@@ -10,6 +10,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 const Package = require("../models/packageModel");
+const QueryFeatures = require("../utils/queryFeatures");
 // updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
@@ -268,7 +269,11 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
 
     // Find user model
     let userModel;
-
+    if (req.user.role === "Teacher" && container.teacherAllowed === false) {
+      return next(
+        new AppError("You are not allowed to purchase this container", 400)
+      );
+    }
     // Try finding as Student
     userModel = await Student.findById(userId).session(session);
 
@@ -276,7 +281,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     if (!userModel) {
       userModel = await Parent.findById(userId).session(session);
     }
-
+    if (!userModel) {
+      userModel = await Teacher.findById(userId).session(session);
+    }
     // If still not found, check standard User model to determine role
     if (!userModel) {
       const baseUser = await User.findById(userId).session(session);
@@ -408,7 +415,13 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
  * Get all purchases
  */
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-  const purchases = await Purchase.find().populate([
+  let query = Purchase.find()
+  const features = new QueryFeatures(query, req.query)
+    .filter()
+    .sort()
+    .paginate();
+  query = features.query;
+  const purchases = await query.populate([
     "container",
     "lecturer",
     "student",
@@ -460,6 +473,12 @@ exports.getLecturerPointsBalance = catchAsync(async (req, res, next) => {
   // If not found, try as Parent
   if (!userModel) {
     userModel = await Parent.findById(userId).populate({
+      path: "lecturerPoints.lecturer",
+      select: "name",
+    });
+  }
+  if (!userModel) {
+    userModel = await Teacher.findById(userId).populate({
       path: "lecturerPoints.lecturer",
       select: "name",
     });
@@ -542,6 +561,12 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
   // If not found, try as Parent
   if (!userModel) {
     userModel = await Parent.findById(userId).populate({
+      path: "lecturerPoints.lecturer",
+      select: "name subject",
+    });
+  }
+  if (!userModel) {
+    userModel = await Teacher.findById(userId).populate({
       path: "lecturerPoints.lecturer",
       select: "name subject",
     });
