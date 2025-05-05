@@ -5,7 +5,7 @@ const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
-router.use(verifyJWT, authController.verifyRoles("admin"));
+router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
 
 router
   .route("/")

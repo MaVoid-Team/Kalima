@@ -8,8 +8,8 @@ const router = express.Router();
 // Apply JWT verification to all routes
 router.use(verifyJWT);
 
-// Protect routes - Only Admins/SubAdmins can manage pricing rules
-router.use(authController.verifyRoles("Admin", "Sub-Admin"));
+// Protect routes - Only Admins/SubAdmins/Moderators can manage pricing rules
+router.use(authController.verifyRoles("Admin", "Sub-Admin", "Moderator"));
 
 router
   .route("/")

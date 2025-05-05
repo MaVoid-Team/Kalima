@@ -5,7 +5,7 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.use(verifyJWT,authController.verifyRoles("Admin", "SubAdmin"));
+router.use(verifyJWT,authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
 
 router
     .route("/")
