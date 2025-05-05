@@ -129,6 +129,11 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   switch (role.toLowerCase()) {
     case "teacher":
+      if (!newUser.level)
+        return next(new AppError("Level is required for teacher role", 400));
+      const teacherLevel = await Level.findById(newUser.level);
+      if (!teacherLevel)
+        return next(new AppError("There is no level with this id", 404));
       user = await Teacher.create(newUser);
       break;
     case "student":
