@@ -21,7 +21,11 @@ const teacherSchema = new mongoose.Schema(
     faction: String,
     phoneNumber: { type: String, required: true },
     subject: { type: String, required: true },
-    level: { type: String, enum: User.levels, required: true, lowercase: true },
+    level: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Level",
+      required: true,
+    },
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     lecturerPoints: [lecturerPointsSchema],
   },
