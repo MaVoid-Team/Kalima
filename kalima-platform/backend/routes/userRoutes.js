@@ -5,7 +5,7 @@ const validateUser = require("../middleware/validateUser");
 const verifyJWT = require("../middleware/verifyJWT");
 const uploadFileMiddleware =
   require("../utils/upload files/uploadFiles").uploadFileMiddleware;
-
+const authController = require("../controllers/authController");
 // Routes that don't require authentication
 router
   .route("/")
@@ -16,7 +16,11 @@ router
   .route("/:userId")
   .get(userController.getUser)
   .patch(validateUser, userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    userController.deleteUser
+  );
 
 router.route("/role/:role").get(userController.getAllUsersByRole);
 

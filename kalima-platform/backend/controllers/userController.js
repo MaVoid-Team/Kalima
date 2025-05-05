@@ -207,11 +207,21 @@ const updateUser = catchAsync(async (req, res, next) => {
 });
 
 const deleteUser = catchAsync(async (req, res, next) => {
-  const foundUser = await User.findByIdAndDelete(req.params.userId)
-    .select("-password")
-    .lean();
+  const foundUser = await User.findById(req.params.userId).select("-password");
+
   if (!foundUser) return next(new AppError("User not found", 404));
-  res.json(foundUser);
+  if (
+    req.user.role === "SubAdmin" &&
+    (foundUser.role === "Admin" || foundUser.role === "SubAdmin")
+  ) {
+    return next(new AppError("You are not allowed to delete this user", 403));
+  }
+
+  await foundUser.deleteOne();
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 });
 
 // we ahould make a validation for newPassword field here
