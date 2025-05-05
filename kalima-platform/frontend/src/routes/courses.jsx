@@ -82,7 +82,7 @@ export const createSubject = async (subjectData) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await api.post(`${API_URL}/api/v1/subjects/`, subjectData, {
+    const response = await api.post(`${API_URL}/subjects/`, subjectData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
