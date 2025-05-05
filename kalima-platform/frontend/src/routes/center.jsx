@@ -183,7 +183,7 @@ export const getAllParents = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/parents`, {
+    const response = await axios.get(`${API_URL}/parents`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -216,7 +216,7 @@ export const sendLessonReport = async (reportData) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/reports/lesson`,
       reportData,
       {
@@ -253,7 +253,7 @@ export const sendMonthReport = async (reportData) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/reports/month`,
       reportData,
       {
@@ -290,7 +290,7 @@ export const sendCourseReport = async (reportData) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.post(
+    const response = await axios.post(
       `${API_URL}/reports/course`,
       reportData,
       {
@@ -326,7 +326,7 @@ export const getAllAttendance = async () => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/attendance`, {
+    const response = await axios.get(`${API_URL}/attendance`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -362,7 +362,7 @@ export const getLessonById = async (lessonId) => {
       throw new Error("Authentication token is required");
     }
 
-    const response = await api.get(`${API_URL}/lessons/${lessonId}`, {
+    const response = await axios.get(`${API_URL}/lessons/${lessonId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -421,7 +421,7 @@ export const createLecturer = async (lecturerData) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await api.post(`${API_URL}/center-lecturer/`, lecturerData, {
+    const response = await axios.post(`${API_URL}/center-lecturer/`, lecturerData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
