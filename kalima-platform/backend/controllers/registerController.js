@@ -13,30 +13,10 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 
 const validatePassword = (password) => {
-  const minLength = 8;
-  const maxLength = 30;
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasNumbers = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-  if (password.length < minLength) {
-    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
-  }
-  if (password.length > maxLength) {
-    throw new AppError(`Password must be less than ${maxLength} characters`, 400);
-  }
-  if (!hasUpperCase) {
-    throw new AppError("Password must contain at least one uppercase letter", 400);
-  }
-  if (!hasLowerCase) {
-    throw new AppError("Password must contain at least one lowercase letter", 400);
-  }
-  if (!hasNumbers) {
-    throw new AppError("Password must contain at least one number", 400);
-  }
-  if (!hasSpecialChar) {
-    throw new AppError("Password must contain at least one special character", 400);
+  const requiredLength = 8;
+  
+  if (password.length !== requiredLength) {
+    throw new AppError(`Password must be exactly ${requiredLength} characters long`, 400);
   }
 };
 
