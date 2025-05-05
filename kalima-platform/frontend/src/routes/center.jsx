@@ -396,7 +396,7 @@ export const recordAttendance = async (attendanceData) => {
       throw new Error('Not authenticated');
     }
     const token = getToken();
-    const response = await axios.post(`${API_URL}/api/v1/attendance`, attendanceData, {
+    const response = await axios.post(`${API_URL}/attendance`, attendanceData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -421,7 +421,7 @@ export const createLecturer = async (lecturerData) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await api.post(`${API_URL}/api/v1/center-lecturer/`, lecturerData, {
+    const response = await api.post(`${API_URL}/center-lecturer/`, lecturerData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

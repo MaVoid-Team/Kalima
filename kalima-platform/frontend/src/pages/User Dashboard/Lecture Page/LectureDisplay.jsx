@@ -73,7 +73,7 @@ const LectureDisplay = () => {
     const fetchAccessData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access`,
+          `${import.meta.env.VITE_API_URL}/student-lecture-access`,
           {
             headers: {
               Authorization: `Bearer ${getToken()}`,
@@ -149,7 +149,7 @@ const LectureDisplay = () => {
               hasViewedRef.current = true;
               
               const response = await axios.patch(
-                `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/${studentLectureAccessId}`,
+                `${import.meta.env.VITE_API_URL}/student-lecture-access/${studentLectureAccessId}`,
                 { remainingViews: remainingViews - 1 },
                 {
                   headers: {

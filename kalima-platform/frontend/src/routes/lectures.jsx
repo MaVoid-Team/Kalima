@@ -116,7 +116,7 @@ export const downloadAttachmentById = async (attachmentId) => {
       throw new Error("Authentication required");
     }
 
-    const response = await api.get(`${API_URL}/api/v1/lectures/attachment/${attachmentId}/file`, {
+    const response = await api.get(`${API_URL}/lectures/attachment/${attachmentId}/file`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -309,7 +309,7 @@ export const createLectureAttachment = async (lectureId, attachmentData) => {
     formData.append("attachment", attachmentData.attachment);
 
     const response = await api.post(
-      `${API_URL}/api/v1/lectures/attachments/${lectureId}`,
+      `${API_URL}/lectures/attachments/${lectureId}`,
       formData,
       {
         withCredentials: true,
