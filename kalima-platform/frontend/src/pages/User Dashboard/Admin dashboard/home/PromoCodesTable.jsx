@@ -28,11 +28,12 @@ const PromoCodesTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
-
-      const result = await getPromoCodes();
-
-      if (result.success && Array.isArray(result.data)) {
-        const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
+  
+      const promoResult = await getPromoCodes();
+      const studentsResult = await getAllStudents();
+  
+      if (promoResult.success && Array.isArray(promoResult.data)) {
+        const totalPages = Math.ceil(promoResult.data.length / state.itemsPerPage);
         setState(prev => ({
           ...prev,
           promoCodes: promoResult.data,
@@ -45,18 +46,24 @@ const PromoCodesTable = () => {
           ...prev,
           isLoading: false,
           promoCodes: [],
-          error: result.error || t('errors.invalidResponse'),
+          error: promoResult.error || t('errors.invalidResponse'),
         }));
       }
   
       if (studentsResult.success && Array.isArray(studentsResult.data)) {
         setStudents(studentsResult.data);
+        setStudentsError(null);
+      } else {
+        setStudentsError(
+          typeof studentsResult === 'string' ? studentsResult : t('errors.failedToFetchStudents')
+        );
       }
+  
+      setStudentsLoading(false);
     };
-
-    fetchPromoCodes();
+  
+    fetchData();
   }, [t]);
-
   // Fetch students
   useEffect(() => {
     const fetchStudents = async () => {

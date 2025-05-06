@@ -5,6 +5,8 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin"));
+
 router
   .route("/")
   .post(levelController.createLevel)
