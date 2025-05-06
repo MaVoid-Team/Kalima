@@ -21,13 +21,19 @@ const ForgotPassword = () => {
 
     try {
       const response = await requestPasswordReset(email);
-      
+      if (response.status !== 'success') {
+        setError(response.message || t('errors.requestFailed'));
+        return;
+      }
       if (response.status === 'success') {
         setSuccess(response.message);
         navigate('/verify-otp', { state: { email } });
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+      const errorMessage = err.response?.data?.error || 
+                         err.message || 
+                         t('errors.generalError');
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
