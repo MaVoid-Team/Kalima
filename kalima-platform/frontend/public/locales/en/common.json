@@ -18,20 +18,20 @@
     "student": "Student",
     "logoAlt": "Kalima Logo"
   },
-  "gradeLevels": {
-      "Primary": "Primary",
-      "Middle": "Middle",
-      "Upper Primary":  "Upper Primary",
-      "Higher Secondary":  "Higher Secondary",
-      "Fourth Elementary": "Fourth Elementary",
-      "First Primary": "First Primary",
-      "Second Primary": "Second Primary",
-      "Third Primary": "Third Primary",
-      "First Secondary": "First Secondary",
-      "Second Secondary": "Second Secondary",
-      "Third Secondary": "Third Secondary"
-
-    },
+ "gradeLevels": {
+  "1st Primary": "First Primary",
+  "2nd Primary": "Second Primary",
+  "3rd Primary": "Third Primary",
+  "4th Primary": "4th Primary",
+  "5th Primary": "Fifth Primary",
+  "6th Primary": "sixth Primary",
+  "1st Preparatory": "First Preparatory",
+  "2nd Preparatory": "Second Preparatory",
+  "3rd Preparatory": "Third Preparatory",
+  "1st Secondary": "First Secondary",
+  "2nd Secondary": "Second Secondary",
+  "3rd Secondary": "Third Secondary"
+},
   "dashboard": "Dashboard",
   "profile": "My Profile",
   "courses": "My Courses",
@@ -48,5 +48,6 @@
   "auditLog": "Audit Log",
   "myDashboard": "My Dashboard",
   "Packages": "Packages",
-  "select": "Select"
+  "select": "Select",
+  "Create": "Create"
 }
