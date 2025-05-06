@@ -6,7 +6,7 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 // Protect all routes and restrict to admin roles
-router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin"));
+router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
 
 // Get all audit logs with filtering, sorting and pagination
 router.get("/", auditLogController.getAllAuditLogs);

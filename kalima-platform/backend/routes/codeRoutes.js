@@ -9,15 +9,15 @@ router.use(verifyJWT);
 router
   .route("/")
   .get(
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     codeController.getAllCodes
   )
   .post(
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     codeController.createCodes
   )
   .delete(
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     codeController.deleteCodes
   );
 
