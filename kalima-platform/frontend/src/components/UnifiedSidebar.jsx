@@ -129,7 +129,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('Create') || 'Create', 
         icon: <Edit className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/create'
-      }
+      },
+      { 
+        id: 'lectures', 
+        title: t('MyLectures') || 'My Lectures', 
+        icon: <FaGraduationCap className="w-5 h-5" />, 
+        path: '/dashboard/admin-dashboard/lectures-page' 
+      },
     ];
 
     // Lecturer-specific menu items

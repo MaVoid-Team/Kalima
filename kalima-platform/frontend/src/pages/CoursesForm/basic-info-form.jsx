@@ -37,43 +37,58 @@ function BasicInfoForm({
     }
   }
 
-  // Create parent container
   const handleCreateParentContainer = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
-      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields");
-      return;
+      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
+      return
     }
-  
-    setIsSubmitting(true);
-  
+
+    setIsSubmitting(true)
+
     try {
-      const formDataPayload = new FormData();
+      const formDataPayload = new FormData()
       
-      // Append all fields
-      formDataPayload.append("name", formData.courseName);
-      formDataPayload.append("type", "course");
-      formDataPayload.append("createdBy", createdBy);
-      formDataPayload.append("level", formData.gradeLevel);
-      formDataPayload.append("subject", formData.subject);
-      formDataPayload.append("description", formData.description);
-      formDataPayload.append("goal", formData.goal);
-      formDataPayload.append("price", formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0);
-      formDataPayload.append("teacherAllowed", formData.privacy === "teacher");
-      
-      // Append image file if exists
+      // Append required fields
+      formDataPayload.append("name", formData.courseName)
+      formDataPayload.append("type", "course") // Adjust to "month" if required by your API
+      formDataPayload.append("createdBy", createdBy)
+      formDataPayload.append("level", formData.gradeLevel)
+      formDataPayload.append("subject", formData.subject)
+      formDataPayload.append("description", formData.description || "")
+      formDataPayload.append("goal", formData.goal || "")
+      formDataPayload.append("price", formData.courseType === "paid" ? Number(formData.priceFull) || 0 : 0)
+      formDataPayload.append("teacherAllowed", formData.privacy === "teacher")
+      formDataPayload.append("priceAllowed", formData.courseType === "paid")
+
+      // Append image file if exists (video omitted unless API supports it)
       if (courseImage) {
-        formDataPayload.append("image", courseImage);
+        formDataPayload.append("image", courseImage)
       }
-  
-      const response = await createContainer(formDataPayload);
-      // ... rest of your success logic
+
+      const response = await createContainer(formDataPayload)
+      if (response.status === "success") {
+        const container = response.data.container
+        updateCourseStructure({
+          ...courseStructure,
+          parent: {
+            id: container.id,
+            name: container.name,
+            type: container.type,
+          },
+        })
+        alert(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully")
+      } else {
+        alert(isRTL ? "فشل إنشاء الحاوية الرئيسية" : "Failed to create parent container")
+      }
     } catch (error) {
-      // ... error handling
+      console.error("Error creating parent container:", error)
+      const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إنشاء الحاوية الرئيسية"
+      alert(isRTL ? errorMessage : "Error creating parent container")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleCreateParentContainer}>
