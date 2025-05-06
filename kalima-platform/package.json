@@ -7,7 +7,6 @@
     "@capacitor/cli": "^7.2.0",
     "@capacitor/core": "^7.2.0",
     "axios": "^1.8.2",
-    "capacitor-plugin-scanbot-barcode-scanner-sdk": "^6.1.0",
     "chart.js": "^4.4.8",
     "daisyui": "^4.12.23",
     "framer-motion": "^12.5.0",
