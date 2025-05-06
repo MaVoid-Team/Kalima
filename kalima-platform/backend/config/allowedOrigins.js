@@ -4,7 +4,8 @@ const allowedOrigins = [
     'https://localhost',        // Android HTTPS 
     'https://kalima-edu.com',
     'http://localhost:3000',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'file://',
 ];
 
 module.exports = allowedOrigins;

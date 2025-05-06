@@ -129,7 +129,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('Create') || 'Create', 
         icon: <Edit className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/create'
-      }
+      },
+      { 
+        id: 'lectures', 
+        title: t('MyLectures') || 'My Lectures', 
+        icon: <FaGraduationCap className="w-5 h-5" />, 
+        path: '/dashboard/admin-dashboard/lectures-page' 
+      },
     ];
 
     // Lecturer-specific menu items
@@ -145,6 +151,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('lectures') || 'Lectures', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
         path: '/dashboard/lecturer-dashboard/lecture-page'
+      },
+      { 
+        id: 'lectures', 
+        title: t('MyLectures') || 'My Lectures', 
+        icon: <FaGraduationCap className="w-5 h-5" />, 
+        path: '/dashboard/lecturer-dashboard/lectures-page' 
       },
     ];
 
@@ -162,6 +174,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         icon: <FaGraduationCap className="w-5 h-5" />, 
         path: '/dashboard/assistant-dashboard/lecture-page' 
       },
+      { 
+        id: 'lectures', 
+        title: t('MyLectures') || 'My Lectures', 
+        icon: <FaGraduationCap className="w-5 h-5" />, 
+        path: '/dashboard/assistant-dashboard/lectures-page' 
+      },
     ];
 
     // Student-specific menu items
@@ -177,6 +195,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('courses') || 'Courses', 
         icon: <FaGraduationCap className="w-5 h-5" />, 
         path: '/dashboard/student-dashboard/lecture-page' 
+      },
+      { 
+        id: 'lectures', 
+        title: t('MyLectures') || 'My Lectures', 
+        icon: <FaGraduationCap className="w-5 h-5" />, 
+        path: '/dashboard/student-dashboard/lectures-page' 
       },
     ];
 
@@ -201,6 +225,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
     // Return appropriate menu items based on role
     switch (userRole.toLowerCase()) {
       case 'admin':
+        return [...adminItems, ...commonItems];
+      case 'subadmin':
         return [...adminItems, ...commonItems];
       case 'lecturer':
         return [...lecturerItems, ...commonItems];
