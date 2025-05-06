@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { ImSpinner8 } from "react-icons/im";
 import { getPromoCodes } from "../../../../routes/codes";
+import { getAllStudents } from "../../../../routes/fetch-users";
 
 const PromoCodesTable = () => {
   const { t, i18n } = useTranslation('admin');
@@ -19,18 +20,23 @@ const PromoCodesTable = () => {
     isLoading: true,
     error: null
   });
+  const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    const fetchPromoCodes = async () => {
+    const fetchData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
   
-      const result = await getPromoCodes();
+      const [promoResult, studentsResult] = await Promise.all([
+        getPromoCodes(),
+        getAllStudents()
+      ]);
   
-      if (result.success && Array.isArray(result.data)) {
-        const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
+      if (promoResult.success && Array.isArray(promoResult.data)) {
+        const totalPages = Math.ceil(promoResult.data.length / state.itemsPerPage);
+  
         setState(prev => ({
           ...prev,
-          promoCodes: result.data,
+          promoCodes: promoResult.data,
           totalPages,
           isLoading: false,
           error: null
@@ -39,14 +45,23 @@ const PromoCodesTable = () => {
         setState(prev => ({
           ...prev,
           isLoading: false,
-          promoCodes: [], // fallback to empty array
-          error: result.error || 'Invalid response data format'
+          promoCodes: [],
+          error: promoResult.error || 'Invalid promo response'
         }));
+      }
+  
+      if (studentsResult.success && Array.isArray(studentsResult.data)) {
+        setStudents(studentsResult.data);
       }
     };
   
-    fetchPromoCodes();
+    fetchData();
   }, []);
+
+  const getStudentNameById = (id) => {
+    const student = students.find(s => s._id === id);
+    return student ? student.name : '--';
+  };
 
   const paginatedCodes = state.promoCodes.slice(
     (state.currentPage - 1) * state.itemsPerPage,
@@ -161,7 +176,9 @@ const PromoCodesTable = () => {
                         </span>
                       </td>
                       <td>{code.redeemedAt ? new Date(code.redeemedAt).toLocaleDateString() : '--'}</td>
-                      <td className="truncate max-w-[100px]">{code.redeemedBy || '--'}</td>
+                      <td className="truncate max-w-[100px]">
+                        {getStudentNameById(code.redeemedBy)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
