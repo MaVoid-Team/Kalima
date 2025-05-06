@@ -172,7 +172,7 @@ export const createLecture = async (lectureData) => {
 };
 export const createContainer = async (formData) => {
   try {
-    const response = await api.post(`${API_URL}/api/v1/containers`, formData, {
+    const response = await api.post(`${API_URL}/containers`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
