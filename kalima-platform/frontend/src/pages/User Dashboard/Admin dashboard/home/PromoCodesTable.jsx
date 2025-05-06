@@ -26,7 +26,7 @@ const PromoCodesTable = () => {
 
   // Fetch promo codes
   useEffect(() => {
-    const fetchPromoCodes = async () => {
+    const fetchData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
 
       const result = await getPromoCodes();
@@ -35,7 +35,7 @@ const PromoCodesTable = () => {
         const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
         setState(prev => ({
           ...prev,
-          promoCodes: result.data,
+          promoCodes: promoResult.data,
           totalPages,
           isLoading: false,
           error: null,
@@ -47,6 +47,10 @@ const PromoCodesTable = () => {
           promoCodes: [],
           error: result.error || t('errors.invalidResponse'),
         }));
+      }
+  
+      if (studentsResult.success && Array.isArray(studentsResult.data)) {
+        setStudents(studentsResult.data);
       }
     };
 
