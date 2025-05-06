@@ -5,6 +5,7 @@ import { getUserDashboard } from '../../../routes/auth-services';
 import { createSubject, getAllSubjects, deleteSubject } from '../../../routes/courses';
 import { createPackage, fetchPackages, deletePackage } from '../../../routes/packages';
 import { getAllLecturers } from '../../../routes/fetch-users';
+import { getAllLevels, createLevel, deleteLevel } from '../../../routes/levels';
 
 export default function AdminCreate() {
   const { t } = useTranslation();
@@ -16,7 +17,8 @@ export default function AdminCreate() {
   const [lecturers, setLecturers] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [packages, setPackages] = useState([]);
-  const [activeForm, setActiveForm] = useState('subject'); // 'subject' or 'package'
+  const [levels, setLevels] = useState([]);
+  const [activeForm, setActiveForm] = useState('subject'); // 'subject', 'package', or 'level'
 
   // Subject form state
   const [subjectData, setSubjectData] = useState({ name: '' });
@@ -28,6 +30,9 @@ export default function AdminCreate() {
     type: 'month',
     points: [{ lecturer: '', points: '' }],
   });
+
+  // Level form state
+  const [levelData, setLevelData] = useState({ name: '' });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -85,10 +90,24 @@ export default function AdminCreate() {
       }
     };
 
+    const fetchAllLevels = async () => {
+      try {
+        const response = await getAllLevels();
+        if (response.success) {
+          setLevels(response.data);
+        } else {
+          setError(response.error || 'Failed to fetch levels');
+        }
+      } catch (err) {
+        setError('Failed to fetch levels');
+      }
+    };
+
     fetchUserData();
     fetchLecturers();
     fetchSubjects();
     fetchAllPackages();
+    fetchAllLevels();
   }, [navigate]);
 
   const handleSubjectSubmit = async (e) => {
@@ -142,6 +161,28 @@ export default function AdminCreate() {
       }
     } catch (err) {
       setError('Failed to create package');
+    }
+  };
+
+  const handleLevelSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await createLevel(levelData);
+      if (response.success) {
+        setSuccess('Level created successfully');
+        setLevelData({ name: '' });
+        const updatedLevels = await getAllLevels();
+        if (updatedLevels.success) {
+          setLevels(updatedLevels.data);
+        }
+      } else {
+        setError(response.error);
+      }
+    } catch (err) {
+      setError('Failed to create level');
     }
   };
 
@@ -205,6 +246,25 @@ export default function AdminCreate() {
     }
   };
 
+  const handleDeleteLevel = async (levelId) => {
+    if (window.confirm('Are you sure you want to delete this level?')) {
+      try {
+        const response = await deleteLevel(levelId);
+        if (response.success) {
+          setSuccess('Level deleted successfully');
+          const updatedLevels = await getAllLevels();
+          if (updatedLevels.success) {
+            setLevels(updatedLevels.data);
+          }
+        } else {
+          setError(response.error || 'Failed to delete level');
+        }
+      } catch (err) {
+        setError('Failed to delete level');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -248,6 +308,12 @@ export default function AdminCreate() {
           onClick={() => setActiveForm('package')}
         >
           Create New Package
+        </button>
+        <button
+          className={`tab tab-lifted ${activeForm === 'level' ? 'tab-active' : ''}`}
+          onClick={() => setActiveForm('level')}
+        >
+          Create New Level
         </button>
       </div>
 
@@ -457,6 +523,69 @@ export default function AdminCreate() {
               </div>
             ) : (
               <p>No packages available.</p>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Level Creation Form */}
+      {activeForm === 'level' && (
+        <>
+          <form onSubmit={handleLevelSubmit} className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Level Name</span>
+              </label>
+              <input
+                type="text"
+                value={levelData.name}
+                onChange={(e) => setLevelData({ name: e.target.value })}
+                placeholder="e.g., Higher Secondary"
+                className="input input-bordered w-full"
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Create Level
+            </button>
+          </form>
+
+          {/* Level Table */}
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4">Existing Levels</h2>
+            {levels.length > 0 ? (
+              <div className="overflow-x-auto">
+                <div className="bg-base-100 shadow-md rounded-lg">
+                  <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
+                    <div>Level Name</div>
+                    <div>Created On</div>
+                    <div>Actions</div>
+                  </div>
+                  {levels.map((level) => (
+                    <div
+                      key={level._id}
+                      className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
+                    >
+                      <div className="text-sm font-medium">{level.name}</div>
+                      <div className="text-sm text-gray-600">
+                        {new Date(level.createdAt).toLocaleDateString()}
+                      </div>
+                      <div>
+                        {userRole === 'Admin' && (
+                          <button
+                            className="btn btn-error btn-sm"
+                            onClick={() => handleDeleteLevel(level._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-center py-4">No levels available.</p>
             )}
           </div>
         </>
