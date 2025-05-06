@@ -57,6 +57,7 @@ const User = mongoose.model("User", userSchema);
 
 
 // For setting up available grades.
+//i dont think these levels will ever be used in the future but im too lazy to remove them. Xero :)
 
 User.levels = ["grade 4", "grade 5", "grade 6", "first preparatory", "second preparatory", "third preparatory", "first secondary",
   "second secondary", "third secondary"]
