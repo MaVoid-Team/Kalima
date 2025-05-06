@@ -13,10 +13,31 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 
 const validatePassword = (password) => {
-  const requiredLength = 8;
+  const minLength = 8;
   
-  if (password.length !== requiredLength) {
-    throw new AppError(`Password must be exactly ${requiredLength} characters long`, 400);
+  // Check minimum length
+  if (password.length < minLength) {
+    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
+  }
+  
+  // Check for uppercase letters
+  if (!/[A-Z]/.test(password)) {
+    throw new AppError('Password must contain at least one uppercase letter', 400);
+  }
+  
+  // Check for lowercase letters
+  if (!/[a-z]/.test(password)) {
+    throw new AppError('Password must contain at least one lowercase letter', 400);
+  }
+  
+  // Check for numbers
+  if (!/[0-9]/.test(password)) {
+    throw new AppError('Password must contain at least one number', 400);
+  }
+  
+  // Check for special characters
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    throw new AppError('Password must contain at least one special character', 400);
   }
 };
 
@@ -108,6 +129,11 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   switch (role.toLowerCase()) {
     case "teacher":
+      if (!newUser.level)
+        return next(new AppError("Level is required for teacher role", 400));
+      const teacherLevel = await Level.findById(newUser.level);
+      if (!teacherLevel)
+        return next(new AppError("There is no level with this id", 404));
       user = await Teacher.create(newUser);
       break;
     case "student":

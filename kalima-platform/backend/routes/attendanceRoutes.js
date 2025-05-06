@@ -11,7 +11,7 @@ router.use(verifyJWT);
 router
   .route("/")
   .post(
-    authController.verifyRoles("Assistant", "Admin", "Sub-Admin"), // Roles allowed to record
+    authController.verifyRoles("Assistant", "Admin", "Sub-Admin", "Moderator"), // Roles allowed to record
     attendanceController.recordAttendance
   )
   .get(
@@ -26,18 +26,18 @@ router
     attendanceController.getAttendanceById
   )
   .patch(
-    authController.verifyRoles("Assistant", "Admin", "Sub-Admin"), // Roles allowed to update attendance
+    authController.verifyRoles("Assistant", "Admin", "Sub-Admin", "Moderator"), // Roles allowed to update attendance
     attendanceController.updateAttendance
   )
   .delete(
-    authController.verifyRoles("Admin", "Sub-Admin"), // Roles allowed to delete
+    authController.verifyRoles("Admin", "Sub-Admin", "Moderator"), // Roles allowed to delete
     attendanceController.deleteAttendance
   );
 
 // New route for updating exam results
 router.route("/:id/exam-results")
   .patch(
-    authController.verifyRoles("Admin", "Sub-Admin", "Assistant", "Lecturer"), // Roles allowed to update exam results
+    authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant", "Lecturer"), // Roles allowed to update exam results
     attendanceController.updateExamResults
   );
 
