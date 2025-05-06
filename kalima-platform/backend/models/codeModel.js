@@ -41,11 +41,28 @@ const codeSchema = new mongoose.Schema({
 });
 
 codeSchema.methods.generateCode = function () {
+  // Use the ObjectId as a seed for randomness
   const objectIdHex = this._id.toString();
-  const base36 = BigInt("0x" + objectIdHex)
-    .toString(36)
-    .toUpperCase();
-  this.code = base36;
+  
+  // Create a numeric string from the ObjectId to ensure uniqueness
+  // We'll use the last 10 digits of a large number derived from the ObjectId
+  const numericBase = BigInt("0x" + objectIdHex) % 10000000000n;
+  let result = numericBase.toString().padStart(10, '0');
+  
+  // If the result is somehow shorter than 10 digits, pad with random numbers
+  if (result.length < 10) {
+    while (result.length < 10) {
+      const randomDigit = Math.floor(Math.random() * 10);
+      result += randomDigit.toString();
+    }
+  }
+  
+  // Ensure it's exactly 10 digits
+  if (result.length > 10) {
+    result = result.substring(0, 10);
+  }
+  
+  this.code = result;
 };
 
 const Code = mongoose.model("Code", codeSchema);

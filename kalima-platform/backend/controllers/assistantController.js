@@ -98,7 +98,9 @@ exports.createAssistant = catchAsync(async (req, res, next) => {
 
 // Get all assistants
 exports.getAllAssistants = catchAsync(async (req, res, next) => {
-    const assistants = await Assistant.find().populate("assignedLecturer");
+    const assistants = await Assistant.find()
+        .select('name email gender role assignedLecturer profilePicture')
+        .populate("assignedLecturer", "name email");
 
     res.status(200).json({
         status: "success",
