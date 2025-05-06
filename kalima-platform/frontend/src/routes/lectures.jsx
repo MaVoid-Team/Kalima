@@ -170,19 +170,17 @@ export const createLecture = async (lectureData) => {
     return `Error creating lecture: ${error.message}`
   }
 };
-export const createContainer = async (containerData) => {
+export const createContainer = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/containers`, containerData, {
+    const response = await api.post(`${API_URL}/containers`, formData, {
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${getToken()}`,
       },
     });
-
     return response.data;
   } catch (error) {
-    return `Error creating container: ${error.message}`
+    throw new Error(error.response?.data?.message || "Error creating container");
   }
 };
 

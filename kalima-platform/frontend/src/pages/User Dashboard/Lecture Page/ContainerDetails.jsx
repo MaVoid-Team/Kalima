@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getUserDashboard } from "../../../routes/auth-services"
+import { getExamConfigs, createExamConfig } from "../../../routes/examConfigs"
 import { FiBook, FiFolder, FiArrowLeft, FiPlus, FiX, FiPaperclip } from "react-icons/fi"
+import { ExamConfigSection } from "../../../components/exam-config-section"
 
 const ContainerDetailsPage = () => {
   const { containerId } = useParams()
@@ -14,7 +16,7 @@ const ContainerDetailsPage = () => {
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
-  
+
   // Creation modal state
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newItemName, setNewItemName] = useState("")
@@ -27,12 +29,85 @@ const ContainerDetailsPage = () => {
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
   const [numberOfViews, setNumberOfViews] = useState(0)
+  const [requiresExam, setRequiresExam] = useState(false)
+  const [examConfig, setExamConfig] = useState("")
+  const [passingThreshold, setPassingThreshold] = useState(50)
+  const [examConfigs, setExamConfigs] = useState([])
+  const [examConfigsLoading, setExamConfigsLoading] = useState(false)
+  const [examConfigsError, setExamConfigsError] = useState("")
+  const [selectedExamConfigId, setSelectedExamConfigId] = useState("")
+  const [isCreatingNewExamConfig, setIsCreatingNewExamConfig] = useState(false)
+  const [newExamConfig, setNewExamConfig] = useState({
+    name: "",
+    description: "",
+    googleSheetId: "",
+    formUrl: "",
+    studentIdentifierColumn: "Email Address",
+    scoreColumn: "Score",
+    defaultPassingThreshold: 60,
+  })
+
+  useEffect(() => {
+    if (showCreateModal && userRole === "Lecturer" && container?.type?.toLowerCase() === "month") {
+      fetchExamConfigs()
+    }
+  }, [showCreateModal, userRole, container?.type])
+
+  const fetchExamConfigs = async () => {
+    setExamConfigsLoading(true)
+    setExamConfigsError("")
+    try {
+      console.log("Fetching exam configs...")
+      const response = await getExamConfigs()
+      console.log("Exam Configs Response:", response)
+
+      // Check for both possible response formats
+      if (response.status === "success" && response.data?.examConfigs) {
+        // Format: { status: "success", data: { examConfigs: [...] } }
+        setExamConfigs(response.data.examConfigs)
+        console.log("Parsed exam configs (format 1):", response.data.examConfigs)
+      } else if (response.success === true) {
+        // Format: { success: true, data: [...] }
+        setExamConfigs(response.data || [])
+        console.log("Parsed exam configs (format 2):", response.data)
+      } else {
+        // Try to extract data in any possible format
+        const configs = 
+          response.data?.examConfigs || // Try nested examConfigs
+          response.data || // Try direct data array
+          []; // Fallback to empty array
+        
+        console.log("Attempting to extract configs:", configs)
+        setExamConfigs(configs)
+        
+        if (configs.length === 0) {
+          console.log("No exam configs found in response")
+          setExamConfigsError("No exam configurations found. Please create a new one.")
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching exam configs:", err)
+      setExamConfigsError(err.message || "Failed to fetch exam configs")
+    } finally {
+      setExamConfigsLoading(false)
+    }
+  }
+
+  // Add this effect for default passing threshold
+  useEffect(() => {
+    if (selectedExamConfigId && !isCreatingNewExamConfig) {
+      const selectedConfig = examConfigs.find((c) => c._id === selectedExamConfigId)
+      if (selectedConfig) {
+        setPassingThreshold(selectedConfig.defaultPassingThreshold)
+      }
+    }
+  }, [selectedExamConfigId, examConfigs, isCreatingNewExamConfig])
 
   // Fetch container data
   const fetchContainer = async () => {
     try {
       const response = await getContainerById(containerId)
-      if (response.status === 'success') {
+      if (response.status === "success") {
         setContainer(response.data)
       } else {
         setError("Failed to load container details")
@@ -69,11 +144,16 @@ const ContainerDetailsPage = () => {
   const getAllowedChildType = () => {
     if (!container) return null
     switch (container.type.toLowerCase()) {
-      case 'course': return 'year'
-      case 'year': return 'term'
-      case 'term': return 'month'
-      case 'month': return 'lecture'
-      default: return null
+      case "course":
+        return "year"
+      case "year":
+        return "term"
+      case "term":
+        return "month"
+      case "month":
+        return "lecture"
+      default:
+        return null
     }
   }
 
@@ -87,7 +167,6 @@ const ContainerDetailsPage = () => {
       if (!childType) throw new Error("Invalid container type for creation")
       if (!newItemName) throw new Error("Name is required")
 
-      // Common fields for both containers and lectures
       const baseData = {
         name: newItemName,
         parent: containerId,
@@ -99,15 +178,51 @@ const ContainerDetailsPage = () => {
       }
 
       let response
-      if (childType === 'lecture') {
+      if (childType === "lecture") {
         if (!newVideoLink) throw new Error("Video link is required for lectures")
         const lectureData = {
-          ...baseData,
-          type: 'lecture',
+          name: newItemName,
+          type: "lecture",
+          createdBy: userId,
+          level: container.level?._id,
+          subject: container.subject?._id,
+          parent: containerId,
+          price: Number(newPrice) || 0,
           description: newDescription || `Lecture for ${newItemName}`,
-          numberOfViews: numberOfViews,
+          numberOfViews: Number(numberOfViews) || 0,
           videoLink: newVideoLink,
+          teacherAllowed: true,
           lecture_type: newLectureType,
+          requiresExam: requiresExam,
+        }
+        if (requiresExam) {
+          let examConfigIdToUse
+          if (isCreatingNewExamConfig) {
+            // Validate required fields for new exam config
+            if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
+              throw new Error("Please fill in all required exam configuration fields")
+            }
+
+            console.log("Creating new exam config:", newExamConfig)
+            const createResponse = await createExamConfig(newExamConfig)
+            console.log("Create exam config response:", createResponse)
+            
+            if (createResponse.status === "success") {
+              examConfigIdToUse = createResponse.data._id
+            } else if (createResponse.success === true) {
+              examConfigIdToUse = createResponse.data._id
+            } else {
+              throw new Error(createResponse.message || "Failed to create exam config")
+            }
+          } else {
+            if (!selectedExamConfigId) {
+              throw new Error("Please select an exam configuration")
+            }
+            examConfigIdToUse = selectedExamConfigId
+          }
+
+          lectureData.examConfig = examConfigIdToUse
+          lectureData.passingThreshold = Number(passingThreshold) || 60
         }
         response = await createLecture(lectureData)
       } else {
@@ -122,12 +237,11 @@ const ContainerDetailsPage = () => {
         response = await createContainer(containerData)
       }
 
-      if (response.status !== 'success') {
+      if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || `Failed to create ${childType}`)
       }
 
-      // If it's a lecture and there's an attachment, upload it
-      if (childType === 'lecture' && attachmentFile) {
+      if (childType === "lecture" && attachmentFile) {
         const attachmentData = {
           type: "homework",
           attachment: attachmentFile,
@@ -135,7 +249,6 @@ const ContainerDetailsPage = () => {
         await createLectureAttachment(response.data._id, attachmentData)
       }
 
-      // Refetch container to update UI
       await fetchContainer()
 
       setShowCreateModal(false)
@@ -146,9 +259,25 @@ const ContainerDetailsPage = () => {
       setNewVideoLink("")
       setNewLectureType("Revision")
       setAttachmentFile(null)
+      setNumberOfViews(0)
+      setRequiresExam(false)
+      setExamConfig("")
+      setPassingThreshold(50)
+      setExamConfigs([])
+      setSelectedExamConfigId("")
+      setIsCreatingNewExamConfig(false)
+      setNewExamConfig({
+        name: "",
+        description: "",
+        googleSheetId: "",
+        formUrl: "",
+        studentIdentifierColumn: "Email Address",
+        scoreColumn: "Score",
+        defaultPassingThreshold: 60,
+      })
     } catch (err) {
       setCreationError(err.message)
-      console.error('Creation error details:', {
+      console.error("Creation error details:", {
         error: err,
         containerId,
         childType,
@@ -158,6 +287,9 @@ const ContainerDetailsPage = () => {
         newPrice,
         newVideoLink,
         newLectureType,
+        requiresExam,
+        examConfig,
+        passingThreshold,
       })
     } finally {
       setCreationLoading(false)
@@ -188,8 +320,8 @@ const ContainerDetailsPage = () => {
           <div className="text-red-500 text-4xl mb-4">⚠️</div>
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">Oops! Something went wrong</h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <Link 
-            to={userRole === 'Lecturer' ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
+          <Link
+            to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
             className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
           >
             <FiArrowLeft /> Back to Dashboard
@@ -200,15 +332,16 @@ const ContainerDetailsPage = () => {
   }
 
   const childType = getAllowedChildType()
-  const creationLabel = childType === 'lecture' ? 'Lecture' : `${childType?.charAt(0).toUpperCase() + childType?.slice(1)}`
+  const creationLabel =
+    childType === "lecture" ? "Lecture" : `${childType?.charAt(0).toUpperCase() + childType?.slice(1)}`
 
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
           >
             <span className="text-lg">←</span>
@@ -242,15 +375,12 @@ const ContainerDetailsPage = () => {
 
           {/* Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {container.children?.map(child => (
-              <div 
-                key={child._id}
-                className="group relative rounded-xl"
-              >
+            {container.children?.map((child) => (
+              <div key={child._id} className="group relative rounded-xl">
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                      {childType === 'lecture' ? (
+                      {childType === "lecture" ? (
                         <FiBook className="text-primary text-xl" />
                       ) : (
                         <FiFolder className="text-primary text-xl" />
@@ -260,14 +390,12 @@ const ContainerDetailsPage = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">
-                      {childType || container.type}
-                    </span>
+                    <span className="text-sm">{childType || container.type}</span>
                     <Link
                       to={
-                        userRole === 'Lecturer'
-                          ? `/dashboard/lecturer-dashboard/${childType === 'lecture' ? 'lecture-display' : 'container-details'}/${child._id}`
-                          : `/dashboard/student-dashboard/${childType === 'lecture' ? 'lecture-display' : 'container-details'}/${child._id}`
+                        userRole === "Lecturer"
+                          ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
+                          : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                       }
                       className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
                     >
@@ -288,9 +416,9 @@ const ContainerDetailsPage = () => {
         </div>
 
         {/* Lecturer Actions */}
-        {userRole === 'Lecturer' && childType && (
+        {userRole === "Lecturer" && childType && (
           <div className="flex gap-4 justify-end">
-            <button 
+            <button
               onClick={() => setShowCreateModal(true)}
               className="btn btn-primary px-6 py-3 rounded-full flex items-center gap-2"
             >
@@ -302,18 +430,15 @@ const ContainerDetailsPage = () => {
       </div>
 
       {/* DaisyUI Modal */}
-      <div className={`modal ${showCreateModal && 'modal-open'}`}>
+      <div className={`modal ${showCreateModal && "modal-open"}`}>
         <div className="modal-box max-w-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">Create New {creationLabel}</h3>
-            <button 
-              onClick={() => setShowCreateModal(false)}
-              className="btn btn-sm btn-circle btn-ghost"
-            >
+            <button onClick={() => setShowCreateModal(false)} className="btn btn-sm btn-circle btn-ghost">
               <FiX className="w-5 h-5" />
             </button>
           </div>
-          
+
           <form onSubmit={handleCreateItem}>
             <div className="form-control w-full mb-4">
               <label className="label">
@@ -338,11 +463,11 @@ const ContainerDetailsPage = () => {
                 className="textarea textarea-bordered w-full"
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
-                required={childType !== 'lecture'}
+                required={childType !== "lecture"}
               />
             </div>
 
-            {childType !== 'lecture' && (
+            {childType !== "lecture" && (
               <div className="form-control w-full mb-4">
                 <label className="label">
                   <span className="label-text">Goal</span>
@@ -372,7 +497,7 @@ const ContainerDetailsPage = () => {
               />
             </div>
 
-            {childType === 'lecture' && (
+            {childType === "lecture" && (
               <>
                 <div className="form-control w-full mb-4">
                   <label className="label">
@@ -397,6 +522,7 @@ const ContainerDetailsPage = () => {
                     className="input input-bordered w-full"
                     value={numberOfViews}
                     onChange={(e) => setNumberOfViews(e.target.value)}
+                    min="0"
                     required
                   />
                 </div>
@@ -410,9 +536,38 @@ const ContainerDetailsPage = () => {
                     onChange={(e) => setNewLectureType(e.target.value)}
                   >
                     <option value="Revision">Revision</option>
-                    <option value="Paid">Normal</option>
+                    <option value="Paid">Paid</option>
                   </select>
                 </div>
+                <div className="form-control w-full mb-4">
+                  <label className="label">
+                    <span className="label-text">Requires Exam</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={requiresExam}
+                    onChange={(e) => setRequiresExam(e.target.value === "true")}
+                  >
+                    <option value={false}>No</option>
+                    <option value={true}>Yes</option>
+                  </select>
+                </div>
+                {requiresExam && (
+                  <ExamConfigSection
+                    requiresExam={requiresExam}
+                    selectedExamConfigId={selectedExamConfigId}
+                    setSelectedExamConfigId={setSelectedExamConfigId}
+                    isCreatingNewExamConfig={isCreatingNewExamConfig}
+                    setIsCreatingNewExamConfig={setIsCreatingNewExamConfig}
+                    examConfigs={examConfigs}
+                    examConfigsLoading={examConfigsLoading}
+                    examConfigsError={examConfigsError}
+                    passingThreshold={passingThreshold}
+                    setPassingThreshold={setPassingThreshold}
+                    newExamConfig={newExamConfig}
+                    setNewExamConfig={setNewExamConfig}
+                  />
+                )}
                 <div className="form-control w-full mb-4">
                   <label className="label">
                     <span className="label-text">Attach Homework (Optional, .pdf only)</span>
@@ -435,15 +590,25 @@ const ContainerDetailsPage = () => {
 
             {creationError && (
               <div className="alert alert-error mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{creationError}</span>
               </div>
             )}
 
             <div className="modal-action">
-              <button 
+              <button
                 type="button"
                 className="btn btn-ghost"
                 onClick={() => setShowCreateModal(false)}
@@ -451,17 +616,15 @@ const ContainerDetailsPage = () => {
               >
                 Cancel
               </button>
-              <button 
-                type="submit"
-                className="btn btn-primary"
-                disabled={creationLoading}
-              >
+              <button type="submit" className="btn btn-primary" disabled={creationLoading}>
                 {creationLoading ? (
                   <>
                     <span className="loading loading-spinner"></span>
                     Creating...
                   </>
-                ) : 'Create'}
+                ) : (
+                  "Create"
+                )}
               </button>
             </div>
           </form>
@@ -470,5 +633,4 @@ const ContainerDetailsPage = () => {
     </div>
   )
 }
-
 export default ContainerDetailsPage
