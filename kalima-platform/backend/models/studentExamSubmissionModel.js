@@ -46,9 +46,6 @@ const studentExamSubmissionSchema = new mongoose.Schema(
   }
 );
 
-// Prevent duplicate submissions for the same student and lecture
-studentExamSubmissionSchema.index({ student: 1, lecture: 1 }, { unique: true });
-
 // For efficiently finding all submissions for a lecture
 studentExamSubmissionSchema.index({ lecture: 1, submittedAt: -1 });
 

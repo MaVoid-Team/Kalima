@@ -48,7 +48,9 @@ exports.getAllStudents = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
     
-  const students = await features.query;
+  const students = await features.query
+    .populate('parent', 'name')
+    .populate('center', 'name');
   
   res.status(200).json({
     status: "success",
