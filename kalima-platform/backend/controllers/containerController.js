@@ -538,13 +538,14 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
   query = features.query;
-  // If user is not authenticated (not logged in), exclude lecture containers
-  // if (!req.user) {
-  //   query = query.where("type").ne("lecture");
-  //   console.log("User not authenticated, excluding lecture containers.");
-  // }
-  // Fetch containers based on the query
-  const containers = await query.populate();
+  
+  // Fetch containers based on the query with explicit field selection for related entities
+  const containers = await query.populate([
+    { path: "createdBy", select: "name" },
+    { path: "subject", select: "name" },
+    { path: "level", select: "name" },
+    { path: "parent", select: "name" }
+  ]);
 
   if (!containers || containers.length === 0) {
     return next(new AppError("No containers found.", 404));
