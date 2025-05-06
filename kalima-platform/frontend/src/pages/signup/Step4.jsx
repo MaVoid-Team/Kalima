@@ -7,10 +7,7 @@ const ReviewItem = ({ label, value }) => (
 
 export default function Step4({ formData, t, hobbiesList , gradeLevels}) {
   
-    const getLevelName = (levelId) => {
-      const level = gradeLevels?.find(l => l.value === levelId);
-      return level ? t(`gradeLevels.${level.label}`) : levelId;
-    };
+  const levelName= gradeLevels.name;
   return (
     <div className="space-y-6">
       <div className="bg-base-200 p-6 rounded-lg">
@@ -40,7 +37,7 @@ export default function Step4({ formData, t, hobbiesList , gradeLevels}) {
               <>
                 <ReviewItem 
                   label={t('form.level')} 
-                  value={getLevelName(formData.level)}
+                  value={levelName}
                 />
                 <ReviewItem 
                   label={t('form.subject')} 

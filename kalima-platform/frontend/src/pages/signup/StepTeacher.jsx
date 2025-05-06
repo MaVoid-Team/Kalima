@@ -1,11 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
+import { getAllSubjects } from "../../routes/courses";
 
 export default function StepTeacher({ formData, handleInputChange, t, errors , gradeLevels}) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [subjects, setSubjects] = useState([]);
 const {i18n} = useTranslation();
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const response = await getAllSubjects();
+      if (response.success) {
+        setSubjects(response.data);
+      } else {
+        console.error(response.error);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    handleInputChange({ target: { name, value } });
+  }
+
   return (
     <div className="space-y-4">
       <div className="form-control">
@@ -121,22 +142,27 @@ const {i18n} = useTranslation();
           <label className="label">
             <span className="label-text">{t('form.subject')}</span>
           </label>
-          <input
-          type="text"
-          name="subject"
-          className={`input input-bordered ${errors.subject ? "input-error animate-shake" : ""}`}
-          value={formData.subject || ""} // Direct string value
-          onChange={handleInputChange} // Use default handler
-          placeholder={t("form.subjectPlaceholder") || "e.g. Mathematics, Physics"}
-          required
-        />
+          <select
+            name="subject"
+            className={`select select-bordered ${errors.subject ? 'select-error animate-shake' : ''}`}
+            value={formData.subject}
+            onChange={handleSelectChange}
+            required
+          >
+            <option value="">Select Subject</option>
+            {subjects.map(subject => (
+              <option key={subject.id} value={subject.id}>
+                {t(`${subject.name}`)}
+              </option>
+            ))}
+          </select>
           {errors.subject && (
             <span className="text-error text-sm mt-1">
               {t(`validation.${errors.subject}`)}
             </span>
           )}
         </div>
-      </div>
     </div>
+  </div>
   );
 }
