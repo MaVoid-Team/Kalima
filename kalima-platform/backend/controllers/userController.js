@@ -473,7 +473,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
         let containerQuery = Container.find({ createdBy: userId })
-          .select("name type price subject level")
+          .select("name type price subject level createdAt")
           .populate("subject", "name")
           .populate("level", "name");
 

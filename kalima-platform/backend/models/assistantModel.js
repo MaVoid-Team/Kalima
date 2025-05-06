@@ -4,6 +4,10 @@ const User = require("./userModel");
 const assistantSchema = new mongoose.Schema(
   {
     assignedLecturer: { type: mongoose.Schema.Types.ObjectId, ref: "Lecturer", required: true }, // Reference to Lecturer
+    profilePicture: {
+      url: String,
+      publicId: String,
+    },
   },
   {
     timestamps: true,
