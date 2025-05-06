@@ -102,3 +102,27 @@ export const createSubject = async (subjectData) => {
     };
   }
 };
+
+export const deleteSubject = async (subjectId) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error('Not authenticated');
+    }
+    const response = await axios.delete(`${API_URL}/api/v1/subjects/${subjectId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to delete subject: ${error.message}`,
+    };
+  }
+};

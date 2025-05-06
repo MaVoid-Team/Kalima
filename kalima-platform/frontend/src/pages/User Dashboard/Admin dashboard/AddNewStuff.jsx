@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { getUserDashboard } from '../../../routes/auth-services';
-import { createSubject } from '../../../routes/courses';
-import { createPackage } from '../../../routes/packages';
+import { createSubject, getAllSubjects, deleteSubject } from '../../../routes/courses';
+import { createPackage, fetchPackages, deletePackage } from '../../../routes/packages';
 import { getAllLecturers } from '../../../routes/fetch-users';
 
 export default function AdminCreate() {
@@ -14,6 +14,8 @@ export default function AdminCreate() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [lecturers, setLecturers] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [packages, setPackages] = useState([]);
   const [activeForm, setActiveForm] = useState('subject'); // 'subject' or 'package'
 
   // Subject form state
@@ -57,8 +59,36 @@ export default function AdminCreate() {
       }
     };
 
+    const fetchSubjects = async () => {
+      try {
+        const response = await getAllSubjects();
+        if (response.success) {
+          setSubjects(response.data);
+        } else {
+          setError(response.error || 'Failed to fetch subjects');
+        }
+      } catch (err) {
+        setError('Failed to fetch subjects');
+      }
+    };
+
+    const fetchAllPackages = async () => {
+      try {
+        const response = await fetchPackages();
+        if (response.success) {
+          setPackages(response.data);
+        } else {
+          setError(response.error || 'Failed to fetch packages');
+        }
+      } catch (err) {
+        setError('Failed to fetch packages');
+      }
+    };
+
     fetchUserData();
     fetchLecturers();
+    fetchSubjects();
+    fetchAllPackages();
   }, [navigate]);
 
   const handleSubjectSubmit = async (e) => {
@@ -71,6 +101,10 @@ export default function AdminCreate() {
       if (response.success) {
         setSuccess('Subject created successfully');
         setSubjectData({ name: '' });
+        const updatedSubjects = await getAllSubjects();
+        if (updatedSubjects.success) {
+          setSubjects(updatedSubjects.data);
+        }
       } else {
         setError(response.error);
       }
@@ -99,6 +133,10 @@ export default function AdminCreate() {
           type: 'month',
           points: [{ lecturer: '', points: '' }],
         });
+        const updatedPackages = await fetchPackages();
+        if (updatedPackages.success) {
+          setPackages(updatedPackages.data);
+        }
       } else {
         setError(response.error);
       }
@@ -129,6 +167,44 @@ export default function AdminCreate() {
     }));
   };
 
+  const handleDeleteSubject = async (subjectId) => {
+    if (window.confirm('Are you sure you want to delete this subject?')) {
+      try {
+        const response = await deleteSubject(subjectId);
+        if (response.success) {
+          setSuccess('Subject deleted successfully');
+          const updatedSubjects = await getAllSubjects();
+          if (updatedSubjects.success) {
+            setSubjects(updatedSubjects.data);
+          }
+        } else {
+          setError(response.error || 'Failed to delete subject');
+        }
+      } catch (err) {
+        setError('Failed to delete subject');
+      }
+    }
+  };
+
+  const handleDeletePackage = async (packageId) => {
+    if (window.confirm('Are you sure you want to delete this package?')) {
+      try {
+        const response = await deletePackage(packageId);
+        if (response.success) {
+          setSuccess('Package deleted successfully');
+          const updatedPackages = await fetchPackages();
+          if (updatedPackages.success) {
+            setPackages(updatedPackages.data);
+          }
+        } else {
+          setError(response.error || 'Failed to delete package');
+        }
+      } catch (err) {
+        setError('Failed to delete package');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -138,7 +214,7 @@ export default function AdminCreate() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-3xl">
+    <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
       <h1 className="text-3xl font-bold mb-6">Create New {activeForm}</h1>
 
       {error && (
@@ -165,137 +241,225 @@ export default function AdminCreate() {
           className={`tab ${activeForm === 'subject' ? 'tab-active' : ''}`}
           onClick={() => setActiveForm('subject')}
         >
-            Create New Subject
+          Create New Subject
         </button>
         <button
           className={`tab tab-lifted ${activeForm === 'package' ? 'tab-active' : ''}`}
           onClick={() => setActiveForm('package')}
         >
-            Create New Package
+          Create New Package
         </button>
       </div>
 
       {/* Subject Creation Form */}
       {activeForm === 'subject' && (
-        <form onSubmit={handleSubjectSubmit} className="space-y-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Subject Name</span>
-            </label>
-            <input
-              type="text"
-              value={subjectData.name}
-              onChange={(e) => setSubjectData({ name: e.target.value })}
-              placeholder="e.g., Geography"
-              className="input input-bordered w-full"
-              required
-            />
+        <>
+          <form onSubmit={handleSubjectSubmit} className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Subject Name</span>
+              </label>
+              <input
+                type="text"
+                value={subjectData.name}
+                onChange={(e) => setSubjectData({ name: e.target.value })}
+                placeholder="e.g., Geography"
+                className="input input-bordered w-full"
+                required
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Create Subject
+            </button>
+          </form>
+
+          {/* Subject Table */}
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4">Existing Subjects</h2>
+            {subjects.length > 0 ? (
+              <div className="overflow-x-auto">
+                <div className="bg-base-100 shadow-md rounded-lg">
+                  <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
+                    <div>Subject Name</div>
+                    <div>Created On</div>
+                    <div>Actions</div>
+                  </div>
+                  {subjects.map((subject) => (
+                    <div
+                      key={subject._id}
+                      className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
+                    >
+                      <div className="text-sm font-medium">{subject.name}</div>
+                      <div className="text-sm text-gray-600">
+                        {new Date(subject.createdAt).toLocaleDateString()}
+                      </div>
+                      <div>
+                        {userRole === 'Admin' && (
+                          <button
+                            className="btn btn-error btn-sm"
+                            onClick={() => handleDeleteSubject(subject._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-center py-4">No subjects available.</p>
+            )}
           </div>
-          <button type="submit" className="btn btn-primary">
-            Create Subject
-          </button>
-        </form>
+        </>
       )}
 
       {/* Package Creation Form */}
       {activeForm === 'package' && (
-        <form onSubmit={handlePackageSubmit} className="space-y-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Create New Package</span>
-            </label>
-            <input
-              type="text"
-              value={packageData.name}
-              onChange={(e) => setPackageData({ ...packageData, name: e.target.value })}
-              placeholder="e.g., Premium Monthly"
-              className="input input-bordered w-full"
-              required
-            />
-          </div>
+        <>
+          <form onSubmit={handlePackageSubmit} className="space-y-4">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Create New Package</span>
+              </label>
+              <input
+                type="text"
+                value={packageData.name}
+                onChange={(e) => setPackageData({ ...packageData, name: e.target.value })}
+                placeholder="e.g., Premium Monthly"
+                className="input input-bordered w-full"
+                required
+              />
+            </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Package Price</span>
-            </label>
-            <input
-              type="number"
-              value={packageData.price}
-              onChange={(e) => setPackageData({ ...packageData, price: e.target.value })}
-              placeholder="e.g., 300"
-              className="input input-bordered w-full"
-              min={0}
-              step="0.01"
-              required
-            />
-          </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Package Price</span>
+              </label>
+              <input
+                type="number"
+                value={packageData.price}
+                onChange={(e) => setPackageData({ ...packageData, price: e.target.value })}
+                placeholder="e.g., 300"
+                className="input input-bordered w-full"
+                min={0}
+                step="0.01"
+                required
+              />
+            </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Package Type</span>
-            </label>
-            <select
-              value={packageData.type}
-              onChange={(e) => setPackageData({ ...packageData, type: e.target.value })}
-              className="select select-bordered w-full"
-              disabled
-            >
-              <option value="month">Monthly</option>
-            </select>
-          </div>
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Package Type</span>
+              </label>
+              <select
+                value={packageData.type}
+                onChange={(e) => setPackageData({ ...packageData, type: e.target.value })}
+                className="select select-bordered w-full"
+                disabled
+              >
+                <option value="month">Monthly</option>
+              </select>
+            </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Points</span>
-            </label>
-            {packageData.points.map((point, index) => (
-              <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
-                <select
-                  value={point.lecturer}
-                  onChange={(e) => updatePoint(index, 'lecturer', e.target.value)}
-                  className="select select-bordered w-full sm:w-1/2"
-                  required
-                >
-                  <option value="">Select Lecturers</option>
-                  {lecturers.map(lecturer => (
-                    <option key={lecturer._id} value={lecturer._id}>
-                      {lecturer.name} ({lecturer.expertise})
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  value={point.points}
-                  onChange={(e) => updatePoint(index, 'points', e.target.value)}
-                  placeholder="e.g., 200"
-                  className="input input-bordered w-full sm:w-1/3"
-                  min="0"
-                  required
-                />
-                {packageData.points.length > 1 && (
-                  <button
-                    type="button"
-                    className="btn btn-error btn-sm"
-                    onClick={() => removePoint(index)}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Points</span>
+              </label>
+              {packageData.points.map((point, index) => (
+                <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
+                  <select
+                    value={point.lecturer}
+                    onChange={(e) => updatePoint(index, 'lecturer', e.target.value)}
+                    className="select select-bordered w-full sm:w-1/2"
+                    required
                   >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              className="btn btn-outline btn-sm mt-2"
-              onClick={addPoint}
-            >
-              Add Points
-            </button>
-          </div>
+                    <option value="">Select Lecturers</option>
+                    {lecturers.map(lecturer => (
+                      <option key={lecturer._id} value={lecturer._id}>
+                        {lecturer.name} ({lecturer.expertise})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    value={point.points}
+                    onChange={(e) => updatePoint(index, 'points', e.target.value)}
+                    placeholder="e.g., 200"
+                    className="input input-bordered w-full sm:w-1/3"
+                    min="0"
+                    required
+                  />
+                  {packageData.points.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn btn-error btn-sm"
+                      onClick={() => removePoint(index)}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                className="btn btn-outline btn-sm mt-2"
+                onClick={addPoint}
+              >
+                Add Points
+              </button>
+            </div>
 
-          <button type="submit" className="btn btn-primary">
-            Create Package
-          </button>
-        </form>
+            <button type="submit" className="btn btn-primary">
+              Create Package
+            </button>
+          </form>
+
+          {/* Package List */}
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4">Existing Packages</h2>
+            {packages.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {packages.map((pkg) => (
+                  <div key={pkg._id} className="card bg-base-100 shadow-md p-4">
+                    <div className="card-body">
+                      <h3 className="card-title">{pkg.name}</h3>
+                      <p className="text-sm text-gray-600">
+                        Price: ${pkg.price}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Type: {pkg.type.charAt(0).toUpperCase() + pkg.type.slice(1)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Created: {new Date(pkg.createdAt).toLocaleDateString()}
+                      </p>
+                      <div className="mt-2">
+                        <h4 className="text-sm font-medium">Points Distribution:</h4>
+                        <ul className="list-disc list-inside text-sm text-gray-600">
+                          {pkg.points.map((point, index) => (
+                            <li key={index}>
+                              {point.lecturer.name}: {point.points} points
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      {userRole === 'Admin' && (
+                        <button
+                          className="btn btn-error btn-sm mt-2"
+                          onClick={() => handleDeletePackage(pkg._id)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No packages available.</p>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
