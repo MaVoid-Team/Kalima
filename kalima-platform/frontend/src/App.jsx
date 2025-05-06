@@ -153,6 +153,7 @@ function App() {
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
             <Route path="/dashboard/admin-dashboard/create" element={<AdminCreate />} />
+            <Route path="/dashboard/admin-dashboard/lectures-page" element={<MyLecturesPage />} />
             
             {/* Lecturer Routes */}
             <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />

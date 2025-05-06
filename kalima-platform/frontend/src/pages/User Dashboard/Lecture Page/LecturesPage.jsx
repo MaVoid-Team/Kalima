@@ -45,14 +45,14 @@ const MyLecturesPage = () => {
             try {
                 setLoading(true)
 
-                // Fetch subjects and levels first
+                // Fetch subjects and levels first (needed for all roles for the modal/filters)
                 const subjectsRes = await getAllSubjects()
                 const levelsRes = await getAllLevels()
 
                 if (subjectsRes.success) setSubjects(subjectsRes.data)
                 if (levelsRes.success) setLevels(levelsRes.data.levels)
 
-                // Then fetch dashboard data
+                // Fetch dashboard data to get user role
                 const result = await getUserDashboard({
                     params: { fields: 'userInfo,containers,purchaseHistory', limit: 100 }
                 })
@@ -62,29 +62,9 @@ const MyLecturesPage = () => {
                     setUserRole(userInfo.role)
                     setFormData(prev => ({ ...prev, createdBy: userInfo._id }))
 
+                    // Fetch lectures only for Student and Lecturer roles
                     let lecturesData = []
-                    if (['Lecturer', 'Admin', 'Subadmin', 'Moderator', 'Assistant'].includes(userInfo.role)) {
-                        lecturesData = result.data.data.containers
-                            .filter(c => c.type === 'lecture')
-                            .map(lecture => ({
-                                id: lecture._id,
-                                name: lecture.name,
-                                subject: lecture.subject,
-                                level: lecture.level,
-                                price: lecture.price,
-                                videoLink: lecture.videoLink,
-                                lecture_type: lecture.lecture_type,
-                                createdAt: new Date(lecture.createdAt).toLocaleString('en-gb', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false
-                                }),
-                                lecturer: userInfo,
-                            }))
-                    } else {
+                    if (userInfo.role === 'Student') {
                         lecturesData = result.data.data.purchaseHistory
                             .filter(p => p.container?.type === 'lecture')
                             .map(p => ({
@@ -104,6 +84,27 @@ const MyLecturesPage = () => {
                                 lecturer: p.lecturer,
                                 subject: p.container?.subject,
                                 level: p.container?.level
+                            }))
+                    } else if (userInfo.role === 'Lecturer') {
+                        lecturesData = result.data.data.containers
+                            .filter(c => c.type === 'lecture')
+                            .map(lecture => ({
+                                id: lecture._id,
+                                name: lecture.name,
+                                subject: lecture.subject,
+                                level: lecture.level,
+                                price: lecture.price,
+                                videoLink: lecture.videoLink,
+                                lecture_type: lecture.lecture_type,
+                                createdAt: new Date(lecture.createdAt).toLocaleString('en-gb', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                }),
+                                lecturer: userInfo,
                             }))
                     }
 
@@ -190,6 +191,7 @@ const MyLecturesPage = () => {
             }
 
             const response = await createLecture(lectureData);
+            console.log("Create Lecture Response:", response);
 
             if (response.status === "success") {
                 setShowCreateModal(false);
@@ -210,36 +212,45 @@ const MyLecturesPage = () => {
                     passingThreshold: 50
                 });
 
-                // Refetch data to refresh the table
-                const result = await getUserDashboard({
-                    params: { fields: 'userInfo,containers,purchaseHistory', limit: 100 }
-                });
+                // Refetch data to refresh the table (only for Lecturer role)
+                if (userRole === 'Lecturer') {
+                    const result = await getUserDashboard({
+                        params: { fields: 'userInfo,containers,purchaseHistory', limit: 100 }
+                    });
 
-                if (result.success) {
-                    const allLectures = result.data.data.containers
-                        .filter(c => c.type === 'lecture')
-                        .map(lecture => ({
-                            id: lecture._id,
-                            name: lecture.name,
-                            subject: lecture.subject,
-                            level: lecture.level,
-                            price: lecture.price,
-                            videoLink: lecture.videoLink,
-                            lecture_type: lecture.lecture_type,
-                            requiresExam: lecture.requiresExam,
-                            examConfig: lecture.examConfig, // Include examConfig in the table data
-                            createdAt: new Date(lecture.createdAt).toLocaleString('en-gb', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            }),
-                            lecturer: result.data.data.userInfo,
-                        }));
-                    setLectures(applyPagination(allLectures, currentPage, itemsPerPage));
-                    setTotalPages(Math.ceil(allLectures.length / itemsPerPage));
+                    if (result.success) {
+                        const allLectures = result.data.data.containers
+                            .filter(c => c.type === 'lecture')
+                            .map(lecture => ({
+                                id: lecture._id,
+                                name: lecture.name,
+                                subject: lecture.subject,
+                                level: lecture.level,
+                                price: lecture.price,
+                                videoLink: lecture.videoLink,
+                                lecture_type: lecture.lecture_type,
+                                requiresExam: lecture.requiresExam,
+                                examConfig: lecture.examConfig,
+                                createdAt: new Date(lecture.createdAt).toLocaleString('en-gb', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                }),
+                                lecturer: result.data.data.userInfo,
+                            }));
+                        let filteredLectures = allLectures;
+                        if (selectedSubjectFilter) {
+                            filteredLectures = filteredLectures.filter(l => l.subject?._id === selectedSubjectFilter);
+                        }
+                        if (selectedLevelFilter) {
+                            filteredLectures = filteredLectures.filter(l => l.level?._id === selectedLevelFilter);
+                        }
+                        setLectures(applyPagination(filteredLectures, currentPage, itemsPerPage));
+                        setTotalPages(Math.ceil(filteredLectures.length / itemsPerPage));
+                    }
                 }
             } else {
                 setFormError("فشل إنشاء المحاضرة");
