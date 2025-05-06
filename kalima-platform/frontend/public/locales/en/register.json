@@ -1,7 +1,9 @@
 {
   "studentRegister": "Student Register",
   "parentRegister": "Parent Register",
-  "lecturerRegister": "Lecturer Register",
+  "teacherRegister": "Teacher Register",
+  "dismiss": "Dismiss",
+  "childIdInvalid": "Invalid child ID format (24 characters)",  
   "steps": {
     "personalInfo": "Basic Information",
     "parentInfo": "Contact Information",
@@ -9,6 +11,10 @@
     "review": "Review",
     "childrenInfo": "Children Information",
     "professionalInfo": "Professional Information"
+  },
+
+  "navigation": {
+    "fixHere": "Fix here"
   },
   "form": {
     "studentId": "Student ID",
@@ -47,8 +53,7 @@
     "selectLevel" : "Select Level",
     "validatepassword": "Confirm Password",
     "subject" : "Subject",
-    "subjectPlaceholder" : "Enter Subject",
-    "children" : "Children"
+    "subjectPlaceholder" : "Enter Subject"
   
   },
   "gender": {
@@ -82,28 +87,28 @@
   "role": {
     "student": "Student",
     "parent": "Parent",
-    "lecturer": "Lecturer"
+    "teacher": "Teacher"
   },
- "gradeLevels": {
-      "Primary": "Primary",
-      "Middle": "Middle",
-      "Upper Primary":  "Upper Primary",
-      "Higher Secondary":  "Higher Secondary",
-      "Fourth Elementary": "Fourth Elementary",
-      "First Primary": "First Primary",
-      "Second Primary": "Second Primary",
-      "Third Primary": "Third Primary",
-      "First Secondary": "First Secondary",
-      "Second Secondary": "Second Secondary",
-      "Third Secondary": "Third Secondary"
-
-    },
+"gradeLevels": {
+  "1st Primary": "First Primary",
+  "2nd Primary": "Second Primary",
+  "3rd Primary": "Third Primary",
+  "4th Primary": "4th Primary",
+  "5th Primary": "Fifth Primary",
+  "6th Primary": "sixth Primary",
+  "1st Preparatory": "First Preparatory",
+  "2nd Preparatory": "Second Preparatory",
+  "3rd Preparatory": "Third Preparatory",
+  "1st Secondary": "First Secondary",
+  "2nd Secondary": "Second Secondary",
+  "3rd Secondary": "Third Secondary"
+},
   "roleSelection": {
     "title": "Choose your role",
     "description": "Select the role that best describes you",
     "studentDesc": "Access learning materials and track your progress",
     "parentDesc": "Monitor your children's academic journey",
-    "lecturerDesc": "Create courses and manage your students"
+    "teacherDesc": "Create courses and manage your students"
   },
   "validation": {
     "required": "This field is required",
@@ -112,6 +117,40 @@
     "phoneFormat": "Invalid phone number format",
     "emailFormat": "Invalid email format",
     "hobbies": "Select at least 2 hobbies",
-    "bioMinimum": "Bio must be at least 50 characters"
+    "bioMinimum": "Bio must be at least 50 characters",
+    "submissionError": "Please fix the following errors:",
+    "children": "Invalid child sequence IDs",
+    "bio": "Bio must be at least 50 characters",
+    "expertise": "Expertise field required",
+    "subject": "At least one subject required",
+    "confirmPassword": "Passwords do not match",
+    "emailInvalid": "Invalid email format",
+    "phoneInvalid": "Invalid phone number format",
+    "passwordsMismatch": "Passwords do not match",
+    "hobbiesRequired": "Select at least one hobby",
+    "childIdInvalid": "Invalid child ID format (24 characters)",
+    "subjectRequired": "Subject is required",
+    "levelRequired": "Level is required",
+    "genderRequired": "Gender is required",
+    "parentPhoneRequired": "Parent phone number is required",
+    "emailExists": "Email already registered",
+    "phoneExists": "Phone number already registered",
+    "invalidSequenceId": "Invalid child sequence ID format (24 characters)"
+  },
+  
+  "errors": {
+    "errorTitle": "Registration Error",
+    "apiError": "Server Error",
+    "emailExists": "Email already registered",
+    "invalidData": "Invalid form data",
+    "networkError": "Network error - check connection",
+    "unexpectedError": "Unexpected error occurred",
+    "hobbyUpdateFailed": "Failed to update hobbies",
+    "childUpdateFailed": "Failed to update child info",
+    "phoneExists": "Phone number already registered",
+    "roleSelectFailed": "Failed to select role",
+    "PasswordSpecialChar":"Password must contain at least one special character",
+    "childIdInvalid":"Invalid child ID format (24 characters)",
+    "PasswordCapitalLetter":"Password must contain at least one capital letter"
   }
 }
