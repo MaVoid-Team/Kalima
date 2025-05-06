@@ -368,12 +368,12 @@ const LectureDisplay = () => {
           }}
         ></video>
           <div className="mt-2">
-            <p>تقدم التشغيل: {playbackProgress.toFixed(2)}%</p>
+            {/* <p>تقدم التشغيل: {playbackProgress.toFixed(2)}%</p>
             <progress
               className="progress progress-primary w-full"
               value={playbackProgress}
               max="100"
-            ></progress>
+            ></progress> */}
             <p className="mt-2">المشاهدات المتبقية: {remainingViews}</p>
           </div>
         </div>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Step2({ formData, handleInputChange, t, errors }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const {i18n} = useTranslation();
   return (
     <div className="space-y-4">
       <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
@@ -25,7 +26,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
           />
           {errors.parentPhoneNumber && (
             <span className="text-error text-sm mt-1">
-              {t(errors.parentPhoneNumber)}
+              {t(`validation.${errors.parentPhoneNumber}`)}
             </span>
           )}
         </div>
@@ -47,7 +48,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
           />
           {errors.email && (
             <span className="text-error text-sm mt-1">
-              {t(errors.email)}
+              {t(`validation.${errors.email}`)}
             </span>
           )}
         </div>
@@ -63,14 +64,14 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
               <input
                 type={showPassword ? 'text' : 'password'}
                 name="password"
-                className={`input input-bordered0 pr-12 ${errors.password ? 'input-error animate-shake' : ''}`}
+                className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
                 value={formData.password || ''}
                 onChange={handleInputChange}
                 required
               />
               <button
                 type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                 className={`absolute top-1/2 ${i18n.language === 'ar' ? 'right-3' : 'left-3'} -translate-y-1/2 z-10 text-gray-500`}
                 onClick={() => setShowPassword((prev) => !prev)}
                 tabIndex={-1}
               >
@@ -94,7 +95,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             <input
               type={showConfirmPassword ? 'text' : 'password'}
               name="confirmPassword"
-              className={`input input-bordered pr-10 ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+             className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
               value={formData.confirmPassword || ''}
               onChange={handleInputChange}
               required
@@ -110,7 +111,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
           </div>
           {errors.confirmPassword && (
             <span className="text-error text-sm mt-1">
-              {t(errors.confirmPassword)}
+              {t(`validation.${errors.confirmPassword}`)}
             </span>
           )}
         </div>

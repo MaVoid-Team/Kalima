@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllLevels } from '../../routes/levels';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange }) {
     const [childrenCount, setChildrenCount] = useState(1);
@@ -9,7 +10,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
     const [apiError, setApiError] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    
+    const { i18n } = useTranslation();
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
@@ -74,7 +75,11 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         placeholder="email@example.com"
                         required
                     />
-                    {renderErrorMessage('email')}
+                    {errors.email && (
+                    <span className="text-error text-sm mt-1">
+                    {t(`validation.${errors.email}`)}
+                    </span>
+          )}
                 </div>
             </div>
 
@@ -88,21 +93,25 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showPassword ? 'text' : 'password'}
                             name="password"
-                            className={`input input-bordered pr-12 ${errors.password ? 'input-error animate-shake' : ''}`}
+                             className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.password ? 'input-error animate-shake' : ''}`}
                             value={formData.password || ''}
                             onChange={handleInputChange}
                             required
                         />
                         <button
                             type="button"
-                            className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                             className={`absolute top-1/2 ${i18n.language === 'ar' ? 'right-3' : 'left-3'} -translate-y-1/2 z-10 text-gray-500`}
                             onClick={() => setShowPassword(prev => !prev)}
                             tabIndex={-1}
                         >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
-                    {renderErrorMessage('password')}
+                    {errors.password && (
+            <span className="text-error text-sm mt-1">
+              {t('validation.passwordRequirements')}
+            </span>
+          )}
                 </div>
             </div>
 
@@ -116,21 +125,25 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             name="confirmPassword"
-                            className={`input input-bordered pr-10 ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
+                            className={`input input-bordered ${i18n.language === 'ar' ? 'pr-12' : 'pl-12'} ${errors.confirmPassword ? 'input-error animate-shake' : ''}`}
                             value={formData.confirmPassword || ''}
                             onChange={handleInputChange}
                             required
                         />
                         <button
                             type="button"
-                            className="absolute top-1/2 right-3 -translate-y-1/2 z-10 text-gray-500"
+                             className={`absolute top-1/2 ${i18n.language === 'ar' ? 'right-3' : 'left-3'} -translate-y-1/2 z-10 text-gray-500`}
                             onClick={() => setShowConfirmPassword(prev => !prev)}
                             tabIndex={-1}
                         >
                             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     </div>
-                    {renderErrorMessage('confirmPassword')}
+                    {errors.confirmPassword && (
+                    <span className="text-error text-sm mt-1">
+                    {t(`validation.${errors.confirmPassword}`)}
+                    </span>
+                )}
                 </div>
             </div>
 
@@ -164,7 +177,11 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                             ))
                         )}
                     </select>
-                    {renderErrorMessage('level')}
+                    {errors.level && (
+              <span className="absolute bottom-0  text-error text-sm mt-1">
+                 {t(`validation.${errors.level}`)}
+              </span>
+            )}
                 </div>
             </div>
 
@@ -177,17 +194,19 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <label className="label">
                             <span className="label-text">{t('form.childSequenceId')} #{i + 1}</span>
                         </label>
-                        <input
-                            type="text"
-                            className={`input input-bordered ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
-                            value={child || ''}
-                            onChange={(e) => handleChildrenChange(i, e.target.value)}
-                            placeholder="333"
-                            required={i === 0}
-                        />
+                                                    <input
+                                type="text"
+                                className={`input input-bordered ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
+                                value={child || ''}
+                                onChange={(e) => handleChildrenChange(i, e.target.value)}
+                                placeholder="5f7d8e3a1c9d440000d4a7b2"
+                                pattern="[a-f0-9]{24}"
+                                title="24-character MongoDB ID"
+                                required={i === 0}
+                            />
                         {errors.children?.[i] && (
                             <span className="text-error text-sm mt-1 animate-fade-in">
-                                {t(errors.children[i]) || t('validation.invalidSequenceId')}
+                                {t(`validation.${errors.children[i]}`) || t('validation.invalidSequenceId')}
                             </span>
                         )}
                     </div>

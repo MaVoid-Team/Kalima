@@ -21,7 +21,7 @@ exports.createAdmin = async (req, res, next) => {
 // Get all admins.
 exports.getAllAdmins = async (req, res, next) => {
     try {
-        const admins = await Admin.find();
+        const admins = await Admin.find().select('name email role gender createdAt updatedAt');
         res.status(200).json({ status: "success", data: admins });
     } catch (error) {
         next(error);

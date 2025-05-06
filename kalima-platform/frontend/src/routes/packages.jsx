@@ -5,19 +5,23 @@ import { isLoggedIn } from "./auth-services";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchPackages = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/packages/`, {
-            headers: {
-                Authorization: `Bearer ${getToken()}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        return response.data.data.packages;
-    } catch (error) {
-        console.error('Error fetching packages:', error);
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch packages';
-        throw new Error(errorMessage);
-    }
+  try {
+      const response = await axios.get(`${API_URL}/api/v1/packages/`, {
+          headers: {
+              Authorization: `Bearer ${getToken()}`,
+              'Content-Type': 'application/json',
+          },
+      });
+      return {
+          success: true,
+          data: response.data.data.packages,
+      };
+  } catch (error) {
+      return {
+          success: false,
+          error: error.response?.data?.message || error.message || 'Failed to fetch packages',
+      };
+  }
 };
 
 export const createPackage = async (packageData) => {
@@ -60,4 +64,24 @@ export const createPackage = async (packageData) => {
         const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch package';
         throw new Error(errorMessage);
     }
+};
+
+export const deletePackage = async (packageId) => {
+  try {
+      const response = await axios.delete(`${API_URL}/api/v1/packages/${packageId}`, {
+          headers: {
+              Authorization: `Bearer ${getToken()}`,
+              'Content-Type': 'application/json',
+          },
+      });
+      return {
+          success: true,
+          data: response.data,
+      };
+  } catch (error) {
+      return {
+          success: false,
+          error: error.response?.data?.message || error.message || 'Failed to delete package',
+      };
+  }
 };
