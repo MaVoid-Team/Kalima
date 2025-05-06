@@ -11,7 +11,7 @@ export default function StepsIndicator({ currentStep, t, role }) {
       t('steps.childrenInfo'),
       t('steps.review')
     ],
-    lecturer: [
+    teacher: [
       t('steps.personalInfo'),
       t('steps.professionalInfo'),
       t('steps.review')

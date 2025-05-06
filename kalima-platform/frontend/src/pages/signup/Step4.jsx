@@ -5,8 +5,12 @@ const ReviewItem = ({ label, value }) => (
   </div>
 );
 
-export default function Step4({ formData, t, hobbiesList }) {
+export default function Step4({ formData, t, hobbiesList , gradeLevels}) {
   
+    const getLevelName = (levelId) => {
+      const level = gradeLevels?.find(l => l.value === levelId);
+      return level ? t(`gradeLevels.${level.label}`) : levelId;
+    };
   return (
     <div className="space-y-6">
       <div className="bg-base-200 p-6 rounded-lg">
@@ -19,10 +23,11 @@ export default function Step4({ formData, t, hobbiesList }) {
 
           {formData.role === 'student' && (
             <>
-               <ReviewItem 
-                    label={t('form.grade')} 
-                    value={t(`gradeLevels.${formData.grade}`)} 
-                  />
+              <ReviewItem 
+                label={t('form.grade')} 
+                value={getLevelName(formData.level)}
+              />
+
                 <ReviewItem label={t('form.parentPhone')} value={formData.parentPhoneNumber} />
                 <ReviewItem 
                   label={t('form.hobbies')} 
@@ -31,13 +36,18 @@ export default function Step4({ formData, t, hobbiesList }) {
                         </>
           )}
 
-          {formData.role === 'lecturer' && (
-            <>
-              <ReviewItem label={t('form.bio')} value={formData.bio} />
-              <ReviewItem label={t('form.expertise')} value={formData.expertise} />
-              <ReviewItem label={t('form.subject')} value={formData.subject.join(', ')} />
-            </>
-          )}
+            {formData.role === 'teacher' && (
+              <>
+                <ReviewItem 
+                  label={t('form.level')} 
+                  value={getLevelName(formData.level)}
+                />
+                <ReviewItem 
+                  label={t('form.subject')} 
+                  value={formData.subject} 
+                />
+              </>
+            )}
 
           {formData.role === 'parent' && (
             <ReviewItem
