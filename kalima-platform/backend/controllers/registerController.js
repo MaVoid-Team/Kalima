@@ -13,34 +13,15 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 
 const validatePassword = (password) => {
-  const minLength = 8;
-  
-  // Check minimum length
-  if (password.length < minLength) {
-    throw new AppError(`Password must be at least ${minLength} characters long`, 400);
-  }
-  
-  // Check for uppercase letters
-  if (!/[A-Z]/.test(password)) {
-    throw new AppError('Password must contain at least one uppercase letter', 400);
-  }
-  
-  // Check for lowercase letters
-  if (!/[a-z]/.test(password)) {
-    throw new AppError('Password must contain at least one lowercase letter', 400);
-  }
-  
-  // Check for numbers
-  if (!/[0-9]/.test(password)) {
-    throw new AppError('Password must contain at least one number', 400);
-  }
-  
-  // Check for special characters
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-    throw new AppError('Password must contain at least one special character', 400);
+  const requiredLength = 8;
+
+  if (password.length !== requiredLength) {
+    throw new AppError(
+      `Password must be exactly ${requiredLength} characters long`,
+      400
+    );
   }
 };
-
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -67,8 +48,10 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   if (!email) {
     return next(new AppError("Email is required", 400));
   }
-  
-  const duplicateEmail = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+
+  const duplicateEmail = await User.findOne({
+    email: { $regex: new RegExp(`^${email}$`, "i") },
+  });
 
   if (duplicateEmail) {
     return next(
@@ -120,7 +103,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     isEmailVerified: true, // Set users to already verified by default
     ...userData,
   };
-  
+
   if (phoneNumber) {
     newUser.phoneNumber = phoneNumber;
   }
@@ -164,11 +147,9 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   }
 
   if (user) {
-    return res
-      .status(201)
-      .json({ 
-        message: `User created successfully with name ${name}.`
-      });
+    return res.status(201).json({
+      message: `User created successfully with name ${name}.`,
+    });
   } else {
     return next(new AppError("Invalid user data received", 400));
   }
