@@ -46,14 +46,14 @@ const TeacherLogin = () => {
       const loginResult = await loginUser(credentials);
       
       if (!loginResult.success) {
-        setError(loginResult.error || 'Login failed.');
+        setError(t('errors.invalidCredentials'));
         return;
       }
 
       const dashboardResult = await getUserDashboard();
       
       if (!dashboardResult.success) {
-        setError(dashboardResult.error || 'Failed to fetch user data.');
+        setError(t('errors.fetchUserDataError'));
         return;
       }
 
@@ -62,14 +62,17 @@ const TeacherLogin = () => {
         navigate('/dashboard/admin-dashboard');
       } else if (userRole === 'Lecturer') {
         navigate('/dashboard/lecturer-dashboard');
-      } else if (userRole === 'Student') {
+      } else if (userRole === 'Student' || userRole === 'Teacher') {
         navigate('/dashboard/student-dashboard/promo-codes');
       } else if (userRole === 'Assistant') {
         navigate('/dashboard/assistant-page');
       }
 
-    } catch (err) {
-      setError('An error occurred. Please try again later.');
+    }  catch (err) {
+      const errorMessage = err.response?.data?.error || 
+                         err.message || 
+                         t('errors.generalError');
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -80,7 +83,6 @@ const TeacherLogin = () => {
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
       <WaveBackground />
       
-      {/* Left side - Teacher Reviews */}
      
       
       {/* Right side - Login Form */}
@@ -154,12 +156,12 @@ const TeacherLogin = () => {
                         value={formData.password}
                         onChange={handleInputChange}
                         placeholder="••••••••" 
-                        className="input input-bordered w-full pr-12" 
+                        className={`input input-bordered w-full ${isRTL ? 'pr-12' : 'pl-12'}`} 
                         required
                       />
                       <button
                         type="button"
-                        className={`absolute top-1/2 ${isRTL ? 'left-3' : 'right-3'} -translate-y-1/2 z-10 text-gray-500`}
+                        className={`absolute top-1/2 ${isRTL ? 'right-3' : 'left-3'} -translate-y-1/2 z-10 text-gray-500`}
                         onClick={() => setShowPassword((prev) => !prev)}
                         tabIndex={-1}
                       >
@@ -201,9 +203,9 @@ const TeacherLogin = () => {
         </div>
       </div>
       
-       <div className="w-full md:w-1/2 z-10">
+       {/* <div className="w-full md:w-1/2 z-10">
         <TeacherReviews />
-      </div>
+      </div> */}
     </div>
   );
 };

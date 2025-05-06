@@ -37,15 +37,20 @@ const VerifyOtp = () => {
 
     try {
       const response = await requestPasswordReset(email);
-      
+      if (response.status !== 'success') {
+        setError(response.message || t('errors.requestFailed'));
+        return;
+      }
       if (response.status === 'success') {
         setSuccess(response.message);
         setResendDisabled(true);
         setCountdown(60);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
-      console.error(err);
+      const errorMessage = err.response?.data?.error || 
+                         err.message || 
+                         t('errors.generalError');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -59,20 +64,27 @@ const VerifyOtp = () => {
 
     try {
       const response = await verifyOtp(email, otp);
+      if (response.status !== 'success') {
+        setError(response.message || t('errors.invalidOtp'));
+        return;
+      }
       if (response.status === 'success') {
         setSuccess(response.message);
         navigate('/reset-password', { state: { email, resetToken: response.resetToken } });
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
-      console.error(err);
-    } finally {
+      const errorMessage = err.response?.data?.error || 
+                         err.message || 
+                         t('errors.generalError');
+      setError(errorMessage);
+  } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-base-100" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-base-100"
+     dir={isRTL ? 'rtl' : 'ltr'} >
       <WaveBackground />
       
       <div className="w-full max-w-md p-6 z-10">

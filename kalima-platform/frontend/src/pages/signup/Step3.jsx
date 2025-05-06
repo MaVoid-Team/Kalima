@@ -24,7 +24,7 @@ export default function Step3({ formData, toggleHobby, t, hobbiesList, errors })
           ))}
            {errors.hobbies && (
           <div className="col-span-full text-error text-sm mt-2">
-            {t('validation.hobbies')}
+            {t(`validation.${errors.hobbies}`)}
           </div>
         )}
         </div>

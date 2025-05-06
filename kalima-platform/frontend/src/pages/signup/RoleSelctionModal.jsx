@@ -17,7 +17,7 @@ const roleConfig = {
     color: "bg-gradient-to-r from-purple-500 to-pink-400",
     hoverColor: "hover:from-purple-600 hover:to-pink-500",
   },
-  lecturer: {
+  teacher: {
     icon: BookOpen,
     color: "bg-gradient-to-r from-amber-500 to-orange-400",
     hoverColor: "hover:from-amber-600 hover:to-orange-500",
@@ -85,7 +85,7 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
           </motion.p>
 
           <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-4">
-            {["student", "parent", "lecturer"].map((role) => {
+            {["student", "parent", "teacher"].map((role) => {
               const RoleIcon = roleConfig[role].icon
 
               return (

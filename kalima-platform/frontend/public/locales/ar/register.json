@@ -1,7 +1,8 @@
 {
   "studentRegister": "  تسجيل الطالب", 
   "parentRegister": "تسجيل ولي الأمر",
-  "lecturerRegister" : "تسجيل المحاضر",
+  "dismiss": "إغلاق",
+  "teacherRegister" : "تسجيل المدرس",
     "steps": {
       "personalInfo": "المعلومات الأساسية",
       "parentInfo": "معلومات الاتصال",
@@ -10,6 +11,9 @@
       "childrenInfo": "معلومات الأبناء",
       "professionalInfo": "معلومات المهنة"
     },
+    "navigation": {
+    "fixHere": "إصلاح هنا"
+  },
     "form": {
      
       "studentId": "رقم الطالب",
@@ -50,9 +54,6 @@
      "subject" : "المادة",
      "subjectPlaceholder" : "اكتب المادة",
      "children" : "ابناء"
-
-
-
     },
     "gender": {
       "male": "ذكر",
@@ -85,28 +86,28 @@
     "role" : { 
       "student": "طالب",
       "parent": "ولي الأمر",
-      "lecturer" : "محاضر"
+      "teacher" : "مدرس"
      },
-     "gradeLevels": {
-      "Primary": "المرحلة الابتدائية",
-      "Middle": "المرحلة المتوسطة",
-      "Upper Primary": "المرحلة الابتدائية العليا",
-      "Higher Secondary": "المرحلة الثانوية",
-      "Fourth Elementary": "الصف الرابع الابتدائي",
-      "First Primary": "الصف الأول الابتدائي",
-      "Second Primary": " الصف الثاني الابتدائي",
-      "Third Primary": "الصف الثالث الابتدائي",
-      "Second Secondary": "الصف الثاني الثانوي",
-      "First Secondary": "الصف الأول الثانوي",
-      "Third Secondary": "الصف الثالث الثانوي"
-
-    },
+    "gradeLevels": {
+      "1st Primary": "الصف الأول الابتدائي",
+      "2nd Primary": "الصف الثاني الابتدائي",
+      "3rd Primary": "الصف الثالث الابتدائي",
+      "4th Primary": "الصف الرابع الابتدائي",
+      "5th Primary": "الصف الخامس الابتدائي",
+      "6th Primary": "الصف السادس الابتدائي",
+      "1st Preparatory": "الصف الأول الإعدادي",
+      "2nd Preparatory": "الصف الثاني الإعدادي",
+      "3rd Preparatory": "الصف الثالث الإعدادي",
+      "1st Secondary": "الصف الأول الثانوي",
+      "2nd Secondary": "الصف الثاني الثانوي",
+      "3rd Secondary": "الصف الثالث الثانوي"
+},
     "roleSelection": {
      "title": "اختر دورك",
      "description": "حدد الدور الذي يصفك بشكل أفضل",
      "studentDesc": "الوصول إلى المواد التعليمية وتتبع تقدمك",
      "parentDesc": "مراقبة الرحلة الأكاديمية لأطفالك",
-     "lecturerDesc": "إنشاء الدورات وإدارة طلابك"
+     "teacherDesc": "إنشاء الدورات وإدارة طلابك"
       },
       "validation": {
         "required": "هذا الحقل مطلوب",
@@ -115,6 +116,40 @@
         "phoneFormat": "صيغة رقم الهاتف غير صحيحة",
         "emailFormat": "صيغة البريد الإلكتروني غير صحيحة",
         "hobbies": "اختر هوايتان على الأقل",
-        "bioMinimum": " يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل"
-        }
+        "bioMinimum": " يجب أن تحتوي السيرة الذاتية على 50 حرفًا على الأقل",
+        "submissionError": "يرجى إصلاح الأخطاء التالية:",
+        "children": " تسلسل الأبناء غير صحيحة",
+        "bio": "السيرة الذاتية يجب أن تحتوي على 50 حرفًا على الأقل",
+        "expertise": "المجال المطلوب",
+        "subject": "المادة مطلوبة",
+        "confirmPassword": "تأكيد كلمة المرور غير صحيح",
+        "emailInvalid": "صيغة البريد الإلكتروني غير صالحة",
+        "phoneInvalid": "صيغة رقم الهاتف غير صالحة",
+        "passwordsMismatch": "كلمات المرور غير متطابقة",
+        "hobbiesRequired": "اختر هواية واحدة على الأقل",
+        "childIdInvalid": "تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
+        "subjectRequired": "المادة مطلوبة",
+        "levelRequired": "المستوى مطلوب",
+        "genderRequired": "الجنس مطلوب",
+        "parentPhoneRequired": "رقم هاتف ولي الأمر مطلوب",
+        "emailExists": "البريد الإلكتروني مسجل مسبقًا",
+        "phoneExists": "رقم الهاتف مسجل مسبقًا",
+        "invalidSequenceId": "تنسيق معرف تسلسل الطفل غير صالح (٢٤ حرفًا)"
+        },
+        "errors": {
+          "apiError": "خطأ في الخادم",
+          "emailExists": "البريد الإلكتروني مسجل مسبقًا",
+          "invalidData": "بيانات غير صالحة",
+          "networkError": "خطأ في الشبكة - تحقق من الاتصال",
+          "unexpectedError": "حدث خطأ غير متوقع",
+          "hobbyUpdateFailed": "فشل تحديث الهوايات",
+          "childUpdateFailed": "فشل تحديث بيانات الطفل",
+          "roleSelectFailed": "فشل اختيار الدور",
+          "errorTitle": "خطأ في التسجيل",
+          "phoneExists": "رقم الهاتف مسجل مسبقاً",
+          "PasswordSpecialChar":" كلمة المرور يجب أن تحتوي على حرف خاص واحد على الأقل",
+          "childIdInvalid":"تنسيق معرف الطفل غير صالح (٢٤ حرفًا)",
+          "PasswordCapitalLetter":"كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل"
+         
+        }      
       }

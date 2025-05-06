@@ -29,15 +29,21 @@ const ResetPassword = () => {
 
     try {
       const response = await resetPassword(resetToken, password, confirmPassword);
+      if (response.status !== 'success') {
+        setError(response.message || t('errors.resetFailed'));
+        return;
+      }
       if (response.status === 'success') {
         setShowToast(true);
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
-      console.error(err);
+    }  catch (err) {
+      const errorMessage = err.response?.data?.error || 
+                         err.message || 
+                         t('errors.generalError');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

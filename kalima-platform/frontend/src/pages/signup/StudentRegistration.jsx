@@ -4,13 +4,14 @@ import Step1 from './step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import StepParent from './StepParent';
-import StepLecturer from './StepLecturer';
+import StepTeacher from './StepTeacher';
 import Step4 from './Step4';
 import StepsIndicator from './StepsIndicator';
 import NavigationButtons from './NavigationButtons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RoleSelectionModal from './RoleSelctionModal';
+import { getAllLevels } from '../../routes/levels';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const hobbiesList = [
@@ -22,13 +23,13 @@ const hobbiesList = [
   { id: 6, name: 'cooking', img: '/hobbies/cooking.jpg' },
   { id: 7, name: 'photography', img: '/hobbies/photography.jpg' },
   { id: 8, name: 'dancing', img: '/hobbies/dancing.jpg' },
-  { id: 9, name: 'technology', img: '/hobbies propagetechnology.jpg' },
+  { id: 9, name: 'technology', img: '/hobbies/technology.jpg' },
 ];
 
 const totalSteps = {
   student: 4,
   parent: 3,
-  lecturer: 3
+  teacher: 3
 };
 
 export default function StudentRegistration() {
@@ -47,17 +48,16 @@ export default function StudentRegistration() {
     phoneNumber: '',
     gender: '',
     faction: 'Alpha',
-    grade: '',
     level: '',
     hobbies: [],
     parentPhoneNumber: '',
-    children: [''],
-    bio: '',
-    expertise: '',
-    subject: [],
+    children: [''],     
+    subject: [],    
+    
   });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState(null);
+  const [gradeLevels, setGradeLevels] = useState([]);
 
   useEffect(() => {
     setErrors({});
@@ -69,70 +69,88 @@ export default function StudentRegistration() {
     const { role } = formData;
     const phoneRegex = /^\+?[0-9]\d{7,14}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])[A-Za-z\d!@#$%^&*]{6,}$/;
-
+    const passwordRegex = /^.{8,}$/;
+  
     if (step === 1) {
-      if (!formData.fullName?.trim()) errors.fullName = 'Full name is required';
-      if (!formData.gender) errors.gender = 'Gender is required';
+      if (!formData.fullName?.trim()) errors.fullName = 'required';
+      if (!formData.gender) errors.gender = 'required';
+      
       if (!formData.phoneNumber) {
-        errors.phoneNumber = 'Phone number is required';
+        errors.phoneNumber = 'required';
       } else if (!phoneRegex.test(formData.phoneNumber)) {
-        errors.phoneNumber = 'Invalid phone number format';
+        errors.phoneNumber = 'phoneInvalid';
       }
-      if (role === 'student' && !formData.grade) {
-        errors.grade = 'Grade is required';
+  
+      if (role === 'student' && !formData.level) {
+        errors.level = 'required';
       }
     }
-
+  
     if (step === 2) {
       if (!formData.email) {
-        errors.email = 'Email is required';
+        errors.email = 'required';
       } else if (!emailRegex.test(formData.email)) {
-        errors.email = 'Invalid email format';
+        errors.email = 'emailInvalid';
       }
-
+  
       if (!formData.password) {
-        errors.password = 'Password is required';
+        errors.password = 'required';
       } else if (!passwordRegex.test(formData.password)) {
-        errors.password = 'Password must be at least 6 characters, include one uppercase and one lowercase letter';
+        errors.password = 'passwordRequirements';
       }
-
+  
       if (!formData.confirmPassword) {
-        errors.confirmPassword = 'Confirm password is required';
+        errors.confirmPassword = 'required';
       } else if (formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = 'Passwords do not match';
+        errors.confirmPassword = 'passwordsMismatch';
       }
-
-      if (role === 'student') {
-        if (!formData.parentPhoneNumber) {
-          errors.parentPhoneNumber = 'Parent phone number is required';
-        } else if (!phoneRegex.test(formData.parentPhoneNumber)) {
-          errors.parentPhoneNumber = 'Invalid parent phone number format';
-        }
+  
+      if (role === 'student' && !formData.parentPhoneNumber) {
+        errors.parentPhoneNumber = 'parentPhoneRequired';
       }
-
+  
       if (role === 'parent') {
         if (!formData.children[0]?.trim()) {
-          errors.children = { 0: 'At least one child sequence ID is required' };
+          errors.children = { 0: 'required' };
         } else {
           formData.children.forEach((child, index) => {
-            if (child && !/^\d+$/.test(child.trim())) {
-              errors.children = errors.children || {};
-              errors.children[index] = 'Child sequence ID must be numeric';
+            if (child && !/^[a-f\d]{24}$/i.test(child.trim())) {
+              errors.children = { ...errors.children, [index]: 'childIdInvalid' };
             }
           });
         }
       }
-
-      if (role === 'lecturer') {
-        if (!formData.bio?.trim()) errors.bio = 'Bio is required';
-        if (!formData.expertise?.trim()) errors.expertise = 'Expertise is required';
-        if (!formData.subject?.length) errors.subject = 'At least one subject is required';
+  
+      if (role === 'teacher' && !formData.subject?.trim()) {
+        errors.subject = 'subjectRequired';
       }
     }
-
+  
+    if (step === 3 && role === 'student' && formData.hobbies.length === 0) {
+      errors.hobbies = 'hobbiesRequired';
+    }
+  
     return errors;
   };
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        const response = await getAllLevels();
+        if (response.success) {
+          const levels = response.data.levels.map(level => ({
+            value: level._id,
+            label: level.name
+          }));
+          setGradeLevels(levels);
+        }
+      } catch (error) {
+        console.error("Error fetching levels:", error);
+      }
+    };
+    
+    fetchLevels();
+  }, []);
 
   const toggleHobby = (hobbyId) => {
     try {
@@ -154,7 +172,7 @@ export default function StudentRegistration() {
     
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
-      setApiError('Please correct the errors in the form before proceeding');
+      setApiError(t('validation.submissionError'));
       return;
     }
 
@@ -208,7 +226,7 @@ export default function StudentRegistration() {
             email: formData.email.toLowerCase().trim(),
             password: formData.password,
             confirmPassword: formData.confirmPassword,
-            level: formData.grade,
+            level: formData.level,
             hobbies: formData.hobbies.map(id => 
               hobbiesList.find(hobby => hobby.id === id)?.name || ''
             ).filter(name => name !== ''),
@@ -232,19 +250,19 @@ export default function StudentRegistration() {
           };
           break;
 
-        case 'lecturer':
-          payload = {
-            role: 'lecturer',
-            name: formData.fullName.trim(),
-            email: formData.email.toLowerCase().trim(),
-            password: formData.password,
-            confirmPassword: formData.confirmPassword,
-            bio: formData.bio.trim(),
-            expertise: formData.expertise.trim(),
-            gender: formData.gender,
-            subject: formData.subject,
-          };
-          break;
+          case 'teacher':
+            payload = {
+              role: 'teacher',
+              name: formData.fullName.trim(),
+              email: formData.email.toLowerCase().trim(),
+              password: formData.password,
+              confirmPassword: formData.confirmPassword,
+              level: formData.level,
+              subject: formData.subject.trim(), 
+              phoneNumber: formData.phoneNumber,
+              gender: formData.gender
+            };
+            break;
 
         default:
           throw new Error('Invalid role selected');
@@ -256,43 +274,49 @@ export default function StudentRegistration() {
         state: { message: 'Registration successful' } 
       });
     } catch (error) {
-      console.error('Registration failed:', error);
-      let errorMessage = 'Registration failed';
+      let errorMessage = t('errors.unexpectedError');
       let fieldErrors = {};
-
+  
       if (error.response) {
         const { status, data } = error.response;
+       
         switch (status) {
           case 400:
-            errorMessage = 'Invalid data provided';
-            if (data.errors) {
-              // Assuming server returns errors in format: { field: message }
-              fieldErrors = Object.keys(data.errors).reduce((acc, key) => {
-                acc[key] = data.errors[key];
-                return acc;
-              }, {});
+            errorMessage = data.message || t('errors.invalidData');
+            if (data.message?.includes("phone number")) {
+              errorMessage = t('errors.phoneExists');             
+            } 
+            if (data.message?.includes("at least one special character")) {
+              errorMessage = t('errors.PasswordSpecialChar');             
+            } 
+            if (data.message?.includes("at least one uppercase")) {
+              errorMessage = t('errors.PasswordCapitalLetter');
+                                  
+            } 
+            if (data.field) {
+              fieldErrors[data.field] = data.errorKey || 'invalidInput';
             }
             break;
           case 409:
-            errorMessage = 'Email already exists';
-            fieldErrors.email = 'This email is already registered';
+            errorMessage = data.message || t('errors.emailExists');
+            if (data.field) {
+              fieldErrors[data.field] = data.errorKey || 'duplicate';
+            }
+            if (data.message?.includes("E-Mail")) {
+              errorMessage = t('errors.emailExists');
+            }
             break;
+    
           case 500:
-            errorMessage = 'Server error occurred';
+            errorMessage = t('errors.apiError');
             break;
-          default:
-            errorMessage = 'Unexpected error occurred';
         }
       } else if (error.request) {
-        errorMessage = 'Network error: Unable to reach the server';
-      } else {
-        errorMessage = 'Error: ' + error.message;
+        errorMessage = t('errors.networkError');
       }
-
+  
       setApiError(errorMessage);
-      if (Object.keys(fieldErrors).length > 0) {
-        setErrors(fieldErrors);
-      }
+      setErrors(fieldErrors);
     }
   };
 
@@ -303,10 +327,10 @@ export default function StudentRegistration() {
       switch (role) {
         case 'student':
           switch (currentStep) {
-            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
+            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role}   gradeLevels={gradeLevels}/>;
             case 2: return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
             case 3: return <Step3 formData={formData} toggleHobby={toggleHobby} t={t} hobbiesList={hobbiesList} errors={errors} />;
-            case 4: return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} />;
+            case 4: return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />;
             default: return null;
           }
         case 'parent':
@@ -316,11 +340,11 @@ export default function StudentRegistration() {
             case 3: return <Step4 formData={formData} t={t} />;
             default: return null;
           }
-        case 'lecturer':
+          case 'teacher':
           switch (currentStep) {
-            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />;
-            case 2: return <StepLecturer formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />;
-            case 3: return <Step4 formData={formData} t={t} />;
+            case 1: return <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role}  />;
+            case 2: return <StepTeacher formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} gradeLevels={gradeLevels} />;
+            case 3: return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />;
             default: return null;
           }
         default:
@@ -334,7 +358,7 @@ export default function StudentRegistration() {
   };
 
   return (
-    <div className="flex bg-primary" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex bg-primary" dir={i18n.language === 'ar' ? 'ltr' : 'rtl'}>
       <div className="sm:hidden absolute inset-0 overflow-hidden z-0">
         <img 
           src="/registration-image.png" 
@@ -343,16 +367,24 @@ export default function StudentRegistration() {
         />
       </div>
 
-      <div className="w-1/3 relative sm:block hidden">
+      <div className="w-1/3  2xl:w-1/2 relative sm:block hidden">
         <img 
           src="/registration-image.png" 
           alt="Background" 
-          className="absolute bottom-20 object-cover object-bottom"
+          className="absolute bottom-20 object-cover object-bottom h-[500px] w-[500px]"
+ 
         />
       </div>
       
-      <div className="sm:w-2/3 py-2 pr-12 w-full h-full">
-        <div className="mx-auto bg-base-100 rounded-tr-[50px] rounded-br-[50px] w-full p-10 relative shadow-xl">
+      <div className={`sm:w-2/3  py-2 2xl:w-1/2 `} dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="mx-auto bg-base-100 rounded-tr-[50px] rounded-bl-[50px] w-full p-10 relative shadow-xl"
+          style={{
+            borderTopRightRadius: i18n.language === 'ar' ? 0 : '50px',
+            borderBottomRightRadius: i18n.language === 'ar' ? 0 : '50px',
+            borderTopLeftRadius: i18n.language === 'ar' ? '50px' : 0,
+            borderBottomLeftRadius: i18n.language === 'ar' ? '50px' : 0,
+          }}
+        >
           <h1 className="text-4xl lg:text-6xl font-bold mb-8 relative">
             {t(`${role}Register`)}
             <div 
@@ -382,33 +414,58 @@ export default function StudentRegistration() {
               t={t}
             />
           )}
-          
-          {apiError && (
-            <div className="alert alert-error mb-4 animate-fade-in">
-              <div className="flex flex-col">
-                <span>{apiError}</span>
-                {Object.keys(errors).length > 0 && (
-                  <ul className="list-disc list-inside mt-2">
-                    {Object.entries(errors).map(([field, message]) => (
-                      typeof message === 'string' && (
-                        <li key={field}>{field}: {message}</li>
-                      )
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <button 
-                className="btn btn-sm btn-ghost"
-                onClick={() => {
-                  setApiError(null);
-                  setErrors({});
-                }}
-              >
-                Dismiss
-              </button>
-            </div>
-          )}
-          
+       {apiError && (
+  <div className="alert alert-error mb-4 animate-fade-in w-1/2" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex-1">
+      <div className="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <h3 className="font-bold">{t('errors.errorTitle')}</h3>
+          <p className="text-sm">{t(apiError)}</p>
+        </div>
+      </div>
+
+      {Object.keys(errors).length > 0 && (
+        <div className="mt-4 pl-8">
+          <ul className="list-disc space-y-1">
+            {Object.entries(errors).map(([field, message]) => (
+              typeof message === 'string' && (
+                <li 
+                  key={field}
+                  className="flex gap-2 items-start"
+                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                >
+                  <span className="font-medium">
+                    {t(`form.${field}`)}:
+                  </span>
+                  <span className="text-opacity-80">
+                    {t(`validation.${message}`)}
+                  </span>
+                </li>
+              )
+            ))}
+          </ul>
+          <div className='flex items-center justify-center mt-4'>
+          <button 
+      className="btn btn-sm btn-ghost hover:bg-error-content/10 mx-auto"
+      onClick={() => {
+        setApiError(null);
+        setErrors({});
+      }}
+    >
+      {t('dismiss')}
+     </button>
+     </div>
+        </div>
+       
+      )}
+    </div>
+
+    
+  </div>
+)}
           {renderStepContent()}
 
           <NavigationButtons 
