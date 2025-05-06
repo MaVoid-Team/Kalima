@@ -7,7 +7,7 @@ const router = express.Router();
 router
     .route("/")
     .get(lecturerController.getAllLecturers)
-    .post(lecturerController.createLecturer);
+    .post(lecturerController.uploadLecturerPhoto ,lecturerController.createLecturer);
 
 router
     .route("/:id")

@@ -2,26 +2,94 @@ const Assistant = require("../models/assistantModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const bcrypt = require("bcrypt");
+const configureCloudinary = require("../config/cloudinaryOptions");
+// const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
 
+configureCloudinary();
+
+const multerImageStorage = multer.memoryStorage();
+
+const multerImageFilter = (req, file, cb) => {
+    // Check if the file mimetype starts with 'image/'
+    if (file.mimetype.startsWith('image')) {
+        cb(null, true); // Accept file
+    } else {
+        cb(new AppError('Not an image! Please upload only images.', 400), false); // Reject file
+    }
+};
+
+const upload = multer({
+    storage: multerImageStorage,
+    fileFilter: multerImageFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Example: Limit file size to 5MB
+});
+
+exports.uploadAssistantPhoto = upload.single('profilePicture');
 
 exports.createAssistant = catchAsync(async (req, res, next) => {
     const { name, email, password, gender, role, assignedLecturer } = req.body;
-
+    
     if (!assignedLecturer) {
         return next(new AppError("Assigned lecturer is required.", 400));
     }
-
+    
     const hashedPassword = await bcrypt.hash(password, 12);
-
-    const assistant = await Assistant.create({
+    
+    const assistantData = {
         name,
         email,
         password: hashedPassword,
         role,
         gender,
         assignedLecturer,
-    });
-
+        // Initialize profilePicture as an object structure that matches your schema
+        profilePicture: req.body.profilePicture || null,
+    };
+    
+    console.log("File received:", req.file);
+    
+    if (req.file) {
+        try {
+            const imageUploadResult = await new Promise((resolve, reject) => {
+                const base64File = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+                
+                cloudinary.uploader.upload(
+                    base64File, 
+                    { folder: 'assistant_profiles', resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            console.error("Cloudinary upload error:", error);
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                );
+            });
+            
+            console.log("Cloudinary result:", imageUploadResult);
+            
+            if (imageUploadResult && imageUploadResult.secure_url) {
+                // Set profilePicture as an object with url and publicId properties
+                assistantData.profilePicture = {
+                    url: imageUploadResult.secure_url,
+                    publicId: imageUploadResult.public_id
+                };
+            }
+        } catch (err) {
+            console.error("Image upload error:", err);
+            return next(new AppError(`Image upload failed: ${err.message}`, 500));
+        }
+    }
+    
+    console.log("Assistant data before creation:", assistantData);
+    
+    const assistant = await Assistant.create(assistantData);
+    
+    console.log("Created assistant:", assistant);
+    
     res.status(201).json({
         status: "success",
         data: assistant,
