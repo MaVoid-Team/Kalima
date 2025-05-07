@@ -108,7 +108,7 @@ export const deleteSubject = async (subjectId) => {
     if (!isLoggedIn()) {
       throw new Error('Not authenticated');
     }
-    const response = await axios.delete(`${API_URL}/api/v1/subjects/${subjectId}`, {
+    const response = await axios.delete(`${API_URL}/subjects/${subjectId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

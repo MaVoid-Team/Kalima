@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchPackages = async () => {
   try {
-      const response = await axios.get(`${API_URL}/api/v1/packages/`, {
+      const response = await axios.get(`${API_URL}/packages/`, {
           headers: {
               Authorization: `Bearer ${getToken()}`,
               'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const createPackage = async (packageData) => {
 
 export const deletePackage = async (packageId) => {
   try {
-      const response = await axios.delete(`${API_URL}/api/v1/packages/${packageId}`, {
+      const response = await axios.delete(`${API_URL}/packages/${packageId}`, {
           headers: {
               Authorization: `Bearer ${getToken()}`,
               'Content-Type': 'application/json',

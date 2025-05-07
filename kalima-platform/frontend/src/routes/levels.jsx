@@ -29,7 +29,7 @@ export const getAllLevels = async () => {
 
 export const createLevel = async (levelData) => {
   try {
-    const response = await api.post(`${API_URL}/api/v1/levels/`, levelData, {
+    const response = await api.post(`${API_URL}/levels/`, levelData, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -48,7 +48,7 @@ export const createLevel = async (levelData) => {
 
 export const deleteLevel = async (levelId) => {
   try {
-    const response = await api.delete(`${API_URL}/api/v1/levels/${levelId}`, {
+    const response = await api.delete(`${API_URL}/levels/${levelId}`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
