@@ -6,7 +6,7 @@ export const AssistantService = {
     // Fetch all assistants
     getAssistants: async () => {
       try {
-        const response = await api.get(`${API_URL}/api/v1/assistants/`)
+        const response = await axios.get(`${API_URL}/api/v1/assistants/`)
   
         if (response.data.status === "success") {
           return {
@@ -28,7 +28,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
         
-        const response = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
+        const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
           headers: {
             Authorization: `Bearer ${getToken()}`,
           },
@@ -47,7 +47,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
   
-        const response = await api.get(
+        const response = await axios.get(
           `${API_URL}/api/v1/assistants/lecturer/${lecturerId}`,
           {
             headers: {

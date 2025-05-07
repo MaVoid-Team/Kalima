@@ -33,7 +33,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         
         const levelsResponse = await getAllLevels();
         if (levelsResponse.success) {
-          setLevels(levelsResponse.data.levels);
+          setLevels(levelsResponse.data);
         }
       } catch (err) {
         console.error("Error fetching data for mapping:", err);
