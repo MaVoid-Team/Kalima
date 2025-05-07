@@ -162,14 +162,27 @@ exports.getLectureHomeworkSubmissions = catchAsync(async (req, res, next) => {
   // Verify the lecture exists
   const lecture = await Lecture.findById(lectureId)
     .populate('subject', 'name')
-    .populate('level', 'name');
+    .populate('level', 'name')
+    .populate('createdBy', 'name'); // Explicitly populate createdBy
     
   if (!lecture) {
     return next(new AppError("Lecture not found", 404));
   }
   
+  // Get the assistant with populated assignedLecturer
+  const assistant = await Assistant.findById(req.user._id).populate('assignedLecturer');
+  
+  if (!assistant || !assistant.assignedLecturer) {
+    return next(new AppError("Assistant not found or not assigned to a lecturer", 404));
+  }
+  
+  // Safe check for lecture.createdBy and compare with assistant's lecturer
+  if (!lecture.createdBy || !lecture.createdBy._id) {
+    return next(new AppError("Lecture creator information is missing", 500));
+  }
+  
   // Verify the assistant has access to this lecture
-  if (lecture.createdBy.toString() !== req.user.assignedLecturer.toString()) {
+  if (lecture.createdBy._id.toString() !== assistant.assignedLecturer._id.toString()) {
     return next(new AppError("You don't have permission to access this lecture", 403));
   }
   
