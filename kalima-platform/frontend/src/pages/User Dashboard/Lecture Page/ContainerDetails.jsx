@@ -57,33 +57,12 @@ const ContainerDetailsPage = () => {
     setExamConfigsLoading(true)
     setExamConfigsError("")
     try {
-      console.log("Fetching exam configs...")
       const response = await getExamConfigs()
-      console.log("Exam Configs Response:", response)
 
       // Check for both possible response formats
-      if (response.status === "success" && response.data?.examConfigs) {
-        // Format: { status: "success", data: { examConfigs: [...] } }
-        setExamConfigs(response.data.examConfigs)
+      if (response.status === "success") {
+        setExamConfigs(response.data.data.examConfigs)
         console.log("Parsed exam configs (format 1):", response.data.examConfigs)
-      } else if (response.success === true) {
-        // Format: { success: true, data: [...] }
-        setExamConfigs(response.data || [])
-        console.log("Parsed exam configs (format 2):", response.data)
-      } else {
-        // Try to extract data in any possible format
-        const configs = 
-          response.data?.examConfigs || // Try nested examConfigs
-          response.data || // Try direct data array
-          []; // Fallback to empty array
-        
-        console.log("Attempting to extract configs:", configs)
-        setExamConfigs(configs)
-        
-        if (configs.length === 0) {
-          console.log("No exam configs found in response")
-          setExamConfigsError("No exam configurations found. Please create a new one.")
-        }
       }
     } catch (err) {
       console.error("Error fetching exam configs:", err)

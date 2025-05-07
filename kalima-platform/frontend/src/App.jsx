@@ -39,6 +39,7 @@ const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
 const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
 const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
 const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
+const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
 
 function App() {
   const location = useLocation()
@@ -162,6 +163,7 @@ function App() {
             <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetails />} />
             <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
             <Route path="/dashboard/lecturer-dashboard/lectures-page" element={<MyLecturesPage />} />
+            <Route path="/dashboard/lecturer-dashboard/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
             
             {/* Center Dashboard Routes */}
             <Route path="/dashboard/courses-dashboard" element={<CoursesDashboard />} />
