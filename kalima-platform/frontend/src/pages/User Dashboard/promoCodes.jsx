@@ -576,7 +576,8 @@ const PromoCodes = () => {
                   `${balance} ${t("balance.currency")}`
                 )}
               </div>
-              <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p>
+              {/* <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p> */}
+              <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها</p>
             </div>
           </div>
 
@@ -634,10 +635,13 @@ const PromoCodes = () => {
                         {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
                       </h3>
                     </div>
+                    
                     <div className="flex justify-between items-end">
                       <p className="text-2xl font-bold">{balance.points}</p>
                       <span className="text-xs opacity-70">{t("balance.currency")}</span>
                     </div>
+                    <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها ل استاذ {balance.lecturer ? balance.lecturer.name : t("generalPoints")}</p>
+
                   </div>
                 ))}
               </div>
@@ -730,7 +734,8 @@ const PromoCodes = () => {
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm mb-3">{t("scanner.instructions")}</p>
+              {/* <p className="text-sm mb-3">{t("scanner.instructions")}</p> */}
+              <p className="text-sm mb-3">هات الكاميرا على ال QR كود</p>
               <div className="flex justify-center gap-3 mt-4">
                 <button
                   className="btn btn-outline btn-sm"
