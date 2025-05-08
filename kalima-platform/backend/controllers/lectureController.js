@@ -536,6 +536,8 @@ exports.deletelecture = catchAsync(async (req, res, next) => {
     if (!lecture) {
       throw new AppError("Lecture not found", 404);
     }
+    
+    // Remove this lecture from its parent container's children array if it has a parent
     if (lecture.parent) {
       const parent = await Container.findById(lecture.parent).session(session);
       if (parent) {
@@ -545,6 +547,10 @@ exports.deletelecture = catchAsync(async (req, res, next) => {
         await parent.save({ session });
       }
     }
+    
+    // Delete the actual lecture
+    await Lecture.findByIdAndDelete(lectureId).session(session);
+    
     await session.commitTransaction();
     res.status(204).json({ status: "success", data: null });
   } catch (error) {
