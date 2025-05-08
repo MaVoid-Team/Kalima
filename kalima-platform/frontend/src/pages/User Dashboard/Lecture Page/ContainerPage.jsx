@@ -172,7 +172,9 @@ const ContainersPage = () => {
       <h1 className="text-3xl font-bold mb-6">
         {userRole === 'Lecturer' ? 'الدورات الخاصة بك' : 'الدورات المشتراة'}
       </h1>
-      <p className="text-sm opacity-80 mt-2"> كل الدورات الي تم شرائها</p>
+      <p className="text-sm opacity-80">
+      {userRole === 'Lecturer' ?  "المحاضرات التي قمت بنشرها" : "المحاضرات التي قمت بشرائها"}
+      </p>
 
       {/* Items per page selector */}
       <div className="flex justify-end mb-4">
