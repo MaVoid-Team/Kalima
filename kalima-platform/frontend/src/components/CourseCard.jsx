@@ -1,5 +1,6 @@
-import { Star } from "lucide-react"
+import { Star } from 'lucide-react'
 import { useTranslation } from "react-i18next"
+import { useState } from "react"
 
 export const CourseCard = ({
   image,
@@ -16,8 +17,10 @@ export const CourseCard = ({
   childrenCount,
   containerType,
   isRTL,
+  containerImage, // New prop for container image from API
 }) => {
   const { t, i18n } = useTranslation("home")
+  const [imageError, setImageError] = useState(false)
 
   const stars = Array.from({ length: 5 }, (_, i) => (
     <Star
@@ -45,10 +48,28 @@ export const CourseCard = ({
     return t("paid")
   }
 
+  // Handle image loading error
+  const handleImageError = () => {
+    setImageError(true)
+  }
+
+  // Determine which image to display
+  // Priority: 1. containerImage from API, 2. image prop, 3. fallback image
+  const imageToDisplay = !imageError && containerImage 
+    ? containerImage 
+    : !imageError && image 
+      ? image 
+      : "/course1.png"
+
   return (
     <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all h-full" dir={isRTL ? "rtl" : "ltr"}>
       <figure className="relative">
-        <img src={image || "/placeholder.svg"} alt={title} className="w-full h-48 object-cover" />
+        <img 
+          src={imageToDisplay || "/placeholder.svg"} 
+          alt={title} 
+          className="w-full h-48 object-cover" 
+          onError={handleImageError}
+        />
         {status && (
           <div className="absolute top-2 right-2">
             <div className={`badge ${getStatusBadgeClass()}`}>{getStatusText()}</div>
