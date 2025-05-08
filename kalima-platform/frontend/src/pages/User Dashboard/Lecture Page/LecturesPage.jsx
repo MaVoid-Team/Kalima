@@ -330,10 +330,10 @@ const MyLecturesPage = () => {
   try {
     return (
       <div className="container mx-auto p-4" dir="rtl">
-        <h1 className="text-2xl font-bold mb-6">
+        <h1 className="text-2xl font-bold mb-2">
           {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) ? "إدارة المحاضرات" : "المحاضرات المشتراة"}
         </h1>
-
+        <p className="text-sm opacity-80 mt-2 mb-5">تفاصيل كل محاضراتي</p>
         {error && (
           <div className="alert alert-error mb-4">
             <span>{error}</span>
