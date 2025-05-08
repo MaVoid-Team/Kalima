@@ -138,7 +138,7 @@ export default function StudentRegistration() {
       try {
         const response = await getAllLevels();
         if (response.success) {
-          const levels = response.data.levels.map(level => ({
+          const levels = response.data.map(level => ({
             value: level._id,
             label: level.name
           }));
