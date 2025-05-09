@@ -51,7 +51,4 @@ const lecturerExamConfigSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for faster queries
-lecturerExamConfigSchema.index({ lecturer: 1, name: 1 }, { unique: true });
-
 module.exports = mongoose.model("LecturerExamConfig", lecturerExamConfigSchema);

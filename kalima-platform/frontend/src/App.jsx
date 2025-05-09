@@ -38,6 +38,8 @@ const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
 const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
 const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
 const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
+const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
+const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
 
 function App() {
   const location = useLocation()
@@ -141,15 +143,18 @@ function App() {
             <Route path="/dashboard/student-dashboard/promo-codes" element={<PromoCodes />} />
             <Route path="/dashboard/student-dashboard/container-details/:containerId" element={<ContainerDetails />} />
             <Route path="/dashboard/student-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
+            <Route path="/dashboard/student-dashboard/lectures-page" element={<MyLecturesPage />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
             <Route path="/dashboard/assistant-page" element={<UserDashboard />} />
+            <Route path="/dashboard/assistant-page/lectures-page" element={<MyLecturesPage />} />
             
             {/* Admin Routes */}
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/admin-dashboard/audit-log" element={<AuditLog />} />
             <Route path="/dashboard/admin-dashboard/create" element={<AdminCreate />} />
+            <Route path="/dashboard/admin-dashboard/lectures-page" element={<MyLecturesPage />} />
             
             {/* Lecturer Routes */}
             <Route path="/dashboard/lecturer-dashboard" element={<DashboardPage />} />
@@ -157,6 +162,10 @@ function App() {
             <Route path="/dashboard/lecturer-dashboard/CoursesForm" element={<CoursesForm />} />
             <Route path="/dashboard/lecturer-dashboard/container-details/:containerId" element={<ContainerDetails />} />
             <Route path="/dashboard/lecturer-dashboard/lecture-display/:lectureId" element={<LectureDisplay />} />
+            <Route path="/dashboard/lecturer-dashboard/lectures-page" element={<MyLecturesPage />} />
+            <Route path="/dashboard/lecturer-dashboard/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
+            
+            {/* Center Dashboard Routes */}
             <Route path="/dashboard/courses-dashboard" element={<CoursesDashboard />} />
             <Route path="/dashboard/center-dashboard" element={<CenterDashboard />} />
           </Routes>

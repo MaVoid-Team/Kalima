@@ -1,245 +1,321 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
-import ScanbotSDK from 'scanbot-web-sdk';
+"use client"
 
-const BARCODE_SCANNER_CONTAINER_ID = 'barcode-scanner-view';
+import { useState, useRef, useEffect, useCallback } from "react"
+import { Html5Qrcode } from "html5-qrcode"
 
-// Accept centerId, centerName, and onScanSuccess as props
-export default function BarcodeScanner({ centerId, centerName, onScanSuccess, translations }) {
-  const scannerContainerRef = useRef(null);
-  const [sdk, setSdk] = useState(null);
-  const [barcodeScanner, setBarcodeScanner] = useState(null);
-  const [isScanningActive, setIsScanningActive] = useState(false);
-  const [lastResult, setLastResult] = useState(null);
-  const [sdkError, setSdkError] = useState(null); // State for SDK initialization errors
+const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
+  const [scanning, setScanning] = useState(false)
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  // Initialize Scanbot SDK
-  useEffect(() => {
-    let ignore = false;
-    (async () => {
-      try {
-        console.log('Initializing Scanbot SDK...');
-         setSdkError(null); // Clear previous errors
-        const scanbotSDK = await ScanbotSDK.initialize({
-          licenseKey: import.meta.env.VITE_SCANBOT_LICENSE,
-          enginePath: '/wasm/', // Ensure this path is correct
-        });
-        if (!ignore) {
-          console.log('Scanbot SDK Initialized:', scanbotSDK);
-          setSdk(scanbotSDK);
-        }
-      } catch (e) {
-        console.error('SDK init error:', e);
-        setSdkError(`SDK Initialization Error: ${e.message}`);
-      }
-    })();
-    return () => {
-      ignore = true;
-      // Dispose SDK if initialized but scanner wasn't created
-      if (sdk && !barcodeScanner) {
-          try {
-               sdk.dispose();
-          } catch (e) {
-              console.warn('Error disposing SDK during unmount (ignored)', e);
-          }
-      }
-    };
-  }, []); // Empty dependency array means this runs once on mount
+  // Use refs to maintain scanner instance and state across renders
+  const scannerRef = useRef(null)
+  const isRunningRef = useRef(false)
 
-  // Dispose Barcode Scanner on unmount
+  // Clean up scanner on unmount
   useEffect(() => {
     return () => {
-      if (barcodeScanner) {
-        try {
-          console.log('Component unmounting, disposing barcode scanner...');
-          barcodeScanner.dispose();
-        } catch (e) {
-          console.warn('Error disposing scanner during unmount (ignored)', e);
-        }
-      }
-    };
-  }, [barcodeScanner]); // Depend on barcodeScanner instance
-
-  // Handle detected barcodes
-  const handleBarcodesDetected = useCallback(
-    (result) => {
-      if (result?.barcodes?.length > 0) {
-        console.log('🎉 Barcode found!', result.barcodes[0]);
-        const detectedBarcode = result.barcodes[0];
-        setLastResult(detectedBarcode);
-
-        // Call the onScanSuccess callback passed from the parent
-        if (onScanSuccess) {
-            // Pass the necessary data back to the dashboard
-            onScanSuccess(detectedBarcode.text, detectedBarcode.format || detectedBarcode.type);
-        }
-
-        
-        stopScanningAndReset();
-
-      } else {
-         setLastResult(translations?.noBarcodeDetected || 'No barcode detected.');
-      }
-    },
-    [onScanSuccess, translations] // Depend on onScanSuccess and translations
-  );
-
-  // Handle scanner errors
-  const handleScannerError = useCallback((error) => {
-    console.error('Barcode scanner error:', error);
-    setSdkError(`Scanner Error: ${error.message}`); // Set a scanner-specific error message
-    if (barcodeScanner) {
-        try {
-            barcodeScanner.dispose();
-        } catch (e) {
-            console.warn('Error disposing scanner after error (ignored)', e);
-        }
+      stopScanner()
     }
-    setBarcodeScanner(null);
-    setIsScanningActive(false);
-  }, [barcodeScanner, translations]); // Depend on barcodeScanner and translations
+  }, [])
 
-  // Start the barcode scanning process
-  const startScanning = async () => {
-    if (!sdk || barcodeScanner) {
-      console.log("Start scanning prevented:", { sdk: !!sdk, hasScanner: !!barcodeScanner });
-      return; // Prevent starting if SDK not ready or scanner already exists
-    }
-
-    setLastResult(null); // Clear previous result
-     setSdkError(null); // Clear previous scanner errors
-    setIsScanningActive(true);
+  const startScanner = useCallback(() => {
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    setScanning(true)
 
     try {
-      console.log('Creating Barcode Scanner instance...');
-      const scannerConfig = {
-        containerId: BARCODE_SCANNER_CONTAINER_ID,
-        onBarcodesDetected: handleBarcodesDetected,
-        onError: handleScannerError,
-        style: { // Basic styling, adjust as needed
-          window: { aspectRatio: 0.75, padding: { top: 40, left: 40, right: 40, bottom: 40 } },
-          viewfinder: { borderColor: 'white', borderWidth: 2 },
-        },
-        videoConstraints: { facingMode: 'environment' }, // Use rear camera
-        engineMode: 'NEXT_GEN', // Use the next-generation engine
-        // Add other configurations as needed (e.g., barcode formats)
-      };
+      // Create scanner instance
+      const scanner = new Html5Qrcode("barcode-scanner-view")
+      scannerRef.current = scanner
 
-      const scanner = await sdk.createBarcodeScanner(scannerConfig);
-
-      console.log('Barcode Scanner created:', scanner);
-
-       // Small delay to ensure the container is ready might sometimes be helpful
-      // await new Promise(resolve => setTimeout(resolve, 100));
-
-      setBarcodeScanner(scanner);
-
-    } catch (e) {
-      console.error('Failed to create barcode scanner:', e);
-      setIsScanningActive(false);
-       setSdkError(`Failed to start scanner: ${e.message}`); // Set an error if creation fails
-      setBarcodeScanner(null);
-    }
-  };
-
-  // Stop the scanning and clean up
-  const stopScanningAndReset = () => {
-    if (barcodeScanner) {
-      console.log('Disposing scanner and resetting...');
-      try {
-        barcodeScanner.dispose();
-      } catch (e) {
-        console.warn('Error disposing scanner (ignored)', e);
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
       }
+
+      // Start scanner with camera
+      scanner
+        .start(
+          { facingMode: "environment" }, // Use back camera
+          config,
+          onScanComplete,
+          onScanError,
+        )
+        .then(() => {
+          isRunningRef.current = true
+          setLoading(false)
+          console.log("Scanner started successfully")
+        })
+        .catch((err) => {
+          setError(translations.cameraError || "Could not access camera. Please check permissions.")
+          setLoading(false)
+          setScanning(false)
+          console.error("Error starting scanner:", err)
+        })
+    } catch (err) {
+      setError(translations.initError || "Failed to initialize scanner")
+      setLoading(false)
+      setScanning(false)
+      console.error("Error initializing scanner:", err)
     }
-    setBarcodeScanner(null);
-    setIsScanningActive(false);
-    // Optionally clear the last result when stopping
-    // setLastResult(null);
-  };
+  }, [translations, onScanSuccess])
 
-  // Check if SDK is initializing or encountered an error
-   if (!sdk && !sdkError) {
-       return (
-           <div className="flex justify-center items-center h-64 bg-base-300 rounded-md">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-               <p className="ml-2">{translations?.initializing || 'Initializing Scanner...'}</p>
-           </div>
-       );
-   }
+  const stopScanner = useCallback(() => {
+    if (scannerRef.current && isRunningRef.current) {
+      try {
+        scannerRef.current
+          .stop()
+          .then(() => {
+            console.log("Scanner stopped successfully")
+          })
+          .catch((err) => {
+            console.warn("Error stopping scanner (handled):", err)
+          })
+          .finally(() => {
+            isRunningRef.current = false
+            scannerRef.current = null
+            setScanning(false)
+          })
+      } catch (err) {
+        console.warn("Error in stopScanner (handled):", err)
+        isRunningRef.current = false
+        scannerRef.current = null
+        setScanning(false)
+      }
+    } else {
+      isRunningRef.current = false
+      scannerRef.current = null
+      setScanning(false)
+    }
+  }, [])
 
-   if (sdkError) {
-       return (
-           <div role="alert" className="alert alert-error shadow-lg">
-               <div>
-                   <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                   <span>{sdkError}</span>
-               </div>
-           </div>
-       );
-   }
+  const onScanComplete = (decodedText, decodedResult) => {
+    // Mark scanner as not running to prevent multiple stop attempts
+    isRunningRef.current = false
 
+    try {
+      // Try to stop scanner
+      if (scannerRef.current) {
+        scannerRef.current.stop()
+        console.log("Scanner stopped after successful scan")
+      }
+    } catch (err) {
+      console.warn("Error stopping scanner after scan (handled):", err)
+    } finally {
+      scannerRef.current = null
+      setScanning(false)
+    }
+
+    // Process the result
+    const resultData = {
+      text: decodedText,
+      format: decodedResult.result.format?.formatName || "Unknown",
+      type: decodedResult.result.format?.formatName || "Unknown",
+    }
+
+    setResult(resultData)
+
+    // Provide haptic feedback if available
+    if (navigator.vibrate) {
+      navigator.vibrate(200)
+    }
+
+    // Call the callback if provided
+    if (onScanSuccess) {
+      onScanSuccess(resultData.text, resultData.format)
+    }
+  }
+
+  const onScanError = (error) => {
+    // Don't show errors for normal scanning attempts
+    console.log("Scan error (normal during scanning):", error)
+  }
+
+  const resetScanner = () => {
+    setResult(null)
+    setError(null)
+  }
 
   return (
-     // Use DaisyUI card classes for consistent styling
-    <div className="card bg-base-100 shadow-xl mb-8">
+    <div className="card bg-base-100 shadow-md border border-base-200">
       <div className="card-body">
-        <h3 className="card-title">{translations?.title || 'Barcode Scanner'}</h3>
+        <h3 className="card-title flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-barcode"
+          >
+            <path d="M3 5v14"></path>
+            <path d="M8 5v14"></path>
+            <path d="M12 5v14"></path>
+            <path d="M17 5v14"></path>
+            <path d="M21 5v14"></path>
+          </svg>
+          {translations.title || "Barcode Scanner"}
+        </h3>
 
-        <div className="relative w-full max-w-md h-64 border mb-4 bg-base-300 mx-auto"> {/* Added mx-auto for centering */}
-          <div
-            id={BARCODE_SCANNER_CONTAINER_ID}
-            ref={scannerContainerRef}
-            className="absolute inset-0"
-          />
-          {/* Message shown when scanner is not active and no result is present */}
-          {!isScanningActive && !barcodeScanner && !lastResult && (
-            <div className="absolute inset-0 flex items-center justify-center text-base-content opacity-60 pointer-events-none">
-              {translations?.clickStart || 'Click “Start Scanning”'}
+        <div className="relative w-full max-w-md h-64 border rounded-lg bg-base-200 mx-auto overflow-hidden">
+          <div id="barcode-scanner-view" className="absolute inset-0"></div>
+
+          {/* Loading state */}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-base-100/80 z-10">
+              <div className="flex flex-col items-center">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+                <p className="mt-4 font-medium">{translations.initializing || "Initializing camera..."}</p>
+              </div>
             </div>
           )}
-           {/* Message shown when scanner is created but camera stream is not yet visible */}
-           {isScanningActive && !lastResult && (
-               <div className="absolute inset-0 flex items-center justify-center text-base-content opacity-60 pointer-events-none">
-                  {translations?.scanningInstructions || 'Align barcode in the frame...'}
-               </div>
-           )}
+
+          {/* Inactive state */}
+          {!scanning && !loading && !result && (
+            <div className="absolute inset-0 flex items-center justify-center text-base-content/70">
+              <div className="text-center p-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mx-auto mb-4 opacity-50"
+                >
+                  <path d="M3 5v14"></path>
+                  <path d="M8 5v14"></path>
+                  <path d="M12 5v14"></path>
+                  <path d="M17 5v14"></path>
+                  <path d="M21 5v14"></path>
+                </svg>
+                <p>{translations.clickStart || 'Click "Start Scanning" to begin'}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Active scanning state */}
+          {scanning && !loading && !result && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-48 h-48 border-2 border-primary rounded-lg"></div>
+              <p className="absolute bottom-4 left-0 right-0 text-center text-white bg-black/50 py-2">
+                {translations.scanningInstructions || "Align barcode in the frame..."}
+              </p>
+            </div>
+          )}
         </div>
 
-         {/* Displaying the result */}
-        {lastResult && typeof lastResult !== 'string' && ( // Check if lastResult is an object with barcode data
-          <div className="mb-4 p-3 border border-success bg-success bg-opacity-10 rounded w-full max-w-md text-center text-success-content mx-auto"> {/* Added mx-auto */}
-            <p className="font-bold mb-1">{translations?.resultLabel || 'Barcode Detected:'}</p>
-            <p className="text-sm">Type: {lastResult.format || lastResult.type}</p>
-            <p className="break-all">Value: {lastResult.text}</p>
+        {/* Error message */}
+        {error && (
+          <div className="alert alert-error mt-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
-         {/* Displaying the 'No barcode detected' message */}
-        {lastResult && typeof lastResult === 'string' && (
-            <div className="mb-4 p-3 border border-info bg-info bg-opacity-10 rounded w-full max-w-md text-center text-info-content mx-auto"> {/* Added mx-auto */}
-                 {lastResult} {/* Display the message */}
+
+        {/* Result display */}
+        {result && (
+          <div className="mt-4 p-4 border border-success bg-success/10 rounded-lg text-center">
+            <h4 className="font-bold mb-2 text-success">{translations.resultLabel || "Barcode Detected:"}</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-base-200 p-2 rounded-lg">
+                <span className="font-medium block mb-1">Type:</span>
+                <span>{result.format}</span>
+              </div>
+              <div className="bg-base-200 p-2 rounded-lg">
+                <span className="font-medium block mb-1">Value:</span>
+                <span className="break-all">{result.text}</span>
+              </div>
             </div>
+          </div>
         )}
 
+        {/* Action buttons */}
+        <div className="card-actions justify-center mt-4">
+          {!scanning ? (
+            <>
+              <button onClick={startScanner} disabled={loading} className="btn btn-primary">
+                {loading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    {translations.starting || "Starting..."}
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2"
+                    >
+                      <rect width="20" height="20" x="2" y="2" rx="5"></rect>
+                      <path d="M16 8h.01"></path>
+                      <path d="M8 16v-4a4 4 0 0 1 8 0v4"></path>
+                    </svg>
+                    {translations.startButton || "Start Scanning"}
+                  </>
+                )}
+              </button>
 
-        <div className="card-actions justify-center"> {/* Use card-actions for button alignment */}
-          {!barcodeScanner ? (
-            <button
-              onClick={startScanning}
-              disabled={!sdk || isScanningActive} // Disable if SDK not ready or already starting
-              className="btn btn-primary"
-            >
-              {isScanningActive ? (translations?.starting || 'Starting...') : (translations?.startButton || 'Start Scanning')}
-            </button>
+              {result && (
+                <button onClick={resetScanner} className="btn btn-outline">
+                  {translations.resetButton || "Reset"}
+                </button>
+              )}
+            </>
           ) : (
-            <button
-              onClick={stopScanningAndReset}
-              className="btn btn-error"
-            >
-              {translations?.stopButton || 'Stop & Reset'}
+            <button onClick={stopScanner} className="btn btn-error">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <path d="M9 9h6v6H9z"></path>
+              </svg>
+              {translations.stopButton || "Stop Scanning"}
             </button>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }
+
+export default BarcodeScanner

@@ -6,7 +6,7 @@ export const AssistantService = {
     // Fetch all assistants
     getAssistants: async () => {
       try {
-        const response = await api.get(`${API_URL}/api/v1/assistants/`)
+        const response = await axios.get(`${API_URL}/api/v1/assistants/`)
   
         if (response.data.status === "success") {
           return {
@@ -28,7 +28,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
         
-        const response = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
+        const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
           headers: {
             Authorization: `Bearer ${getToken()}`,
           },
@@ -47,7 +47,7 @@ export const AssistantService = {
       try {
         if (!isLoggedIn()) throw new Error("User not authenticated");
   
-        const response = await api.get(
+        const response = await axios.get(
           `${API_URL}/api/v1/assistants/lecturer/${lecturerId}`,
           {
             headers: {
@@ -70,7 +70,7 @@ export const AssistantService = {
     try {
       if (!isLoggedIn()) throw new Error("User not authenticated");
 
-      const response = await api.post(`${API_URL}/api/v1/assistants`, data, {
+      const response = await axios.post(`${API_URL}/api/v1/assistants`, data, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -84,3 +84,48 @@ export const AssistantService = {
       return `Failed to create assistant: ${error.message}`
     }
   }
+
+  export const deleteAssistant = async (assistantId) => {
+    try {
+      if (!isLoggedIn()) throw new Error("User not authenticated");
+  
+      const response = await axios.delete(`${API_URL}/api/v1/assistants/${assistantId}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+  
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
+  
+  // Update an assistant
+  export const updateAssistant = async (assistantId, data) => {
+    try {
+      if (!isLoggedIn()) throw new Error("User not authenticated");
+  
+      const response = await axios.patch(`${API_URL}/api/v1/assistants/${assistantId}`, data, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+  
+      return {
+        success: true,
+        data: response.data.data.assistant
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
