@@ -22,7 +22,7 @@ export const getStudentSubmissionsByLectureId = async (lectureId) => {
       };
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/assistant-homework/lecture/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/assistant-homework/lecture/${lectureId}`, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
