@@ -75,7 +75,7 @@ const MyLecturesPage = () => {
 
         // Fetch dashboard data to get user role
         const result = await getUserDashboard({
-          params: { fields: "userInfo,containers,purchaseHistory", limit: 100 },
+          params: { fields: "userInfo,containers,purchaseHistory", limit: 200 },
         })
 
         if (result.success) {
@@ -87,8 +87,9 @@ const MyLecturesPage = () => {
           // Different data fetching based on user role
           if (["Admin", "Subadmin", "Moderator"].includes(userInfo.role)) {
             // For admin roles, fetch all lectures
-            const allLecturesResult = await getAllLectures()
-            console.log("All lectures response:", allLecturesResult)
+            const allLecturesResult = await getAllLectures({
+              limit: 200
+            })
 
             if (allLecturesResult.status === "success") {
               const lecturesData = allLecturesResult.data.containers.map((lecture) => ({

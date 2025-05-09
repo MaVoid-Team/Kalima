@@ -246,9 +246,11 @@ export const getMyContainers = async () => {
 }
 
 // Function to get all lectures
-export const getAllLectures = async () => {
+export const getAllLectures = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures`, {withCredentials: true,
+    const response = await axios.get(`${API_URL}/api/v1/lectures`, {
+      params: queryParams,
+      withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },});
