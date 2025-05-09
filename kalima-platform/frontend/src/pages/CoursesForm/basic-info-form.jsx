@@ -67,6 +67,7 @@ function BasicInfoForm({
       }
 
       const response = await createContainer(formDataPayload)
+      console.log(response)
       if (response.status === "success") {
         const container = response.data.container
         updateCourseStructure({

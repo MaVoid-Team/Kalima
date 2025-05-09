@@ -5,17 +5,32 @@ import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Function to get all containers
-export const getAllContainers = async () => {
+export const getAllContainers = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/containers`, {
+      params: queryParams, // Pass query parameters like limit and type
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
+    });
+    return response.data;
+  } catch (error) {
+    return `Error fetching containers: ${error.message}`;
+  }
+};
+
+export const getAllLecturesPublic = async (queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/lectures/public`, {
+      params: queryParams,
+      withCredentials: true,
+      auth: `Bearer ${getToken()}`,
     })
     return response.data
-  } catch (error) {
-    return `Error fetching containers: ${error.message}`
+  }
+  catch (error) {
+    return `Error fetching lectures: ${error.message}`
   }
 }
 
@@ -107,6 +122,44 @@ export const getLectureAttachments = async (lectureId) => {
   }
 };
 
+/**
+ * Delete a lecture by ID
+ * @param {string} lectureId - The ID of the lecture to delete
+ * @returns {Promise<Object>} - The response from the API
+ */
+export const deleteLecture = async (lectureId) => {
+  try {
+    const token = getToken()
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Authentication required",
+      }
+    }
+
+    const response = await axios.delete(`${API_URL}/api/v1/lectures/${lectureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    return {
+      success: true,
+      message: "Lecture deleted successfully",
+      data: response.data,
+    }
+  } catch (error) {
+    console.error("Error deleting lecture:", error)
+
+    return {
+      success: false,
+      message: error.response?.data?.message || "Failed to delete lecture",
+      error: error.message,
+    }
+  }
+}
+
 
 export const downloadAttachmentById = async (attachmentId) => {
   try {
@@ -142,22 +195,11 @@ export const downloadAttachmentById = async (attachmentId) => {
     throw new Error(`Failed to download attachment: ${error.message}`);
   }
 };
-export const getAllLecturesPublic = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/lectures/public`, {
-      withCredentials: true,
-      auth: `Bearer ${getToken()}`,
-    })
-    return response.data
-  }
-  catch (error) {
-    return `Error fetching lectures: ${error.message}`
-  }
-}
+
 
 export const createLecture = async (lectureData) => {
   try {
-    const response = await axios.post(`${API_URL}/lectures`, lectureData, {
+    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -172,7 +214,7 @@ export const createLecture = async (lectureData) => {
 };
 export const createContainer = async (formData) => {
   try {
-    const response = await api.post(`${API_URL}/containers`, formData, {
+    const response = await axios.post(`${API_URL}/containers`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -204,9 +246,11 @@ export const getMyContainers = async () => {
 }
 
 // Function to get all lectures
-export const getAllLectures = async () => {
+export const getAllLectures = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}`, {withCredentials: true,
+    const response = await axios.get(`${API_URL}/lectures`, {
+      params: queryParams,
+      withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },});
