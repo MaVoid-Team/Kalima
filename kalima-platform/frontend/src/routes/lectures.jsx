@@ -209,7 +209,13 @@ export const createLecture = async (lectureData) => {
 
     return response.data;
   } catch (error) {
-    return `Error creating lecture: ${error.message}`
+    console.error("Error details:", error);
+    // Return a structured error object instead of a string
+    return {
+      status: "error",
+      message: `Error creating lecture: ${error.message}`,
+      error
+    };
   }
 };
 export const createContainer = async (formData) => {
