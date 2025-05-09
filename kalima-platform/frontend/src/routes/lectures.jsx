@@ -138,7 +138,7 @@ export const deleteLecture = async (lectureId) => {
       }
     }
 
-    const response = await axios.delete(`${API_URL}/api/v1/lectures/${lectureId}`, {
+    const response = await axios.delete(`${API_URL}/lectures/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -199,7 +199,7 @@ export const downloadAttachmentById = async (attachmentId) => {
 
 export const createLecture = async (lectureData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
+    const response = await axios.post(`${API_URL}/lectures`, lectureData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
