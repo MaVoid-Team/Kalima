@@ -11,6 +11,7 @@ const PromoCodesTable = () => {
   const [filters, setFilters] = useState({
     isRedeemed: '', // 'true' | 'false' | ''
     redeemedBy: '',
+    type: "general", //general | specific | false
   });
   const [state, setState] = useState({
     promoCodes: [],
@@ -24,14 +25,24 @@ const PromoCodesTable = () => {
   const [studentsLoading, setStudentsLoading] = useState(true);
   const [studentsError, setStudentsError] = useState(null);
 
-  // Fetch promo codes
+  // Fetch data (promo codes and students)
   useEffect(() => {
     const fetchData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
-  
-      const promoResult = await getPromoCodes();
-      const studentsResult = await getAllStudents();
-  
+      setStudentsLoading(true);
+
+      const promoParams = {
+        limit: 1000,
+        ...filters.isRedeemed !== '' && { isRedeemed: filters.isRedeemed },
+        ...filters.redeemedBy && { redeemedBy: filters.redeemedBy },
+        ...filters.type && {type: filters.type}
+      };
+
+      const [promoResult, studentsResult] = await Promise.all([
+        getPromoCodes({ params: promoParams }),
+        getAllStudents()
+      ]);
+
       if (promoResult.success && Array.isArray(promoResult.data)) {
         const totalPages = Math.ceil(promoResult.data.length / state.itemsPerPage);
         setState(prev => ({
@@ -49,38 +60,19 @@ const PromoCodesTable = () => {
           error: promoResult.error || t('errors.invalidResponse'),
         }));
       }
-  
+
       if (studentsResult.success && Array.isArray(studentsResult.data)) {
         setStudents(studentsResult.data);
         setStudentsError(null);
       } else {
-        setStudentsError(
-          typeof studentsResult === 'string' ? studentsResult : t('errors.failedToFetchStudents')
-        );
+        setStudentsError(studentsResult.error || t('errors.failedToFetchStudents'));
       }
-  
+
       setStudentsLoading(false);
     };
-  
+
     fetchData();
-  }, [t]);
-  // Fetch students
-  useEffect(() => {
-    const fetchStudents = async () => {
-      setStudentsLoading(true);
-      const result = await getAllStudents();
-
-      if (result.success && Array.isArray(result.data)) {
-        setStudents(result.data);
-        setStudentsError(null);
-      } else {
-        setStudentsError(result || t('errors.failedToFetchStudents'));
-      }
-      setStudentsLoading(false);
-    };
-
-    fetchStudents();
-  }, [t]);
+  }, [t, filters]);
 
   // Get student name by ID
   const getStudentName = (studentId) => {
@@ -88,34 +80,9 @@ const PromoCodesTable = () => {
     return student ? student.name : '--';
   };
 
-  // Filter promo codes
-  const fetchFilteredPromoCodes = async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
-
-    const cleanFilters = {};
-    if (filters.isRedeemed !== '') cleanFilters.isRedeemed = filters.isRedeemed;
-    if (filters.redeemedBy) cleanFilters.redeemedBy = filters.redeemedBy;
-
-    const result = await getPromoCodes(cleanFilters);
-
-    if (result.success && Array.isArray(result.data)) {
-      const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
-      setState(prev => ({
-        ...prev,
-        promoCodes: result.data,
-        currentPage: 1,
-        totalPages,
-        isLoading: false,
-        error: null,
-      }));
-    } else {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        promoCodes: [],
-        error: result.error || t('errors.invalidResponse'),
-      }));
-    }
+  // Handle filter application
+  const handleApplyFilters = () => {
+    setState(prev => ({ ...prev, currentPage: 1 }));
   };
 
   const handlePreviousPage = () => {
@@ -128,7 +95,7 @@ const PromoCodesTable = () => {
   const handleNextPage = () => {
     setState(prev => ({
       ...prev,
-      currentPage: Math.min(state.totalPages, prev.currentPage + 1),
+      currentPage: Math.min(prev.totalPages, prev.currentPage + 1),
     }));
   };
 
@@ -179,9 +146,20 @@ const PromoCodesTable = () => {
                 ))}
               </select>
 
+               <select
+                className="select select-bordered"
+                value={filters.type}
+                onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+              >
+                <option value="">All</option>
+                <option value="specific">Specific</option>
+                <option value="general">General</option>
+                <option value="promo">Promo</option>
+              </select>
+
               <button
                 className="btn btn-primary"
-                onClick={() => fetchFilteredPromoCodes()}
+                onClick={handleApplyFilters}
               >
                 {t('filters.apply')}
               </button>
