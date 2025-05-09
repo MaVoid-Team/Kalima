@@ -5,17 +5,32 @@ import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Function to get all containers
-export const getAllContainers = async () => {
+export const getAllContainers = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/containers`, {
+      params: queryParams, // Pass query parameters like limit and type
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
+    });
+    return response.data;
+  } catch (error) {
+    return `Error fetching containers: ${error.message}`;
+  }
+};
+
+export const getAllLecturesPublic = async (queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
+      params: queryParams,
+      withCredentials: true,
+      auth: `Bearer ${getToken()}`,
     })
     return response.data
-  } catch (error) {
-    return `Error fetching containers: ${error.message}`
+  }
+  catch (error) {
+    return `Error fetching lectures: ${error.message}`
   }
 }
 
@@ -180,18 +195,7 @@ export const downloadAttachmentById = async (attachmentId) => {
     throw new Error(`Failed to download attachment: ${error.message}`);
   }
 };
-export const getAllLecturesPublic = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
-      withCredentials: true,
-      auth: `Bearer ${getToken()}`,
-    })
-    return response.data
-  }
-  catch (error) {
-    return `Error fetching lectures: ${error.message}`
-  }
-}
+
 
 export const createLecture = async (lectureData) => {
   try {

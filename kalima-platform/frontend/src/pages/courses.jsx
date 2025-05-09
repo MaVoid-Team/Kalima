@@ -57,7 +57,7 @@ export default function CoursesPage() {
         // Fetch levels
         const levelsResult = await getAllLevels()
         if (levelsResult.success) {
-          setLevels(levelsResult.data?.levels || [])
+          setLevels(levelsResult.data || [])
         } else {
           console.error("Failed to fetch levels:", levelsResult.error)
         }
@@ -83,36 +83,37 @@ export default function CoursesPage() {
   }, [currentPage])
 
   const fetchContainers = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      // Use the original getAllContainers function without modifications
-      const result = await getAllContainers()
-      console.log("API Response:", result)
+  setLoading(true);
+  setError("");
+  try {
+    // Fetch only containers with type "course" and a large limit
+    const result = await getAllContainers({
+      type: "course",
+      limit: 200,
+    });
+    console.log("API Response:", result);
 
-      if (result.status === "success") {
-        // Filter containers to only include those with type "course"
-        const courseContainers = result.data.containers.filter((container) => container.type === "course")
+    if (result.status === "success") {
+      const containers = result.data.containers;
+      // Apply pagination
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const paginatedContainers = containers.slice(startIndex, endIndex);
 
-        // Apply pagination
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-        const endIndex = startIndex + ITEMS_PER_PAGE
-        const paginatedContainers = courseContainers.slice(startIndex, endIndex)
-
-        setContainers(courseContainers)
-        setFilteredContainers(paginatedContainers)
-        setTotalResults(courseContainers.length)
-        setTotalPages(Math.ceil(courseContainers.length / ITEMS_PER_PAGE))
-      } else {
-        setError(result.error || "Failed to fetch containers")
-      }
-    } catch (err) {
-      console.error("Error fetching containers:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
-    } finally {
-      setLoading(false)
+      setContainers(containers); // Store all fetched course containers
+      setFilteredContainers(paginatedContainers); // Set paginated subset
+      setTotalResults(containers.length);
+      setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE));
+    } else {
+      setError(result.error || "Failed to fetch containers");
     }
+  } catch (err) {
+    console.error("Error fetching containers:", err);
+    setError("حدث خطأ أثناء تحميل البيانات");
+  } finally {
+    setLoading(false);
   }
+};
 
   const resetFilters = useCallback(() => {
     setSelectedStage("")
@@ -197,9 +198,13 @@ export default function CoursesPage() {
       const teacherId = container.createdBy?._id || container.createdBy
       const matchedLecturer = lecturers.find((lecturer) => lecturer._id === teacherId)
 
+      // Get container image URL if available
+      const containerImageUrl = container.containerImage?.url || container.image?.url || null
+
       return {
         id: container._id,
-        image: `/course-${(index % 6) + 1}.png`,
+        image: `/course-${(index % 6) + 1}.png`, // Fallback image pattern
+        containerImage: containerImageUrl, // Pass the actual container image URL
         title: container.name,
         subject: container.subject?.name || "",
         teacher: matchedLecturer?.name || "مدرس غير محدد",
