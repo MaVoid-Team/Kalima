@@ -169,21 +169,30 @@ exports.getLectureHomeworkSubmissions = catchAsync(async (req, res, next) => {
     return next(new AppError("Lecture not found", 404));
   }
   
-  // Get the assistant with populated assignedLecturer
-  const assistant = await Assistant.findById(req.user._id).populate('assignedLecturer');
-  
-  if (!assistant || !assistant.assignedLecturer) {
-    return next(new AppError("Assistant not found or not assigned to a lecturer", 404));
-  }
-  
-  // Safe check for lecture.createdBy and compare with assistant's lecturer
-  if (!lecture.createdBy || !lecture.createdBy._id) {
-    return next(new AppError("Lecture creator information is missing", 500));
-  }
-  
-  // Verify the assistant has access to this lecture
-  if (lecture.createdBy._id.toString() !== assistant.assignedLecturer._id.toString()) {
-    return next(new AppError("You don't have permission to access this lecture", 403));
+  // Check if user is a lecturer or an assistant
+  if (req.user.role === 'Lecturer') {
+    // For lecturers, check if they created the lecture
+    if (lecture.createdBy._id.toString() !== req.user._id.toString()) {
+      return next(new AppError("You don't have permission to access this lecture", 403));
+    }
+  } else if (req.user.role === 'Assistant') {
+    // For assistants, check if they are assigned to the lecturer who created the lecture
+    // Get the assistant with populated assignedLecturer
+    const assistant = await Assistant.findById(req.user._id).populate('assignedLecturer');
+    
+    if (!assistant || !assistant.assignedLecturer) {
+      return next(new AppError("Assistant not found or not assigned to a lecturer", 404));
+    }
+    
+    // Safe check for lecture.createdBy and compare with assistant's lecturer
+    if (!lecture.createdBy || !lecture.createdBy._id) {
+      return next(new AppError("Lecture creator information is missing", 500));
+    }
+    
+    // Verify the assistant has access to this lecture
+    if (lecture.createdBy._id.toString() !== assistant.assignedLecturer._id.toString()) {
+      return next(new AppError("You don't have permission to access this lecture", 403));
+    }
   }
   
   // Get all homework submissions for this lecture grouped by student
