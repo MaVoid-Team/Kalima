@@ -7,8 +7,12 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(levelController.createLevel)
-  .get(levelController.getAllLevels);
+  .get(levelController.getAllLevels)
+  .post(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.createLevel
+  );
 
 router
   .route("/:id")
