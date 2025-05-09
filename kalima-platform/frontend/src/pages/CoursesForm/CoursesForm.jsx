@@ -56,8 +56,8 @@ function CourseCreationForm() {
 
         // Fetch levels from API
         const levelsResponse = await getAllLevels()
-        if (levelsResponse.data && levelsResponse.data.levels) {
-          setLevels(levelsResponse.data.levels)
+        if (levelsResponse.success) {
+          setLevels(levelsResponse.data)
         } else {
           console.error("Failed to fetch levels:", levelsResponse)
         }

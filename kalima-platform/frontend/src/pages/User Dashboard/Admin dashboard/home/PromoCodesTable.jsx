@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { ImSpinner8 } from "react-icons/im";
 import { getPromoCodes } from "../../../../routes/codes";
+import { getAllStudents } from "../../../../routes/fetch-users";
 
 const PromoCodesTable = () => {
   const { t, i18n } = useTranslation('admin');
@@ -10,6 +11,7 @@ const PromoCodesTable = () => {
   const [filters, setFilters] = useState({
     isRedeemed: '', // 'true' | 'false' | ''
     redeemedBy: '',
+    type: "general", //general | specific | false
   });
   const [state, setState] = useState({
     promoCodes: [],
@@ -17,129 +19,153 @@ const PromoCodesTable = () => {
     itemsPerPage: 10,
     totalPages: 1,
     isLoading: true,
-    error: null
+    error: null,
   });
+  const [students, setStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(true);
+  const [studentsError, setStudentsError] = useState(null);
 
+  // Fetch data (promo codes and students)
   useEffect(() => {
-    const fetchPromoCodes = async () => {
+    const fetchData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
-  
-      const result = await getPromoCodes();
-  
-      if (result.success && Array.isArray(result.data)) {
-        const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
+      setStudentsLoading(true);
+
+      const promoParams = {
+        limit: 1000,
+        ...filters.isRedeemed !== '' && { isRedeemed: filters.isRedeemed },
+        ...filters.redeemedBy && { redeemedBy: filters.redeemedBy },
+        ...filters.type && {type: filters.type}
+      };
+
+      const [promoResult, studentsResult] = await Promise.all([
+        getPromoCodes({ params: promoParams }),
+        getAllStudents()
+      ]);
+
+      if (promoResult.success && Array.isArray(promoResult.data)) {
+        const totalPages = Math.ceil(promoResult.data.length / state.itemsPerPage);
         setState(prev => ({
           ...prev,
-          promoCodes: result.data,
+          promoCodes: promoResult.data,
           totalPages,
           isLoading: false,
-          error: null
+          error: null,
         }));
       } else {
         setState(prev => ({
           ...prev,
           isLoading: false,
-          promoCodes: [], // fallback to empty array
-          error: result.error || 'Invalid response data format'
+          promoCodes: [],
+          error: promoResult.error || t('errors.invalidResponse'),
         }));
       }
+
+      if (studentsResult.success && Array.isArray(studentsResult.data)) {
+        setStudents(studentsResult.data);
+        setStudentsError(null);
+      } else {
+        setStudentsError(studentsResult.error || t('errors.failedToFetchStudents'));
+      }
+
+      setStudentsLoading(false);
     };
-  
-    fetchPromoCodes();
-  }, []);
 
-  const paginatedCodes = state.promoCodes.slice(
-    (state.currentPage - 1) * state.itemsPerPage,
-    state.currentPage * state.itemsPerPage
-  );
+    fetchData();
+  }, [t, filters]);
 
-  const fetchFilteredPromoCodes = async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
-  
-    const cleanFilters = {};
-    if (filters.isRedeemed !== '') cleanFilters.isRedeemed = filters.isRedeemed;
-    if (filters.redeemedBy) cleanFilters.redeemedBy = filters.redeemedBy;
-  
-    const result = await getPromoCodes(cleanFilters);
-  
-    if (result.success) {
-      const totalPages = Math.ceil(result.data.length / state.itemsPerPage);
-      setState(prev => ({
-        ...prev,
-        promoCodes: result.data,
-        currentPage: 1,
-        totalPages,
-        isLoading: false,
-        error: null,
-      }));
-    } else {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        promoCodes: [],
-        error: result.error,
-      }));
-    }
+  // Get student name by ID
+  const getStudentName = (studentId) => {
+    const student = students.find(s => s._id === studentId);
+    return student ? student.name : '--';
   };
+
+  // Handle filter application
+  const handleApplyFilters = () => {
+    setState(prev => ({ ...prev, currentPage: 1 }));
+  };
+
   const handlePreviousPage = () => {
     setState(prev => ({
       ...prev,
-      currentPage: Math.max(1, prev.currentPage - 1)
+      currentPage: Math.max(1, prev.currentPage - 1),
     }));
   };
 
   const handleNextPage = () => {
     setState(prev => ({
       ...prev,
-      currentPage: Math.min(state.totalPages, prev.currentPage + 1)
+      currentPage: Math.min(prev.totalPages, prev.currentPage + 1),
     }));
   };
+
+  // Paginated promo codes
+  const paginatedCodes = state.promoCodes.slice(
+    (state.currentPage - 1) * state.itemsPerPage,
+    state.currentPage * state.itemsPerPage
+  );
 
   return (
     <div className="card bg-base-100 border border-primary shadow-2xl my-6" dir={dir}>
       <div className="card-body">
         <h2 className="card-title text-2xl mb-4">{t('promoCodes.title')}</h2>
 
-        {state.isLoading ? (
+        {(state.isLoading || studentsLoading) ? (
           <div className="flex justify-center py-8">
             <ImSpinner8 className="animate-spin text-4xl text-primary" />
           </div>
         ) : (
           <>
-            {state.error && (
+            {(state.error || studentsError) && (
               <div className="alert alert-error mb-4">
-                {state.error}
+                {state.error || studentsError}
               </div>
             )}
 
-            <div className="overflow-x-auto">
             <div className="flex flex-wrap gap-4 mb-4">
-            <select
+              <select
                 className="select select-bordered"
                 value={filters.isRedeemed}
                 onChange={(e) => setFilters(prev => ({ ...prev, isRedeemed: e.target.value }))}
-            >
+              >
                 <option value="">{t('filters.allStatuses')}</option>
                 <option value="false">{t('filters.active')}</option>
                 <option value="true">{t('filters.redeemed')}</option>
-            </select>
+              </select>
 
-            <input
-                type="text"
-                className="input input-bordered"
-                placeholder={t('filters.redeemedBy')}
+              <select
+                className="select select-bordered"
                 value={filters.redeemedBy}
                 onChange={(e) => setFilters(prev => ({ ...prev, redeemedBy: e.target.value }))}
-            />
+              >
+                <option value="">All Students</option>
+                {students.map(student => (
+                  <option key={student._id} value={student._id}>
+                    {student.name}
+                  </option>
+                ))}
+              </select>
 
-            <button
+               <select
+                className="select select-bordered"
+                value={filters.type}
+                onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+              >
+                <option value="">All</option>
+                <option value="specific">Specific</option>
+                <option value="general">General</option>
+                <option value="promo">Promo</option>
+              </select>
+
+              <button
                 className="btn btn-primary"
-                onClick={() => fetchFilteredPromoCodes()}
-            >
+                onClick={handleApplyFilters}
+              >
                 {t('filters.apply')}
-            </button>
+              </button>
             </div>
 
+            <div className="overflow-x-auto">
               <table className="table w-full">
                 <thead>
                   <tr>
@@ -161,7 +187,7 @@ const PromoCodesTable = () => {
                         </span>
                       </td>
                       <td>{code.redeemedAt ? new Date(code.redeemedAt).toLocaleDateString() : '--'}</td>
-                      <td className="truncate max-w-[100px]">{code.redeemedBy || '--'}</td>
+                      <td className="truncate max-w-[100px]">{getStudentName(code.redeemedBy)}</td>
                     </tr>
                   ))}
                 </tbody>

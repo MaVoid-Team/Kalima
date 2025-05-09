@@ -21,13 +21,23 @@ const CreateUserModal = ({
     password: "",
     confirmPassword: "",
     gender: "male",
+    level: "",
+    phoneNumber: "",
+    parentPhoneNumber: "",
+    hobbies: [],
+    faction: "",
+    school: "",
+    parent: "",
+    subject: [],
+    bio: "",
+    expertise: "",
+    assignedLecturer: "",
+    sequencedId: "",
   };
 
   const [userData, setUserData] = useState(initialUserState);
   const [formError, setFormError] = useState("");
-  const [isBulkMode, setIsBulkMode] = useState(false); // State to toggle between modes
-  
-  // State for dropdown data
+  const [isBulkMode, setIsBulkMode] = useState(false);
   const [levels, setLevels] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [lecturers, setLecturers] = useState([]);
@@ -38,7 +48,7 @@ const CreateUserModal = ({
     if (isOpen) {
       setUserData(initialUserState);
       setFormError("");
-      setIsBulkMode(false); // Reset to single user mode
+      setIsBulkMode(false);
       fetchDropdownData();
     }
   }, [isOpen]);
@@ -56,7 +66,7 @@ const CreateUserModal = ({
       
       const subjectsResult = await getAllSubjects();
       if (subjectsResult.success) {
-        setSubjects(subjectsResult.data.subjects || []);
+        setSubjects(subjectsResult.data || []);
       } else {
         console.error("Failed to fetch subjects:", subjectsResult.error);
       }
@@ -68,7 +78,7 @@ const CreateUserModal = ({
         console.error("Failed to fetch lecturers:", lecturersResult.error);
       }
     } catch (error) {
-      setFormError("Failed to load dropdown data");
+      setFormError("فشل في تحميل بيانات القوائم المنسدلة");
       console.error("Error fetching dropdown data:", error);
     } finally {
       setLoadingDropdowns(false);
@@ -78,7 +88,7 @@ const CreateUserModal = ({
   // Display error from parent component
   useEffect(() => {
     if (error) {
-      setFormError(error);
+      setFormError(typeof error === "string" ? error : error.message || "فشل في إنشاء المستخدم");
     }
   }, [error]);
 
@@ -87,31 +97,64 @@ const CreateUserModal = ({
     setUserData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validateForm = () => {
+    // Email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.email)) {
+      return "البريد الإلكتروني غير صالح";
+    }
+
+    // Password match and length
+    if (userData.password !== userData.confirmPassword) {
+      return "كلمات المرور غير متطابقة";
+    }
+    if (userData.password.length < 6) {
+      return "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+    }
+
+    // Role-specific validations
+    if (userData.role === "student") {
+      if (!userData.level) {
+        return "الرجاء تحديد المستوى الدراسي";
+      }
+      if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
+        return "رقم الهاتف غير صالح (10-15 أرقام)";
+      }
+    }
+
+    if (userData.role === "parent") {
+      if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
+        return "رقم الهاتف غير صالح (10-15 أرقام)";
+      }
+    }
+
+    if (userData.role === "lecturer") {
+      if (!userData.subject || userData.subject.length === 0) {
+        return "الرجاء إدخال المواد الدراسية";
+      }
+    }
+
+    if (userData.role === "assistant") {
+      if (!userData.assignedLecturer) {
+        return "الرجاء تحديد المعلم المسؤول";
+      }
+    }
+
+    return "";
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormError("");
 
-    if (userData.password !== userData.confirmPassword) {
-      setFormError("كلمات المرور غير متطابقة");
-      return;
-    }
-
-    if (userData.role === "student" && !userData.level) {
-      setFormError("الرجاء تحديد المستوى الدراسي");
-      return;
-    }
-
-    if (userData.role === "lecturer" && (!userData.subject || userData.subject.length === 0)) {
-      setFormError("الرجاء إدخال المواد الدراسية");
-      return;
-    }
-
-    if (userData.role === "assistant" && !userData.assignedLecturer) {
-      setFormError("الرجاء تحديد المعلم المسؤول");
+    const validationError = validateForm();
+    if (validationError) {
+      setFormError(validationError);
       return;
     }
 
     const filteredData = filterDataByRole(userData);
+    console.log("Filtered Data sent to backend:", filteredData); // Log data for debugging
     onCreateUser(filteredData);
   };
 
@@ -122,7 +165,7 @@ const CreateUserModal = ({
       email: data.email,
       password: data.password,
       confirmPassword: data.confirmPassword,
-      gender: data.gender
+      gender: data.gender,
     };
 
     switch (data.role) {
@@ -131,32 +174,32 @@ const CreateUserModal = ({
           ...commonFields,
           level: data.level || undefined,
           phoneNumber: data.phoneNumber || undefined,
-          ...(data.sequencedId ? { sequencedId: data.sequencedId } : {}),
-          ...(data.parentPhoneNumber ? { parentPhoneNumber: data.parentPhoneNumber } : {}),
-          ...(data.hobbies && data.hobbies.length > 0 ? { hobbies: data.hobbies } : {}),
-          ...(data.faction ? { faction: data.faction } : {}),
-          ...(data.school ? { school: data.school } : {}),
-          ...(data.parent ? { parent: data.parent } : {})
+          sequencedId: data.sequencedId || undefined,
+          parentPhoneNumber: data.parentPhoneNumber || undefined,
+          hobbies: data.hobbies && data.hobbies.length > 0 ? data.hobbies : undefined,
+          faction: data.faction || undefined,
+          school: data.school || undefined,
+          parent: data.parent || undefined,
         };
       
       case "parent":
         return {
           ...commonFields,
-          phoneNumber: data.phoneNumber || undefined
+          phoneNumber: data.phoneNumber || undefined,
         };
       
       case "lecturer":
         return {
           ...commonFields,
           subject: data.subject || [],
-          ...(data.bio ? { bio: data.bio } : {}),
-          ...(data.expertise ? { expertise: data.expertise } : {})
+          bio: data.bio || undefined,
+          expertise: data.expertise || undefined,
         };
       
       case "assistant":
         return {
           ...commonFields,
-          assignedLecturer: data.assignedLecturer || undefined
+          assignedLecturer: data.assignedLecturer || undefined,
         };
       
       case "subadmin":
@@ -177,7 +220,6 @@ const CreateUserModal = ({
           {isBulkMode ? "إنشاء مستخدمين بالجملة" : "إنشاء مستخدم جديد"}
         </h3>
 
-        {/* Toggle between single and bulk user creation */}
         <div className="tabs tabs-border mb-4">
           <button
             className={`tab ${!isBulkMode ? "tab-active" : ""}`}
@@ -210,107 +252,108 @@ const CreateUserModal = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">نوع الحساب</span>
-                </label>
-                <select
-                  name="role"
-                  className="select select-bordered"
-                  value={userData.role}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="subadmin">مدير فرعي</option>
-                  <option value="moderator">مشرف</option>
-                  <option value="assistant">مساعد</option>
-                  <option value="student">طالب</option>
-                  <option value="parent">ولي أمر</option>
-                  <option value="lecturer">معلم</option>
-                </select>
+                  <label className="label">
+                    <span className="label-text">نوع الحساب</span>
+                  </label>
+                  <select
+                    name="role"
+                    className="select select-bordered"
+                    value={userData.role}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="" disabled>اختر نوع الحساب</option>
+                    <option value="subadmin">مدير فرعي</option>
+                    <option value="moderator">مشرف</option>
+                    <option value="assistant">مساعد</option>
+                    <option value="student">طالب</option>
+                    <option value="parent">ولي أمر</option>
+                    <option value="lecturer">معلم</option>
+                  </select>
                 </div>
               </div>
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">الجنس</span>
-                </label>
-                <select
-                  name="gender"
-                  className="select select-bordered"
-                  value={userData.gender}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="male">ذكر</option>
-                  <option value="female">أنثى</option>
-                </select>
+                  <label className="label">
+                    <span className="label-text">الجنس</span>
+                  </label>
+                  <select
+                    name="gender"
+                    className="select select-bordered"
+                    value={userData.gender}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="male">ذكر</option>
+                    <option value="female">أنثى</option>
+                  </select>
                 </div>
               </div>
             </div>
 
             <div className="form-control">
               <div className="flex flex-col gap-2">
-              <label className="label">
-                <span className="label-text">الاسم</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                className="input input-bordered"
-                value={userData.name}
-                onChange={handleChange}
-                required
-              />
+                <label className="label">
+                  <span className="label-text">الاسم</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  className="input input-bordered"
+                  value={userData.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
             <div className="form-control">
               <div className="flex flex-col gap-2">
-              <label className="label">
-                <span className="label-text">البريد الإلكتروني</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                className="input input-bordered"
-                value={userData.email}
-                onChange={handleChange}
-                required
-              />
+                <label className="label">
+                  <span className="label-text">البريد الإلكتروني</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  className="input input-bordered"
+                  value={userData.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">كلمة المرور</span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  className="input input-bordered"
-                  value={userData.password}
-                  onChange={handleChange}
-                  required
-                />
+                  <label className="label">
+                    <span className="label-text">كلمة المرور</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    className="input input-bordered"
+                    value={userData.password}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">تأكيد كلمة المرور</span>
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  className="input input-bordered"
-                  value={userData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
+                  <label className="label">
+                    <span className="label-text">تأكيد كلمة المرور</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    className="input input-bordered"
+                    value={userData.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
             </div>
@@ -332,7 +375,11 @@ const CreateUserModal = ({
               <button type="button" className="btn" onClick={onClose}>
                 إلغاء
               </button>
-              <button type="submit" className="btn btn-primary">
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={loadingDropdowns}
+              >
                 إنشاء
               </button>
             </div>

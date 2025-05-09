@@ -19,19 +19,19 @@
     "logoAlt": "شعار كلمة"
   },
   "gradeLevels": {
-      "Primary": "المرحلة الابتدائية",
-      "Middle": "المرحلة المتوسطة",
-      "Upper Primary": "المرحلة الابتدائية العليا",
-      "Higher Secondary": "المرحلة الثانوية",
-      "Fourth Elementary": "الصف الرابع الابتدائي",
-      "First Primary": "الصف الأول الابتدائي",
-      "Second Primary": " الصف الثاني الابتدائي",
-      "Third Primary": "الصف الثالث الابتدائي",
-      "Second Secondary": "الصف الثاني الثانوي",
-      "First Secondary": "الصف الأول الثانوي",
-      "Third Secondary": "الصف الثالث الثانوي"
-
-    },
+      "1st Primary": "الصف الأول الابتدائي",
+      "2nd Primary": "الصف الثاني الابتدائي",
+      "3rd Primary": "الصف الثالث الابتدائي",
+      "4th Primary": "الصف الرابع الابتدائي",
+      "5th Primary": "الصف الخامس الابتدائي",
+      "6th Primary": "الصف السادس الابتدائي",
+      "1st Preparatory": "الصف الأول الإعدادي",
+      "2nd Preparatory": "الصف الثاني الإعدادي",
+      "3rd Preparatory": "الصف الثالث الإعدادي",
+      "1st Secondary": "الصف الأول الثانوي",
+      "2nd Secondary": "الصف الثاني الثانوي",
+      "3rd Secondary": "الصف الثالث الثانوي"
+},
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",
@@ -48,5 +48,6 @@
   "auditLog": "سجل التدقيق",
   "myDashboard": "لوحة التحكم",
   "Packages": "الباقات",
-  "select": "اختر"
+  "select": "اختر",
+  "Create": "اضافة"
   }

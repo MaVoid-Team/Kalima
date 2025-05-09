@@ -180,7 +180,7 @@ export default function CourseDetails() {
           
           // Store user points if available
           if (dashboardResult.data.data.userInfo) {
-            setRemainingPoints(dashboardResult.data.data.userInfo.generalPoints || 0)
+            setRemainingPoints(dashboardResult.data.data.userInfo.generalPoints)
           }
         }
       } catch (err) {
@@ -217,8 +217,8 @@ export default function CourseDetails() {
         setPurchaseSuccess(true)
         
         // Update remaining points if available in the response
-        if (response.data.data && response.data.data.remainingPoints !== undefined) {
-          setRemainingPoints(response.data.data.remainingPoints)
+        if (response.data.data && response.data.data.remainingLecturerPoints !== undefined) {
+          setRemainingPoints(response.data.data.remainingLecturerPoints)
         }
         
         // Add the new purchase to the purchase history
@@ -306,14 +306,6 @@ export default function CourseDetails() {
                     label="حالة الشراء"
                     value={isContainerPurchased(courseId) ? "مشتراة" : "غير مشتراة"}
                   />
-                  
-                  {remainingPoints !== null && (
-                    <DetailItem
-                      icon={<FaMoneyBillWave className="text-primary" />}
-                      label="النقاط المتبقية"
-                      value={`${remainingPoints} نقطة`}
-                    />
-                  )}
                 </div>
                 
                 <div className="card-actions mt-6">

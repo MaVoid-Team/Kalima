@@ -21,127 +21,90 @@ const ContainersPage = () => {
       try {
         setLoading(true)
         
-        // Request all purchase history items without filtering by type
-        // This ensures we get all container types and can filter on the client
         const result = await getUserDashboard({
           params: {
             fields: 'userInfo,containers,purchaseHistory',
-            limit: 100, // Request a large number to get all items
-            page: 1 // Always start from page 1 to get everything
+            limit: 200,
+            page: 1
           }
         });
 
         console.log("Dashboard data:", result.data.data);
 
         if (result.success) {
-          const { userInfo } = result.data.data
-          setUserRole(userInfo.role)
+          const { userInfo } = result.data.data;
+          setUserRole(userInfo.role);
+
+          let courseContainers = [];
 
           if (userInfo.role === 'Lecturer') {
-            // For lecturers: containers are directly in the response
-            const { containers = [] } = result.data.data
-            
-            // Filter for course-type containers only
-            const courseContainers = containers.filter(container => container.type === 'course')
-            
-            // Apply client-side pagination
-            const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage)
-            setContainers(paginatedContainers)
-            
-            // Calculate total pages
-            setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1)
-          } else {
-            // For students: containers are in purchaseHistory
-            const { purchaseHistory = [] } = result.data.data
-            
-            console.log("Purchase history:", purchaseHistory);
-
-            // Process all container purchases
-            const allPurchasedContainers = purchaseHistory
-              .filter(p => p.type === 'containerPurchase')
-              .map(p => {
-                // If container is just an ID string
-                if (typeof p.container === 'string') {
-                  return {
-                    _id: p.container,
-                    name: p.description ? p.description.replace('Purchased container ', '').split(' for ')[0] : 'Unknown',
-                    type: 'course', // Assume course since we're on the courses page
-                    lecturer: p.lecturer,
-                    purchasedAt: p.purchasedAt,
-                    purchaseId: p._id,
-                    price: p.points || 0
-                  };
-                }
-                
-                // If container is a full object
-                return {
-                  ...p.container,
-                  lecturer: p.lecturer,
-                  purchasedAt: p.purchasedAt,
-                  purchaseId: p._id
-                };
-              });
-            
-            console.log("All purchased containers:", allPurchasedContainers);
-            
-            // Filter for course-type containers only
-            const courseContainers = allPurchasedContainers
-              .filter(container => container.type === 'course')
-              // Remove duplicates based on _id
-              .filter((container, index, self) =>
-                index === self.findIndex(c => c._id === container._id)
+            // For lecturers: containers are directly in response.data.containers
+            const { containers = [] } = result.data.data;
+            courseContainers = containers.filter(container => container.type === 'course');
+          } else if (userInfo.role === 'Student') {
+            // For students: containers are in response.data.purchaseHistory.container
+            const { purchaseHistory = [] } = result.data.data;
+            const containerPurchases = purchaseHistory
+              .filter(p => 
+                p.type === 'containerPurchase' && 
+                p.container && 
+                p.container.type === 'course'
               );
-            
-            console.log("Course containers:", courseContainers);
-            
-            // Apply client-side pagination
-            const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage)
-            console.log("Paginated containers:", paginatedContainers);
-            
-            setContainers(paginatedContainers)
-            
-            // Calculate total pages
-            setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1)
+            // Remove duplicates by container._id
+            const uniqueCourseContainers = Array.from(
+              new Map(containerPurchases.map(p => [p.container._id, p])).values()
+            ).map(p => ({
+              ...p.container,
+              lecturer: p.lecturer,
+              purchasedAt: p.purchasedAt,
+              purchaseId: p._id,
+              price: p.points || 0
+            }));
+            courseContainers = uniqueCourseContainers;
           }
+
+          const paginatedContainers = applyPagination(courseContainers, currentPage, itemsPerPage);
+          setContainers(paginatedContainers);
+          setTotalPages(Math.ceil(courseContainers.length / itemsPerPage) || 1);
         } else {
-          setError("Failed to load data")
+          setError("Failed to load data");
         }
       } catch (err) {
-        setError("Failed to load data. Please try again later.")
-        console.error("Error:", err)
+        setError("Failed to load data. Please try again later.");
+        console.error("Error:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [currentPage, itemsPerPage])
+    fetchData();
+  }, [currentPage, itemsPerPage]);
 
   // Apply pagination to an array
   const applyPagination = (items, page, limit) => {
-    const startIndex = (page - 1) * limit
-    return items.slice(startIndex, startIndex + limit)
-  }
+    const startIndex = (page - 1) * limit;
+    return items.slice(startIndex, startIndex + limit);
+  };
 
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage)
+      setCurrentPage(newPage);
     }
-  }
+  };
 
   // Handle items per page change
   const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(Number(e.target.value))
-    setCurrentPage(1) // Reset to first page when changing items per page
-  }
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="loading loading-spinner loading-lg text-primary"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -164,7 +127,7 @@ const ContainersPage = () => {
           <span>{error}</span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -172,6 +135,9 @@ const ContainersPage = () => {
       <h1 className="text-3xl font-bold mb-6">
         {userRole === 'Lecturer' ? 'الدورات الخاصة بك' : 'الدورات المشتراة'}
       </h1>
+      <p className="text-sm opacity-80">
+        {userRole === 'Lecturer' ? "المحاضرات التي قمت بنشرها" : "المحاضرات التي قمت بشرائها"}
+      </p>
 
       {/* Items per page selector */}
       <div className="flex justify-end mb-4">
@@ -199,17 +165,15 @@ const ContainersPage = () => {
                 {container.level?.name && (
                   <div className="badge badge-secondary">{container.level.name}</div>
                 )}
-                <div className="badge badge-accent">{container.type || 'course'}</div>
+                <div className="badge badge-accent">course</div>
               </div>
               
-              {/* Show price for lecturer view */}
               {userRole === 'Lecturer' && (
                 <p className="text-sm">
                   السعر: {container.price} نقطة
                 </p>
               )}
               
-              {/* Show lecturer name for student view */}
               {userRole === 'Student' && container.lecturer && (
                 <p className="text-sm">
                   المدرس: {typeof container.lecturer === 'string' 
@@ -218,7 +182,6 @@ const ContainersPage = () => {
                 </p>
               )}
               
-              {/* Show purchase date for student view */}
               {userRole === 'Student' && container.purchasedAt && (
                 <p className="text-sm opacity-75">
                   تاريخ الشراء: {new Date(container.purchasedAt).toLocaleDateString('ar-EG')}
@@ -230,6 +193,7 @@ const ContainersPage = () => {
                   <Link 
                     to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
                     className="btn btn-primary"
+                    state={{ userRole: 'Lecturer' }}
                   >
                     عرض التفاصيل
                   </Link>
@@ -237,6 +201,7 @@ const ContainersPage = () => {
                   <Link 
                     to={`/dashboard/student-dashboard/container-details/${container._id}`} 
                     className="btn btn-primary"
+                    state={{ userRole: 'Student' }}
                   >
                     عرض التفاصيل
                   </Link>
@@ -260,7 +225,6 @@ const ContainersPage = () => {
         </div>
       )}
 
-      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8">
           <div className="join">
@@ -293,7 +257,7 @@ const ContainersPage = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ContainersPage
+export default ContainersPage;

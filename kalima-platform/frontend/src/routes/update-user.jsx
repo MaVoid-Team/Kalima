@@ -26,7 +26,7 @@ export const updateUser = async (userId, updateData) => {
     }
 
     // Make the API request
-    const response = await api.patch(`${API_URL}/api/v1/users/${userId}`,
+    const response = await axios.patch(`${API_URL}/api/v1/users/${userId}`,
       updateData,
       {
         headers: {
@@ -67,7 +67,7 @@ export const updateUser = async (userId, updateData) => {
 export const updateCurrentUser = async (updateData) => {
   try {
     // Fetch current user data to get the ID and role
-    const userDataResponse = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
+    const userDataResponse = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
       headers: {
         'Authorization': `Bearer ${getToken()}`
       }

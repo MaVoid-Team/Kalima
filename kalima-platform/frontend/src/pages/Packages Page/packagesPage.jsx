@@ -16,9 +16,10 @@ const PackagesPage = () => {
     useEffect(() => {
         const loadPackages = async () => {
             try {
-                const data = await fetchPackages();
-                setPackages(data);
-                setFilteredPackages(data);
+                const response = await fetchPackages();
+                console.log(response.data)
+                setPackages(response.data);
+                setFilteredPackages(response.data);
                 setLoading(false);
             } catch (err) {
                 setError('Failed to load packages. Please try again later.');

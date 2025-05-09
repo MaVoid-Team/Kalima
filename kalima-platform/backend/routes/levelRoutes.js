@@ -17,7 +17,15 @@ router
 router
   .route("/:id")
   .get(levelController.getLevelById)
-  .patch(levelController.updateLevelById)
-  .delete(levelController.deleteLevelById);
+  .patch(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.updateLevelById
+  )
+  .delete(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.deleteLevelById
+  );
 
 module.exports = router;

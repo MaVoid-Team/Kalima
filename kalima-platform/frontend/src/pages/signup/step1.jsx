@@ -1,34 +1,11 @@
 import { useState, useEffect } from 'react';
-import { getAllLevels } from '../../routes/levels'; // Adjust the import path based on your project structure
 
-export default function Step1({ formData, handleInputChange, t, errors, role }) {
-  const [gradeLevels, setGradeLevels] = useState([]);
+
+export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels  }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchLevels = async () => {
-      try {
-        const response = await getAllLevels();
-        if (response.success) {
-          const levels = response.data.levels.map(level => ({
-            value: level._id,
-            label: level.name
-          }));
-          setGradeLevels(levels);
-          setLoading(false);
-        } else {
-          setError(response);
-          setLoading(false);
-        }
-      } catch (err) {
-        setError('Failed to fetch grade levels');
-        setLoading(false);
-      }
-    };
-
-    fetchLevels();
-  }, []);
+  
 
   return (
     <div className="space-y-4">
@@ -49,8 +26,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
             required
           />
           {errors.fullName && (
-            <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
-              {t(errors.fullName)}
+            <span className="absolute bottom-0  text-error text-sm mt-1">
+             {t(`validation.${errors.fullName}`)}
             </span>
           )}
         </div>
@@ -89,8 +66,8 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
             required
           />
           {errors.phoneNumber && (
-            <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
-              {t(errors.phoneNumber)}
+            <span className="absolute bottom-0  text-error text-sm mt-1">
+               {t(`validation.${errors.phoneNumber}`)}
             </span>
           )}
         </div>
@@ -99,43 +76,32 @@ export default function Step1({ formData, handleInputChange, t, errors, role }) 
       {/* Student-specific fields */}
       {role === 'student' && (
         <>
-          <div className="form-control relative pb-5">
-            <div className="flex flex-col gap-2">
-              <label className="label">
-                <span className="label-text">{t('form.grade')}</span>
-              </label>
-              <select
-                name="grade"
-                className={`select select-bordered w-2/3 lg:w-1/2 ${errors.grade ? 'select-error animate-shake' : ''}`}
-                value={formData.grade}
-                onChange={handleInputChange}
-                required
-                disabled={loading || error}
-              >
-                <option value="">{t('form.selectGrade')}</option>
-                {loading ? (
-                  <option value="" disabled>
-                    {t('form.loading')}
-                  </option>
-                ) : error ? (
-                  <option value="" disabled>
-                    {t('form.errorLoadingGrades')}
-                  </option>
-                ) : (
-                  gradeLevels.map(level => (
-                    <option key={level.value} value={level.value}>
-                   {t(`gradeLevels.${level.label}`)}
-                    </option>
-                  ))
-                )}
-              </select>
-              {errors.grade && (
-                <span className="absolute bottom-0 left-0 text-error text-sm mt-1">
-                  {t(errors.grade)}
-                </span>
-              )}
-            </div>
+       <div className="form-control relative pb-5">
+          <div className="flex flex-col gap-2">
+            <label className="label">
+              <span className="label-text">{t('form.grade')}</span>
+            </label>
+            <select
+              name="level"
+              className={`select select-bordered w-2/3 lg:w-1/2 ${errors.level ? 'select-error animate-shake' : ''}`}
+              value={formData.level}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">{t('form.selectGrade')}</option>
+              {gradeLevels.map(level => (
+                <option key={level.value} value={level.value}>
+                  {t(`gradeLevels.${level.label}`)}
+                </option>
+              ))}
+            </select>
+            {errors.level && (
+              <span className="absolute bottom-0  text-error text-sm mt-1">
+                 {t(`validation.${errors.level}`)}
+              </span>
+            )}
           </div>
+        </div>
         </>
       )}
     </div>

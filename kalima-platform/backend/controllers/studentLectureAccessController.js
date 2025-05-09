@@ -153,3 +153,33 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get student lecture access by lecture ID
+exports.getLectureAccessByLectureId = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  
+  // Verify lecture exists
+  const lecture = await Lecture.findById(lectureId);
+  if (!lecture) {
+    return next(new AppError("Lecture not found", 404));
+  }
+  
+  // Find all access records for this lecture
+  const accessRecords = await StudentLectureAccess.find({ lecture: lectureId })
+    .populate({
+      path: 'student',
+      select: 'name email' // Include student details you want to return
+    });
+  
+  res.status(200).json({
+    status: "success",
+    results: accessRecords.length,
+    data: {
+      lecture: {
+        _id: lecture._id,
+        name: lecture.name
+      },
+      accessRecords
+    }
+  });
+});
