@@ -298,7 +298,10 @@ export const refreshToken = async () => {
 
 // --- USER DATA API CALLS ---
 
-export const getUserDashboard = async ({ page = 1, limit = 100 } = {}) => {
+export const getUserDashboard = async ({ params = {} } = {}) => {
+  const defaultParams = { page: 1, limit: 200 };
+  const finalParams = { ...defaultParams, ...params };
+
   try {
     if (!isLoggedIn()) {
       return { success: false, error: "Not authenticated" };
@@ -309,7 +312,7 @@ export const getUserDashboard = async ({ page = 1, limit = 100 } = {}) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      params: { page, limit },
+      params: finalParams,
     });
 
     return {
@@ -330,7 +333,7 @@ export const getUserDashboard = async ({ page = 1, limit = 100 } = {}) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${newToken}`,
               },
-              params: { page, limit },
+              params: finalParams,
             }).then((response) => ({
               success: true,
               data: response.data,
@@ -354,7 +357,7 @@ export const getUserDashboard = async ({ page = 1, limit = 100 } = {}) => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
             },
-            params: { page, limit },
+            params: finalParams,
           });
           return {
             success: true,
