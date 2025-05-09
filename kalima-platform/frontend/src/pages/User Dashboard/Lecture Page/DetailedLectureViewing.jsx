@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getLectureById, getLectureAttachments, deleteLecture } from "../../../routes/lectures"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
+import { getStudentSubmissionsByLectureId } from "../../../routes/examsAndHomeworks"
 import {
   FiArrowLeft,
   FiDownload,
@@ -19,6 +20,10 @@ import {
   FiCheck,
   FiX,
   FiAlertTriangle,
+  FiUpload,
+  FiUsers,
+  FiFile,
+  FiInfo,
 } from "react-icons/fi"
 
 const DetailedLectureView = () => {
@@ -36,26 +41,37 @@ const DetailedLectureView = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [userRole, setUserRole] = useState(null)
+  const [userId, setUserId] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
+  const [studentSubmissions, setStudentSubmissions] = useState([])
+  const [submissionsLoading, setSubmissionsLoading] = useState(false)
+  const [submissionsError, setSubmissionsError] = useState(null)
+  const [viewingSubmission, setViewingSubmission] = useState(null)
+  const [showSubmissionModal, setShowSubmissionModal] = useState(false)
+  const fileViewerRef = useRef(null)
 
-  // Fetch user role first
+  // Check if user has admin-like privileges
+  const hasAdminPrivileges = ["Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"].includes(userRole)
+
+  // Fetch user role and ID first
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchUserData = async () => {
       try {
         const result = await getUserDashboard()
         if (result.success) {
           setUserRole(result.data.data.userInfo.role)
+          setUserId(result.data.data.userInfo.id)
         } else {
-          console.error("Failed to fetch user role:", result)
+          console.error("Failed to fetch user data:", result)
         }
       } catch (err) {
-        console.error("Error fetching user role:", err)
+        console.error("Error fetching user data:", err)
       }
     }
 
-    fetchUserRole()
+    fetchUserData()
   }, [])
 
   // Fetch lecture data, attachments, subjects, and levels
@@ -127,6 +143,45 @@ const DetailedLectureView = () => {
     }
   }, [lectureId])
 
+  // Fetch student submissions
+  useEffect(() => {
+    const fetchStudentSubmissions = async () => {
+      if (!lectureId || !userRole || !userId) {
+        return
+      }
+
+      try {
+        setSubmissionsLoading(true)
+        setSubmissionsError(null)
+
+        const result = await getStudentSubmissionsByLectureId(lectureId)
+
+        if (result.success) {
+          // Store all submissions if user has admin privileges
+          // Otherwise, filter to only show the current user's submissions
+          if (hasAdminPrivileges) {
+            setStudentSubmissions(result.data.students || [])
+          } else {
+            // Filter submissions to only show the current user's
+            const userSubmissions = (result.data.students || []).filter(
+              (studentData) => studentData.student._id === userId,
+            )
+            setStudentSubmissions(userSubmissions)
+          }
+        } else {
+          setSubmissionsError(result.error || "Failed to fetch student submissions")
+        }
+      } catch (err) {
+        console.error("Error fetching student submissions:", err)
+        setSubmissionsError("An unexpected error occurred while fetching student submissions")
+      } finally {
+        setSubmissionsLoading(false)
+      }
+    }
+
+    fetchStudentSubmissions()
+  }, [lectureId, userRole, userId, hasAdminPrivileges])
+
   // Helper function to get subject name
   const getSubjectName = () => {
     if (!lecture || !lecture.subject) return "غير محدد"
@@ -163,6 +218,29 @@ const DetailedLectureView = () => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  // Handle viewing a submission
+  const handleViewSubmission = (submission) => {
+    setViewingSubmission(submission)
+    setShowSubmissionModal(true)
+  }
+
+  // Get file icon based on file type
+  const getFileIcon = (fileType) => {
+    if (fileType.includes("pdf")) {
+      return "pdf"
+    } else if (fileType.includes("word") || fileType.includes("document")) {
+      return "doc"
+    } else if (fileType.includes("sheet") || fileType.includes("excel")) {
+      return "xls"
+    } else if (fileType.includes("presentation") || fileType.includes("powerpoint")) {
+      return "ppt"
+    } else if (fileType.includes("image")) {
+      return "img"
+    } else {
+      return "file"
+    }
   }
 
   // Handle lecture deletion
@@ -287,7 +365,7 @@ const DetailedLectureView = () => {
         </div>
 
         {/* Admin/Lecturer Actions */}
-        {["Admin", "Lecturer", "Subadmin", "Moderator"].includes(userRole) && (
+        {hasAdminPrivileges && (
           <div className="flex gap-2">
             <button className="btn btn-outline btn-sm">تعديل المحاضرة</button>
             <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
@@ -333,6 +411,113 @@ const DetailedLectureView = () => {
         </div>
       )}
 
+      {/* Submission Viewer Modal */}
+      {showSubmissionModal && viewingSubmission && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-4xl w-11/12 h-5/6 max-h-screen">
+            <h3 className="font-bold text-lg flex items-center gap-2 mb-4">
+              <FiFile className="text-primary" />
+              {viewingSubmission.fileName}
+            </h3>
+
+            <div className="bg-base-200 rounded-lg p-2 mb-4 text-sm flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span>
+                  النوع: <span className="font-medium">{viewingSubmission.fileType}</span>
+                </span>
+                <span>
+                  الحجم: <span className="font-medium">{(viewingSubmission.fileSize / 1024).toFixed(2)} KB</span>
+                </span>
+                <span>
+                  تاريخ الرفع:{" "}
+                  <span className="font-medium">
+                    {new Date(viewingSubmission.uploadedOn).toLocaleDateString("ar-EG")}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-base-300 rounded-lg overflow-hidden h-[calc(100%-8rem)] flex items-center justify-center">
+              {/* File preview based on file type */}
+              {viewingSubmission.fileType.includes("image") ? (
+                <div className="w-full h-full flex items-center justify-center p-4">
+                  <img
+                    src={`data:${viewingSubmission.fileType};base64,${viewingSubmission.fileData}`}
+                    alt={viewingSubmission.fileName}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              ) : viewingSubmission.fileType.includes("pdf") ? (
+                <div className="w-full h-full p-4">
+                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <FiFileText className="w-16 h-16 mx-auto text-primary mb-4" />
+                      <p className="font-medium mb-2">ملف PDF</p>
+                      <p className="text-sm opacity-70 mb-4">
+                        لا يمكن عرض محتوى ملف PDF مباشرة. يرجى تنزيل الملف لعرضه.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : viewingSubmission.fileType.includes("word") || viewingSubmission.fileType.includes("document") ? (
+                <div className="w-full h-full p-4">
+                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <FiFileText className="w-16 h-16 mx-auto text-blue-600 mb-4" />
+                      <p className="font-medium mb-2">مستند Word</p>
+                      <p className="text-sm opacity-70 mb-4">
+                        لا يمكن عرض محتوى مستند Word مباشرة. يرجى تنزيل الملف لعرضه.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : viewingSubmission.fileType.includes("sheet") || viewingSubmission.fileType.includes("excel") ? (
+                <div className="w-full h-full p-4">
+                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <FiFileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
+                      <p className="font-medium mb-2">جدول بيانات Excel</p>
+                      <p className="text-sm opacity-70 mb-4">
+                        لا يمكن عرض محتوى جدول البيانات مباشرة. يرجى تنزيل الملف لعرضه.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full h-full p-4">
+                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <FiFile className="w-16 h-16 mx-auto text-gray-600 mb-4" />
+                      <p className="font-medium mb-2">ملف غير مدعوم للعرض</p>
+                      <p className="text-sm opacity-70 mb-4">
+                        لا يمكن عرض محتوى هذا النوع من الملفات مباشرة. يرجى تنزيل الملف لعرضه.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-action">
+              <button className="btn btn-outline" onClick={() => setShowSubmissionModal(false)}>
+                إغلاق
+              </button>
+              <a
+                href={`data:${viewingSubmission.fileType};base64,${viewingSubmission.fileData}`}
+                download={viewingSubmission.fileName}
+                className="btn btn-primary"
+              >
+                <FiDownload className="ml-2" />
+                تنزيل الملف
+              </a>
+            </div>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setShowSubmissionModal(false)}>close</button>
+          </form>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2">
@@ -346,6 +531,127 @@ const DetailedLectureView = () => {
               <p className="whitespace-pre-line">{lecture.description || "لا يوجد وصف متاح"}</p>
             </div>
           </div>
+
+          {/* Student Submissions */}
+          {(hasAdminPrivileges || userRole === "Student") && (
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <FiUpload className="text-primary" />
+                {hasAdminPrivileges ? "واجبات الطلاب" : "واجباتي المرفوعة"}
+              </h2>
+
+              {submissionsLoading ? (
+                <div className="flex justify-center py-8 bg-base-200 rounded-lg">
+                  <div className="loading loading-spinner loading-md"></div>
+                </div>
+              ) : submissionsError ? (
+                <div className="alert alert-error">
+                  <FiX className="w-5 h-5" />
+                  <span>{submissionsError}</span>
+                </div>
+              ) : studentSubmissions.length > 0 ? (
+                <div className="bg-base-200 rounded-lg p-4">
+                  <div className="overflow-x-auto">
+                    <table className="table w-full">
+                      <thead>
+                        <tr>
+                          <th>الطالب</th>
+                          <th>الملفات المرفوعة</th>
+                          <th>الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentSubmissions.map((studentData) => (
+                          <tr key={studentData.student._id}>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="avatar avatar-placeholder">
+                                  <div className="bg-primary text-primary-content rounded-full w-8">
+                                    <span>{studentData.student.name.charAt(0)}</span>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="font-bold">{studentData.student.name}</div>
+                                  <div className="text-sm opacity-70">{studentData.student.email}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              {studentData.submissions.length > 0 ? (
+                                <div className="space-y-2">
+                                  {studentData.submissions.map((submission) => (
+                                    <div key={submission._id} className="flex items-center gap-2">
+                                      <div className="bg-base-300 p-1 rounded">
+                                        <FiFile className="text-primary" />
+                                      </div>
+                                      <span className="text-sm">{submission.fileName}</span>
+                                      <span className="text-xs bg-base-300 px-2 py-1 rounded">
+                                        {(submission.fileSize / 1024).toFixed(2)} KB
+                                      </span>
+                                      <span className="text-xs opacity-70">
+                                        {new Date(submission.uploadedOn).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-sm opacity-70">لم يتم رفع أي ملفات</span>
+                              )}
+                            </td>
+                            <td>
+                              {studentData.submissions.length > 0 ? (
+                                <div className="flex gap-2">
+                                  {studentData.submissions.map((submission) => (
+                                    <button
+                                      key={submission._id}
+                                      onClick={() =>
+                                        handleViewSubmission({
+                                          ...submission,
+                                          // This is a placeholder for file data that would come from an API
+                                          // In a real implementation, you would fetch this from the backend
+                                          fileData: null,
+                                        })
+                                      }
+                                      className="btn btn-sm btn-primary"
+                                    >
+                                      <FiEye className="mr-1" />
+                                      عرض
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : (
+                                <button className="btn btn-sm btn-disabled">لا توجد ملفات</button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : userRole === "Student" ? (
+                <div className="alert alert-info">
+                  <FiInfo className="w-5 h-5" />
+                  <span>لم تقم برفع أي واجبات لهذه المحاضرة بعد</span>
+                </div>
+              ) : (
+                <div className="alert alert-info">
+                  <FiUsers className="w-5 h-5" />
+                  <span>لم يقم أي طالب برفع واجبات لهذه المحاضرة بعد</span>
+                </div>
+              )}
+
+              {/* Upload Homework Button (for students) */}
+              {userRole === "Student" && (
+                <div className="mt-4">
+                  <button className="btn btn-outline btn-primary">
+                    <FiUpload className="ml-2" />
+                    رفع واجب جديد
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Attachments */}
           <div className="mb-6">
@@ -365,9 +671,7 @@ const DetailedLectureView = () => {
               )}
 
             {/* Add Attachment Button (for admin/lecturer) */}
-            {["Admin", "Lecturer", "Subadmin", "Moderator"].includes(userRole) && (
-              <button className="btn btn-outline btn-sm mt-4">إضافة مرفق جديد</button>
-            )}
+            {hasAdminPrivileges && <button className="btn btn-outline btn-sm mt-4">إضافة مرفق جديد</button>}
           </div>
         </div>
 

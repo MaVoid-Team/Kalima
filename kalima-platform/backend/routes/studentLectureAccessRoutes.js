@@ -9,6 +9,9 @@ router.use(verifyJWT);
 router.route("/check/:lectureId")
   .get(studentLectureAccessController.checkLectureAccess);
 
+router.route("/lecture/:lectureId")
+  .get(studentLectureAccessController.getLectureAccessByLectureId);
+
 router
   .route("/")
   .get(studentLectureAccessController.getAllStudentLectureAccess)
