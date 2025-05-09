@@ -22,6 +22,9 @@ export default function LecturesPage() {
   const [selectedSubject, setSelectedSubject] = useState("")
   const [selectedStatus, setSelectedStatus] = useState("")
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const lecturesPerPage = 6
+
   useEffect(() => {
     fetchLectures()
   }, [])
@@ -30,7 +33,10 @@ export default function LecturesPage() {
     setLoading(true)
     setError("")
     try {
-      const result = await getAllLecturesPublic()
+      const result = await getAllLecturesPublic({
+        limit: 200,
+        page: 1
+      });
       if (result.status === "success") {
         setLectures(result.data.containers)
         setFilteredLectures(result.data.containers)
@@ -61,9 +67,9 @@ export default function LecturesPage() {
       price: lecture.price || 0,
       childrenCount: lecture.attachments
         ? (lecture.attachments.booklets?.length || 0) +
-          (lecture.attachments.exams?.length || 0) +
-          (lecture.attachments.homeworks?.length || 0) +
-          (lecture.attachments.pdfsandimages?.length || 0)
+        (lecture.attachments.exams?.length || 0) +
+        (lecture.attachments.homeworks?.length || 0) +
+        (lecture.attachments.pdfsandimages?.length || 0)
         : 0,
       views: lecture.numberOfViews || 0,
       description: lecture.description || "لا يوجد وصف",
@@ -99,6 +105,7 @@ export default function LecturesPage() {
     }
 
     setFilteredLectures(filtered)
+    setCurrentPage(1) // Reset to first page when filters are applied
   }, [selectedStage, selectedGrade, selectedSubject, selectedStatus, lectures])
 
   const resetFilters = useCallback(() => {
@@ -107,12 +114,23 @@ export default function LecturesPage() {
     setSelectedSubject("")
     setSelectedStatus("")
     setFilteredLectures(lectures)
+    setCurrentPage(1) // Reset to first page when filters are reset
   }, [lectures])
 
   const memoizedFilteredLectures = useMemo(
     () => generateLectureData(filteredLectures),
     [filteredLectures]
   )
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(memoizedFilteredLectures.length / lecturesPerPage)
+  }, [memoizedFilteredLectures, lecturesPerPage])
+
+  const currentLectures = useMemo(() => {
+    const indexOfLastLecture = currentPage * lecturesPerPage
+    const indexOfFirstLecture = indexOfLastLecture - lecturesPerPage
+    return memoizedFilteredLectures.slice(indexOfFirstLecture, indexOfLastLecture)
+  }, [memoizedFilteredLectures, currentPage, lecturesPerPage])
 
   const subjectOptions = useMemo(() => {
     const uniqueSubjects = new Set()
@@ -173,13 +191,10 @@ export default function LecturesPage() {
     },
   ]
 
-  // Inline dropdown component with translation support
   const FilterDropdown = ({ label, options, selectedValue, onSelect, isRTL }) => (
     <div className="w-full">
       <label
-        className={`block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200 ${
-          isRTL ? "text-right" : "text-left"
-        }`}
+        className={`block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200 ${isRTL ? "text-right" : "text-left"}`}
       >
         {label}
       </label>
@@ -187,9 +202,7 @@ export default function LecturesPage() {
         <select
           value={selectedValue}
           onChange={(e) => onSelect(e.target.value)}
-          className={`w-full appearance-none px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-            isRTL ? "text-right" : "text-left"
-          }`}
+          className={`w-full appearance-none px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${isRTL ? "text-right" : "text-left"}`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           <option value="">{t("filters.reset")}</option>
@@ -213,7 +226,28 @@ export default function LecturesPage() {
       </div>
     </div>
   )
-  
+
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    return (
+      <div className="flex justify-center mt-8">
+        <button
+          className="btn btn-outline btn-sm mx-1"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="mx-2">Page {currentPage} Of {totalPages}</span>
+        <button
+          className="btn btn-outline btn-sm mx-1"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-screen w-full" dir={isRTL ? "rtl" : "ltr"}>
@@ -280,7 +314,7 @@ export default function LecturesPage() {
             <LoadingSpinner />
           ) : error ? (
             <ErrorAlert error={error} onRetry={fetchLectures} />
-          ) : memoizedFilteredLectures.length === 0 ? (
+          ) : currentLectures.length === 0 ? (
             <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
               <p className="text-lg">{t("noLectures")}</p>
               {(selectedStage || selectedGrade || selectedSubject || selectedStatus) && (
@@ -290,27 +324,36 @@ export default function LecturesPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence>
-                {memoizedFilteredLectures.map((lecture) => (
-                  <motion.div
-                    key={lecture.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <CourseCard
-                      {...lecture}
-                      isRTL={isRTL}
-                      childrenCount={lecture.childrenCount}
-                      teacherRole={lecture.teacherRole}
-                      status={lecture.status}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <AnimatePresence>
+                  {currentLectures.map((lecture) => (
+                    <motion.div
+                      key={lecture.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <CourseCard
+                        {...lecture}
+                        isRTL={isRTL}
+                        childrenCount={lecture.childrenCount}
+                        teacherRole={lecture.teacherRole}
+                        status={lecture.status}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
