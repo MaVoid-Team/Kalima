@@ -117,15 +117,10 @@ export const generatePromoCodes = async (data) => {
     };
   }
 };
-export const getPromoCodes = async (filters = {}) => {
+export const getPromoCodes = async ({ params = {} } = {}) => {
   try {
-    const queryParams = new URLSearchParams({
-      limit: 100,
-      type: 'promo',
-      ...filters
-    });
-
-    const response = await axios.get(`${API_URL}/api/v1/codes?${queryParams.toString()}`, {
+    const response = await axios.get(`${API_URL}/api/v1/codes/`, {
+      params,
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
