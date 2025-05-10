@@ -145,7 +145,12 @@
         "lecture": "درس",
         "user": "مستخدم",
         "timetable": "جدول زمني",
-        "center": "مركز" 
+        "center": "مركز" ,
+        "code": "كود",
+        "promoCode": "كود ترويجي", 
+        "admin": "أدمن",
+        "assistant": "مساعد",
+        "parent": "ولي أمر"
       },
       "idDisplay": "ID: {{id}}",
       
