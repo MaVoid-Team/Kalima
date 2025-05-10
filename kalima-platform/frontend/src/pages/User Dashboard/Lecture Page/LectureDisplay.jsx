@@ -8,11 +8,15 @@ import {
   downloadAttachmentById,
   createLectureAttachment,
 } from "../../../routes/lectures"
-import { checkLectureAccess } from "../../../routes/examsAndHomeworks"
-import {uploadHomework, getLectureHomeworks,} from "../../../routes/homeworks"
+import {
+  checkLectureAccess,
+  verifyExamSubmission,
+  uploadHomework,
+  getLectureHomeworks,
+} from "../../../routes/examsAndHomeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
-import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink } from "react-icons/fi"
+import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
 
 // Vidstack imports
 import { MediaPlayer, MediaProvider, Poster } from "@vidstack/react"
@@ -83,6 +87,7 @@ const LectureDisplay = () => {
   const [examVerificationLoading, setExamVerificationLoading] = useState(false)
   const [examRequired, setExamRequired] = useState(false)
   const [examData, setExamData] = useState(null)
+  const [examSubmission, setExamSubmission] = useState(null)
 
   // Attachment tabs and uploads
   const [activeTab, setActiveTab] = useState("pdfsandimages")
@@ -213,21 +218,32 @@ const LectureDisplay = () => {
       try {
         setExamVerificationLoading(true)
 
-        // Check if the lecture requires an exam
+        // First check if the lecture requires an exam
         const accessResult = await checkLectureAccess(lectureId)
 
-        if (accessResult.status === "restricted") {
-          // Student needs to pass an exam
+        if (accessResult.status === "restricted" && accessResult.data?.requiresExam) {
+          // Lecture requires an exam
           setExamRequired(true)
           setExamData(accessResult.data)
-          setExamVerified(false)
+
+          // Now verify if the student has passed the exam
+          const verificationResult = await verifyExamSubmission(lectureId)
+
+          if (verificationResult.success && verificationResult.status === "success") {
+            // Student has passed the exam
+            setExamVerified(true)
+            setExamSubmission(verificationResult.data.submission)
+          } else {
+            // Student has not passed the exam
+            setExamVerified(false)
+          }
         } else {
           // No exam required or already passed
           setExamRequired(false)
           setExamVerified(true)
         }
       } catch (err) {
-        console.error("Error checking lecture access:", err)
+        console.error("Error verifying exam submission:", err)
       } finally {
         setExamVerificationLoading(false)
       }
@@ -552,6 +568,25 @@ const LectureDisplay = () => {
     }
   }
 
+  // Format date to readable string
+  const formatDate = (dateString) => {
+    if (!dateString) return "غير متاح"
+
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    } catch (error) {
+      console.error("Error formatting date:", error)
+      return "تاريخ غير صالح"
+    }
+  }
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -752,6 +787,24 @@ const LectureDisplay = () => {
               ></path>
             </svg>
             <span>أنت تشاهد هذه المحاضرة بصفتك {userRole}</span>
+          </div>
+        </div>
+      )}
+
+      {userRole === "Student" && examRequired && examVerified && examSubmission && (
+        <div className="alert alert-success mb-6 shadow-lg">
+          <div className="flex items-center gap-2">
+            <FiAward className="stroke-current shrink-0 w-6 h-6" />
+            <div>
+              <span className="font-bold">تم اجتياز الامتحان بنجاح!</span>
+              <div className="text-sm mt-1">
+                <span>
+                  الدرجة: {examSubmission.score}/{examSubmission.maxScore}
+                </span>
+                <span className="mx-2">|</span>
+                <span>تاريخ الاجتياز: {formatDate(examSubmission.verifiedAt)}</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
