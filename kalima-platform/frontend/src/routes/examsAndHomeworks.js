@@ -40,7 +40,7 @@ export const getStudentSubmissionsByLectureId = async (lectureId) => {
 };
 
 /**
- * Verify if a student has submitted an exam for a lecture and passed
+ * Verify if a student has submitted and passed an exam for a specific lecture
  * @param {string} lectureId - The ID of the lecture
  * @returns {Promise<Object>} - The response data
  */
@@ -62,15 +62,16 @@ export const verifyExamSubmission = async (lectureId) => {
 
     return {
       success: true,
-      data: response.data,
-      status: response.data.status
+      status: response.data.status,
+      data: response.data.data,
+      passed: response.data.data?.passed || false
     }
   } catch (error) {
     console.error("Error verifying exam submission:", error)
     return {
       success: false,
+      status: "fail",
       error: error.response?.data?.message || error.message || "Failed to verify exam submission",
-      status: error.response?.data?.status || "error"
     }
   }
 }
