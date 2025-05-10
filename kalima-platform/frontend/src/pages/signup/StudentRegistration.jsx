@@ -22,7 +22,7 @@ const hobbiesList = [
   { id: 5, name: 'gaming', img: '/hobbies/gaming.jpg' },
   { id: 6, name: 'cooking', img: '/hobbies/cooking.jpg' },
   { id: 7, name: 'photography', img: '/hobbies/photography.jpg' },
-  { id: 8, name: 'dancing', img: '/hobbies/dancing.jpg' },
+  { id: 8, name: 'bicycling', img: '/hobbies/bicycle.jpg' },
   { id: 9, name: 'technology', img: '/hobbies/technology.jpg' },
 ];
 
