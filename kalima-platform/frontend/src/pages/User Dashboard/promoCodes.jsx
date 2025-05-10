@@ -24,6 +24,8 @@ import {
 } from "lucide-react"
 import { getUserDashboard } from "../../routes/auth-services"
 import { redeemPromoCode } from "../../routes/codes"
+import { getAccessToken } from "../../utils/useLocalStroage"
+import { useNavigate } from "react-router-dom"
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation("promoCodes")
@@ -46,7 +48,14 @@ const PromoCodes = () => {
   const [scannerLoading, setScannerLoading] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("transactions")
-
+  const navigate = useNavigate();
+  const accessToken = getAccessToken();
+  useEffect(() => {
+    if(!accessToken){
+      navigate("/login")
+    }
+  }, [accessToken,navigate])
+  
   // Use a ref for the scanner instance to maintain it across renders
   const scannerRef = useRef(null)
   // Track if scanner is actually running

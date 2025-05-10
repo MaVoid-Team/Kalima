@@ -5,18 +5,34 @@ const ReviewItem = ({ label, value }) => (
   </div>
 );
 
-export default function Step4({ formData, t, hobbiesList , gradeLevels}) {
-  
-  const levelName= gradeLevels.name;
+export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
+  // Function to find and translate level name
+  const getLevelName = (levelId) => {
+    const level = gradeLevels.find(level => level.value === levelId);
+    return level ? t(`gradeLevels.${level.label}`) : '-';
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-base-200 p-6 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">{t('review.title')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <ReviewItem label={t('form.role')} value={t(`role.${formData.role}`)} />
-          <ReviewItem label={t('form.fullName')} value={formData.fullName} />
-          <ReviewItem label={t('form.gender')} value={t(`gender.${formData.gender}`)} />
-          <ReviewItem label={t('form.phoneNumber')} value={formData.phoneNumber} />
+          <ReviewItem 
+            label={t('form.role')} 
+            value={t(`role.${formData.role}`)} 
+          />
+          <ReviewItem 
+            label={t('form.fullName')} 
+            value={formData.fullName} 
+          />
+          <ReviewItem 
+            label={t('form.gender')} 
+            value={t(`gender.${formData.gender}`)} 
+          />
+          <ReviewItem 
+            label={t('form.phoneNumber')} 
+            value={formData.phoneNumber} 
+          />
 
           {formData.role === 'student' && (
             <>
@@ -24,27 +40,29 @@ export default function Step4({ formData, t, hobbiesList , gradeLevels}) {
                 label={t('form.grade')} 
                 value={getLevelName(formData.level)}
               />
-
-                <ReviewItem label={t('form.parentPhone')} value={formData.parentPhoneNumber} />
-                <ReviewItem 
-                  label={t('form.hobbies')} 
-                  value={formData.hobbies.map(id => t(`hobbies.${hobbiesList.find(hobby => hobby.id === id).name}`)).join(', ')} 
-                          />
-                        </>
+              <ReviewItem 
+                label={t('form.parentPhone')} 
+                value={formData.parentPhoneNumber} 
+              />
+              <ReviewItem 
+                label={t('form.hobbies')} 
+                value={formData.hobbies.map(id => t(`hobbies.${hobbiesList.find(hobby => hobby.id === id)?.name}`)).join(', ')} 
+              />
+            </>
           )}
 
-            {formData.role === 'teacher' && (
-              <>
-                <ReviewItem 
-                  label={t('form.level')} 
-                  value={levelName}
-                />
-                <ReviewItem 
-                  label={t('form.subject')} 
-                  value={formData.subject} 
-                />
-              </>
-            )}
+          {formData.role === 'teacher' && (
+            <>
+              <ReviewItem 
+                label={t('form.level')} 
+                value={getLevelName(formData.level)}
+              />
+              <ReviewItem 
+                label={t('form.subject')} 
+                value={formData.subject} 
+              />
+            </>
+          )}
 
           {formData.role === 'parent' && (
             <ReviewItem
