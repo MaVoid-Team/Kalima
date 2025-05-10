@@ -1,10 +1,4 @@
 "use client"
-
-import {
-  checkLectureAccess,
-  verifyExamSubmission,
-} from "../../../routes/examsAndHomeworks"
-
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
