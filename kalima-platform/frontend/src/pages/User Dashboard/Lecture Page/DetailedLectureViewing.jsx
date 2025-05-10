@@ -7,6 +7,7 @@ import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentSubmissionsByLectureId } from "../../../routes/examsAndHomeworks"
+import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import {
   FiArrowLeft,
   FiDownload,
@@ -24,6 +25,9 @@ import {
   FiUsers,
   FiFile,
   FiInfo,
+  FiEdit,
+  FiClock,
+  FiSave,
 } from "react-icons/fi"
 
 const DetailedLectureView = () => {
@@ -51,6 +55,16 @@ const DetailedLectureView = () => {
   const [viewingSubmission, setViewingSubmission] = useState(null)
   const [showSubmissionModal, setShowSubmissionModal] = useState(false)
   const fileViewerRef = useRef(null)
+
+  // Student lecture access states
+  const [studentLectureAccesses, setStudentLectureAccesses] = useState([])
+  const [accessesLoading, setAccessesLoading] = useState(false)
+  const [accessesError, setAccessesError] = useState(null)
+  const [editingAccessId, setEditingAccessId] = useState(null)
+  const [remainingViews, setRemainingViews] = useState(0)
+  const [updateAccessLoading, setUpdateAccessLoading] = useState(false)
+  const [updateAccessError, setUpdateAccessError] = useState(null)
+  const [updateAccessSuccess, setUpdateAccessSuccess] = useState(false)
 
   // Check if user has admin-like privileges
   const hasAdminPrivileges = ["Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"].includes(userRole)
@@ -182,6 +196,35 @@ const DetailedLectureView = () => {
     fetchStudentSubmissions()
   }, [lectureId, userRole, userId, hasAdminPrivileges])
 
+  // Fetch student lecture accesses
+  useEffect(() => {
+    const fetchStudentLectureAccesses = async () => {
+      if (!lectureId || !userRole || !hasAdminPrivileges) {
+        return
+      }
+
+      try {
+        setAccessesLoading(true)
+        setAccessesError(null)
+
+        const result = await getAllStudentLectureAccess(lectureId)
+
+        if (result.success) {
+          setStudentLectureAccesses(result.data || [])
+        } else {
+          setAccessesError(result.error || "Failed to fetch student lecture accesses")
+        }
+      } catch (err) {
+        console.error("Error fetching student lecture accesses:", err)
+        setAccessesError("An unexpected error occurred while fetching student lecture accesses")
+      } finally {
+        setAccessesLoading(false)
+      }
+    }
+
+    fetchStudentLectureAccesses()
+  }, [lectureId, userRole, hasAdminPrivileges])
+
   // Helper function to get subject name
   const getSubjectName = () => {
     if (!lecture || !lecture.subject) return "غير محدد"
@@ -210,20 +253,61 @@ const DetailedLectureView = () => {
     return foundLevel ? foundLevel.name : "غير محدد"
   }
 
-  // Handle attachment download
-  const handleDownloadAttachment = (attachment) => {
-    const link = document.createElement("a")
-    link.href = attachment.filePath
-    link.download = attachment.fileName
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
   // Handle viewing a submission
   const handleViewSubmission = (submission) => {
     setViewingSubmission(submission)
     setShowSubmissionModal(true)
+  }
+
+  // Handle editing student lecture access
+  const handleEditAccess = (access) => {
+    setEditingAccessId(access._id)
+    setRemainingViews(access.remainingViews)
+    setUpdateAccessError(null)
+    setUpdateAccessSuccess(false)
+  }
+
+  // Handle saving updated student lecture access
+  const handleSaveAccess = async () => {
+    try {
+      setUpdateAccessLoading(true)
+      setUpdateAccessError(null)
+      setUpdateAccessSuccess(false)
+
+      const result = await updateStudentLectureAccess(editingAccessId, {
+        remainingViews: remainingViews,
+      })
+
+      if (result.success) {
+        // Update the local state with the new data
+        setStudentLectureAccesses((prevAccesses) =>
+          prevAccesses.map((access) =>
+            access._id === editingAccessId ? { ...access, remainingViews: remainingViews } : access,
+          ),
+        )
+        setUpdateAccessSuccess(true)
+
+        // Reset editing state after a short delay
+        setTimeout(() => {
+          setEditingAccessId(null)
+          setUpdateAccessSuccess(false)
+        }, 2000)
+      } else {
+        setUpdateAccessError(result.error)
+      }
+    } catch (err) {
+      console.error("Error updating student lecture access:", err)
+      setUpdateAccessError("An unexpected error occurred while updating student lecture access")
+    } finally {
+      setUpdateAccessLoading(false)
+    }
+  }
+
+  // Handle canceling edit
+  const handleCancelEdit = () => {
+    setEditingAccessId(null)
+    setUpdateAccessError(null)
+    setUpdateAccessSuccess(false)
   }
 
   // Get file icon based on file type
@@ -250,7 +334,6 @@ const DetailedLectureView = () => {
       setDeleteError(null)
 
       const result = await deleteLecture(lectureId)
-      console.log(result)
       if (result.success) {
         // Navigate back to the lectures list page after successful deletion
         navigate("/dashboard/lecturer-dashboard")
@@ -264,6 +347,21 @@ const DetailedLectureView = () => {
       setShowDeleteModal(false)
     } finally {
       setDeleteLoading(false)
+    }
+  }
+
+  // Format date to local string
+  const formatDate = (dateString) => {
+    try {
+      return new Date(dateString).toLocaleString("ar-EG", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    } catch (error) {
+      return "تاريخ غير صالح"
     }
   }
 
@@ -300,9 +398,6 @@ const DetailedLectureView = () => {
                   >
                     <FiEye className="mr-1" /> عرض
                   </a>
-                  <button onClick={() => handleDownloadAttachment(attachment)} className="btn btn-sm btn-primary">
-                    <FiDownload className="mr-1" /> تحميل
-                  </button>
                 </div>
               </li>
             ))}
@@ -367,7 +462,6 @@ const DetailedLectureView = () => {
         {/* Admin/Lecturer Actions */}
         {hasAdminPrivileges && (
           <div className="flex gap-2">
-            <button className="btn btn-outline btn-sm">تعديل المحاضرة</button>
             <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
               حذف المحاضرة
             </button>
@@ -532,6 +626,124 @@ const DetailedLectureView = () => {
             </div>
           </div>
 
+          {/* Student Lecture Access - Only visible to admin users */}
+          {hasAdminPrivileges && (
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                <FiUsers className="text-primary" />
+                وصول الطلاب للمحاضرة
+              </h2>
+
+              {accessesLoading ? (
+                <div className="flex justify-center py-8 bg-base-200 rounded-lg">
+                  <div className="loading loading-spinner loading-md"></div>
+                </div>
+              ) : accessesError ? (
+                <div className="alert alert-error">
+                  <FiX className="w-5 h-5" />
+                  <span>{accessesError}</span>
+                </div>
+              ) : studentLectureAccesses.length > 0 ? (
+                <div className="bg-base-200 rounded-lg p-4">
+                  <div className="overflow-x-auto">
+                    <table className="table w-full">
+                      <thead>
+                        <tr>
+                          <th>الطالب</th>
+                          <th>المشاهدات المتبقية</th>
+                          <th>آخر وصول</th>
+                          <th>الإجراءات</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {studentLectureAccesses.map((access) => (
+                          <tr key={access._id}>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="avatar avatar-placeholder">
+                                  <div className="bg-primary text-primary-content rounded-full w-8">
+                                    <span>{access.student.name.charAt(0)}</span>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="font-bold">{access.student.name}</div>
+                                  <div className="text-xs opacity-70">{access.student.role}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              {editingAccessId === access._id ? (
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    className="input input-bordered input-sm w-20"
+                                    value={remainingViews}
+                                    onChange={(e) => setRemainingViews(Number.parseInt(e.target.value) || 0)}
+                                    min="0"
+                                  />
+                                  {updateAccessError && <span className="text-xs text-error">{updateAccessError}</span>}
+                                  {updateAccessSuccess && (
+                                    <span className="text-xs text-success">تم التحديث بنجاح</span>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{access.remainingViews}</span>
+                                  <span className="text-xs opacity-70">مشاهدة</span>
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <FiClock className="text-primary w-4 h-4" />
+                                <span>{formatDate(access.lastAccessed)}</span>
+                              </div>
+                            </td>
+                            <td>
+                              {editingAccessId === access._id ? (
+                                <div className="flex gap-2">
+                                  <button
+                                    className="btn btn-sm btn-primary"
+                                    onClick={handleSaveAccess}
+                                    disabled={updateAccessLoading}
+                                  >
+                                    {updateAccessLoading ? (
+                                      <span className="loading loading-spinner loading-xs"></span>
+                                    ) : (
+                                      <FiSave className="w-4 h-4" />
+                                    )}
+                                    حفظ
+                                  </button>
+                                  <button
+                                    className="btn btn-sm btn-outline"
+                                    onClick={handleCancelEdit}
+                                    disabled={updateAccessLoading}
+                                  >
+                                    إلغاء
+                                  </button>
+                                </div>
+                              ) : (
+                                <button className="btn btn-sm btn-outline" onClick={() => handleEditAccess(access)}>
+                                  <FiEdit className="w-4 h-4 ml-1" />
+                                  تعديل
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="alert alert-info">
+                  <FiInfo className="w-5 h-5" />
+                  <span>لا يوجد طلاب لديهم حق الوصول لهذه المحاضرة</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Student Submissions */}
           {(hasAdminPrivileges || userRole === "Student") && (
             <div className="mb-6">
@@ -669,9 +881,6 @@ const DetailedLectureView = () => {
                   <span>لا توجد مرفقات لهذه المحاضرة</span>
                 </div>
               )}
-
-            {/* Add Attachment Button (for admin/lecturer) */}
-            {hasAdminPrivileges && <button className="btn btn-outline btn-sm mt-4">إضافة مرفق جديد</button>}
           </div>
         </div>
 

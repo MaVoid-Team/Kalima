@@ -145,7 +145,12 @@
         "lecture": "Lesson",
         "user": "User",
         "timetable": "Schedule",
-        "center": "Center"
+        "center": "Center",
+        "code": "Code",
+        "promoCode": "Promo Code",
+        "admin": "Admin",
+        "assistant": "Assistant",
+        "parent": "Parent"
       },
       "idDisplay": "ID: {{id}}",
       "status": {
