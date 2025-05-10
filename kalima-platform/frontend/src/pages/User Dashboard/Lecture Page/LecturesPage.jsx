@@ -610,7 +610,9 @@ const MyLecturesPage = () => {
                     <td>{lecture.price || 0} نقطة</td>
                     {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
                     <td>
-                    {userRole === "Student" ? "" : 
+                    {userRole === "Student" ? <Link to={`/dashboard/student-dashboard/lecture-display/${lecture.id}`}>
+                    <button className="btn btn-ghost">التفاصيل</button>
+                    </Link> : 
                       (
                         <Link to={`/dashboard/lecturer-dashboard/detailed-lecture-view/${lecture.id}`}>
                             <button className="btn btn-ghost">التفاصيل</button>
