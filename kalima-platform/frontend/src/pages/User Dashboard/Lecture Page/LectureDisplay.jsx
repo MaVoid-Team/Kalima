@@ -1,5 +1,10 @@
 "use client"
 
+import {
+  checkLectureAccess,
+  verifyExamSubmission,
+} from "../../../routes/examsAndHomeworks"
+
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
@@ -11,9 +16,10 @@ import {
 import {
   checkLectureAccess,
   verifyExamSubmission,
-  uploadHomework,
-  getLectureHomeworks,
 } from "../../../routes/examsAndHomeworks"
+import {
+  uploadHomework,
+  getLectureHomeworks,} from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
