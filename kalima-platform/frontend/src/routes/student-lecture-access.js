@@ -14,7 +14,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access`,
       {
         params: {
           lecture: lectureId,
@@ -54,7 +54,7 @@ export const getStudentLectureAccessByLectureId = async (lectureId) => {
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/lecture/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/lecture/${lectureId}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -91,7 +91,7 @@ export const updateStudentLectureAccess = async (accessId, data) => {
     }
 
     const response = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access/${accessId}`,
+      `${import.meta.env.VITE_API_URL}/student-lecture-access/${accessId}`,
       data,
       {
         headers: {
