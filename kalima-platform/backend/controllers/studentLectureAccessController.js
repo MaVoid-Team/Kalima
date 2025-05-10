@@ -123,7 +123,7 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
 
     // If no passing exam submission, provide exam information
     if (!examSubmission) {
-      return res.status(403).json({
+      return res.status(200).json({
         status: "restricted",
         message: "You must pass the exam before accessing this lecture",
         data: {

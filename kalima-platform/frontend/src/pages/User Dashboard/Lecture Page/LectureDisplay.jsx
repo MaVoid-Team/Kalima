@@ -8,13 +8,8 @@ import {
   downloadAttachmentById,
   createLectureAttachment,
 } from "../../../routes/lectures"
-import {
-  verifyExamSubmission,
-  checkLectureAccess,
-} from "../../../routes/examsAndHomeworks"
-import {  
-  uploadHomework,
-  getLectureHomeworks,} from "../../../routes/homeworks"
+import { checkLectureAccess } from "../../../routes/examsAndHomeworks"
+import {uploadHomework, getLectureHomeworks,} from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink } from "react-icons/fi"
@@ -164,6 +159,7 @@ const LectureDisplay = () => {
       try {
         const result = await getLectureAttachments(lectureId)
         if (result.status === "success") {
+          console.log("FULL API RESPONSE:", result)
 
           // Set the entire data object with all attachment types
           setAttachments(result.data)
@@ -175,6 +171,8 @@ const LectureDisplay = () => {
             ...(result.data.exams || []),
             ...(result.data.booklets || []),
           ]
+
+          console.log("ALL ATTACHMENTS ARRAY:", allAttachmentsArray)
           setAllAttachments(allAttachmentsArray)
         } else {
           console.error("Failed to fetch attachments:", result.message)
@@ -215,34 +213,21 @@ const LectureDisplay = () => {
       try {
         setExamVerificationLoading(true)
 
-        // First check if the lecture requires an exam
+        // Check if the lecture requires an exam
         const accessResult = await checkLectureAccess(lectureId)
 
-        if (accessResult.success) {
-          if (accessResult.status === "restricted" && accessResult.data.requiresExam) {
-            setExamRequired(true)
-            setExamData(accessResult.data)
-
-            // Now verify if the student has submitted the exam
-            const verificationResult = await verifyExamSubmission(lectureId)
-
-            if (verificationResult.success) {
-              // Student has passed the exam
-              setExamVerified(true)
-            } else {
-              // Student has not passed the exam
-              setExamVerified(false)
-            }
-          } else {
-            // No exam required
-            setExamRequired(false)
-            setExamVerified(true)
-          }
+        if (accessResult.status === "restricted") {
+          // Student needs to pass an exam
+          setExamRequired(true)
+          setExamData(accessResult.data)
+          setExamVerified(false)
         } else {
-          console.error("Failed to check lecture access:", accessResult.error)
+          // No exam required or already passed
+          setExamRequired(false)
+          setExamVerified(true)
         }
       } catch (err) {
-        console.error("Error verifying exam submission:", err)
+        console.error("Error checking lecture access:", err)
       } finally {
         setExamVerificationLoading(false)
       }
@@ -672,9 +657,13 @@ const LectureDisplay = () => {
           <div className="card-body">
             <h2 className="card-title flex items-center gap-2">
               <FiAlertTriangle className="text-warning" />
-              يجب اجتياز الامتحان أولاً
+              قيود الوصول للمحاضرة
             </h2>
-            <p className="my-4">يجب عليك اجتياز الامتحان قبل أن تتمكن من الوصول إلى محتوى هذه المحاضرة.</p>
+
+            <div className="alert alert-warning my-4">
+              <FiAlertTriangle className="h-6 w-6" />
+              <span>{examData?.message || "يجب عليك اجتياز الامتحان قبل الوصول إلى هذه المحاضرة"}</span>
+            </div>
 
             {examData && (
               <div className="bg-base-200 p-4 rounded-lg my-4">
@@ -686,10 +675,15 @@ const LectureDisplay = () => {
                 </ul>
 
                 <div className="mt-6">
-                  <button onClick={handleTakeExam} className="btn btn-primary w-full sm:w-auto">
+                  <a
+                    href={examData.examUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary w-full sm:w-auto"
+                  >
                     <FiExternalLink className="mr-2" />
                     بدء الامتحان
-                  </button>
+                  </a>
                 </div>
               </div>
             )}
@@ -708,7 +702,7 @@ const LectureDisplay = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>بعد اجتياز الامتحان بنجاح، ستتمكن من الوصول إلى محتوى المحاضرة.</span>
+              <span>بعد اجتياز الامتحان بنجاح، قم بتحديث الصفحة للوصول إلى محتوى المحاضرة.</span>
             </div>
           </div>
         </div>
