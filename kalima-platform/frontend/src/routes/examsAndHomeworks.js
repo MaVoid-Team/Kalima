@@ -93,20 +93,16 @@ export const checkLectureAccess = async (lectureId) => {
           Authorization: `Bearer ${getToken()}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     )
 
-    return {
-      success: true,
-      data: response.data,
-      status: response.data.status
-    }
+    // Return the direct response data, which includes status, message, and data
+    return response.data
   } catch (error) {
     console.error("Error checking lecture access:", error)
     return {
-      success: false,
-      error: error.response?.data?.message || error.message || "Failed to check lecture access",
-      status: error.response?.data?.status || "error"
+      status: "error",
+      message: error.response?.data?.message || error.message || "Failed to check lecture access",
     }
   }
 }
