@@ -137,6 +137,7 @@
       
       "roles": {
         "admin": "مسؤول",
+        "subadmin": "مسؤول فرعي",
         "lecturer": "معلم",
         "student": "طالب"
       },
