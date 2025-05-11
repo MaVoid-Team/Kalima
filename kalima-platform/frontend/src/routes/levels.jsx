@@ -15,9 +15,20 @@ export const getAllLevels = async () => {
       withCredentials: true,
     });
 
+    
+    const levels = response.data.data.levels;
+
+    const order = ["3rd Secondary","2nd Secondary","1st Secondary","3rd Preparatory","2nd Preparatory","1st Preparatory","6th Primary","5th Primary","4th Primary","3rd Primary","2nd Primary","1st Primary",
+ 
+    ];
+
+    const sortedLevels = levels.sort(
+      (a, b) => order.indexOf(a.name) - order.indexOf(b.name)
+    );
+
     return {
       success: true,
-      data: response.data.data.levels, // Extract the levels array
+      data: sortedLevels,
     };
   } catch (error) {
     return {

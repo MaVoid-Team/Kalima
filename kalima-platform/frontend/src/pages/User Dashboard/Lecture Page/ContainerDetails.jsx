@@ -593,7 +593,7 @@ const ContainerDetailsPage = () => {
           </label>
           <input
             type="text"
-            placeholder="Enter Google Sheet ID"
+            placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
             className="input input-bordered w-full"
             value={newExamConfig.googleSheetId}
             onChange={(e) => setNewExamConfig((prev) => ({ ...prev, googleSheetId: e.target.value }))}
