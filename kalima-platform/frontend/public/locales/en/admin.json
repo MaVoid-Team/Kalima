@@ -15,8 +15,9 @@
         "codesError": "Number of codes must be greater than zero",
         "phoneRequired": "Please enter phone number",
         "lecturerRequired": "Please select a lecturer",
-      "generationFailed": "Failed to generate promo codes",
-      "fetchUsers": "Failed to fetch users"
+       "generationFailed": "Failed to generate promo codes",
+       "fetchUsers": "Failed to fetch users"
+      
       },
       "success": {
         "codesGenerated": "Promo codes generated successfully"
@@ -26,11 +27,17 @@
         "numCodes": "Number of Codes",
         "codeType": "Code Type",
         "general": "General",
-        "specific": "Specific to Lecturer",
+        "specific": "Specific",
+        "promo": "Promo",
         "lecturer": "Lecturer",
         "lecturerPlaceholder": "Select Lecturer",
-        "promo": "Promo Code"
+        "generateQrCodes": "Generate QR Codes",
+        "qrCodeDescription": "Generate QR codes for easy code redemption",
+        "qrCodeSize": "QR Code Size"
       },
+      "printQrCodes": "Print QR Codes",
+      "downloadAllQrCodes": "Download All QR Codes",
+      "points": "Points",
       "userManagement": {
         "title": "User Actions Log",
         "createUser": "Create New User",
@@ -199,7 +206,18 @@
     },
     "errors": {
       "fetchPromo": "Failed to fetch promo codes"
-    }
+    },
+    "revenue" :{
+      "errorLoadingRevenue": "Error loading revenue data",
+      "lecturerRevenue": "Lecturer Revenue",
+      "revenueSummary": "Revenue Summary",
+      "totalRevenue": "Total Revenue",
+      "currency": "SAR",
+      "totalPurchases": "Total Purchases",
+      "monthsWithRevenue": "Months with Revenue",
+      "purchaseCount": "Purchase Count",
+      "noRevenueData": "No revenue data available for this lecturer"
+  }
   }
    
   
