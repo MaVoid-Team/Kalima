@@ -28,15 +28,6 @@ function BasicInfoForm({
     }
   }
 
-  const handleVideoUpload = (e) => {
-    const file = e.target.files[0]
-    if (file && file.size <= 1024 * 1024 * 1024) {
-      setCourseVideo(file)
-    } else {
-      alert(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
-    }
-  }
-
   const handleCreateParentContainer = async (e) => {
     e.preventDefault()
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
@@ -220,24 +211,6 @@ function BasicInfoForm({
                   </p>
                 )}
               </div>
-              <div>
-                <h2 className="block text-lg text-primary font-medium mb-2">
-                  {isRTL ? "فيديو مقدمة الكورس" : "Course Introduction Video"}
-                </h2>
-                <label className="border-2 border-dashed border-primary/20 rounded-lg p-6 flex flex-col items-center justify-center h-48 cursor-pointer">
-                  <Video className="w-10 h-10 mb-2 text-primary" />
-                  <span className="btn text-primary btn-sm btn-ghost border-primary border-2 mb-2">
-                    {isRTL ? "اضف فيديو" : "Add Video"}
-                  </span>
-                  <p className="text-xs text-base-content/50">{isRTL ? "المساحة القصوى 1 Gb" : "Max size 1 Gb"}</p>
-                  <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
-                </label>
-                {courseVideo && (
-                  <p className="text-sm mt-2 text-center">
-                    {isRTL ? "تم اختيار: " : "Selected: "} {courseVideo.name}
-                  </p>
-                )}
-              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div>
                   <h2 className="block text-lg text-primary font-medium mb-2">
@@ -282,19 +255,6 @@ function BasicInfoForm({
                           value={formData.priceFull}
                           onChange={handleChange}
                           placeholder={isRTL ? "الكورس كامل" : "Full Course"}
-                          className="input input-bordered bg-base-200 flex-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">
-                          {isRTL ? "سعر الشهر" : "Monthly Price"}
-                        </label>
-                        <input
-                          type="text"
-                          name="priceMonthly"
-                          value={formData.priceMonthly}
-                          onChange={handleChange}
-                          placeholder={isRTL ? "سعر الشهر" : "Monthly Price"}
                           className="input input-bordered bg-base-200 flex-1"
                         />
                       </div>
