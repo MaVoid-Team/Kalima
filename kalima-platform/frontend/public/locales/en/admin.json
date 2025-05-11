@@ -136,6 +136,7 @@
       
       "roles": {
         "admin": "Admin",
+        "subadmin": "Subadmin",
         "lecturer": "Lecturer",
         "student": "Student"
       },
