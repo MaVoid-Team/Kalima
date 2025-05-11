@@ -9,12 +9,14 @@ import {
   createLectureAttachment,
 } from "../../../routes/lectures"
 import {
-  checkLectureAccess,
+  
   verifyExamSubmission,
+  checkLectureAccess,
 } from "../../../routes/examsAndHomeworks"
 import {
   uploadHomework,
-  getLectureHomeworks,} from "../../../routes/homeworks"
+  getLectureHomeworks,
+} from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
@@ -211,6 +213,56 @@ const LectureDisplay = () => {
     }
   }, [lectureId, userId, userRole])
 
+  // Update the verifyExamAndCheckAccess function to properly handle the success response format
+  // and store the submission data
+
+  // In the verifyExamAndCheckAccess function, replace the verification result handling with:
+  const verifyExamAndCheckAccess = async () => {
+    if (userRole !== "Student" || !lectureId) return
+
+    try {
+      setExamVerificationLoading(true)
+
+      // First check if the lecture requires an exam
+      const accessResult = await checkLectureAccess(lectureId)
+
+      if (accessResult.status === "restricted" && accessResult.data?.requiresExam) {
+        // Lecture requires an exam
+        setExamRequired(true)
+        setExamData(accessResult.data)
+
+        // Now verify if the student has submitted the exam
+        const verificationResult = await verifyExamSubmission(lectureId)
+
+        if (verificationResult.success && verificationResult.data?.passed) {
+          // Student has passed the exam
+          setExamVerified(true)
+          setExamSubmission(verificationResult.data.submission)
+        } else {
+          // Student has not passed the exam
+          setExamVerified(false)
+        }
+      } else {
+        // No exam required or already passed
+        setExamRequired(false)
+        setExamVerified(true)
+      }
+    } catch (err) {
+      console.error("Error verifying exam submission:", err)
+    } finally {
+      setExamVerificationLoading(false)
+    }
+  }
+
+  // Add a useEffect to call verifyExamAndCheckAccess on refresh
+  // Add this after the existing useEffect that fetches lecture data
+  useEffect(() => {
+    // This will run when the component mounts or when lectureId or userRole changes
+    if (userRole === "Student" && lectureId) {
+      verifyExamAndCheckAccess()
+    }
+  }, [lectureId, userRole])
+
   // Verify exam submission and check lecture access for students
   useEffect(() => {
     const verifyExamAndCheckAccess = async () => {
@@ -227,13 +279,12 @@ const LectureDisplay = () => {
           setExamRequired(true)
           setExamData(accessResult.data)
 
-          // Now verify if the student has passed the exam
+          // Now verify if the student has submitted the exam
           const verificationResult = await verifyExamSubmission(lectureId)
 
           if (verificationResult.success && verificationResult.status === "success") {
             // Student has passed the exam
             setExamVerified(true)
-            setExamSubmission(verificationResult.data.submission)
           } else {
             // Student has not passed the exam
             setExamVerified(false)
@@ -261,7 +312,8 @@ const LectureDisplay = () => {
         userRole === "Admin" ||
         userRole === "SubAdmin" ||
         userRole === "Moderator" ||
-        userRole === "Assistant"
+        userRole === "Assistant" ||
+        !userId // Make sure we have a userId before proceeding
       )
         return
 
@@ -270,15 +322,19 @@ const LectureDisplay = () => {
         const result = await getStudentLectureAccessByLectureId(lectureId)
 
         if (result.success && result.data.accessRecords && result.data.accessRecords.length > 0) {
-          // Get the first access record (assuming there's only one per student)
-          const accessRecord = result.data.accessRecords[0]
+          // Find the access record that matches the current user's ID
+          const currentUserAccessRecord = result.data.accessRecords.find((record) => record.student._id === userId)
 
-          setRemainingViews(accessRecord.remainingViews)
-          setStudentLectureAccessId(accessRecord._id)
+          if (currentUserAccessRecord) {
+            setRemainingViews(currentUserAccessRecord.remainingViews)
+            setStudentLectureAccessId(currentUserAccessRecord._id)
 
-          if (accessRecord.remainingViews <= 0) {
-            setVideoBlocked(true)
-            redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
+            if (currentUserAccessRecord.remainingViews <= 0) {
+              setVideoBlocked(true)
+              redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
+            }
+          } else {
+            setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
           }
         } else {
           setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
@@ -289,10 +345,10 @@ const LectureDisplay = () => {
       }
     }
 
-    if (lectureId && userRole === "Student") {
+    if (lectureId && userRole === "Student" && userId) {
       fetchAccessData()
     }
-  }, [lectureId, navigate, userRole])
+  }, [lectureId, navigate, userRole, userId]) // Added userId to the dependency array
 
   // Reset upload states when changing tabs
   useEffect(() => {
@@ -569,25 +625,6 @@ const LectureDisplay = () => {
     }
   }
 
-  // Format date to readable string
-  const formatDate = (dateString) => {
-    if (!dateString) return "غير متاح"
-
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString("ar-EG", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    } catch (error) {
-      console.error("Error formatting date:", error)
-      return "تاريخ غير صالح"
-    }
-  }
-
   // Cleanup
   useEffect(() => {
     return () => {
@@ -693,13 +730,9 @@ const LectureDisplay = () => {
           <div className="card-body">
             <h2 className="card-title flex items-center gap-2">
               <FiAlertTriangle className="text-warning" />
-              قيود الوصول للمحاضرة
+              يجب اجتياز الامتحان أولاً
             </h2>
-
-            <div className="alert alert-warning my-4">
-              <FiAlertTriangle className="h-6 w-6" />
-              <span>{examData?.message || "يجب عليك اجتياز الامتحان قبل الوصول إلى هذه المحاضرة"}</span>
-            </div>
+            <p className="my-4">يجب عليك اجتياز الامتحان قبل أن تتمكن من الوصول إلى محتوى هذه المحاضرة.</p>
 
             {examData && (
               <div className="bg-base-200 p-4 rounded-lg my-4">
@@ -738,7 +771,7 @@ const LectureDisplay = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>بعد اجتياز الامتحان بنجاح، قم بتحديث الصفحة للوصول إلى محتوى المحاضرة.</span>
+              <span>بعد اجتياز الامتحان بنجاح، ستتمكن من الوصول إلى محتوى المحاضرة.</span>
             </div>
           </div>
         </div>
@@ -761,6 +794,26 @@ const LectureDisplay = () => {
       return <FiFile className="text-purple-500 text-xl" />
     } else {
       return <FiFile className="text-primary text-xl" />
+    }
+  }
+
+  // Add a function to format dates for better display
+  // Add this with the other utility functions:
+  const formatDate = (dateString) => {
+    if (!dateString) return "غير متاح"
+
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    } catch (error) {
+      console.error("Error formatting date:", error)
+      return "تاريخ غير صالح"
     }
   }
 
@@ -792,6 +845,8 @@ const LectureDisplay = () => {
         </div>
       )}
 
+      {/* Add a success message when the student has passed the exam
+      Add this after the userRole info alert and before the showFiftyPercentWarning alert: */}
       {userRole === "Student" && examRequired && examVerified && examSubmission && (
         <div className="alert alert-success mb-6 shadow-lg">
           <div className="flex items-center gap-2">
