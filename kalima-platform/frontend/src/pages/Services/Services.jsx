@@ -103,7 +103,7 @@ const Services = () => {
         <LanguageBooks books={books1} isRTL={isRTL} />
         <LanguageBooks books={books} isRTL={isRTL} />
         <LanguageBooks books={books2} isRTL={isRTL} />
-        <TestimonialsSection isRTL={isRTL} />
+        {/* <TestimonialsSection isRTL={isRTL} /> */}
       </div>
     </motion.section>
   );
