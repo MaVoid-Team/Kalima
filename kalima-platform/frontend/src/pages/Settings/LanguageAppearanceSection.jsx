@@ -18,7 +18,7 @@ function LanguageAppearanceSection() {
     "winter", "dim", "nord", "sunset"]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light"
+    const savedTheme = localStorage.getItem("theme")
     const savedLang = localStorage.getItem("lng") || "ar"
     setSelectedTheme(savedTheme)
     i18n.changeLanguage(savedLang)
