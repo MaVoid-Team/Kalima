@@ -4,10 +4,13 @@ import { useState, useEffect, useMemo, useCallback } from "react"
 import { Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { getAllLecturesPublic } from "../routes/lectures"
+import { getUserDashboard } from "../routes/auth-services"
+import { purchaseContainer } from "../routes/lectures"
 import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
-import { CourseCard } from "../components/CourseCard"
+import { LectureCard } from "../components/lectureCard"
 import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "react-hot-toast"
 
 export default function LecturesPage() {
   const [lectures, setLectures] = useState([])
@@ -25,9 +28,44 @@ export default function LecturesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const lecturesPerPage = 6
 
+  const [userData, setUserData] = useState(null)
+  const [purchasedLectures, setPurchasedLectures] = useState([])
+
   useEffect(() => {
     fetchLectures()
+    fetchUserData()
   }, [])
+
+  const fetchUserData = async () => {
+    try {
+      const result = await getUserDashboard({
+        params: { fields: "userInfo,purchaseHistory" },
+      })
+
+      if (result.success) {
+        setUserData(result.data.data.userInfo)
+
+        // Extract purchased lecture IDs from purchase history
+        const purchasedIds = result.data.data.purchaseHistory
+          .filter((purchase) => purchase.type === "containerPurchase")
+          .map((purchase) => {
+            // Extract container ID from description if container is null
+            if (!purchase.container) {
+              const match = purchase.description.match(/Purchased container (.*?) for/)
+              return match ? match[1] : null
+            }
+            return purchase.container?._id
+          })
+          .filter((id) => id) // Remove nulls
+
+        setPurchasedLectures(purchasedIds)
+      } else {
+        console.error("Failed to fetch user data:", result.error)
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err)
+    }
+  }
 
   const fetchLectures = async () => {
     setLoading(true)
@@ -35,8 +73,8 @@ export default function LecturesPage() {
     try {
       const result = await getAllLecturesPublic({
         limit: 200,
-        page: 1
-      });
+        page: 1,
+      })
       if (result.status === "success") {
         setLectures(result.data.containers)
         setFilteredLectures(result.data.containers)
@@ -48,6 +86,31 @@ export default function LecturesPage() {
       setError("حدث خطأ أثناء تحميل المحاضرات")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePurchaseLecture = async (lectureId) => {
+    if (!userData) {
+      toast.error(t("errors.loginRequired"))
+      return
+    }
+
+    try {
+      const response = await purchaseContainer(lectureId)
+
+      if (response.data && response.data.status === "success") {
+        toast.success(t("purchase.success"))
+        // Add the purchased lecture to the list
+        setPurchasedLectures((prev) => [...prev, lectureId])
+        // Refresh user data to get updated points
+        fetchUserData()
+      } else {
+        const errorMessage = typeof response === "string" ? response : response.data?.message || t("purchase.failed")
+        toast.error(errorMessage)
+      }
+    } catch (err) {
+      console.error("Error purchasing lecture:", err)
+      toast.error(t("purchase.failed"))
     }
   }
 
@@ -67,12 +130,13 @@ export default function LecturesPage() {
       price: lecture.price || 0,
       childrenCount: lecture.attachments
         ? (lecture.attachments.booklets?.length || 0) +
-        (lecture.attachments.exams?.length || 0) +
-        (lecture.attachments.homeworks?.length || 0) +
-        (lecture.attachments.pdfsandimages?.length || 0)
+          (lecture.attachments.exams?.length || 0) +
+          (lecture.attachments.homeworks?.length || 0) +
+          (lecture.attachments.pdfsandimages?.length || 0)
         : 0,
       views: lecture.numberOfViews || 0,
       description: lecture.description || "لا يوجد وصف",
+      isPurchased: purchasedLectures.includes(lecture._id),
     }))
   }
 
@@ -80,21 +144,15 @@ export default function LecturesPage() {
     let filtered = lectures
 
     if (selectedStage) {
-      filtered = filtered.filter(
-        (lecture) => lecture.createdBy?.role === selectedStage
-      )
+      filtered = filtered.filter((lecture) => lecture.createdBy?.role === selectedStage)
     }
 
     if (selectedGrade) {
-      filtered = filtered.filter(
-        (lecture) => lecture.level?.name === selectedGrade
-      )
+      filtered = filtered.filter((lecture) => lecture.level?.name === selectedGrade)
     }
 
     if (selectedSubject) {
-      filtered = filtered.filter(
-        (lecture) => lecture.subject?.name === selectedSubject
-      )
+      filtered = filtered.filter((lecture) => lecture.subject?.name === selectedSubject)
     }
 
     if (selectedStatus) {
@@ -119,7 +177,7 @@ export default function LecturesPage() {
 
   const memoizedFilteredLectures = useMemo(
     () => generateLectureData(filteredLectures),
-    [filteredLectures]
+    [filteredLectures, purchasedLectures],
   )
 
   const totalPages = useMemo(() => {
@@ -237,7 +295,9 @@ export default function LecturesPage() {
         >
           Previous
         </button>
-        <span className="mx-2">Page {currentPage} Of {totalPages}</span>
+        <span className="mx-2">
+          Page {currentPage} Of {totalPages}
+        </span>
         <button
           className="btn btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage + 1)}
@@ -268,6 +328,24 @@ export default function LecturesPage() {
             <p className="text-3xl font-bold text-primary md:mx-40">{t("title")}</p>
             <img src="/underline.png" alt="underline" className="object-contain" />
           </div>
+
+          {userData && (
+            <div className="bg-base-200 p-4 rounded-lg shadow-sm mt-4 mb-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-medium">
+                    {t("welcome")}, {userData.name}
+                  </p>
+                  <p className="text-sm opacity-80">{userData.role}</p>
+                </div>
+                <div className="bg-primary text-white px-4 py-2 rounded-lg">
+                  <p className="font-bold">
+                    {userData.generalPoints} {t("points")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="container mx-auto px-4 py-4">
@@ -335,23 +413,19 @@ export default function LecturesPage() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <CourseCard
+                      <LectureCard
                         {...lecture}
                         isRTL={isRTL}
-                        childrenCount={lecture.childrenCount}
-                        teacherRole={lecture.teacherRole}
-                        status={lecture.status}
+                        isPurchased={lecture.isPurchased}
+                        onPurchase={handlePurchaseLecture}
+                        userPoints={userData?.generalPoints || 0}
                       />
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
               {totalPages > 1 && (
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
               )}
             </>
           )}
