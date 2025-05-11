@@ -102,7 +102,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             />
             <button
               type="button"
-              className="absolute top-1/2 right-3 -translate-y-1/2  z-10 text-gray-500"
+              className={`absolute top-1/2 ${i18n.language === 'ar' ? 'right-3' : 'left-3'} -translate-y-1/2 z-10 text-gray-500`}
               onClick={() => setShowConfirmPassword((prev) => !prev)}
               tabIndex={-1}
             >
