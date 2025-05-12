@@ -87,23 +87,44 @@ const getExamResultsFromSheet = async (sheetId, studentIdentifier, studentIdenti
         error: `No submission found for student with identifier: ${studentIdentifier}` 
       };
     }
-    
-    // Get the score and parse it as a number
+      // Get the score and parse it as a number
     const rawScore = studentRow[scoreColIndex];
-    const score = parseFloat(rawScore);
-      // If the score is not a valid number, return an error
-    if (isNaN(score)) {
-      return { 
-        found: false, 
-        error: `Invalid score format for student: ${studentIdentifier}` 
-      };
+    
+    // Check if the score is in format "X/Y" (e.g. "9/9")
+    let score, maxScore;
+    
+    if (typeof rawScore === 'string' && rawScore.includes('/')) {
+      // Score is in format X/Y
+      const [scoreValue, maxScoreValue] = rawScore.split('/').map(val => parseFloat(val.trim()));
+      
+      if (!isNaN(scoreValue) && !isNaN(maxScoreValue)) {
+        score = scoreValue;
+        maxScore = maxScoreValue;
+      } else {
+        return { 
+          found: false, 
+          error: `Invalid score format for student: ${studentIdentifier}. Expected format X/Y.` 
+        };
+      }
+    } else {
+      // Score is a simple number
+      score = parseFloat(rawScore);
+      // If Google Forms doesn't provide max score, use the score as the max score if it's perfect
+      maxScore = score; 
+      
+      if (isNaN(score)) {
+        return { 
+          found: false, 
+          error: `Invalid score format for student: ${studentIdentifier}` 
+        };
+      }
     }
     
     // All checks passed, return the student's score
     return {
       found: true,
       score: score,
-      maxScore: 100, // Assuming the maximum score is 100, adjust based on your form
+      maxScore: maxScore, // Use the parsed max score
       studentRow: studentRow, // Include the full row for additional info if needed
       fetchTime: new Date().toISOString() // Add timestamp to track when data was fetched
     };
