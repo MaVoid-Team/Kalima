@@ -5,7 +5,7 @@ import { requestPasswordReset } from '../../routes/auth-services';
 import WaveBackground from './WaveBackground';
 
 const ForgotPassword = () => {
-  const { t, i18n } = useTranslation("forgotPassword");
+  const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -56,14 +56,14 @@ const ForgotPassword = () => {
           <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="form-control mb-6">
               <label className="label">
-                <span className="label-text">{t('emailLabel', 'Email Address')}</span>
+                <span className="label-text mb-2">{t('emailLabel', 'Email Address')}</span>
               </label>
               <input
                 type="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="teacher@example.com"
+                placeholder="your email@example.com"
                 className="input input-bordered w-full"
                 required
               />

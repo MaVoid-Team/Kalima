@@ -23,7 +23,24 @@
     "login": "Login",
     "needAccount": "Don't have an account?",
     "register": "Register here",
-  
+    "forgotPasswordTitle": "Forgot password?",
+    "forgotPasswordSubtitle" : "Enter your email address to reset your password",
+    "backToLogin":  "Back to login",
+    "sendOtp": "Send OTP",
+    "sending" : "Sending",
+    "passwordMismatch": "Passwords don't match",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordSubtitle": "Enter your new password",
+    "confirmPasswordLabel": "Confirm Password",
+    "resetting": "Resetting",
+    "passwordResetSuccess": "Password reset successfully",
+
+    "verifyOtpTitle": "Verify OTP",
+    "verifyOtpSubtitle": "Enter the verification code we sent to your email",
+    "otpLabel": "Verification Code",
+    "resendCodeIn": "Resend in",
+    "resendCode": "Resend code",
+    "verifyOtp": "Verify OTP",
       "errors": {
         "loginFailed": "Login failed. Please check your credentials",
         "invalidCredentials": "Invalid email/phone or password",
@@ -54,7 +71,10 @@
         "unauthorized": "Authentication required",
         "forbidden": "Access denied",
         "notFound": "Resource not found",
-        "timeout": "Request timed out"
-      
+        "timeout": "Request timed out",
+        "resetFailed": "Password reset failed. Try again later.",
+        "generalError": "Something went wrong. Try again later.",
+        "requestFailed": "Request failed. Try again later."
+       
     }
   }

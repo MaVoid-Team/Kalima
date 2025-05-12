@@ -12,7 +12,7 @@ const studentLectureAccess = require("../models/studentLectureAccessModel");
 const Package = require("../models/packageModel");
 const QueryFeatures = require("../utils/queryFeatures");
 
-const findFreeChildContainers = async (containerId, session) => {
+const findAllChildContainers = async (containerId, session) => {
   try {
     // Find the container and all its nested children using GraphLookup
     const containerTree = await Container.aggregate([
@@ -34,16 +34,14 @@ const findFreeChildContainers = async (containerId, session) => {
       return [];
     }
 
-    // Get all child containers that are free (price = 0)
+    // Return all child containers regardless of price
     const containerDoc = containerTree[0];
-    const freeChildren = containerDoc.nestedChildren.filter(child => {
-      return (child.price === 0 || child.price === null);
-    });
+    const allChildren = containerDoc.nestedChildren;
 
-    console.log(`Found ${freeChildren.length} free child containers for container ${containerId}`);
-    return freeChildren;
+    console.log(`Found ${allChildren.length} child containers for container ${containerId}`);
+    return allChildren;
   } catch (error) {
-    console.error("Error finding free child containers:", error);
+    console.error("Error finding child containers:", error);
     return [];
   }
 };
@@ -413,31 +411,29 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         [{ student: userId, lecture: containerId }],
         { session }
       );
-    }
-
-    // Automatically grant access to all free child containers
+    }    // Automatically grant access to all child containers (both free and paid)
     // Only do this for parent containers (not lectures as they typically don't have children)
     if (container.children && container.children.length > 0) {
-      // Find all free child containers
-      const freeChildren = await findFreeChildContainers(containerId, session);
+      // Find all child containers regardless of price
+      const allChildren = await findAllChildContainers(containerId, session);
       
-      if (freeChildren.length > 0) {
-        console.log(`Auto-granting access to ${freeChildren.length} free child containers`);
+      if (allChildren.length > 0) {
+        console.log(`Auto-granting access to ${allChildren.length} child containers (free and paid)`);
         
-        // Create purchase records for all free children
-        const childPurchases = freeChildren.map(childContainer => ({
+        // Create purchase records for all children
+        const childPurchases = allChildren.map(childContainer => ({
           student: userId,
           lecturer: lecturerId,
-          points: 0, // Free containers
+          points: 0, // No additional points deducted as parent was already purchased
           container: childContainer._id,
           type: "containerPurchase",
-          description: `Auto-granted access to free container ${childContainer.name} as child of ${container.name}`,
+          description: `Auto-granted access to container ${childContainer.name} (price: ${childContainer.price || 0}) as child of ${container.name}`,
         }));
         
         await Purchase.create(childPurchases, { session });
         
         // Grant lecture access for any children that are lectures
-        const lectureChildren = freeChildren.filter(child => child.kind === "Lecture");
+        const lectureChildren = allChildren.filter(child => child.kind === "Lecture");
         
         if (lectureChildren.length > 0) {
           const lectureAccesses = lectureChildren.map(lecture => ({

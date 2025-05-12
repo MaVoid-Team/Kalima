@@ -23,6 +23,23 @@
     "login": "تسجيل الدخول",
     "needAccount": "ليس لديك حساب؟",
     "register": "سجل هنا",
+    "forgotPasswordTitle": "نسيت كلمة المرور؟",
+    "forgotPasswordSubtitle" : "ادخل عنوان البريد الإلكتروني الخاص بك لاسترداد كلمة المرور",
+    "backToLogin": "العودة للتسجيل الدخول",
+    "sendOtp": "ارسل كود التحقق",
+    "sending" : "جاري الارسال",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "resetPasswordTitle": "استعادة كلمة المرور",
+    "resetPasswordSubtitle": "ادخل كلمة المرور الجديدة",
+    "confirmPasswordLabel": "تاكيد كلمة المرور",
+    "resetting": "جاري استعادة كلمة المرور",
+    "passwordResetSuccess": "تم استعادة كلمة المرور بنجاح",
+    "verifyOtpTitle": "تحقق من الكود",
+    "verifyOtpSubtitle": "ادخل كود التحقق المرسل لبريدك الإلكتروني",
+    "otpLabel": "كود التحقق",
+    "resendCodeIn": "اعادة الارسال في",
+    "resendCode": "اعادة الارسال",
+    "verifyOtp": "تحقق من الكود",
     "errors": {
       "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من البيانات",
       "invalidCredentials": "بريد إلكتروني/هاتف أو كلمة مرور خاطئة",
@@ -53,7 +70,9 @@
       "unauthorized": "مطلوب مصادقة",
       "forbidden": "وصول مرفوض",
       "notFound": "الملف غير موجود",
-      "timeout": "انتهت مدة الطلب"
-
+      "timeout": "انتهت مدة الطلب",
+      "resetFailed": "فشل اعادة تعيين كلمة المرور. يرجى التحقق من البيانات",
+      "generalError": "خطاء سيرفري. حاول لاحقًا",
+      "requestFailed": "فشل الطلب. حاول لاحقًا"
   }
   }
