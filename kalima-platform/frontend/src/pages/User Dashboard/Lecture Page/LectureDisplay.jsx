@@ -8,15 +8,8 @@ import {
   downloadAttachmentById,
   createLectureAttachment,
 } from "../../../routes/lectures"
-import {
-  
-  verifyExamSubmission,
-  checkLectureAccess,
-} from "../../../routes/examsAndHomeworks"
-import {
-  uploadHomework,
-  getLectureHomeworks,
-} from "../../../routes/homeworks"
+import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
+import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
@@ -90,6 +83,7 @@ const LectureDisplay = () => {
   const [examVerificationLoading, setExamVerificationLoading] = useState(false)
   const [examRequired, setExamRequired] = useState(false)
   const [examData, setExamData] = useState(null)
+  const [examUrl, setExamUrl] = useState("")
   const [examSubmission, setExamSubmission] = useState(null)
 
   // Attachment tabs and uploads
@@ -213,27 +207,31 @@ const LectureDisplay = () => {
     }
   }, [lectureId, userId, userRole])
 
-  // Update the verifyExamAndCheckAccess function to properly handle the success response format
-  // and store the submission data
-
-  // In the verifyExamAndCheckAccess function, replace the verification result handling with:
+  // Implement the complete flow for exam verification and lecture access
   const verifyExamAndCheckAccess = async () => {
     if (userRole !== "Student" || !lectureId) return
 
     try {
       setExamVerificationLoading(true)
 
-      // First check if the lecture requires an exam
+      // Step 1: First check if the student has submitted the exam
+      const verificationResult = await verifyExamSubmission(lectureId)
+      console.log("Exam verification result:", verificationResult)
+
+      // Step 2: Check lecture access regardless of exam submission result
       const accessResult = await checkLectureAccess(lectureId)
+      console.log("Lecture access result:", accessResult)
 
       if (accessResult.status === "restricted" && accessResult.data?.requiresExam) {
         // Lecture requires an exam
         setExamRequired(true)
-        setExamData(accessResult.data)
+        setExamData({
+          passingThreshold: accessResult.data.passingThreshold,
+          examUrl: accessResult.data.examUrl,
+        })
+        setExamUrl(accessResult.data.examUrl)
 
-        // Now verify if the student has submitted the exam
-        const verificationResult = await verifyExamSubmission(lectureId)
-
+        // Check if the student has passed the exam based on verification result
         if (verificationResult.success && verificationResult.data?.passed) {
           // Student has passed the exam
           setExamVerified(true)
@@ -242,66 +240,35 @@ const LectureDisplay = () => {
           // Student has not passed the exam
           setExamVerified(false)
         }
-      } else {
+      } else if (accessResult.status === "success") {
         // No exam required or already passed
+        setExamRequired(accessResult.data?.requiresExam || false)
+        setExamVerified(accessResult.data?.examPassed || true)
+
+        // If we have exam submission data, store it
+        if (verificationResult.success && verificationResult.data?.submission) {
+          setExamSubmission(verificationResult.data.submission)
+        }
+      } else {
+        // Some other error or status
+        console.error("Unexpected access check result:", accessResult)
         setExamRequired(false)
-        setExamVerified(true)
+        setExamVerified(true) // Default to allowing access on error
       }
     } catch (err) {
-      console.error("Error verifying exam submission:", err)
+      console.error("Error in exam verification flow:", err)
+      setExamVerified(true) // Default to allowing access on error
     } finally {
       setExamVerificationLoading(false)
     }
   }
 
   // Add a useEffect to call verifyExamAndCheckAccess on refresh
-  // Add this after the existing useEffect that fetches lecture data
   useEffect(() => {
     // This will run when the component mounts or when lectureId or userRole changes
     if (userRole === "Student" && lectureId) {
       verifyExamAndCheckAccess()
     }
-  }, [lectureId, userRole])
-
-  // Verify exam submission and check lecture access for students
-  useEffect(() => {
-    const verifyExamAndCheckAccess = async () => {
-      if (userRole !== "Student" || !lectureId) return
-
-      try {
-        setExamVerificationLoading(true)
-
-        // First check if the lecture requires an exam
-        const accessResult = await checkLectureAccess(lectureId)
-
-        if (accessResult.status === "restricted" && accessResult.data?.requiresExam) {
-          // Lecture requires an exam
-          setExamRequired(true)
-          setExamData(accessResult.data)
-
-          // Now verify if the student has submitted the exam
-          const verificationResult = await verifyExamSubmission(lectureId)
-
-          if (verificationResult.success && verificationResult.status === "success") {
-            // Student has passed the exam
-            setExamVerified(true)
-          } else {
-            // Student has not passed the exam
-            setExamVerified(false)
-          }
-        } else {
-          // No exam required or already passed
-          setExamRequired(false)
-          setExamVerified(true)
-        }
-      } catch (err) {
-        console.error("Error verifying exam submission:", err)
-      } finally {
-        setExamVerificationLoading(false)
-      }
-    }
-
-    verifyExamAndCheckAccess()
   }, [lectureId, userRole])
 
   // Fetch student access data - only for students
