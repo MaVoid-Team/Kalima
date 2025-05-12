@@ -15,9 +15,9 @@ const Level = require("../models/levelModel.js");
 const validatePassword = (password) => {
   const requiredLength = 8;
 
-  if (password.length !== requiredLength) {
+  if (password.length < requiredLength) {
     throw new AppError(
-      `Password must be exactly ${requiredLength} characters long`,
+      `Password must be ${requiredLength} characters long or more`,
       400
     );
   }
