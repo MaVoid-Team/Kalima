@@ -4,46 +4,41 @@ import React, { useMemo } from "react"
 import { motion } from "framer-motion"
 import { FaCertificate, FaClock, FaGraduationCap, FaMedal } from "react-icons/fa"
 import ServiceCard from "../../components/ServiceCard"
+import { useTranslation } from "react-i18next"
 
-const ServicesGrid = React.memo(({ isRTL }) => {
+const ServicesGrid = React.memo(() => {
+  const { t, i18n } = useTranslation("home")
+  const isRTL = i18n.language === "ar"
+
   const services = useMemo(
     () => [
       {
         icon: FaClock,
-        title: isRTL ? "التعلم في أي وقت" : "Learn Anytime",
-        subtitle: isRTL ? "مرونة كاملة" : "Complete Flexibility",
-        description: isRTL
-          ? "الوصول إلى الدروس 24/7 مع إمكانية التكرار والمشاهدة في الوقت الذي يناسبك"
-          : "24/7 access to lessons with replay options whenever it suits you",
+        title: t("services.learnAnytime.title"),
+        subtitle: t("services.learnAnytime.subtitle"),
+        description: t("services.learnAnytime.description"),
       },
       {
         icon: FaGraduationCap,
-        title: isRTL ? "معلمين خبراء معتمدين" : "Certified Expert Teachers",
-        subtitle: isRTL ? "خبرة عالية" : "High Expertise",
-        description: isRTL
-          ? "فريق من المعلمين المؤهلين ذوي الخبرة الطويلة في المناهج التعليمية"
-          : "Team of qualified teachers with extensive experience in educational curricula",
+        title: t("services.teachers.title"),
+        subtitle: t("services.teachers.subtitle"),
+        description: t("services.teachers.description"),
       },
       {
         icon: FaMedal,
-        title: isRTL ? "مناهج عالية الجودة" : "Premium Curriculum",
-        subtitle: isRTL ? "محتوى متميز" : "Outstanding Content",
-        description: isRTL
-          ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب مع ضمان الجودة العالية"
-          : "Carefully designed curriculum covering all student needs with guaranteed high quality",
+        title: t("services.curriculum.title"),
+        subtitle: t("services.curriculum.subtitle"),
+        description: t("services.curriculum.description"),
       },
       {
         icon: FaCertificate,
-        title: isRTL ? "شهادات معتمدة" : "Certified Certificates",
-        subtitle: isRTL ? "اعتماد رسمي" : "Official Recognition",
-        description: isRTL
-          ? "حصول الطلاب على شهادات معتمدة بعد إتمام كل مستوى تعليمي"
-          : "Students receive certified certificates upon completion of each educational level",
+        title: t("services.certificates.title"),
+        subtitle: t("services.certificates.subtitle"),
+        description: t("services.certificates.description"),
       },
     ],
-    [isRTL],
+    [t]
   )
-
   return (
     <div className="py-16 px-4 sm:px-6 lg:px-8 rounded-xl">
       <div className="max-w-7xl mx-auto flex flex-row justify-end items-center">
@@ -58,7 +53,7 @@ const ServicesGrid = React.memo(({ isRTL }) => {
         >
           <div className="relative inline-block">
             <h2 className="text-3xl sm:text-4xl font-bold text-primary relative z-10 pb-2">
-              {isRTL ? "خدماتنا" : "Our Services"}
+            {t("services.title")}
               <svg
                 className="absolute bottom-0 left-0 w-full h-2 text-primary"
                 viewBox="0 0 200 10"

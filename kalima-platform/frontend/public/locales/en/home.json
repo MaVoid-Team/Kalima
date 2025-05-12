@@ -1,5 +1,12 @@
 {
-
+  "welcome": {
+    "title": "Welcome to {{highlight}}Kalima{{/highlight}} Platform",
+    "description": "Kalima Platform is an e-learning platform providing resources for students from 4th grade through 12th grade.",
+    "kalima": "Kalima",
+    "maleStudentAlt": "Male student",
+    "femaleStudentAlt": "Female student"
+  },
+  "signIn": "Sign In",
 "hero": {
       "title": "The shortest path to brilliant success",
       "heading": "Welcome to the Kalima Platform",
@@ -30,30 +37,28 @@
   },
   "services": {
     "title": "Our Services",
-    "heading": "Our goal is to simplify subjects to ensure your excellence ",
-    "withUs": "With Us",
-    "items": [
-      {
-        "title": "Performance Tracking",
-        "subtitle": "Anytime",
-        "description": "Continuous student progress monitoring through periodic reports showing improvement areas"
-      },
-      {
-        "title": "Regular Tests",
-        "subtitle": "On Our Platform", 
-        "description": "Diverse tests with instant correction and answer explanations"
-      },
-      {
-        "title": "Top-Level",
-        "subtitle": "Teachers",
-        "description": "Team of expert teachers providing simplified and engaging lessons"
-      },
-      {
-        "title": "High Quality",
-        "subtitle": "Courses",
-        "description": "Comprehensive courses covering all curriculum aspects with practical applications"
-      }
-    ]
+    "subtitle": "Our goal is to simplify information to ensure your academic excellence",
+    "learnAnytime": {
+      "title": "Learn Anytime",
+      "subtitle": "Complete Flexibility",
+      "description": "24/7 access to lessons with replay options whenever it suits you"
+    },
+    "teachers": {
+      "title": "Certified Expert Teachers",
+      "subtitle": "High Expertise",
+      "description": "Team of qualified teachers with extensive experience in educational curricula"
+    },
+    "curriculum": {
+      "title": "Premium Curriculum",
+      "subtitle": "Outstanding Content",
+      "description": "Carefully designed curriculum covering all student needs with guaranteed high quality"
+    },
+    "certificates": {
+      "title": "Certified Certificates",
+      "subtitle": "Official Recognition",
+      "description": "Students receive certified certificates upon completion of each educational level"
+    }
+  
   },
   "teachers": {
     "title": "Our Teachers",
@@ -144,5 +149,6 @@
     "viewAll":  "View All",
     "viewDetails":  "View Details"
   },
-  "priceUnavailable": "N/A"
+  "priceUnavailable": "N/A" 
+  
 }
