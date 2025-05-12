@@ -11,6 +11,43 @@ const catchAsync = require("../utils/catchAsync");
 const studentLectureAccess = require("../models/studentLectureAccessModel");
 const Package = require("../models/packageModel");
 const QueryFeatures = require("../utils/queryFeatures");
+
+const findFreeChildContainers = async (containerId, session) => {
+  try {
+    // Find the container and all its nested children using GraphLookup
+    const containerTree = await Container.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(containerId) },
+      },
+      {
+        $graphLookup: {
+          from: "containers", // Collection name
+          startWith: "$children",
+          connectFromField: "children",
+          connectToField: "_id",
+          as: "nestedChildren",
+        },
+      },
+    ]).session(session);
+
+    if (!containerTree || containerTree.length === 0) {
+      return [];
+    }
+
+    // Get all child containers that are free (price = 0)
+    const containerDoc = containerTree[0];
+    const freeChildren = containerDoc.nestedChildren.filter(child => {
+      return (child.price === 0 || child.price === null);
+    });
+
+    console.log(`Found ${freeChildren.length} free child containers for container ${containerId}`);
+    return freeChildren;
+  } catch (error) {
+    console.error("Error finding free child containers:", error);
+    return [];
+  }
+};
+
 // updated version
 exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
   const { lecturerId, lectureId } = req.body;
@@ -305,16 +342,6 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
     const generalPoints = userModel.generalPoints || 0;
     const promoPoints = userModel.promoPoints || 0;
-    
-    // Log points balances for debugging
-    console.log(`User ID: ${userId}`);
-    console.log(`Lecturer points: ${lecturerPoints}`);
-    console.log(`General points: ${generalPoints}`);
-    console.log(`Promo points: ${promoPoints}`);
-    console.log(`Points required: ${pointsRequired}`);
-    console.log(`Has promo code: ${userModel.hasPromoCode}`);
-    console.log(`Has used promo code: ${userModel.hasUsedPromoCode}`);
-
     let purchaseType = '';
     let isPromoCodePurchase = false;
     
@@ -328,7 +355,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         return next(new AppError("Failed to deduct lecturer points", 500));
       }
       
-      purchaseType = 'Lecturer points';
+      purchaseType = pointsRequired === 0 ? 'Free container (lecturer)' : 'Lecturer points';
     } 
     // If lecturer points aren't enough, check if user has an unused promo code
     else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
@@ -365,9 +392,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       );
     }
 
-    await userModel.save({ session });
-
-    // Create purchase record
+    await userModel.save({ session });    // Create purchase record
     const purchase = await Purchase.create(
       [
         {
@@ -388,6 +413,41 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         [{ student: userId, lecture: containerId }],
         { session }
       );
+    }
+
+    // Automatically grant access to all free child containers
+    // Only do this for parent containers (not lectures as they typically don't have children)
+    if (container.children && container.children.length > 0) {
+      // Find all free child containers
+      const freeChildren = await findFreeChildContainers(containerId, session);
+      
+      if (freeChildren.length > 0) {
+        console.log(`Auto-granting access to ${freeChildren.length} free child containers`);
+        
+        // Create purchase records for all free children
+        const childPurchases = freeChildren.map(childContainer => ({
+          student: userId,
+          lecturer: lecturerId,
+          points: 0, // Free containers
+          container: childContainer._id,
+          type: "containerPurchase",
+          description: `Auto-granted access to free container ${childContainer.name} as child of ${container.name}`,
+        }));
+        
+        await Purchase.create(childPurchases, { session });
+        
+        // Grant lecture access for any children that are lectures
+        const lectureChildren = freeChildren.filter(child => child.kind === "Lecture");
+        
+        if (lectureChildren.length > 0) {
+          const lectureAccesses = lectureChildren.map(lecture => ({
+            student: userId,
+            lecture: lecture._id,
+          }));
+          
+          await studentLectureAccess.create(lectureAccesses, { session });
+        }
+      }
     }
 
     await session.commitTransaction();

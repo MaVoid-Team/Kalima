@@ -11,7 +11,6 @@ import ServicesGrid from "./ServicesGrid";
 import ExamPreparationSection from "./ExamPreparationSection";
 import CoursesOverviews from "./CoursesOverview";
 import LanguageBooks from "./LanguageBooks";
-import TestimonialsSection from "./TestimonialsSection";
 import { TeachersSection } from "./teachers-section";
 import { CoursesSection } from "./courses-section";
 
@@ -103,7 +102,6 @@ const Services = () => {
         <LanguageBooks books={books1} isRTL={isRTL} />
         <LanguageBooks books={books} isRTL={isRTL} />
         <LanguageBooks books={books2} isRTL={isRTL} />
-        <TestimonialsSection isRTL={isRTL} />
       </div>
     </motion.section>
   );
