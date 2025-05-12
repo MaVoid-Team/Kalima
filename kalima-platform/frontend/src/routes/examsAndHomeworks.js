@@ -50,8 +50,9 @@ export const verifyExamSubmission = async (lectureId) => {
       throw new Error("Lecture ID is required")
     }
 
-    const response = await axios.get(
+    const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/v1/exam-submissions/verify/${lectureId}`,
+      {}, // Empty object as request body
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -94,7 +95,7 @@ export const checkLectureAccess = async (lectureId) => {
           Authorization: `Bearer ${getToken()}`,
           "Content-Type": "application/json",
         },
-      },
+      } // Removed extra comma here
     )
 
     // Return the direct response data, which includes status, message, and data
