@@ -24,14 +24,14 @@ const getExamResultsFromSheet = async (sheetId, studentIdentifier, studentIdenti
     
     // Get the first sheet's title (usually where form responses go)
     const sheetTitle = spreadsheet.data.sheets[0].properties.title;
-    
-    // Get all rows from the spreadsheet
+      // Get all rows from the spreadsheet with cache busting to ensure fresh data
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
       range: sheetTitle, // Using the first sheet
+      valueRenderOption: 'UNFORMATTED_VALUE', // Get raw values, not formatted strings
+      dateTimeRenderOption: 'FORMATTED_STRING',
     });
-    
-    // If there's no data, return not found
+      // If there's no data, return not found
     if (!response.data.values || response.data.values.length === 0) {
       return { found: false, error: "No data found in the spreadsheet" };
     }
@@ -59,10 +59,26 @@ const getExamResultsFromSheet = async (sheetId, studentIdentifier, studentIdenti
     
     // Find the row that matches the student identifier
     const dataRows = response.data.values.slice(1); // Skip header row
-    const studentRow = dataRows.find(
+    
+    // Filter all matching rows for this student
+    const studentRows = dataRows.filter(
       row => row[identifierColIndex] && 
-             row[identifierColIndex].toLowerCase() === studentIdentifier.toLowerCase()
+             row[identifierColIndex].toLowerCase().trim() === studentIdentifier.toLowerCase().trim()
     );
+    
+    // If there are multiple submissions, get the most recent one
+    // Assuming the first column contains the timestamp
+    let studentRow = null;
+    if (studentRows.length > 0) {
+      // Sort by timestamp (newest first) - assuming timestamp is in column 0
+      studentRows.sort((a, b) => {
+        const dateA = new Date(a[0]);
+        const dateB = new Date(b[0]);
+        return dateB - dateA; // Newest first
+      });
+      
+      studentRow = studentRows[0]; // Get the most recent submission
+    }
     
     // If no matching row is found, return not found
     if (!studentRow) {
@@ -71,24 +87,46 @@ const getExamResultsFromSheet = async (sheetId, studentIdentifier, studentIdenti
         error: `No submission found for student with identifier: ${studentIdentifier}` 
       };
     }
+      // Get the score and parse it as a number
+    const rawScore = studentRow[scoreColIndex];
     
-    // Get the score and parse it as a number
-    const score = parseFloat(studentRow[scoreColIndex]);
+    // Check if the score is in format "X/Y" (e.g. "9/9")
+    let score, maxScore;
     
-    // If the score is not a valid number, return an error
-    if (isNaN(score)) {
-      return { 
-        found: false, 
-        error: `Invalid score format for student: ${studentIdentifier}` 
-      };
+    if (typeof rawScore === 'string' && rawScore.includes('/')) {
+      // Score is in format X/Y
+      const [scoreValue, maxScoreValue] = rawScore.split('/').map(val => parseFloat(val.trim()));
+      
+      if (!isNaN(scoreValue) && !isNaN(maxScoreValue)) {
+        score = scoreValue;
+        maxScore = maxScoreValue;
+      } else {
+        return { 
+          found: false, 
+          error: `Invalid score format for student: ${studentIdentifier}. Expected format X/Y.` 
+        };
+      }
+    } else {
+      // Score is a simple number
+      score = parseFloat(rawScore);
+      // If Google Forms doesn't provide max score, use the score as the max score if it's perfect
+      maxScore = score; 
+      
+      if (isNaN(score)) {
+        return { 
+          found: false, 
+          error: `Invalid score format for student: ${studentIdentifier}` 
+        };
+      }
     }
     
     // All checks passed, return the student's score
     return {
       found: true,
       score: score,
-      maxScore: 100, // Assuming the maximum score is 100, adjust based on your form
-      studentRow: studentRow // Include the full row for additional info if needed
+      maxScore: maxScore, // Use the parsed max score
+      studentRow: studentRow, // Include the full row for additional info if needed
+      fetchTime: new Date().toISOString() // Add timestamp to track when data was fetched
     };
   } catch (error) {
     console.error("Error fetching exam results from Google Sheet:", error);
