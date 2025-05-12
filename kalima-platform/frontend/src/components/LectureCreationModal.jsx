@@ -261,7 +261,7 @@ const LectureCreationModal = ({
 
         // Set the exam config ID in the lecture data
         lectureData.examConfig = examConfigIdToUse
-        lectureData.passingThreshold = Number(passingThreshold) || 60
+        lectureData.passingThreshold = Number.parseInt(passingThreshold, 10) || 50
       }
 
       // Call the onSubmit callback with the lecture data and attachment
@@ -343,7 +343,7 @@ const LectureCreationModal = ({
                 placeholder="Enter passing threshold"
                 className="input input-bordered w-full"
                 value={passingThreshold}
-                onChange={(e) => setPassingThreshold(e.target.value)}
+                onChange={(e) => setPassingThreshold(Number.parseInt(e.target.value, 10) || 0)}
                 min="0"
                 max="100"
                 required
