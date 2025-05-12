@@ -38,7 +38,9 @@ const findAllChildContainers = async (containerId, session) => {
     const containerDoc = containerTree[0];
     const allChildren = containerDoc.nestedChildren;
 
-    console.log(`Found ${allChildren.length} child containers for container ${containerId}`);
+    console.log(
+      `Found ${allChildren.length} child containers for container ${containerId}`
+    );
     return allChildren;
   } catch (error) {
     console.error("Error finding child containers:", error);
@@ -340,45 +342,52 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
     const generalPoints = userModel.generalPoints || 0;
     const promoPoints = userModel.promoPoints || 0;
-    let purchaseType = '';
+    let purchaseType = "";
     let isPromoCodePurchase = false;
-    
+
     // First try to use lecturer-specific points
     if (lecturerPoints >= pointsRequired) {
       // Deduct from lecturer points
       const success = userModel.useLecturerPoints(lecturerId, pointsRequired);
-      
+
       if (!success) {
         await session.abortTransaction();
         return next(new AppError("Failed to deduct lecturer points", 500));
       }
-      
-      purchaseType = pointsRequired === 0 ? 'Free container (lecturer)' : 'Lecturer points';
-    } 
+
+      purchaseType =
+        pointsRequired === 0 ? "Free container (lecturer)" : "Lecturer points";
+    }
     // If lecturer points aren't enough, check if user has an unused promo code
-    else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
-      // Mark the promo code as used 
+    else if (
+      userModel.hasPromoCode &&
+      !userModel.hasUsedPromoCode &&
+      promoPoints > 0
+    ) {
+      // Mark the promo code as used
       userModel.hasUsedPromoCode = true;
-      
+
       // Calculate how many promo points would remain after this purchase
       const promoPointsUsed = pointsRequired;
       const remainingPromoPoints = promoPoints - promoPointsUsed;
-      
+
       // Set promoPoints to 0 to remove all promo points
       userModel.promoPoints = 0;
-      
+
       // Add a log for points deduction
-      console.log(`Removing all promo points. Used: ${promoPointsUsed}, Removed additional: ${remainingPromoPoints}`);
-      
-      purchaseType = 'Promo code (one-time use)';
+      console.log(
+        `Removing all promo points. Used: ${promoPointsUsed}, Removed additional: ${remainingPromoPoints}`
+      );
+
+      purchaseType = "Promo code (one-time use)";
       isPromoCodePurchase = true;
     }
     // If no promo code, try using general points
     else if (generalPoints >= pointsRequired) {
       // Deduct from general points
       userModel.generalPoints -= pointsRequired;
-      purchaseType = 'General points';
-    } 
+      purchaseType = "General points";
+    }
     // If neither has enough points
     else {
       await session.abortTransaction();
@@ -390,7 +399,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       );
     }
 
-    await userModel.save({ session });    // Create purchase record
+    await userModel.save({ session }); // Create purchase record
     const purchase = await Purchase.create(
       [
         {
@@ -399,52 +408,62 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
           points: isPromoCodePurchase ? 0 : pointsRequired, // No points charged for promo purchase
           container: containerId,
           type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
-          description: `Purchased container ${container.name} ${isPromoCodePurchase ? 'using promotional code' : `for ${pointsRequired} points using ${purchaseType}`}`,
+          description: `Purchased container ${container.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
         },
       ],
       { session }
     );
-    
-    // Grant access if it's a lecture
-    if (container.kind === "Lecture") {
-      await studentLectureAccess.create(
-        [{ student: userId, lecture: containerId }],
-        { session }
-      );
-    }    // Automatically grant access to all child containers (both free and paid)
-    // Only do this for parent containers (not lectures as they typically don't have children)
-    if (container.children && container.children.length > 0) {
-      // Find all child containers regardless of price
-      const allChildren = await findAllChildContainers(containerId, session);
-      
-      if (allChildren.length > 0) {
-        console.log(`Auto-granting access to ${allChildren.length} child containers (free and paid)`);
-        
-        // Create purchase records for all children
-        const childPurchases = allChildren.map(childContainer => ({
-          student: userId,
-          lecturer: lecturerId,
-          points: 0, // No additional points deducted as parent was already purchased
-          container: childContainer._id,
-          type: "containerPurchase",
-          description: `Auto-granted access to container ${childContainer.name} (price: ${childContainer.price || 0}) as child of ${container.name}`,
-        }));
-        
-        await Purchase.create(childPurchases, { session });
-        
-        // Grant lecture access for any children that are lectures
-        const lectureChildren = allChildren.filter(child => child.kind === "Lecture");
-        
-        if (lectureChildren.length > 0) {
-          const lectureAccesses = lectureChildren.map(lecture => ({
-            student: userId,
-            lecture: lecture._id,
-          }));
-          
-          await studentLectureAccess.create(lectureAccesses, { session });
-        }
-      }
-    }
+
+    // // Grant access if it's a lecture
+    // if (container.kind === "Lecture") {
+    //   await studentLectureAccess.create(
+    //     [
+    //       {
+    //         student: userId,
+    //         lecture: containerId,
+    //         remainingViews: container.remainingViews,
+    //       },
+    //     ],
+    //     { session }
+    //   );
+    // } // Automatically grant access to all child containers (both free and paid)
+    // // Only do this for parent containers (not lectures as they typically don't have children)
+    // if (container.children && container.children.length > 0) {
+    //   // Find all child containers regardless of price
+    //   const allChildren = await findAllChildContainers(containerId, session);
+
+    //   if (allChildren.length > 0) {
+    //     console.log(
+    //       `Auto-granting access to ${allChildren.length} child containers (free and paid)`
+    //     );
+
+    //     // Create purchase records for all children
+    //     const childPurchases = allChildren.map((childContainer) => ({
+    //       student: userId,
+    //       lecturer: lecturerId,
+    //       points: 0, // No additional points deducted as parent was already purchased
+    //       container: childContainer._id,
+    //       type: "containerPurchase",
+    //       description: `Auto-granted access to container ${childContainer.name} (price: ${childContainer.price || 0}) as child of ${container.name}`,
+    //     }));
+
+    //     await Purchase.create(childPurchases, { session });
+
+    //     // Grant lecture access for any children that are lectures
+    //     const lectureChildren = allChildren.filter(
+    //       (child) => child.kind === "Lecture"
+    //     );
+
+    //     if (lectureChildren.length > 0) {
+    //       const lectureAccesses = lectureChildren.map((lecture) => ({
+    //         student: userId,
+    //         lecture: lecture._id,
+    //       }));
+
+    //       await studentLectureAccess.create(lectureAccesses, { session });
+    //     }
+    //   }
+    // }
 
     await session.commitTransaction();
 
@@ -455,7 +474,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         remainingLecturerPoints: userModel.getLecturerPointsBalance(lecturerId),
         remainingGeneralPoints: userModel.generalPoints,
         usedPointsType: purchaseType,
-        promoUsed: isPromoCodePurchase
+        promoUsed: isPromoCodePurchase,
       },
     });
   } catch (error) {
@@ -471,17 +490,13 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
  * Get all purchases
  */
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-  let query = Purchase.find()
+  let query = Purchase.find();
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
   query = features.query;
-  const purchases = await query.populate([
-    "container",
-    "lecturer",
-    "student",
-  ]);
+  const purchases = await query.populate(["container", "lecturer", "student"]);
 
   res.status(200).json({
     status: "success",
@@ -661,7 +676,7 @@ exports.getAllUserPointBalances = catchAsync(async (req, res, next) => {
   // Log points balances for debugging
   console.log(`User ${userModel.name} general points: ${generalPoints}`);
   console.log(`User ${userModel.name} promo points: ${promoPoints}`);
-  
+
   res.status(200).json({
     status: "success",
     data: {
@@ -776,8 +791,8 @@ exports.purchasePackageWithPoints = catchAsync(async (req, res, next) => {
       req.user.role === "Student"
         ? Student
         : req.user.role === "Parent"
-        ? Parent
-        : null;
+          ? Parent
+          : null;
 
     if (!Model) {
       await session.abortTransaction();
