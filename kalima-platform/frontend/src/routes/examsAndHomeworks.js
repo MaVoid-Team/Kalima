@@ -51,7 +51,7 @@ export const verifyExamSubmission = async (lectureId) => {
     }
 
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/v1/exam-submissions/verify/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/exam-submissions/verify/${lectureId}`,
       {}, // Empty object as request body
       {
         headers: {
