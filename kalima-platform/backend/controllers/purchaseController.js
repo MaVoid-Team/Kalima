@@ -305,16 +305,6 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     const lecturerPoints = userModel.getLecturerPointsBalance(lecturerId);
     const generalPoints = userModel.generalPoints || 0;
     const promoPoints = userModel.promoPoints || 0;
-    
-    // Log points balances for debugging
-    console.log(`User ID: ${userId}`);
-    console.log(`Lecturer points: ${lecturerPoints}`);
-    console.log(`General points: ${generalPoints}`);
-    console.log(`Promo points: ${promoPoints}`);
-    console.log(`Points required: ${pointsRequired}`);
-    console.log(`Has promo code: ${userModel.hasPromoCode}`);
-    console.log(`Has used promo code: ${userModel.hasUsedPromoCode}`);
-
     let purchaseType = '';
     let isPromoCodePurchase = false;
     
@@ -328,7 +318,7 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         return next(new AppError("Failed to deduct lecturer points", 500));
       }
       
-      purchaseType = 'Lecturer points';
+      purchaseType = pointsRequired === 0 ? 'Free container (lecturer)' : 'Lecturer points';
     } 
     // If lecturer points aren't enough, check if user has an unused promo code
     else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {

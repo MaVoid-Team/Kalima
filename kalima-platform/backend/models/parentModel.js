@@ -47,6 +47,11 @@ parentSchema.methods.addLecturerPoints = function(lecturerId, pointsToAdd) {
 
 // Helper method to use points for a specific lecturer
 parentSchema.methods.useLecturerPoints = function(lecturerId, pointsToUse) {
+  // Special case - if trying to deduct 0 points, always succeed
+  if (pointsToUse === 0) {
+    return true;
+  }
+  
   const lecturerPointsEntry = this.lecturerPoints.find(
     entry => entry.lecturer.toString() === lecturerId.toString()
   );
