@@ -197,9 +197,8 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
   if (!examResults.found) {
     return next(new AppError(examResults.error || "No exam submission found for this student", 404));
   }
-  
-  // Determine passing threshold (use lecture-specific threshold if set, otherwise use the config default)
-  const passingThreshold = lecture.passingThreshold || examConfig.defaultPassingThreshold;
+    // Determine passing threshold from the exam config
+  const passingThreshold = examConfig.defaultPassingThreshold;
   
   // Check if student passed
   const passed = examResults.score >= passingThreshold;

@@ -128,12 +128,10 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
         message: "You must pass the exam before accessing this lecture",
         data: {
           requiresExam: true,
-          examUrl: lecture.examConfig ? lecture.examConfig.formUrl : null,
-          passingThreshold:
-            lecture.passingThreshold ||
-            (lecture.examConfig
+          examUrl: lecture.examConfig ? lecture.examConfig.formUrl : null,          passingThreshold:
+            lecture.examConfig
               ? lecture.examConfig.defaultPassingThreshold
-              : 60),
+              : 60,
         },
       });
     }
