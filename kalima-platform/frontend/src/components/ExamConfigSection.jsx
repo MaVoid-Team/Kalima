@@ -1,0 +1,331 @@
+import { useState, useEffect } from "react"
+import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
+
+const ExamConfigSection = ({
+  requiresExam,
+  selectedExamConfigId,
+  setSelectedExamConfigId,
+  passingThreshold,
+  setPassingThreshold,
+  onExamConfigCreated,
+}) => {
+  const [examConfigs, setExamConfigs] = useState([])
+  const [examConfigsLoading, setExamConfigsLoading] = useState(false)
+  const [examConfigsError, setExamConfigsError] = useState("")
+  const [isCreatingNewExamConfig, setIsCreatingNewExamConfig] = useState(false)
+  const [newExamConfig, setNewExamConfig] = useState({
+    name: "",
+    description: "",
+    googleSheetId: "",
+    formUrl: "",
+    studentIdentifierColumn: "Email Address",
+    scoreColumn: "Score",
+    defaultPassingThreshold: 60,
+  })
+
+  useEffect(() => {
+    if (requiresExam) {
+      fetchExamConfigs()
+    }
+  }, [requiresExam])
+
+  // Update passing threshold when exam config changes
+  useEffect(() => {
+    if (selectedExamConfigId && !isCreatingNewExamConfig) {
+      const selectedConfig = examConfigs.find((c) => c._id === selectedExamConfigId)
+      if (selectedConfig) {
+        setPassingThreshold(selectedConfig.defaultPassingThreshold)
+      }
+    }
+  }, [selectedExamConfigId, examConfigs, isCreatingNewExamConfig, setPassingThreshold])
+
+  const fetchExamConfigs = async () => {
+    setExamConfigsLoading(true)
+    setExamConfigsError("")
+    try {
+      console.log("Fetching exam configs...")
+      const response = await getExamConfigs()
+      console.log("Exam Configs Response:", response)
+
+      if (response.success && response.data) {
+        // Try to extract exam configs from different possible response structures
+        const configs =
+          (response.data.data && response.data.data.examConfigs) || // Format: { data: { data: { examConfigs: [...] } } }
+          response.data.examConfigs || // Format: { data: { examConfigs: [...] } }
+          (Array.isArray(response.data) ? response.data : []) // Format: { data: [...] }
+
+        console.log("Extracted exam configs:", configs)
+
+        if (Array.isArray(configs) && configs.length > 0) {
+          setExamConfigs(configs)
+        } else {
+          console.log("No exam configs found in response")
+          setExamConfigsError("No exam configurations found. Please create a new one.")
+          setExamConfigs([])
+        }
+      } else {
+        console.error("Failed to fetch exam configs:", response.message)
+        setExamConfigsError(response.message || "Failed to fetch exam configs")
+        setExamConfigs([])
+      }
+    } catch (err) {
+      console.error("Error fetching exam configs:", err)
+      setExamConfigsError(err.message || "Failed to fetch exam configs")
+      setExamConfigs([])
+    } finally {
+      setExamConfigsLoading(false)
+    }
+  }
+
+  const handleCreateExamConfig = async () => {
+    try {
+      // Validate required fields for new exam config
+      if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
+        throw new Error("Please fill in all required exam configuration fields")
+      }
+
+      console.log("Creating new exam config:", newExamConfig)
+      const createResponse = await createExamConfig(newExamConfig)
+      console.log("Create exam config response:", createResponse)
+
+      // Extract the exam config ID from different response formats
+      let examConfigId = null
+      if (createResponse.success === true && createResponse.data) {
+        if (createResponse.data._id) {
+          examConfigId = createResponse.data._id
+        } else if (
+          createResponse.data.data &&
+          createResponse.data.data.examConfig &&
+          createResponse.data.data.examConfig._id
+        ) {
+          examConfigId = createResponse.data.data.examConfig._id
+        } else if (createResponse.data.examConfig && createResponse.data.examConfig._id) {
+          examConfigId = createResponse.data.examConfig._id
+        } else {
+          throw new Error("Failed to extract exam config ID from response")
+        }
+      } else if (createResponse.status === "success" && createResponse.data && createResponse.data._id) {
+        examConfigId = createResponse.data._id
+      } else {
+        throw new Error(createResponse.message || "Failed to create exam config")
+      }
+
+      // Refresh the exam configs list
+      await fetchExamConfigs()
+      
+      // Set the selected exam config to the newly created one
+      setSelectedExamConfigId(examConfigId)
+      setIsCreatingNewExamConfig(false)
+      
+      // Call the callback with the new exam config ID
+      if (onExamConfigCreated) {
+        onExamConfigCreated(examConfigId)
+      }
+      
+      return examConfigId
+    } catch (err) {
+      setExamConfigsError(err.message)
+      console.error("Error creating exam config:", err)
+      throw err
+    }
+  }
+
+  if (!requiresExam) return null
+
+  const hasExistingConfigs = Array.isArray(examConfigs) && examConfigs.length > 0
+
+  // New Exam Config Form Component
+  const NewExamConfigForm = () => {
+    return (
+      <div className="space-y-4 mb-4 p-4 border border-base-300 rounded-lg">
+        <h4 className="font-medium">New Exam Configuration</h4>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Name</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter exam config name"
+            className="input input-bordered w-full"
+            value={newExamConfig.name}
+            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, name: e.target.value }))}
+            required
+          />
+        </div>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Description</span>
+          </label>
+          <textarea
+            placeholder="Enter description"
+            className="textarea textarea-bordered w-full"
+            value={newExamConfig.description}
+            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, description: e.target.value }))}
+            required
+          />
+        </div>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Google Sheet ID</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
+            className="input input-bordered w-full"
+            value={newExamConfig.googleSheetId}
+            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, googleSheetId: e.target.value }))}
+            required
+          />
+          <label className="label">
+            <span className="label-text-alt">The ID from your Google Sheet URL</span>
+          </label>
+        </div>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Form URL</span>
+          </label>
+          <input
+            type="url"
+            placeholder="Enter Google Form URL"
+            className="input input-bordered w-full"
+            value={newExamConfig.formUrl}
+            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, formUrl: e.target.value }))}
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Student Identifier Column</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Column name"
+              className="input input-bordered w-full"
+              value={newExamConfig.studentIdentifierColumn}
+              onChange={(e) => setNewExamConfig((prev) => ({ ...prev, studentIdentifierColumn: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Score Column</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Column name"
+              className="input input-bordered w-full"
+              value={newExamConfig.scoreColumn}
+              onChange={(e) => setNewExamConfig((prev) => ({ ...prev, scoreColumn: e.target.value }))}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Default Passing Threshold (%)</span>
+          </label>
+          <input
+            type="number"
+            placeholder="Enter threshold"
+            className="input input-bordered w-full"
+            value={newExamConfig.defaultPassingThreshold}
+            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, defaultPassingThreshold: Number(e.target.value) }))}
+            min="0"
+            max="100"
+            required
+          />
+        </div>
+
+        <div className="flex justify-end mt-4">
+          <button 
+            type="button" 
+            className="btn btn-primary"
+            onClick={handleCreateExamConfig}
+          >
+            Create Exam Config
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="form-control w-full mb-4">
+        <label className="label">
+          <span className="label-text">Exam Configuration</span>
+        </label>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <select
+              className="select select-bordered flex-grow"
+              value={isCreatingNewExamConfig ? "new" : selectedExamConfigId}
+              onChange={(e) => {
+                const value = e.target.value
+                if (value === "new") {
+                  setIsCreatingNewExamConfig(true)
+                  setSelectedExamConfigId("")
+                } else {
+                  setIsCreatingNewExamConfig(false)
+                  setSelectedExamConfigId(value)
+                }
+              }}
+              disabled={examConfigsLoading}
+            >
+              <option value="">Select Exam Config</option>
+              {hasExistingConfigs ? (
+                examConfigs.map((config) => (
+                  <option key={config._id} value={config._id}>
+                    {config.name}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>
+                  No existing configs
+                </option>
+              )}
+              <option value="new">Create New Exam Config</option>
+            </select>
+            {examConfigsLoading && <span className="loading loading-spinner"></span>}
+          </div>
+          {examConfigsError && <div className="text-error text-sm">{examConfigsError}</div>}
+          {!hasExistingConfigs && !examConfigsError && !examConfigsLoading && (
+            <div className="text-info text-sm">No existing exam configurations found. You can create a new one.</div>
+          )}
+        </div>
+      </div>
+
+      {isCreatingNewExamConfig ? (
+        <NewExamConfigForm />
+      ) : (
+        selectedExamConfigId && (
+          <div className="form-control w-full mb-4">
+            <label className="label">
+              <span className="label-text">Passing Threshold</span>
+            </label>
+            <input
+              type="number"
+              placeholder="Enter passing threshold"
+              className="input input-bordered w-full"
+              value={passingThreshold}
+              onChange={(e) => setPassingThreshold(e.target.value)}
+              min="0"
+              max="100"
+              required
+            />
+          </div>
+        )
+      )}
+    </>
+  )
+}
+
+export default ExamConfigSection
