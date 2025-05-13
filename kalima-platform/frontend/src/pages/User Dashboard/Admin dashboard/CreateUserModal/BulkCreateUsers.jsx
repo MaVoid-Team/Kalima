@@ -38,8 +38,9 @@ const BulkCreateUsers = () => {
     const formData = new FormData();
     formData.append("accountType", accountType);
     formData.append("file", file);
-
+    console.log(formData)
     const result = await bulkCreateUsers(formData);
+    console.log(result)
 
     if (result.success) {
       setSuccess("Users created successfully!");
