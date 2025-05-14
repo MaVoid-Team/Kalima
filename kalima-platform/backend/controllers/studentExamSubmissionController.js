@@ -333,52 +333,34 @@ exports.verifyExamSubmission = catchAsync(async (req, res, next) => {
             `Threshold: ${passingThreshold}, Passed: ${passed}`
         );
 
-        // Check if submission already exists
-// Replace the create/update logic with this robust version:
-try {
-  let submission = await StudentExamSubmission.findOne({
-    student: studentId,
-    lecture: lectureId,
-    type: 'homework'
-  });
+        // Find and update or create homework submission
+        const submission = await StudentExamSubmission.findOneAndUpdate(
+          {
+            student: studentId,
+            lecture: lectureId,
+            type: "homework",
+          },
+          {
+            score: homeworkResults.score,
+            maxScore: homeworkResults.maxScore,
+            passingThreshold: passingThreshold,
+            passed: passed,
+            submittedAt: new Date(),
+            verifiedAt: new Date(),
+            config: homeworkConfig._id,
+          },
+          { new: true, upsert: true }
+        );
 
-  const submissionData = {
-    score: homeworkResults.score,
-    maxScore: homeworkResults.maxScore,
-    passingThreshold: passingThreshold,
-    passed: passed,
-    verifiedAt: new Date(),
-    config: homeworkConfig._id
-  };
+        console.log(`[Homework] Saved submission: ${submission._id}`);
 
-  if (submission) {
-    // Update existing
-    submission.set(submissionData);
-    await submission.save();
-    console.log(`[Homework] Updated submission ${submission._id}`);
-  } else {
-    // Create new
-    submission = await StudentExamSubmission.create({
-      student: studentId,
-      lecture: lectureId,
-      type: 'homework',
-      submittedAt: new Date(),
-      ...submissionData
-    });
-    console.log(`[Homework] Created submission ${submission._id}`);
-  }
-
-  results.homework = {
-    status: passed ? "passed" : "failed",
-    submission,
-    passed,
-    requiredScore: passingThreshold,
-    homeworkUrl: homeworkConfig.formUrl
-  };
-} catch (error) {
-  console.error('[Homework] Submission processing failed:', error);
-  return next(new AppError('Failed to process homework submission', 500));
-}
+        results.homework = {
+          status: passed ? "passed" : "failed",
+          submission,
+          passed,
+          requiredScore: passingThreshold,
+          homeworkUrl: homeworkConfig.formUrl,
+        };
       }
     }
   } else {
