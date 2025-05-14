@@ -56,8 +56,8 @@ const studentExamSubmissionSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for efficient queries
-studentExamSubmissionSchema.index({ student: 1, lecture: 1, type: 1 });
+// Updated compound index to include type field for uniqueness
+studentExamSubmissionSchema.index({ student: 1, lecture: 1, type: 1 }, { unique: true });
 studentExamSubmissionSchema.index({ lecture: 1, submittedAt: -1 });
 studentExamSubmissionSchema.index({ type: 1, passed: 1 });
 
