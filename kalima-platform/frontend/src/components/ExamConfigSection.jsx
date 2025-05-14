@@ -20,7 +20,7 @@ const ExamConfigSection = ({
     formUrl: "",
     studentIdentifierColumn: "Email Address",
     scoreColumn: "Score",
-    defaultPassingThreshold: 60,
+    defaultPassingThreshold: 5,
   })
 
   useEffect(() => {

@@ -272,50 +272,50 @@ const LectureDisplay = () => {
   }, [lectureId, userRole])
 
   // Fetch student access data - only for students
-  useEffect(() => {
-    const fetchAccessData = async () => {
-      if (
-        userRole === "Lecturer" ||
-        userRole === "Admin" ||
-        userRole === "SubAdmin" ||
-        userRole === "Moderator" ||
-        userRole === "Assistant" ||
-        !userId // Make sure we have a userId before proceeding
-      )
-        return
+  // useEffect(() => {
+  //   const fetchAccessData = async () => {
+  //     if (
+  //       userRole === "Lecturer" ||
+  //       userRole === "Admin" ||
+  //       userRole === "SubAdmin" ||
+  //       userRole === "Moderator" ||
+  //       userRole === "Assistant" ||
+  //       !userId // Make sure we have a userId before proceeding
+  //     )
+  //       return
 
-      try {
-        // Use the new function to fetch student lecture access by lecture ID
-        const result = await getStudentLectureAccessByLectureId(lectureId)
+  //     try {
+  //       // Use the new function to fetch student lecture access by lecture ID
+  //       const result = await getStudentLectureAccessByLectureId(lectureId)
 
-        if (result.success && result.data.accessRecords && result.data.accessRecords.length > 0) {
-          // Find the access record that matches the current user's ID
-          const currentUserAccessRecord = result.data.accessRecords.find((record) => record.student._id === userId)
+  //       if (result.success && result.data.accessRecords && result.data.accessRecords.length > 0) {
+  //         // Find the access record that matches the current user's ID
+  //         const currentUserAccessRecord = result.data.accessRecords.find((record) => record.student._id === userId)
 
-          if (currentUserAccessRecord) {
-            setRemainingViews(currentUserAccessRecord.remainingViews)
-            setStudentLectureAccessId(currentUserAccessRecord._id)
+  //         if (currentUserAccessRecord) {
+  //           setRemainingViews(currentUserAccessRecord.remainingViews)
+  //           setStudentLectureAccessId(currentUserAccessRecord._id)
 
-            if (currentUserAccessRecord.remainingViews <= 0) {
-              setVideoBlocked(true)
-              redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
-            }
-          } else {
-            setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
-          }
-        } else {
-          setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
-        }
-      } catch (error) {
-        console.error("Error fetching access data:", error)
-        setError("فشل تحميل بيانات الوصول")
-      }
-    }
+  //           if (currentUserAccessRecord.remainingViews <= 0) {
+  //             setVideoBlocked(true)
+  //             redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
+  //           }
+  //         } else {
+  //           setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+  //         }
+  //       } else {
+  //         setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching access data:", error)
+  //       setError("فشل تحميل بيانات الوصول")
+  //     }
+  //   }
 
-    if (lectureId && userRole === "Student" && userId) {
-      fetchAccessData()
-    }
-  }, [lectureId, navigate, userRole, userId]) // Added userId to the dependency array
+  //   if (lectureId && userRole === "Student" && userId) {
+  //     fetchAccessData()
+  //   }
+  // }, [lectureId, navigate, userRole, userId]) // Added userId to the dependency array
 
   // Reset upload states when changing tabs
   useEffect(() => {
