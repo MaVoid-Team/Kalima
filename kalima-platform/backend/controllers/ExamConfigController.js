@@ -7,6 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 exports.createExamConfig = catchAsync(async (req, res, next) => {
   const {
     name,
+    type = 'exam',
     description,
     googleSheetId,
     formUrl,
@@ -22,10 +23,18 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Validate type
+  if (type !== 'exam' && type !== 'homework') {
+    return next(
+      new AppError("Type must be either 'exam' or 'homework'", 400)
+    );
+  }
+
   // Create the configuration
   const examConfig = await LecturerExamConfig.create({
     lecturer: req.user._id, // Use the authenticated user's ID
     name,
+    type,
     description,
     googleSheetId,
     formUrl,
@@ -85,6 +94,7 @@ exports.getExamConfig = catchAsync(async (req, res, next) => {
 exports.updateExamConfig = catchAsync(async (req, res, next) => {
   const {
     name,
+    type,
     description,
     googleSheetId,
     formUrl,
@@ -94,6 +104,13 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     isActive,
   } = req.body;
 
+  // Validate type if provided
+  if (type && type !== 'exam' && type !== 'homework') {
+    return next(
+      new AppError("Type must be either 'exam' or 'homework'", 400)
+    );
+  }
+  
   // Find the configuration
   const examConfig = await LecturerExamConfig.findById(req.params.id);
 

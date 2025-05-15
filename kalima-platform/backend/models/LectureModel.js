@@ -17,6 +17,24 @@ const lectureSchema = new mongoose.Schema({
   examConfig: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "LecturerExamConfig"
+  },  
+  passingThreshold: {
+    type: Number,
+    min: 0,
+    max: 100,
+  },
+  requiresHomework: {
+    type: Boolean,
+    default: false
+  },
+  homeworkConfig: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "LecturerExamConfig"
+  },
+  homeworkPassingThreshold: {
+    type: Number,
+    min: 0,
+    max: 100,
   },
   attachments: {
     booklets: [{ type: mongoose.Schema.Types.ObjectId, ref: "Attachment" }],
