@@ -40,7 +40,11 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       lecture_type,
       // New exam requirement fields
       requiresExam,
-      examConfig
+      examConfig,
+      passingThreshold,
+      requiresHomework,
+      homeworkConfig,
+      homeworkPassingThreshold
     } = req.body;
 
     // Validate lecture type
@@ -83,7 +87,12 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           lecture_type,
           // Add exam requirement fields
           requiresExam: requiresExam || false,
-          examConfig
+          examConfig,
+          passingThreshold,
+          // Homework requirement fields
+          requiresHomework: requiresHomework || false,
+          homeworkConfig,
+          homeworkPassingThreshold
         },
       ],
       { session }
@@ -353,7 +362,12 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     lecture_type,
     // New exam requirement fields
     requiresExam,
-    examConfig
+    examConfig,
+    passingThreshold,
+    // Homework requirement fields
+    requiresHomework,
+    homeworkConfig,
+    homeworkPassingThreshold
   } = req.body;
   
   const session = await mongoose.startSession();

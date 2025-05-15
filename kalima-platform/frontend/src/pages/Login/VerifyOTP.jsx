@@ -5,7 +5,7 @@ import { requestPasswordReset, verifyOtp } from '../../routes/auth-services';
 import WaveBackground from './WaveBackground';
 
 const VerifyOtp = () => {
-  const { t, i18n } = useTranslation("verifyOtp");
+  const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const location = useLocation();
   const navigate = useNavigate();
@@ -106,7 +106,7 @@ const VerifyOtp = () => {
                 name="otp"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP"
+                placeholder="OTP"
                 className="input input-bordered w-full"
                 required
               />
