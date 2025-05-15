@@ -86,7 +86,7 @@ export default function LecturerRevenue() {
   return (
     <div className="space-y-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-3xl font-extrabold text-primary">{t("lecturerRevenue")}</h2>
+        <h2 className="text-3xl font-extrabold text-primary">إيرادات المحاضر</h2>
         <select
           className="select select-bordered select-primary w-full sm:w-64 font-bold"
           value={selectedLecturer}
@@ -107,15 +107,15 @@ export default function LecturerRevenue() {
             <div className="flex items-center gap-6">
               <Trophy className="h-12 w-12" />
               <div>
-                <h3 className="text-2xl font-extrabold">{t("revenueSummary")}</h3>
+                <h3 className="text-2xl font-extrabold">ملخص الإيرادات</h3>
                 <p className="text-lg font-bold mt-2">
-                  {t("totalRevenue")}: {revenueData.summary.totalRevenue} {t("currency")}
+                  إجمالي الإيرادات: {revenueData.summary.totalRevenue} {t("currency")}
                 </p>
                 <p className="text-lg font-bold">
-                  {t("totalPurchases")}: {revenueData.summary.totalPurchases}
+                  إجمالي المشتريات: {revenueData.summary.totalPurchases}
                 </p>
                 <p className="text-lg font-bold">
-                  {t("monthsWithRevenue")}: {revenueData.summary.monthsWithRevenue}
+                  شهور   مع إيرادات: {revenueData.summary.monthsWithRevenue}
                 </p>
               </div>
             </div>
@@ -134,13 +134,13 @@ export default function LecturerRevenue() {
                   </h3>
                   <div className="space-y-3 mt-4">
                     <p className="text-lg font-bold">
-                      {t("totalRevenue")}:{" "}
+                      إجمالي الإيرادات:{" "}
                       <span className="text-success">
                         {month.totalRevenue} {t("currency")}
                       </span>
                     </p>
                     <p className="text-lg font-bold">
-                      {t("purchaseCount")}:{" "}
+                      إجمالي المشتريات:{" "}
                       <span className="text-accent">{month.purchaseCount}</span>
                     </p>
                   </div>

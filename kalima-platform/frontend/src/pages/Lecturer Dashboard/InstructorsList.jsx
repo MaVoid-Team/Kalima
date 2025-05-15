@@ -235,13 +235,13 @@ export default function InstructorsList() {
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{t("Assistants")}</h2>
+        <h2 className="text-2xl font-bold">المساعدين</h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="btn btn-primary gap-2"
         >
           <Plus size={18} />
-          {t("Add Assistant")}
+         اضف مساعدين
         </button>
       </div>
 

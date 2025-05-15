@@ -52,7 +52,7 @@ export default function LecturerDashboard() {
       >
         <div className="mx-auto p-6 md:p-10 lg:p-14">
           <h1 className="text-3xl md:text-4xl text-center mb-8 text-primary font-semibold">
-            {t("courseManagement") || "اداره الكورسات"}
+             اداره الكورسات
           </h1>
 
           {/* Course Grid Section */}

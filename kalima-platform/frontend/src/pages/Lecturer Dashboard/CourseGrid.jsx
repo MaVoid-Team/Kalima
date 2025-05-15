@@ -91,7 +91,7 @@ const CourseCard = memo(function CourseCard({
           <Link to={`container-details/${container._id}`}>
             <button className="btn btn-sm btn-ghost">
               <Eye className="h-4 w-4 mr-1" />
-              {t("view")}
+              اظهار
             </button>
           </Link>
           <button
@@ -99,7 +99,7 @@ const CourseCard = memo(function CourseCard({
             onClick={() => onDelete(container._id)}
             disabled={loading}
           >
-            {t("delete")}
+            مسح
           </button>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function CourseGrid() {
       <div className="text-center py-12">
         <p className="text-lg text-gray-500">{t("noCourses")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
-          <button className="btn btn-primary mt-4">{t("addNewCourse")}</button>
+          <button className="btn btn-primary mt-4">قم باضافه كورس</button>
         </Link>
       </div>
     )
@@ -245,10 +245,11 @@ export default function CourseGrid() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold">{t("courseManagement")}</h2>
+                     اداره الكورساتي
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
           <button className="btn btn-primary btn-base rounded-xl">
-            <span>{t("addNewCourse")}</span>
+            <span>            قم باضافه كورس 
+</span>
           </button>
         </Link>
       </div>

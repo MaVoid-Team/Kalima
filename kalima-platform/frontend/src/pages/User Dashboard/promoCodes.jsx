@@ -355,11 +355,11 @@ const PromoCodes = () => {
       <table className="table w-full">
         <thead className="bg-primary/5">
           <tr>
-            <th className="rounded-tl-xl">{t("table.date")}</th>
-            <th>{t("table.type")}</th>
+            <th className="rounded-tl-xl">معلومات التعاملات</th>
+            <th>نوع التعاملات</th>
             <th>{t("table.amount")}</th>
             <th>{t("table.teacher")}</th>
-            <th className="rounded-tr-xl">{t("table.actions")}</th>
+            <th className="rounded-tr-xl">عمليات التعاملات</th>
           </tr>
         </thead>
         <tbody>
@@ -538,7 +538,8 @@ const PromoCodes = () => {
       <div className="bg-gradient-to-b from-primary/10 to-transparent pt-6 pb-12">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl font-bold text-center mb-2">{t("title")}</h1>
-          <p className="text-center text-base-content/70">{t("subtitle")}</p>
+          {/* <p className="text-center text-base-content/70">{t("subtitle")}</p> */}
+          <p className="text-center text-base-content/70">اكواد شحني</p>
         </div>
       </div>
 
@@ -593,7 +594,7 @@ const PromoCodes = () => {
           {/* Actions Card */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
             <div className="card-body">
-              <h2 className="card-title mb-4">{t("actions.title")}</h2>
+              <h2 className="card-title mb-4">العمليات على الاكواد</h2>
               <div className="grid grid-cols-2 gap-3">
                 <button onClick={startScanner} className="btn btn-primary">
                   <QrCode className="w-4 h-4 mr-2" />
@@ -620,7 +621,8 @@ const PromoCodes = () => {
         <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
           <div className="card-body">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="card-title">{t("lecturerPoints.title")}</h2>
+              {/* <h2 className="card-title">{t("lecturerPoints.title")}</h2> */}
+              <h2 className="card-title">اكواد شحني لكل المدرسين</h2>
               <BarChart3 className="w-5 h-5 text-primary" />
             </div>
 

@@ -56,7 +56,8 @@ const Hero = () => {
 
   return (
     <div className="mx-auto p-6 w-full font-[Cairo]">
-    <h1 className={`text-3xl font-bold mb-8 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
+    <h1 className={`text-3xl font-bold mb-5 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
+              <p className="text-sm opacity-80 mb-2">كل معلومات المنصه</p>
 
       {error && (
         <div className="alert alert-error mb-6">
