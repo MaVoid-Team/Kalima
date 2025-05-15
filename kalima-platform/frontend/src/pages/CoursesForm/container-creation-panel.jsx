@@ -219,10 +219,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
             examConfigIdToUse = selectedExamConfigId
           }
 
-          // Set the exam config ID and passing threshold in the lecture data
+          // Set the exam config ID in the lecture data (without passing threshold)
           lectureData.requiresExam = true
           lectureData.examConfig = examConfigIdToUse
-          lectureData.passingThreshold = Number(passingThreshold) || 60
+          // Passing threshold is now defined in the exam config
         }
 
         console.log("Creating lecture with data:", lectureData)

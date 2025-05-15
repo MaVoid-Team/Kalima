@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { getExamConfigs, createExamConfig } from "../routes/examConfigs"
 
@@ -8,6 +10,7 @@ const ExamConfigSection = ({
   passingThreshold,
   setPassingThreshold,
   onExamConfigCreated,
+  configType = "exam", // Default to "exam", can be "homework"
 }) => {
   const [examConfigs, setExamConfigs] = useState([])
   const [examConfigsLoading, setExamConfigsLoading] = useState(false)
@@ -15,6 +18,7 @@ const ExamConfigSection = ({
   const [isCreatingNewExamConfig, setIsCreatingNewExamConfig] = useState(false)
   const [newExamConfig, setNewExamConfig] = useState({
     name: "",
+    type: configType, // Set the type based on the prop
     description: "",
     googleSheetId: "",
     formUrl: "",
@@ -43,9 +47,9 @@ const ExamConfigSection = ({
     setExamConfigsLoading(true)
     setExamConfigsError("")
     try {
-      console.log("Fetching exam configs...")
+      console.log(`Fetching ${configType} configs...`)
       const response = await getExamConfigs()
-      console.log("Exam Configs Response:", response)
+      console.log(`${configType.charAt(0).toUpperCase() + configType.slice(1)} Configs Response:`, response)
 
       if (response.success && response.data) {
         // Try to extract exam configs from different possible response structures
@@ -54,23 +58,29 @@ const ExamConfigSection = ({
           response.data.examConfigs || // Format: { data: { examConfigs: [...] } }
           (Array.isArray(response.data) ? response.data : []) // Format: { data: [...] }
 
-        console.log("Extracted exam configs:", configs)
+        console.log(`Extracted ${configType} configs:`, configs)
 
-        if (Array.isArray(configs) && configs.length > 0) {
-          setExamConfigs(configs)
+        // Filter configs by type if configType is "homework"
+        const filteredConfigs =
+          configType === "homework"
+            ? configs.filter((config) => config.type === "homework")
+            : configs.filter((config) => config.type !== "homework" || !config.type)
+
+        if (Array.isArray(filteredConfigs) && filteredConfigs.length > 0) {
+          setExamConfigs(filteredConfigs)
         } else {
-          console.log("No exam configs found in response")
-          setExamConfigsError("No exam configurations found. Please create a new one.")
+          console.log(`No ${configType} configs found in response`)
+          setExamConfigsError(`No ${configType} configurations found. Please create a new one.`)
           setExamConfigs([])
         }
       } else {
-        console.error("Failed to fetch exam configs:", response.message)
-        setExamConfigsError(response.message || "Failed to fetch exam configs")
+        console.error(`Failed to fetch ${configType} configs:`, response.message)
+        setExamConfigsError(response.message || `Failed to fetch ${configType} configs`)
         setExamConfigs([])
       }
     } catch (err) {
-      console.error("Error fetching exam configs:", err)
-      setExamConfigsError(err.message || "Failed to fetch exam configs")
+      console.error(`Error fetching ${configType} configs:`, err)
+      setExamConfigsError(err.message || `Failed to fetch ${configType} configs`)
       setExamConfigs([])
     } finally {
       setExamConfigsLoading(false)
@@ -81,12 +91,12 @@ const ExamConfigSection = ({
     try {
       // Validate required fields for new exam config
       if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
-        throw new Error("Please fill in all required exam configuration fields")
+        throw new Error(`Please fill in all required ${configType} configuration fields`)
       }
 
-      console.log("Creating new exam config:", newExamConfig)
+      console.log(`Creating new ${configType} config:`, newExamConfig)
       const createResponse = await createExamConfig(newExamConfig)
-      console.log("Create exam config response:", createResponse)
+      console.log(`Create ${configType} config response:`, createResponse)
 
       // Extract the exam config ID from different response formats
       let examConfigId = null
@@ -107,27 +117,35 @@ const ExamConfigSection = ({
       } else if (createResponse.status === "success" && createResponse.data && createResponse.data._id) {
         examConfigId = createResponse.data._id
       } else {
-        throw new Error(createResponse.message || "Failed to create exam config")
+        throw new Error(createResponse.message || `Failed to create ${configType} config`)
       }
 
       // Refresh the exam configs list
       await fetchExamConfigs()
-      
+
       // Set the selected exam config to the newly created one
       setSelectedExamConfigId(examConfigId)
       setIsCreatingNewExamConfig(false)
-      
+
       // Call the callback with the new exam config ID
       if (onExamConfigCreated) {
         onExamConfigCreated(examConfigId)
       }
-      
+
       return examConfigId
     } catch (err) {
       setExamConfigsError(err.message)
-      console.error("Error creating exam config:", err)
+      console.error(`Error creating ${configType} config:`, err)
       throw err
     }
+  }
+
+  // Handle input changes for the new exam config form
+  const handleInputChange = (field, value) => {
+    setNewExamConfig({
+      ...newExamConfig,
+      [field]: field === "defaultPassingThreshold" ? Number(value) : value,
+    })
   }
 
   if (!requiresExam) return null
@@ -138,7 +156,7 @@ const ExamConfigSection = ({
   const NewExamConfigForm = () => {
     return (
       <div className="space-y-4 mb-4 p-4 border border-base-300 rounded-lg">
-        <h4 className="font-medium">New Exam Configuration</h4>
+        <h4 className="font-medium">New {configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration</h4>
 
         <div className="form-control w-full">
           <label className="label">
@@ -146,12 +164,31 @@ const ExamConfigSection = ({
           </label>
           <input
             type="text"
-            placeholder="Enter exam config name"
+            placeholder={`Enter ${configType} config name`}
             className="input input-bordered w-full"
             value={newExamConfig.name}
-            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, name: e.target.value }))}
+            onChange={(e) => handleInputChange("name", e.target.value)}
             required
           />
+        </div>
+
+        {/* Type selection */}
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Type</span>
+          </label>
+          <select
+            className="select select-bordered w-full"
+            value={newExamConfig.type}
+            onChange={(e) => handleInputChange("type", e.target.value)}
+            required
+          >
+            <option value="exam">Exam</option>
+            <option value="homework">Homework</option>
+          </select>
+          <label className="label">
+            <span className="label-text-alt">Select whether this is for an exam or homework</span>
+          </label>
         </div>
 
         <div className="form-control w-full">
@@ -162,7 +199,7 @@ const ExamConfigSection = ({
             placeholder="Enter description"
             className="textarea textarea-bordered w-full"
             value={newExamConfig.description}
-            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, description: e.target.value }))}
+            onChange={(e) => handleInputChange("description", e.target.value)}
             required
           />
         </div>
@@ -176,7 +213,7 @@ const ExamConfigSection = ({
             placeholder="Eg : 1Iaosq_KHl7w6__oJB9nFnFr9QYiTDmSSKrWADszUcsM"
             className="input input-bordered w-full"
             value={newExamConfig.googleSheetId}
-            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, googleSheetId: e.target.value }))}
+            onChange={(e) => handleInputChange("googleSheetId", e.target.value)}
             required
           />
           <label className="label">
@@ -193,7 +230,7 @@ const ExamConfigSection = ({
             placeholder="Enter Google Form URL"
             className="input input-bordered w-full"
             value={newExamConfig.formUrl}
-            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, formUrl: e.target.value }))}
+            onChange={(e) => handleInputChange("formUrl", e.target.value)}
             required
           />
         </div>
@@ -208,7 +245,7 @@ const ExamConfigSection = ({
               placeholder="Column name"
               className="input input-bordered w-full"
               value={newExamConfig.studentIdentifierColumn}
-              onChange={(e) => setNewExamConfig((prev) => ({ ...prev, studentIdentifierColumn: e.target.value }))}
+              onChange={(e) => handleInputChange("studentIdentifierColumn", e.target.value)}
               required
             />
           </div>
@@ -222,7 +259,7 @@ const ExamConfigSection = ({
               placeholder="Column name"
               className="input input-bordered w-full"
               value={newExamConfig.scoreColumn}
-              onChange={(e) => setNewExamConfig((prev) => ({ ...prev, scoreColumn: e.target.value }))}
+              onChange={(e) => handleInputChange("scoreColumn", e.target.value)}
               required
             />
           </div>
@@ -237,7 +274,7 @@ const ExamConfigSection = ({
             placeholder="Enter threshold"
             className="input input-bordered w-full"
             value={newExamConfig.defaultPassingThreshold}
-            onChange={(e) => setNewExamConfig((prev) => ({ ...prev, defaultPassingThreshold: Number(e.target.value) }))}
+            onChange={(e) => handleInputChange("defaultPassingThreshold", Number(e.target.value))}
             min="0"
             max="100"
             required
@@ -245,12 +282,8 @@ const ExamConfigSection = ({
         </div>
 
         <div className="flex justify-end mt-4">
-          <button 
-            type="button" 
-            className="btn btn-primary"
-            onClick={handleCreateExamConfig}
-          >
-            Create Exam Config
+          <button type="button" className="btn btn-primary" onClick={handleCreateExamConfig}>
+            Create {configType.charAt(0).toUpperCase() + configType.slice(1)} Config
           </button>
         </div>
       </div>
@@ -261,7 +294,7 @@ const ExamConfigSection = ({
     <>
       <div className="form-control w-full mb-4">
         <label className="label">
-          <span className="label-text">Exam Configuration</span>
+          <span className="label-text">{configType.charAt(0).toUpperCase() + configType.slice(1)} Configuration</span>
         </label>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
@@ -280,11 +313,11 @@ const ExamConfigSection = ({
               }}
               disabled={examConfigsLoading}
             >
-              <option value="">Select Exam Config</option>
+              <option value="">Select {configType.charAt(0).toUpperCase() + configType.slice(1)} Config</option>
               {hasExistingConfigs ? (
                 examConfigs.map((config) => (
                   <option key={config._id} value={config._id}>
-                    {config.name}
+                    {config.name} ({config.type || "exam"})
                   </option>
                 ))
               ) : (
@@ -292,13 +325,15 @@ const ExamConfigSection = ({
                   No existing configs
                 </option>
               )}
-              <option value="new">Create New Exam Config</option>
+              <option value="new">Create New {configType.charAt(0).toUpperCase() + configType.slice(1)} Config</option>
             </select>
             {examConfigsLoading && <span className="loading loading-spinner"></span>}
           </div>
           {examConfigsError && <div className="text-error text-sm">{examConfigsError}</div>}
           {!hasExistingConfigs && !examConfigsError && !examConfigsLoading && (
-            <div className="text-info text-sm">No existing exam configurations found. You can create a new one.</div>
+            <div className="text-info text-sm">
+              No existing {configType} configurations found. You can create a new one.
+            </div>
           )}
         </div>
       </div>
@@ -316,7 +351,7 @@ const ExamConfigSection = ({
               placeholder="Enter passing threshold"
               className="input input-bordered w-full"
               value={passingThreshold}
-              onChange={(e) => setPassingThreshold(e.target.value)}
+              onChange={(e) => setPassingThreshold(Number(e.target.value))}
               min="0"
               max="100"
               required

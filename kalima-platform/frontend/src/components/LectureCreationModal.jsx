@@ -26,9 +26,16 @@ const LectureCreationModal = ({
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
   const [numberOfViews, setNumberOfViews] = useState(0)
+
+  // Exam related state
   const [requiresExam, setRequiresExam] = useState(false)
   const [passingThreshold, setPassingThreshold] = useState(50)
   const [selectedExamConfigId, setSelectedExamConfigId] = useState("")
+
+  // Homework related state
+  const [requiresHomework, setRequiresHomework] = useState(false)
+  const [homeworkPassingThreshold, setHomeworkPassingThreshold] = useState(50)
+  const [selectedHomeworkConfigId, setSelectedHomeworkConfigId] = useState("")
 
   // Levels and subjects state
   const [levels, setLevels] = useState([])
@@ -97,12 +104,20 @@ const LectureCreationModal = ({
     setNewLectureType("Revision")
     setAttachmentFile(null)
     setNumberOfViews(0)
+
+    // Reset exam fields
     setRequiresExam(false)
     setPassingThreshold(50)
+    setSelectedExamConfigId("")
+
+    // Reset homework fields
+    setRequiresHomework(false)
+    setHomeworkPassingThreshold(50)
+    setSelectedHomeworkConfigId("")
+
     setSelectedLevel(containerLevel || "")
     setSelectedSubject(containerSubject || "")
     setAttachmentType("homeworks")
-    setSelectedExamConfigId("")
     setCreationError("")
   }
 
@@ -144,10 +159,22 @@ const LectureCreationModal = ({
         if (!selectedExamConfigId) {
           throw new Error("Please select an exam configuration")
         }
-        
+
         // Set the exam config ID in the lecture data
         lectureData.examConfig = selectedExamConfigId
-        lectureData.passingThreshold = Number(passingThreshold) || 60
+        // Passing threshold is now defined in the exam config
+      }
+
+      // Handle homework config if required
+      if (requiresHomework) {
+        if (!selectedHomeworkConfigId) {
+          throw new Error("Please select a homework configuration")
+        }
+
+        // Set the homework config ID in the lecture data
+        lectureData.requiresHomework = true
+        lectureData.homeworkConfig = selectedHomeworkConfigId
+        // Passing threshold is now defined in the homework config
       }
 
       // Call the onSubmit callback with the lecture data and attachment
@@ -301,6 +328,9 @@ const LectureCreationModal = ({
             </select>
           </div>
 
+          {/* Exam Section */}
+          <div className="divider">Exam Settings</div>
+
           <div className="form-control w-full mb-4">
             <label className="label">
               <span className="label-text">Requires Exam</span>
@@ -327,7 +357,48 @@ const LectureCreationModal = ({
             }}
           />
 
+          {/* Homework Section */}
+          <div className="divider">Homework Settings</div>
+
+          <div className="form-control w-full mb-4">
+            <label className="label">
+              <span className="label-text">Requires Homework</span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={requiresHomework}
+              onChange={(e) => setRequiresHomework(e.target.value === "true")}
+            >
+              <option value={false}>No</option>
+              <option value={true}>Yes</option>
+            </select>
+          </div>
+
+          {/* Homework Config Section */}
+          {requiresHomework && (
+            <>
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text">Homework Configuration</span>
+                </label>
+                <ExamConfigSection
+                  requiresExam={requiresHomework}
+                  selectedExamConfigId={selectedHomeworkConfigId}
+                  setSelectedExamConfigId={setSelectedHomeworkConfigId}
+                  passingThreshold={homeworkPassingThreshold}
+                  setPassingThreshold={setHomeworkPassingThreshold}
+                  onExamConfigCreated={(homeworkConfigId) => {
+                    setSelectedHomeworkConfigId(homeworkConfigId)
+                  }}
+                  configType="homework"
+                />
+              </div>
+            </>
+          )}
+
           {/* Attachment section with type selection */}
+          <div className="divider">Attachments</div>
+
           <div className="form-control w-full mb-4">
             <label className="label">
               <span className="label-text">Attachment (Optional)</span>

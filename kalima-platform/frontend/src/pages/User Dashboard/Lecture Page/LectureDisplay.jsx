@@ -11,7 +11,7 @@ import {
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
+import { checkStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
 
 // Vidstack imports
@@ -77,6 +77,7 @@ const LectureDisplay = () => {
   const [videoBlocked, setVideoBlocked] = useState(false)
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
+  const [purchaseId, setPurchaseId] = useState(null)
 
   // Exam verification states
   const [examVerified, setExamVerified] = useState(false)
@@ -124,6 +125,23 @@ const LectureDisplay = () => {
           const { userInfo } = dashboardResult.data.data
           setUserRole(userInfo.role)
           setUserId(userInfo.id)
+
+          // Get purchase ID from purchase history if available
+          if (dashboardResult.data.data.purchaseHistory && dashboardResult.data.data.purchaseHistory.length > 0) {
+            // Find the purchase for this lecture
+            const lecturePurchase = dashboardResult.data.data.purchaseHistory.find(
+              (purchase) => purchase.container && purchase.container._id === lectureId,
+            )
+
+            if (lecturePurchase) {
+              setPurchaseId(lecturePurchase._id)
+              console.log("Found purchase ID for lecture:", lecturePurchase._id)
+            } else {
+              console.log("No purchase found for this lecture in purchase history")
+            }
+          } else {
+            console.log("No purchase history found in user data")
+          }
         } else {
           console.error("Failed to fetch user data:", dashboardResult.error)
           setError("Failed to authenticate user")
@@ -228,6 +246,7 @@ const LectureDisplay = () => {
         setExamData({
           passingThreshold: accessResult.data.passingThreshold,
           examUrl: accessResult.data.examUrl,
+          examType: accessResult.data.examType || "exam", // Store exam type if available
         })
         setExamUrl(accessResult.data.examUrl)
 
@@ -272,50 +291,58 @@ const LectureDisplay = () => {
   }, [lectureId, userRole])
 
   // Fetch student access data - only for students
-  // useEffect(() => {
-  //   const fetchAccessData = async () => {
-  //     if (
-  //       userRole === "Lecturer" ||
-  //       userRole === "Admin" ||
-  //       userRole === "SubAdmin" ||
-  //       userRole === "Moderator" ||
-  //       userRole === "Assistant" ||
-  //       !userId // Make sure we have a userId before proceeding
-  //     )
-  //       return
+  useEffect(() => {
+    const fetchAccessData = async () => {
+      if (
+        userRole === "Lecturer" ||
+        userRole === "Admin" ||
+        userRole === "SubAdmin" ||
+        userRole === "Moderator" ||
+        userRole === "Assistant" ||
+        !userId || // Make sure we have a userId before proceeding
+        !purchaseId // Make sure we have a purchaseId before proceeding
+      )
+        return
 
-  //     try {
-  //       // Use the new function to fetch student lecture access by lecture ID
-  //       const result = await getStudentLectureAccessByLectureId(lectureId)
+      try {
+        // Use the new function to check student lecture access
+        const result = await checkStudentLectureAccess(userId, lectureId, purchaseId)
+        console.log("Student lecture access check result:", result)
 
-  //       if (result.success && result.data.accessRecords && result.data.accessRecords.length > 0) {
-  //         // Find the access record that matches the current user's ID
-  //         const currentUserAccessRecord = result.data.accessRecords.find((record) => record.student._id === userId)
+        if (result.success && result.data) {
+          // The access data is directly in result.data.access
+          if (result.data.access) {
+            console.log("Setting remaining views to:", result.data.access.remainingViews)
+            // Only set the studentLectureAccessId, don't update remainingViews yet
+            setStudentLectureAccessId(result.data.access._id)
 
-  //         if (currentUserAccessRecord) {
-  //           setRemainingViews(currentUserAccessRecord.remainingViews)
-  //           setStudentLectureAccessId(currentUserAccessRecord._id)
+            // Store the remaining views in a ref to use when the video plays
+            if (result.data.access.remainingViews !== undefined) {
+              setRemainingViews(result.data.access.remainingViews)
+            }
 
-  //           if (currentUserAccessRecord.remainingViews <= 0) {
-  //             setVideoBlocked(true)
-  //             redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
-  //           }
-  //         } else {
-  //           setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
-  //         }
-  //       } else {
-  //         setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching access data:", error)
-  //       setError("فشل تحميل بيانات الوصول")
-  //     }
-  //   }
+            if (result.data.access.remainingViews <= 0) {
+              setVideoBlocked(true)
+              redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
+            }
+          } else {
+            console.error("No access data found in API response")
+            setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+          }
+        } else {
+          console.error("Failed to check lecture access:", result.error)
+          setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+        }
+      } catch (error) {
+        console.error("Error fetching access data:", error)
+        setError("فشل تحميل بيانات الوصول")
+      }
+    }
 
-  //   if (lectureId && userRole === "Student" && userId) {
-  //     fetchAccessData()
-  //   }
-  // }, [lectureId, navigate, userRole, userId]) // Added userId to the dependency array
+    if (lectureId && userRole === "Student" && userId && purchaseId) {
+      fetchAccessData()
+    }
+  }, [lectureId, navigate, userRole, userId, purchaseId])
 
   // Reset upload states when changing tabs
   useEffect(() => {
@@ -381,7 +408,10 @@ const LectureDisplay = () => {
       })
 
       if (response.success) {
+        // The updated data is directly in response.data
+        console.log("Updated remaining views:", response.data.remainingViews)
         setRemainingViews(response.data.remainingViews)
+
         if (response.data.remainingViews <= 0) {
           setVideoBlocked(true)
           playerRef.current?.pause()
@@ -389,6 +419,7 @@ const LectureDisplay = () => {
           redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
         }
       } else {
+        console.error("Failed to update remaining views:", response.error)
         hasViewedRef.current = false
       }
     } catch (error) {
@@ -1148,10 +1179,20 @@ const LectureDisplay = () => {
                 <>
                   <h3 className="text-lg font-semibold mb-2">إكمال نموذج Google</h3>
 
-                  {lecture?.homeworkFormLink ? (
+                  {lecture?.homeworkFormLink || examUrl ? (
                     <div className="mb-4">
                       <p className="mb-4">قم بإكمال نموذج Google التالي وإرساله للتصحيح:</p>
-                      <button onClick={handleSubmitHomework} className="btn btn-primary w-full">
+                      <button
+                        onClick={() => {
+                          // Open the Google Form in a new tab
+                          if (examData && examData.examType === "homework" && examUrl) {
+                            window.open(examUrl, "_blank")
+                          } else if (lecture.homeworkFormLink) {
+                            window.open(lecture.homeworkFormLink, "_blank")
+                          }
+                        }}
+                        className="btn btn-primary w-full"
+                      >
                         <FiLink className="mr-2" />
                         فتح نموذج Google
                       </button>
