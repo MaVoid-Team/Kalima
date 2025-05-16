@@ -111,14 +111,86 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   let user;
 
   switch (role.toLowerCase()) {
-    case "teacher":
-      if (!newUser.level)
-        return next(new AppError("Level is required for teacher role", 400));
-      const teacherLevel = await Level.findById(newUser.level);
-      if (!teacherLevel)
-        return next(new AppError("There is no level with this id", 404));
+    case "teacher": {
+      // Validate level (must be one of the allowed periods)
+      if (
+        !newUser.level ||
+        !["primary", "preparatory", "secondary"].includes(newUser.level)
+      ) {
+        return next(
+          new AppError(
+            "Level is required for teacher role and must be one of: Primary, Preparatory, Secondary",
+            400
+          )
+        );
+      }
+      // Validate teachesAtType
+      if (
+        !newUser.teachesAtType ||
+        !["Center", "School", "Both"].includes(newUser.teachesAtType)
+      ) {
+        return next(
+          new AppError(
+            "teachesAtType is required and must be 'Center', 'School', or 'Both'",
+            400
+          )
+        );
+      }
+      // Validate centers
+      if (
+        (newUser.teachesAtType === "Center" ||
+          newUser.teachesAtType === "Both") &&
+        (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
+      ) {
+        return next(
+          new AppError(
+            "At least one center is required if teachesAtType is 'Center' or 'Both'",
+            400
+          )
+        );
+      }
+      // Validate school
+      if (
+        (newUser.teachesAtType === "School" ||
+          newUser.teachesAtType === "Both") &&
+        (!newUser.school || newUser.school.trim() === "")
+      ) {
+        return next(
+          new AppError(
+            "School is required if teachesAtType is 'School' or 'Both'",
+            400
+          )
+        );
+      }
+      // Validate socialMedia (optional, but if present, must be array of {platform, account})
+      if (newUser.socialMedia && !Array.isArray(newUser.socialMedia)) {
+        return next(new AppError("socialMedia must be an array", 400));
+      }
+      if (Array.isArray(newUser.socialMedia)) {
+        for (const sm of newUser.socialMedia) {
+          if (typeof sm !== "object") continue;
+          if (
+            sm.platform &&
+            ![
+              "Facebook",
+              "Instagram",
+              "Twitter",
+              "LinkedIn",
+              "TikTok",
+              "YouTube",
+              "WhatsApp",
+              "Telegram",
+            ].includes(sm.platform)
+          ) {
+            return next(
+              new AppError(`Invalid social media platform: ${sm.platform}`, 400)
+            );
+          }
+        }
+      }
       user = await Teacher.create(newUser);
       break;
+    }
     case "student":
       if (!newUser.level)
         return next(new AppError("Level is required for student role", 400));

@@ -22,17 +22,70 @@ const teacherSchema = new mongoose.Schema(
     phoneNumber: { type: String, required: true },
     subject: { type: String, required: true },
     level: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Level",
+      type: String,
+      enum: ["primary", "preparatory", "secondary"],
       required: true,
     },
-    school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
+    socialMedia: [
+      {
+        platform: {
+          type: String,
+          enum: [
+            "Facebook",
+            "Instagram",
+            "Twitter",
+            "LinkedIn",
+            "TikTok",
+            "YouTube",
+            "WhatsApp",
+            "Telegram",
+          ],
+          required: false,
+        },
+        account: {
+          type: String,
+          required: false,
+        },
+      },
+    ],
+
+    teachesAtType: {
+      type: String,
+      enum: ["Center", "School", "Both"],
+      required: true,
+    },
+    centers: [{ type: String }], // Array of strings for center names
+    school: { type: String },
     lecturerPoints: [lecturerPointsSchema],
   },
   {
     timestamps: true,
   }
 );
+
+// Custom validation for conditional required fields
+teacherSchema.pre("validate", function (next) {
+  if (
+    (this.teachesAtType === "Center" || this.teachesAtType === "Both") &&
+    (!this.centers || this.centers.length === 0)
+  ) {
+    this.invalidate(
+      "centers",
+      "At least one center is required if teachesAtType is 'Center' or 'Both'."
+    );
+  }
+  if (
+    (this.teachesAtType === "School" || this.teachesAtType === "Both") &&
+    (!this.school || this.school.trim() === "")
+  ) {
+    this.invalidate(
+      "school",
+      "School is required if teachesAtType is 'School' or 'Both'."
+    );
+  }
+  next();
+});
+
 teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
@@ -59,7 +112,7 @@ teacherSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   if (pointsToUse === 0) {
     return true;
   }
-  
+
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
   );
