@@ -112,14 +112,17 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   switch (role.toLowerCase()) {
     case "teacher": {
-      // Validate level (must be one of the allowed periods)
+      // Validate level (must be an array of allowed values)
       if (
-        !newUser.level ||
-        !["primary", "preparatory", "secondary"].includes(newUser.level)
+        !Array.isArray(newUser.level) ||
+        newUser.level.length === 0 ||
+        !newUser.level.every((l) =>
+          ["primary", "preparatory", "secondary"].includes(l)
+        )
       ) {
         return next(
           new AppError(
-            "Level is required for teacher role and must be one of: Primary, Preparatory, Secondary",
+            "Level is required for teacher role and must be a non-empty array of: Primary, Preparatory, Secondary",
             400
           )
         );

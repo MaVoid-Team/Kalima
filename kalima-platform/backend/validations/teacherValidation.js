@@ -7,7 +7,10 @@ const teacherValidation = userValidation.concat(
     faction: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
     subject: Joi.string().required(),
-    level: Joi.string().valid("primary", "preparatory", "secondary").required(),
+    level: Joi.array()
+      .items(Joi.string().valid("primary", "preparatory", "secondary"))
+      .min(1)
+      .required(),
     teachesAtType: Joi.string().valid("Center", "School", "Both").required(),
     centers: Joi.array()
       .items(Joi.string())
