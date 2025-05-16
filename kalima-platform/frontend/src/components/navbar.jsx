@@ -30,20 +30,25 @@ const NavBar = () => {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  fetchUserRole();
+
+  const handleStorageChange = () => {
     fetchUserRole();
+  };
 
-    // Listen for login status changes
-    const handleStorageChange = () => {
-      fetchUserRole();
-    };
+  const handleCustomAuthChange = () => {
+    fetchUserRole();
+  };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  window.addEventListener('storage', handleStorageChange);
+  window.addEventListener('user-auth-changed', handleCustomAuthChange);
 
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+    window.removeEventListener('user-auth-changed', handleCustomAuthChange);
+  };
+}, []);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuOpen && 
