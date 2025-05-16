@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 import { getUserDashboard } from "../../../routes/auth-services"
 
 const ContainersPage = () => {
+  const { t, i18n } = useTranslation('containersPage');
+  const isRTL = i18n.language === "ar";
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -130,13 +133,13 @@ const ContainersPage = () => {
     );
   }
 
-  return (
-    <div className="container mx-auto p-4" dir="rtl">
+   return (
+    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
       <h1 className="text-3xl font-bold mb-6">
-        {userRole === 'Lecturer' ? 'الدورات الخاصة بك' : 'الدورات المشتراة'}
+        {userRole === 'Lecturer' ? t('containersPage.headers.lecturerCourses') : t('containersPage.headers.studentCourses')}
       </h1>
       <p className="text-sm opacity-80">
-        {userRole === 'Lecturer' ? "المحاضرات التي قمت بنشرها" : "المحاضرات التي قمت بشرائها"}
+        {userRole === 'Lecturer' ? t('containersPage.descriptions.lecturer') : t('containersPage.descriptions.student')}
       </p>
 
       {/* Items per page selector */}
@@ -146,9 +149,9 @@ const ContainersPage = () => {
           value={itemsPerPage} 
           onChange={handleItemsPerPageChange}
         >
-          <option value={5}>5 لكل صفحة</option>
-          <option value={10}>10 لكل صفحة</option>
-          <option value={20}>20 لكل صفحة</option>
+          <option value={5}>{t('containersPage.itemsPerPage', { count: 5 })}</option>
+          <option value={10}>{t('containersPage.itemsPerPage', { count: 10 })}</option>
+          <option value={20}>{t('containersPage.itemsPerPage', { count: 20 })}</option>
         </select>
       </div>
 
@@ -165,37 +168,37 @@ const ContainersPage = () => {
                 {container.level?.name && (
                   <div className="badge badge-secondary">{container.level.name}</div>
                 )}
-                <div className="badge badge-accent">course</div>
+                <div className="badge badge-accent">{t('containersPage.labels.course')}</div>
               </div>
               
               {userRole === 'Lecturer' && (
                 <p className="text-sm">
-                  السعر: {container.price} نقطة
+                  {t('containersPage.labels.price', { price: container.price })}
                 </p>
               )}
               
               {userRole === 'Student' && container.lecturer && (
                 <p className="text-sm">
-                  المدرس: {typeof container.lecturer === 'string' 
+                  {t('containersPage.labels.lecturer')}: {typeof container.lecturer === 'string' 
                     ? container.lecturer 
-                    : container.lecturer.name || 'Unknown'}
+                    : container.lecturer.name || t('containersPage.unknown')}
                 </p>
               )}
               
               {userRole === 'Student' && container.purchasedAt && (
                 <p className="text-sm opacity-75">
-                  تاريخ الشراء: {new Date(container.purchasedAt).toLocaleDateString('ar-EG')}
+                  {t('containersPage.labels.purchaseDate')}: {new Date(container.purchasedAt).toLocaleDateString(i18n.language)}
                 </p>
               )}
 
               <div className="card-actions justify-end mt-4">
-                {userRole === 'Lecturer' ? (
+                  {userRole === 'Lecturer' ? (
                   <Link 
                     to={`/dashboard/lecturer-dashboard/container-details/${container._id}`} 
                     className="btn btn-primary"
                     state={{ userRole: 'Lecturer' }}
                   >
-                    عرض التفاصيل
+                    {t('containersPage.buttons.viewDetails')}
                   </Link>
                 ) : (
                   <Link 
@@ -203,7 +206,7 @@ const ContainersPage = () => {
                     className="btn btn-primary"
                     state={{ userRole: 'Student' }}
                   >
-                    عرض التفاصيل
+                    {t('containersPage.buttons.viewDetails')}
                   </Link>
                 )}
               </div>
@@ -219,8 +222,8 @@ const ContainersPage = () => {
           </svg>
           <span>
             {userRole === 'Lecturer' 
-              ? 'لا توجد دورات متاحة حالياً.' 
-              : 'لم تقم بشراء أي دورات بعد.'}
+              ? t('containersPage.emptyStates.lecturer')
+              : t('containersPage.emptyStates.student')}
           </span>
         </div>
       )}
@@ -233,7 +236,7 @@ const ContainersPage = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              السابق
+              {t('containersPage.pagination.previous')}
             </button>
             
             {[...Array(totalPages)].map((_, index) => (
@@ -251,7 +254,7 @@ const ContainersPage = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              التالي
+              {t('containersPage.pagination.next')}
             </button>
           </div>
         </div>
