@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
@@ -10,6 +11,8 @@ import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 
 const MyLecturesPage = () => {
+  const { t, i18n } = useTranslation('lecturesPage');
+  const isRTL = i18n.language === "ar";
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
@@ -293,73 +296,74 @@ const MyLecturesPage = () => {
   // Basic error boundary for rendering
   try {
     return (
-      <div className="container mx-auto p-4" dir="rtl">
-        <h1 className="text-2xl font-bold mb-2">
-          {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) ? "إدارة المحاضرات" : "المحاضرات المشتراة"}
-        </h1>
-        <p className="text-sm opacity-80 mt-2 mb-5">تفاصيل كل محاضراتي</p>
-        {error && (
-          <div className="alert alert-error mb-4">
-            <span>{error}</span>
-            <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
-              إغلاق
-            </button>
-          </div>
-        )}
+    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+      <h1 className="text-2xl font-bold mb-2">
+        {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) 
+          ? t('lecturesPage.pageTitle.manage') 
+          : t('lecturesPage.pageTitle.purchased')}
+      </h1>
+      <p className="text-sm opacity-80 mt-2 mb-5">{t('lecturesPage.pageDescription')}</p>
+      
+      {error && (
+        <div className="alert alert-error mb-4">
+          <span>{error}</span>
+          <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
+            {t('lecturesPage.buttons.close')}
+          </button>
+        </div>
+      )}
 
-        <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
-          <div className="flex flex-col md:flex-row gap-4 flex-1">
-            <select
-              className="select select-bordered w-full md:w-64"
-              value={selectedSubjectFilter}
-              onChange={(e) => {
-                setSelectedSubjectFilter(e.target.value)
-                setCurrentPage(1) // Reset to first page when filter changes
-              }}
-            >
-              <option value="">كل المواد</option>
-              {subjects &&
-                subjects.map((subject) => (
-                  <option key={subject._id} value={subject._id}>
-                    {subject.name}
-                  </option>
-                ))}
-            </select>
-
-            <select
-              className="select select-bordered w-full md:w-64"
-              value={selectedLevelFilter}
-              onChange={(e) => {
-                setSelectedLevelFilter(e.target.value)
-                setCurrentPage(1) // Reset to first page when filter changes
-              }}
-            >
-              <option value="">كل المستويات</option>
-              {levels &&
-                levels.map((level) => (
-                  <option key={level._id} value={level._id}>
-                    {level.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-
-          {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) && (
-            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-              إنشاء محاضرة جديدة
-            </button>
-          )}
+      <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
+        <div className="flex flex-col md:flex-row gap-4 flex-1">
+          <select
+            className="select select-bordered w-full md:w-64"
+            value={selectedSubjectFilter}
+            onChange={(e) => {
+              setSelectedSubjectFilter(e.target.value)
+              setCurrentPage(1)
+            }}
+          >
+            <option value="">{t('lecturesPage.filters.allSubjects')}</option>
+            {subjects?.map((subject) => (
+              <option key={subject._id} value={subject._id}>
+                {subject.name}
+              </option>
+            ))}
+          </select>
 
           <select
-            className="select select-bordered w-full md:w-48"
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
+            className="select select-bordered w-full md:w-64"
+            value={selectedLevelFilter}
+            onChange={(e) => {
+              setSelectedLevelFilter(e.target.value)
+              setCurrentPage(1)
+            }}
           >
-            <option value={10}>10 لكل صفحة</option>
-            <option value={20}>20 لكل صفحة</option>
-            <option value={50}>50 لكل صفحة</option>
+            <option value="">{t('lecturesPage.filters.allLevels')}</option>
+            {levels?.map((level) => (
+              <option key={level._id} value={level._id}>
+                {t(`gradeLevels.${level.name}` , { ns: 'common' })}
+              </option>
+            ))}
           </select>
         </div>
+
+        {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) && (
+          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
+            {t('lecturesPage.buttons.createNewLecture')}
+          </button>
+        )}
+
+        <select
+          className="select select-bordered w-full md:w-48"
+          value={itemsPerPage}
+          onChange={handleItemsPerPageChange}
+        >
+          <option value={10}>{t('lecturesPage.itemsPerPage', { count: 10 })}</option>
+          <option value={20}>{t('lecturesPage.itemsPerPage', { count: 20 })}</option>
+          <option value={50}>{t('lecturesPage.itemsPerPage', { count: 50 })}</option>
+        </select>
+      </div>
 
         {/* Lecture Creation Modal */}
         <LectureCreationModal
@@ -374,68 +378,62 @@ const MyLecturesPage = () => {
         />
 
         <div className="overflow-x-auto">
-          <table className="table table-zebra w-full">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && <th>المحاضر</th>}
-                <th>المادة</th>
-                <th>المستوى</th>
-                <th>النوع</th>
-                <th>السعر</th>
-                {userRole === "Student" && <th>تاريخ الشراء</th>}
-                {userRole !== "Student" && <th>الإجراءات</th>}
+        <table className="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>{t('lecturesPage.tableHeaders.name')}</th>
+              {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && 
+                <th>{t('lecturesPage.tableHeaders.lecturer')}</th>}
+              <th>{t('lecturesPage.tableHeaders.subject')}</th>
+              <th>{t('lecturesPage.tableHeaders.level')}</th>
+              <th>{t('lecturesPage.tableHeaders.type')}</th>
+              <th>{t('lecturesPage.tableHeaders.price')}</th>
+              {userRole === "Student" && <th>{t('lecturesPage.tableHeaders.purchaseDate')}</th>}
+              {userRole !== "Student" && <th>{t('lecturesPage.tableHeaders.actions')}</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {lectures?.map((lecture) => (
+              <tr key={lecture.id}>
+                <td>{lecture.name}</td>
+                {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                  <td>{lecture.lecturer?.name || t('lecturesPage.unknown')}</td>
+                )}
+                <td>{lecture.subject?.name || t('lecturesPage.notSpecified')}</td>
+                <td>{t(`gradeLevels.${lecture.level?.name}` , { ns: 'common' }) || lecture.level?.name || t('lecturesPage.notSpecified')}</td>
+                <td>{lecture.lecture_type === "Paid" ? t('lecturesPage.lectureType.paid') : t('lecturesPage.lectureType.review')}</td>
+                <td>{lecture.price || 0} {t('lecturesPage.points')}</td>
+                {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
+                <td>
+                  <Link to={`/dashboard/${userRole === "Student" ? 'student' : 'lecturer'}-dashboard/${userRole === "Student" ? 'lecture-display' : 'detailed-lecture-view'}/${lecture.id}`}>
+                    <button className="btn btn-ghost">{t('lecturesPage.buttons.details')}</button>
+                  </Link>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {lectures &&
-                lectures.map((lecture) => (
-                  <tr key={lecture.id}>
-                    <td>{lecture.name}</td>
-                    {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
-                      <td>{lecture.lecturer?.name || "غير معروف"}</td>
-                    )}
-                    <td>{lecture.subject?.name || "غير محدد"}</td>
-                    <td>{lecture.level?.name || "غير محدد"}</td>
-                    <td>{lecture.lecture_type === "Paid" ? "مدفوعة" : "مراجعة"}</td>
-                    <td>{lecture.price || 0} نقطة</td>
-                    {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
-                    <td>
-                      {userRole === "Student" ? (
-                        <Link to={`/dashboard/student-dashboard/lecture-display/${lecture.id}`}>
-                          <button className="btn btn-ghost">التفاصيل</button>
-                        </Link>
-                      ) : (
-                        <Link to={`/dashboard/lecturer-dashboard/detailed-lecture-view/${lecture.id}`}>
-                          <button className="btn btn-ghost">التفاصيل</button>
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {lectures.length === 0 && (
+        <div className="alert alert-info mt-4">
+          <span>
+            {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+              ? t('lecturesPage.emptyStates.noLectures')
+              : t('lecturesPage.emptyStates.noPurchases')}
+          </span>
         </div>
+      )}
 
-        {lectures.length === 0 && (
-          <div className="alert alert-info mt-4">
-            <span>
-              {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
-                ? "لا توجد محاضرات متاحة"
-                : "لم تقم بشراء أي محاضرات بعد"}
-            </span>
-          </div>
-        )}
-
-        {totalPages > 1 && (
-          <div className="join flex justify-center mt-4">
-            <button
-              className="join-item btn"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              السابق
-            </button>
+      {totalPages > 1 && (
+        <div className="join flex justify-center mt-4">
+          <button
+            className="join-item btn"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            {t('lecturesPage.pagination.previous')}
+          </button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               // Show at most 5 page buttons
               let pageNum
@@ -464,12 +462,12 @@ const MyLecturesPage = () => {
               )
             })}
             <button
-              className="join-item btn"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              التالي
-            </button>
+            className="join-item btn"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            {t('lecturesPage.pagination.next')}
+          </button>
           </div>
         )}
       </div>
