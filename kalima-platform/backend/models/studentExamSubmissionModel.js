@@ -12,11 +12,20 @@ const studentExamSubmissionSchema = new mongoose.Schema(
       ref: "Lecture",
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+      enum: ['exam', 'homework'],
+      default: 'exam'
+    },
+    config: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LecturerExamConfig"
+    },
     score: {
       type: Number,
       required: true,
       min: 0,
-      max: 100,
     },
     maxScore: {
       type: Number,
@@ -27,6 +36,7 @@ const studentExamSubmissionSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+      max: 100,
     },
     passed: {
       type: Boolean,
@@ -46,7 +56,9 @@ const studentExamSubmissionSchema = new mongoose.Schema(
   }
 );
 
-// For efficiently finding all submissions for a lecture
+// Updated compound index to include type field for uniqueness
+studentExamSubmissionSchema.index({ student: 1, lecture: 1, type: 1 }, { unique: true });
 studentExamSubmissionSchema.index({ lecture: 1, submittedAt: -1 });
+studentExamSubmissionSchema.index({ type: 1, passed: 1 });
 
 module.exports = mongoose.model("StudentExamSubmission", studentExamSubmissionSchema);

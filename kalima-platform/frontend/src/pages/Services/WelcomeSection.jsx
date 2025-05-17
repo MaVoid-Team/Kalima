@@ -1,8 +1,13 @@
 import React, { useMemo } from "react";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation, Trans } from "react-i18next";
 
-const WelcomeSection = React.memo(({ isRTL, t }) => {
+const WelcomeSection = React.memo(() => {
+  const { t, i18n } = useTranslation("home");
+  const isRTL = i18n.language === "ar";
+  const navigate = useNavigate();
+
   const images = useMemo(
     () => ({
       maleStudent: "/servicesherosection2",
@@ -10,8 +15,26 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
     }),
     []
   );
-  const navigate = useNavigate();
-
+  const titleParts = t("welcome.title").split(/({{highlight}}|{{\/highlight}})/);
+  const HighlightedText = ({ children, isRTL }) => (
+    <span className="relative inline-block text-primary">
+      {children}
+      <svg
+        className={`absolute -bottom-3 w-full ${isRTL ? "right-0" : "left-0"}`}
+        width="140"
+        height="16"
+        viewBox="0 0 140 16"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      </svg>
+    </span>
+  );
   const fadeIn = (direction, type, delay, duration) => ({
     hidden: {
       x: direction === "left" ? 50 : direction === "right" ? -50 : 0,
@@ -30,6 +53,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
       },
     },
   });
+
   return (
     <div
       className={`flex flex-col lg:flex-row items-center gap-8 ${
@@ -58,7 +82,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
           >
             <img
               src={images.maleStudent}
-              alt={isRTL ? "طالب" : "Male student"}
+              alt={t("welcome.maleStudentAlt")}
               className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-secondary/30"
               loading="lazy"
               onError={(e) => {
@@ -72,7 +96,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
           >
             <img
               src={images.femaleStudent}
-              alt={isRTL ? "طالبة" : "Female student"}
+              alt={t("welcome.femaleStudentAlt")}
               className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-primary/30"
               loading="lazy"
               onError={(e) => {
@@ -84,7 +108,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
               initial={{ y: -20 }}
               animate={{ y: 0 }}
             >
-              {isRTL ? "كلمة" : "Kalima"}
+              {t("welcome.kalima")}
             </motion.div>
           </motion.div>
         </div>
@@ -105,61 +129,42 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
         className="w-full lg:w-1/2 space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0"
       >
         <div className="relative">
-          <motion.h1
-            initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className={`text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-base-content leading-tight ${
-              isRTL ? "text-right" : "text-left"
-            }`}
-          >
-            {isRTL ? (
-              <>
-                <span className="text-base-content">مرحبا بك في منصة</span>{" "}
-                <span className="text-primary relative inline-block">
-                  كلمـــــة
-                  <svg
-                    className="absolute -bottom-3 left-0 w-full"
-                    width="140"
-                    height="16"
-                    viewBox="0 0 140 16"
-                    fill="none"
-                  >
-                    <path
-                      d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="text-primary">
-                  Welcome to{" "}
-                  <span className="text-primary relative inline-block">
-                    Kalima
-                    <svg
-                      className="absolute -bottom-3 left-0 w-full"
-                      width="140"
-                      height="16"
-                      viewBox="0 0 140 16"
-                      fill="none"
-                    >
-                      <path
-                        d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>{" "}
-                  Platform
-                </span>
-              </>
-            )}
-          </motion.h1>
+        <motion.h1
+  initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  transition={{ duration: 0.6 }}
+  className={`text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-base-content leading-tight ${
+    isRTL ? "text-right" : "text-left"
+  }`}
+>
+  {(() => {
+    const title = t("welcome.title");
+    const parts = [];
+    const regex = /\{\{highlight\}\}(.*?)\{\{\/highlight\}\}/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(title)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        parts.push(title.substring(lastIndex, match.index));
+      }
+      // Add highlighted component
+      parts.push(
+        <HighlightedText key={match[1]} isRTL={isRTL}>
+          {match[1]}
+        </HighlightedText>
+      );
+      lastIndex = regex.lastIndex;
+    }
+    // Add remaining text after last match
+    if (lastIndex < title.length) {
+      parts.push(title.substring(lastIndex));
+    }
+
+    return parts;
+  })()}
+</motion.h1>
         </div>
 
         <motion.div
@@ -169,9 +174,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
           className={`relative ${isRTL ? "text-right" : "text-left"}`}
         >
           <motion.p className="text-lg sm:text-xl md:text-2xl text-base-content/80 leading-relaxed mb-6">
-            {isRTL
-              ? "منصة كلمة هي منصة تعليم الكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي."
-              : "Kalima Platform is an e-learning platform providing resources for students from 4th grade through 12th grade."}
+            {t("welcome.description")}
           </motion.p>
           <div className="w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mb-6"></div>
         </motion.div>
@@ -180,14 +183,10 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className={`flex flex-wrap gap-4 ${
-            isRTL ? "justify-start" : "justify-end"
-          }`}
+          className={`flex flex-wrap gap-4 ${isRTL ? "justify-start" : "justify-end"}`}
         >
           <motion.button
-            onClick={() => {
-              navigate("/register");
-            }}
+            onClick={() => navigate("/login")}
             whileHover={{
               scale: 1.05,
               boxShadow: "0 10px 25px -5px rgba(var(--p), 0.2)",
@@ -195,7 +194,7 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
             whileTap={{ scale: 0.98 }}
             className="btn btn-primary btn-md gap-2"
           >
-            {isRTL ? "تسجيل الدخول" : "Sign In"}
+            {t("signIn")}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -218,12 +217,12 @@ const WelcomeSection = React.memo(({ isRTL, t }) => {
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
               )}
-              
             </svg>
           </motion.button>
         </motion.div>
       </motion.div>
     </div>
   );
-})
-  export default WelcomeSection;
+});
+
+export default WelcomeSection;

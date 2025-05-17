@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import {
   getLectureById,
   getLectureAttachments,
@@ -10,7 +11,7 @@ import {
 import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsAndHomeworks"
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { getStudentLectureAccessByLectureId, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
+import { checkStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
 
 // Vidstack imports
@@ -58,6 +59,9 @@ const getYouTubeId = (url) => {
 }
 
 const LectureDisplay = () => {
+  const { t, i18n } = useTranslation("lectureDisplay")
+  const isRTL = i18n.language === "ar"
+
   const { lectureId } = useParams()
   const navigate = useNavigate()
   const [lecture, setLecture] = useState(null)
@@ -76,6 +80,7 @@ const LectureDisplay = () => {
   const [videoBlocked, setVideoBlocked] = useState(false)
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
+  const [purchaseId, setPurchaseId] = useState(null)
 
   // Exam verification states
   const [examVerified, setExamVerified] = useState(false)
@@ -123,17 +128,34 @@ const LectureDisplay = () => {
           const { userInfo } = dashboardResult.data.data
           setUserRole(userInfo.role)
           setUserId(userInfo.id)
+
+          // Get purchase ID from purchase history if available
+          if (dashboardResult.data.data.purchaseHistory && dashboardResult.data.data.purchaseHistory.length > 0) {
+            // Find the purchase for this lecture
+            const lecturePurchase = dashboardResult.data.data.purchaseHistory.find(
+              (purchase) => purchase.container && purchase.container._id === lectureId,
+            )
+
+            if (lecturePurchase) {
+              setPurchaseId(lecturePurchase._id)
+              console.log("Found purchase ID for lecture:", lecturePurchase._id)
+            } else {
+              console.log("No purchase found for this lecture in purchase history")
+            }
+          } else {
+            console.log("No purchase history found in user data")
+          }
         } else {
           console.error("Failed to fetch user data:", dashboardResult.error)
-          setError("Failed to authenticate user")
+          setError(t("failedToAuthenticateUser"))
         }
       } catch (err) {
         console.error("Error fetching user data:", err)
-        setError("Failed to authenticate user")
+        setError(t("failedToAuthenticateUser"))
       }
     }
     fetchUserData()
-  }, [])
+  }, [t])
 
   // Fetch lecture data and attachments
   useEffect(() => {
@@ -146,10 +168,10 @@ const LectureDisplay = () => {
           const lectureData = result.data.container
           setLecture(lectureData)
         } else {
-          setError(result.error || "Failed to load lecture")
+          setError(result.error || t("failedToLoadLecture"))
         }
       } catch (err) {
-        setError("Failed to load lecture. Please try again later.")
+        setError(t("failedToLoadLectureTryAgain"))
         console.error("Error:", err)
       } finally {
         setLoading(false)
@@ -204,7 +226,7 @@ const LectureDisplay = () => {
       fetchAttachments()
       fetchHomeworks()
     }
-  }, [lectureId, userId, userRole])
+  }, [lectureId, userId, userRole, t])
 
   // Implement the complete flow for exam verification and lecture access
   const verifyExamAndCheckAccess = async () => {
@@ -227,6 +249,7 @@ const LectureDisplay = () => {
         setExamData({
           passingThreshold: accessResult.data.passingThreshold,
           examUrl: accessResult.data.examUrl,
+          examType: accessResult.data.examType || "exam", // Store exam type if available
         })
         setExamUrl(accessResult.data.examUrl)
 
@@ -279,42 +302,50 @@ const LectureDisplay = () => {
         userRole === "SubAdmin" ||
         userRole === "Moderator" ||
         userRole === "Assistant" ||
-        !userId // Make sure we have a userId before proceeding
+        !userId || // Make sure we have a userId before proceeding
+        !purchaseId // Make sure we have a purchaseId before proceeding
       )
         return
 
       try {
-        // Use the new function to fetch student lecture access by lecture ID
-        const result = await getStudentLectureAccessByLectureId(lectureId)
+        // Use the new function to check student lecture access
+        const result = await checkStudentLectureAccess(userId, lectureId, purchaseId)
+        console.log("Student lecture access check result:", result)
 
-        if (result.success && result.data.accessRecords && result.data.accessRecords.length > 0) {
-          // Find the access record that matches the current user's ID
-          const currentUserAccessRecord = result.data.accessRecords.find((record) => record.student._id === userId)
+        if (result.success && result.data) {
+          // The access data is directly in result.data.access
+          if (result.data.access) {
+            console.log("Setting remaining views to:", result.data.access.remainingViews)
+            // Only set the studentLectureAccessId, don't update remainingViews yet
+            setStudentLectureAccessId(result.data.access._id)
 
-          if (currentUserAccessRecord) {
-            setRemainingViews(currentUserAccessRecord.remainingViews)
-            setStudentLectureAccessId(currentUserAccessRecord._id)
+            // Store the remaining views in a ref to use when the video plays
+            if (result.data.access.remainingViews !== undefined) {
+              setRemainingViews(result.data.access.remainingViews)
+            }
 
-            if (currentUserAccessRecord.remainingViews <= 0) {
+            if (result.data.access.remainingViews <= 0) {
               setVideoBlocked(true)
               redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
             }
           } else {
-            setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+            console.error("No access data found in API response")
+            setError(t("noAccessToLecture"))
           }
         } else {
-          setError("لا تملك صلاحية الوصول إلى هذه المحاضرة")
+          console.error("Failed to check lecture access:", result.error)
+          setError(t("noAccessToLecture"))
         }
       } catch (error) {
         console.error("Error fetching access data:", error)
-        setError("فشل تحميل بيانات الوصول")
+        setError(t("failedToLoadAccessData"))
       }
     }
 
-    if (lectureId && userRole === "Student" && userId) {
+    if (lectureId && userRole === "Student" && userId && purchaseId) {
       fetchAccessData()
     }
-  }, [lectureId, navigate, userRole, userId]) // Added userId to the dependency array
+  }, [lectureId, navigate, userRole, userId, purchaseId, t])
 
   // Reset upload states when changing tabs
   useEffect(() => {
@@ -380,23 +411,27 @@ const LectureDisplay = () => {
       })
 
       if (response.success) {
+        // The updated data is directly in response.data
+        console.log("Updated remaining views:", response.data.remainingViews)
         setRemainingViews(response.data.remainingViews)
+
         if (response.data.remainingViews <= 0) {
           setVideoBlocked(true)
           playerRef.current?.pause()
-          alert("انتهت عدد مشاهداتك لهذه المحاضرة!")
+          alert(t("noMoreViewsAlert"))
           redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
         }
       } else {
+        console.error("Failed to update remaining views:", response.error)
         hasViewedRef.current = false
       }
     } catch (error) {
       console.error("View update error:", error)
       hasViewedRef.current = false
       if (error.message && error.message.includes("CORS")) {
-        setError("حدث خطأ في الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.")
+        setError(t("connectionError"))
       } else {
-        setError("حدث خطأ أثناء تحديث عدد المشاهدات.")
+        setError(t("viewUpdateError"))
       }
     }
   }
@@ -437,13 +472,13 @@ const LectureDisplay = () => {
 
   const handleOnError = (event) => {
     console.error("Vidstack Player Error:", event.detail)
-    let errorMessage = "حدث خطأ في تشغيل الفيديو."
+    let errorMessage = t("videoPlaybackError")
     const errorObj = event.detail
     if (errorObj && errorObj.message) {
       if (errorObj.data && (errorObj.data.code === 101 || errorObj.data.code === 150)) {
-        errorMessage = "الفيديو غير متاح أو تم تقييده من قبل المالك."
+        errorMessage = t("videoUnavailable")
       } else if (errorObj.message.toLowerCase().includes("network")) {
-        errorMessage = "مشكلة في الشبكة، يرجى التحقق من اتصالك بالإنترنت."
+        errorMessage = t("networkError")
       }
     }
     setError(errorMessage)
@@ -502,7 +537,7 @@ const LectureDisplay = () => {
       }
     } catch (err) {
       console.error("Error uploading files:", err)
-      setUploadError(`فشل رفع الملفات: ${err.message}`)
+      setUploadError(`${t("uploadFailure")}: ${err.message}`)
     } finally {
       setIsUploading(false)
     }
@@ -523,12 +558,12 @@ const LectureDisplay = () => {
 
   const handleSubmitHomework = async () => {
     if (homeworkSubmitType === "file" && homeworkFiles.length === 0) {
-      setHomeworkError("يرجى اختيار ملف واحد على الأقل")
+      setHomeworkError(t("pleaseSelectFile"))
       return
     }
 
     if (homeworkSubmitType === "form" && !lecture?.homeworkFormLink) {
-      setHomeworkError("لا يوجد رابط نموذج متاح")
+      setHomeworkError(t("noFormLinkAvailable"))
       return
     }
 
@@ -552,7 +587,7 @@ const LectureDisplay = () => {
         const result = await uploadHomework(lectureId, homeworkData)
 
         if (!result.success) {
-          throw new Error(result.error || "Failed to upload homework")
+          throw new Error(result.error || t("homeworkUploadFailed"))
         }
       }
 
@@ -578,7 +613,7 @@ const LectureDisplay = () => {
       }
     } catch (err) {
       console.error("Error uploading homework:", err)
-      setHomeworkError(`فشل رفع الواجب: ${err.message}`)
+      setHomeworkError(`${t("homeworkUploadFailed")}: ${err.message}`)
     } finally {
       setIsSubmittingHomework(false)
     }
@@ -603,7 +638,7 @@ const LectureDisplay = () => {
   // Enhanced download function to handle different file types
   const handleDownload = async (attachment) => {
     if (!attachment || !attachment._id) {
-      setError("معرف المرفق غير صالح")
+      setError(t("invalidAttachmentId"))
       return
     }
 
@@ -637,7 +672,7 @@ const LectureDisplay = () => {
         }
       } catch (fallbackErr) {
         console.error("Fallback download failed:", fallbackErr)
-        setError(`فشل تحميل المرفق: ${err.message}`)
+        setError(`${t("downloadFailure")}: ${err.message}`)
       }
     } finally {
       setIsDownloading(false)
@@ -684,28 +719,26 @@ const LectureDisplay = () => {
   // Render exam requirement message if needed
   if (isContentBlocked) {
     return (
-      <div className="container mx-auto p-4" dir="rtl">
+      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
         <button onClick={() => navigate(-1)} className="btn btn-outline btn-primary mb-4">
-          رجوع
+          {t("back")}
         </button>
-        <h1 className="text-3xl font-bold mb-6 text-center md:text-right">
-          {lecture?.name || "جاري تحميل المحاضرة..."}
-        </h1>
+        <h1 className="text-3xl font-bold mb-6 text-center md:text-right">{lecture?.name || t("loadingLecture")}</h1>
 
         <div className="card bg-base-100 shadow-xl mb-6">
           <div className="card-body">
             <h2 className="card-title flex items-center gap-2">
               <FiAlertTriangle className="text-warning" />
-              يجب اجتياز الامتحان أولاً
+              {t("examRequiredFirst")}
             </h2>
-            <p className="my-4">يجب عليك اجتياز الامتحان قبل أن تتمكن من الوصول إلى محتوى هذه المحاضرة.</p>
+            <p className="my-4">{t("examRequiredDescription")}</p>
 
             {examData && (
               <div className="bg-base-200 p-4 rounded-lg my-4">
-                <h3 className="font-semibold mb-2">معلومات الامتحان:</h3>
+                <h3 className="font-semibold mb-2">{t("examInfo")}:</h3>
                 <ul className="space-y-2">
                   <li>
-                    <span className="font-medium">درجة النجاح المطلوبة:</span> {examData.passingThreshold}
+                    <span className="font-medium">{t("requiredPassingScore")}:</span> {examData.passingThreshold}
                   </li>
                 </ul>
 
@@ -717,7 +750,7 @@ const LectureDisplay = () => {
                     className="btn btn-primary w-full sm:w-auto"
                   >
                     <FiExternalLink className="mr-2" />
-                    بدء الامتحان
+                    {t("startExam")}
                   </a>
                 </div>
               </div>
@@ -737,7 +770,7 @@ const LectureDisplay = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>بعد اجتياز الامتحان بنجاح، ستتمكن من الوصول إلى محتوى المحاضرة.</span>
+              <span>{t("afterPassingExam")}</span>
             </div>
           </div>
         </div>
@@ -766,11 +799,11 @@ const LectureDisplay = () => {
   // Add a function to format dates for better display
   // Add this with the other utility functions:
   const formatDate = (dateString) => {
-    if (!dateString) return "غير متاح"
+    if (!dateString) return t("notAvailable")
 
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString("ar-EG", {
+      return date.toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
@@ -779,16 +812,16 @@ const LectureDisplay = () => {
       })
     } catch (error) {
       console.error("Error formatting date:", error)
-      return "تاريخ غير صالح"
+      return t("invalidDate")
     }
   }
 
   return (
-    <div className="container mx-auto p-4" dir="rtl">
+    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
       <button onClick={() => navigate(-1)} className="btn btn-outline btn-primary mb-4">
-        رجوع
+        {t("back")}
       </button>
-      <h1 className="text-3xl font-bold mb-6 text-center md:text-right">{lecture?.name || "جاري تحميل المحاضرة..."}</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center md:text-right">{lecture?.name || t("loadingLecture")}</h1>
 
       {userRole && userRole !== "Student" && (
         <div className="alert alert-info mb-6 shadow-lg">
@@ -806,25 +839,25 @@ const LectureDisplay = () => {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span>أنت تشاهد هذه المحاضرة بصفتك {userRole}</span>
+            <span>{t("viewingAs", { role: userRole })}</span>
           </div>
         </div>
       )}
 
-      {/* Add a success message when the student has passed the exam
-      Add this after the userRole info alert and before the showFiftyPercentWarning alert: */}
       {userRole === "Student" && examRequired && examVerified && examSubmission && (
         <div className="alert alert-success mb-6 shadow-lg">
           <div className="flex items-center gap-2">
             <FiAward className="stroke-current shrink-0 w-6 h-6" />
             <div>
-              <span className="font-bold">تم اجتياز الامتحان بنجاح!</span>
+              <span className="font-bold">{t("examPassedSuccessfully")}</span>
               <div className="text-sm mt-1">
                 <span>
-                  الدرجة: {examSubmission.score}/{examSubmission.maxScore}
+                  {t("score")}: {examSubmission.score}/{examSubmission.maxScore}
                 </span>
                 <span className="mx-2">|</span>
-                <span>تاريخ الاجتياز: {formatDate(examSubmission.verifiedAt)}</span>
+                <span>
+                  {t("passDate")}: {formatDate(examSubmission.verifiedAt)}
+                </span>
               </div>
             </div>
           </div>
@@ -847,7 +880,7 @@ const LectureDisplay = () => {
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
-            <span>تنبيه: لقد شاهدت أكثر من نصف مدة المحاضرة.</span>
+            <span>{t("fiftyPercentWarning")}</span>
           </div>
         </div>
       )}
@@ -868,7 +901,7 @@ const LectureDisplay = () => {
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
-            <span>لقد استنفدت جميع مشاهداتك المسموحة! سيتم إعادة توجيهك خلال 3 دقائق</span>
+            <span>{t("noMoreViewsRedirect")}</span>
           </div>
         </div>
       ) : youtubeVideoId ? (
@@ -890,7 +923,11 @@ const LectureDisplay = () => {
           >
             <MediaProvider>
               {lecture.thumbnailLink && (
-                <Poster className="vds-poster" src={lecture.thumbnailLink} alt={`ملصق محاضرة ${lecture.name}`} />
+                <Poster
+                  className="vds-poster"
+                  src={lecture.thumbnailLink}
+                  alt={t("lecturePoster", { name: lecture.name })}
+                />
               )}
             </MediaProvider>
             <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture.videoThumbnailsVTT || null} />
@@ -898,7 +935,7 @@ const LectureDisplay = () => {
           <div className="p-4 bg-base-200 rounded-b-lg">
             {userRole === "Student" && (
               <p className="mt-2 text-sm text-gray-600">
-                المشاهدات المتبقية: {remainingViews === null ? "جار التحميل..." : remainingViews}
+                {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
               </p>
             )}
           </div>
@@ -919,7 +956,7 @@ const LectureDisplay = () => {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span>رابط الفيديو غير صالح أو لا يمكن عرضه حاليًا.</span>
+            <span>{t("invalidVideoLink")}</span>
           </div>
         </div>
       ) : (
@@ -938,33 +975,34 @@ const LectureDisplay = () => {
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               ></path>
             </svg>
-            <span>لا يوجد رابط فيديو متاح لهذه المحاضرة.</span>
+            <span>{t("noVideoLink")}</span>
           </div>
         </div>
       )}
 
       <div className="card bg-base-100 shadow-xl mb-6">
         <div className="card-body">
-          <h2 className="card-title">تفاصيل المحاضرة</h2>
+          <h2 className="card-title">{t("lectureDetails")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="mb-2">
-                <strong>الوصف:</strong> {lecture?.description || "لا يوجد وصف متوفر."}
+                <strong>{t("description")}:</strong> {lecture?.description || t("noDescriptionAvailable")}
               </p>
               <p className="mb-2">
-                <strong>السعر:</strong> {lecture?.price !== undefined ? `${lecture?.price} نقاط` : "غير محدد"}
+                <strong>{t("price")}:</strong>{" "}
+                {lecture?.price !== undefined ? t("pricePoints", { price: lecture?.price }) : t("notSpecified")}
               </p>
             </div>
             <div>
               <p className="mb-2">
-                <strong>النوع:</strong> {lecture?.lecture_type || "غير محدد"}
+                <strong>{t("type")}:</strong> {lecture?.lecture_type || t("notSpecified")}
               </p>
               <p className="mb-2">
-                <strong>أنشأها:</strong> {lecture?.createdBy?.name || "غير محدد"}
+                <strong>{t("createdBy")}:</strong> {lecture?.createdBy?.name || t("notSpecified")}
               </p>
               {lecture?.requiresExam && (
                 <p className="mb-2">
-                  <strong>يتطلب امتحان لاجتياز الدورة:</strong> نعم
+                  <strong>{t("requiresExam")}:</strong> {t("yes")}
                 </p>
               )}
             </div>
@@ -975,7 +1013,7 @@ const LectureDisplay = () => {
       {/* IMPROVED RESPONSIVE ATTACHMENTS DISPLAY */}
       <div className="card bg-base-100 shadow-xl mb-6">
         <div className="card-body">
-          <h2 className="card-title mb-4">المرفقات</h2>
+          <h2 className="card-title mb-4">{t("attachments")}</h2>
 
           {allAttachments.length === 0 ? (
             <div className="alert alert-info">
@@ -992,7 +1030,7 @@ const LectureDisplay = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>لا توجد مرفقات متاحة لهذه المحاضرة.</span>
+              <span>{t("noAttachments")}</span>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
@@ -1007,18 +1045,22 @@ const LectureDisplay = () => {
                         <div className="mt-1">{getFileIcon(attachment.fileType)}</div>
                         <div className="flex-1">
                           <h3 className="font-bold text-lg mb-1 break-words">
-                            {attachment.fileName || "ملف بدون اسم"}
+                            {attachment.fileName || t("fileWithoutName")}
                           </h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4">
                             <p className="mb-1">
-                              الحجم:{" "}
-                              {attachment.fileSize ? `${Math.round(attachment.fileSize / 1024)} كيلوبايت` : "غير محدد"}
+                              {t("size")}:{" "}
+                              {attachment.fileSize
+                                ? t("kilobytes", { size: Math.round(attachment.fileSize / 1024) })
+                                : t("notSpecified")}
                             </p>
                             <p className="mb-1">
-                              تاريخ الرفع:{" "}
+                              {t("uploadDate")}:{" "}
                               {attachment.uploadedOn
-                                ? new Date(attachment.uploadedOn).toLocaleDateString()
-                                : "غير محدد"}
+                                ? new Date(attachment.uploadedOn).toLocaleDateString(
+                                    i18n.language === "ar" ? "ar-EG" : "en-US",
+                                  )
+                                : t("notSpecified")}
                             </p>
                           </div>
                         </div>
@@ -1031,7 +1073,7 @@ const LectureDisplay = () => {
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-primary"
                           >
-                            <FiEye className="mr-1" /> عرض
+                            <FiEye className="mr-1" /> {t("view")}
                           </a>
                         )}
                       </div>
@@ -1048,27 +1090,27 @@ const LectureDisplay = () => {
       {userRole === "Student" && (
         <div className="card bg-base-100 shadow-xl mb-6">
           <div className="card-body">
-            <h2 className="card-title mb-4">تسليم الواجب</h2>
+            <h2 className="card-title mb-4">{t("submitHomework")}</h2>
 
             <div className="tabs tabs-boxed mb-4">
               <a
                 className={`tab ${homeworkSubmitType === "file" ? "tab-active" : ""}`}
                 onClick={() => setHomeworkSubmitType("file")}
               >
-                رفع ملف
+                {t("uploadFile")}
               </a>
               <a
                 className={`tab ${homeworkSubmitType === "form" ? "tab-active" : ""}`}
                 onClick={() => setHomeworkSubmitType("form")}
               >
-                نموذج Google
+                {t("googleForm")}
               </a>
             </div>
 
             <div className="p-4 border border-dashed border-primary rounded-lg">
               {homeworkSubmitType === "file" ? (
                 <>
-                  <h3 className="text-lg font-semibold mb-2">رفع ملف الواجب</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t("uploadHomeworkFile")}</h3>
 
                   <div className="mb-4">
                     <input
@@ -1082,7 +1124,7 @@ const LectureDisplay = () => {
 
                   {homeworkFiles.length > 0 && (
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium mb-2">الملفات المحددة:</h4>
+                      <h4 className="text-sm font-medium mb-2">{t("selectedFiles")}:</h4>
                       <ul className="space-y-2">
                         {homeworkFiles.map((file, index) => (
                           <li key={index} className="flex justify-between items-center p-2 bg-base-200 rounded">
@@ -1121,7 +1163,7 @@ const LectureDisplay = () => {
                   {homeworkSuccess && (
                     <div className="alert alert-success mb-4">
                       <FiCheck className="stroke-current shrink-0 h-6 w-6" />
-                      <span>تم رفع الواجب بنجاح!</span>
+                      <span>{t("homeworkUploadSuccess")}</span>
                     </div>
                   )}
 
@@ -1133,26 +1175,36 @@ const LectureDisplay = () => {
                     {isSubmittingHomework ? (
                       <>
                         <span className="loading loading-spinner"></span>
-                        جاري إرسال الواجب...
+                        {t("submittingHomework")}
                       </>
                     ) : (
                       <>
                         <FiUpload className="mr-2" />
-                        إرسال الواجب
+                        {t("submitHomework")}
                       </>
                     )}
                   </button>
                 </>
               ) : (
                 <>
-                  <h3 className="text-lg font-semibold mb-2">إكمال نموذج Google</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t("completeGoogleForm")}</h3>
 
-                  {lecture?.homeworkFormLink ? (
+                  {lecture?.homeworkFormLink || examUrl ? (
                     <div className="mb-4">
-                      <p className="mb-4">قم بإكمال نموذج Google التالي وإرساله للتصحيح:</p>
-                      <button onClick={handleSubmitHomework} className="btn btn-primary w-full">
+                      <p className="mb-4">{t("completeGoogleFormDescription")}</p>
+                      <button
+                        onClick={() => {
+                          // Open the Google Form in a new tab
+                          if (examData && examData.examType === "homework" && examUrl) {
+                            window.open(examUrl, "_blank")
+                          } else if (lecture.homeworkFormLink) {
+                            window.open(lecture.homeworkFormLink, "_blank")
+                          }
+                        }}
+                        className="btn btn-primary w-full"
+                      >
                         <FiLink className="mr-2" />
-                        فتح نموذج Google
+                        {t("openGoogleForm")}
                       </button>
                     </div>
                   ) : (
@@ -1170,17 +1222,17 @@ const LectureDisplay = () => {
                           d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                         />
                       </svg>
-                      <span>لم يتم توفير رابط نموذج Google لهذا الواجب.</span>
+                      <span>{t("noGoogleFormLink")}</span>
                     </div>
                   )}
                 </>
               )}
 
               <div className="mt-4 text-sm text-gray-600">
-                <p>ملاحظات:</p>
+                <p>{t("notes")}:</p>
                 <ul className="list-disc list-inside">
-                  <li>يمكنك رفع ملفات بصيغة PDF أو Word أو صور</li>
-                  <li>الحد الأقصى لحجم الملف: 5 ميجابايت</li>
+                  <li>{t("fileFormatsNote")}</li>
+                  <li>{t("fileSizeLimit")}</li>
                 </ul>
               </div>
             </div>
@@ -1192,7 +1244,7 @@ const LectureDisplay = () => {
       {hasUploadPermission() && homeworks.length > 0 && (
         <div className="card bg-base-100 shadow-xl mb-6">
           <div className="card-body">
-            <h2 className="card-title mb-4">واجبات الطلاب المقدمة</h2>
+            <h2 className="card-title mb-4">{t("studentSubmittedHomeworks")}</h2>
             <div className="grid grid-cols-1 gap-4">
               {homeworks.map((homework, index) => (
                 <div
@@ -1204,17 +1256,27 @@ const LectureDisplay = () => {
                       <div className="flex items-start gap-3">
                         <div className="mt-1">{getFileIcon(homework.fileType)}</div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-1 break-words">{homework.fileName || "ملف بدون اسم"}</h3>
+                          <h3 className="font-bold text-lg mb-1 break-words">
+                            {homework.fileName || t("fileWithoutName")}
+                          </h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-x-4">
                             <p className="mb-1">
-                              الحجم:{" "}
-                              {homework.fileSize ? `${Math.round(homework.fileSize / 1024)} كيلوبايت` : "غير محدد"}
+                              {t("size")}:{" "}
+                              {homework.fileSize
+                                ? t("kilobytes", { size: Math.round(homework.fileSize / 1024) })
+                                : t("notSpecified")}
                             </p>
                             <p className="mb-1">
-                              تاريخ التقديم:{" "}
-                              {homework.uploadedOn ? new Date(homework.uploadedOn).toLocaleDateString() : "غير محدد"}
+                              {t("submissionDate")}:{" "}
+                              {homework.uploadedOn
+                                ? new Date(homework.uploadedOn).toLocaleDateString(
+                                    i18n.language === "ar" ? "ar-EG" : "en-US",
+                                  )
+                                : t("notSpecified")}
                             </p>
-                            <p className="mb-1">الطالب: {homework.studentId.name || "غير محدد"}</p>
+                            <p className="mb-1">
+                              {t("student")}: {homework.studentId.name || t("notSpecified")}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -1226,7 +1288,7 @@ const LectureDisplay = () => {
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-primary"
                           >
-                            <FiEye className="mr-1" /> عرض
+                            <FiEye className="mr-1" /> {t("view")}
                           </a>
                         )}
                       </div>
@@ -1243,7 +1305,7 @@ const LectureDisplay = () => {
       {hasUploadPermission() && (
         <div className="card bg-base-100 shadow-xl mb-6">
           <div className="card-body">
-            <h2 className="card-title mb-4">رفع مرفقات جديدة</h2>
+            <h2 className="card-title mb-4">{t("uploadNewAttachments")}</h2>
 
             <div className="tabs tabs-boxed mb-4 flex flex-wrap">
               {["pdfsandimages", "homeworks", "exams", "booklets"].map((type) => (
@@ -1252,28 +1314,14 @@ const LectureDisplay = () => {
                   className={`tab flex-grow sm:flex-grow-0 ${activeTab === type ? "tab-active" : ""}`}
                   onClick={() => setActiveTab(type)}
                 >
-                  {type === "pdfsandimages"
-                    ? "ملفات PDF وصور"
-                    : type === "homeworks"
-                      ? "الواجبات"
-                      : type === "exams"
-                        ? "الامتحانات"
-                        : "الكتيبات"}
+                  {t(type)}
                 </a>
               ))}
             </div>
 
             <div className="p-4 border border-dashed border-primary rounded-lg">
               <h3 className="text-lg font-semibold mb-2">
-                إضافة مرفقات جديدة (
-                {activeTab === "pdfsandimages"
-                  ? "ملفات PDF وصور"
-                  : activeTab === "homeworks"
-                    ? "الواجبات"
-                    : activeTab === "exams"
-                      ? "الامتحانات"
-                      : "الكتيبات"}
-                )
+                {t("addNewAttachments")} ({t(activeTab)})
               </h3>
 
               <div className="mb-4">
@@ -1288,7 +1336,7 @@ const LectureDisplay = () => {
 
               {uploadingFiles.length > 0 && (
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2">الملفات المحددة:</h4>
+                  <h4 className="text-sm font-medium mb-2">{t("selectedFiles")}:</h4>
                   <ul className="space-y-2">
                     {uploadingFiles.map((file, index) => (
                       <li key={index} className="flex justify-between items-center p-2 bg-base-200 rounded">
@@ -1324,7 +1372,7 @@ const LectureDisplay = () => {
               {uploadSuccess && (
                 <div className="alert alert-success mb-4">
                   <FiCheck className="stroke-current shrink-0 h-6 w-6" />
-                  <span>تم رفع الملفات بنجاح!</span>
+                  <span>{t("filesUploadedSuccessfully")}</span>
                 </div>
               )}
 
@@ -1336,12 +1384,12 @@ const LectureDisplay = () => {
                 {isUploading ? (
                   <>
                     <span className="loading loading-spinner"></span>
-                    جاري الرفع...
+                    {t("uploading")}
                   </>
                 ) : (
                   <>
                     <FiUpload className="mr-2" />
-                    رفع الملفات
+                    {t("uploadFiles")}
                   </>
                 )}
               </button>

@@ -539,6 +539,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: teacher.level,
         faction: teacher.faction,
         school: teacher.school,
+        ...teacher,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
