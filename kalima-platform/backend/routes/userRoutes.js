@@ -15,10 +15,15 @@ router
 router
   .route("/:userId")
   .get(userController.getUser)
-  .patch(validateUser, userController.updateUser)
+  .patch(
+    validateUser,
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    userController.updateUser
+  )
   .delete(
     verifyJWT,
-    authController.verifyRoles("Admin"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     userController.deleteUser
   );
 
