@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
-  "scripts": {
+  "main": "server.js",  "scripts": {
     "start": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 nodemon server.js",
     "start:prod": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js",
-    "dev": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js"
+    "dev": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js",
+    "seed": "node scripts/seed.js"
   },
   "keywords": [],
   "author": "",
