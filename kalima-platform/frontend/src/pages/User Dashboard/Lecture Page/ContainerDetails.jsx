@@ -10,7 +10,7 @@ import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 
 const ContainerDetailsPage = () => {
-  const { t, i18n } = useTranslation('containerDetails');
+  const { t, i18n } = useTranslation('lecturesPage');
   const isRTL = i18n.language === "ar";
   const { containerId } = useParams()
   const navigate = useNavigate()
@@ -297,7 +297,7 @@ const ContainerDetailsPage = () => {
               className="btn btn-primary px-6 py-3 rounded-full flex items-center gap-2"
             >
               <FiPlus className="text-lg" />
-              {t('containerDetails.buttons.add')} {creationLabel}
+              {t('containerDetails.buttons.add')} {t(`types.${creationLabel.toLowerCase()}`)}
             </button>
           </div>
         )}

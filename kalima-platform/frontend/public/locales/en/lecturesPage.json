@@ -1,4 +1,12 @@
 {
+  "types": {
+      
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
   "lecturesPage": {
     "pageTitle": {
       "manage": "Manage Lectures",
@@ -51,6 +59,7 @@
       "points": "Points"
     },
     "types": {
+      
       "course": "Course",
       "year": "Year",
       "term": "Term",
@@ -92,5 +101,10 @@
       "previous": "Previous",
       "next": "Next"
     }
+  },
+   "mobileOnly": {
+    "title": "Mobile Only Content",
+    "message": "This content is only available on mobile devices.",
+    "backButton": "Back to Homepage"
   }
 }
