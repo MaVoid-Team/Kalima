@@ -52,8 +52,6 @@ const seedInitialAdminDirect = require('./utils/seeds/seedInitialAdminDirect');
 
 connectDB();
 
-// Trust the first proxy hop (adjust '1' if you have more proxies)
-F('trust proxy', 1);
 // After connecting to the database, check for admin user
 mongoose.connection.once('open', async () => {
   console.log('Connected to MongoDB');
