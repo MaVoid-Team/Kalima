@@ -48,14 +48,14 @@ const PromoCodes = () => {
   const [scannerLoading, setScannerLoading] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("transactions")
-  const navigate = useNavigate();
-  const accessToken = getAccessToken();
+  const navigate = useNavigate()
+  const accessToken = getAccessToken()
   useEffect(() => {
-    if(!accessToken){
+    if (!accessToken) {
       navigate("/login")
     }
-  }, [accessToken,navigate])
-  
+  }, [accessToken, navigate])
+
   // Use a ref for the scanner instance to maintain it across renders
   const scannerRef = useRef(null)
   // Track if scanner is actually running
@@ -74,41 +74,41 @@ const PromoCodes = () => {
           setUserInfo(userInfo)
           setBalance(userInfo?.totalPoints || 0)
 
-          const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
-            id: `code-${index + 1}`,
-            type: "Code Redemption",
-            code: code.code,
-            amount: code.pointsAmount,
-            instructorName: code.lecturerId
-              ? pointsBalances?.find((b) => b.lecturer?._id === code.lecturerId)?.lecturer?.name || "N/A"
-              : t("generalPoints"),
-            createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            }),
-            isRedemption: true,
-          }))
+            const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
+              id: `code-${index + 1}`,
+              type: t("transactions.types.codeRedemption"),
+              code: code.code,
+              amount: code.pointsAmount,
+              instructorName: code.lecturerId
+                ? pointsBalances?.find((b) => b.lecturer?._id === code.lecturerId)?.lecturer?.name || t("notAvailable")
+                : t("generalPoints"),
+              createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              }),
+              isRedemption: true,
+            }))
 
-          const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
-            id: `purchase-${index + 1}`,
-            type: "Course Purchase",
-            code: purchase.description,
-            amount: purchase.points,
-            instructorName: purchase.lecturer?.name || "N/A",
-            createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            }),
-            isRedemption: false,
-          }))
+            const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
+              id: `purchase-${index + 1}`,
+              type: t("transactions.types.coursePurchase"),
+              code: purchase.description,
+              amount: purchase.points,
+              instructorName: purchase.lecturer?.name || t("notAvailable"),
+              createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              }),
+              isRedemption: false,
+            }))
 
           const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
@@ -396,7 +396,7 @@ const PromoCodes = () => {
                     {transaction.isRedemption ? (
                       <span className="text-green-600">+{transaction.amount}</span>
                     ) : (
-                      <span className="text-red-600">-{transaction.amount}</span>
+                      <span className="text-red-600 text-cent">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
                     )}
                   </td>
                   <td>{transaction.instructorName}</td>
@@ -451,7 +451,7 @@ const PromoCodes = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              <ChevronLeft className="w-4 h-4" />
+              {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </button>
 
             {/* Show limited page numbers with ellipsis for large page counts */}
@@ -483,7 +483,7 @@ const PromoCodes = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              <ChevronRight className="w-4 h-4" />
+              {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -585,8 +585,7 @@ const PromoCodes = () => {
                   `${balance} ${t("balance.currency")}`
                 )}
               </div>
-              {/* <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p> */}
-              <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها</p>
+              <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p>
             </div>
           </div>
 
@@ -644,13 +643,12 @@ const PromoCodes = () => {
                         {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
                       </h3>
                     </div>
-                    
+
                     <div className="flex justify-between items-end">
                       <p className="text-2xl font-bold">{balance.points}</p>
                       <span className="text-xs opacity-70">{t("balance.currency")}</span>
                     </div>
-                    <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها ل استاذ {balance.lecturer ? balance.lecturer.name : t("generalPoints")}</p>
-
+                    <p className="text-sm opacity-80 mt-2">{t("lecturerPoints.description")}</p>
                   </div>
                 ))}
               </div>
@@ -743,8 +741,7 @@ const PromoCodes = () => {
             </div>
 
             <div className="mt-6 text-center">
-              {/* <p className="text-sm mb-3">{t("scanner.instructions")}</p> */}
-              <p className="text-sm mb-3">هات الكاميرا على ال QR كود</p>
+              <p className="text-sm mb-3">{t("scanner.instructions")}</p>
               <div className="flex justify-center gap-3 mt-4">
                 <button
                   className="btn btn-outline btn-sm"
