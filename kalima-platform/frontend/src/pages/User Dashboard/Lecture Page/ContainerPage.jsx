@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { getUserDashboard } from "../../../routes/auth-services"
 
 const ContainersPage = () => {
-  const { t, i18n } = useTranslation('containersPage');
+  const { t, i18n } = useTranslation('lecturesPage');
   const isRTL = i18n.language === "ar";
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
