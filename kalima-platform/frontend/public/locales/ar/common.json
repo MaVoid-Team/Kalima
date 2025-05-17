@@ -30,7 +30,8 @@
       "3rd Preparatory": "الصف الثالث الإعدادي",
       "1st Secondary": "الصف الأول الثانوي",
       "2nd Secondary": "الصف الثاني الثانوي",
-      "3rd Secondary": "الصف الثالث الثانوي"
+      "3rd Secondary": "الصف الثالث الثانوي",
+      "undefined": "غير محدد"
 },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",

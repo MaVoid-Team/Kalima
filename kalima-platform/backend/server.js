@@ -48,11 +48,24 @@ const reportRouter = require("./routes/reportRoutes.js");
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
 const assistantHomeworkRouter = require("./routes/assistantHomeworkRoutes.js");
+const seedInitialAdminDirect = require('./utils/seeds/seedInitialAdminDirect');
 
 connectDB();
 
 // Trust the first proxy hop (adjust '1' if you have more proxies)
-app.set('trust proxy', 1);
+F('trust proxy', 1);
+// After connecting to the database, check for admin user
+mongoose.connection.once('open', async () => {
+  console.log('Connected to MongoDB');
+  try {
+    // Attempt to create an initial admin user if none exists
+    // using the direct approach that bypasses validation
+    await seedInitialAdminDirect();
+    console.log('Admin user check completed');
+  } catch (err) {
+    console.error('Error during admin user initialization:', err);
+  }
+});
 
 app.use(cors(corsOptions));
 app.use(express.json());

@@ -1,0 +1,110 @@
+{
+  "types": {
+      
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
+  "lecturesPage": {
+    "pageTitle": {
+      "manage": "Manage Lectures",
+      "purchased": "Purchased Lectures"
+    },
+    "pageDescription": "Details of all my lectures",
+    "buttons": {
+      "close": "Close",
+      "createNewLecture": "Create New Lecture",
+      "details": "Details"
+    },
+    "filters": {
+      "allSubjects": "All Subjects",
+      "allLevels": "All Levels"
+    },
+    "itemsPerPage": "{{count}} per page",
+    "tableHeaders": {
+      "name": "Name",
+      "lecturer": "Lecturer",
+      "subject": "Subject",
+      "level": "Level",
+      "type": "Type",
+      "price": "Price",
+      "purchaseDate": "Purchase Date",
+      "actions": "Actions"
+    },
+    "lectureType": {
+      "paid": "Paid",
+      "review": "Review"
+    },
+    "points": "points",
+    "unknown": "Unknown",
+    "notSpecified": "Not specified",
+    "emptyStates": {
+      "noLectures": "No lectures available",
+      "noPurchases": "You haven't purchased any lectures yet"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+  "containerDetails": {
+    "buttons": {
+      "backToDashboard": "Back to Dashboard",
+      "viewDetails": "View Details",
+      "add": "Add"
+    },
+    "labels": {
+      "points": "Points"
+    },
+    "types": {
+      
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
+    "error": {
+      "title": "Oops! Something went wrong"
+    },
+    "emptyState": {
+      "noContent": "No content available in this container"
+    }
+  },
+  "containersPage": {
+    "headers": {
+      "lecturerCourses": "Your Courses",
+      "studentCourses": "Purchased Courses"
+    },
+    "descriptions": {
+      "lecturer": "Lectures you've published",
+      "student": "Lectures you've purchased"
+    },
+    "labels": {
+      "course": "Course",
+      "price": "Price: {{price}} points",
+      "lecturer": "Lecturer",
+      "purchaseDate": "Purchase Date",
+      "unknown": "Unknown"
+    },
+    "buttons": {
+      "viewDetails": "View Details"
+    },
+    "itemsPerPage": "{{count}} per page",
+    "emptyStates": {
+      "lecturer": "No courses currently available.",
+      "student": "You haven't purchased any courses yet."
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    }
+  },
+   "mobileOnly": {
+    "title": "Mobile Only Content",
+    "message": "This content is only available on mobile devices.",
+    "backButton": "Back to Homepage"
+  }
+}

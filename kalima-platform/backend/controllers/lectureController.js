@@ -26,8 +26,7 @@ const checkDoc = async (Model, id, session) => {
 exports.createLecture = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-  try {
-    const {
+  try {    const {
       name,
       price,
       level,
@@ -36,14 +35,16 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       teacherAllowed,
       createdBy,
       videoLink,
-      examLink,
       description,
       numberOfViews,
       lecture_type,
       // New exam requirement fields
       requiresExam,
       examConfig,
-      passingThreshold
+      passingThreshold,
+      requiresHomework,
+      homeworkConfig,
+      homeworkPassingThreshold
     } = req.body;
 
     // Validate lecture type
@@ -81,14 +82,17 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           parent,
           createdBy: createdBy || req.user._id,
           videoLink,
-          examLink,
           description,
           numberOfViews,
           lecture_type,
           // Add exam requirement fields
           requiresExam: requiresExam || false,
           examConfig,
-          passingThreshold
+          passingThreshold,
+          // Homework requirement fields
+          requiresHomework: requiresHomework || false,
+          homeworkConfig,
+          homeworkPassingThreshold
         },
       ],
       { session }
@@ -246,36 +250,6 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getLectureById = catchAsync(async (req, res, next) => {
-  const Role = req.user.role?.toLowerCase();
-  const container = await Lecture.findById(req.params.lectureId).populate([
-    // { path: "children", select: "name" },
-    { path: "createdBy", select: "name" },
-  ]);
-  if (!container) return next(new AppError("Lecture not found", 404));
-  if (Role === "teacher") {
-    if (!container.teacherAllowed) {
-      return res.status(200).json({
-        status: "restricted",
-        data: {
-          id: container._id,
-          name: container.name,
-          owner: container.createdBy.name || container.createdBy._id,
-          subject: container.subject.name || container.subject._id,
-          type: container.type,
-        },
-      });
-    }
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      container,
-    },
-  });
-});
-
 // New function specifically for public, non-sensitive data
 exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   let query = Lecture.find();
@@ -383,14 +357,17 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     subject,
     videoLink,
     teacherAllowed,
-    examLink,
     description,
     numberOfViews,
     lecture_type,
     // New exam requirement fields
     requiresExam,
     examConfig,
-    passingThreshold
+    passingThreshold,
+    // Homework requirement fields
+    requiresHomework,
+    homeworkConfig,
+    homeworkPassingThreshold
   } = req.body;
   
   const session = await mongoose.startSession();
@@ -430,15 +407,9 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         );
       }
     }
-    
-    // Only update examConfig if provided
+      // Only update examConfig if provided
     if (examConfig) {
       obj.examConfig = examConfig;
-    }
-    
-    // Only update passingThreshold if provided
-    if (passingThreshold !== undefined) {
-      obj.passingThreshold = passingThreshold;
     }
 
     if (subject) {

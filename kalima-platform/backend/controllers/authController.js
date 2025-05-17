@@ -90,6 +90,9 @@ const refresh = catchAsync(async (req, res, next) => {
 });
 
 const logout = catchAsync(async (req, res, next) => {
+  if (req.user._id == null) {
+    return res.json({ message: "You are not logged in." });
+  }
   await RefreshToken.deleteMany({ user: req.user._id });
   return res.json({ message: "Logged out successfully" });
 });

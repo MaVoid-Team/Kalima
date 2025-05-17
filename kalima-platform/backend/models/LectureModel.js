@@ -3,7 +3,6 @@ const Container = require("./containerModel");
 
 const lectureSchema = new mongoose.Schema({
   videoLink: { type: String, required: true },
-  examLink: { type: String },
   description: { type: String },
   numberOfViews: { type: Number, default: 3 },
   teacherAllowed: { type: Boolean, required: true },
@@ -11,16 +10,28 @@ const lectureSchema = new mongoose.Schema({
     type: String,
     enum: ['Free', 'Paid', 'Revision', 'Teachers Only'],
     required: [true, 'A lecture must have a type'],
-  },
-  requiresExam: {
+  },  requiresExam: {
     type: Boolean,
     default: false
   },
   examConfig: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "LecturerExamConfig"
-  },
+  },  
   passingThreshold: {
+    type: Number,
+    min: 0,
+    max: 100,
+  },
+  requiresHomework: {
+    type: Boolean,
+    default: false
+  },
+  homeworkConfig: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "LecturerExamConfig"
+  },
+  homeworkPassingThreshold: {
     type: Number,
     min: 0,
     max: 100,
