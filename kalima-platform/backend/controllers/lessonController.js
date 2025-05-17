@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Lesson = require("../models/lessonModel");
 const Subject = require("../models/subjectModel");
-const CLecturer = require("../models/Center.LecturerModel");
+const CLecturer = require("../models/center.lecturerModel");
 const Level = require("../models/levelModel");
 const Center = require("../models/centerModel");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/AppError");
+const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 // This is the imported model, variable name is groupedLessonsModel
 const groupedLessonsModel = require('../models/groupedLessonsModel'); // Renamed for clarity
