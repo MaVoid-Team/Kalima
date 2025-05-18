@@ -42,20 +42,20 @@ const PromoCodes = () => {
   const [fetchError, setFetchError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [limit] = useState(6) // Number of transactions per page
+  const [limit] = useState(10) // Number of transactions per page
   const [scannerActive, setScannerActive] = useState(false)
   const [scannerError, setScannerError] = useState(null)
   const [scannerLoading, setScannerLoading] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("transactions")
-  const navigate = useNavigate();
-  const accessToken = getAccessToken();
+  const navigate = useNavigate()
+  const accessToken = getAccessToken()
   useEffect(() => {
-    if(!accessToken){
+    if (!accessToken) {
       navigate("/login")
     }
-  }, [accessToken,navigate])
-  
+  }, [accessToken, navigate])
+
   // Use a ref for the scanner instance to maintain it across renders
   const scannerRef = useRef(null)
   // Track if scanner is actually running
@@ -76,11 +76,11 @@ const PromoCodes = () => {
 
           const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
             id: `code-${index + 1}`,
-            type: "Code Redemption",
+            type: t("transactions.types.codeRedemption"),
             code: code.code,
             amount: code.pointsAmount,
             instructorName: code.lecturerId
-              ? pointsBalances?.find((b) => b.lecturer?._id === code.lecturerId)?.lecturer?.name || "N/A"
+              ? pointsBalances?.find((b) => b.lecturer?._id === code.lecturerId)?.lecturer?.name || t("notAvailable")
               : t("generalPoints"),
             createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
               year: "numeric",
@@ -95,10 +95,10 @@ const PromoCodes = () => {
 
           const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
             id: `purchase-${index + 1}`,
-            type: "Course Purchase",
+            type: t("transactions.types.coursePurchase"),
             code: purchase.description,
             amount: purchase.points,
-            instructorName: purchase.lecturer?.name || "N/A",
+            instructorName: purchase.lecturer?.name || t("notAvailable"),
             createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
               year: "numeric",
               month: "short",
@@ -355,10 +355,21 @@ const PromoCodes = () => {
       <table className="table w-full">
         <thead className="bg-primary/5">
           <tr>
-            <th className="rounded-tl-xl">{t("table.date")}</th>
-            <th>{t("table.type")}</th>
-            <th>{t("table.amount")}</th>
-            <th>{t("table.teacher")}</th>
+            <th className="rounded-tl-xl tooltip" data-tip={t("table.dateTooltip") || "When the transaction occurred"}>
+              {t("table.date")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th className="tooltip hidden md:table-cell" data-tip={t("table.typeTooltip") || "Type of transaction"}>
+              {t("table.type")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th className="tooltip" data-tip={t("table.amountTooltip") || "Points added or deducted"}>
+              {t("table.amount")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th
+              className="tooltip hidden md:table-cell"
+              data-tip={t("table.teacherTooltip") || "Teacher associated with these points"}
+            >
+              {t("table.teacher")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
             <th className="rounded-tr-xl">{t("table.actions")}</th>
           </tr>
         </thead>
@@ -371,7 +382,7 @@ const PromoCodes = () => {
                   className={`hover:bg-base-200 ${index % 2 === 0 ? "bg-base-100" : "bg-base-100/50"}`}
                 >
                   <td className="whitespace-nowrap">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10">
                         {transaction.isRedemption ? (
                           <Ticket className="w-4 h-4 text-primary" />
@@ -380,41 +391,58 @@ const PromoCodes = () => {
                         )}
                       </div>
                       <div>
-                        <div className="font-medium">{transaction.createdAt.split(",")[0]}</div>
+                        <div className="font-medium text-sm">{transaction.createdAt.split(",")[0]}</div>
                         <div className="text-xs opacity-70">{transaction.createdAt.split(",")[1]}</div>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td className="hidden md:table-cell">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}`}
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                      }`}
                     >
                       {transaction.type}
                     </span>
                   </td>
                   <td className="font-medium">
-                    {transaction.isRedemption ? (
-                      <span className="text-green-600">+{transaction.amount}</span>
-                    ) : (
-                      <span className="text-red-600">-{transaction.amount}</span>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {transaction.isRedemption ? (
+                        <span className="text-green-600">+{transaction.amount}</span>
+                      ) : (
+                        <span className="text-red-600">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
+                      )}
+                      <span className="md:hidden text-xs opacity-70">
+                        {transaction.isRedemption ? (
+                          <span className="bg-green-100 text-green-800 px-1 rounded text-[10px]">
+                            {t("transactions.types.codeRedemption")}
+                          </span>
+                        ) : (
+                          <span className="bg-blue-100 text-blue-800 px-1 rounded text-[10px]">
+                            {t("transactions.types.coursePurchase")}
+                          </span>
+                        )}
+                      </span>
+                    </div>
                   </td>
-                  <td>{transaction.instructorName}</td>
+                  <td className="hidden md:table-cell">{transaction.instructorName}</td>
                   <td>
-                    {transaction.isRedemption && (
-                      <button
-                        onClick={() => copyToClipboard(transaction.code)}
-                        className="btn btn-ghost btn-sm"
-                        title={t("copy")}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    )}
-                    {!transaction.isRedemption && (
-                      <button className="btn btn-ghost btn-sm" title={t("details")}>
-                        <Info className="w-4 h-4" />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {transaction.isRedemption ? (
+                        <button
+                          onClick={() => copyToClipboard(transaction.code)}
+                          className="btn btn-ghost btn-sm"
+                          title={t("copy")}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button className="btn btn-ghost btn-sm" title={t("details")}>
+                          <Info className="w-4 h-4" />
+                        </button>
+                      )}
+                      <span className="md:hidden text-xs truncate max-w-[80px]">{transaction.instructorName}</span>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -451,10 +479,10 @@ const PromoCodes = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              <ChevronLeft className="w-4 h-4" />
+              {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </button>
 
-            {/* Show limited page numbers with ellipsis for large page counts */}
+            {/* Show page numbers with proper handling for many pages */}
             {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
               let pageNum
               if (totalPages <= 5) {
@@ -483,7 +511,7 @@ const PromoCodes = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              <ChevronRight className="w-4 h-4" />
+              {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -501,19 +529,19 @@ const PromoCodes = () => {
           >
             <div className="card-body p-4">
               <div className="flex justify-between items-start">
-                <h3 className="card-title text-base">{access.lecture.name}</h3>
-                <div className="badge badge-primary">
+                <h3 className="card-title text-base line-clamp-1">{access.lecture.name}</h3>
+                <div className="badge badge-primary whitespace-nowrap">
                   {access.remainingViews} {t("views")}
                 </div>
               </div>
               <p className="text-sm opacity-70 line-clamp-2">{access.lecture.description}</p>
-              <div className="flex justify-between items-center mt-2 text-xs opacity-70">
+              <div className="flex flex-wrap justify-between items-center mt-2 text-xs opacity-70 gap-2">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
+                  <Clock className="w-3 h-3 flex-shrink-0" />
                   {new Date(access.lastAccessed).toLocaleDateString()}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
+                  <Users className="w-3 h-3 flex-shrink-0" />
                   {access.lecture.numberOfViews} {t("totalViews")}
                 </span>
               </div>
@@ -552,24 +580,58 @@ const PromoCodes = () => {
         )}
 
         {/* User Info & Points Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           {/* User Profile Card */}
           <div className="card bg-base-100 shadow-sm border border-base-200">
-            <div className="card-body">
+            <div className="card-body p-4 md:p-6">
               <div className="flex items-center gap-4">
                 <div className="avatar avatar-placeholder">
-                  <div className="bg-primary/10 text-primary rounded-full w-16">
+                  <div className="bg-primary/10 text-primary rounded-full w-12 md:w-16">
                     <span className="text-xl">{userInfo?.name?.charAt(0) || "U"}</span>
                   </div>
                 </div>
-                <div>
-                  <h2 className="card-title">{userInfo?.name || t("user")}</h2>
-                  <p className="text-sm opacity-70">{userInfo?.email || ""}</p>
+                <div className="overflow-hidden">
+                  <h2 className="card-title text-base md:text-lg truncate">{userInfo?.name || t("user")}</h2>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-base-content/60">{t("profile.email")}:</span>
+                    <p className="text-sm opacity-70 truncate">{userInfo?.email || ""}</p>
+                  </div>
+                  <div
+                    className="flex items-center gap-1 tooltip"
+                    data-tip={
+                      t("profile.sequenceIdTooltip") || "Parents should use this ID when signing up to link accounts"
+                    }
+                  >
+                    <span className="text-xs font-semibold text-base-content/60">{t("profile.sequenceId")}:</span>
+                    <p className="text-sm opacity-70 truncate">{userInfo?.sequencedId || ""}</p>
+                    <Info className="w-3 h-3 text-primary flex-shrink-0" />
+                  </div>
                   <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
                 </div>
               </div>
             </div>
           </div>
+
+          {userInfo?.role === "student" && userInfo?.sequencedId && (
+            <div className="lg:col-span-3 alert alert-info text-info-content">
+              <Info className="w-5 h-5" />
+              <div>
+                <h3 className="font-bold">{t("profile.parentLinkTitle") || "For Parents"}</h3>
+                <div className="text-sm">
+                  {t("profile.parentLinkDescription") ||
+                    "Parents should use this Sequence ID when registering to link their account with yours:"}
+                  <span className="font-mono bg-info-content/10 px-2 py-1 rounded ml-2">{userInfo.sequencedId}</span>
+                  <button
+                    onClick={() => copyToClipboard(userInfo.sequencedId)}
+                    className="btn btn-xs btn-ghost ml-2"
+                    title={t("copy")}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Total Points Card */}
           <div className="card bg-primary text-primary-content shadow-md">
@@ -585,8 +647,7 @@ const PromoCodes = () => {
                   `${balance} ${t("balance.currency")}`
                 )}
               </div>
-              {/* <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p> */}
-              <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها</p>
+              <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p>
             </div>
           </div>
 
@@ -633,7 +694,7 @@ const PromoCodes = () => {
                 {pointsBalances.map((balance, index) => (
                   <div key={index} className="bg-base-200/50 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                         {balance.lecturer ? (
                           <span className="text-primary font-medium">{balance.lecturer.name.charAt(0)}</span>
                         ) : (
@@ -644,13 +705,12 @@ const PromoCodes = () => {
                         {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
                       </h3>
                     </div>
-                    
+
                     <div className="flex justify-between items-end">
                       <p className="text-2xl font-bold">{balance.points}</p>
                       <span className="text-xs opacity-70">{t("balance.currency")}</span>
                     </div>
-                    <p className="text-sm opacity-80 mt-2">كل الفلوس الي تم شحنها ل استاذ {balance.lecturer ? balance.lecturer.name : t("generalPoints")}</p>
-
+                    <p className="text-sm opacity-80 mt-2 line-clamp-2">{t("lecturerPoints.description")}</p>
                   </div>
                 ))}
               </div>
@@ -743,8 +803,7 @@ const PromoCodes = () => {
             </div>
 
             <div className="mt-6 text-center">
-              {/* <p className="text-sm mb-3">{t("scanner.instructions")}</p> */}
-              <p className="text-sm mb-3">هات الكاميرا على ال QR كود</p>
+              <p className="text-sm mb-3">{t("scanner.instructions")}</p>
               <div className="flex justify-center gap-3 mt-4">
                 <button
                   className="btn btn-outline btn-sm"

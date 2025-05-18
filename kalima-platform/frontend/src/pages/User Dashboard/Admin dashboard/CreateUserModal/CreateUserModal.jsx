@@ -59,7 +59,7 @@ const CreateUserModal = ({
     try {
       const levelsResult = await getAllLevels();
       if (levelsResult.success) {
-        setLevels(levelsResult.data.levels || []);
+        setLevels(levelsResult.data || []);
       } else {
         console.error("Failed to fetch levels:", levelsResult.error);
       }

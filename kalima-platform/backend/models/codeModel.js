@@ -41,28 +41,22 @@ const codeSchema = new mongoose.Schema({
 });
 
 codeSchema.methods.generateCode = function () {
-  // Use the ObjectId as a seed for randomness
-  const objectIdHex = this._id.toString();
-  
-  // Create a numeric string from the ObjectId to ensure uniqueness
-  // We'll use the last 10 digits of a large number derived from the ObjectId
-  const numericBase = BigInt("0x" + objectIdHex) % 10000000000n;
-  let result = numericBase.toString().padStart(10, '0');
-  
-  // If the result is somehow shorter than 10 digits, pad with random numbers
-  if (result.length < 10) {
-    while (result.length < 10) {
-      const randomDigit = Math.floor(Math.random() * 10);
-      result += randomDigit.toString();
-    }
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  // Get current time in nanoseconds (as string)
+  const timestamp = Date.now().toString(36).toUpperCase(); // base36 for compactness
+  // Generate random part to fill up to 10 characters
+  let randLength = 10 - timestamp.length;
+  let randPart = '';
+  for (let i = 0; i < randLength; i++) {
+    randPart += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  
-  // Ensure it's exactly 10 digits
-  if (result.length > 10) {
-    result = result.substring(0, 10);
+  // Combine timestamp and random part, then shuffle for extra randomness
+  let codeArr = (timestamp + randPart).split('');
+  for (let i = codeArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [codeArr[i], codeArr[j]] = [codeArr[j], codeArr[i]];
   }
-  
-  this.code = result;
+  this.code = codeArr.join('');
 };
 
 const Code = mongoose.model("Code", codeSchema);

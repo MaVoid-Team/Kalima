@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-
+import { governments, getAdministrationZonesForGovernment } from "../../constants/locations"
 
 export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels  }) {
   const [loading, setLoading] = useState(true);
@@ -8,7 +8,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
 
       {/* Common fields */}
@@ -72,7 +72,62 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           )}
         </div>
       </div>
+    {/* Government Selection */}
+      <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t("form.government") || "Government"}</span>
+          </label>
+          <select
+            name="government"
+            className={`select select-bordered w-2/3 lg:w-1/2 ${errors.government ? "select-error animate-shake" : ""}`}
+            value={formData.government || ""}
+            onChange={handleInputChange}
+          >
+            <option value="">{t("form.selectGovernment") || "Select Government"}</option>
+            {governments.map((government) => (
+              <option key={government} value={government}>
+                {government}
+              </option>
+            ))}
+          </select>
+          {errors.government && (
+            <span className="absolute bottom-0  text-error text-sm mt-1">
+              {t(`validation.${errors.government}`) || "Government is required"}
+            </span>
+          )}
+        </div>
+      </div>
 
+      {/* Administration Zone Selection - Only show if government is selected */}
+      
+        <div className="form-control relative pb-5">
+          <div className="flex flex-col gap-2">
+            <label className="label">
+              <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
+            </label>
+            <select
+              disabled={!formData.government}
+              name="administrationZone"
+              className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
+              value={formData.administrationZone || ""}
+              onChange={handleInputChange}
+            >
+              <option value="">{t("form.selectAdministrationZone") || "Select Administration Zone"}</option>
+              {getAdministrationZonesForGovernment(formData.government).map((zone) => (
+                <option key={zone} value={zone}>
+                  {zone}
+                </option>
+              ))}
+            </select>
+            {errors.administrationZone && (
+              <span className="absolute bottom-0  text-error text-sm mt-1">
+                {t(`validation.${errors.administrationZone}`) || "Administration Zone is required"}
+              </span>
+            )}
+          </div>
+        </div>
+     
       {/* Student-specific fields */}
       {role === 'student' && (
         <>

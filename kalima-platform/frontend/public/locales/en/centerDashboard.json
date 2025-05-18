@@ -15,19 +15,45 @@
     },
     "lecturersList": {
         "title": "Lecturers",
-        "searchPlaceholder": "Search lecturer",
-        "addLecturer": "Add Lecturer",
-        "subjects": "Subjects",
-        "noSubjects": "No subjects",
-        "viewDetails": "View Details",
-        "noLecturers": "No lecturers found"
+      "searchPlaceholder": "Search lecturers...",
+      "addLecturer": "Add Lecturer",
+      "noLecturers": "No lecturers found",
+      "subjects": "Subjects",
+      "noSubjects": "No subjects assigned",
+      "viewDetails": "View Details",
+      
+      "lecturerAddedSuccess": "Lecturer added successfully",
+      "lecturerAddedError": "Failed to add lecturer",
+      "subjectAddedSuccess": "Subject added successfully",
+      "subjectAddedError": "Failed to add subject",
+      
+      "lecturerName": "Lecturer Name",
+      "lecturerNamePlaceholder": "Enter lecturer name",
+      "lecturerPhone": "Phone Number",
+      "lecturerPhonePlaceholder": "Enter phone number",
+      "lecturerSubjects": "Subjects",
+      "selectSubject": "Select a subject",
+      
+      "addNewSubject": "Add New Subject",
+      "newSubjectPlaceholder": "Enter subject name",
+      "addSubjectButton": "Add Subject",
+      
+      "submitLecturer": "Add Lecturer",
+      "cancel": "Cancel"
     },
     "courseList": {
-      "title": "Courses",
-      "addCourse": "Add Course",
-      "noCourses": "No courses available",
+     "title": "Lectures Schedule",
       "addLecture": "Add Lecture",
-        "noLessons": "No lessons found"
+      "noLessons": "No lessons found",
+      "filters": {
+        "allLevels": "All Levels",
+        "allLecturers": "All Lecturers"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "na": "N/A"
     },
     "barCodeScanner": {
       "title": "QR Code Scanner",
@@ -178,6 +204,7 @@
 },
 "courseCard": {
   "session": "Session {{session}}",
+  "showDetails" : "Show Details",
   "types": {
     "lecture": "Lecture",
     "tutorial": "Tutorial",
@@ -288,6 +315,27 @@
     "homework": "Homework:",
     "total": "Total:",
     "viewReport": "View Report"
+  },
+"revenue": {
+    "loading": "Loading...",
+    "error": "Failed to load revenue data.",
+    "summary": {
+      "totalRevenue": "Total Revenue",
+      "lessonRevenue": "Lesson Revenue",
+      "bookletRevenue": "Booklet Revenue",
+      "attendancesPaid": "Attendances Paid"
+    },
+    "paymentTypes": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Transfer"
+    },
+    "withBookletSuffix": "(with booklet)",
+    "labels": {
+      "count": "Count",
+      "lessonRev": "Lesson Rev",
+      "bookletRev": "Booklet Rev",
+      "totalRev": "Total Rev"
+    }
   }
-
   }

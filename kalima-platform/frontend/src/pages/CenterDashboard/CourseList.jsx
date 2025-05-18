@@ -6,7 +6,7 @@ import { getAllLevels } from "../../routes/levels";
 import { getAllSubjects } from "../../routes/courses";
 
 const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
-  const { t, i18n } = useTranslation("centerDashboard");
+  const { t, i18n } = useTranslation(['centerDashboard', 'common']);
   const isRTL = i18n.language === "ar";
   
   const [filters, setFilters] = useState({
@@ -64,7 +64,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         subjectId: lesson.subject,
         session: (index + 1).toString(),
         type: t('courseCard.types.lecture'),
-        room: "N/A",
+        room: t('common.na'),
         time: `${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
         date: startTime.toLocaleDateString(),
         teacher: {
@@ -77,7 +77,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
     });
     
     setMappedLessons(mapped);
-    setCurrentPage(1); // Reset to first page when lessons change
+    setCurrentPage(1);
   }, [lessons, subjects, levels, lecturers, dataLoading, isLoading, t]);
 
   const uniqueSubjects = [...new Set(mappedLessons.map(lesson => lesson.subject))];
@@ -86,7 +86,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
 
   const handleFilterChange = (filterName, value) => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const filteredLessons = mappedLessons.filter(lesson => {
@@ -95,7 +95,6 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
            (!filters.level || lesson.teacher.group === filters.level);
   });
 
-  // Pagination logic
   const totalItems = filteredLessons.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -109,30 +108,32 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
   };
 
   return (
-    <div className="bg-base-100 rounded-lg shadow-lg p-6">
+    <div className="bg-base-100 rounded-lg shadow-lg p-6" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-xl font-bold">
           {t('courseList.title')}
         </h2>
         
         <div className="flex flex-wrap gap-2">
-          <select 
-            className="select select-bordered"
-            value={filters.level}
-            onChange={(e) => handleFilterChange("level", e.target.value)}
-          >
-            <option value="">{t('filters.allLevels')}</option>
-            {uniqueLevels.map(level => (
-              <option key={level} value={level}>{level}</option>
-            ))}
-          </select>
+         <select 
+          className="select select-bordered"
+          value={filters.level}
+          onChange={(e) => handleFilterChange("level", e.target.value)}
+        >
+          <option value="">{t('filters.allLevels')}</option>
+          {levels.map(level => (
+            <option key={level._id} value={level._id}>
+              {t(`gradeLevels.${level.name}`, { ns: 'common' })}
+            </option>
+          ))}
+        </select>
           
           <select 
             className="select select-bordered"
             value={filters.lecturer}
             onChange={(e) => handleFilterChange("lecturer", e.target.value)}
           >
-            <option value="">{t('filters.allLecturers')}</option>
+            <option value="">{t('courseList.filters.allLecturers')}</option>
             {uniqueLecturers.map(lecturer => (
               <option key={lecturer} value={lecturer}>{lecturer}</option>
             ))}
@@ -168,7 +169,6 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         </div>
       )}
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-6 gap-2">
           <button
@@ -176,8 +176,8 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            <ChevronRight className="w-5 h-5" />
-            previous
+            {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            {t('courseList.pagination.previous')}
           </button>
           
           <div className="flex gap-1">
@@ -197,8 +197,8 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            next
-            <ChevronLeft className="w-5 h-5" />
+            {t('courseList.pagination.next')}
+            {isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
         </div>
       )}
