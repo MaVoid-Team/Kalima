@@ -30,7 +30,8 @@
   "3rd Preparatory": "Third Preparatory",
   "1st Secondary": "First Secondary",
   "2nd Secondary": "Second Secondary",
-  "3rd Secondary": "Third Secondary"
+  "3rd Secondary": "Third Secondary",
+  "undefined": "Undefined"
 },
   "dashboard": "Dashboard",
   "profile": "My Profile",
@@ -49,5 +50,6 @@
   "myDashboard": "My Dashboard",
   "Packages": "Packages",
   "select": "Select",
-  "Create": "Create"
+  "Create": "Create",
+  "MyLectures": "My Lectures"
 }

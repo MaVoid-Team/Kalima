@@ -389,6 +389,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         totalPoints: student.totalPoints || 0,
         hobbies: student.hobbies,
         faction: student.faction,
+        sequencedId : student.sequencedId
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -539,6 +540,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: teacher.level,
         faction: teacher.faction,
         school: teacher.school,
+        ...teacher,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)

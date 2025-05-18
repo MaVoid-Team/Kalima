@@ -87,7 +87,7 @@ const TeacherLogin = () => {
         setError(t("errors.fetchUserDataError"));
         return;
       }
-
+      window.dispatchEvent(new Event('user-auth-changed'));
       const userRole = dashboardResult.data.data.userInfo.role;
       if (userRole === "Admin" || userRole === "SubAdmin") {
         navigate("/dashboard/admin-dashboard");
@@ -145,7 +145,7 @@ const TeacherLogin = () => {
             {activeTab === "email_tab" ? (
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">
+                  <span className="label-text mb-2">
                     {t("emailLabel", "Email Address")}
                   </span>
                 </label>
@@ -154,7 +154,7 @@ const TeacherLogin = () => {
                   name="email"
                   value={formData.email.toLowerCase()}
                   onChange={handleInputChange}
-                  placeholder="teacher@example.com"
+                  placeholder="youremail@example.com"
                   className="input input-bordered w-full"
                   required
                 />
@@ -162,7 +162,7 @@ const TeacherLogin = () => {
             ) : (
               <div className="form-control mb-4">
                 <label className="label">
-                  <span className="label-text">
+                  <span className="label-text mb-2">
                     {t("phoneLabel", "Phone Number")}
                   </span>
                 </label>
@@ -180,7 +180,7 @@ const TeacherLogin = () => {
 
             <div className="form-control mb-6">
               <label className="label">
-                <span className="label-text">
+                <span className="label-text mb-2">
                   {t("passwordLabel", "Password")}
                 </span>
               </label>
@@ -211,7 +211,7 @@ const TeacherLogin = () => {
               <label className="label">
                 <Link
                   to="/forgot-password"
-                  className="label-text-alt link link-hover text-primary"
+                  className="label-text-alt link link-hover text-primary mt-2"
                 >
                   {t("forgotPassword", "Forgot password?")}
                 </Link>

@@ -7,6 +7,7 @@ import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getStudentSubmissionsByLectureId } from "../../../routes/examsAndHomeworks"
+import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import {
   FiArrowLeft,
@@ -31,6 +32,8 @@ import {
 } from "react-icons/fi"
 
 const DetailedLectureView = () => {
+  const { t, i18n } = useTranslation("lectureDisplay")
+  const isRTL = i18n.language === 'ar'
   const { lectureId } = useParams()
   const navigate = useNavigate()
   const [lecture, setLecture] = useState(null)
@@ -102,7 +105,7 @@ const DetailedLectureView = () => {
         } else {
           console.error("Failed to fetch subjects:", subjectsResult.error)
           setError((prev) =>
-            prev ? `${prev}. فشل في تحميل المواد، لكن يمكنك المتابعة.` : "فشل في تحميل المواد، لكن يمكنك المتابعة.",
+            prev ? `${prev}. ${t("failedToLoadSubjects")}` : t("failedToLoadSubjects"),
           )
         }
 
@@ -114,8 +117,8 @@ const DetailedLectureView = () => {
           console.error("Failed to fetch levels:", levelsResult.error)
           setError((prev) =>
             prev
-              ? `${prev}. فشل في تحميل المستويات، لكن يمكنك المتابعة.`
-              : "فشل في تحميل المستويات، لكن يمكنك المتابعة.",
+              ? `${prev}. ${t("failedToLoadLevels")}`
+              : t("failedToLoadLevels"),
           )
         }
 
@@ -142,11 +145,11 @@ const DetailedLectureView = () => {
             console.error("Failed to fetch attachments:", attachmentsResult)
           }
         } else {
-          setError("Failed to fetch lecture details")
+          setError(t("failedToFetchLectureDetails"))
         }
       } catch (err) {
         console.error("Error in fetchLectureData:", err)
-        setError(`Failed to load lecture data: ${err.message}`)
+        setError(t("failedToLoadLectureData", { error: err.message }))
       } finally {
         setLoading(false)
       }
@@ -155,7 +158,7 @@ const DetailedLectureView = () => {
     if (lectureId) {
       fetchLectureData()
     }
-  }, [lectureId])
+  }, [lectureId, t])
 
   // Fetch student submissions
   useEffect(() => {
@@ -183,18 +186,18 @@ const DetailedLectureView = () => {
             setStudentSubmissions(userSubmissions)
           }
         } else {
-          setSubmissionsError(result.error || "Failed to fetch student submissions")
+          setSubmissionsError(result.error || t("failedToFetchStudentSubmissions"))
         }
       } catch (err) {
         console.error("Error fetching student submissions:", err)
-        setSubmissionsError("An unexpected error occurred while fetching student submissions")
+        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"))
       } finally {
         setSubmissionsLoading(false)
       }
     }
 
     fetchStudentSubmissions()
-  }, [lectureId, userRole, userId, hasAdminPrivileges])
+  }, [lectureId, userRole, userId, hasAdminPrivileges, t])
 
   // Fetch student lecture accesses
   useEffect(() => {
@@ -212,22 +215,22 @@ const DetailedLectureView = () => {
         if (result.success) {
           setStudentLectureAccesses(result.data || [])
         } else {
-          setAccessesError(result.error || "Failed to fetch student lecture accesses")
+          setAccessesError(result.error || t("failedToFetchStudentAccesses"))
         }
       } catch (err) {
         console.error("Error fetching student lecture accesses:", err)
-        setAccessesError("An unexpected error occurred while fetching student lecture accesses")
+        setAccessesError(t("unexpectedErrorFetchingAccesses"))
       } finally {
         setAccessesLoading(false)
       }
     }
 
     fetchStudentLectureAccesses()
-  }, [lectureId, userRole, hasAdminPrivileges])
+  }, [lectureId, userRole, hasAdminPrivileges, t])
 
   // Helper function to get subject name
   const getSubjectName = () => {
-    if (!lecture || !lecture.subject) return "غير محدد"
+    if (!lecture || !lecture.subject) return t("notSpecified")
 
     // If subject is an object with name property
     if (lecture.subject.name) return lecture.subject.name
@@ -236,12 +239,12 @@ const DetailedLectureView = () => {
     const subjectId = typeof lecture.subject === "object" ? lecture.subject._id : lecture.subject
     const foundSubject = subjects.find((s) => s._id === subjectId)
 
-    return foundSubject ? foundSubject.name : "غير محدد"
+    return foundSubject ? foundSubject.name : t("notSpecified")
   }
 
   // Helper function to get level name
   const getLevelName = () => {
-    if (!lecture || !lecture.level) return "غير محدد"
+    if (!lecture || !lecture.level) return t("notSpecified")
 
     // If level is an object with name property
     if (lecture.level.name) return lecture.level.name
@@ -250,7 +253,7 @@ const DetailedLectureView = () => {
     const levelId = typeof lecture.level === "object" ? lecture.level._id : lecture.level
     const foundLevel = levels.find((l) => l._id === levelId)
 
-    return foundLevel ? foundLevel.name : "غير محدد"
+    return foundLevel ? foundLevel.name : t("notSpecified")
   }
 
   // Handle viewing a submission
@@ -297,7 +300,7 @@ const DetailedLectureView = () => {
       }
     } catch (err) {
       console.error("Error updating student lecture access:", err)
-      setUpdateAccessError("An unexpected error occurred while updating student lecture access")
+      setUpdateAccessError(t("unexpectedErrorUpdatingAccess"))
     } finally {
       setUpdateAccessLoading(false)
     }
@@ -338,12 +341,12 @@ const DetailedLectureView = () => {
         // Navigate back to the lectures list page after successful deletion
         navigate("/dashboard/lecturer-dashboard")
       } else {
-        setDeleteError(result.message || "Failed to delete lecture")
+        setDeleteError(result.message || t("failedToDeleteLecture"))
         setShowDeleteModal(false)
       }
     } catch (err) {
       console.error("Error deleting lecture:", err)
-      setDeleteError("An unexpected error occurred while deleting the lecture")
+      setDeleteError(t("unexpectedErrorDeletingLecture"))
       setShowDeleteModal(false)
     } finally {
       setDeleteLoading(false)
@@ -353,7 +356,7 @@ const DetailedLectureView = () => {
   // Format date to local string
   const formatDate = (dateString) => {
     try {
-      return new Date(dateString).toLocaleString("ar-EG", {
+      return new Date(dateString).toLocaleString(i18n.language === 'ar' ? "ar-EG" : "en-US", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
@@ -361,7 +364,7 @@ const DetailedLectureView = () => {
         minute: "2-digit",
       })
     } catch (error) {
-      return "تاريخ غير صالح"
+      return t("invalidDate")
     }
   }
 
@@ -377,7 +380,7 @@ const DetailedLectureView = () => {
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
           <Icon className="text-primary" />
-          {title}
+          {t(title)}
         </h3>
         <div className="bg-base-200 rounded-lg p-4">
           <ul className="divide-y divide-base-300">
@@ -396,7 +399,7 @@ const DetailedLectureView = () => {
                     rel="noopener noreferrer"
                     className="btn btn-sm btn-outline"
                   >
-                    <FiEye className="mr-1" /> عرض
+                    <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t("view")}
                   </a>
                 </div>
               </li>
@@ -419,13 +422,14 @@ const DetailedLectureView = () => {
   // Error state
   if (error) {
     return (
-      <div className="container mx-auto p-4" dir="rtl">
+      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
         <div className="alert alert-error">
           <FiX className="w-6 h-6" />
-          <span>{error}</span>
+          <span>{t('errorGeneric')}</span>
         </div>
         <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
-          <FiArrowLeft className="ml-2" /> العودة
+          <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
+          {t('back')}
         </button>
       </div>
     )
@@ -434,19 +438,20 @@ const DetailedLectureView = () => {
   // No lecture found
   if (!lecture) {
     return (
-      <div className="container mx-auto p-4" dir="rtl">
+      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
         <div className="alert alert-warning">
-          <span>لم يتم العثور على المحاضرة المطلوبة</span>
+          <span>{t('lectureNotFound')}</span>
         </div>
         <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
-          <FiArrowLeft className="ml-2" /> العودة
+          <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
+          {t('back')}
         </button>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-4" dir="rtl">
+    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <div className="flex items-center gap-2 mb-4 md:mb-0">
@@ -455,7 +460,7 @@ const DetailedLectureView = () => {
           </button>
           <h1 className="text-2xl font-bold">{lecture.name}</h1>
           <span className={`badge ${lecture.lecture_type === "Paid" ? "badge-primary" : "badge-secondary"}`}>
-            {lecture.lecture_type === "Paid" ? "مدفوعة" : "مراجعة"}
+            {lecture.lecture_type === "Paid" ? t('paid') : t('review')}
           </span>
         </div>
 
@@ -463,7 +468,7 @@ const DetailedLectureView = () => {
         {hasAdminPrivileges && (
           <div className="flex gap-2">
             <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
-              حذف المحاضرة
+              {t('deleteLecture')}
             </button>
           </div>
         )}
@@ -475,10 +480,10 @@ const DetailedLectureView = () => {
           <div className="modal-box">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <FiAlertTriangle className="text-error" />
-              تأكيد حذف المحاضرة
+              {t('deleteConfirmTitle')}
             </h3>
             <p className="py-4">
-              هل أنت متأكد من رغبتك في حذف محاضرة "{lecture.name}"؟ هذا الإجراء لا يمكن التراجع عنه.
+              {t('deleteConfirmMessage', { name: lecture.name })}
             </p>
             {deleteError && (
               <div className="alert alert-error mt-2">
@@ -488,16 +493,16 @@ const DetailedLectureView = () => {
             )}
             <div className="modal-action">
               <button className="btn btn-outline" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
-                إلغاء
+                {t('cancel')}
               </button>
               <button className="btn btn-error" onClick={handleDeleteLecture} disabled={deleteLoading}>
                 {deleteLoading ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    جاري الحذف...
+                    {t('deleting')}
                   </>
                 ) : (
-                  "تأكيد الحذف"
+                  t('confirmDelete')
                 )}
               </button>
             </div>
@@ -517,15 +522,15 @@ const DetailedLectureView = () => {
             <div className="bg-base-200 rounded-lg p-2 mb-4 text-sm flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <span>
-                  النوع: <span className="font-medium">{viewingSubmission.fileType}</span>
+                  {t('type')}: <span className="font-medium">{viewingSubmission.fileType}</span>
                 </span>
                 <span>
-                  الحجم: <span className="font-medium">{(viewingSubmission.fileSize / 1024).toFixed(2)} KB</span>
+                  {t('size')}: <span className="font-medium">{(viewingSubmission.fileSize / 1024).toFixed(2)} KB</span>
                 </span>
                 <span>
-                  تاريخ الرفع:{" "}
+                  {t('uploadDate')}:{" "}
                   <span className="font-medium">
-                    {new Date(viewingSubmission.uploadedOn).toLocaleDateString("ar-EG")}
+                    {new Date(viewingSubmission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
                   </span>
                 </span>
               </div>
@@ -546,9 +551,9 @@ const DetailedLectureView = () => {
                   <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-primary mb-4" />
-                      <p className="font-medium mb-2">ملف PDF</p>
+                      <p className="font-medium mb-2">{t('pdfFile')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                        لا يمكن عرض محتوى ملف PDF مباشرة. يرجى تنزيل الملف لعرضه.
+                      {t('downloadToView')}
                       </p>
                     </div>
                   </div>
@@ -558,9 +563,9 @@ const DetailedLectureView = () => {
                   <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-blue-600 mb-4" />
-                      <p className="font-medium mb-2">مستند Word</p>
+                     <p className="font-medium mb-2">{t('wordDoc')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                        لا يمكن عرض محتوى مستند Word مباشرة. يرجى تنزيل الملف لعرضه.
+                        {t('downloadToView')}
                       </p>
                     </div>
                   </div>
@@ -570,9 +575,9 @@ const DetailedLectureView = () => {
                   <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
-                      <p className="font-medium mb-2">جدول بيانات Excel</p>
+                      <p className="font-medium mb-2">{t('excelSheet')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                        لا يمكن عرض محتوى جدول البيانات مباشرة. يرجى تنزيل الملف لعرضه.
+                       {t('downloadToView')}
                       </p>
                     </div>
                   </div>
@@ -582,9 +587,9 @@ const DetailedLectureView = () => {
                   <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFile className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-                      <p className="font-medium mb-2">ملف غير مدعوم للعرض</p>
+                      <p className="font-medium mb-2">{t('fileNotSupported')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                        لا يمكن عرض محتوى هذا النوع من الملفات مباشرة. يرجى تنزيل الملف لعرضه.
+                        {t('downloadToView')}
                       </p>
                     </div>
                   </div>
@@ -594,21 +599,18 @@ const DetailedLectureView = () => {
 
             <div className="modal-action">
               <button className="btn btn-outline" onClick={() => setShowSubmissionModal(false)}>
-                إغلاق
+                {t('close')}
               </button>
               <a
                 href={`data:${viewingSubmission.fileType};base64,${viewingSubmission.fileData}`}
                 download={viewingSubmission.fileName}
                 className="btn btn-primary"
               >
-                <FiDownload className="ml-2" />
-                تنزيل الملف
+                <FiDownload className={isRTL ? "ml-2" : "mr-2"} />
+                {t('download')}
               </a>
             </div>
           </div>
-          <form method="dialog" className="modal-backdrop">
-            <button onClick={() => setShowSubmissionModal(false)}>close</button>
-          </form>
         </div>
       )}
 
@@ -619,19 +621,19 @@ const DetailedLectureView = () => {
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
               <FiFileText className="text-primary" />
-              وصف المحاضرة
+              {t('description')}
             </h2>
             <div className="bg-base-200 rounded-lg p-4">
-              <p className="whitespace-pre-line">{lecture.description || "لا يوجد وصف متاح"}</p>
+              <p className="whitespace-pre-line">{lecture.description || t('noDescription')}</p>
             </div>
           </div>
 
-          {/* Student Lecture Access - Only visible to admin users */}
+          {/* Student Lecture Access */}
           {hasAdminPrivileges && (
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <FiUsers className="text-primary" />
-                وصول الطلاب للمحاضرة
+                {t('studentAccess')}
               </h2>
 
               {accessesLoading ? (
@@ -649,11 +651,11 @@ const DetailedLectureView = () => {
                     <table className="table w-full">
                       <thead>
                         <tr>
-                          <th>الطالب</th>
-                          <th>المشاهدات المتبقية</th>
-                          <th>آخر وصول</th>
-                          <th>الإجراءات</th>
-                        </tr>
+                        <th>{t('student')}</th>
+                        <th>{t('remainingViews')}</th>
+                        <th>{t('lastAccess')}</th>
+                        <th>{t('actions')}</th>
+                      </tr>
                       </thead>
                       <tbody>
                         {studentLectureAccesses.map((access) => (
@@ -683,13 +685,13 @@ const DetailedLectureView = () => {
                                   />
                                   {updateAccessError && <span className="text-xs text-error">{updateAccessError}</span>}
                                   {updateAccessSuccess && (
-                                    <span className="text-xs text-success">تم التحديث بنجاح</span>
+                                    <span className="text-xs text-success">{t('updateSuccess')}</span>
                                   )}
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
                                   <span className="font-medium">{access.remainingViews}</span>
-                                  <span className="text-xs opacity-70">مشاهدة</span>
+                                  <span className="text-xs opacity-70">{t('views')}</span>
                                 </div>
                               )}
                             </td>
@@ -712,20 +714,20 @@ const DetailedLectureView = () => {
                                     ) : (
                                       <FiSave className="w-4 h-4" />
                                     )}
-                                    حفظ
+                                    {t('save')}
                                   </button>
                                   <button
                                     className="btn btn-sm btn-outline"
                                     onClick={handleCancelEdit}
                                     disabled={updateAccessLoading}
                                   >
-                                    إلغاء
+                                    {t('cancel')}
                                   </button>
                                 </div>
                               ) : (
                                 <button className="btn btn-sm btn-outline" onClick={() => handleEditAccess(access)}>
                                   <FiEdit className="w-4 h-4 ml-1" />
-                                  تعديل
+                                  {t('edit')}
                                 </button>
                               )}
                             </td>
@@ -738,7 +740,7 @@ const DetailedLectureView = () => {
               ) : (
                 <div className="alert alert-info">
                   <FiInfo className="w-5 h-5" />
-                  <span>لا يوجد طلاب لديهم حق الوصول لهذه المحاضرة</span>
+                <span>{t('noAccess')}</span>
                 </div>
               )}
             </div>
@@ -749,7 +751,7 @@ const DetailedLectureView = () => {
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <FiUpload className="text-primary" />
-                {hasAdminPrivileges ? "واجبات الطلاب" : "واجباتي المرفوعة"}
+               {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
               </h2>
 
               {submissionsLoading ? (
@@ -767,9 +769,9 @@ const DetailedLectureView = () => {
                     <table className="table w-full">
                       <thead>
                         <tr>
-                          <th>الطالب</th>
-                          <th>الملفات المرفوعة</th>
-                          <th>الإجراءات</th>
+                          <th>{t('student')}</th>
+                          <th>{t('uploadedFiles')}</th>
+                          <th>{t('actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -801,13 +803,13 @@ const DetailedLectureView = () => {
                                         {(submission.fileSize / 1024).toFixed(2)} KB
                                       </span>
                                       <span className="text-xs opacity-70">
-                                        {new Date(submission.uploadedOn).toLocaleDateString()}
+                                        {new Date(submission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
                                       </span>
                                     </div>
                                   ))}
                                 </div>
                               ) : (
-                                <span className="text-sm opacity-70">لم يتم رفع أي ملفات</span>
+                                <span className="text-sm opacity-70">{t('noSubmissions')}</span>
                               )}
                             </td>
                             <td>
@@ -826,13 +828,13 @@ const DetailedLectureView = () => {
                                       }
                                       className="btn btn-sm btn-primary"
                                     >
-                                      <FiEye className="mr-1" />
-                                      عرض
+                                      <FiEye className={isRTL ? "ml-1" : "mr-1"} />
+                                    {t('view')}
                                     </button>
                                   ))}
                                 </div>
                               ) : (
-                                <button className="btn btn-sm btn-disabled">لا توجد ملفات</button>
+                                <button className="btn btn-sm btn-disabled">{t('noFiles')}</button>
                               )}
                             </td>
                           </tr>
@@ -844,12 +846,12 @@ const DetailedLectureView = () => {
               ) : userRole === "Student" ? (
                 <div className="alert alert-info">
                   <FiInfo className="w-5 h-5" />
-                  <span>لم تقم برفع أي واجبات لهذه المحاضرة بعد</span>
+                  <span>{t('noHomeworkUploaded')}</span>
                 </div>
               ) : (
                 <div className="alert alert-info">
                   <FiUsers className="w-5 h-5" />
-                  <span>لم يقم أي طالب برفع واجبات لهذه المحاضرة بعد</span>
+                  <span>{t('noStudentUploads')}</span>
                 </div>
               )}
 
@@ -857,8 +859,8 @@ const DetailedLectureView = () => {
               {userRole === "Student" && (
                 <div className="mt-4">
                   <button className="btn btn-outline btn-primary">
-                    <FiUpload className="ml-2" />
-                    رفع واجب جديد
+                    <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
+                   {t('uploadHomework')}
                   </button>
                 </div>
               )}
@@ -866,40 +868,39 @@ const DetailedLectureView = () => {
           )}
 
           {/* Attachments */}
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-3">المرفقات</h2>
-            {renderAttachments(attachments.booklets, "الكتيبات", FiBook)}
-            {renderAttachments(attachments.pdfsandimages, "الملفات والصور", FiFileText)}
-            {renderAttachments(attachments.homeworks, "الواجبات", FiBook)}
-            {renderAttachments(attachments.exams, "الامتحانات", FiFileText)}
+           <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-3">{t('attachments')}</h2>
+            {renderAttachments(attachments.booklets, 'booklets', FiBook)}
+            {renderAttachments(attachments.pdfsandimages, 'filesImages', FiFileText)}
+            {renderAttachments(attachments.homeworks, 'homeworks', FiBook)}
+            {renderAttachments(attachments.exams, 'exams', FiFileText)}
 
             {!attachments.booklets?.length &&
               !attachments.pdfsandimages?.length &&
               !attachments.homeworks?.length &&
               !attachments.exams?.length && (
                 <div className="alert alert-info">
-                  <span>لا توجد مرفقات لهذه المحاضرة</span>
+                  <span>{t('noAttachments')}</span>
                 </div>
               )}
           </div>
         </div>
 
+
         {/* Sidebar - Lecture Details */}
         <div className="lg:col-span-1">
-          <div className="bg-base-200 rounded-lg p-4 sticky top-4">
-            <h2 className="text-xl font-semibold mb-4">تفاصيل المحاضرة</h2>
-
-            <ul className="space-y-4">
-              {/* Price */}
-              <li className="flex items-center gap-3">
-                <div className="bg-base-300 p-2 rounded-lg">
-                  <FiDollarSign className="text-primary" />
-                </div>
-                <div>
-                  <span className="text-sm text-base-content/70">السعر</span>
-                  <p className="font-medium">{lecture.price} نقطة</p>
-                </div>
-              </li>
+        <div className="bg-base-200 rounded-lg p-4 sticky top-4">
+          <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
+          <ul className="space-y-4">
+            <li className="flex items-center gap-3">
+              <div className="bg-base-300 p-2 rounded-lg">
+                <FiDollarSign className="text-primary" />
+              </div>
+              <div>
+                <span className="text-sm text-base-content/70">{t('price')}</span>
+                <p className="font-medium">{lecture.price} {t('points')}</p>
+              </div>
+            </li>
 
               {/* Created By */}
               <li className="flex items-center gap-3">
@@ -907,8 +908,8 @@ const DetailedLectureView = () => {
                   <FiUser className="text-primary" />
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">المحاضر</span>
-                  <p className="font-medium">{lecture.createdBy?.name || "غير معروف"}</p>
+                   <span className="text-sm text-base-content/70">{t('lecturer')}</span>
+                  <p className="font-medium">{lecture.createdBy?.name || t('unknown')}</p>
                 </div>
               </li>
 
@@ -918,7 +919,7 @@ const DetailedLectureView = () => {
                   <FiBook className="text-primary" />
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">المادة</span>
+                  <span className="text-sm text-base-content/70">{t('subject')}</span>
                   <p className="font-medium">{getSubjectName()}</p>
                 </div>
               </li>
@@ -929,7 +930,7 @@ const DetailedLectureView = () => {
                   <FiLayers className="text-primary" />
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">المستوى</span>
+                <span className="text-sm text-base-content/70">{t('level')}</span>
                   <p className="font-medium">{getLevelName()}</p>
                 </div>
               </li>
@@ -940,7 +941,7 @@ const DetailedLectureView = () => {
                   <FiEye className="text-primary" />
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">عدد المشاهدات</span>
+                   <span className="text-sm text-base-content/70">{t('viewsCount')}</span>
                   <p className="font-medium">{lecture.numberOfViews || 0}</p>
                 </div>
               </li>
@@ -951,8 +952,8 @@ const DetailedLectureView = () => {
                   {lecture.teacherAllowed ? <FiCheck className="text-success" /> : <FiEyeOff className="text-error" />}
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">مسموح للمعلمين</span>
-                  <p className="font-medium">{lecture.teacherAllowed ? "نعم" : "لا"}</p>
+                  <span className="text-sm text-base-content/70">{t('teacherAllowed')}</span>
+                  <p className="font-medium">{lecture.teacherAllowed ? t('yes') : t('no')}</p>
                 </div>
               </li>
 
@@ -962,8 +963,8 @@ const DetailedLectureView = () => {
                   {lecture.requiresExam ? <FiCheck className="text-success" /> : <FiX className="text-error" />}
                 </div>
                 <div>
-                  <span className="text-sm text-base-content/70">يتطلب امتحان</span>
-                  <p className="font-medium">{lecture.requiresExam ? "نعم" : "لا"}</p>
+                  <span className="text-sm text-base-content/70">{t('requiresExam')}</span>
+                  <p className="font-medium">{lecture.requiresExam ? t('yes') : t('no')}</p>
                 </div>
               </li>
             </ul>

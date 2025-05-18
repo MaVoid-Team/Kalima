@@ -1,276 +1,278 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { getUserDashboard } from '../../../routes/auth-services';
-import { createSubject, getAllSubjects, deleteSubject } from '../../../routes/courses';
-import { createPackage, fetchPackages, deletePackage } from '../../../routes/packages';
-import { getAllLecturers } from '../../../routes/fetch-users';
-import { getAllLevels, createLevel, deleteLevel } from '../../../routes/levels';
+"use client"
+
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
+import { getUserDashboard } from "../../../routes/auth-services"
+import { createSubject, getAllSubjects, deleteSubject } from "../../../routes/courses"
+import { createPackage, fetchPackages, deletePackage } from "../../../routes/packages"
+import { getAllLecturers } from "../../../routes/fetch-users"
+import { getAllLevels, createLevel, deleteLevel } from "../../../routes/levels"
 
 export default function AdminCreate() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [lecturers, setLecturers] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [packages, setPackages] = useState([]);
-  const [levels, setLevels] = useState([]);
-  const [activeForm, setActiveForm] = useState('subject'); // 'subject', 'package', or 'level'
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const [userRole, setUserRole] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+  const [lecturers, setLecturers] = useState([])
+  const [subjects, setSubjects] = useState([])
+  const [packages, setPackages] = useState([])
+  const [levels, setLevels] = useState([])
+  const [activeForm, setActiveForm] = useState("subject") // 'subject', 'package', or 'level'
 
   // Subject form state
-  const [subjectData, setSubjectData] = useState({ name: '' });
+  const [subjectData, setSubjectData] = useState({ name: "" })
 
   // Package form state
   const [packageData, setPackageData] = useState({
-    name: '',
-    price: '',
-    type: 'month',
-    points: [{ lecturer: '', points: '' }],
-  });
+    name: "",
+    price: "",
+    type: "month",
+    points: [{ lecturer: "", points: "" }],
+  })
 
   // Level form state
-  const [levelData, setLevelData] = useState({ name: '' });
+  const [levelData, setLevelData] = useState({ name: "" })
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const result = await getUserDashboard();
+        const result = await getUserDashboard()
         if (result.success) {
-          setUserRole(result.data.data.userInfo.role);
+          setUserRole(result.data.data.userInfo.role)
         } else {
-          navigate('/');
+          navigate("/")
         }
       } catch (err) {
-        setError('Failed to verify user permissions');
-        navigate('/login');
+        setError("Failed to verify user permissions")
+        navigate("/login")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
     const fetchLecturers = async () => {
       try {
-        const response = await getAllLecturers();
+        const response = await getAllLecturers()
         if (response.success) {
-          setLecturers(response.data);
+          setLecturers(response.data)
         } else {
-          setError(response.error || 'Failed to fetch lecturers');
+          setError(response.error || "Failed to fetch lecturers")
         }
       } catch (err) {
-        setError('Failed to fetch lecturers');
+        setError("Failed to fetch lecturers")
       }
-    };
+    }
 
     const fetchSubjects = async () => {
       try {
-        const response = await getAllSubjects();
+        const response = await getAllSubjects()
         if (response.success) {
-          setSubjects(response.data);
+          setSubjects(response.data)
         } else {
-          setError(response.error || 'Failed to fetch subjects');
+          setError(response.error || "Failed to fetch subjects")
         }
       } catch (err) {
-        setError('Failed to fetch subjects');
+        setError("Failed to fetch subjects")
       }
-    };
+    }
 
     const fetchAllPackages = async () => {
       try {
-        const response = await fetchPackages();
+        const response = await fetchPackages()
         if (response.success) {
-          setPackages(response.data);
+          setPackages(response.data)
         } else {
-          setError(response.error || 'Failed to fetch packages');
+          setError(response.error || "Failed to fetch packages")
         }
       } catch (err) {
-        setError('Failed to fetch packages');
+        setError("Failed to fetch packages")
       }
-    };
+    }
 
     const fetchAllLevels = async () => {
       try {
-        const response = await getAllLevels();
+        const response = await getAllLevels()
         if (response.success) {
-          setLevels(response.data);
+          setLevels(response.data)
         } else {
-          setError(response.error || 'Failed to fetch levels');
+          setError(response.error || "Failed to fetch levels")
         }
       } catch (err) {
-        setError('Failed to fetch levels');
+        setError("Failed to fetch levels")
       }
-    };
+    }
 
-    fetchUserData();
-    fetchLecturers();
-    fetchSubjects();
-    fetchAllPackages();
-    fetchAllLevels();
-  }, [navigate]);
+    fetchUserData()
+    fetchLecturers()
+    fetchSubjects()
+    fetchAllPackages()
+    fetchAllLevels()
+  }, [navigate])
 
   const handleSubjectSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
 
     try {
-      const response = await createSubject(subjectData);
+      const response = await createSubject(subjectData)
       if (response.success) {
-        setSuccess('Subject created successfully');
-        setSubjectData({ name: '' });
-        const updatedSubjects = await getAllSubjects();
+        setSuccess("Subject created successfully")
+        setSubjectData({ name: "" })
+        const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
-          setSubjects(updatedSubjects.data);
+          setSubjects(updatedSubjects.data)
         }
       } else {
-        setError(response.error);
+        setError(response.error)
       }
     } catch (err) {
-      setError('Failed to create subject');
+      setError("Failed to create subject")
     }
-  };
+  }
 
   const handlePackageSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
 
     try {
-      const formattedPoints = packageData.points.filter(point => point.lecturer && point.points);
+      const formattedPoints = packageData.points.filter((point) => point.lecturer && point.points)
       const response = await createPackage({
         ...packageData,
-        price: parseFloat(packageData.price),
+        price: Number.parseFloat(packageData.price),
         points: formattedPoints,
-      });
+      })
       if (response.success) {
-        setSuccess('Package created successfully');
+        setSuccess("Package created successfully")
         setPackageData({
-          name: '',
-          price: '',
-          type: 'month',
-          points: [{ lecturer: '', points: '' }],
-        });
-        const updatedPackages = await fetchPackages();
+          name: "",
+          price: "",
+          type: "month",
+          points: [{ lecturer: "", points: "" }],
+        })
+        const updatedPackages = await fetchPackages()
         if (updatedPackages.success) {
-          setPackages(updatedPackages.data);
+          setPackages(updatedPackages.data)
         }
       } else {
-        setError(response.error);
+        setError(response.error)
       }
     } catch (err) {
-      setError('Failed to create package');
+      setError("Failed to create package")
     }
-  };
+  }
 
   const handleLevelSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
 
     try {
-      const response = await createLevel(levelData);
+      const response = await createLevel(levelData)
       if (response.success) {
-        setSuccess('Level created successfully');
-        setLevelData({ name: '' });
-        const updatedLevels = await getAllLevels();
+        setSuccess("Level created successfully")
+        setLevelData({ name: "" })
+        const updatedLevels = await getAllLevels()
         if (updatedLevels.success) {
-          setLevels(updatedLevels.data);
+          setLevels(updatedLevels.data)
         }
       } else {
-        setError(response.error);
+        setError(response.error)
       }
     } catch (err) {
-      setError('Failed to create level');
+      setError("Failed to create level")
     }
-  };
+  }
 
   const addPoint = () => {
-    setPackageData(prev => ({
+    setPackageData((prev) => ({
       ...prev,
-      points: [...prev.points, { lecturer: '', points: '' }],
-    }));
-  };
+      points: [...prev.points, { lecturer: "", points: "" }],
+    }))
+  }
 
   const updatePoint = (index, field, value) => {
-    setPackageData(prev => {
-      const newPoints = [...prev.points];
-      newPoints[index] = { ...newPoints[index], [field]: value };
-      return { ...prev, points: newPoints };
-    });
-  };
+    setPackageData((prev) => {
+      const newPoints = [...prev.points]
+      newPoints[index] = { ...newPoints[index], [field]: value }
+      return { ...prev, points: newPoints }
+    })
+  }
 
   const removePoint = (index) => {
-    setPackageData(prev => ({
+    setPackageData((prev) => ({
       ...prev,
       points: prev.points.filter((_, i) => i !== index),
-    }));
-  };
+    }))
+  }
 
   const handleDeleteSubject = async (subjectId) => {
-    if (window.confirm('Are you sure you want to delete this subject?')) {
+    if (window.confirm("Are you sure you want to delete this subject?")) {
       try {
-        const response = await deleteSubject(subjectId);
+        const response = await deleteSubject(subjectId)
         if (response.success) {
-          setSuccess('Subject deleted successfully');
-          const updatedSubjects = await getAllSubjects();
+          setSuccess("Subject deleted successfully")
+          const updatedSubjects = await getAllSubjects()
           if (updatedSubjects.success) {
-            setSubjects(updatedSubjects.data);
+            setSubjects(updatedSubjects.data)
           }
         } else {
-          setError(response.error || 'Failed to delete subject');
+          setError(response.error || "Failed to delete subject")
         }
       } catch (err) {
-        setError('Failed to delete subject');
+        setError("Failed to delete subject")
       }
     }
-  };
+  }
 
   const handleDeletePackage = async (packageId) => {
-    if (window.confirm('Are you sure you want to delete this package?')) {
+    if (window.confirm("Are you sure you want to delete this package?")) {
       try {
-        const response = await deletePackage(packageId);
+        const response = await deletePackage(packageId)
         if (response.success) {
-          setSuccess('Package deleted successfully');
-          const updatedPackages = await fetchPackages();
+          setSuccess("Package deleted successfully")
+          const updatedPackages = await fetchPackages()
           if (updatedPackages.success) {
-            setPackages(updatedPackages.data);
+            setPackages(updatedPackages.data)
           }
         } else {
-          setError(response.error || 'Failed to delete package');
+          setError(response.error || "Failed to delete package")
         }
       } catch (err) {
-        setError('Failed to delete package');
+        setError("Failed to delete package")
       }
     }
-  };
+  }
 
   const handleDeleteLevel = async (levelId) => {
-    if (window.confirm('Are you sure you want to delete this level?')) {
+    if (window.confirm("Are you sure you want to delete this level?")) {
       try {
-        const response = await deleteLevel(levelId);
+        const response = await deleteLevel(levelId)
         if (response.success) {
-          setSuccess('Level deleted successfully');
-          const updatedLevels = await getAllLevels();
+          setSuccess("Level deleted successfully")
+          const updatedLevels = await getAllLevels()
           if (updatedLevels.success) {
-            setLevels(updatedLevels.data);
+            setLevels(updatedLevels.data)
           }
         } else {
-          setError(response.error || 'Failed to delete level');
+          setError(response.error || "Failed to delete level")
         }
       } catch (err) {
-        setError('Failed to delete level');
+        setError("Failed to delete level")
       }
     }
-  };
+  }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
-    );
+    )
   }
 
   return (
@@ -298,27 +300,27 @@ export default function AdminCreate() {
       {/* Form Selector */}
       <div className="tabs tabs-border mb-6">
         <button
-          className={`tab ${activeForm === 'subject' ? 'tab-active' : ''}`}
-          onClick={() => setActiveForm('subject')}
+          className={`tab ${activeForm === "subject" ? "tab-active" : ""}`}
+          onClick={() => setActiveForm("subject")}
         >
           Create New Subject
         </button>
         <button
-          className={`tab tab-lifted ${activeForm === 'package' ? 'tab-active' : ''}`}
-          onClick={() => setActiveForm('package')}
+          className={`tab tab-lifted ${activeForm === "package" ? "tab-active" : ""}`}
+          onClick={() => setActiveForm("package")}
         >
           Create New Package
         </button>
         <button
-          className={`tab tab-lifted ${activeForm === 'level' ? 'tab-active' : ''}`}
-          onClick={() => setActiveForm('level')}
+          className={`tab tab-lifted ${activeForm === "level" ? "tab-active" : ""}`}
+          onClick={() => setActiveForm("level")}
         >
           Create New Level
         </button>
       </div>
 
       {/* Subject Creation Form */}
-      {activeForm === 'subject' && (
+      {activeForm === "subject" && (
         <>
           <form onSubmit={handleSubjectSubmit} className="space-y-4">
             <div className="form-control">
@@ -356,15 +358,10 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{subject.name}</div>
-                      <div className="text-sm text-gray-600">
-                        {new Date(subject.createdAt).toLocaleDateString()}
-                      </div>
+                      <div className="text-sm text-gray-600">{new Date(subject.createdAt).toLocaleDateString()}</div>
                       <div>
-                        {userRole === 'Admin' && (
-                          <button
-                            className="btn btn-error btn-sm"
-                            onClick={() => handleDeleteSubject(subject._id)}
-                          >
+                        {userRole !== "moderator" && (
+                          <button className="btn btn-error btn-sm" onClick={() => handleDeleteSubject(subject._id)}>
                             Delete
                           </button>
                         )}
@@ -381,7 +378,7 @@ export default function AdminCreate() {
       )}
 
       {/* Package Creation Form */}
-      {activeForm === 'package' && (
+      {activeForm === "package" && (
         <>
           <form onSubmit={handlePackageSubmit} className="space-y-4">
             <div className="form-control">
@@ -436,12 +433,12 @@ export default function AdminCreate() {
                 <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
                   <select
                     value={point.lecturer}
-                    onChange={(e) => updatePoint(index, 'lecturer', e.target.value)}
+                    onChange={(e) => updatePoint(index, "lecturer", e.target.value)}
                     className="select select-bordered w-full sm:w-1/2"
                     required
                   >
                     <option value="">Select Lecturers</option>
-                    {lecturers.map(lecturer => (
+                    {lecturers.map((lecturer) => (
                       <option key={lecturer._id} value={lecturer._id}>
                         {lecturer.name} ({lecturer.expertise})
                       </option>
@@ -450,28 +447,20 @@ export default function AdminCreate() {
                   <input
                     type="number"
                     value={point.points}
-                    onChange={(e) => updatePoint(index, 'points', e.target.value)}
+                    onChange={(e) => updatePoint(index, "points", e.target.value)}
                     placeholder="e.g., 200"
                     className="input input-bordered w-full sm:w-1/3"
                     min="0"
                     required
                   />
                   {packageData.points.length > 1 && (
-                    <button
-                      type="button"
-                      className="btn btn-error btn-sm"
-                      onClick={() => removePoint(index)}
-                    >
+                    <button type="button" className="btn btn-error btn-sm" onClick={() => removePoint(index)}>
                       Remove
                     </button>
                   )}
                 </div>
               ))}
-              <button
-                type="button"
-                className="btn btn-outline btn-sm mt-2"
-                onClick={addPoint}
-              >
+              <button type="button" className="btn btn-outline btn-sm mt-2" onClick={addPoint}>
                 Add Points
               </button>
             </div>
@@ -490,15 +479,11 @@ export default function AdminCreate() {
                   <div key={pkg._id} className="card bg-base-100 shadow-md p-4">
                     <div className="card-body">
                       <h3 className="card-title">{pkg.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        Price: ${pkg.price}
-                      </p>
+                      <p className="text-sm text-gray-600">Price: ${pkg.price}</p>
                       <p className="text-sm text-gray-600">
                         Type: {pkg.type.charAt(0).toUpperCase() + pkg.type.slice(1)}
                       </p>
-                      <p className="text-sm text-gray-600">
-                        Created: {new Date(pkg.createdAt).toLocaleDateString()}
-                      </p>
+                      <p className="text-sm text-gray-600">Created: {new Date(pkg.createdAt).toLocaleDateString()}</p>
                       <div className="mt-2">
                         <h4 className="text-sm font-medium">Points Distribution:</h4>
                         <ul className="list-disc list-inside text-sm text-gray-600">
@@ -509,11 +494,8 @@ export default function AdminCreate() {
                           ))}
                         </ul>
                       </div>
-                      {userRole === 'Admin' && (
-                        <button
-                          className="btn btn-error btn-sm mt-2"
-                          onClick={() => handleDeletePackage(pkg._id)}
-                        >
+                      {userRole !== "moderator" && (
+                        <button className="btn btn-error btn-sm mt-2" onClick={() => handleDeletePackage(pkg._id)}>
                           Delete
                         </button>
                       )}
@@ -529,7 +511,7 @@ export default function AdminCreate() {
       )}
 
       {/* Level Creation Form */}
-      {activeForm === 'level' && (
+      {activeForm === "level" && (
         <>
           <form onSubmit={handleLevelSubmit} className="space-y-4">
             <div className="form-control">
@@ -567,15 +549,10 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{level.name}</div>
-                      <div className="text-sm text-gray-600">
-                        {new Date(level.createdAt).toLocaleDateString()}
-                      </div>
+                      <div className="text-sm text-gray-600">{new Date(level.createdAt).toLocaleDateString()}</div>
                       <div>
-                        {userRole === 'Admin' && (
-                          <button
-                            className="btn btn-error btn-sm"
-                            onClick={() => handleDeleteLevel(level._id)}
-                          >
+                        {userRole !== "moderator" && (
+                          <button className="btn btn-error btn-sm" onClick={() => handleDeleteLevel(level._id)}>
                             Delete
                           </button>
                         )}
@@ -591,5 +568,5 @@ export default function AdminCreate() {
         </>
       )}
     </div>
-  );
+  )
 }

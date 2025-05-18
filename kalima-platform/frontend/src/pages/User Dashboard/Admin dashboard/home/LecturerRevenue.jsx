@@ -7,7 +7,7 @@ import { getLecturerMonthlyRevenue } from "../../../../routes/revenue"
 import { BookOpen, Trophy } from "lucide-react"
 
 export default function LecturerRevenue() {
-  const { t, i18n } = useTranslation("dashboard")
+  const { t, i18n } = useTranslation("admin")
   const isRTL = i18n.language === "ar"
   const [lecturers, setLecturers] = useState([])
   const [selectedLecturer, setSelectedLecturer] = useState("")
@@ -77,7 +77,7 @@ export default function LecturerRevenue() {
         <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
-        <h3 className="text-xl font-bold">{t("errorLoadingRevenue")}</h3>
+        <h3 className="text-xl font-bold">{t("revenue.errorLoadingRevenue")}</h3>
         <p className="text-gray-500">{error}</p>
       </div>
     )
@@ -86,7 +86,11 @@ export default function LecturerRevenue() {
   return (
     <div className="space-y-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<<<<<<< HEAD
         <h2 className="text-3xl font-extrabold text-primary">إيرادات المحاضر</h2>
+=======
+        <h2 className="text-3xl font-extrabold text-primary">{t("revenue.lecturerRevenue")}</h2>
+>>>>>>> c3d0880bfc38785709115a953b9d57e3aaa785d9
         <select
           className="select select-bordered select-primary w-full sm:w-64 font-bold"
           value={selectedLecturer}
@@ -107,6 +111,7 @@ export default function LecturerRevenue() {
             <div className="flex items-center gap-6">
               <Trophy className="h-12 w-12" />
               <div>
+<<<<<<< HEAD
                 <h3 className="text-2xl font-extrabold">ملخص الإيرادات</h3>
                 <p className="text-lg font-bold mt-2">
                   إجمالي الإيرادات: {revenueData.summary.totalRevenue} {t("currency")}
@@ -116,6 +121,17 @@ export default function LecturerRevenue() {
                 </p>
                 <p className="text-lg font-bold">
                   شهور   مع إيرادات: {revenueData.summary.monthsWithRevenue}
+=======
+                <h3 className="text-2xl font-extrabold">{t("revenue.revenueSummary")}</h3>
+                <p className="text-lg font-bold mt-2">
+                  {t("revenue.totalRevenue")}: {revenueData.summary.totalRevenue} {t("revenue.currency")}
+                </p>
+                <p className="text-lg font-bold">
+                  {t("revenue.totalPurchases")}: {revenueData.summary.totalPurchases}
+                </p>
+                <p className="text-lg font-bold">
+                  {t("revenue.monthsWithRevenue")}: {revenueData.summary.monthsWithRevenue}
+>>>>>>> c3d0880bfc38785709115a953b9d57e3aaa785d9
                 </p>
               </div>
             </div>
@@ -134,13 +150,21 @@ export default function LecturerRevenue() {
                   </h3>
                   <div className="space-y-3 mt-4">
                     <p className="text-lg font-bold">
+<<<<<<< HEAD
                       إجمالي الإيرادات:{" "}
+=======
+                      {t("revenue.totalRevenue")}:{" "}
+>>>>>>> c3d0880bfc38785709115a953b9d57e3aaa785d9
                       <span className="text-success">
-                        {month.totalRevenue} {t("currency")}
+                        {month.totalRevenue} {t("revenue.currency")}
                       </span>
                     </p>
                     <p className="text-lg font-bold">
+<<<<<<< HEAD
                       إجمالي المشتريات:{" "}
+=======
+                      {t("revenue.purchaseCount")}:{" "}
+>>>>>>> c3d0880bfc38785709115a953b9d57e3aaa785d9
                       <span className="text-accent">{month.purchaseCount}</span>
                     </p>
                   </div>
@@ -153,7 +177,7 @@ export default function LecturerRevenue() {
 
       {revenueData && revenueData.monthlyRevenue.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-lg font-bold text-gray-500">{t("noRevenueData")}</p>
+          <p className="text-lg font-bold text-gray-500">{t("revenue.noRevenueData")}</p>
         </div>
       )}
     </div>

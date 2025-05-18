@@ -7,25 +7,17 @@ import { Link } from "react-router-dom"
 import { getMyContainers, deleteContainerById } from "../../routes/lectures"
 import Pagination from "../../components/Pagination"
 
-// Memoized container type mapping
-const containerTypeArabicMap = {
-  course: "كورس",
-  year: "سنة دراسية",
-  term: "فصل دراسي",
-  month: "شهر",
-  lecture: "محاضرة"
-}
-
 // Memoized Course Card Component
 const CourseCard = memo(function CourseCard({
   container,
   index,
   stats,
-  getContainerTypeArabic,
+  getContainerTypeTranslation,
   getContainerImage,
   onDelete,
   loading,
-  t
+  t,
+  isRTL,
 }) {
   return (
     <div className="card bg-base-100 shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-full flex flex-col">
@@ -38,11 +30,11 @@ const CourseCard = memo(function CourseCard({
         />
         {container.price > 0 ? (
           <div className="absolute bottom-2 left-2 bg-primary text-white px-2 py-1 rounded-md text-sm font-medium">
-            {container.price} جنيه
+            {container.price} {t("currency")}
           </div>
         ) : (
           <div className="absolute bottom-2 left-2 bg-success text-white px-2 py-1 rounded-md text-sm font-medium">
-            مجاني
+            {t("free")}
           </div>
         )}
       </figure>
@@ -50,23 +42,23 @@ const CourseCard = memo(function CourseCard({
       <div className="card-body p-4 flex-grow flex flex-col">
         <div className="flex items-center justify-between">
           <h3 className="card-title text-lg font-bold line-clamp-1">{container.name}</h3>
-          <div className="badge badge-outline">{getContainerTypeArabic(container.type)}</div>
+          <div className="badge badge-outline">{getContainerTypeTranslation(container.type)}</div>
         </div>
 
         <div className="space-y-1 mt-2">
           <div className="flex items-center gap-2 text-sm text-base-content/70">
             <User className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.createdBy?.name || "غير معروف"}</span>
+            <span className="truncate">{container.createdBy?.name || t("unknown")}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-base-content/70">
             <BookOpen className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.subject?.name || "غير محدد"}</span>
+            <span className="truncate">{container.subject?.name || t("unspecified")}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-base-content/70">
             <Star className="h-4 w-4 text-primary flex-shrink-0" />
-            <span className="truncate">{container.level?.name || "غير محدد"}</span>
+            <span className="truncate">{container.level?.name || t("unspecified")}</span>
           </div>
         </div>
 
@@ -75,11 +67,15 @@ const CourseCard = memo(function CourseCard({
         <div className="flex justify-between text-xs text-base-content/60 mt-auto">
           <div className="flex items-center gap-1">
             <Users className="h-3 w-3 flex-shrink-0" />
-            <span>{stats.students} طالب</span>
+            <span>
+              {stats.students} {t("student")}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <FileText className="h-3 w-3 flex-shrink-0" />
-            <span>{stats.lectures} محتوى</span>
+            <span>
+              {stats.lectures} {t("content")}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3 flex-shrink-0" />
@@ -90,6 +86,7 @@ const CourseCard = memo(function CourseCard({
         <div className="card-actions justify-end mt-3">
           <Link to={`container-details/${container._id}`}>
             <button className="btn btn-sm btn-ghost">
+<<<<<<< HEAD
               <Eye className="h-4 w-4 mr-1" />
               اظهار
             </button>
@@ -100,6 +97,17 @@ const CourseCard = memo(function CourseCard({
             disabled={loading}
           >
             مسح
+=======
+              <Eye
+                className="h-4 w-4"
+                style={{ marginRight: isRTL ? 0 : "0.25rem", marginLeft: isRTL ? "0.25rem" : 0 }}
+              />
+              {t("view")}
+            </button>
+          </Link>
+          <button className="btn btn-error btn-sm" onClick={() => onDelete(container._id)} disabled={loading}>
+            {t("delete")}
+>>>>>>> c3d0880bfc38785709115a953b9d57e3aaa785d9
           </button>
         </div>
       </div>
@@ -110,7 +118,7 @@ const CourseCard = memo(function CourseCard({
 CourseCard.displayName = "CourseCard"
 
 export default function CourseGrid() {
-  const { t, i18n } = useTranslation("dashboard")
+  const { t, i18n } = useTranslation("lecturerDashboard")
   const isRTL = i18n.language === "ar"
   const [containers, setContainers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -120,9 +128,7 @@ export default function CourseGrid() {
 
   // Memoized filtered containers
   const filteredContainers = useMemo(() => {
-    return containers.filter(
-      (container) => container.parent === null || container.type === "lecture"
-    )
+    return containers.filter((container) => container.parent === null || container.type === "lecture")
   }, [containers])
 
   // Fetch lecturer's containers
@@ -138,30 +144,33 @@ export default function CourseGrid() {
       }
     } catch (err) {
       console.error("Error fetching containers:", err)
-      setError("حدث خطأ أثناء تحميل البيانات")
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const handleDeleteContainer = useCallback(async (containerId) => {
-    if (!window.confirm(t("confirmDeleteContainer"))) return
-    
-    try {
-      setLoading(true)
-      const result = await deleteContainerById(containerId)
-      if (result.status === "success") {
-        fetchContainers()
-      } else {
-        setError(result.message || t("failedToDeleteContainer"))
-      }
-    } catch (err) {
-      console.error("Error deleting container:", err)
       setError(t("errorDeletingContainer"))
     } finally {
       setLoading(false)
     }
-  }, [t, fetchContainers])
+  }, [t])
+
+  const handleDeleteContainer = useCallback(
+    async (containerId) => {
+      if (!window.confirm(t("confirmDeleteContainer"))) return
+
+      try {
+        setLoading(true)
+        const result = await deleteContainerById(containerId)
+        if (result.status === "success") {
+          fetchContainers()
+        } else {
+          setError(result.message || t("failedToDeleteContainer"))
+        }
+      } catch (err) {
+        console.error("Error deleting container:", err)
+        setError(t("errorDeletingContainer"))
+      } finally {
+        setLoading(false)
+      }
+    },
+    [t, fetchContainers],
+  )
 
   useEffect(() => {
     fetchContainers()
@@ -173,14 +182,17 @@ export default function CourseGrid() {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage
     return {
       currentItems: filteredContainers.slice(indexOfFirstItem, indexOfLastItem),
-      totalItems: filteredContainers.length
+      totalItems: filteredContainers.length,
     }
   }, [currentPage, filteredContainers, itemsPerPage])
 
-  // Memoized container type getter
-  const getContainerTypeArabic = useCallback((type) => {
-    return containerTypeArabicMap[type] || type
-  }, [])
+  // Memoized container type getter using translations
+  const getContainerTypeTranslation = useCallback(
+    (type) => {
+      return t(`containerTypes.${type}`, { defaultValue: type })
+    },
+    [t],
+  )
 
   // Memoized container image getter
   const getContainerImage = useCallback((container, index) => {
@@ -193,14 +205,16 @@ export default function CourseGrid() {
     return `/course-${(index % 6) + 1}.png`
   }, [])
 
-  // Memoized container stats calculator
-  const getContainerStats = useCallback((container) => ({
-    students: container.numberOfViews || 0,
-    lectures: container.children?.length || 0,
-    duration: container.type === "lecture" 
-      ? "45 دقيقة" 
-      : `${container.children?.length || 0} محاضرة`
-  }), [])
+  // Memoized container stats calculator with translations
+  const getContainerStats = useCallback(
+    (container) => ({
+      students: container.numberOfViews || 0,
+      lectures: container.children?.length || 0,
+      duration:
+        container.type === "lecture" ? `45 ${t("minutes")}` : `${container.children?.length || 0} ${t("lectures")}`,
+    }),
+    [t],
+  )
 
   // Loading state
   if (loading) {
@@ -222,7 +236,7 @@ export default function CourseGrid() {
         <p className="text-lg text-gray-500 max-w-md mx-auto">{t("noCoursesDescription")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
           <button className="btn btn-primary mt-4">
-            <Edit className="h-4 w-4 mr-2" />
+            <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.5rem", marginLeft: isRTL ? "0.5rem" : 0 }} />
             {t("addNewCourse")}
           </button>
         </Link>
@@ -263,11 +277,12 @@ export default function CourseGrid() {
               container={container}
               index={index}
               stats={stats}
-              getContainerTypeArabic={getContainerTypeArabic}
+              getContainerTypeTranslation={getContainerTypeTranslation}
               getContainerImage={getContainerImage}
               onDelete={handleDeleteContainer}
               loading={loading}
               t={t}
+              isRTL={isRTL}
             />
           )
         })}
@@ -279,10 +294,10 @@ export default function CourseGrid() {
         itemsPerPage={itemsPerPage}
         onPageChange={setCurrentPage}
         labels={{
-          previous: "السابق",
-          next: "التالي",
-          showing: "عرض",
-          of: "من"
+          previous: isRTL ? "السابق" : "Previous",
+          next: isRTL ? "التالي" : "Next",
+          showing: isRTL ? "عرض" : "Showing",
+          of: isRTL ? "من" : "of",
         }}
       />
     </div>

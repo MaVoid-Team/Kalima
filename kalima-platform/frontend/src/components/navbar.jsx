@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 import { isLoggedIn, getUserDashboard, logoutUser } from '../routes/auth-services';
 
@@ -11,7 +11,7 @@ const NavBar = () => {
   const isAr = i18n.language === 'ar';
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
-
+  const navigate = useNavigate()
   const fetchUserRole = async () => {
     if (isLoggedIn()) {
       try {
@@ -30,20 +30,25 @@ const NavBar = () => {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  fetchUserRole();
+
+  const handleStorageChange = () => {
     fetchUserRole();
+  };
 
-    // Listen for login status changes
-    const handleStorageChange = () => {
-      fetchUserRole();
-    };
+  const handleCustomAuthChange = () => {
+    fetchUserRole();
+  };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  window.addEventListener('storage', handleStorageChange);
+  window.addEventListener('user-auth-changed', handleCustomAuthChange);
 
+  return () => {
+    window.removeEventListener('storage', handleStorageChange);
+    window.removeEventListener('user-auth-changed', handleCustomAuthChange);
+  };
+}, []);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuOpen && 
@@ -69,6 +74,7 @@ const NavBar = () => {
       await logoutUser();
       setUserRole(null);
       setMenuOpen(false);
+      navigate('/')
     } catch (err) {
       console.error('Logout failed:', err);
     }

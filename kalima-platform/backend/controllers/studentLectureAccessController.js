@@ -123,17 +123,15 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
 
     // If no passing exam submission, provide exam information
     if (!examSubmission) {
-      return res.status(403).json({
+      return res.status(200).json({
         status: "restricted",
         message: "You must pass the exam before accessing this lecture",
         data: {
           requiresExam: true,
           examUrl: lecture.examConfig ? lecture.examConfig.formUrl : null,
-          passingThreshold:
-            lecture.passingThreshold ||
-            (lecture.examConfig
-              ? lecture.examConfig.defaultPassingThreshold
-              : 60),
+          passingThreshold: lecture.examConfig
+            ? lecture.examConfig.defaultPassingThreshold
+            : 60,
         },
       });
     }
@@ -157,29 +155,30 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
 // Get student lecture access by lecture ID
 exports.getLectureAccessByLectureId = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
-  
+
   // Verify lecture exists
   const lecture = await Lecture.findById(lectureId);
   if (!lecture) {
     return next(new AppError("Lecture not found", 404));
   }
-  
+
   // Find all access records for this lecture
-  const accessRecords = await StudentLectureAccess.find({ lecture: lectureId })
-    .populate({
-      path: 'student',
-      select: 'name email' // Include student details you want to return
-    });
-  
+  const accessRecords = await StudentLectureAccess.find({
+    lecture: lectureId,
+  }).populate({
+    path: "student",
+    select: "name email", // Include student details you want to return
+  });
+
   res.status(200).json({
     status: "success",
     results: accessRecords.length,
     data: {
       lecture: {
         _id: lecture._id,
-        name: lecture.name
+        name: lecture.name,
       },
-      accessRecords
-    }
+      accessRecords,
+    },
   });
 });

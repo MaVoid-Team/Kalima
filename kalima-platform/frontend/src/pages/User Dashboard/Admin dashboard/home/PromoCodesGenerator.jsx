@@ -207,119 +207,145 @@ const PromoCodeGenerator = () => {
 
   // Print QR codes
   const printQRCodes = () => {
-    if (!printFrameRef.current) return
-
-    // Create a new window for printing
+    if (!generatedCodes.length) return
+  
     const printWindow = window.open("", "_blank")
     if (!printWindow) {
       alert("Please allow pop-ups to print QR codes")
       return
     }
-
-    // Generate HTML content for printing
+  
+    const templateImage = "/promocodes/promocode-template.png"
+  
     const printContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>QR Codes - ${new Date().toLocaleDateString()}</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-          }
-          .print-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            page-break-inside: avoid;
-          }
-          .qr-item {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            page-break-inside: avoid;
-          }
-          .qr-code {
-            margin-bottom: 10px;
-          }
-          .qr-code img {
-            max-width: 100%;
-            height: auto;
-          }
-          .qr-details {
-            font-size: 12px;
-          }
-          .qr-code-text {
-            font-family: monospace;
-            font-weight: bold;
-            margin: 8px 0;
-            word-break: break-all;
-          }
-          .qr-points {
-            margin-top: 5px;
-          }
-          @media print {
-            @page {
-              size: A4;
-              margin: 1cm;
-            }
-            body {
-              padding: 0;
-            }
-            .print-container {
-              grid-template-columns: repeat(3, 1fr);
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="print-container">
-          ${generatedCodes
-            .map(
-              (code, index) => `
-            <div class="qr-item">
-              <div class="qr-code">
-                <img src="${qrCodeUrls[index] || ""}" alt="QR Code">
-              </div>
-              <div class="qr-details">
-                <div class="qr-code-text">${code.code}</div>
-                <div class="qr-points">
-                  ${
-                    formData.type === "promo"
-                      ? t("admin.discount")
-                      : `${code.pointsAmount || formData.pointsAmount} ${t("admin.points")}`
-                  }
-                </div>
-              </div>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>QR Codes - ${new Date().toLocaleDateString()}</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 0;
+        }
+        body {
+          margin: 0;
+        }
+        .print-container {
+          display: grid;
+          grid-template-columns: repeat(3, 9cm);
+          grid-auto-rows: 4.75cm;
+          width: 100%;
+        }
+        .qr-item {
+          position: relative;
+          width: 9cm;
+          height: 4.75cm;
+        }
+        .template-image {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          z-index: 1;
+        }
+        .code-number {
+          position: absolute;
+          top: 3%;
+          left: 2%;
+          font-size: 14px;
+          font-weight: bold;
+          color: #fff;
+          z-index: 2; 
+        }
+        .qr-code {
+          position: absolute;
+          top: 35%;
+          left: 7%;
+          width: 50px;
+          height: 50px;
+          z-index: 2;
+        }
+        .code-value {
+          position: absolute;
+          top: 12%;
+          left: 11%;
+          font-size: 11px;
+          font-weight: bold;
+          color: #000;
+          width: 40%;
+          text-align: left;
+          z-index: 2;
+        }
+        .promo-code {
+          position: absolute;
+          bottom: 13%;
+          right: 30%;
+          font-size: 16px;
+          color: #000;
+          width: 40%;
+          text-align: center;
+          word-break: break-all;
+          z-index: 2;
+        }
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="print-container">
+        ${generatedCodes.map((code, index) => `
+          <div class="qr-item">
+            <img class="template-image" src="${templateImage}" /> <!-- Added template image -->
+            <div class="code-number">#${index + 1}</div>
+            <div class="qr-code">
+              <img src="${qrCodeUrls[index]}" alt="QR Code">
             </div>
-          `,
-            )
-            .join("")}
-        </div>
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-              setTimeout(function() {
-                window.close();
-              }, 500);
-            }, 500);
-          };
-        </script>
-      </body>
-      </html>
-    `
+            <div class="code-value">
+              ${formData.type === 'promo' 
+                ? t('admin.discount') 
+                : `${code.pointsAmount || formData.pointsAmount}`
+              }
+            </div>
+            <div class="promo-code">${code.code}</div>
+          </div>
+        `).join('')}
+      </div>
+      <script>
+        window.onload = function() {
+          // Wait for all images (template + QR codes)
+          Promise.all(
+            Array.from(document.querySelectorAll('img'))
+              .map(img => img.complete 
+                ? Promise.resolve() 
+                : new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                  })
+              )
+          ).then(() => {
+            return new Promise(resolve => setTimeout(resolve, 1000));
+          }).then(() => {
+            window.print();
+            setTimeout(() => window.close(), 1500);
+          }).catch(error => {
+            console.error('Error loading images:', error);
+            window.print();
+            window.close();
+          });
+        }
+      </script>
+    </body>
+    </html>
+  `;
 
-    // Write to the new window and trigger print
-    printWindow.document.open()
-    printWindow.document.write(printContent)
-    printWindow.document.close()
-  }
-
+  printWindow.document.write(printContent);
+  printWindow.document.close();
+}
   return (
     <div className="rounded-lg shadow-md p-6 mb-8" dir={dir}>
       <div className="flex items-center gap-2 mb-6">

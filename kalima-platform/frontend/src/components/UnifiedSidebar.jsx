@@ -268,14 +268,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
               <FaUser className="w-2 h-2" />
             </div>
           </div>
-          {isMobile && (
-            <button 
-              className="text-base-content hover:text-primary"
-              onClick={toggleSidebar}
-            >
-              <FaTimes className="w-5 h-5" />
-            </button>
-          )}
         </div>
 
         {/* User info section */}
