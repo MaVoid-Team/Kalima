@@ -11,7 +11,10 @@ const parentValidation = userValidation.concat(
       .optional()
       .messages({
         "string.pattern.base": "level must be a valid MongoDB ObjectId.",
+
       }),
+    government: Joi.string().required(),
+    administrationZone: Joi.string().required(),
   })
 );
 

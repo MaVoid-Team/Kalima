@@ -12,10 +12,9 @@ const userValidation = Joi.object({
   referralSource: Joi.string().optional(),
   password: Joi.string().min(6).required(),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required()
-    .messages({'any.only': 'Passwords do not match'}),
+    .messages({ 'any.only': 'Passwords do not match' }),
   role: Joi.string().required(),
-  government: Joi.string().required(),
-  administrationZone: Joi.string().required(),
+
 });
 
 // For setting up available grades so my fingers don't work too hard.

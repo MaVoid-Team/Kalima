@@ -55,7 +55,9 @@ const studentSchema = new mongoose.Schema(
     promoPoints: {
       type: Number,
       default: 0
-    }
+    },
+    government: { type: String, required: true },
+    administrationZone: { type: String, required: true },
   },
 
   {
@@ -96,7 +98,7 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   if (pointsToUse === 0) {
     return true;
   }
-  
+
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
   );
@@ -108,6 +110,23 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   lecturerPointsEntry.points -= pointsToUse;
   return true; // Successfully used points
 };
+
+// Pre-validate hook to ensure the selected zone belongs to the selected government
+studentSchema.pre("validate", async function (next) {
+  if (this.government && this.zone) {
+    const Government = require("./governmentModel");
+    const gov = await Government.findOne({ name: this.government });
+    if (!gov) {
+      this.invalidate("government", "Selected government does not exist.");
+    } else if (!gov.administrationZone.includes(this.administrationZone)) {
+      this.invalidate(
+        "zone",
+        "Selected zone does not belong to the selected government."
+      );
+    }
+  }
+  next();
+});
 
 // A plugin to easily increment a field.
 studentSchema.plugin(mongooseSequence, {
