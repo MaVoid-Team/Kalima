@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import RoleSelectionModal from "./RoleSelctionModal"
 import { getAllLevels } from "../../routes/levels"
-
 const apiUrl = import.meta.env.VITE_API_URL
 const hobbiesList = [
   { id: 1, name: "reading", img: "/hobbies/reading.jpg" },
@@ -81,7 +80,8 @@ export default function StudentRegistration() {
     if (step === 1) {
       if (!formData.fullName?.trim()) errors.fullName = "required"
       if (!formData.gender) errors.gender = "required"
-
+      if (!formData.government) errors.government = "required"
+      if(!formData.administrationZone) errors.administrationZone = "required"
       if (!formData.phoneNumber) {
         errors.phoneNumber = "required"
       } else if (!phoneRegex.test(formData.phoneNumber)) {
@@ -92,6 +92,7 @@ export default function StudentRegistration() {
         errors.level = "required"
       }
     }
+
 
     if (step === 2) {
       if (!formData.email) {
@@ -281,6 +282,8 @@ export default function StudentRegistration() {
             phoneNumber: formData.phoneNumber,
             faction: formData.faction || "Alpha",
             gender: formData.gender,
+            government: formData.government,
+            administrationZone: formData.administrationZone,
           }
           break
 
@@ -294,6 +297,8 @@ export default function StudentRegistration() {
             confirmPassword: formData.confirmPassword,
             phoneNumber: formData.phoneNumber,
             gender: formData.gender,
+            government: formData.government,
+            administrationZone: formData.administrationZone,
           }
           break
 
