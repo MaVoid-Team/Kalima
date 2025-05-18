@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
+const { uniqueId } = require("lodash");
+const AppError = require("../utils/appError");
 
 const lecturerPointsSchema = new mongoose.Schema(
   {
@@ -50,7 +52,14 @@ const teacherSchema = new mongoose.Schema(
         },
       },
     ],
-
+    phoneNumber2: {
+      type: String,
+      required: false,
+      unique: true,
+      default: null,
+      sparse: true,
+      trim: true,
+    },
     teachesAtType: {
       type: String,
       enum: ["Center", "School", "Both"],
@@ -87,7 +96,22 @@ teacherSchema.pre("validate", function (next) {
   }
   next();
 });
-
+teacherSchema.pre("save", function (next) {
+  if (
+    this.phoneNumber2 &&
+    this.phoneNumber &&
+    this.phoneNumber.trim() === this.phoneNumber2.trim()
+  ) {
+    this.invalidate(
+      "phoneNumber2",
+      "Phone number 2 must be different from phone number 1."
+    );
+    return next(
+      new AppError("Phone number 2 must be different from phone number 1.", 400)
+    );
+  }
+  next();
+});
 teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
