@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("./userModel");
 const { uniqueId } = require("lodash");
 const AppError = require("../utils/appError");
+const Government = require("./governmentModel");
 
 const lecturerPointsSchema = new mongoose.Schema(
   {
@@ -68,6 +69,8 @@ const teacherSchema = new mongoose.Schema(
     centers: [{ type: String }], // Array of strings for center names
     school: { type: String },
     lecturerPoints: [lecturerPointsSchema],
+    government: { type: String, required: true },
+    administrationZone: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -112,6 +115,21 @@ teacherSchema.pre("save", function (next) {
   }
   next();
 });
+teacherSchema.pre("validate", async function (next) {
+  if (this.government && this.administrationZone) {
+    const gov = await Government.findOne({ name: this.government });
+    if (!gov) {
+      this.invalidate("government", "Selected government does not exist.");
+    } else if (!gov.administrationZone.includes(this.administrationZone)) {
+      this.invalidate(
+        "zone",
+        "Selected zone does not belong to the selected government."
+      );
+    }
+  }
+  next();
+});
+
 teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()

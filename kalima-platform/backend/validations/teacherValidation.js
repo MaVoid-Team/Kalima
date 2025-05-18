@@ -44,8 +44,8 @@ const teacherValidation = userValidation.concat(
         })
       )
       .optional(),
-    government: Joi.string().optional(),
-    administrationZone: Joi.string().optional(),
+    government: Joi.string().required(),
+    administrationZone: Joi.string().required(),
   })
 );
 
