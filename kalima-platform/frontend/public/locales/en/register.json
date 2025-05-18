@@ -4,6 +4,9 @@
   "teacherRegister": "Teacher Register",
   "dismiss": "Dismiss",
   "childIdInvalid": "Invalid child ID format (24 characters)",  
+  "center": "Center",
+  "school": "School",
+  "both": "Both",
   "steps": {
     "personalInfo": "Basic Information",
     "parentInfo": "Contact Information",
@@ -53,8 +56,32 @@
     "selectLevel" : "Select Level",
     "validatepassword": "Confirm Password",
     "subject" : "Subject",
-    "subjectPlaceholder" : "Enter Subject"
-  
+    "subjectPlaceholder" : "Enter Subject",
+    "addOtherHobby": "Add Other Hobby",
+    "add" : "Add",
+    "cancel" : "Cancel",
+    "enterHobby" : "Enter Hobby",
+    "teachesAtType": "Where do you teach?",
+    "selectTeachesAt": "Select where you teach",
+    "centers": "Centers",
+    "centerName": "Center name",
+    "school": "School",
+    "socialMedia": "Social Media",
+    "selectPlatform": "Select platform",
+    "accountName": "Account name/handle",
+    "selectSubject": "Select subject",
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "tikTok": "TikTok",
+      "youtube": "YouTube",
+      "telegram": "Telegram",
+      "whatsApp": "WhatsApp",
+      "government": "Government",
+    "selectGovernment": "Select Government",
+    "administrationZone": "Administration Zone",
+    "selectAdministrationZone": "Select Administration Zone"
   },
   "gender": {
     "male": "Male",
@@ -101,7 +128,10 @@
   "3rd Preparatory": "Third Preparatory",
   "1st Secondary": "First Secondary",
   "2nd Secondary": "Second Secondary",
-  "3rd Secondary": "Third Secondary"
+  "3rd Secondary": "Third Secondary",
+  "primary": "Primary",
+    "preparatory": "Preparatory",
+    "secondary": "Secondary"
 },
   "roleSelection": {
     "title": "Choose your role",
@@ -135,7 +165,14 @@
     "parentPhoneRequired": "Parent phone number is required",
     "emailExists": "Email already registered",
     "phoneExists": "Phone number already registered",
-    "invalidSequenceId": "Invalid child sequence ID format (24 characters)"
+    "invalidSequenceId": "Invalid child sequence ID format (24 characters)",
+    "teachesAtType": "Please select where you teach",
+    "centers": "Please add at least one center",
+    "school": "School name is required",
+    "socialMediaPlatform": "Platform is required",
+    "socialMediaAccount": "Account name is required",
+    "governmentRequired": "Government is required",
+    "administrationZoneRequired": "Administration zone is required"
   },
   
   "errors": {
