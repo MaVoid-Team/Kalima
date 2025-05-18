@@ -81,7 +81,8 @@
       "government": "Government",
     "selectGovernment": "Select Government",
     "administrationZone": "Administration Zone",
-    "selectAdministrationZone": "Select Administration Zone"
+    "selectAdministrationZone": "Select Administration Zone",
+    "yourCustomHobbies": "Your Custom Hobbies"
   },
   "gender": {
     "male": "Male",

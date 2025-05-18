@@ -44,16 +44,15 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
           <ReviewItem label={t("form.fullName")} value={formData.fullName} />
           <ReviewItem label={t("form.gender")} value={t(`gender.${formData.gender}`)} />
           <ReviewItem label={t("form.phoneNumber")} value={formData.phoneNumber} />
-
-          {formData.role === "student" && (
-            <>
-              <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
-              <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
-              <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
+          <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
               <ReviewItem
                 label={t("form.administrationZone") || "Administration Zone"}
                 value={formData.administrationZone || "-"}
               />
+          {formData.role === "student" && (
+            <>
+              <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
+              <ReviewItem label={t("form.parentPhone")} value={formData.parentPhoneNumber} />
               <ReviewItem
                 label={t("form.hobbies")}
                 value={formData.hobbies
@@ -67,11 +66,6 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
             <>
               <ReviewItem label={t("form.level")} value={formatTeacherLevels(formData.level)} />
               <ReviewItem label={t("form.subject")} value={formData.subject} />
-              <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
-              <ReviewItem
-                label={t("form.administrationZone") || "Administration Zone"}
-                value={formData.administrationZone || "-"}
-              />
               <ReviewItem
                 label={t("form.teachesAtType") || "Teaches At"}
                 value={t(formData.teachesAtType.toLowerCase()) || "-"}
