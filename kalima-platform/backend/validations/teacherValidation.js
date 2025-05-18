@@ -6,6 +6,7 @@ const teacherValidation = userValidation.concat(
     role: Joi.string().valid("teacher").required(),
     faction: Joi.string().optional(),
     phoneNumber: Joi.string().required(),
+    phoneNumber2: Joi.string().trim().allow(null, "").optional(),
     subject: Joi.string().required(),
     level: Joi.array()
       .items(Joi.string().valid("primary", "preparatory", "secondary"))
@@ -43,6 +44,8 @@ const teacherValidation = userValidation.concat(
         })
       )
       .optional(),
+    government: Joi.string().optional(),
+    administrationZone: Joi.string().optional(),
   })
 );
 
