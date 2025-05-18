@@ -87,7 +87,7 @@ const TeacherLogin = () => {
         setError(t("errors.fetchUserDataError"));
         return;
       }
-
+      window.dispatchEvent(new Event('user-auth-changed'));
       const userRole = dashboardResult.data.data.userInfo.role;
       if (userRole === "Admin" || userRole === "SubAdmin") {
         navigate("/dashboard/admin-dashboard");

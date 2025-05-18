@@ -186,7 +186,7 @@ const WelcomeSection = React.memo(() => {
           className={`flex flex-wrap gap-4 ${isRTL ? "justify-start" : "justify-end"}`}
         >
           <motion.button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
             whileHover={{
               scale: 1.05,
               boxShadow: "0 10px 25px -5px rgba(var(--p), 0.2)",

@@ -96,7 +96,8 @@
     },
     "actions": {
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "cancel":"Cancel"
     },
     "pagination": {
       "previous": "Previous",
@@ -186,14 +187,20 @@
       "status": "Status",
       "redeemedAt": "Redeemed At",
       "redeemedBy": "Redeemed By",
-      "noCodes": "No promo codes found"
+      "noCodes": "No promo codes found",
+      "actions": "Actions"
     },
     "filters": {
       "allStatuses": " All Statuses",
       "redeemed": " Redeemed",
       "active": " Active",
       "redeemedBy": "Redeemed By",
-      "apply":  "Apply Filters"
+      "apply":  "Apply Filters",
+      "allStudents": "All Students",
+      "all": "All",
+      "general": "General",
+      "specific": "Specific",
+      "promo": "Promo"
     },
     "pagination": {
       "previous": "Previous",

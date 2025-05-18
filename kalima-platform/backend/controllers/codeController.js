@@ -13,11 +13,11 @@ const createCodes = catchAsync(async (req, res, next) => {
   if (!numOfCodes || !type) {
     return next(new AppError("Code type and number of codes are required"));
   }
-  
+
   // For promo codes, we'll set a very large point amount (e.g., 1,000,000) 
   // so users can purchase anything they want
   const actualPointsAmount = type === "promo" ? 1000000 : pointsAmount;
-  
+
   // Validate pointsAmount for non-promo codes
   if (type !== "promo" && !pointsAmount) {
     return next(new AppError("Points amount is required for non-promo codes"));
@@ -78,6 +78,7 @@ const getAllCodes = catchAsync(async (req, res, next) => {
     },
   });
 });
+
 const getCodeById = catchAsync(async (req, res, next) => {
   if (!req.params.id) {
     return next(new AppError("Code ID is required", 400));
@@ -96,6 +97,7 @@ const getCodeById = catchAsync(async (req, res, next) => {
     },
   });
 });
+
 const deleteCodes = catchAsync(async (req, res, next) => {
   const { code } = req.body;
   if (!code) {
@@ -111,6 +113,24 @@ const deleteCodes = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: `Code <${code}> deleted successfully`,
+  });
+});
+
+const deleteMultipleCodes = catchAsync(async (req, res, next) => {
+  const { codes } = req.body;
+  if (!Array.isArray(codes) || codes.length === 0) {
+    return next(new AppError("An array of codes is required", 400));
+  }
+
+  const result = await Code.deleteMany({ code: { $in: codes }, isRedeemed: false });
+
+  if (result.deletedCount === 0) {
+    return next(new AppError("No codes deleted. They may not exist or have been redeemed.", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: `${result.deletedCount} code(s) deleted successfully`,
   });
 });
 
@@ -137,19 +157,19 @@ const redeemCode = catchAsync(async (req, res, next) => {
 
     // Instead of directly using User model, we need to find the user based on their role
     let currentUser;
-    
+
     // First, find the base user to get the role
     const baseUser = await User.findById(req.user._id).session(session);
     if (!baseUser) {
       await session.abortTransaction();
       return next(new AppError("User not found", 404));
     }
-    
+
     // Find the user in the appropriate model based on role
     if (baseUser.role === 'Student') {
       const Student = require('../models/studentModel');
       currentUser = await Student.findById(req.user._id).session(session);
-      
+
       // For promo codes, check if the student already has an active promo
       if (isExistCode.type === "promo" && currentUser.hasPromoCode) {
         await session.abortTransaction();
@@ -162,7 +182,7 @@ const redeemCode = catchAsync(async (req, res, next) => {
       // If not a student or parent, use the base user model
       currentUser = baseUser;
     }
-    
+
     if (!currentUser) {
       await session.abortTransaction();
       return next(new AppError("User profile not found", 404));
@@ -170,17 +190,17 @@ const redeemCode = catchAsync(async (req, res, next) => {
 
     // Handle different code types
     let responseMessage;
-    
+
     if (isExistCode.type === "promo") {
       // For promo codes: Mark the user as having a promo code
       if (currentUser.hasPromoCode !== undefined) {
         currentUser.hasPromoCode = true;
         currentUser.hasUsedPromoCode = false; // Reset this flag if they're redeeming a new promo code
-        
+
         // Store promo points separately instead of adding to general points
         currentUser.promoPoints = isExistCode.pointsAmount;
       }
-      
+
       responseMessage = "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
     } else if (isExistCode.type === "specific") {
       // For specific lecturer codes: Add points to the specific lecturer's balance
@@ -188,20 +208,20 @@ const redeemCode = catchAsync(async (req, res, next) => {
         await session.abortTransaction();
         return next(new AppError("This code is not properly configured", 500));
       }
-      
+
       currentUser.addLecturerPoints(
         isExistCode.lecturerId,
         isExistCode.pointsAmount
       );
-      
+
       responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points for this lecturer`;
     } else {
       // For general codes: Add points to the general points balance
       currentUser.generalPoints = (currentUser.generalPoints || 0) + isExistCode.pointsAmount;
-      
+
       responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general points`;
     }
-    
+
     await currentUser.save({ session });
 
     // Mark the code as redeemed
@@ -234,6 +254,7 @@ module.exports = {
   createCodes,
   getAllCodes,
   deleteCodes,
+  deleteMultipleCodes,
   redeemCode,
   getCodeById,
 };

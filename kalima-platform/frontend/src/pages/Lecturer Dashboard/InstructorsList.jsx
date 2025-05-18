@@ -7,7 +7,7 @@ import { CreateAssistant, deleteAssistant, updateAssistant } from "../../routes/
 import { BookOpen, Plus, X, Edit, Trash2 } from "lucide-react"
 
 export default function InstructorsList() {
-  const { t, i18n } = useTranslation("dashboard")
+  const { t, i18n } = useTranslation("lecturerDashboard")
   const isRTL = i18n.language === "ar"
   const [assistants, setAssistants] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +25,7 @@ export default function InstructorsList() {
     email: "",
     gender: "male",
     password: "",
-    role: "Assistant"
+    role: "Assistant",
   })
   const [formErrors, setFormErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -58,24 +58,24 @@ export default function InstructorsList() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: null }))
+      setFormErrors((prev) => ({ ...prev, [name]: null }))
     }
   }
 
   const validateForm = () => {
     const errors = {}
-    if (!formData.name.trim()) errors.name = t("Name is required")
+    if (!formData.name.trim()) errors.name = t("nameIsRequired")
     if (!formData.email.trim()) {
-      errors.email = t("Email is required")
+      errors.email = t("emailIsRequired")
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      errors.email = t("Invalid email format")
+      errors.email = t("invalidEmailFormat")
     }
     if (!formData.password) {
-      errors.password = t("Password is required")
+      errors.password = t("passwordIsRequired")
     } else if (formData.password.length < 6) {
-      errors.password = t("Password must be at least 6 characters")
+      errors.password = t("passwordMustBe6Chars")
     }
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -91,7 +91,7 @@ export default function InstructorsList() {
     try {
       const payload = {
         ...formData,
-        assignedLecturer: lecturerId
+        assignedLecturer: lecturerId,
       }
 
       const result = await CreateAssistant(payload)
@@ -120,14 +120,14 @@ export default function InstructorsList() {
       email: "",
       gender: "male",
       password: "",
-      role: "Assistant"
+      role: "Assistant",
     })
     setFormErrors({})
   }
 
   const closeModal = () => {
     setShowAddModal(false)
-    setEditingAssistant(null);
+    setEditingAssistant(null)
     resetForm()
     setSubmitError(null)
   }
@@ -165,7 +165,7 @@ export default function InstructorsList() {
       const payload = {
         name: formData.name,
         email: formData.email,
-        gender: formData.gender
+        gender: formData.gender,
         // Don't update password unless changed
       }
 
@@ -197,7 +197,7 @@ export default function InstructorsList() {
       email: assistant.email,
       gender: assistant.gender,
       password: "", // Don't pre-fill password
-      role: "Assistant"
+      role: "Assistant",
     })
     setShowAddModal(true)
   }
@@ -221,12 +221,9 @@ export default function InstructorsList() {
         <div className="mx-auto w-24 h-24 bg-base-200 rounded-full flex items-center justify-center">
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
-        <h3 className="text-xl font-bold">{t("No assistants found")}</h3>
-        <button
-          onClick={() => window.location.reload()}
-          className="btn btn-primary"
-        >
-          {t("Try again")}
+        <h3 className="text-xl font-bold">{t("noAssistants")}</h3>
+        <button onClick={() => window.location.reload()} className="btn btn-primary">
+          {t("tryAgain")}
         </button>
       </div>
     )
@@ -235,13 +232,10 @@ export default function InstructorsList() {
   return (
     <div className="p-4 space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{t("Assistants")}</h2>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="btn btn-primary gap-2"
-        >
+        <h2 className="text-2xl font-bold">{t("assistants")}</h2>
+        <button onClick={() => setShowAddModal(true)} className="btn btn-primary gap-2">
           <Plus size={18} />
-          {t("Add Assistant")}
+          {t("addAssistant")}
         </button>
       </div>
 
@@ -250,12 +244,9 @@ export default function InstructorsList() {
           <div className="card-body items-center text-center py-12">
             <BookOpen className="text-primary" size={48} />
             <p className="text-lg">{t("noAssistants")}</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn btn-primary mt-4 gap-2"
-            >
+            <button onClick={() => setShowAddModal(true)} className="btn btn-primary mt-4 gap-2">
               <Plus size={18} />
-              {t("Add your first assistant")}
+              {t("addYourFirstAssistant")}
             </button>
           </div>
         </div>
@@ -267,14 +258,14 @@ export default function InstructorsList() {
                 <button
                   onClick={() => startEdit(assistant)}
                   className="btn btn-sm btn-circle btn-ghost"
-                  title={t("Edit")}
+                  title={t("editAssistant")}
                 >
                   <Edit size={16} />
                 </button>
                 <button
                   onClick={() => confirmDelete(assistant._id)}
                   className="btn btn-sm btn-circle btn-ghost text-error"
-                  title={t("Delete")}
+                  title={t("delete")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -283,10 +274,7 @@ export default function InstructorsList() {
                 <div className="avatar mb-3">
                   <div className="w-20 rounded-full bg-base-200">
                     {assistant.image ? (
-                      <img
-                        src={assistant.image}
-                        alt={assistant.name}
-                      />
+                      <img src={assistant.image || "/placeholder.svg"} alt={assistant.name} />
                     ) : (
                       <div className="flex items-center justify-center h-full text-2xl font-bold">
                         {assistant.name.charAt(0).toUpperCase()}
@@ -295,11 +283,9 @@ export default function InstructorsList() {
                   </div>
                 </div>
                 <h3 className="card-title">{assistant.name}</h3>
-                <p className="text-sm opacity-70">
-                  {assistant.assignedLecturer?.expertise || t("assistantSpecialty")}
-                </p>
+                <p className="text-sm opacity-70">{assistant.assignedLecturer?.expertise || t("assistantSpecialty")}</p>
                 <div className="mt-2">
-                  <span className={`badge ${assistant.gender === "male" ? 'badge-info' : 'badge-accent'}`}>
+                  <span className={`badge ${assistant.gender === "male" ? "badge-info" : "badge-accent"}`}>
                     {assistant.gender === "male" ? t("male") : t("female")}
                   </span>
                 </div>
@@ -313,26 +299,14 @@ export default function InstructorsList() {
       {showDeleteModal && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg">{t("Confirm Deletion")}</h3>
-            <p className="py-4">{t("Are you sure you want to delete this assistant? This action cannot be undone.")}</p>
+            <h3 className="font-bold text-lg">{t("confirmDeletion")}</h3>
+            <p className="py-4">{t("areYouSureDelete")}</p>
             <div className="modal-action">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="btn btn-ghost"
-                disabled={isDeleting}
-              >
-                {t("Cancel")}
+              <button onClick={() => setShowDeleteModal(false)} className="btn btn-ghost" disabled={isDeleting}>
+                {t("cancel")}
               </button>
-              <button
-                onClick={handleDelete}
-                className="btn btn-error"
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <span className="loading loading-spinner"></span>
-                ) : (
-                  t("Delete")
-                )}
+              <button onClick={handleDelete} className="btn btn-error" disabled={isDeleting}>
+                {isDeleting ? <span className="loading loading-spinner"></span> : t("delete")}
               </button>
             </div>
           </div>
@@ -343,21 +317,26 @@ export default function InstructorsList() {
       {showAddModal && (
         <div className="modal modal-open">
           <div className="modal-box relative max-w-md">
-            <button
-              onClick={closeModal}
-              className="btn btn-sm btn-circle absolute right-2 top-2"
-            >
+            <button onClick={closeModal} className="btn btn-sm btn-circle absolute right-2 top-2">
               <X size={18} />
             </button>
 
-            <h3 className="font-bold text-lg mb-4">
-              {editingAssistant ? t("Edit Assistant") : t("Add New Assistant")}
-            </h3>
+            <h3 className="font-bold text-lg mb-4">{editingAssistant ? t("editAssistant") : t("createAssistant")}</h3>
 
             {submitError && (
               <div className="alert alert-error mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="stroke-current shrink-0 h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{submitError}</span>
               </div>
@@ -366,41 +345,37 @@ export default function InstructorsList() {
             <form onSubmit={editingAssistant ? handleEditSubmit : handleSubmit} className="space-y-4">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t("Full Name")}*</span>
+                  <span className="label-text">{t("fullName")}*</span>
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  placeholder={t("Enter full name")}
-                  className={`input input-bordered w-full ${formErrors.name ? 'input-error' : ''}`}
+                  placeholder={t("enterFullName")}
+                  className={`input input-bordered w-full ${formErrors.name ? "input-error" : ""}`}
                 />
-                {formErrors.name && (
-                  <span className="label-text-alt text-error mt-1">{formErrors.name}</span>
-                )}
+                {formErrors.name && <span className="label-text-alt text-error mt-1">{formErrors.name}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t("Email")}*</span>
+                  <span className="label-text">{t("email")}*</span>
                 </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  placeholder={t("Enter email address")}
-                  className={`input input-bordered w-full ${formErrors.email ? 'input-error' : ''}`}
+                  placeholder={t("enterEmailAddress")}
+                  className={`input input-bordered w-full ${formErrors.email ? "input-error" : ""}`}
                 />
-                {formErrors.email && (
-                  <span className="label-text-alt text-error mt-1">{formErrors.email}</span>
-                )}
+                {formErrors.email && <span className="label-text-alt text-error mt-1">{formErrors.email}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t("Gender")}*</span>
+                  <span className="label-text">{t("gender")}*</span>
                 </label>
                 <div className="flex gap-4">
                   <label className="label cursor-pointer gap-2">
@@ -430,39 +405,30 @@ export default function InstructorsList() {
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">{t("Password")}*</span>
+                  <span className="label-text">{t("password")}*</span>
                 </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder={t("At least 6 characters")}
-                  className={`input input-bordered w-full ${formErrors.password ? 'input-error' : ''}`}
+                  placeholder={t("atLeast6Characters")}
+                  className={`input input-bordered w-full ${formErrors.password ? "input-error" : ""}`}
                 />
-                {formErrors.password && (
-                  <span className="label-text-alt text-error mt-1">{formErrors.password}</span>
-                )}
+                {formErrors.password && <span className="label-text-alt text-error mt-1">{formErrors.password}</span>}
               </div>
 
               <div className="modal-action">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="btn btn-ghost"
-                  disabled={isSubmitting}
-                >
-                  {t("Cancel")}
+                <button type="button" onClick={closeModal} className="btn btn-ghost" disabled={isSubmitting}>
+                  {t("cancel")}
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isSubmitting}
-                >
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <span className="loading loading-spinner"></span>
+                  ) : editingAssistant ? (
+                    t("editAssistant")
                   ) : (
-                    t("Create Assistant")
+                    t("createAssistant")
                   )}
                 </button>
               </div>

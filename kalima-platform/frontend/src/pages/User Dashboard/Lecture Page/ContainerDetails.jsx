@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 import { getContainerById, createContainer, createLecture, createLectureAttachment } from "../../../routes/lectures"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { FiBook, FiFolder, FiArrowLeft, FiPlus } from "react-icons/fi"
@@ -9,6 +10,8 @@ import LectureCreationModal from "../../../components/LectureCreationModal"
 import ContainerCreationModal from "../../../components/ContainerCreationModal"
 
 const ContainerDetailsPage = () => {
+  const { t, i18n } = useTranslation('lecturesPage');
+  const isRTL = i18n.language === "ar";
   const { containerId } = useParams()
   const navigate = useNavigate()
   const [container, setContainer] = useState(null)
@@ -179,31 +182,32 @@ const ContainerDetailsPage = () => {
     )
   }
 
-  if (error) {
+   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="max-w-md text-center">
           <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Oops! Something went wrong</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">{t('containerDetails.error.title')}</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <Link
             to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
             className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
           >
-            <FiArrowLeft /> Back to Dashboard
+            <FiArrowLeft /> {t('containerDetails.buttons.backToDashboard')}
           </Link>
         </div>
       </div>
     )
   }
 
+
   const childType = getAllowedChildType()
   const creationLabel =
     childType === "lecture" ? "Lecture" : `${childType?.charAt(0).toUpperCase() + childType?.slice(1)}`
   const isLectureCreation = childType === "lecture"
 
-  return (
-    <div className="min-h-screen p-8">
+    return (
+    <div className="min-h-screen p-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
@@ -212,13 +216,13 @@ const ContainerDetailsPage = () => {
             className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
           >
             <span className="text-lg">←</span>
-            <span className="font-medium">Back to Dashboard</span>
+            <span className="font-medium">{t('containerDetails.buttons.backToDashboard')}</span>
           </button>
           <div className="flex items-center gap-4">
             {container.points > 0 && (
               <div className="bg-primary/30 px-4 py-2 rounded-full flex items-center gap-2">
                 <span className="text-lg">🏅</span>
-                <span className="font-medium">{container.points} Points</span>
+                <span className="font-medium">{container.points} {t('containerDetails.labels.points')}</span>
               </div>
             )}
           </div>
@@ -231,7 +235,7 @@ const ContainerDetailsPage = () => {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-2">
                 <FiFolder className="text-lg" />
-                {container.type}
+                {t(`types.${container.type.toLowerCase()}`)}
               </span>
               <span className="flex items-center gap-2">
                 <FiBook className="text-lg" />
@@ -260,7 +264,7 @@ const ContainerDetailsPage = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">{childType || container.type}</span>
+                    <span className="text-sm">{t(`types.${childType?.toLowerCase()}`) || container.type}</span>
                     <Link
                       to={
                         userRole === "Lecturer"
@@ -269,7 +273,7 @@ const ContainerDetailsPage = () => {
                       }
                       className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
                     >
-                      View Details →
+                      {t('containerDetails.buttons.viewDetails')} →
                     </Link>
                   </div>
                 </div>
@@ -280,7 +284,7 @@ const ContainerDetailsPage = () => {
           {container.children?.length === 0 && (
             <div className="text-center py-12">
               <div className="text-4xl mb-4">📭</div>
-              <p className="">No content available in this container</p>
+              <p className="">{t('containerDetails.emptyState.noContent')}</p>
             </div>
           )}
         </div>
@@ -293,7 +297,7 @@ const ContainerDetailsPage = () => {
               className="btn btn-primary px-6 py-3 rounded-full flex items-center gap-2"
             >
               <FiPlus className="text-lg" />
-              Add {creationLabel}
+              {t('containerDetails.buttons.add')} {t(`types.${creationLabel.toLowerCase()}`)}
             </button>
           </div>
         )}

@@ -97,7 +97,8 @@
     },
     "actions": {
       "delete": "حذف",
-      "edit": "تعديل"
+      "edit": "تعديل",
+      "cancel": "إلغاء"
     },
     "pagination": {
       "previous": "السابق",
@@ -146,7 +147,8 @@
         "create": "إنشاء",
         "read": "قراءة",
         "update": "تعديل",
-        "delete": "حذف"
+        "delete": "حذف",
+        "cancel": "إلغاء"
       },
       
       "resources": {
@@ -188,14 +190,20 @@
       "status": " الحالة",
       "redeemedAt": "تم استرداده في",
       "redeemedBy": "تم الاسترداد بواسطة",
-      "noCodes": "لم يتم العثور على أكواد ترويجية"
+      "noCodes": "لم يتم العثور على أكواد ترويجية",
+      "actions": "الإجراءات"
     },
     "filters": {
       "allStatuses": "كل الحالات",
       "redeemed": "مسترد",
       "active": "نشط",
       "redeemedBy": "تم استرداده بواسطة",
-      "apply": "تطبيق"
+      "apply": "تطبيق",
+      "allStudents": "كل الطلاب",
+      "all": "كل الانواع",
+      "general": "عام",
+      "specific": "مخصص",
+      "promo": "ترويجي"
     },
     "pagination": {
       "previous": "السابق",
