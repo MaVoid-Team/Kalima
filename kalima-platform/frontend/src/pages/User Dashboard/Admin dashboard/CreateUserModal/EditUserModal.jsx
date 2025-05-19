@@ -79,7 +79,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box" dir={dir}>
+      <div className="modal-box" dir={isRTL ? "rtl" : "ltr"}>
         <h3 className={`font-bold text-lg mb-4 ${isRTL ? "text-right" : "text-left"}`}>
           {t("admin.editUser.title", { name: user?.name })}
         </h3>
@@ -92,9 +92,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">{t("admin.editUser.name")}</span>
-            </label>
+         <label className="label flex flex-col items-start">
+        <span className="label-text mb-1">
+          {t("admin.editUser.name")}</span>
+            </label>  
             <input
               type="text"
               name="name"
@@ -106,8 +107,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">{t("admin.editUser.email")}</span>
+          <label className="label flex flex-col items-start">
+        <span className="label-text mb-1">{t("admin.editUser.email")}</span>
             </label>
             <input
               type="email"
@@ -120,8 +121,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">{t("admin.editUser.phone")}</span>
+             <label className="label flex flex-col items-start">
+        <span className="label-text mb-1">{t("admin.editUser.phone")}</span>
             </label>
             <input
               type="text"
@@ -134,8 +135,8 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="form-control mb-6">
-            <label className="label">
-              <span className="label-text">{t("admin.editUser.password")}</span>
+            <label className="label flex flex-col items-start">
+        <span className="label-text mb-1">{t("admin.editUser.password")}</span>
             </label>
             <div className="relative">
               <input
@@ -143,12 +144,12 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className="input input-bordered "
                 placeholder={t("admin.editUser.passwordPlaceholder")}
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className={`absolute inset-y-0 ${isRTL ? "right-0 pr-3" : "left-0 pl-3"} flex items-center`}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? "🙈" : "👁️"}

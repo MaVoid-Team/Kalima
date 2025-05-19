@@ -9,6 +9,20 @@
       "sendOffer": "ارسل عرضك الان!",
       "promo": "كود خاص",
       "discount": "خصم",
+      "editUser": {
+        "title": "تعديل المستخدم",
+        "name": "الاسم",
+        "namePlaceholder": "الاسم",
+        "phone": "رقم الهاتف",
+        "phonePlaceholder": "رقم الهاتف",
+        "email": "البريد الالكتروني",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "كلمة المرور",
+        "passwordHint": "يرجى ادخال كلمة المرور",
+        "save": "حفظ",
+        "cancel": "الغاء"
+      },
+     
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
         "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
@@ -50,7 +64,7 @@
         "phoneLabel": "رقم الهاتف",
         "phonePlaceholder": "ادخل رقم الهاتف",
         "messageLabel": "الرسالة (اختياري)",
-        "messagePlaceholder": "اكتب رسالتك هنا...",
+        "placeholder": "اكتب رسالتك هنا...",
         "cancel": "إلغاء",
         "send": "إرسال"
       },
@@ -232,5 +246,10 @@
       "monthsWithRevenue": "أشهر بها إيرادات",
       "purchaseCount": "عدد المشتريات",
       "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر"
-    }
+    },
+     "modals" : {
+        "confirmDelete": " حذف هذا الكود؟",
+        "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟"
+
+      }
   }
