@@ -161,7 +161,8 @@
         "promoCode": "كود ترويجي", 
         "admin": "أدمن",
         "assistant": "مساعد",
-        "parent": "ولي أمر"
+        "parent": "ولي أمر",
+        "package": "باقات"
       },
       "idDisplay": "ID: {{id}}",
       

@@ -159,7 +159,8 @@
         "promoCode": "Promo Code",
         "admin": "Admin",
         "assistant": "Assistant",
-        "parent": "Parent"
+        "parent": "Parent",
+        "package": "Packages"
       },
       "idDisplay": "ID: {{id}}",
       "status": {
