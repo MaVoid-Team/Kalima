@@ -12,7 +12,7 @@ export function TeachersSection() {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [visibleTeachers, setVisibleTeachers] = useState(3);
+  const [visibleTeachers, setVisibleTeachers] = useState(4);
 
   useEffect(() => {
     fetchTeachers();
