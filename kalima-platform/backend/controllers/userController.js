@@ -822,10 +822,10 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
       }
     });
   }
-
   // Find all children with detailed information
   const children = await Student.find({ _id: { $in: parent.children } })
     .populate("level", "name")
+    .select("name level sequencedId hobbies faction generalPoints totalPoints")
     .lean();
 
   // For each child, get additional data like purchase history
@@ -874,6 +874,158 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
   });
 });
 
+/**
+ * Update the currently logged in user information
+ * Allows users to update their own profile information (except password)
+ */
+const updateMe = catchAsync(async (req, res, next) => {
+  // 1) Check if password is being updated
+  if (req.body.password) {
+    return next(
+      new AppError("This route is not for password updates. Please use /update/password", 400)
+    );
+  }
+
+  // 2) Get user ID from authenticated user
+  const userId = req.user._id;
+  const userRole = req.user.role;
+
+  // 3) Filter out unwanted fields that shouldn't be updated
+  const filteredBody = {};
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address'];
+  
+  // Only copy allowed fields from req.body to filteredBody
+  Object.keys(req.body).forEach(field => {
+    if (allowedFields.includes(field)) {
+      filteredBody[field] = req.body[field];
+    }
+  });
+  // Handle special case for Parent role - adding children by sequenced ID
+  if (userRole === "Parent" && req.body.children) {
+    const childrenIds = req.body.children;
+    
+    // Get current children
+    const currentParent = await Parent.findById(userId).lean();
+    const currentChildren = currentParent?.children || [];
+    
+    // Track children to add
+    const childrenToAdd = [...currentChildren]; // Start with existing children
+    
+    // For each child ID (which could be a sequenced ID or MongoDB ID)
+    for (let childId of childrenIds) {
+      let child;
+
+      // Check if it's a MongoDB Object ID
+      const isMongoId = mongoose.Types.ObjectId.isValid(childId);
+      if (isMongoId) {
+        // Find by MongoDB ID
+        child = await Student.findById(childId).lean();
+      } else {
+        // Find by sequenced ID
+        child = await Student.findOne({ sequencedId: childId }).lean();
+      }
+
+      if (child) {
+        // Check if child is already in the list to avoid duplicates
+        const childIdStr = child._id.toString();
+        const alreadyAdded = childrenToAdd.some(id => id.toString() === childIdStr);
+        
+        if (!alreadyAdded) {
+          childrenToAdd.push(child._id); // Always store MongoDB IDs in the database
+        }
+      } else {
+        return next(new AppError(`No student found with ID: ${childId}`, 404));
+      }
+    }
+
+    // Add children IDs to filteredBody (don't replace if empty array was provided)
+    if (childrenToAdd.length > 0) {
+      filteredBody.children = childrenToAdd;
+    }
+  }
+
+  // 4) Update user document based on their role
+  let updatedUser;
+
+  switch (userRole) {
+    case "Student":
+      updatedUser = await Student.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Parent":
+      updatedUser = await Parent.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .populate({
+          path: "children",
+          select: "name level sequencedId", // Include sequencedId in the populated result
+        })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Lecturer":
+      // For lecturers, we might want to allow updating bio and expertise
+      if (req.body.bio) filteredBody.bio = req.body.bio;
+      if (req.body.expertise) filteredBody.expertise = req.body.expertise;
+
+      updatedUser = await Lecturer.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Teacher":
+      updatedUser = await Teacher.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Assistant":
+      updatedUser = await Assistant.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Admin":
+    case "SubAdmin":
+    case "Moderator":
+    default:
+      // For other roles, use the basic User model
+      updatedUser = await User.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+  }
+
+  if (!updatedUser) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser
+    }
+  });
+});
+
 module.exports = {
   getAllUsers,
   getAllUsersByRole,
@@ -885,4 +1037,5 @@ module.exports = {
   uploadFileForBulkCreation,
   getMyData,
   getParentChildrenData,
+  updateMe
 };

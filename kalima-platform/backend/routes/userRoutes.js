@@ -44,6 +44,9 @@ router.get("/me/dashboard", userController.getMyData);
 // Get parent's children data with detailed information
 router.get("/me/children", userController.getParentChildrenData);
 
+// Update current user profile information
+router.patch("/me/update", userController.updateMe);
+
 router.route("/update/password").patch(userController.changePassword);
 
 module.exports = router;
