@@ -47,7 +47,7 @@ export const LectureCard = ({
             </div>
             <div className="ml-2">
               <p className="font-medium text-sm">{teacher}</p>
-              <p className="text-xs opacity-70">{grade}</p>
+              <p className="text-xs opacity-70">{t(`gradeLevels.${grade}`, { ns: "common" })}</p>
             </div>
           </div>
         </div>

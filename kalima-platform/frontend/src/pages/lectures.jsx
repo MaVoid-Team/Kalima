@@ -322,17 +322,17 @@ export default function LecturesPage() {
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          Previous
+          {t("pagination.previous")}
         </button>
         <span className="mx-2">
-          Page {currentPage} Of {totalPages}
+          {t("pagination.page")} {currentPage} {t("pagination.of")} {totalPages}
         </span>
         <button
           className="btn btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          Next
+          {t("pagination.next")}
         </button>
       </div>
     )
@@ -366,7 +366,7 @@ export default function LecturesPage() {
                     <p className="font-medium">
                       {t("welcome")}, {userData.name}
                     </p>
-                    <p className="text-sm opacity-80">{userData.role}</p>
+                    <p className="text-sm opacity-80">{t(`role.${userData.role.toLowerCase()}`,{ns:"common"})}</p>
                   </div>
                 </div>
                 
