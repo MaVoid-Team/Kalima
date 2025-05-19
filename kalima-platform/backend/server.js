@@ -44,11 +44,13 @@ const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
 const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
 const reportRouter = require("./routes/reportRoutes.js");
+
 // New routes for exam and homework functionality
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
 const assistantHomeworkRouter = require("./routes/assistantHomeworkRoutes.js");
 const seedInitialAdminDirect = require('./utils/seeds/seedInitialAdminDirect');
+const governmentRoutes = require('./routes/governmentRoutes');
 
 connectDB();
 
@@ -108,6 +110,7 @@ app.use('/api/v1/reports', reportRouter); // Mount report router
 app.use("/api/v1/exam-configs", ExamConfigRouter);
 app.use("/api/v1/exam-submissions", studentExamSubmissionRouter);
 app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
+app.use('/api/v1/governments', governmentRoutes);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");

@@ -7,6 +7,7 @@ function LanguageAppearanceSection() {
   const { t, i18n } = useTranslation("settings")
   const [selectedTheme, setSelectedTheme] = useState("")
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const [showThemes, setShowThemes] = useState(false)
   const isRTL = i18n.language === 'ar'
 
   // List of all 35 DaisyUI themes
@@ -91,27 +92,47 @@ function LanguageAppearanceSection() {
           </div>
 
           <div className="my-6">
-            <label className={`label ${isRTL ? 'justify-end' : 'justify-start'}`}>
-              <span className="label-text">{t("languageAppearance.options.theme")}</span>
-            </label>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {themes.map((theme) => (
-                <ThemeCard
-                  key={theme}
-                  theme={theme}
-                  onSelect={handleThemeSelect}
-                  isSelected={selectedTheme === theme}
-                  isRTL={isRTL}
-                />
-              ))}
+            <div className={`flex ${isRTL ? 'flex-row-reverse' : 'flex-row'} justify-between items-center mb-4`}>
+              <label className={`label ${isRTL ? 'justify-end' : 'justify-start'}`}>
+                <span className="label-text">{t("languageAppearance.options.theme")}</span>
+              </label>
+              <button 
+                className="btn btn-sm btn-ghost"
+                onClick={() => setShowThemes(!showThemes)}
+              >
+                {showThemes ? t("languageAppearance.hideThemes") : t("languageAppearance.showThemes")}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className={`w-4 h-4 transition-transform ${showThemes ? 'rotate-180' : ''}`}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
             </div>
+
+            {showThemes && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {themes.map((theme) => (
+                  <ThemeCard
+                    key={theme}
+                    theme={theme}
+                    onSelect={handleThemeSelect}
+                    isSelected={selectedTheme === theme}
+                    isRTL={isRTL}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   )
-}
+} 
 
 function ThemeCard({ theme, onSelect, isSelected, isRTL }) {
   const { t } = useTranslation("settings")

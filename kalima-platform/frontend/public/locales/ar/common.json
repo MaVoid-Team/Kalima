@@ -33,6 +33,18 @@
       "3rd Secondary": "الصف الثالث الثانوي",
       "undefined": "غير محدد"
 },
+  "role" :{
+    "student": "طالب",
+    "teacher": "معلم",
+    "admin": "مسؤول",
+    "assistnat": "مساعد"
+  },
+  "passwordStrength": {
+    "label": "القوّة:",
+    "weak": "ضعيف",
+    "medium": "متوسّط",
+    "strong": "قوي"
+  },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",

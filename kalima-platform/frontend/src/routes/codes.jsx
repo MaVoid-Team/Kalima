@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
-import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -132,5 +131,87 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
     return { success: true, data: promoCodes };
   } catch (error) {
     return { success: false, error: error.message || 'Failed to fetch promo codes' };
+  }
+};
+
+/**
+ * Deletes a single promo code by code number
+ * 
+ * @param {string} code - The promo code to delete
+ * @returns {Promise<{ success: boolean, data?: any, error?: string }>}
+ */
+export const deletePromoCode = async (code) => {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/api/v1/codes/`,
+      {
+        headers: {
+          ...getAuthHeader(),
+          "Content-Type": "application/json",
+        },
+        data: { code },
+        withCredentials: true,
+      }
+    );
+
+    if (response.data && response.data.status === "success") {
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || "Failed to delete promo code"
+      };
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error.response?.data?.message || error.message || 'Failed to delete promo code' 
+    };
+  }
+};
+
+/**
+ * Deletes multiple promo codes by code numbers
+ * 
+ * @param {string[]} codes - Array of promo codes to delete
+ * @returns {Promise<{ success: boolean, data?: any, error?: string }>}
+ */
+export const deleteBulkPromoCodes = async (codes) => {
+  try {
+    if (!Array.isArray(codes) || codes.length === 0) {
+      return { success: false, error: 'No codes provided for deletion' };
+    }
+
+    const response = await axios.delete(
+      `${API_URL}/api/v1/codes/multiple`,
+      {
+        headers: {
+          ...getAuthHeader(),
+          "Content-Type": "application/json",
+        },
+        data: { codes },
+        withCredentials: true,
+      }
+    );
+
+    if (response.data && response.data.status === "success") {
+      return {
+        success: true,
+        data: response.data.data
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data?.message || "Failed to delete promo codes"
+      };
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error.response?.data?.message || error.message || 'Failed to delete promo codes' 
+    };
   }
 };
