@@ -10,7 +10,8 @@ import { getAllLecturers } from "../../../routes/fetch-users"
 import { getAllLevels, createLevel, deleteLevel } from "../../../routes/levels"
 
 export default function AdminCreate() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation("createAdmin")
+  const isRTL = i18n.language === "ar"
   const navigate = useNavigate()
   const [userRole, setUserRole] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -46,7 +47,7 @@ export default function AdminCreate() {
           navigate("/")
         }
       } catch (err) {
-        setError("Failed to verify user permissions")
+        setError(t("errors.verifyPermissions"))
         navigate("/login")
       } finally {
         setLoading(false)
@@ -59,10 +60,10 @@ export default function AdminCreate() {
         if (response.success) {
           setLecturers(response.data)
         } else {
-          setError(response.error || "Failed to fetch lecturers")
+          setError(response.error || t("errors.fetchLecturers"))
         }
       } catch (err) {
-        setError("Failed to fetch lecturers")
+        setError(t("errors.fetchLecturers"))
       }
     }
 
@@ -72,10 +73,10 @@ export default function AdminCreate() {
         if (response.success) {
           setSubjects(response.data)
         } else {
-          setError(response.error || "Failed to fetch subjects")
+          setError(response.error || t("errors.fetchSubjects"))
         }
       } catch (err) {
-        setError("Failed to fetch subjects")
+        setError(t("errors.fetchSubjects"))
       }
     }
 
@@ -85,10 +86,10 @@ export default function AdminCreate() {
         if (response.success) {
           setPackages(response.data)
         } else {
-          setError(response.error || "Failed to fetch packages")
+          setError(response.error || t("errors.fetchPackages"))
         }
       } catch (err) {
-        setError("Failed to fetch packages")
+        setError(t("errors.fetchPackages"))
       }
     }
 
@@ -98,10 +99,10 @@ export default function AdminCreate() {
         if (response.success) {
           setLevels(response.data)
         } else {
-          setError(response.error || "Failed to fetch levels")
+          setError(response.error || t("errors.fetchLevels"))
         }
       } catch (err) {
-        setError("Failed to fetch levels")
+        setError(t("errors.fetchLevels"))
       }
     }
 
@@ -110,7 +111,7 @@ export default function AdminCreate() {
     fetchSubjects()
     fetchAllPackages()
     fetchAllLevels()
-  }, [navigate])
+  }, [navigate, t])
 
   const handleSubjectSubmit = async (e) => {
     e.preventDefault()
@@ -120,7 +121,7 @@ export default function AdminCreate() {
     try {
       const response = await createSubject(subjectData)
       if (response.success) {
-        setSuccess("Subject created successfully")
+        setSuccess(t("success.subjectCreated"))
         setSubjectData({ name: "" })
         const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
@@ -130,7 +131,7 @@ export default function AdminCreate() {
         setError(response.error)
       }
     } catch (err) {
-      setError("Failed to create subject")
+      setError(t("errors.createSubject"))
     }
   }
 
@@ -147,7 +148,7 @@ export default function AdminCreate() {
         points: formattedPoints,
       })
       if (response.success) {
-        setSuccess("Package created successfully")
+        setSuccess(t("success.packageCreated"))
         setPackageData({
           name: "",
           price: "",
@@ -162,7 +163,7 @@ export default function AdminCreate() {
         setError(response.error)
       }
     } catch (err) {
-      setError("Failed to create package")
+      setError(t("errors.createPackage"))
     }
   }
 
@@ -174,7 +175,7 @@ export default function AdminCreate() {
     try {
       const response = await createLevel(levelData)
       if (response.success) {
-        setSuccess("Level created successfully")
+        setSuccess(t("success.levelCreated"))
         setLevelData({ name: "" })
         const updatedLevels = await getAllLevels()
         if (updatedLevels.success) {
@@ -184,7 +185,7 @@ export default function AdminCreate() {
         setError(response.error)
       }
     } catch (err) {
-      setError("Failed to create level")
+      setError(t("errors.createLevel"))
     }
   }
 
@@ -211,58 +212,58 @@ export default function AdminCreate() {
   }
 
   const handleDeleteSubject = async (subjectId) => {
-    if (window.confirm("Are you sure you want to delete this subject?")) {
+    if (window.confirm(t("confirmations.deleteSubject"))) {
       try {
         const response = await deleteSubject(subjectId)
         if (response.success) {
-          setSuccess("Subject deleted successfully")
+          setSuccess(t("success.subjectDeleted"))
           const updatedSubjects = await getAllSubjects()
           if (updatedSubjects.success) {
             setSubjects(updatedSubjects.data)
           }
         } else {
-          setError(response.error || "Failed to delete subject")
+          setError(response.error || t("errors.deleteSubject"))
         }
       } catch (err) {
-        setError("Failed to delete subject")
+        setError(t("errors.deleteSubject"))
       }
     }
   }
 
   const handleDeletePackage = async (packageId) => {
-    if (window.confirm("Are you sure you want to delete this package?")) {
+    if (window.confirm(t("confirmations.deletePackage"))) {
       try {
         const response = await deletePackage(packageId)
         if (response.success) {
-          setSuccess("Package deleted successfully")
+          setSuccess(t("success.packageDeleted"))
           const updatedPackages = await fetchPackages()
           if (updatedPackages.success) {
             setPackages(updatedPackages.data)
           }
         } else {
-          setError(response.error || "Failed to delete package")
+          setError(response.error || t("errors.deletePackage"))
         }
       } catch (err) {
-        setError("Failed to delete package")
+        setError(t("errors.deletePackage"))
       }
     }
   }
 
   const handleDeleteLevel = async (levelId) => {
-    if (window.confirm("Are you sure you want to delete this level?")) {
+    if (window.confirm(t("confirmations.deleteLevel"))) {
       try {
         const response = await deleteLevel(levelId)
         if (response.success) {
-          setSuccess("Level deleted successfully")
+          setSuccess(t("success.levelDeleted"))
           const updatedLevels = await getAllLevels()
           if (updatedLevels.success) {
             setLevels(updatedLevels.data)
           }
         } else {
-          setError(response.error || "Failed to delete level")
+          setError(response.error || t("errors.deleteLevel"))
         }
       } catch (err) {
-        setError("Failed to delete level")
+        setError(t("errors.deleteLevel"))
       }
     }
   }
@@ -276,14 +277,18 @@ export default function AdminCreate() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6">Create New {activeForm}</h1>
+    <div 
+    className={`container mx-auto p-4 sm:p-6 max-w-4xl `}
+    dir={isRTL ? "rtl" : "ltr"}>
+      <h1 className="text-3xl font-bold mb-6">
+        {t("createNew")} {t(`forms.${activeForm}.title`)}
+      </h1>
 
       {error && (
         <div className="alert alert-error mb-4">
           <span>{error}</span>
           <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
-            Dismiss
+            {t("actions.dismiss")}
           </button>
         </div>
       )}
@@ -292,7 +297,7 @@ export default function AdminCreate() {
         <div className="alert alert-success mb-4">
           <span>{success}</span>
           <button className="btn btn-sm btn-ghost" onClick={() => setSuccess(null)}>
-            Dismiss
+            {t("actions.dismiss")}
           </button>
         </div>
       )}
@@ -303,19 +308,19 @@ export default function AdminCreate() {
           className={`tab ${activeForm === "subject" ? "tab-active" : ""}`}
           onClick={() => setActiveForm("subject")}
         >
-          Create New Subject
+          {t("forms.subject.createNew")}
         </button>
         <button
           className={`tab tab-lifted ${activeForm === "package" ? "tab-active" : ""}`}
           onClick={() => setActiveForm("package")}
         >
-          Create New Package
+          {t("forms.package.createNew")}
         </button>
         <button
           className={`tab tab-lifted ${activeForm === "level" ? "tab-active" : ""}`}
           onClick={() => setActiveForm("level")}
         >
-          Create New Level
+          {t("forms.level.createNew")}
         </button>
       </div>
 
@@ -325,32 +330,32 @@ export default function AdminCreate() {
           <form onSubmit={handleSubjectSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Subject Name</span>
+                <span className="label-text">{t("forms.subject.name")}</span>
               </label>
               <input
                 type="text"
                 value={subjectData.name}
                 onChange={(e) => setSubjectData({ name: e.target.value })}
-                placeholder="e.g., Geography"
+                placeholder={t("forms.subject.namePlaceholder")}
                 className="input input-bordered w-full"
                 required
               />
             </div>
             <button type="submit" className="btn btn-primary">
-              Create Subject
+              {t("forms.subject.create")}
             </button>
           </form>
 
           {/* Subject Table */}
           <div className="mt-6">
-            <h2 className="text-2xl font-semibold mb-4">Existing Subjects</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("forms.subject.existing")}</h2>
             {subjects.length > 0 ? (
               <div className="overflow-x-auto">
                 <div className="bg-base-100 shadow-md rounded-lg">
                   <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
-                    <div>Subject Name</div>
-                    <div>Created On</div>
-                    <div>Actions</div>
+                    <div>{t("forms.subject.nameColumn")}</div>
+                    <div>{t("common.createdOn")}</div>
+                    <div>{t("common.actions")}</div>
                   </div>
                   {subjects.map((subject) => (
                     <div
@@ -358,11 +363,13 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{subject.name}</div>
-                      <div className="text-sm text-gray-600">{new Date(subject.createdAt).toLocaleDateString()}</div>
+                      <div className="text-sm text-gray-600">
+                        {new Date(subject.createdAt).toLocaleDateString(i18n.language)}
+                      </div>
                       <div>
                         {userRole !== "moderator" && (
                           <button className="btn btn-error btn-sm" onClick={() => handleDeleteSubject(subject._id)}>
-                            Delete
+                            {t("actions.delete")}
                           </button>
                         )}
                       </div>
@@ -371,7 +378,7 @@ export default function AdminCreate() {
                 </div>
               </div>
             ) : (
-              <p className="text-center py-4">No subjects available.</p>
+              <p className="text-center py-4">{t("forms.subject.noSubjects")}</p>
             )}
           </div>
         </>
@@ -383,13 +390,13 @@ export default function AdminCreate() {
           <form onSubmit={handlePackageSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Create New Package</span>
+                <span className="label-text">{t("forms.package.name")}</span>
               </label>
               <input
                 type="text"
                 value={packageData.name}
                 onChange={(e) => setPackageData({ ...packageData, name: e.target.value })}
-                placeholder="e.g., Premium Monthly"
+                placeholder={t("forms.package.namePlaceholder")}
                 className="input input-bordered w-full"
                 required
               />
@@ -397,13 +404,13 @@ export default function AdminCreate() {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Package Price</span>
+                <span className="label-text">{t("forms.package.price")}</span>
               </label>
               <input
                 type="number"
                 value={packageData.price}
                 onChange={(e) => setPackageData({ ...packageData, price: e.target.value })}
-                placeholder="e.g., 300"
+                placeholder={t("forms.package.pricePlaceholder")}
                 className="input input-bordered w-full"
                 min={0}
                 step="0.01"
@@ -413,7 +420,7 @@ export default function AdminCreate() {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Package Type</span>
+                <span className="label-text">{t("forms.package.type")}</span>
               </label>
               <select
                 value={packageData.type}
@@ -421,13 +428,13 @@ export default function AdminCreate() {
                 className="select select-bordered w-full"
                 disabled
               >
-                <option value="month">Monthly</option>
+                <option value="month">{t("forms.package.monthly")}</option>
               </select>
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Points</span>
+                <span className="label-text">{t("forms.package.points")}</span>
               </label>
               {packageData.points.map((point, index) => (
                 <div key={index} className="flex flex-col sm:flex-row gap-2 mb-2">
@@ -437,7 +444,7 @@ export default function AdminCreate() {
                     className="select select-bordered w-full sm:w-1/2"
                     required
                   >
-                    <option value="">Select Lecturers</option>
+                    <option value="">{t("forms.package.selectLecturer")}</option>
                     {lecturers.map((lecturer) => (
                       <option key={lecturer._id} value={lecturer._id}>
                         {lecturer.name} ({lecturer.expertise})
@@ -448,55 +455,59 @@ export default function AdminCreate() {
                     type="number"
                     value={point.points}
                     onChange={(e) => updatePoint(index, "points", e.target.value)}
-                    placeholder="e.g., 200"
+                    placeholder={t("forms.package.pointsPlaceholder")}
                     className="input input-bordered w-full sm:w-1/3"
                     min="0"
                     required
                   />
                   {packageData.points.length > 1 && (
                     <button type="button" className="btn btn-error btn-sm" onClick={() => removePoint(index)}>
-                      Remove
+                      {t("actions.remove")}
                     </button>
                   )}
                 </div>
               ))}
               <button type="button" className="btn btn-outline btn-sm mt-2" onClick={addPoint}>
-                Add Points
+                {t("forms.package.addPoints")}
               </button>
             </div>
 
             <button type="submit" className="btn btn-primary">
-              Create Package
+              {t("forms.package.create")}
             </button>
           </form>
 
           {/* Package List */}
           <div className="mt-6">
-            <h2 className="text-2xl font-semibold mb-4">Existing Packages</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("forms.package.existing")}</h2>
             {packages.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {packages.map((pkg) => (
                   <div key={pkg._id} className="card bg-base-100 shadow-md p-4">
                     <div className="card-body">
                       <h3 className="card-title">{pkg.name}</h3>
-                      <p className="text-sm text-gray-600">Price: ${pkg.price}</p>
                       <p className="text-sm text-gray-600">
-                        Type: {pkg.type.charAt(0).toUpperCase() + pkg.type.slice(1)}
+                        {t("forms.package.priceLabel")}: ${pkg.price}
                       </p>
-                      <p className="text-sm text-gray-600">Created: {new Date(pkg.createdAt).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-600">
+                        {t("forms.package.typeLabel")}: {t(`forms.package.${pkg.type}`)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {t("common.created")}: {new Date(pkg.createdAt).toLocaleDateString(i18n.language)}
+                      </p>
                       <div className="mt-2">
-                        <h4 className="text-sm font-medium">Points Distribution:</h4>
+                        <h4 className="text-sm font-medium">{t("forms.package.pointsDistribution")}:</h4>
                         <ul className="list-disc list-inside text-sm text-gray-600">
                           {pkg.points.map((point, index) => (
                             <li key={index}>
-                              {point.lecturer.name}: {point.points} points
+                              {point.lecturer.name}: {point.points} {t("forms.package.pointsUnit")}
                             </li>
                           ))}
                         </ul>
                       </div>
                       {userRole !== "moderator" && (
                         <button className="btn btn-error btn-sm mt-2" onClick={() => handleDeletePackage(pkg._id)}>
-                          Delete
+                          {t("actions.delete")}
                         </button>
                       )}
                     </div>
@@ -504,7 +515,7 @@ export default function AdminCreate() {
                 ))}
               </div>
             ) : (
-              <p>No packages available.</p>
+              <p>{t("forms.package.noPackages")}</p>
             )}
           </div>
         </>
@@ -516,32 +527,32 @@ export default function AdminCreate() {
           <form onSubmit={handleLevelSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Level Name</span>
+                <span className="label-text">{t("forms.level.name")}</span>
               </label>
               <input
                 type="text"
                 value={levelData.name}
                 onChange={(e) => setLevelData({ name: e.target.value })}
-                placeholder="e.g., Higher Secondary"
+                placeholder={t("forms.level.namePlaceholder")}
                 className="input input-bordered w-full"
                 required
               />
             </div>
             <button type="submit" className="btn btn-primary">
-              Create Level
+              {t("forms.level.create")}
             </button>
           </form>
 
           {/* Level Table */}
           <div className="mt-6">
-            <h2 className="text-2xl font-semibold mb-4">Existing Levels</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("forms.level.existing")}</h2>
             {levels.length > 0 ? (
               <div className="overflow-x-auto">
                 <div className="bg-base-100 shadow-md rounded-lg">
                   <div className="grid grid-cols-3 gap-4 p-4 bg-base-200 rounded-t-lg font-semibold text-sm">
-                    <div>Level Name</div>
-                    <div>Created On</div>
-                    <div>Actions</div>
+                    <div>{t("forms.level.nameColumn")}</div>
+                    <div>{t("common.createdOn")}</div>
+                    <div>{t("common.actions")}</div>
                   </div>
                   {levels.map((level) => (
                     <div
@@ -549,11 +560,13 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{level.name}</div>
-                      <div className="text-sm text-gray-600">{new Date(level.createdAt).toLocaleDateString()}</div>
+                      <div className="text-sm text-gray-600">
+                        {new Date(level.createdAt).toLocaleDateString(i18n.language)}
+                      </div>
                       <div>
                         {userRole !== "moderator" && (
                           <button className="btn btn-error btn-sm" onClick={() => handleDeleteLevel(level._id)}>
-                            Delete
+                            {t("actions.delete")}
                           </button>
                         )}
                       </div>
@@ -562,7 +575,7 @@ export default function AdminCreate() {
                 </div>
               </div>
             ) : (
-              <p className="text-center py-4">No levels available.</p>
+              <p className="text-center py-4">{t("forms.level.noLevels")}</p>
             )}
           </div>
         </>

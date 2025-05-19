@@ -139,7 +139,9 @@
         "admin": "Admin",
         "subadmin": "Subadmin",
         "lecturer": "Lecturer",
-        "student": "Student"
+        "student": "Student",
+        "teacher": "Teacher",
+        "assistant": "Assistant "
       },
       
       "actions": {
@@ -159,7 +161,9 @@
         "promoCode": "Promo Code",
         "admin": "Admin",
         "assistant": "Assistant",
-        "parent": "Parent"
+        "parent": "Parent",
+        "package": "Packages",
+        "lesson": "Lesson"
       },
       "idDisplay": "ID: {{id}}",
       "status": {
