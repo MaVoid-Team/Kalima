@@ -140,7 +140,9 @@
         "admin": "مسؤول",
         "subadmin": "مسؤول فرعي",
         "lecturer": "معلم",
-        "student": "طالب"
+        "student": "طالب",
+        "teacher": "معلم",
+        "assistant": "مساعد"
       },
       
       "actions": {
@@ -162,7 +164,8 @@
         "admin": "أدمن",
         "assistant": "مساعد",
         "parent": "ولي أمر",
-        "package": "باقات"
+        "package": "باقات",
+        "lesson": "درس"
       },
       "idDisplay": "ID: {{id}}",
       
