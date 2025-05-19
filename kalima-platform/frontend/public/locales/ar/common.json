@@ -33,6 +33,12 @@
       "3rd Secondary": "الصف الثالث الثانوي",
       "undefined": "غير محدد"
 },
+  "role" :{
+    "student": "طالب",
+    "teacher": "معلم",
+    "admin": "مسؤول",
+    "assistnat": "مساعد"
+  },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",

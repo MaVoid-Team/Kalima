@@ -1,7 +1,8 @@
 {
     "title": "الإعدادات",
     "toggleSidebar": "تبديل القائمة الجانبية",
-
+    "General Points": "نقاط عامة",
+    "Total Points": "نقاط كلية",
 
     "personalInfo": {
     "title": "المعلومات الشخصية",
@@ -25,6 +26,8 @@
   },
     "languageAppearance": {
     "title": "اللغة والمظهر",
+    "showThemes": "اظهار السمات",
+    "hideThemes": "اغلق السمات",
     "options": {
       "language": "اللغة",
       "theme": "السمة"

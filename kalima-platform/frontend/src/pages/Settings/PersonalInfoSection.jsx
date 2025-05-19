@@ -213,7 +213,7 @@ function PersonalInfoSection() {
 
           {/* User Role Badge */}
           <div className="mb-4 flex justify-end">
-            <div className="badge badge-primary badge-lg">{userData?.role}</div>
+            <div className="badge badge-primary badge-lg">{t(`role.${userData?.role?.toLowerCase()}`, {ns:"common"})}</div>
           </div>
 
           {/* Full Name Field */}
@@ -394,11 +394,11 @@ function PersonalInfoSection() {
           {userData?.role === 'Student' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.generalPoints || 'General Points'}</div>
+                <div className="stat-title">{personalInfo.labels.generalPoints || t('General Points')}</div>
                 <div className="stat-value">{userData.generalPoints || 0}</div>
               </div>
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.totalPoints || 'Total Points'}</div>
+                <div className="stat-title">{personalInfo.labels.totalPoints || t('Total Points')}</div>
                 <div className="stat-value">{userData.totalPoints || 0}</div>
               </div>
             </div>
