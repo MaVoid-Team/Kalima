@@ -1,8 +1,16 @@
 {
   "title": "Lectures",
+  "generalPoints": "General Points",
+  "points": "Points",
+   "welcome": "Welcome to the Kalima Platform Lectures Section",
   "discover": "Discover Our Latest Lectures",
   "showLectures": "Show Lectures",
   "noLectures": "No lectures found matching the selected filters.",
+  "free": "Free",
+  "paid": "Paid",
+  "enroll": "Enroll",
+  "purchased": "Purchased",
+  "available : ": " Available",
   "filters": {
     "reset": "Reset Filters",
     "stage": "Instructor Role",
@@ -91,5 +99,11 @@
     "resetButton": "Reset",
     "permissionWarning": "Could not access camera. Please check permissions.",
     "scanError": "Failed to initialize scanner"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   }
 }
