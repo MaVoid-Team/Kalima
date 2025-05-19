@@ -1,59 +1,79 @@
 "use client"
-
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
+import { updateUserPassword } from "../../routes/update-user"
 
-function SecuritySection({ formData, handleInputChange }) {
+function SecuritySection() {
   const { t, i18n } = useTranslation("settings")
   const isRTL = i18n.language === 'ar'
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  })
+  const [passwordStrength, setPasswordStrength] = useState(0)
+  const [updateStatus, setUpdateStatus] = useState({
+    success: false,
+    error: null
+  })
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+
+    // Calculate password strength when new password changes
+    if (name === "newPassword") {
+      let strength = 0
+      if (value.length >= 8) strength += 1
+      if (/[A-Z]/.test(value)) strength += 1
+      if (/\d/.test(value)) strength += 1
+      if (/[^A-Za-z0-9]/.test(value)) strength += 1
+      setPasswordStrength(Math.min(2, Math.floor(strength / 2)))
+    }
+  }
 
   const updatePassword = async () => {
+    // Reset status
+    setUpdateStatus({ success: false, error: null })
+
+    // Validation
     if (formData.newPassword !== formData.confirmPassword) {
-      alert(t('security.errors.mismatch'))
+      setUpdateStatus({ error: t('security.errors.mismatch') })
       return
     }
 
     if (formData.newPassword.length < 8) {
-      alert(t('security.errors.length'))
+      setUpdateStatus({ error: t('security.errors.length') })
       return
     }
 
     setLoading(true)
     try {
-      // Example API call with axios
-      // const response = await axios.post('/api/update-password', {
-      //   currentPassword: formData.currentPassword,
-      //   newPassword: formData.newPassword
-      // })
+      const result = await updateUserPassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      })
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      alert(t('security.success'))
-      handleInputChange({
-        target: {
-          name: "currentPassword",
-          value: "",
-        },
-      })
-      handleInputChange({
-        target: {
-          name: "newPassword",
-          value: "",
-        },
-      })
-      handleInputChange({
-        target: {
-          name: "confirmPassword",
-          value: "",
-        },
-      })
+      if (result.success) {
+        setUpdateStatus({ success: true, error: null })
+        // Clear form
+        setFormData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        })
+      } else {
+        setUpdateStatus({ error: result.error })
+      }
     } catch (error) {
       console.error("Error updating password:", error)
-      alert(t('security.errors.general'))
+      setUpdateStatus({ error: t('security.errors.general') })
     } finally {
       setLoading(false)
     }
@@ -85,6 +105,25 @@ function SecuritySection({ formData, handleInputChange }) {
             {t('security.changePassword')}
           </h3>
 
+          {updateStatus.success && (
+            <div className="alert alert-success mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{t('security.success')}</span>
+            </div>
+          )}
+
+          {updateStatus.error && (
+            <div className="alert alert-error mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{updateStatus.error}</span>
+            </div>
+          )}
+
+          {/* Current Password Field */}
           <div className="form-control mb-4">
             <label className={`label justify-end`}>
               <span className="label-text">{t('security.labels.currentPassword')}</span>
@@ -141,27 +180,30 @@ function SecuritySection({ formData, handleInputChange }) {
             </div>
           </div>
 
-           <div className="form-control mb-4">
+          {/* New Password Field */}
+          <div className="form-control mb-4">
             <label className={`label justify-end`}>
               <span className="label-text">{t('security.labels.newPassword')}</span>
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="newPassword"
               value={formData.newPassword}
               onChange={handleInputChange}
-              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-rig'}`}
+              className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
               placeholder={t('security.placeholders.newPassword')}
               dir={isRTL ? 'rtl' : 'ltr'}
             />
+            <PasswordStrengthIndicator strength={passwordStrength} />
           </div>
 
+          {/* Confirm Password Field */}
           <div className="form-control mb-4">
             <label className={`label justify-end`}>
               <span className="label-text">{t('security.labels.confirmPassword')}</span>
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
@@ -178,7 +220,7 @@ function SecuritySection({ formData, handleInputChange }) {
             <button
               className={`btn btn-primary ${loading ? "loading" : ""}`}
               onClick={updatePassword}
-              disabled={loading}
+              disabled={loading || !formData.currentPassword || !formData.newPassword || !formData.confirmPassword}
             >
               {t('security.updateButton')}
             </button>
@@ -190,18 +232,22 @@ function SecuritySection({ formData, handleInputChange }) {
 }
 
 function PasswordStrengthIndicator({ strength }) {
-  // strength: 0 = weak, 1 = medium, 2 = strong
-  const widths = ["w-1/3", "w-1/2", "w-2/3"]
-  const colors = ["bg-error", "bg-warning", "bg-primary"]
+  const strengthText = ["Weak", "Medium", "Strong"]
+  const colors = ["bg-error", "bg-warning", "bg-success"]
+  const widths = ["w-1/3", "w-2/3", "w-full"]
 
   return (
-    <div className="mt-4">
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div className={`${colors[strength]} ${widths[strength]} h-2.5 rounded-full`}></div>
+    <div className="mt-2">
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className={`${colors[strength]} ${widths[strength]} h-2 rounded-full transition-all duration-300`}></div>
+      </div>
+      <div className="text-xs mt-1 text-gray-500">
+        Strength: <span className={`font-medium ${colors[strength].replace('bg', 'text')}`}>
+          {strengthText[strength]}
+        </span>
       </div>
     </div>
   )
 }
 
 export default SecuritySection
-

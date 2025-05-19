@@ -51,55 +51,6 @@ export default function Step3({ formData, toggleHobby, t, hobbiesList, setHobbie
           </div>
         ))}
       </div>
-
-      {/* Custom hobbies (text only) */}
-      {customHobbies.length > 0 && (
-        <div className="mt-4">
-          <h4 className="text-md font-medium mb-2">{t("form.yourCustomHobbies") || "Your Custom Hobbies"}</h4>
-          <div className="flex flex-wrap gap-2">
-            {customHobbies.map((hobby) => (
-              <div
-                key={hobby.id}
-                onClick={() => toggleHobby(hobby.id)}
-                className={`px-3 py-1 rounded-full text-sm cursor-pointer transition-all
-                  ${
-                    formData.hobbies.includes(hobby.id)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/20 hover:bg-secondary/30"
-                  }`}
-              >
-                {hobby.name}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Add custom hobby input */}
-      <div className="mt-4">
-        <div className="flex gap-2 items-center">
-          <input
-            type="text"
-            value={customHobby}
-            onChange={(e) => setCustomHobby(e.target.value)}
-            placeholder={t("form.enterHobby") || "Enter a hobby"}
-            className="input input-sm input-bordered flex-1"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault()
-                handleAddCustomHobby()
-              }
-            }}
-          />
-          <button type="button" onClick={handleAddCustomHobby} className="btn btn-sm btn-primary">
-            {t("form.add") || "Add"}
-          </button>
-        </div>
-      </div>
-
-      {errors?.hobbies && (
-        <div className="text-error text-sm mt-2">{t(`validation.${errors.hobbies}`) || errors.hobbies}</div>
-      )}
     </div>
   )
 }
