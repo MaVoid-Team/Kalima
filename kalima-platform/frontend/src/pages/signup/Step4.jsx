@@ -64,6 +64,7 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
 
           {formData.role === "teacher" && (
             <>
+              <ReviewItem label={t("form.phoneNumber2")} value={formData.phoneNumber2} />
               <ReviewItem label={t("form.level")} value={formatTeacherLevels(formData.level)} />
               <ReviewItem label={t("form.subject")} value={formData.subject} />
               <ReviewItem

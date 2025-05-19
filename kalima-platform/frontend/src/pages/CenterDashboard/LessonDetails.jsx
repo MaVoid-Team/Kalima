@@ -33,7 +33,7 @@ export default function LessonDetailsSection() {
   const [attendanceDate, setAttendanceDate] = useState("") // State for attendance date (optional)
   const [isBookletPurchased, setIsBookletPurchased] = useState(true) // State for booklet purchased
   const [showScanner, setShowScanner] = useState(false) // State to toggle scanner visibility
-  const { t } = useTranslation()
+  const { t } = useTranslation("lectures")
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -43,7 +43,7 @@ export default function LessonDetailsSection() {
         if (response.status === "success") {
           setStudents(response.data)
         } else {
-          throw new Error(response.message || "Failed to fetch students")
+          throw new Error(response.message || t("errors.fetchStudents", "Failed to fetch students"))
         }
       } catch (err) {
         setError(err.message)
@@ -55,7 +55,7 @@ export default function LessonDetailsSection() {
     if (lesson.center?._id) {
       fetchStudents()
     }
-  }, [lesson.center?._id])
+  }, [lesson.center?._id, t])
 
   // Handler for when a barcode is scanned successfully
   const handleBarcodeScanned = async (barcodeText, barcodeFormat) => {
@@ -160,6 +160,7 @@ export default function LessonDetailsSection() {
     return (
       <div className="flex justify-center items-center py-16">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <span className="ml-2">{t("common.loading", "Loading...")}</span>
       </div>
     )
   if (error)
@@ -188,7 +189,7 @@ export default function LessonDetailsSection() {
     <div className="space-y-8 p-4 max-w-6xl mx-auto">
       {/* Lesson Header */}
       <div className="bg-base-100 shadow-sm rounded-lg p-6 border border-base-200">
-        <h1 className="text-2xl font-bold mb-2">{lesson.title || "Lesson Details"}</h1>
+        <h1 className="text-2xl font-bold mb-2">{lesson.title || t("lesson.detailsTitle", "Lesson Details")}</h1>
         <div className="flex flex-wrap gap-4 text-sm">
           {lesson.center && (
             <div className="badge badge-outline p-3">

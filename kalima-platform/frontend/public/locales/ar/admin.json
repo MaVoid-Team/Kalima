@@ -140,7 +140,9 @@
         "admin": "مسؤول",
         "subadmin": "مسؤول فرعي",
         "lecturer": "معلم",
-        "student": "طالب"
+        "student": "طالب",
+        "teacher": "معلم",
+        "assistant": "مساعد"
       },
       
       "actions": {
@@ -161,7 +163,9 @@
         "promoCode": "كود ترويجي", 
         "admin": "أدمن",
         "assistant": "مساعد",
-        "parent": "ولي أمر"
+        "parent": "ولي أمر",
+        "package": "باقات",
+        "lesson": "درس"
       },
       "idDisplay": "ID: {{id}}",
       
