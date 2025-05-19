@@ -21,12 +21,30 @@ exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
       student,
       lecture,
       passed: true,
+      type: "exam",
     });
 
     if (!examSubmission) {
       return next(
         new AppError(
           "You must pass the exam before accessing this lecture",
+          403
+        )
+      );
+    }
+  }
+
+  if (lectureDoc.requiresHomework) {
+    const homeworkSubmission = await StudentExamSubmission.findOne({
+      student,
+      lecture,
+      passed: true,
+      type: "homework",
+    });
+    if (!homeworkSubmission) {
+      return next(
+        new AppError(
+          "You must pass the homework before accessing this lecture",
           403
         )
       );
