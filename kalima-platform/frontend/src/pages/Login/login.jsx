@@ -93,7 +93,7 @@ const TeacherLogin = () => {
         navigate("/dashboard/admin-dashboard");
       } else if (userRole === "Lecturer") {
         navigate("/dashboard/lecturer-dashboard");
-      } else if (userRole === "Student" || userRole === "Teacher") {
+      } else if (userRole === "Student" || userRole === "Teacher" || userRole === "Parent") {
         navigate("/dashboard/student-dashboard/promo-codes");
       } else if (userRole === "Assistant") {
         navigate("/dashboard/assistant-page");
