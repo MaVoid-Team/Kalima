@@ -793,6 +793,87 @@ const getStudentParentAdditionalData = async (
   return responseData;
 };
 
+/**
+ * Get parent's children data with detailed information
+ * This allows a parent to see information about their children
+ */
+const getParentChildrenData = catchAsync(async (req, res, next) => {
+  // Get parent ID from authenticated user
+  const parentId = req.user._id;
+
+  // Check if user is a parent
+  if (req.user.role !== "Parent") {
+    return next(new AppError("Only parents can access their children's data", 403));
+  }
+
+  // Find parent with children and get IDs
+  const parent = await Parent.findById(parentId).lean();
+
+  if (!parent) {
+    return next(new AppError("Parent not found", 404));
+  }
+
+  if (!parent.children || parent.children.length === 0) {
+    return res.status(200).json({
+      status: "success",
+      results: 0,
+      data: {
+        children: []
+      }
+    });
+  }
+
+  // Find all children with detailed information
+  const children = await Student.find({ _id: { $in: parent.children } })
+    .populate("level", "name")
+    .lean();
+
+  // For each child, get additional data like purchase history
+  const childrenWithData = await Promise.all(
+    children.map(async (child) => {
+      // Get purchase history
+      const purchaseHistory = await Purchase.find({ student: child._id })
+        .populate({
+          path: "container",
+          select: "name type price subject level",
+          populate: [
+            { path: "subject", select: "name" },
+            { path: "level", select: "name" }
+          ]
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      // Get lecture access
+      const lectureAccess = await StudentLectureAccess.find({ student: child._id })
+        .populate("lecture", "name")
+        .lean();
+
+      // Get redeemed promo codes
+      const redeemedCodes = await Code.find({
+        redeemedBy: child._id,
+        isRedeemed: true
+      }).lean();
+      
+      // Return child with additional data
+      return {
+        ...child,
+        purchaseHistory,
+        lectureAccess,
+        redeemedCodes
+      };
+    })
+  );
+
+  res.status(200).json({
+    status: "success",
+    results: childrenWithData.length,
+    data: {
+      children: childrenWithData
+    }
+  });
+});
+
 module.exports = {
   getAllUsers,
   getAllUsersByRole,
@@ -803,4 +884,5 @@ module.exports = {
   changePassword,
   uploadFileForBulkCreation,
   getMyData,
+  getParentChildrenData,
 };

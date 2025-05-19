@@ -41,6 +41,9 @@ router.use(verifyJWT);
 // Get current user's data (for student/parent only)
 router.get("/me/dashboard", userController.getMyData);
 
+// Get parent's children data with detailed information
+router.get("/me/children", userController.getParentChildrenData);
+
 router.route("/update/password").patch(userController.changePassword);
 
 module.exports = router;
