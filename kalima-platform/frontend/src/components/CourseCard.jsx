@@ -71,8 +71,8 @@ export const CourseCard = ({
         <h2 className="card-title">{title || t("titleFallback")}</h2>
         <div className="flex flex-wrap gap-2 mt-1">
           {subject && <div className="badge badge-primary">{subject}</div>}
-          {grade && <div className="badge badge-secondary">{grade}</div>}
-          {stage && <div className="badge badge-accent">{stage}</div>}
+          {grade && <div className="badge badge-secondary">{t(`gradeLevels.${grade}` ,{ ns: "common" })}</div>}
+            {stage && <div className="badge badge-accent">{stage}</div>}
           {type && <div className="badge badge-outline">{type}</div>}
         </div>
 
