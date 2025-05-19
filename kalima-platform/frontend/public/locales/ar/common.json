@@ -39,6 +39,12 @@
     "admin": "مسؤول",
     "assistnat": "مساعد"
   },
+  "passwordStrength": {
+    "label": "القوّة:",
+    "weak": "ضعيف",
+    "medium": "متوسّط",
+    "strong": "قوي"
+  },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",
