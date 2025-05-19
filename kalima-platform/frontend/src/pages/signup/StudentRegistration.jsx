@@ -47,9 +47,10 @@ export default function StudentRegistration() {
     password: "",
     confirmPassword: "",
     phoneNumber: "",
+    phoneNumber2: "",
     gender: "",
     faction: "Alpha",
-    level: [],
+    level: "",
     hobbies: [],
     parentPhoneNumber: "",
     children: [""],
@@ -117,17 +118,7 @@ export default function StudentRegistration() {
         errors.parentPhoneNumber = "parentPhoneRequired"
       }
 
-      if (role === "parent") {
-        if (!formData.children[0]?.trim()) {
-          errors.children = { 0: "required" }
-        } else {
-          formData.children.forEach((child, index) => {
-            if (child && !/^[a-f\d]{24}$/i.test(child.trim())) {
-              errors.children = { ...errors.children, [index]: "childIdInvalid" }
-            }
-          })
-        }
-      }
+     
 
       if (role === "teacher") {
         if (!formData.subject?.trim()) {
@@ -187,10 +178,10 @@ export default function StudentRegistration() {
         const response = await getAllLevels()
         if (response.success) {
           const levels = response.data.map((level) => ({
-            value: level._id,
-            label: level.name,
-          }))
-          setGradeLevels(levels)
+          value: level._id,
+          label: level.name
+        }));
+        setGradeLevels(levels);
         }
       } catch (error) {
         console.error("Error fetching levels:", error)
@@ -296,6 +287,7 @@ export default function StudentRegistration() {
             password: formData.password,
             confirmPassword: formData.confirmPassword,
             phoneNumber: formData.phoneNumber,
+
             gender: formData.gender,
             government: formData.government,
             administrationZone: formData.administrationZone,
@@ -311,6 +303,7 @@ export default function StudentRegistration() {
             password: formData.password,
             confirmPassword: formData.confirmPassword,
             phoneNumber: formData.phoneNumber,
+            phoneNumber2: formData.phoneNumber2,
             subject: formData.subject.trim(),
             level: formData.level,
             teachesAtType: formData.teachesAtType,
@@ -427,6 +420,7 @@ export default function StudentRegistration() {
                   handleChildrenChange={handleChildrenChange}
                   handleInputChange={handleInputChange}
                   t={t}
+                  gradeLevels={gradeLevels} 
                   errors={errors}
                 />
               )

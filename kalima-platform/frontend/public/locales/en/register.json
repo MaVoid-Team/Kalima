@@ -27,6 +27,7 @@
     "bio": "Bio",
     "expertise": "Expertise",
     "phoneNumber": "Personal Phone Number",
+    "phoneNumber2": "secondary phone number",
     "parentPhone": "Parent Phone",
     "email": "Email Address",
     "address": "Address",

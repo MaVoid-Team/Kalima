@@ -72,6 +72,35 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           )}
         </div>
       </div>
+
+       {role === 'teacher' && (
+        <>
+     <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t('form.phoneNumber2')}</span>
+          </label>
+          <input
+            type="number"
+            name="phoneNumber2"
+            className={`input input-bordered w-2/3 lg:w-1/2 `}
+            value={formData.phoneNumber2}
+            onChange={handleInputChange}
+            required
+          />
+          <label className="label">
+            <span className="label-text">{t('form.optional')}</span>
+          </label>
+          {errors.phoneNumber2 && (
+            <span className="absolute bottom-0  text-error text-sm mt-1">
+               {t(`validation.${errors.phoneNumber2}`)}
+            </span>
+          )}
+        </div>
+      </div>
+        </>
+      )}
+
     {/* Government Selection */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">

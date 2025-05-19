@@ -3,9 +3,8 @@ import { getAllLevels } from '../../routes/levels';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 
-export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange }) {
+export default function StepParent({ formData, handleChildrenChange, t, errors, handleInputChange , gradeLevels}) {
     const [childrenCount, setChildrenCount] = useState(1);
-    const [gradeLevels, setGradeLevels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [apiError, setApiError] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
@@ -14,32 +13,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
     // Ensure we have enough empty slots for all children
     const safeChildren = [...formData.children, ...Array(childrenCount - formData.children.length).fill('')];
 
-    useEffect(() => {
-        const fetchLevels = async () => {
-            try {
-                setLoading(true);
-                setApiError(null);
-                const response = await getAllLevels();
-                
-                if (response.success) {
-                    const levels = response.data.levels.map(level => ({
-                        value: level._id,
-                        label: level.name
-                    }));
-                    setGradeLevels(levels);
-                } else {
-                    throw new Error(response.message || 'Failed to fetch grade levels');
-                }
-            } catch (err) {
-                setApiError(err.message || 'An unexpected error occurred while fetching grade levels');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchLevels();
-    }, []);
-
+   
     const renderErrorMessage = (errorKey) => {
         if (!errors[errorKey]) return null;
         return (
@@ -158,24 +132,16 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         className={`select select-bordered ${errors.level ? 'select-error animate-shake' : ''}`}
                         value={formData.level || ''}
                         onChange={handleInputChange}
-                        disabled={loading || !!apiError}
+                      
                     >
-                        <option value="">{t('form.selectLevel')}</option>
-                        {loading ? (
-                            <option value="" disabled>
-                                {t('form.loading')}
-                            </option>
-                        ) : apiError ? (
-                            <option value="" disabled>
-                                {t('form.errorLoadingLevels')}
-                            </option>
-                        ) : (
-                            gradeLevels.map(level => (
-                                <option key={level.value} value={level.value}>
-                                    {t(`gradeLevels.${level.label}`)}
-                                </option>
-                            ))
-                        )}
+                         <option value="">{t('form.selectGrade')}</option>
+              {gradeLevels.map(level => (
+                <option key={level.value} value={level.value}>
+                  {t(`gradeLevels.${level.label}`)}
+                </option>
+              ))}
+                           
+                        
                     </select>
                     {errors.level && (
               <span className="absolute bottom-0  text-error text-sm mt-1">
@@ -194,7 +160,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                         <label className="label">
                             <span className="label-text">{t('form.childSequenceId')} #{i + 1}</span>
                         </label>
-                                                    <input
+                                <input
                                 type="text"
                                 className={`input input-bordered ${errors.children?.[i] ? 'input-error animate-shake' : ''}`}
                                 value={child || ''}
@@ -204,6 +170,7 @@ export default function StepParent({ formData, handleChildrenChange, t, errors, 
                                 title="24-character MongoDB ID"
                                 required={i === 0}
                             />
+                            <p className="label"> {t('form.optional')}</p>
                         {errors.children?.[i] && (
                             <span className="text-error text-sm mt-1 animate-fade-in">
                                 {t(`validation.${errors.children[i]}`) || t('validation.invalidSequenceId')}
