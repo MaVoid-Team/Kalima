@@ -42,10 +42,10 @@ export function AppDownloadSection() {
   }, [appDownloadUrl])
 
   return (
-    <div className="w-full py-16 bg-[#1a1f2e] text-white overflow-hidden">
+    <div className="w-full py-16 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Yellow border overlay */}
-        <div className="absolute inset-0 border-4 border-yellow-500 rounded-[3rem] -z-0"></div>
+        <div className="absolute inset-0 border-4 border-primary rounded-[3rem] -z-0"></div>
 
         {/* Blue accent dots */}
         <div className="absolute top-0 right-0 w-24 h-24 rounded-full border-4 border-dashed border-blue-500 opacity-30 -translate-y-1/4 translate-x-1/4"></div>
@@ -56,40 +56,16 @@ export function AppDownloadSection() {
             {/* Text Content */}
             <div className={`text-center md:text-left md:w-1/2 ${isRTL ? "md:order-2" : "md:order-1"}`}>
               <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isRTL ? "text-right" : "text-left"}`}>
-                <span className="text-blue-400">{t("appDownload.title") || "Download"}</span>{" "}
+                <span>{t("appDownload.title") || "Download"}</span>{" "}
                 <span>{t("appDownload.now") || "Our App Now"}</span>
               </h2>
 
-              <p className={`text-lg md:text-xl text-gray-300 mb-6 ${isRTL ? "text-right" : "text-left"}`}>
+              <p className={`text-lg md:text-xl mb-6 ${isRTL ? "text-right" : "text-left"}`}>
                 {t("appDownload.content1") || "Best free educational app. Download our app"}{" "}
-                <span className="text-blue-400">{t("appDownload.now") || "now"}</span>{" "}
+                <span className="text-primary">{t("appDownload.now") || "now"}</span>{" "}
                 {t("appDownload.content2") || "on your mobile to learn"}{" "}
-                <span className="text-blue-400">{t("appDownload.everywhere") || "everywhere"}</span>
+                <span className="text-primary">{t("appDownload.everywhere") || "everywhere"}</span>
               </p>
-
-              <div className={`mt-6 ${isRTL ? "text-right" : "text-left"}`}>
-                <div className="inline-flex items-center px-4 py-2 bg-blue-500 bg-opacity-20 rounded-lg">
-                  <div className="mr-3">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-blue-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-blue-100">
-                    {t("appDownload.scanInstructions") || "Scan the QR code to download our app"}
-                  </p>
-                </div>
-              </div>
             </div>
 
             {/* QR Code Section */}
@@ -143,8 +119,8 @@ export function AppDownloadSection() {
                 )}
 
                 {/* Decorative elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full"></div>
-                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-blue-500 rounded-full"></div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-secondary rounded-full"></div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-secondary rounded-full"></div>
               </div>
             </div>
           </div>
