@@ -13,7 +13,7 @@ export const getAllStudentLectureAccess = async (lectureId, limit = 100) => {
       throw new Error("Lecture ID is required")
     }
 
-    const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/student-lecture-access`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/student-lecture-access`, {
       params: {
         lecture: lectureId,
         limit,
@@ -120,7 +120,7 @@ export const checkStudentLectureAccess = async (studentId, containerId, purchase
     }
 
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/v1/containers/student/${studentId}/container/${containerId}/purchase/${purchaseId}`,
+      `${import.meta.env.VITE_API_URL}/containers/student/${studentId}/container/${containerId}/purchase/${purchaseId}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,

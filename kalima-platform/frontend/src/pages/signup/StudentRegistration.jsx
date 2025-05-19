@@ -327,7 +327,7 @@ export default function StudentRegistration() {
           throw new Error("Invalid role selected")
       }
 
-      const url = `${apiUrl}/api/v1/register`
+      const url = `${apiUrl}/register`
       const response = await axios.post(url, payload)
       navigate("/login", {
         state: { message: "Registration successful" },
