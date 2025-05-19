@@ -5,7 +5,8 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { fetchPackageById, purchasePackage } from "../../routes/packages"
 import { getUserDashboard } from "../../routes/auth-services"
 import { toast } from "react-hot-toast"
-import { ArrowLeft, Calendar, Users, Book, Award, Check, X } from "lucide-react"
+import { ArrowLeft, Calendar, Users, Book, Award, Check, X } from 'lucide-react'
+import { useTranslation } from "react-i18next"
 
 const PackageDetails = () => {
   const navigate = useNavigate()
@@ -19,7 +20,8 @@ const PackageDetails = () => {
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   // Add state for purchased status
   const [isPurchased, setIsPurchased] = useState(false)
-
+  const { t ,i18n} = useTranslation("packages")
+  const isRTL = i18n.language === "ar"
   // Fetch package details and user data
   useEffect(() => {
     const loadData = async () => {
@@ -54,22 +56,22 @@ const PackageDetails = () => {
         setLoading(false)
       } catch (error) {
         console.error("Error loading package:", error)
-        setError("Failed to load package details. Please try again later.")
+        setError(t("common.error"))
         setLoading(false)
       }
     }
     loadData()
-  }, [packageId, state])
+  }, [packageId, state, t])
 
   // Handle purchase
   const handlePurchase = () => {
     if (!userData) {
-      toast.error("Please log in to purchase this package")
+      toast.error(t("packageDetails.loginToPurchase"))
       return
     }
 
     if (userData.generalPoints < pkg.price) {
-      toast.error("You don't have enough general points to purchase this package")
+      toast.error(t("purchaseModal.insufficientPoints"))
       return
     }
 
@@ -95,17 +97,19 @@ const PackageDetails = () => {
 
         toast.success(
           <div>
-            <p>Package purchased successfully!</p>
-            <p className="text-sm mt-1">Remaining points: {response.remainingPoints}</p>
+            <p>{t("purchaseModal.successMessage")}</p>
+            <p className="text-sm mt-1">
+              {t("purchaseModal.remainingPoints", { points: response.remainingPoints })}
+            </p>
           </div>,
         )
 
         setIsModalOpen(false)
       } else {
-        toast.error(response.message || "Failed to purchase package")
+        toast.error(response.message || t("purchaseModal.failureMessage"))
       }
     } catch (err) {
-      toast.error("An error occurred while purchasing the package")
+      toast.error(t("purchaseModal.errorMessage"))
       console.error(err)
     } finally {
       setPurchaseLoading(false)
@@ -114,16 +118,7 @@ const PackageDetails = () => {
 
   // Get duration text
   const getDurationText = (type) => {
-    switch (type) {
-      case "month":
-        return "1 Month Access"
-      case "year":
-        return "1 Year Access"
-      case "week":
-        return "1 Week Access"
-      default:
-        return `${type.charAt(0).toUpperCase() + type.slice(1)} Access`
-    }
+    return t(`duration.${type}`, t(`duration.${type}`, type))
   }
 
   // Calculate total points in the package
@@ -143,7 +138,7 @@ const PackageDetails = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
         <div className="text-error mb-4 text-xl">{error}</div>
         <button className="btn btn-primary" onClick={() => navigate("/packages")}>
-          Back to Packages
+          {t("common.backToPackages")}
         </button>
       </div>
     )
@@ -151,19 +146,20 @@ const PackageDetails = () => {
   if (!pkg)
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
-        <div className="text-xl mb-4">Package not found</div>
+        <div className="text-xl mb-4">{t("common.packageNotFound")}</div>
         <button className="btn btn-primary" onClick={() => navigate("/packages")}>
-          Back to Packages
+          {t("common.backToPackages")}
         </button>
       </div>
     )
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8"
+    dir={isRTL ? "rtl" : "ltr"}>
       {/* Back Button */}
       <button className="btn btn-ghost mb-6 gap-2" onClick={() => navigate("/packages")}>
         <ArrowLeft className="w-4 h-4" />
-        Back to Packages
+        {t("common.backToPackages")}
       </button>
 
       {/* Package Header */}
@@ -181,12 +177,12 @@ const PackageDetails = () => {
           <div className="flex flex-wrap gap-6 justify-between">
             {/* Package Info */}
             <div className="flex-1 min-w-[280px]">
-              <h2 className="text-xl font-bold mb-4">Package Overview</h2>
+              <h2 className="text-xl font-bold mb-4">{t("packageDetails.overview")}</h2>
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Calendar className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium">Duration</p>
+                    <p className="font-medium">{t("packageDetails.duration")}</p>
                     <p className="text-sm">{getDurationText(pkg.type)}</p>
                   </div>
                 </div>
@@ -194,23 +190,27 @@ const PackageDetails = () => {
                 <div className="flex items-center">
                   <Users className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium">Teachers</p>
-                    <p className="text-sm">{pkg.points.length} expert instructors</p>
+                    <p className="font-medium">{t("packageDetails.teachers")}</p>
+                    <p className="text-sm">
+                      {pkg.points.length} {t("packageDetails.expertInstructors")}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center">
                   <Book className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium">Total Points</p>
-                    <p className="text-sm">{getTotalPoints(pkg.points)} points distributed</p>
+                    <p className="font-medium">{t("packageDetails.totalPoints")}</p>
+                    <p className="text-sm">
+                      {getTotalPoints(pkg.points)} {t("packageDetails.pointsDistributed")}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-center">
                   <Award className="w-5 h-5 text-primary mr-3" />
                   <div>
-                    <p className="font-medium">Created</p>
+                    <p className="font-medium">{t("packageDetails.created")}</p>
                     <p className="text-sm">{new Date(pkg.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
@@ -219,31 +219,35 @@ const PackageDetails = () => {
 
             {/* Purchase Card */}
             <div className="bg-base-200 p-6 rounded-xl min-w-[280px] max-w-sm">
-              <h3 className="text-xl font-bold mb-4">Package Price</h3>
-              <div className="text-3xl font-bold mb-4">{pkg.price} Points</div>
+              <h3 className="text-xl font-bold mb-4">{t("packageDetails.packagePrice")}</h3>
+              <div className="text-3xl font-bold mb-4">
+                {pkg.price} {t("common.points")}
+              </div>
 
               {userData ? (
                 isPurchased ? (
                   <div className="mb-6">
                     <div className="bg-success/20 p-4 rounded-lg text-center">
-                      <div className="text-success font-bold mb-2">Already Purchased</div>
-                      <p className="text-sm">You already own this package</p>
+                      <div className="text-success font-bold mb-2">{t("packageDetails.alreadyPurchased")}</div>
+                      <p className="text-sm">{t("packageDetails.youAlreadyOwn")}</p>
                     </div>
                   </div>
                 ) : (
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm">Your Balance:</span>
-                      <span className="font-medium">{userData.generalPoints} Points</span>
+                      <span className="text-sm">{t("packageDetails.yourBalance")}:</span>
+                      <span className="font-medium">
+                        {userData.generalPoints} {t("common.points")}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">After Purchase:</span>
+                      <span className="text-sm">{t("packageDetails.afterPurchase")}:</span>
                       <span
                         className={`font-medium ${
                           userData.generalPoints - pkg.price < 0 ? "text-error" : "text-success"
                         }`}
                       >
-                        {userData.generalPoints - pkg.price} Points
+                        {userData.generalPoints - pkg.price} {t("common.points")}
                       </span>
                     </div>
 
@@ -253,12 +257,14 @@ const PackageDetails = () => {
                         onClick={handlePurchase}
                         disabled={userData.generalPoints < pkg.price}
                       >
-                        {userData.generalPoints >= pkg.price ? "Purchase Now" : "Insufficient Points"}
+                        {userData.generalPoints >= pkg.price
+                          ? t("packageDetails.purchaseNow")
+                          : t("common.insufficientPoints")}
                       </button>
 
                       {userData.generalPoints < pkg.price && (
                         <p className="text-xs text-error mt-2 text-center">
-                          You need {pkg.price - userData.generalPoints} more points to purchase this package
+                          {t("packageDetails.needMorePoints", { points: pkg.price - userData.generalPoints })}
                         </p>
                       )}
                     </div>
@@ -266,14 +272,12 @@ const PackageDetails = () => {
                 )
               ) : (
                 <div className="mb-6">
-                  <p className="text-sm mb-4">Please log in to purchase this package</p>
-                  <button className="btn btn-primary w-full">Log In to Purchase</button>
+                  <p className="text-sm mb-4">{t("packageDetails.loginToPurchase")}</p>
+                  <button className="btn btn-primary w-full">{t("packageDetails.loginButton")}</button>
                 </div>
               )}
 
-              <div className="text-xs mt-2">
-                * This package can only be purchased using general points
-              </div>
+              <div className="text-xs mt-2">{t("packageDetails.generalPointsOnly")}</div>
             </div>
           </div>
         </div>
@@ -285,7 +289,7 @@ const PackageDetails = () => {
         <div className="bg-base-100 p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4 flex items-center">
             <Users className="w-5 h-5 mr-2 text-primary" />
-            Teachers Included
+            {t("packageDetails.teachersIncluded")}
           </h2>
 
           <div className="space-y-4">
@@ -303,7 +307,7 @@ const PackageDetails = () => {
                   </div>
                 </div>
                 <div className="bg-primary px-3 py-1 rounded-full text-sm font-bold">
-                  {point.points} Points
+                  {point.points} {t("common.points")}
                 </div>
               </div>
             ))}
@@ -314,7 +318,7 @@ const PackageDetails = () => {
         <div className="bg-base-100 p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-bold mb-4 flex items-center">
             <Award className="w-5 h-5 mr-2 text-primary" />
-            Package Benefits
+            {t("packageDetails.packageBenefits")}
           </h2>
 
           <ul className="space-y-3">
@@ -322,31 +326,37 @@ const PackageDetails = () => {
               <div className="mt-1 mr-3 bg-primary/20 p-1 rounded-full">
                 <Check className="w-4 h-4 text-primary" />
               </div>
-              <span>Access to content from {pkg.points.length} expert teachers</span>
+              <span>
+                {t("packageDetails.benefits.accessToContent", { count: pkg.points.length })}
+              </span>
             </li>
             <li className="flex items-start">
               <div className="mt-1 mr-3 bg-primary/20 p-1 rounded-full">
                 <Check className="w-4 h-4 text-primary" />
               </div>
-              <span>{getDurationText(pkg.type)} to all included materials</span>
+              <span>
+                {t("packageDetails.benefits.durationAccess", { duration: getDurationText(pkg.type) })}
+              </span>
             </li>
             <li className="flex items-start">
               <div className="mt-1 mr-3 bg-primary/20 p-1 rounded-full">
                 <Check className="w-4 h-4 text-primary" />
               </div>
-              <span>Total of {getTotalPoints(pkg.points)} points distributed across teachers</span>
+              <span>
+                {t("packageDetails.benefits.totalPoints", { points: getTotalPoints(pkg.points) })}
+              </span>
             </li>
             <li className="flex items-start">
               <div className="mt-1 mr-3 bg-primary/20 p-1 rounded-full">
                 <Check className="w-4 h-4 text-primary" />
               </div>
-              <span>Flexible learning at your own pace</span>
+              <span>{t("packageDetails.benefits.flexibleLearning")}</span>
             </li>
             <li className="flex items-start">
               <div className="mt-1 mr-3 bg-primary/20 p-1 rounded-full">
                 <Check className="w-4 h-4 text-primary" />
               </div>
-              <span>Comprehensive curriculum covering multiple subjects</span>
+              <span>{t("packageDetails.benefits.comprehensiveCurriculum")}</span>
             </li>
           </ul>
         </div>
@@ -357,7 +367,7 @@ const PackageDetails = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-base-100 p-6 rounded-xl max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Confirm Purchase</h3>
+              <h3 className="text-xl font-bold">{t("purchaseModal.title")}</h3>
               <button
                 className="btn btn-sm btn-circle btn-ghost"
                 onClick={() => setIsModalOpen(false)}
@@ -368,40 +378,49 @@ const PackageDetails = () => {
             </div>
 
             <div className="mb-6">
-              <p className="mb-4">Are you sure you want to purchase this package?</p>
+              <p className="mb-4">{t("purchaseModal.confirmMessage")}</p>
 
               <div className="bg-base-200 p-4 rounded-lg mb-4">
                 <h4 className="font-semibold mb-2">{pkg.name}</h4>
                 <p className="text-sm mb-1">
-                  <span className="font-medium">Type:</span> {pkg.type === "month" ? "Monthly" : pkg.type}
+                  <span className="font-medium">{t("purchaseModal.type")}:</span>{" "}
+                  {pkg.type === "month" ? t("duration.month") : pkg.type}
                 </p>
                 <p className="text-sm mb-1">
-                  <span className="font-medium">Price:</span> {pkg.price} Points
+                  <span className="font-medium">{t("purchaseModal.price")}:</span> {pkg.price} {t("common.points")}
                 </p>
                 <p className="text-sm">
-                  <span className="font-medium">Teachers:</span>{" "}
+                  <span className="font-medium">{t("purchaseModal.teachers")}:</span>{" "}
                   {pkg.points.map((point) => point.lecturer.name).join(", ")}
                 </p>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
                 <div>
-                  <p className="text-sm font-medium">Your Balance</p>
-                  <p className="text-lg font-bold">{userData?.generalPoints || 0} Points</p>
+                  <p className="text-sm font-medium">{t("purchaseModal.yourBalance")}</p>
+                  <p className="text-lg font-bold">
+                    {userData?.generalPoints || 0} {t("common.points")}
+                  </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium">After Purchase</p>
-                  <p className="text-lg font-bold">{(userData?.generalPoints || 0) - pkg.price} Points</p>
+                  <p className="text-sm font-medium">{t("purchaseModal.afterPurchase")}</p>
+                  <p className="text-lg font-bold">
+                    {(userData?.generalPoints || 0) - pkg.price} {t("common.points")}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end gap-3">
               <button className="btn btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
-                Cancel
+                {t("common.cancel")}
               </button>
               <button className="btn btn-primary" onClick={confirmPurchase} disabled={purchaseLoading}>
-                {purchaseLoading ? <span className="loading loading-spinner loading-sm"></span> : "Confirm Purchase"}
+                {purchaseLoading ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  t("purchaseModal.confirmButton")
+                )}
               </button>
             </div>
           </div>
