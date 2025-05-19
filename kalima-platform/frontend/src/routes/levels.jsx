@@ -1,5 +1,4 @@
 import axios from "axios";
-import api from "../services/errorHandling";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // Helper function to get auth headers

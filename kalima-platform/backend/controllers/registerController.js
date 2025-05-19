@@ -297,6 +297,10 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   switch (role.toLowerCase()) {
     case "teacher": {
+      // check phoneNumber2 (optional)
+      if (userData.phoneNumber2 !== undefined) {
+        newUser.phoneNumber2 = userData.phoneNumber2;
+      }
       // Validate level (must be an array of allowed values)
       if (
         !Array.isArray(newUser.level) ||

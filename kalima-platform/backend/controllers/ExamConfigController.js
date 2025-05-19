@@ -7,7 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 exports.createExamConfig = catchAsync(async (req, res, next) => {
   const {
     name,
-    type = 'exam',
+    type = "exam",
     description,
     googleSheetId,
     formUrl,
@@ -24,10 +24,8 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
   }
 
   // Validate type
-  if (type !== 'exam' && type !== 'homework') {
-    return next(
-      new AppError("Type must be either 'exam' or 'homework'", 400)
-    );
+  if (type !== "exam" && type !== "homework") {
+    return next(new AppError("Type must be either 'exam' or 'homework'", 400));
   }
 
   // Create the configuration
@@ -40,7 +38,8 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
     formUrl,
     studentIdentifierColumn: studentIdentifierColumn || "Email Address",
     scoreColumn: scoreColumn || "Score",
-    defaultPassingThreshold: defaultPassingThreshold || 60,
+    defaultPassingThreshold:
+      defaultPassingThreshold != null ? defaultPassingThreshold : 60,
   });
 
   res.status(201).json({
@@ -78,7 +77,10 @@ exports.getExamConfig = catchAsync(async (req, res, next) => {
   // Check if the config belongs to the logged in user
   if (examConfig.lecturer.toString() !== req.user._id.toString()) {
     return next(
-      new AppError("You do not have permission to access this configuration", 403)
+      new AppError(
+        "You do not have permission to access this configuration",
+        403
+      )
     );
   }
 
@@ -105,12 +107,10 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
   } = req.body;
 
   // Validate type if provided
-  if (type && type !== 'exam' && type !== 'homework') {
-    return next(
-      new AppError("Type must be either 'exam' or 'homework'", 400)
-    );
+  if (type && type !== "exam" && type !== "homework") {
+    return next(new AppError("Type must be either 'exam' or 'homework'", 400));
   }
-  
+
   // Find the configuration
   const examConfig = await LecturerExamConfig.findById(req.params.id);
 
@@ -122,7 +122,10 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
   // Check if the config belongs to the logged in user
   if (examConfig.lecturer.toString() !== req.user._id.toString()) {
     return next(
-      new AppError("You do not have permission to modify this configuration", 403)
+      new AppError(
+        "You do not have permission to modify this configuration",
+        403
+      )
     );
   }
 
@@ -166,7 +169,10 @@ exports.deleteExamConfig = catchAsync(async (req, res, next) => {
   // Check if the config belongs to the logged in user
   if (examConfig.lecturer.toString() !== req.user._id.toString()) {
     return next(
-      new AppError("You do not have permission to delete this configuration", 403)
+      new AppError(
+        "You do not have permission to delete this configuration",
+        403
+      )
     );
   }
 

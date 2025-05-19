@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
+const { uniqueId } = require("lodash");
+const AppError = require("../utils/appError");
+const Government = require("./governmentModel");
 
 const lecturerPointsSchema = new mongoose.Schema(
   {
@@ -50,7 +53,14 @@ const teacherSchema = new mongoose.Schema(
         },
       },
     ],
-
+    phoneNumber2: {
+      type: String,
+      required: false,
+      unique: true,
+      default: null,
+      sparse: true,
+      trim: true,
+    },
     teachesAtType: {
       type: String,
       enum: ["Center", "School", "Both"],
@@ -59,6 +69,8 @@ const teacherSchema = new mongoose.Schema(
     centers: [{ type: String }], // Array of strings for center names
     school: { type: String },
     lecturerPoints: [lecturerPointsSchema],
+    government: { type: String, required: true },
+    administrationZone: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -84,6 +96,36 @@ teacherSchema.pre("validate", function (next) {
       "school",
       "School is required if teachesAtType is 'School' or 'Both'."
     );
+  }
+  next();
+});
+teacherSchema.pre("save", function (next) {
+  if (
+    this.phoneNumber2 &&
+    this.phoneNumber &&
+    this.phoneNumber.trim() === this.phoneNumber2.trim()
+  ) {
+    this.invalidate(
+      "phoneNumber2",
+      "Phone number 2 must be different from phone number 1."
+    );
+    return next(
+      new AppError("Phone number 2 must be different from phone number 1.", 400)
+    );
+  }
+  next();
+});
+teacherSchema.pre("validate", async function (next) {
+  if (this.government && this.administrationZone) {
+    const gov = await Government.findOne({ name: this.government });
+    if (!gov) {
+      this.invalidate("government", "Selected government does not exist.");
+    } else if (!gov.administrationZone.includes(this.administrationZone)) {
+      this.invalidate(
+        "zone",
+        "Selected zone does not belong to the selected government."
+      );
+    }
   }
   next();
 });

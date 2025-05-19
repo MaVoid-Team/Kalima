@@ -1,7 +1,8 @@
 {
     "title": "Settings",
     "toggleSidebar": "Toggle Sidebar",
-
+    "General Points": "General Points",
+    "Total Points": "Total Points",
 
     "personalInfo": {
         "title": "Personal Information",
@@ -25,6 +26,8 @@
       },
     "languageAppearance": {
     "title": "Language & Appearance",
+    "showThemes": "Show themes",
+    "hideThemes": "Hide themes",
     "options": {
       "language": "Language",
       "theme": "Theme"

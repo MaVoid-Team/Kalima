@@ -21,10 +21,16 @@ import {
   Clock,
   BookOpen,
   BarChart3,
+  User,
+  GraduationCap,
+  School,
+  UserCircle2,
 } from "lucide-react"
 import { getUserDashboard } from "../../routes/auth-services"
+import { getChildrenData } from "../../routes/parents"
 import { redeemPromoCode } from "../../routes/codes"
-import { getAccessToken } from "../../utils/useLocalStroage"
+import { getToken } from "../../routes/auth-services"
+import { updateCurrentUser } from "../../routes/update-user"
 import { useNavigate } from "react-router-dom"
 
 const PromoCodes = () => {
@@ -40,25 +46,34 @@ const PromoCodes = () => {
   const [redeemError, setRedeemError] = useState(null)
   const [redeemSuccess, setRedeemSuccess] = useState(null)
   const [fetchError, setFetchError] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [limit] = useState(6) // Number of transactions per page
+  const [transactionsPage, setTransactionsPage] = useState(1)
+  const [lecturesPage, setLecturesPage] = useState(1)
+  const [transactionsTotalPages, setTransactionsTotalPages] = useState(1)
+  const [lectureAccessTotalPages, setLectureAccessTotalPages] = useState(1)
+  const [limit] = useState(10)
   const [scannerActive, setScannerActive] = useState(false)
   const [scannerError, setScannerError] = useState(null)
   const [scannerLoading, setScannerLoading] = useState(false)
   const [userInfo, setUserInfo] = useState(null)
   const [activeTab, setActiveTab] = useState("transactions")
+  const [isParent, setIsParent] = useState(false)
+  const [children, setChildren] = useState([])
+  const [selectedChild, setSelectedChild] = useState(null)
+  const [childrenLoading, setChildrenLoading] = useState(false)
+  const [sequencedId, setSequencedId] = useState("")
+  const [addChildLoading, setAddChildLoading] = useState(false)
+  const [addChildError, setAddChildError] = useState(null)
+  const [addChildSuccess, setAddChildSuccess] = useState(null)
   const navigate = useNavigate()
-  const accessToken = getAccessToken()
+  const accessToken = getToken()
+
   useEffect(() => {
     if (!accessToken) {
       navigate("/login")
     }
   }, [accessToken, navigate])
 
-  // Use a ref for the scanner instance to maintain it across renders
   const scannerRef = useRef(null)
-  // Track if scanner is actually running
   const isRunningRef = useRef(false)
 
   useEffect(() => {
@@ -66,14 +81,15 @@ const PromoCodes = () => {
       setLoading(true)
       setFetchError(null)
       try {
-        const result = await getUserDashboard({ page: currentPage, limit: limit })
+        const pageToFetch = activeTab === "transactions" ? transactionsPage : lecturesPage
+        const result = await getUserDashboard({ page: pageToFetch, limit: limit })
         if (result.success) {
           const { userInfo, pointsBalances, redeemedCodes, purchaseHistory, lectureAccess, paginationInfo } =
             result.data.data || {}
-
           setUserInfo(userInfo)
           setBalance(userInfo?.totalPoints || 0)
-
+          setIsParent(userInfo?.role === "Parent")
+          if (!selectedChild) {
             const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
               id: `code-${index + 1}`,
               type: t("transactions.types.codeRedemption"),
@@ -92,7 +108,6 @@ const PromoCodes = () => {
               }),
               isRedemption: true,
             }))
-
             const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
               id: `purchase-${index + 1}`,
               type: t("transactions.types.coursePurchase"),
@@ -109,19 +124,19 @@ const PromoCodes = () => {
               }),
               isRedemption: false,
             }))
-
-          const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-          )
-
-          setTransactions(combinedTransactions)
-          setPointsBalances(pointsBalances || [])
-          setLectureAccess(lectureAccess || [])
-
-          // Set total pages based on the maximum totalPages from purchaseHistory or redeemedCodes
-          const purchaseTotalPages = paginationInfo?.purchaseHistory?.totalPages || 1
-          const redeemedTotalPages = paginationInfo?.redeemedCodes?.totalPages || 1
-          setTotalPages(Math.max(purchaseTotalPages, redeemedTotalPages))
+            const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+            )
+            setTransactions(combinedTransactions)
+            setPointsBalances(pointsBalances || [])
+            setLectureAccess(lectureAccess || [])
+            if (paginationInfo) {
+              const purchaseTotalPages = paginationInfo.purchaseHistory?.totalPages || 1
+              const redeemedTotalPages = paginationInfo.redeemedCodes?.totalPages || 1
+              setTransactionsTotalPages(Math.max(purchaseTotalPages, redeemedTotalPages))
+              setLectureAccessTotalPages(paginationInfo.lectureAccess?.totalPages || 1)
+            }
+          }
         } else {
           setFetchError(result.error || t("errors.fetchFailed"))
         }
@@ -132,65 +147,127 @@ const PromoCodes = () => {
       }
     }
     fetchDashboardData()
-  }, [currentPage, limit, redeemSuccess, t, i18n.language])
+  }, [transactionsPage, lecturesPage, activeTab, limit, redeemSuccess, t, i18n.language, selectedChild])
 
-  // Initialize QR scanner
   useEffect(() => {
-    // Add event listener for modal close events
-    const scannerModal = document.getElementById("scanner_modal")
+    const fetchChildrenData = async () => {
+      if (isParent) {
+        setChildrenLoading(true)
+        try {
+          const result = await getChildrenData()
+          if (result.success) {
+            setChildren(result.data.data.children || [])
+          } else {
+            console.error("Failed to fetch children data:", result.error)
+          }
+        } catch (error) {
+          console.error("Error fetching children data:", error)
+        } finally {
+          setChildrenLoading(false)
+        }
+      }
+    }
+    if (isParent) {
+      fetchChildrenData()
+    }
+  }, [isParent])
 
+  useEffect(() => {
+    if (selectedChild) {
+      const childData = children.find((child) => child._id === selectedChild)
+      if (childData) {
+        setBalance(childData.totalPoints || 0)
+        const mappedRedeemedCodes = (childData.redeemedCodes || []).map((code, index) => ({
+          id: `code-${index + 1}`,
+          type: t("transactions.types.codeRedemption"),
+          code: code.code,
+          amount: code.pointsAmount,
+          instructorName: code.lecturerId ? t("notAvailable") : t("generalPoints"),
+          createdAt: new Date(code.redeemedAt).toLocaleString(i18n.language, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+          isRedemption: true,
+        }))
+        const mappedPurchaseHistory = (childData.purchaseHistory || []).map((purchase, index) => ({
+          id: `purchase-${index + 1}`,
+          type: t("transactions.types.coursePurchase"),
+          code: purchase.description,
+          amount: purchase.points,
+          instructorName: purchase.lecturer?.name || t("notAvailable"),
+          createdAt: new Date(purchase.purchasedAt).toLocaleString(i18n.language, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+          isRedemption: false,
+        }))
+        const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        )
+        setTransactions(combinedTransactions)
+        setLectureAccess(childData.lectureAccess || [])
+        setTransactionsTotalPages(1)
+        setLectureAccessTotalPages(1)
+      }
+    }
+  }, [selectedChild, children, t, i18n.language])
+
+  useEffect(() => {
+    const scannerModal = document.getElementById("scanner_modal")
     const handleModalClose = () => {
       stopScanner()
     }
-
     if (scannerModal) {
       scannerModal.addEventListener("close", handleModalClose)
     }
-
-    // Clean up scanner and event listener when component unmounts
     return () => {
       stopScanner()
-
       if (scannerModal) {
         scannerModal.removeEventListener("close", handleModalClose)
       }
     }
   }, [])
 
+  useEffect(() => {
+    if (addChildSuccess) {
+      const timer = setTimeout(() => {
+        setAddChildSuccess(null)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [addChildSuccess])
+
   const startScanner = () => {
-    // Reset states
     setScannerActive(true)
     setScannerError(null)
     setScannerLoading(true)
-
-    // Close the redeem modal if it's open
     document.getElementById("redeem_modal").close()
-    // Open the scanner modal
     document.getElementById("scanner_modal").showModal()
-
-    // Initialize scanner after modal is shown
     setTimeout(() => {
       try {
-        // Create a new scanner instance
         const scanner = new Html5Qrcode("qr-reader")
         scannerRef.current = scanner
-
         const config = {
           fps: 10,
           qrbox: { width: 250, height: 250 },
           aspectRatio: 1.0,
         }
-
-        // Start scanner with camera
         scanner
           .start(
-            { facingMode: "environment" }, // Use back camera
+            { facingMode: "environment" },
             config,
             onScanSuccess,
             onScanFailure,
           )
           .then(() => {
-            // Scanner started successfully
             isRunningRef.current = true
             setScannerLoading(false)
             console.log("Scanner started successfully")
@@ -213,7 +290,6 @@ const PromoCodes = () => {
   }
 
   const stopScanner = () => {
-    // Only try to stop if we have a scanner instance and it's running
     if (scannerRef.current && isRunningRef.current) {
       try {
         scannerRef.current
@@ -222,18 +298,15 @@ const PromoCodes = () => {
             console.log("Scanner stopped successfully")
           })
           .catch((err) => {
-            // Just log the error, don't throw
             console.log("Error stopping scanner (handled):", err)
           })
           .finally(() => {
-            // Always reset state
             isRunningRef.current = false
             scannerRef.current = null
             setScannerActive(false)
             setScannerLoading(false)
           })
       } catch (err) {
-        // Catch any synchronous errors
         console.log("Error in stopScanner (handled):", err)
         isRunningRef.current = false
         scannerRef.current = null
@@ -241,7 +314,6 @@ const PromoCodes = () => {
         setScannerLoading(false)
       }
     } else {
-      // Reset state even if scanner wasn't running
       isRunningRef.current = false
       scannerRef.current = null
       setScannerActive(false)
@@ -250,48 +322,33 @@ const PromoCodes = () => {
   }
 
   const onScanSuccess = async (decodedText) => {
-    // Mark scanner as not running to prevent multiple stop attempts
     isRunningRef.current = false
-
     try {
-      // Try to stop scanner
       if (scannerRef.current) {
         await scannerRef.current.stop()
         console.log("Scanner stopped after successful scan")
       }
     } catch (err) {
-      // Just log the error, don't throw
       console.log("Error stopping scanner after scan (handled):", err)
     } finally {
-      // Always reset scanner state
       scannerRef.current = null
       setScannerActive(false)
       setScannerLoading(false)
     }
-
     try {
-      // Try to parse the QR code content as JSON
       let codeToRedeem = decodedText
-
       try {
         const parsedData = JSON.parse(decodedText)
         if (parsedData && parsedData.code) {
           codeToRedeem = parsedData.code
         }
       } catch (e) {
-        // If parsing fails, use the raw text as the code
         console.log("QR code is not in JSON format, using raw text")
       }
-
-      // Provide haptic feedback if available
       if (navigator.vibrate) {
         navigator.vibrate(200)
       }
-
-      // Close scanner modal
       document.getElementById("scanner_modal").close()
-
-      // Show redeem modal with the scanned code
       setRedeemCode(codeToRedeem)
       setRedeemError(null)
       setRedeemSuccess(null)
@@ -303,7 +360,6 @@ const PromoCodes = () => {
   }
 
   const onScanFailure = (error) => {
-    // Don't show errors for normal scanning attempts
     console.log("QR scan error (normal during scanning):", error)
   }
 
@@ -316,11 +372,18 @@ const PromoCodes = () => {
     setRedeemError(null)
     setRedeemSuccess(null)
     try {
+      if (selectedChild) {
+        setRedeemError(
+          t("redeem.errors.childSelected") || "Cannot redeem code for a child. Please select your own account.",
+        )
+        setRedeemLoading(false)
+        return
+      }
       const result = await redeemPromoCode(redeemCode)
       if (result.success) {
         setRedeemSuccess(t("redeem.success"))
         setRedeemCode("")
-        setCurrentPage(1) // Reset to first page after redeeming a code
+        setTransactionsPage(1)
         document.getElementById("redeem_modal").close()
       } else {
         setRedeemError(result.error || t("redeem.errors.generic"))
@@ -332,9 +395,46 @@ const PromoCodes = () => {
     }
   }
 
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage)
+  const handleAddChild = async () => {
+    if (!sequencedId.trim()) {
+      setAddChildError(t("addChild.errors.emptyId"))
+      return
+    }
+    setAddChildLoading(true)
+    setAddChildError(null)
+    setAddChildSuccess(null)
+    try {
+      const currentChildrenIds = children.map(child => child.sequencedId)
+      const updateData = {
+        children: [sequencedId]
+      }
+      const result = await updateCurrentUser(updateData)
+      if (result.success) {
+        setAddChildSuccess(t("addChild.success"))
+        setSequencedId("")
+        const childrenResult = await getChildrenData()
+        if (childrenResult.success) {
+          setChildren(childrenResult.data.data.children || [])
+        }
+      } else {
+        setAddChildError(result.error || t("addChild.errors.generic"))
+      }
+    } catch (error) {
+      setAddChildError(t("addChild.errors.generic"))
+    } finally {
+      setAddChildLoading(false)
+    }
+  }
+
+  const handleTransactionsPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= transactionsTotalPages) {
+      setTransactionsPage(newPage)
+    }
+  }
+
+  const handleLecturesPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= lectureAccessTotalPages) {
+      setLecturesPage(newPage)
     }
   }
 
@@ -342,7 +442,6 @@ const PromoCodes = () => {
     navigator.clipboard
       .writeText(code)
       .then(() => {
-        // Show toast or notification
         console.log("Copied to clipboard:", code)
       })
       .catch((err) => {
@@ -350,15 +449,36 @@ const PromoCodes = () => {
       })
   }
 
+  const handleChildSelect = (childId) => {
+    if (childId === "parent") {
+      setSelectedChild(null)
+    } else {
+      setSelectedChild(childId)
+    }
+    setTransactionsPage(1)
+    setLecturesPage(1)
+  }
+
   const renderTransactionsTab = () => (
     <div className="overflow-x-auto rounded-xl">
       <table className="table w-full">
         <thead className="bg-primary/5">
           <tr>
-            <th className="rounded-tl-xl">{t("table.date")}</th>
-            <th>{t("table.type")}</th>
-            <th>{t("table.amount")}</th>
-            <th>{t("table.teacher")}</th>
+            <th className="rounded-tl-xl tooltip" data-tip={t("table.dateTooltip") || "When the transaction occurred"}>
+              {t("table.date")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th className="tooltip hidden md:table-cell" data-tip={t("table.typeTooltip") || "Type of transaction"}>
+              {t("table.type")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th className="tooltip" data-tip={t("table.amountTooltip") || "Points added or deducted"}>
+              {t("table.amount")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
+            <th
+              className="tooltip hidden md:table-cell"
+              data-tip={t("table.teacherTooltip") || "Teacher associated with these points"}
+            >
+              {t("table.teacher")} <Info className="w-3 h-3 inline-block ml-1 opacity-60" />
+            </th>
             <th className="rounded-tr-xl">{t("table.actions")}</th>
           </tr>
         </thead>
@@ -371,7 +491,7 @@ const PromoCodes = () => {
                   className={`hover:bg-base-200 ${index % 2 === 0 ? "bg-base-100" : "bg-base-100/50"}`}
                 >
                   <td className="whitespace-nowrap">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10">
                         {transaction.isRedemption ? (
                           <Ticket className="w-4 h-4 text-primary" />
@@ -380,41 +500,57 @@ const PromoCodes = () => {
                         )}
                       </div>
                       <div>
-                        <div className="font-medium">{transaction.createdAt.split(",")[0]}</div>
+                        <div className="font-medium text-sm">{transaction.createdAt.split(",")[0]}</div>
                         <div className="text-xs opacity-70">{transaction.createdAt.split(",")[1]}</div>
                       </div>
                     </div>
                   </td>
-                  <td>
+                  <td className="hidden md:table-cell">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"}`}
+                      className={`px-2 py-1 rounded-full text-xs ${transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                        }`}
                     >
                       {transaction.type}
                     </span>
                   </td>
                   <td className="font-medium">
-                    {transaction.isRedemption ? (
-                      <span className="text-green-600">+{transaction.amount}</span>
-                    ) : (
-                      <span className="text-red-600 text-cent">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {transaction.isRedemption ? (
+                        <span className="text-green-600">+{transaction.amount}</span>
+                      ) : (
+                        <span className="text-red-600">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
+                      )}
+                      <span className="md:hidden text-xs opacity-70">
+                        {transaction.isRedemption ? (
+                          <span className="bg-green-100 text-green-800 px-1 rounded text-[10px]">
+                            {t("transactions.types.codeRedemption")}
+                          </span>
+                        ) : (
+                          <span className="bg-blue-100 text-blue-800 px-1 rounded text-[10px]">
+                            {t("transactions.types.coursePurchase")}
+                          </span>
+                        )}
+                      </span>
+                    </div>
                   </td>
-                  <td>{transaction.instructorName}</td>
+                  <td className="hidden md:table-cell">{transaction.instructorName}</td>
                   <td>
-                    {transaction.isRedemption && (
-                      <button
-                        onClick={() => copyToClipboard(transaction.code)}
-                        className="btn btn-ghost btn-sm"
-                        title={t("copy")}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    )}
-                    {!transaction.isRedemption && (
-                      <button className="btn btn-ghost btn-sm" title={t("details")}>
-                        <Info className="w-4 h-4" />
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {transaction.isRedemption ? (
+                        <button
+                          onClick={() => copyToClipboard(transaction.code)}
+                          className="btn btn-ghost btn-sm"
+                          title={t("copy")}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button className="btn btn-ghost btn-sm" title={t("details")}>
+                          <Info className="w-4 h-4" />
+                        </button>
+                      )}
+                      <span className="md:hidden text-xs truncate max-w-[80px]">{transaction.instructorName}</span>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -441,47 +577,41 @@ const PromoCodes = () => {
           )}
         </tbody>
       </table>
-
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
+      {!selectedChild && transactionsTotalPages > 1 && (
         <div className="flex justify-center mt-6">
           <div className="join">
             <button
               className="join-item btn"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => handleTransactionsPageChange(transactionsPage - 1)}
+              disabled={transactionsPage === 1}
             >
               {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </button>
-
-            {/* Show limited page numbers with ellipsis for large page counts */}
-            {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+            {Array.from({ length: Math.min(5, transactionsTotalPages) }).map((_, i) => {
               let pageNum
-              if (totalPages <= 5) {
+              if (transactionsTotalPages <= 5) {
                 pageNum = i + 1
-              } else if (currentPage <= 3) {
+              } else if (transactionsPage <= 3) {
                 pageNum = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i
+              } else if (transactionsPage >= transactionsTotalPages - 2) {
+                pageNum = transactionsTotalPages - 4 + i
               } else {
-                pageNum = currentPage - 2 + i
+                pageNum = transactionsPage - 2 + i
               }
-
               return (
                 <button
                   key={pageNum}
-                  className={`join-item btn ${currentPage === pageNum ? "btn-primary" : ""}`}
-                  onClick={() => handlePageChange(pageNum)}
+                  className={`join-item btn ${transactionsPage === pageNum ? "btn-primary" : ""}`}
+                  onClick={() => handleTransactionsPageChange(pageNum)}
                 >
                   {pageNum}
                 </button>
               )
             })}
-
             <button
               className="join-item btn"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={() => handleTransactionsPageChange(transactionsPage + 1)}
+              disabled={transactionsPage === transactionsTotalPages}
             >
               {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
@@ -492,57 +622,209 @@ const PromoCodes = () => {
   )
 
   const renderLectureAccessTab = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {lectureAccess.length > 0 ? (
-        lectureAccess.map((access, index) => (
-          <div
-            key={index}
-            className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow"
-          >
-            <div className="card-body p-4">
-              <div className="flex justify-between items-start">
-                <h3 className="card-title text-base">{access.lecture.name}</h3>
-                <div className="badge badge-primary">
-                  {access.remainingViews} {t("views")}
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {!loading ? (
+          lectureAccess.length > 0 ? (
+            lectureAccess.map((access, index) => (
+              <div
+                key={index}
+                className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow"
+              >
+                <div className="card-body p-4">
+                  <div className="flex justify-between items-start">
+                    <h3 className="card-title text-base line-clamp-1">{access.lecture.name}</h3>
+                    <div className="badge badge-primary whitespace-nowrap">
+                      {access.remainingViews} {t("views")}
+                    </div>
+                  </div>
+                  <p className="text-sm opacity-70 line-clamp-2">{access.lecture.description || t("noDescription")}</p>
+                  <div className="flex flex-wrap justify-between items-center mt-2 text-xs opacity-70 gap-2">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 flex-shrink-0" />
+                      {new Date(access.lastAccessed).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="w-3 h-3 flex-shrink-0" />
+                      {access.lecture.numberOfViews || 0} {t("totalViews")}
+                    </span>
+                  </div>
                 </div>
               </div>
-              <p className="text-sm opacity-70 line-clamp-2">{access.lecture.description}</p>
-              <div className="flex justify-between items-center mt-2 text-xs opacity-70">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {new Date(access.lastAccessed).toLocaleDateString()}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  {access.lecture.numberOfViews} {t("totalViews")}
-                </span>
+            ))
+          ) : (
+            <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
+              <div className="bg-base-200 p-4 rounded-full mb-4">
+                <BookOpen className="w-8 h-8 text-base-content/60" />
               </div>
+              <p className="text-lg font-medium">{t("noLectures")}</p>
+              <p className="text-sm opacity-70 max-w-md mt-2">{t("noLecturesDescription")}</p>
             </div>
+          )
+        ) : (
+          <div className="col-span-full flex justify-center py-10">
+            <span className="loading loading-spinner loading-lg"></span>
           </div>
-        ))
-      ) : (
-        <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
-          <div className="bg-base-200 p-4 rounded-full mb-4">
-            <BookOpen className="w-8 h-8 text-base-content/60" />
+        )}
+      </div>
+      {!selectedChild && lectureAccessTotalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <div className="join">
+            <button
+              className="join-item btn"
+              onClick={() => handleLecturesPageChange(lecturesPage - 1)}
+              disabled={lecturesPage === 1}
+            >
+              {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            </button>
+            {Array.from({ length: Math.min(5, lectureAccessTotalPages) }).map((_, i) => {
+              let pageNum
+              if (lectureAccessTotalPages <= 5) {
+                pageNum = i + 1
+              } else if (lecturesPage <= 3) {
+                pageNum = i + 1
+              } else if (lecturesPage >= lectureAccessTotalPages - 2) {
+                pageNum = lectureAccessTotalPages - 4 + i
+              } else {
+                pageNum = lecturesPage - 2 + i
+              }
+              return (
+                <button
+                  key={pageNum}
+                  className={`join-item btn ${lecturesPage === pageNum ? "btn-primary" : ""}`}
+                  onClick={() => handleLecturesPageChange(pageNum)}
+                >
+                  {pageNum}
+                </button>
+              )
+            })}
+            <button
+              className="join-item btn"
+              onClick={() => handleLecturesPageChange(lecturesPage + 1)}
+              disabled={lecturesPage === lectureAccessTotalPages}
+            >
+              {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
           </div>
-          <p className="text-lg font-medium">{t("noLectures")}</p>
-          <p className="text-sm opacity-70 max-w-md mt-2">{t("noLecturesDescription")}</p>
         </div>
       )}
     </div>
   )
 
+  const handleTabChange = (tab) => {
+    if (tab !== activeTab) {
+      setActiveTab(tab)
+      if (tab === "transactions") {
+        setTransactionsPage(1)
+      } else if (tab === "lectures") {
+        setLecturesPage(1)
+      }
+    }
+  }
+
+  const renderChildrenSelector = () => {
+    if (!isParent) return null
+    return (
+      <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
+        <div className="card-body">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="card-title">{t("children.title") || "Your Children"}</h2>
+            <Users className="w-5 h-5 text-primary" />
+          </div>
+          {childrenLoading ? (
+            <div className="flex justify-center py-4">
+              <span className="loading loading-spinner loading-md"></span>
+            </div>
+          ) : children.length > 0 ? (
+            <div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <button
+                  onClick={() => handleChildSelect("parent")}
+                  className={`btn ${!selectedChild ? "btn-primary" : "btn-outline"}`}
+                >
+                  <UserCircle2 className="w-4 h-4 mr-2" />
+                  {t("children.yourAccount") || "Your Account"}
+                </button>
+                {children.map((child) => (
+                  <button
+                    key={child._id}
+                    onClick={() => handleChildSelect(child._id)}
+                    className={`btn ${selectedChild === child._id ? "btn-primary" : "btn-outline"}`}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    {child.name}
+                  </button>
+                ))}
+              </div>
+              {selectedChild && (
+                <div className="bg-base-200/50 p-4 rounded-lg">
+                  {(() => {
+                    const child = children.find((c) => c._id === selectedChild)
+                    if (!child) return null
+                    return (
+                      <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <div className="avatar avatar-placeholder">
+                          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-xl text-primary font-medium">{child.name.charAt(0)}</span>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium">{child.name}</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mt-2">
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="w-4 h-4 text-primary" />
+                              <span className="text-sm">{child.level?.name || t("notAvailable")}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <School className="w-4 h-4 text-primary" />
+                              <span className="text-sm">{child.faction || t("notAvailable")}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Wallet className="w-4 h-4 text-primary" />
+                              <span className="text-sm">
+                                {child.generalPoints || 0} {t("balance.currency")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Info className="w-4 h-4 text-primary" />
+                              <span className="text-sm">
+                                {t("profile.sequenceId")}: {child.sequencedId}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-6 bg-base-200/30 rounded-xl">
+              <div className="flex flex-col items-center justify-center text-base-content/60">
+                <div className="bg-base-200 p-4 rounded-full mb-4">
+                  <Users className="w-8 h-8 text-base-content/60" />
+                </div>
+                <p className="text-lg font-medium">{t("children.noChildren") || "No children found"}</p>
+                <p className="text-sm opacity-70 max-w-md mt-2">
+                  {t("children.noChildrenDescription") || "You don't have any children linked to your account yet."}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-base-100" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Header */}
       <div className="bg-gradient-to-b from-primary/10 to-transparent pt-6 pb-12">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl font-bold text-center mb-2">{t("title")}</h1>
           <p className="text-center text-base-content/70">{t("subtitle")}</p>
         </div>
       </div>
-
-      {/* Main Content */}
       <div className="mx-auto px-4 -mt-8">
         {fetchError && (
           <div className="alert alert-error max-w-md mx-auto mb-6">
@@ -550,32 +832,115 @@ const PromoCodes = () => {
             <span>{fetchError}</span>
           </div>
         )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
+          {userInfo?.role === "Parent" ? (
+            <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
+              <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
+                <div className="card-body p-6">
+                  <h2 className="card-title text-lg font-semibold mb-4">{t("addChild.title")}</h2>
+                  <div className="space-y-4">
+                    <div className="form-control">
+                      <label className="label">
+                        <span className="label-text font-medium text-base-content/80">{t("addChild.label")}</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={sequencedId}
+                          onChange={(e) => setSequencedId(e.target.value)}
+                          placeholder={t("addChild.placeholder")}
+                          className="input input-bordered flex-1 focus:ring-2 focus:ring-primary focus:border-transparent"
+                        />
+                        <button
+                          onClick={handleAddChild}
+                          disabled={addChildLoading}
+                          className="btn btn-primary min-w-[120px]"
+                        >
+                          {addChildLoading ? (
+                            <span className="loading loading-spinner"></span>
+                          ) : (
+                            t("addChild.button")
+                          )}
+                        </button>
+                      </div>
+                    </div>
 
-        {/* User Info & Points Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* User Profile Card */}
-          <div className="card bg-base-100 shadow-sm border border-base-200">
-            <div className="card-body">
-              <div className="flex items-center gap-4">
-                <div className="avatar avatar-placeholder">
-                  <div className="bg-primary/10 text-primary rounded-full w-16">
-                    <span className="text-xl">{userInfo?.name?.charAt(0) || "U"}</span>
+                    {addChildError && (
+                      <div className="alert alert-error shadow-lg">
+                        <X className="w-5 h-5 shrink-0" />
+                        <span>{addChildError}</span>
+                      </div>
+                    )}
+
+                    {addChildSuccess && (
+                      <div className="alert alert-success shadow-lg">
+                        <Check className="w-5 h-5 shrink-0" />
+                        <span>{addChildSuccess}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div>
-                  <h2 className="card-title">{userInfo?.name || t("user")}</h2>
-                  <p className="text-sm opacity-70">{userInfo?.email || ""}</p>
-                  <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Total Points Card */}
+          ) : (
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body p-4 md:p-6">
+                <div className="flex items-center gap-4">
+                  <div className="avatar avatar-placeholder">
+                    <div className="bg-primary/10 text-primary rounded-full w-12 md:w-16">
+                      <span className="text-xl">{userInfo?.name?.charAt(0) || "U"}</span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden">
+                    <h2 className="card-title text-base md:text-lg truncate">{userInfo?.name || t("user")}</h2>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-semibold text-base-content/60">{t("profile.email")}:</span>
+                      <p className="text-sm opacity-70 truncate">{userInfo?.email || ""}</p>
+                    </div>
+                    <div
+                      className="flex items-center gap-1 tooltip"
+                      data-tip={
+                        t("profile.sequenceIdTooltip") || "Parents should use this ID when signing up to link accounts"
+                      }
+                    >
+                      <span className="text-xs font-semibold text-base-content/60">{t("profile.sequenceId")}:</span>
+                      <p className="text-sm opacity-70 truncate">{userInfo?.sequencedId || ""}</p>
+                      <Info className="w-3 h-3 text-primary flex-shrink-0" />
+                    </div>
+                    <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {userInfo?.role === "Student" && userInfo?.sequencedId && (
+            <div className="lg:col-span-3 alert alert-info text-info-content">
+              <Info className="w-5 h-5" />
+              <div>
+                <h3 className="font-bold">{t("profile.parentLinkTitle") || "For Parents"}</h3>
+                <div className="text-sm">
+                  {t("profile.parentLinkDescription") ||
+                    "Parents should use this Sequence ID when registering to link their account with yours:"}
+                  <span className="font-mono bg-info-content/10 px-2 py-1 rounded ml-2">{userInfo.sequencedId}</span>
+                  <button
+                    onClick={() => copyToClipboard(userInfo.sequencedId)}
+                    className="btn btn-xs btn-ghost ml-2"
+                    title={t("copy")}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="card bg-primary text-primary-content shadow-md">
             <div className="card-body">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="card-title">{t("balance.title")}</h2>
+                <h2 className="card-title">
+                  {selectedChild
+                    ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("balance.title").toLowerCase()}`
+                    : t("balance.title")}
+                </h2>
                 <Wallet className="w-6 h-6" />
               </div>
               <div className="stat-value text-3xl">
@@ -588,111 +953,120 @@ const PromoCodes = () => {
               <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p>
             </div>
           </div>
-
-          {/* Actions Card */}
-          <div className="card bg-base-100 shadow-sm border border-base-200">
-            <div className="card-body">
-              <h2 className="card-title mb-4">{t("actions.title")}</h2>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={startScanner} className="btn btn-primary">
-                  <QrCode className="w-4 h-4 mr-2" />
-                  {t("scanner.button")}
-                </button>
-                <button
-                  onClick={() => {
-                    setRedeemError(null)
-                    setRedeemSuccess(null)
-                    setRedeemCode("")
-                    document.getElementById("redeem_modal").showModal()
-                  }}
-                  className="btn btn-outline btn-primary"
-                >
-                  <Ticket className="w-4 h-4 mr-2" />
-                  {t("redeem.button")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Points Balances */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
-          <div className="card-body">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="card-title">{t("lecturerPoints.title")}</h2>
-              <BarChart3 className="w-5 h-5 text-primary" />
-            </div>
-
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <span className="loading loading-spinner loading-lg"></span>
-              </div>
-            ) : pointsBalances.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {pointsBalances.map((balance, index) => (
-                  <div key={index} className="bg-base-200/50 rounded-xl p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        {balance.lecturer ? (
-                          <span className="text-primary font-medium">{balance.lecturer.name.charAt(0)}</span>
-                        ) : (
-                          <Wallet className="w-4 h-4 text-primary" />
-                        )}
-                      </div>
-                      <h3 className="font-medium truncate">
-                        {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
-                      </h3>
-                    </div>
-
-                    <div className="flex justify-between items-end">
-                      <p className="text-2xl font-bold">{balance.points}</p>
-                      <span className="text-xs opacity-70">{t("balance.currency")}</span>
-                    </div>
-                    <p className="text-sm opacity-80 mt-2">{t("lecturerPoints.description")}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 bg-base-200/30 rounded-xl">
-                <div className="flex flex-col items-center justify-center text-base-content/60">
-                  <div className="bg-base-200 p-4 rounded-full mb-4">
-                    <Wallet className="w-8 h-8 text-base-content/60" />
-                  </div>
-                  <p className="text-lg font-medium">{t("noLecturerPoints")}</p>
+          {userInfo?.role === "Student" && (
+            <div className="card bg-base-100 shadow-sm border border-base-200">
+              <div className="card-body">
+                <h2 className="card-title mb-4">{t("actions.title")}</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={startScanner}
+                    className="btn btn-primary"
+                    disabled={selectedChild !== null}
+                  >
+                    <QrCode className="w-4 h-4 mr-2" />
+                    {t("scanner.button")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setRedeemError(null)
+                      setRedeemSuccess(null)
+                      setRedeemCode("")
+                      document.getElementById("redeem_modal").showModal()
+                    }}
+                    className="btn btn-outline btn-primary"
+                    disabled={selectedChild !== null}
+                  >
+                    <Ticket className="w-4 h-4 mr-2" />
+                    {t("redeem.button")}
+                  </button>
                 </div>
+                {selectedChild && (
+                  <div className="alert alert-info mt-4 text-sm">
+                    <Info className="w-4 h-4" />
+                    <span>{t("children.actionsDisabled") || "Actions are disabled when viewing a child's account."}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-
-        {/* Tabs for Transactions and Lecture Access */}
+        {renderChildrenSelector()}
+        {!selectedChild && (
+          <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
+            <div className="card-body">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="card-title">{t("lecturerPoints.title")}</h2>
+                <BarChart3 className="w-5 h-5 text-primary" />
+              </div>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <span className="loading loading-spinner loading-lg"></span>
+                </div>
+              ) : pointsBalances.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {pointsBalances.map((balance, index) => (
+                    <div key={index} className="bg-base-200/50 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          {balance.lecturer ? (
+                            <span className="text-primary font-medium">{balance.lecturer.name.charAt(0)}</span>
+                          ) : (
+                            <Wallet className="w-4 h-4 text-primary" />
+                          )}
+                        </div>
+                        <h3 className="font-medium truncate">
+                          {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
+                        </h3>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <p className="text-2xl font-bold">{balance.points}</p>
+                        <span className="text-xs opacity-70">{t("balance.currency")}</span>
+                      </div>
+                      <p className="text-sm opacity-80 mt-2 line-clamp-2">{t("lecturerPoints.description")}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 bg-base-200/30 rounded-xl">
+                  <div className="flex flex-col items-center justify-center text-base-content/60">
+                    <div className="bg-base-200 p-4 rounded-full mb-4">
+                      <Wallet className="w-8 h-8 text-base-content/60" />
+                    </div>
+                    <p className="text-lg font-medium">{t("noLecturerPoints")}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
           <div className="card-body p-0">
             <div className="tabs tabs-bordered">
               <button
                 className={`tab tab-lg ${activeTab === "transactions" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("transactions")}
+                onClick={() => handleTabChange("transactions")}
               >
                 <Clock className="w-4 h-4 mr-2" />
-                {t("transactions.title")}
+                {selectedChild
+                  ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("transactions.title").toLowerCase()}`
+                  : t("transactions.title")}
               </button>
               <button
                 className={`tab tab-lg ${activeTab === "lectures" ? "tab-active" : ""}`}
-                onClick={() => setActiveTab("lectures")}
+                onClick={() => handleTabChange("lectures")}
               >
                 <BookOpen className="w-4 h-4 mr-2" />
-                {t("lectures.title")}
+                {selectedChild
+                  ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("lectures.title").toLowerCase()}`
+                  : t("lectures.title")}
               </button>
             </div>
-
             <div className="p-4">
               {activeTab === "transactions" ? renderTransactionsTab() : renderLectureAccessTab()}
             </div>
           </div>
         </div>
       </div>
-
-      {/* QR Code Scanner Modal */}
       <dialog id="scanner_modal" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box bg-base-100 relative max-w-md p-6">
           <form method="dialog">
@@ -700,12 +1074,10 @@ const PromoCodes = () => {
               <X className="w-4 h-4" />
             </button>
           </form>
-
           <div className="flex items-center mb-4 text-primary">
             <QrCode className="w-6 h-6 mr-2" />
             <h3 className="font-bold text-xl">{t("scanner.title")}</h3>
           </div>
-
           {scannerError && (
             <div className="alert alert-error mb-4">
               <X className="w-5 h-5" />
@@ -722,7 +1094,6 @@ const PromoCodes = () => {
               </button>
             </div>
           )}
-
           <div className="flex flex-col items-center justify-center">
             {scannerLoading && (
               <div className="absolute inset-0 bg-base-100/80 flex items-center justify-center z-10">
@@ -732,21 +1103,17 @@ const PromoCodes = () => {
                 </div>
               </div>
             )}
-
             <div id="qr-reader" className="w-full max-w-xs overflow-hidden rounded-lg border-2 border-primary/20">
-              {/* Scanner will be rendered here */}
               <div className="qr-overlay absolute pointer-events-none">
                 <div className="qr-corners"></div>
               </div>
             </div>
-
             <div className="mt-6 text-center">
               <p className="text-sm mb-3">{t("scanner.instructions")}</p>
               <div className="flex justify-center gap-3 mt-4">
                 <button
                   className="btn btn-outline btn-sm"
                   onClick={() => {
-                    // Switch camera if available
                     if (scannerRef.current) {
                       stopScanner()
                       setTimeout(startScanner, 500)
@@ -764,8 +1131,6 @@ const PromoCodes = () => {
           <button onClick={stopScanner}>close</button>
         </form>
       </dialog>
-
-      {/* Redeem Code Modal */}
       <dialog id="redeem_modal" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box bg-base-100 relative max-w-md p-6">
           <form method="dialog">
@@ -773,12 +1138,10 @@ const PromoCodes = () => {
               <X className="w-4 h-4" />
             </button>
           </form>
-
           <div className="flex items-center mb-4 text-primary">
             <Gift className="w-6 h-6 mr-2" />
             <h3 className="font-bold text-xl">{t("redeem.modalTitle")}</h3>
           </div>
-
           <div className="mb-6">
             <div className="relative">
               <input
@@ -793,21 +1156,18 @@ const PromoCodes = () => {
                 <Search className="w-5 h-5 text-base-content/40" />
               </div>
             </div>
-
             {redeemError && (
               <div className="alert alert-error mt-4">
                 <X className="w-5 h-5" />
                 <span>{redeemError}</span>
               </div>
             )}
-
             {redeemSuccess && (
               <div className="alert alert-success mt-4">
                 <Check className="w-5 h-5" />
                 <span>{redeemSuccess}</span>
               </div>
             )}
-
             <div className="bg-base-200/50 rounded-lg p-4 mt-4">
               <h4 className="font-medium mb-2 flex items-center">
                 <Info className="w-4 h-4 mr-2 text-primary" />
@@ -824,7 +1184,6 @@ const PromoCodes = () => {
                 ))}
               </ul>
             </div>
-
             <button onClick={handleRedeemCode} disabled={redeemLoading} className="btn btn-primary w-full mt-4">
               {redeemLoading ? (
                 <span className="loading loading-spinner"></span>

@@ -82,5 +82,12 @@
   "retry": "Retry",
   "errors": {
     "fetchFailed": "Failed to fetch data"
+  },
+   "profile" :{
+    "email" : "Email",
+    "sequenceId" : "Sequence ID",
+    "sequenceIdTooltip" : "Your sequence ID",
+    "parentLinkTitle" :  "Parent Link",
+    "parentLinkDescription" : "Use this link to access your parent account"
   }
 }
