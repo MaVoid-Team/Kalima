@@ -33,6 +33,12 @@
   "3rd Secondary": "Third Secondary",
   "undefined": "Undefined"
 },
+ "role" :{
+    "student": "Student",
+    "teacher": "Teacher",
+    "admin": "Admin",
+    "assistnat": "Assistant"
+  },
   "dashboard": "Dashboard",
   "profile": "My Profile",
   "courses": "My Courses",
