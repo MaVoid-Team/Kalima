@@ -8,6 +8,7 @@ const Assistant = require("../models/assistantModel.js");
 const Purchase = require("../models/purchaseModel.js");
 const Code = require("../models/codeModel.js");
 const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
+const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -821,8 +822,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         children: []
       }
     });
-  }
-  // Find all children with detailed information
+  }  // Find all children with detailed information
   const children = await Student.find({ _id: { $in: parent.children } })
     .populate("level", "name")
     .select("name level sequencedId hobbies faction generalPoints totalPoints")
@@ -848,8 +848,15 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
       const lectureAccess = await StudentLectureAccess.find({ student: child._id })
         .populate("lecture", "name")
         .lean();
-
-      // Get redeemed promo codes
+        
+      // Get exam scores with lecture information
+      const examScores = await StudentExamSubmission.find({ student: child._id })
+        .populate({
+          path: "lecture",
+          select: "name description"
+        })
+        .sort({ submittedAt: -1 })
+        .lean();      // Get redeemed promo codes
       const redeemedCodes = await Code.find({
         redeemedBy: child._id,
         isRedeemed: true
@@ -860,7 +867,8 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         ...child,
         purchaseHistory,
         lectureAccess,
-        redeemedCodes
+        redeemedCodes,
+        examScores // Include exam scores in the response
       };
     })
   );
