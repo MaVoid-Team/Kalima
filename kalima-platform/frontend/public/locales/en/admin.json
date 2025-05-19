@@ -139,7 +139,9 @@
         "admin": "Admin",
         "subadmin": "Subadmin",
         "lecturer": "Lecturer",
-        "student": "Student"
+        "student": "Student",
+        "teacher": "Teacher",
+        "assistant": "Assistant "
       },
       
       "actions": {
@@ -160,7 +162,8 @@
         "admin": "Admin",
         "assistant": "Assistant",
         "parent": "Parent",
-        "package": "Packages"
+        "package": "Packages",
+        "lesson": "Lesson"
       },
       "idDisplay": "ID: {{id}}",
       "status": {
