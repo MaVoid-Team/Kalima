@@ -232,22 +232,31 @@ function SecuritySection() {
 }
 
 function PasswordStrengthIndicator({ strength }) {
-  const strengthText = ["Weak", "Medium", "Strong"]
-  const colors = ["bg-error", "bg-warning", "bg-success"]
-  const widths = ["w-1/3", "w-2/3", "w-full"]
+  const { t } = useTranslation("common");
+  const colors  = ["bg-error", "bg-warning", "bg-success"];
+  const widths  = ["w-1/3",  "w-2/3",    "w-full"];
+  const labels  = [
+    t("passwordStrength.weak"),
+    t("passwordStrength.medium"),
+    t("passwordStrength.strong"),
+  ];
 
   return (
-    <div className="mt-2">
+    <div className="mt-2" dir={t("dir")}>
       <div className="w-full bg-gray-200 rounded-full h-2">
-        <div className={`${colors[strength]} ${widths[strength]} h-2 rounded-full transition-all duration-300`}></div>
+        <div
+          className={`${colors[strength]} ${widths[strength]} h-2 rounded-full transition-all duration-300`}
+        />
       </div>
+
       <div className="text-xs mt-1 text-gray-500">
-        Strength: <span className={`font-medium ${colors[strength].replace('bg', 'text')}`}>
-          {strengthText[strength]}
+        {t("passwordStrength.label")}&nbsp;
+        <span className={`font-medium ${colors[strength].replace("bg", "text")}`}>
+          {labels[strength]}
         </span>
       </div>
     </div>
-  )
+  );
 }
 
 export default SecuritySection

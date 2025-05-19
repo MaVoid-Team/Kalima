@@ -39,6 +39,12 @@
     "admin": "Admin",
     "assistnat": "Assistant"
   },
+   "passwordStrength": {
+    "label": "Strength:",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong"
+  },
   "dashboard": "Dashboard",
   "profile": "My Profile",
   "courses": "My Courses",
