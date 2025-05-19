@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth-services"; // Adjust the path based on your project structure
 import { getAuthHeader } from "./fetch-users"; // Adjust the path based on your project structure
-import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

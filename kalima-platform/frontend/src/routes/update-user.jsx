@@ -68,35 +68,63 @@ export const updateUser = async (userId, updateData) => {
   }
 }
 
-/**
- * Updates the currently logged in user's information
- * @param {Object} updateData - Object containing the fields to update
- * @returns {Promise<Object>} - Response object with success status and data or error
- */
 export const updateCurrentUser = async (updateData) => {
   try {
-    // Fetch current user data to get the ID and role
-    const userDataResponse = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    })
+    const response = await axios.patch(
+      `${API_URL}/api/v1/users/me/update`,
+      updateData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
 
-    const userInfo = userDataResponse.data.data.userInfo
-    const userId = userInfo.id
+    return { 
+      success: true, 
+      data: response.data 
+    };
 
-    // Include the role in the update data to prevent the "invalid or missing role" error
-    const updatedData = {
-      ...updateData,
-      role: userInfo.role, // Always include the current role
-    }
-
-    // Call the updateUser function with the retrieved ID and the updated data that includes the role
-    return updateUser(userId, updatedData)
   } catch (error) {
     return {
       success: false,
-      error: `Error updating current user: ${error.message}`,
-    }
+      error: error.response?.data?.message || 
+            error.message || 
+            "Failed to update user data"
+    };
   }
-}
+};
+
+/**
+ * Updates the user's password
+ * @param {Object} passwordData - { currentPassword: string, newPassword: string }
+ * @returns {Promise<{success: boolean, data?: any, error?: string}>}
+ */
+export const updateUserPassword = async (passwordData) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/api/v1/users/update/password`,
+      passwordData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    return { 
+      success: true, 
+      data: response.data 
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || 
+            error.message || 
+            "Failed to update password"
+    };
+  }
+};
