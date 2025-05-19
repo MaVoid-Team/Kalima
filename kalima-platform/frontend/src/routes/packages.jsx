@@ -85,3 +85,29 @@ export const deletePackage = async (packageId) => {
       };
   }
 };
+
+export const purchasePackage = async (packageId) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/purchases/package`, {
+      packageId: packageId,
+    }, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    return {
+      success: response.data.status === "success",
+      data: response.data,
+      message: response.data.message || "Package purchased successfully"
+    }
+  } catch (error) {
+    console.error("Error purchasing package:", error)
+    return {
+      success: false,
+      error: error,
+      message: error.response?.data?.message || "Failed to purchase package"
+    }
+  }
+}
