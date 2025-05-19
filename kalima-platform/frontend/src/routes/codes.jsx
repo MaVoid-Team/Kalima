@@ -143,7 +143,7 @@ export const getPromoCodes = async ({ params = {} } = {}) => {
 export const deletePromoCode = async (code) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/api/v1/codes/`,
+      `${API_URL}/codes/`,
       {
         headers: {
           ...getAuthHeader(),
@@ -186,7 +186,7 @@ export const deleteBulkPromoCodes = async (codes) => {
     }
 
     const response = await axios.delete(
-      `${API_URL}/api/v1/codes/multiple`,
+      `${API_URL}/codes/multiple`,
       {
         headers: {
           ...getAuthHeader(),
