@@ -10,6 +10,8 @@ const Code = require("../models/codeModel.js");
 const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
+const Lecture = require("../models/LectureModel.js");
+const Attachment = require("../models/attachmentModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -571,26 +573,161 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!admin) {
         return next(new AppError("User not found", 404));
-      }
-
-      // No additional fields needed for admin roles
+      }      // No additional fields needed for admin roles
       break;
-
+      
     case "Assistant":
-      // Find assistant with related lecturer
+      // Find assistant with related lecturer and all lecture data
       const assistant = await Assistant.findById(userId)
-        .populate("assignedLecturer", "name expertise")
+        .populate({
+          path: "assignedLecturer",
+          select: "name expertise bio profilePicture"
+        })
         .lean();
 
       if (!assistant) {
         return next(new AppError("Assistant not found", 404));
       }
 
-      // Add assistant-specific fields
+      // Add assistant-specific fields to the response
       responseData.userInfo = {
         ...responseData.userInfo,
         assignedLecturer: assistant.assignedLecturer,
+        profilePicture: assistant.profilePicture
       };
+
+      // Only fetch additional data if no specific fields were requested or the relevant fields were included
+      if (!fields || fields.includes("lecturerContainers") || fields.includes("lectures")) {
+        // Get containers (courses, terms, etc.) created by the assigned lecturer
+        const containers = await Container.find({ createdBy: assistant.assignedLecturer._id })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .lean();
+        
+        responseData.lecturerContainers = containers;
+      }
+
+      if (!fields || fields.includes("lectures")) {
+        // Get all lectures from the assigned lecturer
+        const lectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
+          .lean();
+        
+        responseData.lectures = lectures;
+      }
+
+      if (!fields || fields.includes("attachments")) {
+        // Get all attachments related to lecturer's lectures
+        const lecturerLectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+          .select("_id")
+          .lean();
+        
+        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        
+        const attachments = await Attachment.find({ lectureId: { $in: lectureIds } })
+          .populate("lectureId", "name")
+          .populate("studentId", "name")
+          .lean();
+        
+        responseData.attachments = attachments;
+      }
+
+      if (!fields || fields.includes("examSubmissions")) {
+        // Get exam submissions for lectures created by the assigned lecturer
+        const lecturerLectures = !responseData.lectures ? 
+          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
+          responseData.lectures;
+        
+        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        
+        const examSubmissions = await StudentExamSubmission.find({ 
+          lecture: { $in: lectureIds },
+          type: "exam"
+        })
+          .populate("student", "name sequencedId")
+          .populate("lecture", "name")
+          .populate("config", "name type")
+          .lean();
+        
+        responseData.examSubmissions = examSubmissions;
+      }      if (!fields || fields.includes("homeworkSubmissions")) {
+        // Get homework submissions for lectures created by the assigned lecturer
+        const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ? 
+          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
+          (responseData.lectures || responseData.examSubmissions);
+        
+        // Get lecture IDs, handling both direct lecture objects and exam submission objects
+        const lectureIds = lecturerLectures.map(lecture => {
+          if (lecture._id) return lecture._id;
+          if (lecture.lecture && lecture.lecture._id) return lecture.lecture._id;
+          return lecture;
+        }).filter(id => id); // Filter out any undefined values
+        
+        const homeworkSubmissions = await StudentExamSubmission.find({ 
+          lecture: { $in: lectureIds },
+          type: "homework"
+        })
+          .populate("student", "name sequencedId")
+          .populate("lecture", "name")
+          .populate("config", "name type")
+          .lean();
+        
+        responseData.homeworkSubmissions = homeworkSubmissions;
+      }
+
+      if (!fields || fields.includes("stats")) {
+        // Calculate statistics about lecturer's content and student engagement
+        const stats = {
+          totalLectures: 0,
+          totalStudentExamSubmissions: 0,
+          totalStudentHomeworkSubmissions: 0,
+          totalAttachments: 0,
+          lectureViews: 0
+        };
+        
+        if (responseData.lectures) {
+          stats.totalLectures = responseData.lectures.length;
+          stats.lectureViews = responseData.lectures.reduce(
+            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+          );
+        } else {
+          const lectureCount = await Lecture.countDocuments({ 
+            createdBy: assistant.assignedLecturer._id 
+          });
+          stats.totalLectures = lectureCount;
+          
+          const lectures = await Lecture.find({ 
+            createdBy: assistant.assignedLecturer._id 
+          }).select("numberOfViews").lean();
+          
+          stats.lectureViews = lectures.reduce(
+            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+          );
+        }
+          stats.totalStudentExamSubmissions = responseData.examSubmissions ? 
+          responseData.examSubmissions.length : 
+          await StudentExamSubmission.countDocuments({ 
+            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
+            type: "exam"
+          });
+          
+        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions ? 
+          responseData.homeworkSubmissions.length : 
+          await StudentExamSubmission.countDocuments({ 
+            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
+            type: "homework"
+          });
+          
+        stats.totalAttachments = responseData.attachments ? 
+          responseData.attachments.length : 
+          await Attachment.countDocuments({ 
+            lectureId: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") }
+          });
+          
+        responseData.stats = stats;
+      }
       break;
 
     default:
