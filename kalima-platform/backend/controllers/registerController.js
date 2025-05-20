@@ -206,17 +206,24 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     ...userData
   } = req.body;
   const phoneRequiredRoles = ["teacher", "parent", "student"];
-  if (!government) {
-    return next(new AppError("Government is required.", 400));
-  }
-  if (!administrationZone) {
-    return next(new AppError("Administration zone is required.", 400));
-  }
+  const govAdminRequiredRoles = ["teacher", "parent", "student"];
+
+  // Only validate government and administration zone for specific roles
+  if (govAdminRequiredRoles.includes(role.toLowerCase())) {
+    if (!government) {
+      return next(new AppError("Government is required.", 400));
+    }
+    if (!administrationZone) {
+      return next(new AppError("Administration zone is required.", 400));
+    }
     if (!governments.includes(government)) {
-    return next(new AppError(`Invalid government: ${government}.`, 400));
-  }
-  if (!administrationZones.includes(administrationZone)) {
-    return next(new AppError(`Invalid administration zone: ${administrationZone}.`, 400));
+      return next(new AppError(`Invalid government: ${government}.`, 400));
+    }
+    if (!administrationZones.includes(administrationZone)) {
+      return next(
+        new AppError(`Invalid administration zone: ${administrationZone}.`, 400)
+      );
+    }
   }
   // Validate password
   try {
