@@ -172,7 +172,6 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
     }
 
     await lecture.save({ session });
-    console.log("Attachment saved successfully", lecture);
     await session.commitTransaction();
     session.endSession();
     res.status(201).json({ message: "Attachment uploaded successfully" });
