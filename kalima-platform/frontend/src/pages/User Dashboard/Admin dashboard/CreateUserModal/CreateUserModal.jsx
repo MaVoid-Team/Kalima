@@ -10,7 +10,7 @@ import ParentForm from "./ParentForm"
 import LecturerForm from "./LecturerForm"
 import AssistantForm from "./AssistantForm"
 import BulkCreateUsers from "./BulkCreateUsers"
-
+import { governments, getAdministrationZonesForGovernment } from "../../../../constants/locations"
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
   const isRTL = i18n.language === "ar"
@@ -34,6 +34,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     expertise: "",
     assignedLecturer: "",
     sequencedId: "",
+    government: "",
+    administrationZone: "",
   }
 
   const [userData, setUserData] = useState(initialUserState)
@@ -181,12 +183,16 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           faction: data.faction || undefined,
           school: data.school || undefined,
           parent: data.parent || undefined,
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
         }
 
       case "parent":
         return {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
         }
 
       case "lecturer":
@@ -195,6 +201,8 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           subject: data.subject || [],
           bio: data.bio || undefined,
           expertise: data.expertise || undefined,
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
         }
 
       case "assistant":
@@ -354,13 +362,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
             </div>
 
             {userData.role === "student" && (
-              <StudentForm userData={userData} handleChange={handleChange} levels={levels} t={t} isRTL={isRTL} />
+              <StudentForm userData={userData} handleChange={handleChange} levels={levels} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "parent" && (
-              <ParentForm userData={userData} handleChange={handleChange} t={t} isRTL={isRTL} />
+              <ParentForm userData={userData} handleChange={handleChange} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "lecturer" && (
-              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} t={t} isRTL={isRTL} />
+              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "assistant" && (
               <AssistantForm

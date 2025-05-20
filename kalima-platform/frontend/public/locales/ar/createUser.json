@@ -1,7 +1,8 @@
 {
   "titles": {
     "createNewUser": "إنشاء مستخدم جديد",
-    "bulkCreate": "إنشاء مستخدمين بالجملة"
+    "bulkCreate": "إنشاء مستخدمين بالجملة",
+    "csvGuidelines": "توصيات CSV"
   },
   "tabs": {
     "createSingleUser": "إنشاء مستخدم واحد",
@@ -26,7 +27,12 @@
     "sequencedIdOptional": "الرقم التسلسلي (اختياري)",
     "parentPhoneNumberOptional": "رقم هاتف ولي الأمر (اختياري)",
     "hobbies": "الاهتمامات",
-    "hobbiesOptional": "الاهتمامات (اختياري)"
+    "hobbiesOptional": "الاهتمامات (اختياري)",
+    "uploadCSV" :"تحميل ملف CSV",
+    "government" : "المحافظه",
+    "administrationZone" : "المناطق الادارية",
+    "selectGovernment" :"اختر المحافظه",
+    "selectAdministrationZone" :"اختر المناطق الادارية"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
@@ -38,8 +44,9 @@
     "expertise": "أدخل التخصص",
     "bio": "أدخل السيرة الذاتية",
     "selectLecturer": "اختر المعلم",
-    "selectSubjects": "اختر المواد الدراسية",
-    "selectHobbies": "اختر الاهتمامات"
+    "selectSubject": "اختر المواد الدراسية",
+    "selectHobbies": "اختر الاهتمامات",
+    "addHobby": "اضافة اهتمام"
   },
   "roles": {
     "subadmin": "مدير فرعي",
@@ -47,14 +54,15 @@
     "assistant": "مساعد",
     "student": "طالب",
     "parent": "ولي أمر",
-    "lecturer": "معلم"
+    "lecturer": "معلم",
+    "teacher" : "مدرس"
   },
   "gender": {
     "male": "ذكر",
     "female": "أنثى"
   },
   "buttons": {
-     "cancel": "إلغاء",
+    "cancel": "إلغاء",
     "create": "إنشاء",
     "save": "حفظ",
     "delete": "حذف",
@@ -64,7 +72,9 @@
     "next": "التالي",
     "previous": "السابق",
     "close": "إغلاق",
-    "add": "اضافة"
+    "add": "اضافة",
+    "createUsers": "انشاء مستخدمين",
+    "uploading": "جاري التحميل..."
   },
   "messages": {
     "loading": "جاري التحميل...",
@@ -92,9 +102,22 @@
   },
   "errors": {
     "failedToLoadDropdowns": "فشل في تحميل بيانات القوائم المنسدلة",
-    "failedToCreateUser": "فشل في إنشاء المستخدم"
+    "failedToCreateUser": "فشل في إنشاء المستخدم",
+    "failedToCreateUsers": "فشل في إنشاء المستخدمين. يرجى المحاولة مجددا.",
+    "unexpectedError": "حدث خطاء غير متوقع. يرجى المحاولة مجددا."
+  },
+  "success": {
+    "usersCreated": "تم انشاء المستخدمين بنجاح!"
   },
   "help": {
-    "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة"
+    "holdCtrlToSelectMultiple": "اضغط Ctrl (أو Cmd) لتحديد خيارات متعددة",
+    "selectAccountType": "حدد نوع الحسابات المراد انشاؤها",
+    "csvRequiredFields": "الملف CSV يجب ان يحتوي على الحقول المطلوبة لنوع الحساب المحدد",
+    "uploadCSV": "تحميل ملف CSV",
+    "csvFormat": "يجب ان يحتوي الملف CSV على الحقول التالية:"
+  },
+  "csvFields" :{
+    "name":"الاسم",
+    "phone":"الرقم"
   }
 }

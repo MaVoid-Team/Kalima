@@ -28,7 +28,11 @@
     "assignedLecturer": "Assigned Lecturer",
     "hobbies": "Hobbies",
     "hobbiesOptional": "Hobbies (Optional)",
-    "uploadCSV": "Upload CSV File"
+    "uploadCSV": "Upload CSV File",
+    "government": "Government",
+    "administrationZone": "Administration Zone",
+    "selectGovernment": "Select Government",
+    "selectAdministrationZone": "Select Administration Zone"
   },
   "placeholders": {
     "selectAccountType": "Select Account Type",
@@ -55,6 +59,28 @@
   "gender": {
     "male": "Male",
     "female": "Female"
+  },
+  "buttons": {
+    "add": "Add",
+    "uploading": "Uploading...",
+    "createUsers": "Create Users",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "success": "Success!",
+    "error": "Error!",
+    "warning": "Warning!",
+    "info": "Information"
   },
   "validation": {
     "invalidEmail": "Invalid email address",
@@ -90,31 +116,9 @@
     "csvRequiredFields": "CSV file should include required fields for the selected account type",
     "csvFormat": "Your CSV file should include the following columns:"
   },
-  "buttons": {
-    "add": "Add",
-    "uploading": "Uploading...",
-    "createUsers": "Create Users",
-    "cancel": "Cancel",
-    "create": "Create",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit",
-    "submit": "Submit",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "close": "Close"
-  },
-  "messages": {
-    "loading": "Loading...",
-    "success": "Success!",
-    "error": "Error!",
-    "warning": "Warning!",
-    "info": "Information"
-  },
+  
   "csvFields": {
     "name": "Name - Full name of the user",
     "phone": "Phone - Full correct Phone number"
   }
-  
 }
