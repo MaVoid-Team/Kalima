@@ -204,19 +204,23 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     government,
     administrationZone,
     ...userData
-  } = req.body;
-  const phoneRequiredRoles = ["teacher", "parent", "student"];
-  if (!government) {
-    return next(new AppError("Government is required.", 400));
-  }
-  if (!administrationZone) {
-    return next(new AppError("Administration zone is required.", 400));
-  }
+  } = req.body;  const phoneRequiredRoles = ["teacher", "parent", "student"];
+  const govAdminRequiredRoles = ["teacher", "parent", "student"];
+  
+  // Only validate government and administration zone for specific roles
+  if (govAdminRequiredRoles.includes(role.toLowerCase())) {
+    if (!government) {
+      return next(new AppError("Government is required.", 400));
+    }
+    if (!administrationZone) {
+      return next(new AppError("Administration zone is required.", 400));
+    }
     if (!governments.includes(government)) {
-    return next(new AppError(`Invalid government: ${government}.`, 400));
-  }
-  if (!administrationZones.includes(administrationZone)) {
-    return next(new AppError(`Invalid administration zone: ${administrationZone}.`, 400));
+      return next(new AppError(`Invalid government: ${government}.`, 400));
+    }
+    if (!administrationZones.includes(administrationZone)) {
+      return next(new AppError(`Invalid administration zone: ${administrationZone}.`, 400));
+    }
   }
   // Validate password
   try {
@@ -275,7 +279,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
     }
   }
-
   const hashedPwd = await bcrypt.hash(password, 12);
 
   const newUser = {
@@ -284,10 +287,14 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     password: hashedPwd,
     children: childrenById,
     isEmailVerified: true, // Set users to already verified by default
-    government,
-    administrationZone,
     ...userData,
   };
+
+  // Only include government and administrationZone for specific roles
+  if (govAdminRequiredRoles.includes(role.toLowerCase())) {
+    newUser.government = government;
+    newUser.administrationZone = administrationZone;
+  }
 
   if (phoneNumber) {
     newUser.phoneNumber = phoneNumber;
