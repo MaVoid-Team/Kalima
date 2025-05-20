@@ -5,6 +5,8 @@ const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
+const Moderator = require("../models/moderatorModel.js");
+const SubAdmin = require("../models/subAdminModel.js");
 const Purchase = require("../models/purchaseModel.js");
 const Code = require("../models/codeModel.js");
 const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
@@ -120,12 +122,12 @@ const updateUser = catchAsync(async (req, res, next) => {
     }
     req.body.children = childrenById;
   }
-
   const updatedUser = {
     name,
     email,
     address,
     children: childrenById,
+    role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
 
