@@ -97,7 +97,7 @@ function LanguageAppearanceSection() {
                 <span className="label-text">{t("languageAppearance.options.theme")}</span>
               </label>
               <button 
-                className="btn btn-sm btn-ghost"
+                className="btn btn-sm btn-ghost text-lg"
                 onClick={() => setShowThemes(!showThemes)}
               >
                 {showThemes ? t("languageAppearance.hideThemes") : t("languageAppearance.showThemes")}

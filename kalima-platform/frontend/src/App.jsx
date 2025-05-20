@@ -27,7 +27,7 @@ const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDash
 const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
 const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
 const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
-const UserDashboard = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
+const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
 const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
 const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
 const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
@@ -147,8 +147,10 @@ function App() {
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
-            <Route path="/dashboard/assistant-page" element={<UserDashboard />} />
+            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
             <Route path="/dashboard/assistant-page/lectures-page" element={<MyLecturesPage />} />
+            <Route path="/dashboard/assistant-page/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
+            <Route path="/dashboard/assistant-page/lecture-display/:lectureId" element={<LectureDisplay />} />
             
             {/* Admin Routes */}
             <Route path="/dashboard/admin-dashboard" element={<AdminDashboard />} />

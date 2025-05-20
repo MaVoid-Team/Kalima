@@ -89,6 +89,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, toggleSidebar, isMobile]);
+  
 
   // Handle logout
   const handleLogout = async () => {
@@ -167,18 +168,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('myDashboard') || 'My Dashboard', 
         icon: <FaUserAlt className="w-5 h-5" />, 
         path: '/dashboard/assistant-page' 
-      },
-      { 
-        id: 'courses', 
-        title: t('courses') || 'Courses', 
-        icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/assistant-dashboard/lecture-page' 
-      },
-      { 
-        id: 'lectures', 
-        title: t('MyLectures') || 'My Lectures', 
-        icon: <FaGraduationCap className="w-5 h-5" />, 
-        path: '/dashboard/assistant-dashboard/lectures-page' 
       },
     ];
 
