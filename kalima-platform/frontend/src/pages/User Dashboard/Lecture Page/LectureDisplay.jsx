@@ -13,7 +13,24 @@ import { verifyExamSubmission, checkLectureAccess } from "../../../routes/examsA
 import { uploadHomework, getLectureHomeworks } from "../../../routes/homeworks"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { checkStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
-import { FiUpload, FiFile, FiX, FiCheck, FiEye, FiLink, FiAlertTriangle, FiExternalLink, FiAward } from "react-icons/fi"
+import {
+  FiUpload,
+  FiFile,
+  FiX,
+  FiCheck,
+  FiEye,
+  FiLink,
+  FiAlertTriangle,
+  FiExternalLink,
+  FiAward,
+  FiClock,
+  FiPlay,
+  FiPause,
+  FiVolume2,
+  FiVolumeX,
+  FiMaximize,
+  FiMinimize,
+} from "react-icons/fi"
 
 // Vidstack imports
 import { MediaPlayer, MediaProvider, Poster } from "@vidstack/react"
@@ -59,6 +76,17 @@ const getYouTubeId = (url) => {
   return videoId
 }
 
+// Helper function to format time in HH:MM:SS format
+const formatTime = (seconds) => {
+  if (isNaN(seconds) || seconds < 0) return "00:00:00"
+
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const secs = Math.floor(seconds % 60)
+
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+}
+
 const LectureDisplay = () => {
   const { t, i18n } = useTranslation("lectureDisplay")
   const isRTL = i18n.language === "ar"
@@ -82,6 +110,49 @@ const LectureDisplay = () => {
   const [userRole, setUserRole] = useState(null)
   const [userId, setUserId] = useState(null)
   const [purchaseId, setPurchaseId] = useState(null)
+
+  // Add this state to track if we should show the exit confirmation
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false)
+  const [pendingNavigation, setPendingNavigation] = useState(null)
+
+  // Add this function to handle navigation attempts
+  const handleNavigateAway = (to) => {
+    if (userRole === "Student" && progress < 50 && !showFiftyPercentWarning) {
+      // If they haven't watched 50% of the video, show the confirmation dialog
+      setShowExitConfirmation(true)
+      setPendingNavigation(to)
+      return false
+    }
+    return true
+  }
+
+  // Add these functions to handle confirmation dialog responses
+  const handleConfirmNavigation = () => {
+    setShowExitConfirmation(false)
+    if (pendingNavigation) {
+      navigate(pendingNavigation)
+    }
+  }
+
+  const handleCancelNavigation = () => {
+    setShowExitConfirmation(false)
+    setPendingNavigation(null)
+    setHasAttemptedToLeave(true)
+  }
+
+  // Video player state
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [progress, setProgress] = useState(0)
+  const [buffered, setBuffered] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [volume, setVolume] = useState(100)
+  const [isMuted, setIsMuted] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
+  const [videoQuality, setVideoQuality] = useState("auto")
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showControls, setShowControls] = useState(false)
+  const [hasAttemptedToLeave, setHasAttemptedToLeave] = useState(false)
 
   // Exam verification states
   const [examVerified, setExamVerified] = useState(false)
@@ -107,13 +178,15 @@ const LectureDisplay = () => {
   const [homeworkError, setHomeworkError] = useState(null)
   const [homeworks, setHomeworks] = useState([])
   const homeworkFileInputRef = useRef(null)
-  const [accessDataLoaded, setAccessDataLoaded] = useState(false);
+  const [accessDataLoaded, setAccessDataLoaded] = useState(false)
 
   const playerRef = useRef(null)
+  const progressBarRef = useRef(null)
   const lastUpdateTimeRef = useRef(0)
   const hasViewedRef = useRef(false)
   const redirectTimeoutRef = useRef(null)
   const fileInputRef = useRef(null)
+  const videoContainerRef = useRef(null)
 
   // Check if user has permission to upload files
   const hasUploadPermission = () => {
@@ -320,14 +393,14 @@ const LectureDisplay = () => {
             console.log("Setting remaining views to:", result.data.access.remainingViews)
             // Only set the studentLectureAccessId, don't update remainingViews yet
             setStudentLectureAccessId(result.data.access._id)
-            setAccessDataLoaded(true);
+            setAccessDataLoaded(true)
 
             // Store the remaining views in a ref to use when the video plays
             if (result.data.access.remainingViews !== undefined) {
               setRemainingViews(result.data.access.remainingViews)
             }
 
-            if (result.data.access.remainingViews <= 0) {
+            if (result.data.access.remainingViews < 0) {
               setVideoBlocked(true)
               redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000)
             }
@@ -342,7 +415,7 @@ const LectureDisplay = () => {
       } catch (error) {
         console.error("Error fetching access data:", error)
         setError(t("failedToLoadAccessData"))
-        setAccessDataLoaded(true);
+        setAccessDataLoaded(true)
       }
     }
 
@@ -380,6 +453,49 @@ const LectureDisplay = () => {
     return () => clearTimeout(timer)
   }, [homeworkSuccess])
 
+  // Fix for exit warning
+  useEffect(() => {
+    // Only add the beforeunload event listener for students who haven't watched 50%
+    if (userRole === "Student") {
+      const handleBeforeUnload = (e) => {
+        // Only show the warning if they haven't watched 50% of the video
+        if (progress < 50) {
+          const message =
+            t("exitWarningMessage") || "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"
+          e.preventDefault()
+          e.returnValue = message
+          setHasAttemptedToLeave(true)
+          return message
+        }
+      }
+
+      window.addEventListener("beforeunload", handleBeforeUnload)
+
+      return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload)
+      }
+    }
+  }, [userRole, progress, t])
+
+  // Add this to handle the back button specifically
+  useEffect(() => {
+    // Only add for students who haven't watched 50%
+    if (userRole === "Student" && progress < 50 && !showFiftyPercentWarning) {
+      // Override the back button
+      const handleBackButton = (e) => {
+        e.preventDefault()
+        setShowExitConfirmation(true)
+        setPendingNavigation(-1) // -1 means go back
+      }
+
+      window.addEventListener("popstate", handleBackButton)
+
+      return () => {
+        window.removeEventListener("popstate", handleBackButton)
+      }
+    }
+  }, [userRole, progress, showFiftyPercentWarning])
+
   // Vidstack Player Logic
   const youtubeVideoId = lecture ? getYouTubeId(lecture.videoLink) : null
 
@@ -404,7 +520,15 @@ const LectureDisplay = () => {
   }
 
   const handleOnPlay = async () => {
-    if (userRole !== "Student" || hasViewedRef.current || (remainingViews !== null && remainingViews <= 0 || !accessDataLoaded)) return
+    if (
+      userRole !== "Student" ||
+      hasViewedRef.current ||
+      (remainingViews !== null && remainingViews <= 0) ||
+      !accessDataLoaded
+    )
+      return
+
+    setIsPlaying(true)
 
     try {
       hasViewedRef.current = true
@@ -440,34 +564,53 @@ const LectureDisplay = () => {
     }
   }
 
-  const handleOnTimeUpdate = (event) => {
-    const player = playerRef.current
-    if (!player || !event.detail) return
-
-    const { currentTime, duration } = event.detail
-    const now = Date.now()
-
-    if (duration > 0) {
-      const progress = (currentTime / duration) * 100
-      if (progress > 50 && !showFiftyPercentWarning) {
-        setShowFiftyPercentWarning(true)
-      }
-    }
-
-    if (now - lastUpdateTimeRef.current >= 5000) {
-      localStorage.setItem(`lecture_${lectureId}_vidstack_time`, currentTime.toString())
-      lastUpdateTimeRef.current = now
-    }
-  }
-
   const handleOnPause = () => {
+    setIsPlaying(false)
     const player = playerRef.current
     if (player && player.currentTime > 0 && !player.ended) {
       localStorage.setItem(`lecture_${lectureId}_vidstack_time`, player.currentTime.toString())
     }
   }
 
+  const handleOnTimeUpdate = () => {
+    const player = playerRef.current
+    if (!player) return
+
+    const currentTimeValue = player.currentTime || 0
+    const durationValue = player.duration || 0
+    const now = Date.now()
+
+    // Update state with current values
+    setCurrentTime(currentTimeValue)
+    setDuration(durationValue)
+
+    // Calculate progress percentage
+    if (durationValue > 0) {
+      const progressValue = (currentTimeValue / durationValue) * 100
+      setProgress(progressValue)
+
+      // Check if we've passed 50% for the warning
+      if (progressValue > 50 && !showFiftyPercentWarning) {
+        setShowFiftyPercentWarning(true)
+      }
+    }
+
+    // Update buffered amount
+    if (player.buffered && player.buffered.length > 0) {
+      const bufferedEnd = player.buffered.end(player.buffered.length - 1)
+      const bufferedPercent = (bufferedEnd / durationValue) * 100
+      setBuffered(bufferedPercent)
+    }
+
+    // Save time to localStorage periodically
+    if (now - lastUpdateTimeRef.current >= 5000) {
+      localStorage.setItem(`lecture_${lectureId}_vidstack_time`, currentTimeValue.toString())
+      lastUpdateTimeRef.current = now
+    }
+  }
+
   const handleOnEnded = () => {
+    setIsPlaying(false)
     localStorage.removeItem(`lecture_${lectureId}_vidstack_time`)
     if (!showFiftyPercentWarning) {
       setShowFiftyPercentWarning(true)
@@ -486,6 +629,87 @@ const LectureDisplay = () => {
       }
     }
     setError(errorMessage)
+  }
+
+  const handleVolumeChange = (event) => {
+    const player = playerRef.current
+    if (!player) return
+
+    setVolume(player.volume * 100)
+    setIsMuted(player.muted)
+  }
+
+  const handlePlaybackRateChange = (event) => {
+    const player = playerRef.current
+    if (!player) return
+
+    setPlaybackRate(player.playbackRate)
+  }
+
+  const handleFullscreenChange = () => {
+    const player = playerRef.current
+    if (!player) return
+
+    setIsFullscreen(document.fullscreenElement !== null)
+  }
+
+  // Custom controls handlers
+  const togglePlay = () => {
+    const player = playerRef.current
+    if (!player) return
+
+    if (player.paused) {
+      player.play()
+    } else {
+      player.pause()
+    }
+  }
+
+  const toggleMute = () => {
+    const player = playerRef.current
+    if (!player) return
+
+    player.muted = !player.muted
+  }
+
+  const changeVolume = (value) => {
+    const player = playerRef.current
+    if (!player) return
+
+    player.volume = value / 100
+  }
+
+  const changePlaybackRate = (rate) => {
+    const player = playerRef.current
+    if (!player) return
+
+    player.playbackRate = rate
+  }
+
+  const toggleFullscreen = () => {
+    if (!videoContainerRef.current) return
+
+    if (!document.fullscreenElement) {
+      videoContainerRef.current.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`)
+      })
+    } else {
+      document.exitFullscreen()
+    }
+  }
+
+  const handleProgressBarClick = (e) => {
+    const player = playerRef.current
+    const progressBar = progressBarRef.current
+    if (!player || !progressBar) return
+
+    const rect = progressBar.getBoundingClientRect()
+    const clickPosition = (e.clientX - rect.left) / rect.width
+    const newTime = clickPosition * player.duration
+
+    if (!isNaN(newTime) && isFinite(newTime) && newTime >= 0 && newTime <= player.duration) {
+      player.currentTime = newTime
+    }
   }
 
   // File upload handlers
@@ -889,6 +1113,17 @@ const LectureDisplay = () => {
         </div>
       )}
 
+      {hasAttemptedToLeave && !showFiftyPercentWarning && (
+        <div className="alert alert-warning my-4 shadow-lg">
+          <div>
+            <FiAlertTriangle className="stroke-current shrink-0 h-6 w-6" />
+            <span>
+              {t("exitWarningMessage") || "You haven't completed 50% of this lecture yet. Please continue watching."}
+            </span>
+          </div>
+        </div>
+      )}
+
       {isVideoEffectivelyBlocked ? (
         <div className="alert alert-error mb-6 shadow-lg">
           <div>
@@ -909,12 +1144,12 @@ const LectureDisplay = () => {
           </div>
         </div>
       ) : youtubeVideoId ? (
-        <div className="mb-6 shadow-xl rounded-lg overflow-hidden">
+        <div className="mb-6 shadow-xl rounded-lg overflow-hidden bg-base-300" ref={videoContainerRef}>
           <MediaPlayer
-            ref={(node) => (playerRef.current = node)}
-            title={lecture.name}
+            ref={playerRef}
+            title={lecture?.name}
             src={`youtube/${youtubeVideoId}`}
-            poster={lecture.thumbnailLink || ""}
+            poster={lecture?.thumbnailLink || ""}
             playsInline
             autoPlay={false}
             onCanPlay={handleOnCanPlay}
@@ -923,28 +1158,149 @@ const LectureDisplay = () => {
             onPause={handleOnPause}
             onEnded={handleOnEnded}
             onError={handleOnError}
+            onVolumeChange={handleVolumeChange}
+            onRateChange={handlePlaybackRateChange}
             aspectRatio="16/9"
           >
             <MediaProvider>
-              {lecture.thumbnailLink && (
+              {lecture?.thumbnailLink && (
                 <Poster
                   className="vds-poster"
                   src={lecture.thumbnailLink}
-                  alt={t("lecturePoster", { name: lecture.name })}
+                  alt={t("lecturePoster", { name: lecture?.name })}
                 />
               )}
             </MediaProvider>
-            <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture.videoThumbnailsVTT || null} />
+            <DefaultVideoLayout icons={defaultLayoutIcons} thumbnails={lecture?.videoThumbnailsVTT || null} />
           </MediaPlayer>
+
+          {/* Enhanced custom progress bar */}
+          <div className="p-4 bg-base-200">
+            <div className="flex flex-col space-y-2">
+              {/* Video info */}
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center gap-2">
+                  <FiClock className="text-primary" />
+                  <span className="text-sm font-medium">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  {/* Playback rate selector */}
+                  <div className="dropdown dropdown-top dropdown-end">
+                    <label tabIndex={0} className="btn btn-sm btn-ghost">
+                      {playbackRate}x
+                    </label>
+                    <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                      {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((rate) => (
+                        <li key={rate}>
+                          <a className={playbackRate === rate ? "active" : ""} onClick={() => changePlaybackRate(rate)}>
+                            {rate}x
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Volume control */}
+                  <div className="flex items-center gap-2">
+                    <button className={`btn btn-sm btn-ghost ${isRTL ? "rotate-180" : ""}`} onClick={toggleMute}>
+                      {isMuted ? <FiVolumeX /> : <FiVolume2 />}
+                    </button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={isMuted ? 0 : volume}
+                      onChange={(e) => changeVolume(Number.parseInt(e.target.value))}
+                      className="range range-xs range-primary w-24"
+                    />
+                  </div>
+
+                  {/* Fullscreen toggle */}
+                  <button className="btn btn-sm btn-ghost" onClick={toggleFullscreen}>
+                    {isFullscreen ? <FiMinimize /> : <FiMaximize />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Progress bar container */}
+              <div
+                className="relative w-full h-4 bg-gray-300 rounded-full cursor-pointer overflow-hidden group"
+                ref={progressBarRef}
+                onClick={handleProgressBarClick}
+              >
+                {/* Buffered progress */}
+                <div
+                  className="absolute top-0 left-0 h-full bg-gray-500 opacity-50 transition-all duration-300"
+                  style={{ width: `${buffered}%` }}
+                ></div>
+
+                {/* Actual progress */}
+                <div
+                  className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out"
+                  style={{ width: `${progress}%` }}
+                ></div>
+
+                {/* Hover effect */}
+                <div className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-20 bg-white"></div>
+
+                {/* Thumb indicator */}
+                <div
+                  className="absolute top-0 h-full aspect-square rounded-full bg-primary-focus border-2 border-white transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ left: `${progress}%` }}
+                ></div>
+              </div>
+
+              {/* Play/Pause button centered over video */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  className="btn btn-circle btn-lg bg-primary bg-opacity-70 hover:bg-opacity-90 border-0"
+                  onClick={togglePlay}
+                >
+                  {isPlaying ? <FiPause className="text-2xl" /> : <FiPlay className="text-2xl" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Video stats and info */}
           <div className="p-4 bg-base-200 rounded-b-lg">
-            {userRole === "Student" && (
-              <p className="mt-2 text-sm text-gray-600">
-                {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
-              </p>
-            )}
+            <div className="flex flex-wrap justify-between items-center">
+              <div className="flex items-center gap-2">
+                <span className="badge badge-primary">
+                  {t("totalDuration")} : {formatTime(duration)}
+                </span>
+                {userRole === "Student" && (
+                  <span className="badge badge-secondary">
+                    {t("remainingViews")}: {remainingViews === null ? t("loading") : remainingViews}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                <span className="badge badge-outline">
+                  {progress < 25
+                    ? t("justStarted")
+                    : progress < 50
+                      ? t("almostHalfway")
+                      : progress < 75
+                        ? t("goodProgress")
+                        : progress < 95
+                          ? t("almostDone")
+                          : t("completed")}
+                </span>
+
+                {progress > 0 && progress < 100 && (
+                  <span className="badge badge-info">
+                    {Math.round(progress)}% {t("completed")}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      ) : lecture.videoLink ? (
+      ) : lecture?.videoLink ? (
         <div className="alert alert-warning mb-6 shadow-lg">
           <div>
             <svg
@@ -1396,6 +1752,26 @@ const LectureDisplay = () => {
                     {t("uploadFiles")}
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Exit confirmation dialog */}
+      {showExitConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
+            <h3 className="font-bold text-lg mb-4">{t("exitWarningTitle") || "Leaving so soon?"}</h3>
+            <p className="mb-6">
+              {t("exitWarningMessage") ||
+                "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"}
+            </p>
+            <div className="flex justify-end gap-2">
+              <button onClick={handleCancelNavigation} className="btn btn-outline">
+                {t("stayOnPage") || "Stay on page"}
+              </button>
+              <button onClick={handleConfirmNavigation} className="btn btn-primary">
+                {t("leavePage") || "Leave anyway"}
               </button>
             </div>
           </div>

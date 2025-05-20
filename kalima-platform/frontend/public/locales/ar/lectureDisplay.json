@@ -1,4 +1,10 @@
-{
+{ 
+  "totalDuration": "المدة الكلية",
+  "almostHalfway": "اقتربت لنصف الفيديو",
+  "justStarted": "بدأت بالفيديو",
+  "goodProgress": "تقدم جيد",
+  "almostDone": "اقتربت من الانتهاء",
+  "completed": "مكتمل",
   "back": "رجوع",
   "loadingLecture": "جاري تحميل المحاضرة...",
   "failedToAuthenticateUser": "فشل في التحقق من هوية المستخدم",
