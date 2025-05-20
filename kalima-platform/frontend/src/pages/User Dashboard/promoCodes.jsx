@@ -25,6 +25,11 @@ import {
   GraduationCap,
   School,
   UserCircle2,
+  Award,
+  FileText,
+  CheckCircle,
+  XCircle,
+  Calendar,
 } from "lucide-react"
 import { getUserDashboard } from "../../routes/auth-services"
 import { getChildrenData } from "../../routes/parents"
@@ -39,6 +44,7 @@ const PromoCodes = () => {
   const [transactions, setTransactions] = useState([])
   const [pointsBalances, setPointsBalances] = useState([])
   const [lectureAccess, setLectureAccess] = useState([])
+  const [examScores, setExamScores] = useState([])
   const [redeemCode, setRedeemCode] = useState("")
   const [balance, setBalance] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -214,9 +220,13 @@ const PromoCodes = () => {
         )
         setTransactions(combinedTransactions)
         setLectureAccess(childData.lectureAccess || [])
+        setExamScores(childData.examScores || [])
         setTransactionsTotalPages(1)
         setLectureAccessTotalPages(1)
       }
+    } else {
+      // Clear exam scores when not viewing a child
+      setExamScores([])
     }
   }, [selectedChild, children, t, i18n.language])
 
@@ -261,12 +271,7 @@ const PromoCodes = () => {
           aspectRatio: 1.0,
         }
         scanner
-          .start(
-            { facingMode: "environment" },
-            config,
-            onScanSuccess,
-            onScanFailure,
-          )
+          .start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
           .then(() => {
             isRunningRef.current = true
             setScannerLoading(false)
@@ -404,9 +409,8 @@ const PromoCodes = () => {
     setAddChildError(null)
     setAddChildSuccess(null)
     try {
-      const currentChildrenIds = children.map(child => child.sequencedId)
       const updateData = {
-        children: [sequencedId]
+        children: [sequencedId],
       }
       const result = await updateCurrentUser(updateData)
       if (result.success) {
@@ -507,8 +511,9 @@ const PromoCodes = () => {
                   </td>
                   <td className="hidden md:table-cell">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-                        }`}
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                      }`}
                     >
                       {transaction.type}
                     </span>
@@ -711,6 +716,88 @@ const PromoCodes = () => {
     </div>
   )
 
+  // New function to render the exam scores tab
+  const renderExamScoresTab = () => (
+    <div>
+      {!loading ? (
+        examScores.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {examScores.map((exam, index) => (
+              <div
+                key={index}
+                className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow"
+              >
+                <div className="card-body p-4">
+                  <div className="flex justify-between items-start">
+                    <h3 className="card-title text-base line-clamp-1">{exam.lecture.name}</h3>
+                    <div className={`badge ${exam.passed ? "badge-success" : "badge-error"} whitespace-nowrap`}>
+                      {exam.passed ? t("exams.passed") || "Passed" : t("exams.failed") || "Failed"}
+                    </div>
+                  </div>
+
+                  <p className="text-sm opacity-70 line-clamp-2 mb-3">
+                    {exam.lecture.description || t("noDescription")}
+                  </p>
+
+                  <div className="bg-base-200/50 rounded-lg p-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">{t("exams.score") || "Score"}:</span>
+                      <span className="font-bold text-lg">
+                        {exam.score} / {exam.maxScore}
+                      </span>
+                    </div>
+
+                    <div className="w-full bg-base-300 rounded-full h-2.5">
+                      <div
+                        className={`h-2.5 rounded-full ${exam.passed ? "bg-success" : "bg-error"}`}
+                        style={{ width: `${(exam.score / exam.maxScore) * 100}%` }}
+                      ></div>
+                    </div>
+
+                    <div className="text-xs mt-2 opacity-70">
+                      {t("exams.passingThreshold") || "Passing threshold"}: {exam.passingThreshold} / {exam.maxScore}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap justify-between items-center mt-3 text-xs opacity-70 gap-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3 flex-shrink-0" />
+                      {new Date(exam.submittedAt).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      {exam.passed ? (
+                        <CheckCircle className="w-3 h-3 flex-shrink-0 text-success" />
+                      ) : (
+                        <XCircle className="w-3 h-3 flex-shrink-0 text-error" />
+                      )}
+                      {exam.passed
+                        ? t("exams.passedMessage") || "Passed successfully"
+                        : t("exams.failedMessage") || "Needs improvement"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <div className="bg-base-200 p-4 rounded-full mb-4">
+              <FileText className="w-8 h-8 text-base-content/60" />
+            </div>
+            <p className="text-lg font-medium">{t("exams.noExams") || "No exam scores available"}</p>
+            <p className="text-sm opacity-70 max-w-md mt-2">
+              {t("exams.noExamsDescription") || "Your child hasn't taken any exams yet."}
+            </p>
+          </div>
+        )
+      ) : (
+        <div className="flex justify-center py-10">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      )}
+    </div>
+  )
+
   const handleTabChange = (tab) => {
     if (tab !== activeTab) {
       setActiveTab(tab)
@@ -835,50 +922,50 @@ const PromoCodes = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           {userInfo?.role === "Parent" ? (
             <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
-              <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
-                <div className="card-body p-6">
-                  <h2 className="card-title text-lg font-semibold mb-4">{t("addChild.title")}</h2>
-                  <div className="space-y-4">
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text font-medium text-base-content/80">{t("addChild.label")}</span>
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={sequencedId}
-                          onChange={(e) => setSequencedId(e.target.value)}
-                          placeholder={t("addChild.placeholder")}
-                          className="input input-bordered flex-1 focus:ring-2 focus:ring-primary focus:border-transparent"
-                        />
-                        <button
-                          onClick={handleAddChild}
-                          disabled={addChildLoading}
-                          className="btn btn-primary min-w-[120px]"
-                        >
-                          {addChildLoading ? (
-                            <span className="loading loading-spinner"></span>
-                          ) : (
-                            t("addChild.button")
-                          )}
-                        </button>
-                      </div>
+              <div className="card-body p-6">
+                <h2 className="card-title text-lg font-semibold mb-4">{t("addChild.title") || "Add Child"}</h2>
+                <div className="space-y-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-medium text-base-content/80">
+                        {t("addChild.label") || "Child's Sequence ID"}
+                      </span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={sequencedId}
+                        onChange={(e) => setSequencedId(e.target.value)}
+                        placeholder={t("addChild.placeholder") || "Enter your child's sequence ID"}
+                        className="input input-bordered flex-1 focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                      <button
+                        onClick={handleAddChild}
+                        disabled={addChildLoading}
+                        className="btn btn-primary min-w-[120px]"
+                      >
+                        {addChildLoading ? (
+                          <span className="loading loading-spinner"></span>
+                        ) : (
+                          t("addChild.button") || "Add Child"
+                        )}
+                      </button>
                     </div>
-
-                    {addChildError && (
-                      <div className="alert alert-error shadow-lg">
-                        <X className="w-5 h-5 shrink-0" />
-                        <span>{addChildError}</span>
-                      </div>
-                    )}
-
-                    {addChildSuccess && (
-                      <div className="alert alert-success shadow-lg">
-                        <Check className="w-5 h-5 shrink-0" />
-                        <span>{addChildSuccess}</span>
-                      </div>
-                    )}
                   </div>
+
+                  {addChildError && (
+                    <div className="alert alert-error shadow-lg">
+                      <X className="w-5 h-5 shrink-0" />
+                      <span>{addChildError}</span>
+                    </div>
+                  )}
+
+                  {addChildSuccess && (
+                    <div className="alert alert-success shadow-lg">
+                      <Check className="w-5 h-5 shrink-0" />
+                      <span>{addChildSuccess}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -958,11 +1045,7 @@ const PromoCodes = () => {
               <div className="card-body">
                 <h2 className="card-title mb-4">{t("actions.title")}</h2>
                 <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={startScanner}
-                    className="btn btn-primary"
-                    disabled={selectedChild !== null}
-                  >
+                  <button onClick={startScanner} className="btn btn-primary" disabled={selectedChild !== null}>
                     <QrCode className="w-4 h-4 mr-2" />
                     {t("scanner.button")}
                   </button>
@@ -983,7 +1066,9 @@ const PromoCodes = () => {
                 {selectedChild && (
                   <div className="alert alert-info mt-4 text-sm">
                     <Info className="w-4 h-4" />
-                    <span>{t("children.actionsDisabled") || "Actions are disabled when viewing a child's account."}</span>
+                    <span>
+                      {t("children.actionsDisabled") || "Actions are disabled when viewing a child's account."}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1060,9 +1145,24 @@ const PromoCodes = () => {
                   ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("lectures.title").toLowerCase()}`
                   : t("lectures.title")}
               </button>
+
+              {/* Only show the exams tab when a child is selected */}
+              {selectedChild && (
+                <button
+                  className={`tab tab-lg ${activeTab === "exams" ? "tab-active" : ""}`}
+                  onClick={() => setActiveTab("exams")}
+                >
+                  <Award className="w-4 h-4 mr-2" />
+                  {`${children.find((c) => c._id === selectedChild)?.name}'s ${t("exams.title") || "Exam Scores"}`}
+                </button>
+              )}
             </div>
             <div className="p-4">
-              {activeTab === "transactions" ? renderTransactionsTab() : renderLectureAccessTab()}
+              {activeTab === "transactions"
+                ? renderTransactionsTab()
+                : activeTab === "lectures"
+                  ? renderLectureAccessTab()
+                  : renderExamScoresTab()}
             </div>
           </div>
         </div>
