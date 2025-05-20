@@ -1,9 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { bulkCreateUsers } from "../../../../routes/fetch-users"
 
 const BulkCreateUsers = () => {
+  const { t, i18n } = useTranslation("createUser")
+  const isRTL = i18n.language === "ar"
+
   const [accountType, setAccountType] = useState("student")
   const [file, setFile] = useState(null)
   const [error, setError] = useState("")
@@ -17,7 +21,7 @@ const BulkCreateUsers = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
     if (selectedFile && selectedFile.type !== "text/csv") {
-      setError("Please upload a valid CSV file")
+      setError(t("validation.invalidFileType"))
       setFile(null)
       return
     }
@@ -32,7 +36,7 @@ const BulkCreateUsers = () => {
     setLoading(true)
 
     if (!file) {
-      setError("Please upload a CSV file")
+      setError(t("validation.fileRequired"))
       setLoading(false)
       return
     }
@@ -54,29 +58,28 @@ const BulkCreateUsers = () => {
       console.log("API Response:", result)
 
       if (result.success) {
-        setSuccess("Users created successfully!")
+        setSuccess(t("success.usersCreated"))
         setFile(null)
         // Reset the file input
         document.getElementById("file-input").value = ""
       } else {
         // Handle error message properly
-        const errorMessage =
-          typeof result === "string" ? result : result.error || "Failed to create users. Please try again."
+        const errorMessage = typeof result === "string" ? result : result.error || t("errors.failedToCreateUsers")
         setError(errorMessage)
       }
     } catch (err) {
       console.error("Error in form submission:", err)
-      setError("An unexpected error occurred. Please try again.")
+      setError(t("errors.unexpectedError"))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title mb-4">Bulk Create Users</h2>
+          <h2 className="card-title mb-4">{t("titles.bulkCreate")}</h2>
 
           {error && (
             <div className="alert alert-error mb-4">
@@ -119,7 +122,7 @@ const BulkCreateUsers = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Account Type</span>
+                <span className="label-text font-medium">{t("fields.accountType")}</span>
               </label>
               <select
                 name="accountType"
@@ -128,22 +131,22 @@ const BulkCreateUsers = () => {
                 onChange={handleAccountTypeChange}
                 required
               >
-                <option value="student">Students</option>
-                <option value="parent">Parents</option>
-                <option value="lecturer">Lecturers</option>
-                <option value="teacher">Teachers</option>
-                <option value="assistant">Assistants</option>
-                <option value="moderator">Moderators</option>
-                <option value="subadmin">Sub Admins</option>
+                <option value="student">{t("roles.student")}</option>
+                <option value="parent">{t("roles.parent")}</option>
+                <option value="lecturer">{t("roles.lecturer")}</option>
+                <option value="teacher">{t("roles.teacher")}</option>
+                <option value="assistant">{t("roles.assistant")}</option>
+                <option value="moderator">{t("roles.moderator")}</option>
+                <option value="subadmin">{t("roles.subadmin")}</option>
               </select>
               <label className="label">
-                <span className="label-text-alt text-info">Select the type of accounts to create</span>
+                <span className="label-text-alt text-info">{t("help.selectAccountType")}</span>
               </label>
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Upload CSV File</span>
+                <span className="label-text font-medium">{t("fields.uploadCSV")}</span>
               </label>
               <input
                 id="file-input"
@@ -154,9 +157,7 @@ const BulkCreateUsers = () => {
                 required
               />
               <label className="label">
-                <span className="label-text-alt text-info">
-                  CSV file should include required fields for the selected account type
-                </span>
+                <span className="label-text-alt text-info">{t("help.csvRequiredFields")}</span>
               </label>
             </div>
 
@@ -165,21 +166,21 @@ const BulkCreateUsers = () => {
                 {loading ? (
                   <>
                     <span className="loading loading-spinner"></span>
-                    Uploading...
+                    {t("buttons.uploading")}
                   </>
                 ) : (
-                  "Create Users"
+                  t("buttons.createUsers")
                 )}
               </button>
             </div>
           </form>
 
           <div className="mt-6 bg-base-200 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">CSV Format Guidelines</h3>
-            <p className="text-sm mb-2">Your CSV file should include the following columns:</p>
+            <h3 className="font-medium mb-2">{t("titles.csvGuidelines")}</h3>
+            <p className="text-sm mb-2">{t("help.csvFormat")}</p>
             <ul className="list-disc list-inside text-sm space-y-1">
-              <li>Name - Full name of the user</li>
-              <li>Phone - Full correct Phone number</li>
+              <li>{t("csvFields.name")}</li>
+              <li>{t("csvFields.phone")}</li>
             </ul>
           </div>
         </div>

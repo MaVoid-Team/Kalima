@@ -1,24 +1,24 @@
-// ParentForm.jsx
-import React from "react";
+"use client"
 
-const ParentForm = ({ userData, handleChange }) => {
+const ParentForm = ({ userData, handleChange, t, isRTL }) => {
   return (
     <div className="form-control">
-      <div className="flex flex-col gap-4">
-      <label className="label">
-        <span className="label-text">رقم الهاتف</span>
-      </label>
-      <input
-        type="text"
-        name="phoneNumber"
-        className="input input-bordered"
-        value={userData.phoneNumber || ""}
-        onChange={handleChange}
-        required
-      />
+      <div className="flex flex-col gap-2">
+        <label className="label">
+          <span className="label-text">{t("fields.phoneNumber")}</span>
+        </label>
+        <input
+          type="tel"
+          name="phoneNumber"
+          className="input input-bordered"
+          value={userData.phoneNumber || ""}
+          onChange={handleChange}
+          placeholder={t("placeholders.phoneNumber")}
+          required
+        />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ParentForm;
+export default ParentForm
