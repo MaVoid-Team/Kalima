@@ -106,5 +106,72 @@
     "title": "محتوى للهاتف المحمول فقط",
     "message": "هذا المحتوى متاح فقط على الأجهزة المحمولة.",
     "backButton": "العودة إلى الصفحة الرئيسية"
+  },
+  "titles": {
+    "createNewLecture": "إنشاء محاضرة جديدة"
+  },
+  "fields": {
+    "name": "الاسم",
+    "level": "المستوى",
+    "subject": "المادة",
+    "description": "الوصف",
+    "price": "السعر",
+    "videoURL": "رابط الفيديو",
+    "numberOfViews": "عدد المشاهدات",
+    "lectureType": "نوع المحاضرة",
+    "requiresExam": "يتطلب اختبار",
+    "requiresHomework": "يتطلب واجب منزلي",
+    "homeworkConfiguration": "إعدادات الواجب المنزلي",
+    "attachmentOptional": "مرفق (اختياري)",
+    "selectedFile": "الملف المحدد"
+  },
+  "placeholders": {
+    "enterLectureName": "أدخل اسم المحاضرة",
+    "selectLevel": "اختر مستوى",
+    "selectSubject": "اختر مادة",
+    "enterDescription": "أدخل وصف المحاضرة",
+    "enterPrice": "أدخل السعر",
+    "enterVideoLink": "أدخل رابط الفيديو",
+    "enterNumberOfViews": "أدخل عدد المشاهدات"
+  },
+  "lectureTypes": {
+    "revision": "مراجعة",
+    "normal": "عادي"
+  },
+  "sections": {
+    "examSettings": "إعدادات الاختبار",
+    "homeworkSettings": "إعدادات الواجب المنزلي",
+    "attachments": "المرفقات"
+  },
+  "attachmentTypes": {
+    "pdfsAndImages": "ملفات PDF وصور",
+    "booklets": "كتيبات",
+    "homeworks": "واجبات منزلية",
+    "exams": "اختبارات"
+  },
+  "validation": {
+    "nameRequired": "الاسم مطلوب",
+    "levelRequired": "المستوى مطلوب",
+    "subjectRequired": "المادة مطلوبة",
+    "videoLinkRequired": "رابط الفيديو مطلوب للمحاضرات",
+    "examConfigRequired": "الرجاء اختيار إعدادات الاختبار",
+    "homeworkConfigRequired": "الرجاء اختيار إعدادات الواجب المنزلي"
+  },
+  "buttons": {
+    "creating": "جاري الإنشاء...",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "submit": "إرسال"
+  },
+  "defaults": {
+    "lectureDescription": "محاضرة لـ"
+  },
+  
+   "options": {
+    "yes": "نعم",
+    "no": "لا"
   }
 }
