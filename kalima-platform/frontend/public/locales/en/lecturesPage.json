@@ -106,5 +106,71 @@
     "title": "Mobile Only Content",
     "message": "This content is only available on mobile devices.",
     "backButton": "Back to Homepage"
+  },
+   "titles": {
+    "createNewLecture": "Create New Lecture"
+  },
+  "fields": {
+    "name": "Name",
+    "level": "Level",
+    "subject": "Subject",
+    "description": "Description",
+    "price": "Price",
+    "videoURL": "Video URL",
+    "numberOfViews": "Number of Views",
+    "lectureType": "Lecture Type",
+    "requiresExam": "Requires Exam",
+    "requiresHomework": "Requires Homework",
+    "homeworkConfiguration": "Homework Configuration",
+    "attachmentOptional": "Attachment (Optional)",
+    "selectedFile": "Selected file"
+  },
+  "placeholders": {
+    "enterLectureName": "Enter lecture name",
+    "selectLevel": "Select a level",
+    "selectSubject": "Select a subject",
+    "enterDescription": "Enter lecture description",
+    "enterPrice": "Enter price",
+    "enterVideoLink": "Enter video link",
+    "enterNumberOfViews": "Enter number of views"
+  },
+  "lectureTypes": {
+    "revision": "Revision",
+    "normal": "Normal"
+  },
+  "sections": {
+    "examSettings": "Exam Settings",
+    "homeworkSettings": "Homework Settings",
+    "attachments": "Attachments"
+  },
+  "attachmentTypes": {
+    "pdfsAndImages": "PDFs and Images",
+    "booklets": "Booklets",
+    "homeworks": "Homeworks",
+    "exams": "Exams"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "levelRequired": "Level is required",
+    "subjectRequired": "Subject is required",
+    "videoLinkRequired": "Video link is required for lectures",
+    "examConfigRequired": "Please select an exam configuration",
+    "homeworkConfigRequired": "Please select a homework configuration"
+  },
+  "buttons": {
+     "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "creating": "Creating..."
+  },
+  "defaults": {
+    "lectureDescription": "Lecture for"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
