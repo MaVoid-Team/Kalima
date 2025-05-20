@@ -2,9 +2,28 @@
 
 import { useState, useEffect } from "react"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { BookOpen, FileText, Layers, User, BarChart2, ChevronLeft, ChevronRight, Search, Filter, Calendar, Clock, CheckCircle, XCircle, Briefcase, GraduationCap, Award, FileCheck, Eye, Paperclip, ChevronDown } from 'lucide-react'
-import { useNavigate } from "react-router-dom";
+import {
+  BookOpen,
+  FileText,
+  Layers,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  CheckCircle,
+  XCircle,
+  GraduationCap,
+  FileCheck,
+  Eye,
+  Paperclip,
+  ChevronDown,
+} from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+
 const AssistantPage = () => {
+  const { t, i18n } = useTranslation("assistantPage")
+  const isRTL = i18n.language === "ar"
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [dashboardData, setDashboardData] = useState(null)
@@ -14,7 +33,7 @@ const AssistantPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [expandedContainers, setExpandedContainers] = useState({})
   const [expandedLectures, setExpandedLectures] = useState({})
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,10 +44,10 @@ const AssistantPage = () => {
           setDashboardData(result.data.data)
           console.log(dashboardData)
         } else {
-          setError(result.error || "Failed to fetch dashboard data")
+          setError(result.error || t("errors.fetchFailed"))
         }
       } catch (err) {
-        setError("An error occurred while fetching data")
+        setError(t("errors.occurred"))
         console.error(err)
       } finally {
         setLoading(false)
@@ -36,7 +55,7 @@ const AssistantPage = () => {
     }
 
     fetchData()
-  }, [])
+  }, [t])
 
   const toggleContainerExpand = (id) => {
     setExpandedContainers((prev) => ({
@@ -61,19 +80,13 @@ const AssistantPage = () => {
 
   const filterData = (data, term) => {
     if (!term) return data
-    
+
     return data.filter((item) => {
-      const searchableText = [
-        item.name,
-        item.description,
-        item.subject?.name,
-        item.level?.name,
-        item.type,
-      ]
+      const searchableText = [item.name, item.description, item.subject?.name, item.level?.name, item.type]
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
-      
+
       return searchableText.includes(term.toLowerCase())
     })
   }
@@ -88,14 +101,14 @@ const AssistantPage = () => {
     if (totalPages <= 1) return null
 
     return (
-      <div className="flex justify-center mt-6">
+      <div className="flex justify-center mt-6" dir={isRTL ? "rtl" : "ltr"}>
         <div className="join">
           <button
             className="join-item btn"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            <ChevronLeft className="w-4 h-4" />
+            {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
           {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
             let pageNum
@@ -123,7 +136,7 @@ const AssistantPage = () => {
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            <ChevronRight className="w-4 h-4" />
+            {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -137,21 +150,23 @@ const AssistantPage = () => {
     const paginatedContainers = paginateData(filteredContainers, currentPage, itemsPerPage)
 
     return (
-      <div>
+      <div dir={isRTL ? "rtl" : "ltr"}>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Containers ({filteredContainers.length})</h2>
+          <h2 className="text-xl font-semibold">
+            {t("containers.title")} ({filteredContainers.length})
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Subject</th>
-                <th>Level</th>
-                <th>Price</th>
-                <th>Actions</th>
+                <th>{t("common.name")}</th>
+                <th>{t("common.type")}</th>
+                <th>{t("common.subject")}</th>
+                <th>{t("common.level")}</th>
+                <th>{t("common.price")}</th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -159,22 +174,21 @@ const AssistantPage = () => {
                 <tr key={container._id} className="hover:bg-base-200">
                   <td className="font-medium">{container.name}</td>
                   <td>
-                    <span className="badge badge-outline capitalize">{container.type}</span>
+                    <span className="badge badge-outline capitalize">{t(`common.${container.type}`)} </span>
                   </td>
-                  <td>{container.subject?.name || "N/A"}</td>
-                  <td>{container.level?.name || "N/A"}</td>
-                  <td>{container.price > 0 ? `${container.price} points` : "Free"}</td>
+                  <td>{container.subject?.name || t("common.notAvailable")}</td>
+                  <td>{container.level?.name || t("common.notAvailable")}</td>
                   <td>
-                    <button
-                      className="btn btn-sm btn-ghost"
-                      onClick={() => toggleContainerExpand(container._id)}
-                    >
+                    {container.price > 0 ? t("common.pricePoints", { price: container.price }) : t("common.free")}
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-ghost" onClick={() => toggleContainerExpand(container._id)}>
                       {expandedContainers[container._id] ? (
                         <ChevronDown className="w-4 h-4" />
                       ) : (
                         <ChevronRight className="w-4 h-4" />
                       )}
-                      Details
+                      {t("common.details")}
                     </button>
                   </td>
                 </tr>
@@ -182,7 +196,7 @@ const AssistantPage = () => {
               {paginatedContainers.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-4">
-                    No containers found
+                    {t("containers.notFound")}
                   </td>
                 </tr>
               )}
@@ -202,9 +216,11 @@ const AssistantPage = () => {
     const paginatedLectures = paginateData(filteredLectures, currentPage, itemsPerPage)
 
     return (
-      <div>
+      <div dir={isRTL ? "rtl" : "ltr"}>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Lectures ({filteredLectures.length})</h2> 
+          <h2 className="text-xl font-semibold">
+            {t("lectures.title")} ({filteredLectures.length})
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -215,15 +231,15 @@ const AssistantPage = () => {
                   <h3 className="card-title text-base line-clamp-1">{lecture.name}</h3>
                   <div className="badge badge-primary">{lecture.lecture_type}</div>
                 </div>
-                <p className="text-sm opacity-70 line-clamp-2">{lecture.description || "No description"}</p>
+                <p className="text-sm opacity-70 line-clamp-2">{lecture.description || t("common.noDescription")}</p>
                 <div className="flex flex-wrap justify-between items-center mt-2 text-xs opacity-70 gap-2">
                   <span className="flex items-center gap-1">
                     <Eye className="w-3 h-3 flex-shrink-0" />
-                    {lecture.numberOfViews || 0} views
+                    {t("lectures.views", { count: lecture.numberOfViews || 0 })}
                   </span>
                   <span className="flex items-center gap-1">
                     <GraduationCap className="w-3 h-3 flex-shrink-0" />
-                    {lecture.subject?.name || "No subject"}
+                    {lecture.subject?.name || t("common.noSubject")}
                   </span>
                   {lecture.level && (
                     <span className="flex items-center gap-1">
@@ -234,7 +250,7 @@ const AssistantPage = () => {
                   {lecture.requiresExam && (
                     <span className="flex items-center gap-1 text-blue-600">
                       <FileCheck className="w-3 h-3 flex-shrink-0" />
-                      Has Exam
+                      {t("lectures.hasExam")}
                     </span>
                   )}
                 </div>
@@ -242,13 +258,13 @@ const AssistantPage = () => {
                   className="btn btn-sm btn-outline btn-primary w-full mt-3"
                   onClick={() => navigate(`/dashboard/assistant-page/detailed-lecture-view/${lecture._id}`)}
                 >
-                 View Lecture Data 
+                  {t("lectures.viewData")}
                 </button>
                 <button
                   className="btn btn-sm btn-outline btn-primary w-full mt-3"
                   onClick={() => navigate(`/dashboard/assistant-page/lecture-display/${lecture._id}`)}
                 >
-                 Go To Lecture 
+                  {t("lectures.goToLecture")}
                 </button>
               </div>
             </div>
@@ -256,7 +272,7 @@ const AssistantPage = () => {
           {paginatedLectures.length === 0 && (
             <div className="col-span-full text-center py-8">
               <BookOpen className="w-12 h-12 mx-auto text-gray-400 mb-2" />
-              <p>No lectures found</p>
+              <p>{t("lectures.notFound")}</p>
             </div>
           )}
         </div>
@@ -270,36 +286,38 @@ const AssistantPage = () => {
     if (!dashboardData?.attachments) return null
 
     const filteredAttachments = dashboardData.attachments.filter(
-      (attachment) => !searchTerm || attachment.fileName.toLowerCase().includes(searchTerm.toLowerCase())
+      (attachment) => !searchTerm || attachment.fileName.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     const paginatedAttachments = paginateData(filteredAttachments, currentPage, itemsPerPage)
 
     return (
-      <div>
+      <div dir={isRTL ? "rtl" : "ltr"}>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Attachments ({filteredAttachments.length})</h2>
+          <h2 className="text-xl font-semibold">
+            {t("attachments.title")} ({filteredAttachments.length})
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
               <tr>
-                <th>File Name</th>
-                <th>Lecture</th>
-                <th>Type</th>
-                <th>Uploaded On</th>
-                <th>Actions</th>
+                <th>{t("attachments.fileName")}</th>
+                <th>{t("common.lecture")}</th>
+                <th>{t("common.type")}</th>
+                <th>{t("attachments.uploadedOn")}</th>
+                <th>{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody>
               {paginatedAttachments.map((attachment) => (
                 <tr key={attachment._id} className="hover:bg-base-200">
                   <td className="font-medium">{attachment.fileName}</td>
-                  <td>{attachment.lectureId?.name || "N/A"}</td>
+                  <td>{attachment.lectureId?.name || t("common.notAvailable")}</td>
                   <td>
                     <span className="badge badge-outline capitalize">{attachment.type}</span>
                   </td>
-                  <td>{new Date(attachment.uploadedOn).toLocaleDateString()}</td>
+                  <td>{new Date(attachment.uploadedOn).toLocaleDateString(i18n.language)}</td>
                   <td>
                     <a
                       href={attachment.filePath}
@@ -308,7 +326,7 @@ const AssistantPage = () => {
                       className="btn btn-sm btn-outline"
                     >
                       <FileText className="w-4 h-4 mr-1" />
-                      View
+                      {t("common.view")}
                     </a>
                   </td>
                 </tr>
@@ -316,7 +334,7 @@ const AssistantPage = () => {
               {paginatedAttachments.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
-                    No attachments found
+                    {t("attachments.notFound")}
                   </td>
                 </tr>
               )}
@@ -336,55 +354,61 @@ const AssistantPage = () => {
       (submission) =>
         !searchTerm ||
         (submission.lecture?.name && submission.lecture.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (submission.student?.name && submission.student.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        (submission.student?.name && submission.student.name.toLowerCase().includes(searchTerm.toLowerCase())),
     )
     const paginatedSubmissions = paginateData(filteredSubmissions, currentPage, itemsPerPage)
 
     return (
-      <div>
+      <div dir={isRTL ? "rtl" : "ltr"}>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Exam Submissions ({filteredSubmissions.length})</h2>
+          <h2 className="text-xl font-semibold">
+            {t("examSubmissions.title")} ({filteredSubmissions.length})
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Lecture</th>
-                <th>Score</th>
-                <th>Status</th>
-                <th>Submitted At</th>
+                <th>{t("common.student")}</th>
+                <th>{t("common.lecture")}</th>
+                <th>{t("common.score")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("common.submittedAt")}</th>
               </tr>
             </thead>
             <tbody>
               {paginatedSubmissions.map((submission) => (
                 <tr key={submission._id} className="hover:bg-base-200">
-                  <td className="font-medium">{submission.student?.name || "Unknown"}</td>
-                  <td>{submission.lecture?.name || "Unknown"}</td>
+                  <td className="font-medium">{submission.student?.name || t("common.unknown")}</td>
+                  <td>{submission.lecture?.name || t("common.unknown")}</td>
                   <td>
-                    {submission.score}/{submission.maxScore} ({Math.round((submission.score / submission.maxScore) * 100)}%)
+                    {t("common.scoreFormat", {
+                      score: submission.score,
+                      maxScore: submission.maxScore,
+                      percentage: Math.round((submission.score / submission.maxScore) * 100),
+                    })}
                   </td>
                   <td>
                     {submission.passed ? (
                       <span className="flex items-center text-green-600">
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        Passed
+                        {t("common.passed")}
                       </span>
                     ) : (
                       <span className="flex items-center text-red-600">
                         <XCircle className="w-4 h-4 mr-1" />
-                        Failed
+                        {t("common.failed")}
                       </span>
                     )}
                   </td>
-                  <td>{new Date(submission.submittedAt).toLocaleString()}</td>
+                  <td>{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
                 </tr>
               ))}
               {paginatedSubmissions.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
-                    No exam submissions found
+                    {t("examSubmissions.notFound")}
                   </td>
                 </tr>
               )}
@@ -404,55 +428,61 @@ const AssistantPage = () => {
       (submission) =>
         !searchTerm ||
         (submission.lecture?.name && submission.lecture.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (submission.student?.name && submission.student.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        (submission.student?.name && submission.student.name.toLowerCase().includes(searchTerm.toLowerCase())),
     )
     const paginatedSubmissions = paginateData(filteredSubmissions, currentPage, itemsPerPage)
 
     return (
-      <div>
+      <div dir={isRTL ? "rtl" : "ltr"}>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Homework Submissions ({filteredSubmissions.length})</h2>
+          <h2 className="text-xl font-semibold">
+            {t("homeworkSubmissions.title")} ({filteredSubmissions.length})
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Lecture</th>
-                <th>Score</th>
-                <th>Status</th>
-                <th>Submitted At</th>
+                <th>{t("common.student")}</th>
+                <th>{t("common.lecture")}</th>
+                <th>{t("common.score")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("common.submittedAt")}</th>
               </tr>
             </thead>
             <tbody>
               {paginatedSubmissions.map((submission) => (
                 <tr key={submission._id} className="hover:bg-base-200">
-                  <td className="font-medium">{submission.student?.name || "Unknown"}</td>
-                  <td>{submission.lecture?.name || "Unknown"}</td>
+                  <td className="font-medium">{submission.student?.name || t("common.unknown")}</td>
+                  <td>{submission.lecture?.name || t("common.unknown")}</td>
                   <td>
-                    {submission.score}/{submission.maxScore} ({Math.round((submission.score / submission.maxScore) * 100)}%)
+                    {t("common.scoreFormat", {
+                      score: submission.score,
+                      maxScore: submission.maxScore,
+                      percentage: Math.round((submission.score / submission.maxScore) * 100),
+                    })}
                   </td>
                   <td>
                     {submission.passed ? (
                       <span className="flex items-center text-green-600">
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        Passed
+                        {t("common.passed")}
                       </span>
                     ) : (
                       <span className="flex items-center text-red-600">
                         <XCircle className="w-4 h-4 mr-1" />
-                        Failed
+                        {t("common.failed")}
                       </span>
                     )}
                   </td>
-                  <td>{new Date(submission.submittedAt).toLocaleString()}</td>
+                  <td>{new Date(submission.submittedAt).toLocaleString(i18n.language)}</td>
                 </tr>
               ))}
               {paginatedSubmissions.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
-                    No homework submissions found
+                    {t("homeworkSubmissions.notFound")}
                   </td>
                 </tr>
               )}
@@ -470,31 +500,31 @@ const AssistantPage = () => {
 
     const stats = [
       {
-        title: "Total Lectures",
+        title: t("stats.totalLectures"),
         value: dashboardData.stats.totalLectures,
         icon: <BookOpen className="w-6 h-6 text-blue-500" />,
         color: "bg-blue-100",
       },
       {
-        title: "Lecture Views",
+        title: t("stats.lectureViews"),
         value: dashboardData.stats.lectureViews,
         icon: <Eye className="w-6 h-6 text-green-500" />,
         color: "bg-green-100",
       },
       {
-        title: "Exam Submissions",
+        title: t("stats.examSubmissions"),
         value: dashboardData.stats.totalStudentExamSubmissions,
         icon: <FileCheck className="w-6 h-6 text-purple-500" />,
         color: "bg-purple-100",
       },
       {
-        title: "Homework Submissions",
+        title: t("stats.homeworkSubmissions"),
         value: dashboardData.stats.totalStudentHomeworkSubmissions,
         icon: <FileText className="w-6 h-6 text-orange-500" />,
         color: "bg-orange-100",
       },
       {
-        title: "Attachments",
+        title: t("stats.attachments"),
         value: dashboardData.stats.totalAttachments,
         icon: <Paperclip className="w-6 h-6 text-red-500" />,
         color: "bg-red-100",
@@ -502,8 +532,8 @@ const AssistantPage = () => {
     ]
 
     return (
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Statistics</h2>
+      <div dir={isRTL ? "rtl" : "ltr"}>
+        <h2 className="text-xl font-semibold mb-4">{t("stats.title")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {stats.map((stat, index) => (
             <div key={index} className="card bg-base-100 shadow-sm border border-base-200">
@@ -528,7 +558,7 @@ const AssistantPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center">
           <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-lg">Loading dashboard data...</p>
+          <p className="mt-4 text-lg">{t("common.loading")}</p>
         </div>
       </div>
     )
@@ -549,14 +579,14 @@ const AssistantPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="alert alert-warning max-w-md">
-          <span>No data available</span>
+          <span>{t("errors.noData")}</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header with user info */}
       <div className="bg-base-100 rounded-xl shadow-sm border border-base-200 p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -568,7 +598,7 @@ const AssistantPage = () => {
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{dashboardData.userInfo.name}</h1>
             <p className="text-base-content/70">{dashboardData.userInfo.email}</p>
-            <div className="badge badge-primary mt-1">{dashboardData.userInfo.role}</div>
+            <div className="badge badge-primary mt-1">{t(`roles.${dashboardData.userInfo.role.toLowerCase()}`)}</div>
           </div>
           {dashboardData.userInfo.assignedLecturer && (
             <div className="bg-base-200/50 p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center gap-3">
@@ -579,9 +609,12 @@ const AssistantPage = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold">{dashboardData.userInfo.assignedLecturer.name}</h2>
-                <p className="text-sm text-base-content/70">{dashboardData.userInfo.assignedLecturer.role}</p>
+                <p className="text-sm text-base-content/70">
+                  {t(`roles.${dashboardData.userInfo.assignedLecturer.role.toLowerCase()}`)}
+                </p>
                 <p className="text-sm">
-                  <span className="font-medium">Expertise:</span> {dashboardData.userInfo.assignedLecturer.expertise}
+                  <span className="font-medium">{t("common.expertise")}:</span>{" "}
+                  {dashboardData.userInfo.assignedLecturer.expertise}
                 </p>
               </div>
             </div>
@@ -592,42 +625,58 @@ const AssistantPage = () => {
       {/* Stats */}
       {renderStats()}
 
+      {/* Search */}
+      <div className="form-control my-4">
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder={t("common.search")}
+            className="input input-bordered w-full"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <button className="btn btn-square">
+            <Search className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
       {/* Tabs */}
-      <div className="tabs tabs-boxed my-6">
+      <div className="tabs tabs-boxed my-6" dir={isRTL ? "rtl" : "ltr"}>
         <button
           className={`tab ${activeTab === "containers" ? "tab-active" : ""}`}
           onClick={() => handleTabChange("containers")}
         >
           <Layers className="w-4 h-4 mr-2" />
-          Containers
+          {t("tabs.containers")}
         </button>
         <button
           className={`tab ${activeTab === "lectures" ? "tab-active" : ""}`}
           onClick={() => handleTabChange("lectures")}
         >
           <BookOpen className="w-4 h-4 mr-2" />
-          Lectures
+          {t("tabs.lectures")}
         </button>
         <button
           className={`tab ${activeTab === "attachments" ? "tab-active" : ""}`}
           onClick={() => handleTabChange("attachments")}
         >
           <Paperclip className="w-4 h-4 mr-2" />
-          Attachments
+          {t("tabs.attachments")}
         </button>
         <button
           className={`tab ${activeTab === "examSubmissions" ? "tab-active" : ""}`}
           onClick={() => handleTabChange("examSubmissions")}
         >
           <FileCheck className="w-4 h-4 mr-2" />
-          Exam Submissions
+          {t("tabs.examSubmissions")}
         </button>
         <button
           className={`tab ${activeTab === "homeworkSubmissions" ? "tab-active" : ""}`}
           onClick={() => handleTabChange("homeworkSubmissions")}
         >
           <FileText className="w-4 h-4 mr-2" />
-          Homework Submissions
+          {t("tabs.homeworkSubmissions")}
         </button>
       </div>
 
