@@ -22,13 +22,21 @@ module.exports = Joi.object({
       'any.only': 'Passwords do not match',
       'any.required': 'Confirm password is required'
     }),
-
   gender: Joi.string()
   .valid("male", "female")
   .required(),
 
   role: Joi.string()
-  .valid("moderator")
-  .required(),
+  .custom((value, helpers) => {
+    // Case-insensitive validation for role
+    if (typeof value === 'string' && value.toLowerCase() === 'moderator') {
+      return 'moderator'; // Return normalized value
+    }
+    return helpers.error('any.only', { value });
+  })
+  .required()
+  .messages({
+    'any.only': 'Role must be "moderator"'
+  }),
 
 });
