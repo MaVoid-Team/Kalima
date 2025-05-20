@@ -10,68 +10,36 @@ import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
 
 // Lazy load components
-const AuditLog = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/auditLog")
-);
-const AdminDashboard = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/home/adminDashboard")
-);
-const CourseDetails = lazy(() => import("./pages/CourseDetails"));
-const LecturesPage = lazy(() => import("./pages/lectures"));
-const TeacherLogin = lazy(() => import("./pages/Login/login"));
-const Footer = lazy(() => import("./components/footer"));
-const CoursesPage = lazy(() => import("./pages/courses"));
-const RegisterStudent = lazy(() =>
-  import("./pages/signup/StudentRegistration")
-);
-const Teachers = lazy(() => import("./pages/Teachers"));
-const TeacherDetails = lazy(() =>
-  import("./pages/teacher details/Teacher-details")
-);
-const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"));
-const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"));
-const Services = lazy(() => import("./pages/Services/Services"));
-const DashboardPage = lazy(() =>
-  import("./pages/Lecturer Dashboard/LecturerDashboard")
-);
-const ContainersPage = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/ContainerPage")
-);
-const ContainerDetails = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/ContainerDetails")
-);
-const LectureDisplay = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/LectureDisplay")
-);
-const UserDashboard = lazy(() =>
-  import("./pages/User Dashboard/assistantPage/assistantPage")
-);
-const CoursesDashboard = lazy(() =>
-  import("./pages/CoursesDashboard/CoursesDashboard")
-);
-const CenterDashboard = lazy(() =>
-  import("./pages/CenterDashboard/CenterDashboard")
-);
-const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"));
-const PackageDetails = lazy(() =>
-  import("./pages/Packages Page/packageDetails")
-);
-const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"));
-const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"));
-const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"));
-const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"));
-const LessonDetailsSection = lazy(() =>
-  import("./pages/CenterDashboard/LessonDetails")
-);
-const AdminCreate = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/AddNewStuff")
-);
-const MyLecturesPage = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/LecturesPage")
-);
-const DetailedLectureView = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/DetailedLectureViewing")
-);
+const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
+const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
+const CourseDetails = lazy(() => import("./pages/CourseDetails"))
+const LecturesPage = lazy(() => import("./pages/lectures"))
+const TeacherLogin = lazy(() => import("./pages/Login/login"))
+const Footer = lazy(() => import("./components/footer"))
+const CoursesPage = lazy(() => import("./pages/courses"))
+const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"))
+const Teachers = lazy(() => import("./pages/Teachers"))
+const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details"))
+const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
+const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
+const Services = lazy(() => import("./pages/Services/Services"))
+const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
+const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
+const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
+const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
+const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
+const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
+const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
+const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
+const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
+const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
+const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
+const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
+const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
+const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
+const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
+const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
+const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
 
 function App() {
   const location = useLocation();
@@ -208,15 +176,11 @@ function App() {
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
-            <Route
-              path="/dashboard/assistant-page"
-              element={<UserDashboard />}
-            />
-            <Route
-              path="/dashboard/assistant-page/lectures-page"
-              element={<MyLecturesPage />}
-            />
-
+            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
+            <Route path="/dashboard/assistant-page/lectures-page" element={<MyLecturesPage />} />
+            <Route path="/dashboard/assistant-page/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
+            <Route path="/dashboard/assistant-page/lecture-display/:lectureId" element={<LectureDisplay />} />
+            
             {/* Admin Routes */}
             <Route
               path="/dashboard/admin-dashboard"

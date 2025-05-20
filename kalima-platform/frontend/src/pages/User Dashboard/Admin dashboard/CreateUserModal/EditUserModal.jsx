@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { updateUser } from "../../../../routes/update-user"
+import { Eye, EyeOff } from "lucide-react"
 
 const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const { t, i18n } = useTranslation("admin")
@@ -149,10 +150,10 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
               />
               <button
                 type="button"
-                className={`absolute inset-y-0 ${isRTL ? "right-0 pr-3" : "left-0 pl-3"} flex items-center`}
+                className={`absolute inset-y-0 ${isRTL ? "left-0 pl-3" : "right-0 pr-3"} flex items-center`}
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? <Eye /> : <EyeOff />}
               </button>
             </div>
             <label className="label">

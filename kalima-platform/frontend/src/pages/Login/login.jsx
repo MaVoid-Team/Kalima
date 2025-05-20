@@ -152,7 +152,7 @@ const TeacherLogin = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email.toLowerCase()}
+                  value={formData.email}
                   onChange={handleInputChange}
                   placeholder="youremail@example.com"
                   className="input input-bordered w-full"

@@ -500,7 +500,7 @@ export default function AdminCreate() {
                         <ul className="list-disc list-inside text-sm text-gray-600">
                           {pkg.points.map((point, index) => (
                             <li key={index}>
-                              {point.lecturer.name}: {point.points} {t("forms.package.pointsUnit")}
+                              {point.lecturer?.name}: {point.points} {t("forms.package.pointsUnit")}
                             </li>
                           ))}
                         </ul>

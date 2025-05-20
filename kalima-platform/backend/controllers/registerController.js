@@ -11,6 +11,8 @@ const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
+const Government = require("../models/governmentModel.js");
+const AdministrationZone = require("../models/administrationZonesModel.js");
 const validatePassword = (password) => {
   const requiredLength = 8;
 
@@ -45,13 +47,49 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     if (!administrationZone) {
       return next(new AppError("Administration zone is required.", 400));
     }
-    if (!governments.includes(government)) {
-      return next(new AppError(`Invalid government: ${government}.`, 400));
-    }
-    if (!administrationZones.includes(administrationZone)) {
-      return next(
-        new AppError(`Invalid administration zone: ${administrationZone}.`, 400)
+    
+    try {
+      // Validate government from database (case-insensitive)
+      const govDoc = await Government.findOne({ 
+        name: { $regex: new RegExp(`^${government}$`, 'i') }
+      });
+      
+      if (!govDoc) {
+
+        return next(new AppError(`Invalid government: ${government}.`, 400));
+      }
+      
+      // Handle case where administrationZone is missing in the Government document
+      if (!govDoc.administrationZone || !Array.isArray(govDoc.administrationZone)) {
+
+        return next(new AppError(`No administration zones defined for government: ${government}.`, 400));
+      }
+      
+      // Accept the zone if it exists in either the Government or AdministrationZone collection
+      const normalizedZone = administrationZone.trim();
+      
+      // First check if the zone exists in the Government document
+      const zoneExistsInGov = govDoc.administrationZone.some(
+        zone => zone && zone.toLowerCase().trim() === normalizedZone.toLowerCase()
       );
+      
+      if (zoneExistsInGov) {
+        // Zone found in government document, proceed with user creation
+        console.log(`Found zone in government: ${normalizedZone}`);
+      } else {
+        // If not found in government, check AdministrationZone collection
+        const zoneDoc = await AdministrationZone.findOne({ 
+          name: { $regex: new RegExp(`^${normalizedZone}$`, 'i') }
+        });
+        
+        if (!zoneDoc) {
+          return next(new AppError(`Administration zone "${administrationZone}" not found for government: ${government}.`, 400));
+        }
+        
+        // Zone is valid, but not in government - could add it to government here if needed
+      }
+    } catch (error) {
+      return next(new AppError(`Error validating location data: ${error.message}`, 500));
     }
   }
   // Validate password
