@@ -70,6 +70,14 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       );
     }
 
+    // Validate homework config if requires homework is true
+    if (requiresHomework && !homeworkConfig) {
+      throw new AppError(
+        "Homework configuration is required when requiresHomework is true", 
+        400
+      );
+    }
+
     // Create the lecture
     const lecture = await Lecture.create(
       [
