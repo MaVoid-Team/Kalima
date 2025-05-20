@@ -1,4 +1,10 @@
 {
+   "totalDuration": "Total Duration",
+  "almostHalfway": "Almost halfway to the video",
+  "justStarted": "Just started the video",
+  "goodProgress": "Good progress",
+  "almostDone": "Almost done",
+  "completed": "Completed",
   "back": "Back",
   "loadingLecture": "Loading lecture...",
   "failedToAuthenticateUser": "Failed to authenticate user",
