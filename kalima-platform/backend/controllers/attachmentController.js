@@ -16,6 +16,8 @@ const QueryFeatures = require("../utils/queryFeatures");
 const Assistant = require("../models/assistantModel");
 const NotificationTemplate = require("../models/notificationTemplateModel");
 const Notification = require("../models/notification");
+const StudentLectureAccess = require("../models/studentLectureAccessModel");
+const Purchase = require("../models/purchaseModel");
 
 // You can configure storage options here
 // Would be changed once we have established cloud storage
@@ -172,6 +174,174 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
     }
 
     await lecture.save({ session });
+
+    // Send notifications to students who have access to this lecture
+    // when lecturer uploads attachments
+    try {
+      // Get notification template based on type
+      let notificationType = "new_attachment";
+      if (type.toLowerCase() === "exams") {
+        notificationType = "new_exam";
+      } else if (type.toLowerCase() === "homeworks") {
+        notificationType = "new_homework_assignment";
+      }
+
+      const template = await NotificationTemplate.findOne({
+        type: notificationType,
+      }).session(session);
+
+      if (!template) {
+        console.log(`No notification template found for ${notificationType}`);
+      } else {
+        // IMPROVED STUDENT ACCESS DETECTION
+        // Step 1: Get students with direct access
+        const studentAccess = await StudentLectureAccess.find({
+          lecture: lectureId,
+        }).session(session);
+        let studentIdsWithAccess = studentAccess.map((access) =>
+          access.student.toString()
+        );
+
+        // Step 2: Get students with access through container purchases
+        // Find all containers that include this lecture
+        if (lecture && lecture.parent) {
+          // Get the parent container and any containers above it
+          const containerHierarchy = await Container.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(lecture.parent) } },
+            {
+              $graphLookup: {
+                from: "containers",
+                startWith: "$parent",
+                connectFromField: "parent",
+                connectToField: "_id",
+                as: "parentContainers",
+              },
+            },
+          ]).session(session);
+
+          if (containerHierarchy.length > 0) {
+            // Get all container IDs in the hierarchy (including direct parent)
+            const containerIds = [
+              lecture.parent.toString(),
+              ...containerHierarchy[0].parentContainers.map((c) =>
+                c._id.toString()
+              ),
+            ];
+
+            // Find all purchases for these containers
+            const purchases = await Purchase.find({
+              container: {
+                $in: containerIds.map((id) => new mongoose.Types.ObjectId(id)),
+              },
+              type: "containerPurchase",
+            }).session(session);
+
+            // Get student IDs from these purchases
+            const studentIdsFromPurchases = purchases.map((p) =>
+              p.student.toString()
+            );
+
+            // Combine with direct access student IDs, removing duplicates
+            studentIdsWithAccess = [
+              ...new Set([...studentIdsWithAccess, ...studentIdsFromPurchases]),
+            ];
+          }
+        }
+
+        console.log(
+          `Found ${studentIdsWithAccess.length} students with access to lecture ${lectureId} (direct or through purchase)`
+        );
+
+        if (studentIdsWithAccess.length > 0) {
+          const io = req.app.get("io");
+          if (!io) {
+            console.log("Socket.IO instance not found");
+            return;
+          }
+
+          // Prepare notification data
+          const notificationData = {
+            title: template.title,
+            message: template.message
+              .replace("{lecture}", lecture.name || "lecture")
+              .replace("{type}", type.toLowerCase()),
+            type: notificationType,
+            relatedId: lecture._id,
+          };
+
+          console.log("Creating notifications with data:", notificationData);
+
+          // Create notifications for all students
+          const notificationsToCreate = studentIdsWithAccess.map(
+            (studentId) => ({
+              userId: studentId,
+              ...notificationData,
+              isSent: false,
+            })
+          );
+
+          // Bulk create notifications
+          const createdNotifications = await Notification.insertMany(
+            notificationsToCreate,
+            { session }
+          );
+
+          console.log(`Created ${createdNotifications.length} notifications`);
+
+          // Attempt to send to online users
+          let sentCount = 0;
+          for (const studentId of studentIdsWithAccess) {
+            // Check if student is online
+            if (io.sockets.adapter.rooms.has(studentId.toString())) {
+              console.log(
+                `Student ${studentId} is online, sending notification`
+              );
+
+              // Find notification for this student
+              const notification = createdNotifications.find(
+                (n) => n.userId.toString() === studentId.toString()
+              );
+
+              if (notification) {
+                // Send notification
+                const eventType =
+                  notificationType === "new_exam"
+                    ? "newAttachment"
+                    : notificationType === "new_homework_assignment"
+                      ? "newAttachment"
+                      : "newAttachment";
+
+                io.to(studentId.toString()).emit(eventType, {
+                  title: notification.title,
+                  message: notification.message,
+                  type: notification.type,
+                  subjectId: notification.relatedId,
+                  notificationId: notification._id,
+                  createdAt: notification.createdAt,
+                });
+
+                // Mark as sent
+                await Notification.findByIdAndUpdate(
+                  notification._id,
+                  { isSent: true },
+                  { session }
+                );
+
+                sentCount++;
+              }
+            }
+          }
+
+          console.log(`Sent ${sentCount} notifications in real-time`);
+        } else {
+          console.log("No students have access to this lecture yet");
+        }
+      }
+    } catch (notificationError) {
+      console.error("Error sending notifications:", notificationError);
+      // Continue without failing - notifications are not critical
+    }
+
     await session.commitTransaction();
     session.endSession();
     res.status(201).json({ message: "Attachment uploaded successfully" });
@@ -192,7 +362,7 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
   try {
     const { lectureId } = req.params;
     const { type } = req.body;
-    
+
     // Check if user is a student
     if (!req.user || req.user.role !== "Student") {
       await cloudinary.uploader.destroy(req.file.filename);
@@ -210,9 +380,9 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
     }
 
     const lecture = await Lecture.findById(lectureId)
-      .populate('createdBy')
+      .populate("createdBy")
       .session(session);
-      
+
     if (!lecture) {
       await cloudinary.uploader.destroy(req.file.filename);
       throw new AppError(`Lecture not found`, 404);
@@ -242,37 +412,87 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
       type: "new_homework",
     }).session(session);
 
-    if (template && lecture.createdBy) {
-      // Find all assistants assigned to this lecturer
-      const assistants = await Assistant.find({
-        assignedLecturer: lecture.createdBy._id
-      }).session(session);
+    console.log("Notification template found:", template ? "Yes" : "No");
+    console.log("Lecture creator found:", lecture.createdBy ? "Yes" : "No");
 
+    if (template && lecture.createdBy) {
       const io = req.app.get("io");
       const student = req.user;
 
+      console.log("Socket IO object:", io ? "Available" : "Not available");
+
+      // Create notification data object
+      const notificationData = {
+        title: template.title,
+        message: template.message
+          .replace("{student}", student.name)
+          .replace("{lecture}", lecture.name),
+        type: "new_homework",
+        relatedId: lecture._id,
+      };
+
+      console.log(
+        "Creating notification for lecturer:",
+        lecture.createdBy._id.toString()
+      );
+
+      // Create notification for the lecturer who created the lecture
+      const lecturerIsOnline = io.sockets.adapter.rooms.has(
+        lecture.createdBy._id.toString()
+      );
+      console.log("Lecturer is online:", lecturerIsOnline);
+      const lecturerIsSent = lecturerIsOnline;
+
+      // Create notification for the lecturer
+      const lecturerNotification = await Notification.create(
+        [
+          {
+            userId: lecture.createdBy._id,
+            ...notificationData,
+            isSent: lecturerIsSent,
+          },
+        ],
+        { session }
+      );
+
+      console.log(
+        "Lecturer notification created:",
+        lecturerNotification[0]._id.toString()
+      );
+
+      // Send immediately if lecturer is online
+      if (lecturerIsOnline) {
+        console.log("Emitting notification to lecturer via socket");
+        io.to(lecture.createdBy._id.toString()).emit("newHomework", {
+          ...notificationData,
+          notificationId: lecturerNotification[0]._id,
+        });
+      }
+
+      // Find all assistants assigned to this lecturer
+      const assistants = await Assistant.find({
+        assignedLecturer: lecture.createdBy._id,
+      }).session(session);
+
+      console.log(`Found ${assistants.length} assistants for this lecturer`);
+
       await Promise.all(
         assistants.map(async (assistant) => {
-          const notificationData = {
-            title: template.title,
-            message: template.message
-              .replace("{student}", student.name)
-              .replace("{lecture}", lecture.name),
-            type: "new_homework",
-            relatedId: lecture._id,
-          };
-
           // Check if assistant is online
-          const isOnline = io.sockets.adapter.rooms.has(assistant._id.toString());
+          const isOnline = io.sockets.adapter.rooms.has(
+            assistant._id.toString()
+          );
           const isSent = isOnline;
 
           // Create notification
           const notification = await Notification.create(
-            [{
-              userId: assistant._id,
-              ...notificationData,
-              isSent,
-            }],
+            [
+              {
+                userId: assistant._id,
+                ...notificationData,
+                isSent,
+              },
+            ],
             { session }
           );
 
@@ -287,7 +507,7 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
       );
     }
 
-await session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
     res.status(201).json({
       status: "success",
