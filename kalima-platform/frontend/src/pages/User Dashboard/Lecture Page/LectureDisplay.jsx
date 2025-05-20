@@ -107,6 +107,7 @@ const LectureDisplay = () => {
   const [homeworkError, setHomeworkError] = useState(null)
   const [homeworks, setHomeworks] = useState([])
   const homeworkFileInputRef = useRef(null)
+  const [accessDataLoaded, setAccessDataLoaded] = useState(false);
 
   const playerRef = useRef(null)
   const lastUpdateTimeRef = useRef(0)
@@ -319,6 +320,7 @@ const LectureDisplay = () => {
             console.log("Setting remaining views to:", result.data.access.remainingViews)
             // Only set the studentLectureAccessId, don't update remainingViews yet
             setStudentLectureAccessId(result.data.access._id)
+            setAccessDataLoaded(true);
 
             // Store the remaining views in a ref to use when the video plays
             if (result.data.access.remainingViews !== undefined) {
@@ -340,6 +342,7 @@ const LectureDisplay = () => {
       } catch (error) {
         console.error("Error fetching access data:", error)
         setError(t("failedToLoadAccessData"))
+        setAccessDataLoaded(true);
       }
     }
 
@@ -401,7 +404,7 @@ const LectureDisplay = () => {
   }
 
   const handleOnPlay = async () => {
-    if (userRole !== "Student" || hasViewedRef.current || (remainingViews !== null && remainingViews <= 0)) return
+    if (userRole !== "Student" || hasViewedRef.current || (remainingViews !== null && remainingViews <= 0 || !accessDataLoaded)) return
 
     try {
       hasViewedRef.current = true

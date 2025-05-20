@@ -10,7 +10,7 @@ export function AppDownloadSection() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
-  const appDownloadUrl = "https://play.google.com/store/apps/details?id=com.kalimatest.mavoid"
+  const appDownloadUrl = "https://play.google.com/apps/test/com.kalimatest.mavoid/8"
   const qrCodeRef = useRef(null)
 
   useEffect(() => {
