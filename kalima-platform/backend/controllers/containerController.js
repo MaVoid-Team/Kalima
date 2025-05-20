@@ -133,7 +133,7 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
             {
               student: studentId,
               lecture: containerDoc._id,
-              remainingViews: containerDoc.numberOfViews - 1,
+              remainingViews: containerDoc.numberOfViews,
             },
           ],
           { session }
@@ -144,7 +144,7 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
         }
       } else {
         if (access.remainingViews > 0) {
-          access.remainingViews -= 1;
+          // access.remainingViews -= 1;
           access.lastAccessed = Date.now();
           await access.save({ session });
         } else {
