@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { FiX, FiPaperclip } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
@@ -16,6 +17,9 @@ const LectureCreationModal = ({
   containerSubject,
   containerType,
 }) => {
+  const { t, i18n } = useTranslation(["lecturesPage"])
+  const isRTL = i18n.language === "ar"
+
   // Form state
   const [newItemName, setNewItemName] = useState("")
   const [newDescription, setNewDescription] = useState("")
@@ -132,10 +136,10 @@ const LectureCreationModal = ({
     setCreationError("")
 
     try {
-      if (!newItemName) throw new Error("Name is required")
-      if (!selectedLevel) throw new Error("Level is required")
-      if (!selectedSubject) throw new Error("Subject is required")
-      if (!newVideoLink) throw new Error("Video link is required for lectures")
+      if (!newItemName) throw new Error(t("validation.nameRequired"))
+      if (!selectedLevel) throw new Error(t("validation.levelRequired"))
+      if (!selectedSubject) throw new Error(t("validation.subjectRequired"))
+      if (!newVideoLink) throw new Error(t("validation.videoLinkRequired"))
 
       // Prepare lecture data
       const lectureData = {
@@ -146,7 +150,7 @@ const LectureCreationModal = ({
         subject: selectedSubject,
         parent: containerId,
         price: Number(newPrice) || 0,
-        description: newDescription || `Lecture for ${newItemName}`,
+        description: newDescription || `${t("defaults.lectureDescription")} ${newItemName}`,
         numberOfViews: Number(numberOfViews) || 0,
         videoLink: newVideoLink,
         teacherAllowed: true,
@@ -157,7 +161,7 @@ const LectureCreationModal = ({
       // Handle exam config if required
       if (requiresExam) {
         if (!selectedExamConfigId) {
-          throw new Error("Please select an exam configuration")
+          throw new Error(t("validation.examConfigRequired"))
         }
 
         // Set the exam config ID in the lecture data
@@ -168,7 +172,7 @@ const LectureCreationModal = ({
       // Handle homework config if required
       if (requiresHomework) {
         if (!selectedHomeworkConfigId) {
-          throw new Error("Please select a homework configuration")
+          throw new Error(t("validation.homeworkConfigRequired"))
         }
 
         // Set the homework config ID in the lecture data
@@ -192,10 +196,10 @@ const LectureCreationModal = ({
   }
 
   return (
-    <div className={`modal ${isOpen && "modal-open"}`}>
+    <div className={`modal ${isOpen && "modal-open"}`} dir={isRTL ? "rtl" : "ltr"}>
       <div className="modal-box max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">Create New Lecture</h3>
+          <h3 className="text-lg font-bold">{t("titles.createNewLecture")}</h3>
           <button onClick={handleClose} className="btn btn-sm btn-circle btn-ghost">
             <FiX className="w-5 h-5" />
           </button>
@@ -204,11 +208,11 @@ const LectureCreationModal = ({
         <form onSubmit={handleSubmit}>
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Name</span>
+              <span className="label-text">{t("fields.name")}</span>
             </label>
             <input
               type="text"
-              placeholder="Enter lecture name"
+              placeholder={t("placeholders.enterLectureName")}
               className="input input-bordered w-full"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
@@ -219,7 +223,7 @@ const LectureCreationModal = ({
           {/* Level dropdown */}
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Level</span>
+              <span className="label-text">{t("fields.level")}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -227,7 +231,7 @@ const LectureCreationModal = ({
               onChange={(e) => setSelectedLevel(e.target.value)}
               required
             >
-              <option value="">Select a level</option>
+              <option value="">{t("placeholders.selectLevel")}</option>
               {levels.map((level) => (
                 <option key={level._id} value={level._id}>
                   {level.name}
@@ -240,7 +244,7 @@ const LectureCreationModal = ({
           {/* Subject dropdown */}
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Subject</span>
+              <span className="label-text">{t("fields.subject")}</span>
             </label>
             <select
               className="select select-bordered w-full"
@@ -248,7 +252,7 @@ const LectureCreationModal = ({
               onChange={(e) => setSelectedSubject(e.target.value)}
               required
             >
-              <option value="">Select a subject</option>
+              <option value="">{t("placeholders.selectSubject")}</option>
               {subjects.map((subject) => (
                 <option key={subject._id} value={subject._id}>
                   {subject.name}
@@ -260,10 +264,10 @@ const LectureCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Description</span>
+              <span className="label-text">{t("fields.description")}</span>
             </label>
             <textarea
-              placeholder="Enter lecture description"
+              placeholder={t("placeholders.enterDescription")}
               className="textarea textarea-bordered w-full"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
@@ -272,11 +276,11 @@ const LectureCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Price</span>
+              <span className="label-text">{t("fields.price")}</span>
             </label>
             <input
               type="number"
-              placeholder="Enter price"
+              placeholder={t("placeholders.enterPrice")}
               className="input input-bordered w-full"
               value={newPrice}
               onChange={(e) => setNewPrice(e.target.value)}
@@ -287,11 +291,11 @@ const LectureCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Video URL</span>
+              <span className="label-text">{t("fields.videoURL")}</span>
             </label>
             <input
               type="url"
-              placeholder="Enter video link"
+              placeholder={t("placeholders.enterVideoLink")}
               className="input input-bordered w-full"
               value={newVideoLink}
               onChange={(e) => setNewVideoLink(e.target.value)}
@@ -301,11 +305,11 @@ const LectureCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Number of Views</span>
+              <span className="label-text">{t("fields.numberOfViews")}</span>
             </label>
             <input
               type="number"
-              placeholder="Enter number of views"
+              placeholder={t("placeholders.enterNumberOfViews")}
               className="input input-bordered w-full"
               value={numberOfViews}
               onChange={(e) => setNumberOfViews(e.target.value)}
@@ -316,32 +320,32 @@ const LectureCreationModal = ({
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Lecture Type</span>
+              <span className="label-text">{t("fields.lectureType")}</span>
             </label>
             <select
               className="select select-bordered w-full"
               value={newLectureType}
               onChange={(e) => setNewLectureType(e.target.value)}
             >
-              <option value="Revision">Revision</option>
-              <option value="Paid">Normal</option>
+              <option value="Revision">{t("lectureTypes.revision")}</option>
+              <option value="Paid">{t("lectureTypes.normal")}</option>
             </select>
           </div>
 
           {/* Exam Section */}
-          <div className="divider">Exam Settings</div>
+          <div className="divider">{t("sections.examSettings")}</div>
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Requires Exam</span>
+              <span className="label-text">{t("fields.requiresExam")}</span>
             </label>
             <select
               className="select select-bordered w-full"
               value={requiresExam}
               onChange={(e) => setRequiresExam(e.target.value === "true")}
             >
-              <option value={false}>No</option>
-              <option value={true}>Yes</option>
+              <option value={false}>{t("options.no")}</option>
+              <option value={true}>{t("options.yes")}</option>
             </select>
           </div>
 
@@ -355,22 +359,24 @@ const LectureCreationModal = ({
             onExamConfigCreated={(examConfigId) => {
               setSelectedExamConfigId(examConfigId)
             }}
+            t={t}
+            i18n={i18n}
           />
 
           {/* Homework Section */}
-          <div className="divider">Homework Settings</div>
+          <div className="divider">{t("sections.homeworkSettings")}</div>
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Requires Homework</span>
+              <span className="label-text">{t("fields.requiresHomework")}</span>
             </label>
             <select
               className="select select-bordered w-full"
               value={requiresHomework}
               onChange={(e) => setRequiresHomework(e.target.value === "true")}
             >
-              <option value={false}>No</option>
-              <option value={true}>Yes</option>
+              <option value={false}>{t("options.no")}</option>
+              <option value={true}>{t("options.yes")}</option>
             </select>
           </div>
 
@@ -379,7 +385,7 @@ const LectureCreationModal = ({
             <>
               <div className="form-control w-full mb-4">
                 <label className="label">
-                  <span className="label-text">Homework Configuration</span>
+                  <span className="label-text">{t("fields.homeworkConfiguration")}</span>
                 </label>
                 <ExamConfigSection
                   requiresExam={requiresHomework}
@@ -391,17 +397,19 @@ const LectureCreationModal = ({
                     setSelectedHomeworkConfigId(homeworkConfigId)
                   }}
                   configType="homework"
+                  t={t}
+                  i18n={i18n}
                 />
               </div>
             </>
           )}
 
           {/* Attachment section with type selection */}
-          <div className="divider">Attachments</div>
+          <div className="divider">{t("sections.attachments")}</div>
 
           <div className="form-control w-full mb-4">
             <label className="label">
-              <span className="label-text">Attachment (Optional)</span>
+              <span className="label-text">{t("fields.attachmentOptional")}</span>
             </label>
             <div className="space-y-3">
               <select
@@ -409,10 +417,10 @@ const LectureCreationModal = ({
                 value={attachmentType}
                 onChange={(e) => setAttachmentType(e.target.value)}
               >
-                <option value="pdfsandimages">PDFs and Images</option>
-                <option value="booklets">Booklets</option>
-                <option value="homeworks">Homeworks</option>
-                <option value="exams">Exams</option>
+                <option value="pdfsandimages">{t("attachmentTypes.pdfsAndImages")}</option>
+                <option value="booklets">{t("attachmentTypes.booklets")}</option>
+                <option value="homeworks">{t("attachmentTypes.homeworks")}</option>
+                <option value="exams">{t("attachmentTypes.exams")}</option>
               </select>
 
               <div className="relative">
@@ -425,7 +433,9 @@ const LectureCreationModal = ({
                 <FiPaperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
               </div>
               {attachmentFile && (
-                <p className="mt-2 text-sm text-base-content/70">Selected file: {attachmentFile.name}</p>
+                <p className="mt-2 text-sm text-base-content/70">
+                  {t("fields.selectedFile")}: {attachmentFile.name}
+                </p>
               )}
             </div>
           </div>
@@ -450,17 +460,22 @@ const LectureCreationModal = ({
           )}
 
           <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
-              Cancel
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={handleClose}
+              disabled={creationLoading}
+            >
+              {t("buttons.cancel")}
             </button>
             <button type="submit" className="btn btn-primary" disabled={creationLoading}>
               {creationLoading ? (
                 <>
                   <span className="loading loading-spinner"></span>
-                  Creating...
+                  {t("buttons.creating")}
                 </>
               ) : (
-                "Create"
+                t("buttons.create")
               )}
             </button>
           </div>
