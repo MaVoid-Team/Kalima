@@ -1,58 +1,60 @@
-// StudentForm.jsx
-import React, { useState } from "react";
+"use client"
 
-const StudentForm = ({ userData, handleChange, levels }) => {
-  const [hobby, setHobby] = useState("");
-  
+import { useState } from "react"
+
+const StudentForm = ({ userData, handleChange, levels, t, isRTL }) => {
+  const [hobby, setHobby] = useState("")
+
   const addHobby = () => {
     if (hobby.trim()) {
-      userData.hobbies = [...(userData.hobbies || []), hobby.trim()];
-      setHobby("");
+      userData.hobbies = [...(userData.hobbies || []), hobby.trim()]
+      setHobby("")
     }
-  };
+  }
 
   const removeHobby = (index) => {
-    userData.hobbies = userData.hobbies.filter((_, i) => i !== index);
-  };
+    userData.hobbies = userData.hobbies.filter((_, i) => i !== index)
+  }
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
           <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">المستوى الدراسي</span>
-          </label>
-          <select
-            name="level"
-            className="select select-bordered"
-            value={userData.level || ""}
-            onChange={handleChange}
-            required
-          >
-            <option value="">اختر المستوى الدراسي</option>
-            {levels.map(level => (
-              <option key={level._id} value={level._id}>
-                {level.name}
-              </option>
-            ))}
-          </select>
+            <label className="label">
+              <span className="label-text">{t("fields.level")}</span>
+            </label>
+            <select
+              name="level"
+              className="select select-bordered"
+              value={userData.level || ""}
+              onChange={handleChange}
+              required
+            >
+              <option value="">{t("placeholders.selectLevel")}</option>
+              {levels.map((level) => (
+                <option key={level._id} value={level._id}>
+                  {level.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="form-control">
           <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">رقم الهاتف</span>
-          </label>
-          <input
-            type="text"
-            name="phoneNumber"
-            className="input input-bordered"
-            value={userData.phoneNumber || ""}
-            onChange={handleChange}
-            required
-          />
+            <label className="label">
+              <span className="label-text">{t("fields.phoneNumber")}</span>
+            </label>
+            <input
+              type="text"
+              name="phoneNumber"
+              className="input input-bordered"
+              value={userData.phoneNumber || ""}
+              onChange={handleChange}
+              placeholder={t("placeholders.phoneNumber")}
+              required
+            />
           </div>
         </div>
       </div>
@@ -60,38 +62,40 @@ const StudentForm = ({ userData, handleChange, levels }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-control">
           <div className="flex flex-col gap-4">
-          <label className="label">
-            <span className="label-text">الرقم التسلسلي (اختياري)</span>
-          </label>
-          <input
-            type="text"
-            name="sequencedId"
-            className="input input-bordered"
-            value={userData.sequencedId || ""}
-            onChange={handleChange}
-          />
+            <label className="label">
+              <span className="label-text">{t("fields.sequencedIdOptional")}</span>
+            </label>
+            <input
+              type="text"
+              name="sequencedId"
+              className="input input-bordered"
+              value={userData.sequencedId || ""}
+              onChange={handleChange}
+              placeholder={t("placeholders.sequencedId")}
+            />
           </div>
         </div>
 
         <div className="form-control">
           <div className="flex flex-col gap-4">
-              <label className="label">
-            <span className="label-text">رقم هاتف ولي الأمر (اختياري)</span>
-          </label>
-          <input
-            type="text"
-            name="parentPhoneNumber"
-            className="input input-bordered"
-            value={userData.parentPhoneNumber || ""}
-            onChange={handleChange}
-          />
+            <label className="label">
+              <span className="label-text">{t("fields.parentPhoneNumberOptional")}</span>
+            </label>
+            <input
+              type="text"
+              name="parentPhoneNumber"
+              className="input input-bordered"
+              value={userData.parentPhoneNumber || ""}
+              onChange={handleChange}
+              placeholder={t("placeholders.parentPhoneNumber")}
+            />
           </div>
         </div>
       </div>
 
       <div className="form-control">
         <label className="label">
-          <span className="label-text">الهوايات (اختياري)</span>
+          <span className="label-text">{t("fields.hobbiesOptional")}</span>
         </label>
         <div className="flex gap-2">
           <input
@@ -99,14 +103,10 @@ const StudentForm = ({ userData, handleChange, levels }) => {
             className="input input-bordered flex-1"
             value={hobby}
             onChange={(e) => setHobby(e.target.value)}
-            placeholder="أضف هواية"
+            placeholder={t("placeholders.addHobby")}
           />
-          <button 
-            type="button" 
-            className="btn btn-secondary" 
-            onClick={addHobby}
-          >
-            إضافة
+          <button type="button" className="btn btn-secondary" onClick={addHobby}>
+            {t("buttons.add")}
           </button>
         </div>
         {userData.hobbies && userData.hobbies.length > 0 && (
@@ -114,11 +114,7 @@ const StudentForm = ({ userData, handleChange, levels }) => {
             {userData.hobbies.map((h, index) => (
               <div key={index} className="badge badge-secondary gap-1">
                 {h}
-                <button 
-                  type="button" 
-                  className="btn btn-ghost btn-xs" 
-                  onClick={() => removeHobby(index)}
-                >
+                <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeHobby(index)}>
                   ×
                 </button>
               </div>
@@ -127,7 +123,7 @@ const StudentForm = ({ userData, handleChange, levels }) => {
         )}
       </div>
     </>
-  );
-};
+  )
+}
 
-export default StudentForm;
+export default StudentForm
