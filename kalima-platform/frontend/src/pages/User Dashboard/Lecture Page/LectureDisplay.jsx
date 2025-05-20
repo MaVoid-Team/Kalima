@@ -957,28 +957,42 @@ const LectureDisplay = () => {
           <div className="card-body">
             <h2 className="card-title flex items-center gap-2">
               <FiAlertTriangle className="text-warning" />
-              {t("examRequiredFirst")}
+              {examData?.examType === "homework"
+                ? t("homeworkRequiredFirst") || "Homework Submission Required"
+                : t("examRequiredFirst")}
             </h2>
-            <p className="my-4">{t("examRequiredDescription")}</p>
+            <p className="my-4">
+              {examData?.examType === "homework"
+                ? t("homeworkRequiredDescription") ||
+                  "You must complete and submit the homework before accessing this lecture content."
+                : t("examRequiredDescription")}
+            </p>
 
             {examData && (
               <div className="bg-base-200 p-4 rounded-lg my-4">
-                <h3 className="font-semibold mb-2">{t("examInfo")}:</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <span className="font-medium">{t("requiredPassingScore")}:</span> {examData.passingThreshold}
-                  </li>
-                </ul>
+                <h3 className="font-semibold mb-2">
+                  {examData.examType === "homework" ? t("homeworkInfo") || "Homework Information" : t("examInfo")}:
+                </h3>
+
+                {examData.passingThreshold && (
+                  <ul className="space-y-2">
+                    <li>
+                      <span className="font-medium">{t("requiredPassingScore")}:</span> {examData.passingThreshold}
+                    </li>
+                  </ul>
+                )}
 
                 <div className="mt-6">
                   <a
-                    href={examData.examUrl}
+                    href={
+                      examData.examType === "homework" ? examData.homeworkUrl || examData.examUrl : examData.examUrl
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary w-full sm:w-auto"
                   >
                     <FiExternalLink className="mr-2" />
-                    {t("startExam")}
+                    {examData.examType === "homework" ? t("startHomework") || "Complete Homework" : t("startExam")}
                   </a>
                 </div>
               </div>
@@ -998,7 +1012,12 @@ const LectureDisplay = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>{t("afterPassingExam")}</span>
+              <span>
+                {examData?.examType === "homework"
+                  ? t("afterCompletingHomework") ||
+                    "After completing the homework, you'll be able to access this lecture."
+                  : t("afterPassingExam")}
+              </span>
             </div>
           </div>
         </div>

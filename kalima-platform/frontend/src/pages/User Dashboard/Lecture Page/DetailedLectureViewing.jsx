@@ -465,7 +465,7 @@ const DetailedLectureView = () => {
         </div>
 
         {/* Admin/Lecturer Actions */}
-        {hasAdminPrivileges && (
+        {hasAdminPrivileges ||  userRole !== "assistant" && (
           <div className="flex gap-2">
             <button className="btn btn-error btn-sm" onClick={() => setShowDeleteModal(true)}>
               {t('deleteLecture')}
