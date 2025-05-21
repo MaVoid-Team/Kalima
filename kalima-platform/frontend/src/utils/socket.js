@@ -10,7 +10,6 @@ export const initializeSocket = (userId) => {
   }
 
   if (socket?.connected) {
-    console.log("Socket already connected:", socket.id);
     return socket;
   }
 
@@ -22,12 +21,10 @@ export const initializeSocket = (userId) => {
 
   // Close any existing socket before creating a new one
   if (socket) {
-    console.log("Closing existing socket before reconnection");
     socket.close();
     socket = null;
   }
 
-  console.log("Creating new socket connection for user:", userId);
   socket = io(import.meta.env.VITE_API_URL, {
     auth: {
       token,
@@ -43,8 +40,6 @@ export const initializeSocket = (userId) => {
   });
 
   socket.on("connect", () => {
-    console.log("Socket connected successfully with ID:", socket.id);
-    console.log("Subscribing user to notifications with ID:", userId);
     socket.emit("subscribe", userId);
   });
 

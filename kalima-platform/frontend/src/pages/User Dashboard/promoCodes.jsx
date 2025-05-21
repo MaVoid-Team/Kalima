@@ -275,7 +275,6 @@ const PromoCodes = () => {
           .then(() => {
             isRunningRef.current = true
             setScannerLoading(false)
-            console.log("Scanner started successfully")
           })
           .catch((err) => {
             setScannerError(t("scanner.errors.cameraPermission"))
@@ -300,10 +299,8 @@ const PromoCodes = () => {
         scannerRef.current
           .stop()
           .then(() => {
-            console.log("Scanner stopped successfully")
           })
           .catch((err) => {
-            console.log("Error stopping scanner (handled):", err)
           })
           .finally(() => {
             isRunningRef.current = false
@@ -312,7 +309,6 @@ const PromoCodes = () => {
             setScannerLoading(false)
           })
       } catch (err) {
-        console.log("Error in stopScanner (handled):", err)
         isRunningRef.current = false
         scannerRef.current = null
         setScannerActive(false)
@@ -331,7 +327,6 @@ const PromoCodes = () => {
     try {
       if (scannerRef.current) {
         await scannerRef.current.stop()
-        console.log("Scanner stopped after successful scan")
       }
     } catch (err) {
       console.log("Error stopping scanner after scan (handled):", err)
@@ -446,7 +441,10 @@ const PromoCodes = () => {
     navigator.clipboard
       .writeText(code)
       .then(() => {
-        console.log("Copied to clipboard:", code)
+        if (navigator.vibrate) {
+          navigator.vibrate(200)
+        }
+        setRedeemSuccess(t("copySuccess") || "Code copied to clipboard!")
       })
       .catch((err) => {
         console.error("Failed to copy:", err)

@@ -88,9 +88,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
     setExamConfigsLoading(true)
     setExamConfigsError("")
     try {
-      console.log("Fetching exam configs...")
       const response = await getExamConfigs()
-      console.log("Exam Configs Response:", response)
 
       if (response.success && response.data) {
         // Try to extract exam configs from different possible response structures
@@ -99,12 +97,10 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           response.data.examConfigs || // Format: { data: { examConfigs: [...] } }
           (Array.isArray(response.data) ? response.data : []) // Format: { data: [...] }
 
-        console.log("Extracted exam configs:", configs)
 
         if (Array.isArray(configs) && configs.length > 0) {
           setExamConfigs(configs)
         } else {
-          console.log("No exam configs found in response")
           setExamConfigsError("No exam configurations found. Please create a new one.")
           setExamConfigs([])
         }
@@ -184,9 +180,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
               return
             }
 
-            console.log("Creating new exam config:", newExamConfig)
             const createResponse = await createExamConfig(newExamConfig)
-            console.log("Create exam config response:", createResponse)
 
             // Extract the exam config ID from different response formats
             if (createResponse.success === true && createResponse.data) {
@@ -225,9 +219,7 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
           // Passing threshold is now defined in the exam config
         }
 
-        console.log("Creating lecture with data:", lectureData)
         const response = await createLecture(lectureData)
-        console.log("Create lecture response:", response)
 
         if (response.status !== "success" && response.success !== true) {
           throw new Error(response.message || "Failed to create lecture")
@@ -248,14 +240,13 @@ function ContainerCreationPanel({ courseStructure, updateCourseStructure, formDa
         // Handle attachment after successful lecture creation
         if (attachmentFile && lectureId) {
           try {
-            console.log("Uploading attachment for lecture ID:", lectureId)
+
             const attachmentData = {
               type: attachmentType,
               attachment: attachmentFile,
             }
 
             const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
-            console.log("Attachment upload response:", attachmentResponse)
           } catch (attachmentError) {
             console.error("Error uploading attachment:", attachmentError)
             alert(

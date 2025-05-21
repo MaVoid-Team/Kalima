@@ -15,7 +15,6 @@ const ActivityTracker = ({ lessonId, students }) => {
       setError(null);
       try {
         const response = await getAllAttendance();
-        console.log(response)
         if (response.status === "success") {
           // Filter attendance records for the specific lesson
           const filteredAttendance = response.data.data.filter(

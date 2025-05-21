@@ -28,7 +28,6 @@ const NotificationCenter = ({ userId }) => {
     setIsLoading(true);
     try {
       const token = getToken();
-      console.log("Fetching unsent notifications for user:", userId);
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/v1/notifications/unsent`,
         {
@@ -38,9 +37,7 @@ const NotificationCenter = ({ userId }) => {
         }
       );
 
-      console.log("Notification API response:", response.data);
       if (response.data.status === "success" && response.data.data.length > 0) {
-        console.log("Received notifications:", response.data.data);
         setNotifications((prev) => {
           // Filter out duplicates
           const existingIds = new Set(prev.map((n) => n.notificationId));
@@ -48,12 +45,10 @@ const NotificationCenter = ({ userId }) => {
             (n) => !existingIds.has(n.notificationId)
           );
 
-          console.log(`Adding ${newNotifications.length} new notifications`);
           return [...newNotifications, ...prev];
         });
         setUnreadCount((prev) => prev + response.data.data.length);
       } else {
-        console.log("No unsent notifications found");
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -64,7 +59,6 @@ const NotificationCenter = ({ userId }) => {
 
   // Function to manually reconnect socket
   const handleReconnect = useCallback(() => {
-    console.log("Manual reconnection requested");
     const socket = forceReconnect(userId);
     if (socket) {
       setupSocketListeners(socket);
@@ -82,12 +76,10 @@ const NotificationCenter = ({ userId }) => {
     }
 
     socket.on("connect", () => {
-      console.log("Socket connected in NotificationCenter");
       setSocketConnected(true);
     });
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected in NotificationCenter");
       setSocketConnected(false);
     });
 
@@ -109,7 +101,6 @@ const NotificationCenter = ({ userId }) => {
     // Add new listeners
     eventTypes.forEach((eventType) => {
       socket.on(eventType, (notification) => {
-        console.log(`NotificationCenter received ${eventType}:`, notification);
         // Add the new notification to the list, avoid duplicates
         setNotifications((prev) => {
           const exists = prev.some(
@@ -125,7 +116,6 @@ const NotificationCenter = ({ userId }) => {
 
   useEffect(() => {
     if (userId) {
-      console.log("NotificationCenter initializing for user:", userId);
 
       // Initialize the socket
       const socket = initializeSocket(userId);
@@ -143,7 +133,6 @@ const NotificationCenter = ({ userId }) => {
 
       // Clean up on unmount
       return () => {
-        console.log("Cleaning up NotificationCenter for user:", userId);
         const currentSocket = getSocket();
         if (currentSocket) {
           [
@@ -167,10 +156,8 @@ const NotificationCenter = ({ userId }) => {
     const pingInterval = setInterval(() => {
       const socket = getSocket();
       if (socket?.connected) {
-        console.log("Sending ping to keep connection alive");
         socket.emit("ping");
       } else if (socket) {
-        console.log("Socket disconnected, attempting to reconnect");
         handleReconnect();
       }
     }, 30000); // Every 30 seconds

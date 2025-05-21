@@ -91,7 +91,6 @@ export default function CoursesPage() {
       type: "course",
       limit: 200,
     });
-    console.log("API Response:", result);
 
     if (result.status === "success") {
       const containers = result.data.containers;

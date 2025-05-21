@@ -156,8 +156,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       return
     }
 
-    const filteredData = filterDataByRole(userData)
-    console.log("Filtered Data sent to backend:", filteredData) // Log data for debugging
+    const filteredData = filterDataByRole(userData)// Log data for debugging
     onCreateUser(filteredData)
   }
 

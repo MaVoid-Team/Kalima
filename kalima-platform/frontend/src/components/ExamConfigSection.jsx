@@ -47,9 +47,7 @@ const ExamConfigSection = ({
     setExamConfigsLoading(true)
     setExamConfigsError("")
     try {
-      console.log(`Fetching ${configType} configs...`)
       const response = await getExamConfigs()
-      console.log(`${configType.charAt(0).toUpperCase() + configType.slice(1)} Configs Response:`, response)
 
       if (response.success && response.data) {
         // Try to extract exam configs from different possible response structures
@@ -57,8 +55,6 @@ const ExamConfigSection = ({
           (response.data.data && response.data.data.examConfigs) || // Format: { data: { data: { examConfigs: [...] } } }
           response.data.examConfigs || // Format: { data: { examConfigs: [...] } }
           (Array.isArray(response.data) ? response.data : []) // Format: { data: [...] }
-
-        console.log(`Extracted ${configType} configs:`, configs)
 
         // Filter configs by type if configType is "homework"
         const filteredConfigs =
@@ -69,7 +65,6 @@ const ExamConfigSection = ({
         if (Array.isArray(filteredConfigs) && filteredConfigs.length > 0) {
           setExamConfigs(filteredConfigs)
         } else {
-          console.log(`No ${configType} configs found in response`)
           setExamConfigsError(`No ${configType} configurations found. Please create a new one.`)
           setExamConfigs([])
         }
@@ -93,10 +88,7 @@ const ExamConfigSection = ({
       if (!newExamConfig.name || !newExamConfig.googleSheetId || !newExamConfig.formUrl) {
         throw new Error(`Please fill in all required ${configType} configuration fields`)
       }
-
-      console.log(`Creating new ${configType} config:`, newExamConfig)
       const createResponse = await createExamConfig(newExamConfig)
-      console.log(`Create ${configType} config response:`, createResponse)
 
       // Extract the exam config ID from different response formats
       let examConfigId = null
