@@ -50,12 +50,19 @@ export const updateUserPassword = async (passwordData) => {
         },
       }
     );
-
-    return { 
-      success: true, 
-      data: response.data 
+    
+    
+    const userInfo = userDataResponse.data.data.userInfo;
+    const userId = userInfo.id;
+    
+    // Include the role in the update data to prevent the "invalid or missing role" error
+    const updatedData = {
+      ...updateData,
+      role: userInfo.role  // Always include the current role
     };
-
+    
+    // Call the updateUser function with the retrieved ID and the updated data that includes the role
+    return updateUser(userId, updatedData);
   } catch (error) {
     return {
       success: false,
