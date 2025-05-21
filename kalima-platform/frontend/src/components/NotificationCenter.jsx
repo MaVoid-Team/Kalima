@@ -29,7 +29,7 @@ const NotificationCenter = ({ userId }) => {
     try {
       const token = getToken();
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/v1/notifications/unsent`,
+        `${import.meta.env.VITE_API_URL}/notifications/unsent`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -183,7 +183,7 @@ const NotificationCenter = ({ userId }) => {
       axios.patch(
         `${
           import.meta.env.VITE_API_URL
-        }/api/v1/notifications/${notificationId}/read`,
+        }/notifications/${notificationId}/read`,
         {},
         {
           headers: {

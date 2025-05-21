@@ -76,7 +76,7 @@ export const updateUserPassword = async (passwordData) => {
 export const updateUser = async (userId, updateData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/api/v1/users/${userId}`,
+      `${API_URL}/users/${userId}`,
       updateData,
       {
         headers: {
