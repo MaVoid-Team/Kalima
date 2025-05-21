@@ -127,12 +127,13 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
       }).session(session);
 
       if (!access) {
+        // console.log("Creating new access record", containerDoc.numberOfViews);
         const accessRecords = await StudentLectureAccess.create(
           [
             {
               student: studentId,
               lecture: containerDoc._id,
-              remainingViews: Number(containerDoc.numberOfViews) - 1,
+              remainingViews: containerDoc.numberOfViews,
             },
           ],
           { session }
@@ -143,7 +144,7 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
         }
       } else {
         if (access.remainingViews > 0) {
-          access.remainingViews -= 1;
+          // access.remainingViews -= 1;
           access.lastAccessed = Date.now();
           await access.save({ session });
         } else {
@@ -538,13 +539,13 @@ exports.getAllContainers = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
   query = features.query;
-  
+
   // Fetch containers based on the query with explicit field selection for related entities
   const containers = await query.populate([
     { path: "createdBy", select: "name" },
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
-    { path: "parent", select: "name" }
+    { path: "parent", select: "name" },
   ]);
 
   if (!containers || containers.length === 0) {

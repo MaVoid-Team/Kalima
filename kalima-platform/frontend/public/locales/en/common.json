@@ -30,8 +30,21 @@
   "3rd Preparatory": "Third Preparatory",
   "1st Secondary": "First Secondary",
   "2nd Secondary": "Second Secondary",
-  "3rd Secondary": "Third Secondary"
+  "3rd Secondary": "Third Secondary",
+  "undefined": "Undefined"
 },
+ "role" :{
+    "student": "Student",
+    "teacher": "Teacher",
+    "admin": "Admin",
+    "assistnat": "Assistant"
+  },
+   "passwordStrength": {
+    "label": "Strength:",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong"
+  },
   "dashboard": "Dashboard",
   "profile": "My Profile",
   "courses": "My Courses",
@@ -49,5 +62,6 @@
   "myDashboard": "My Dashboard",
   "Packages": "Packages",
   "select": "Select",
-  "Create": "Create"
+  "Create": "Create",
+  "MyLectures": "My Lectures"
 }

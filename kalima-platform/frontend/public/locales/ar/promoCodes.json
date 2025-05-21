@@ -1,36 +1,96 @@
 {
-    "title": "اكواد الشحن",
-    "balance": {
-      "title": "الميزانية",
-      "currency": "جنيها"
+  "title": "اكواد الشحن",
+  "subtitle": "إدارة أكواد الشحن ورصيد النقاط",
+  "balance": {
+    "title": "الميزانية",
+    "currency": "جنيها",
+    "description": "كل الفلوس الي تم شحنها"
+  },
+  "redeem": {
+    "title": "شحن كود",
+    "button": "شحن الكود",
+    "modalTitle": "شحن الكود",
+    "placeholder": "من فضلك ادخل كود الشحن",
+    "rulesTitle": "قواعد الشحن",
+    "rules": {
+      "1": "كل كود يقدر يتشحن مرة واحدة بس",
+      "2": "تقدر تستخدم نقاط الشحن للمدرس اللي اشتريت منه الكارت فقط"
     },
-    "redeem": {
-      "title": "شحن كود",
-      "button": "شحن الكود",
-      "modalTitle": "شحن الكود",
-      "placeholder": "من فضلك ادخل كود الشحن",
-      "rules": {
-        "1": "كل كود يقدر يتشحن مرة واحدة بس",
-        "2": "تقدر تستخدم نقاط الشحن للمدرس اللي اشتريت منه الكارت فقط"
-      }
-    },
-    "transactions": {
-      "title": "تاريخ التعاملات"
-    },
-    "sort": {
-      "label": "رتب حسب",
-      "newest": "الأحدث أولاً",
-      "oldest": "الأقدم أولاً"
-    },
-    "table": {
-      "created": "وقت الإنشاء",
-      "teacher": "اسم المدرس",
-      "amount": "رصيد شحن الكارت",
-      "code": "كود الشحن",
-      "id": "رقم الكود"
-    },
-    "noData": "لا يوجد بيانات",
-    "arrowAlt": "سهم بين البطاقات",
-    "decorativeAlt": "زخارف نقطية",
-    "toggleSidebar": "تبديل القائمة الجانبية"
-  }
+    "success": "تم شحن الكود بنجاح!",
+    "errors": {
+      "emptyCode": "من فضلك ادخل الكود",
+      "generic": "فشل في شحن الكود",
+      "invalidCode": "كود غير صالح"
+    }
+  },
+  "transactions": {
+    "title": "تاريخ التعاملات",
+    "types": {
+      "codeRedemption": "شحن كود",
+      "coursePurchase": "شراء كورس"
+    }
+  },
+  "lectures": {
+    "title": "الوصول للمحاضرات"
+  },
+  "actions": {
+    "title": "إجراءات سريعة"
+  },
+  "lecturerPoints": {
+    "title": "النقاط حسب المدرس",
+    "description": "إجمالي النقاط المتاحة لكل مدرس"
+  },
+  "scanner": {
+    "title": "مسح رمز QR",
+    "button": "مسح QR",
+    "instructions": "هات الكاميرا على ال QR كود",
+    "switchCamera": "تبديل الكاميرا",
+    "initializing": "جاري تشغيل الكاميرا...",
+    "errors": {
+      "cameraPermission": "تم رفض إذن الكاميرا",
+      "initFailed": "فشل في تهيئة الماسح",
+      "invalidCode": "رمز QR غير صالح"
+    }
+  },
+  "sort": {
+    "label": "رتب حسب",
+    "newest": "الأحدث أولاً",
+    "oldest": "الأقدم أولاً"
+  },
+  "table": {
+    "date": "التاريخ",
+    "type": "النوع",
+    "amount": "المبلغ",
+    "teacher": "المدرس",
+    "actions": "الإجراءات",
+    "created": "وقت الإنشاء",
+    "code": "كود الشحن",
+    "id": "رقم الكود"
+  },
+  "noData": "لا يوجد بيانات",
+  "noLecturerPoints": "لا توجد نقاط متاحة للمدرسين",
+  "noLectures": "لا توجد محاضرات متاحة",
+  "noLecturesDescription": "لم تقم بالوصول إلى أي محاضرات بعد",
+  "user": "مستخدم",
+  "student": "طالب",
+  "generalPoints": "عام",
+  "notAvailable": "غير متاح",
+  "views": "مشاهدات",
+  "totalViews": "إجمالي المشاهدات",
+  "copy": "نسخ إلى الحافظة",
+  "details": "عرض التفاصيل",
+  "retry": "إعادة المحاولة",
+  "errors": {
+    "fetchFailed": "فشل في جلب البيانات"
+  },
+  "profile" :{
+    "email" : "البريد الالكتروني",
+    "sequenceId" : "رقم التسلسل",
+    "sequenceIdTooltip" : "رقم التسلسل الخاص بك",
+    "parentLinkTitle" : "رابط الوالدين",
+    "parentLinkDescription" : "استخدم هذا الرابط للوصول للوالدين"
+  },
+  "arrowAlt": "سهم بين البطاقات",
+  "decorativeAlt": "زخارف نقطية",
+  "toggleSidebar": "تبديل القائمة الجانبية"
+}

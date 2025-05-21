@@ -296,15 +296,17 @@ const AuditLog = () => {
                 {translateRole(log.user?.role)}
               </td>
               <td className="text-sm py-2 hidden sm:table-cell">
-                {log.resource?.type ? (
-                  <div className="flex items-center gap-2">
-                    <span>
-                      {t(`admin.auditlog.resources.${log.resource.type}`)}
-                      {log.resource.id && ` (${t('admin.auditlog.idDisplay', { id: log.resource.id })})`}
-                    </span>
-                  </div>
-                ) : '-'}
-              </td>
+              {log.resource?.type ? (
+                <div className="flex items-center gap-2">
+                  <span>
+                    {t(`admin.auditlog.resources.${log.resource.type}`)}
+                    {log.resource.details?.name && `: ${log.resource.details.name}`}
+                    {!log.resource.details?.name && log.resource.name && `: ${log.resource.name}`}
+                    {!log.resource.details?.name && !log.resource.name && log.resource.id && ` (${t('admin.auditlog.idDisplay', { id: log.resource.id })}`}
+                  </span>
+                </div>
+              ) : '-'}
+            </td>
               <td className="text-sm py-2 hidden sm:table-cell">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(log.status)}

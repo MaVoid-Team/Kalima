@@ -9,19 +9,25 @@ router.use(verifyJWT);
 router
   .route("/")
   .get(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     codeController.getAllCodes
   )
   .post(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     codeController.createCodes
   )
   .delete(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     codeController.deleteCodes
   );
 
 router.route("/:id").get(codeController.getCodeById);
+
+router.delete(
+  "/multiple",
+  authController.verifyRoles("Admin", "SubAdmin"),
+  codeController.deleteMultipleCodes
+);
 
 router
   .route("/redeem")

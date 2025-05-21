@@ -36,14 +36,16 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       teacherAllowed,
       createdBy,
       videoLink,
-      examLink,
       description,
       numberOfViews,
       lecture_type,
       // New exam requirement fields
       requiresExam,
       examConfig,
-      passingThreshold
+      passingThreshold,
+      requiresHomework,
+      homeworkConfig,
+      homeworkPassingThreshold,
     } = req.body;
 
     // Validate lecture type
@@ -63,7 +65,15 @@ exports.createLecture = catchAsync(async (req, res, next) => {
     // Validate exam config if requires exam is true
     if (requiresExam && !examConfig) {
       throw new AppError(
-        "Exam configuration is required when requiresExam is true", 
+        "Exam configuration is required when requiresExam is true",
+        400
+      );
+    }
+
+    // Validate homework config if requires homework is true
+    if (requiresHomework && !homeworkConfig) {
+      throw new AppError(
+        "Homework configuration is required when requiresHomework is true", 
         400
       );
     }
@@ -81,14 +91,17 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           parent,
           createdBy: createdBy || req.user._id,
           videoLink,
-          examLink,
           description,
           numberOfViews,
           lecture_type,
           // Add exam requirement fields
           requiresExam: requiresExam || false,
           examConfig,
-          passingThreshold
+          passingThreshold,
+          // Homework requirement fields
+          requiresHomework: requiresHomework || false,
+          homeworkConfig,
+          homeworkPassingThreshold,
         },
       ],
       { session }
@@ -246,36 +259,6 @@ exports.getLectureById = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getLectureById = catchAsync(async (req, res, next) => {
-  const Role = req.user.role?.toLowerCase();
-  const container = await Lecture.findById(req.params.lectureId).populate([
-    // { path: "children", select: "name" },
-    { path: "createdBy", select: "name" },
-  ]);
-  if (!container) return next(new AppError("Lecture not found", 404));
-  if (Role === "teacher") {
-    if (!container.teacherAllowed) {
-      return res.status(200).json({
-        status: "restricted",
-        data: {
-          id: container._id,
-          name: container.name,
-          owner: container.createdBy.name || container.createdBy._id,
-          subject: container.subject.name || container.subject._id,
-          type: container.type,
-        },
-      });
-    }
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      container,
-    },
-  });
-});
-
 // New function specifically for public, non-sensitive data
 exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   let query = Lecture.find();
@@ -383,16 +366,19 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     subject,
     videoLink,
     teacherAllowed,
-    examLink,
     description,
     numberOfViews,
     lecture_type,
     // New exam requirement fields
     requiresExam,
     examConfig,
-    passingThreshold
+    passingThreshold,
+    // Homework requirement fields
+    requiresHomework,
+    homeworkConfig,
+    homeworkPassingThreshold,
   } = req.body;
-  
+
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -404,7 +390,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       description,
       numberOfViews,
       lecture_type,
-      teacherAllowed
+      teacherAllowed,
     };
 
     // Basic validation for lecture_type (Mongoose enum validation also applies)
@@ -421,24 +407,25 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
     // Handle exam requirement fields
     if (requiresExam !== undefined) {
       obj.requiresExam = requiresExam;
-      
+
       // If requiresExam is true, examConfig is required
-      if (requiresExam && !examConfig && !await Lecture.findById(req.params.lectureId).select('examConfig').lean().then(doc => doc.examConfig)) {
+      if (
+        requiresExam &&
+        !examConfig &&
+        !(await Lecture.findById(req.params.lectureId)
+          .select("examConfig")
+          .lean()
+          .then((doc) => doc.examConfig))
+      ) {
         throw new AppError(
-          "Exam configuration is required when requiresExam is true", 
+          "Exam configuration is required when requiresExam is true",
           400
         );
       }
     }
-    
     // Only update examConfig if provided
     if (examConfig) {
       obj.examConfig = examConfig;
-    }
-    
-    // Only update passingThreshold if provided
-    if (passingThreshold !== undefined) {
-      obj.passingThreshold = passingThreshold;
     }
 
     if (subject) {
@@ -464,6 +451,178 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
     if (!updatedContainer) {
       throw new AppError("No container found with that ID", 404);
+    }
+
+    // Send notifications to students who have access to this lecture
+    try {
+      // Get notification template for lecture updates
+      const template = await NotificationTemplate.findOne({
+        type: "lecture_updated",
+      }).session(session);
+
+      if (!template) {
+        console.log("No notification template found for lecture_updated");
+      } else {
+        // IMPROVED STUDENT ACCESS DETECTION
+        // Step 1: Get students with direct access
+        const studentAccess = await StudentLectureAccess.find({
+          lecture: req.params.lectureId,
+        }).session(session);
+        let studentIdsWithAccess = studentAccess.map((access) =>
+          access.student.toString()
+        );
+
+        // Step 2: Get students with access through container purchases
+        // Find lecture to get its parent container
+        if (updatedContainer && updatedContainer.parent) {
+          // Get the parent container and any containers above it
+          const containerHierarchy = await Container.aggregate([
+            {
+              $match: {
+                _id: new mongoose.Types.ObjectId(updatedContainer.parent),
+              },
+            },
+            {
+              $graphLookup: {
+                from: "containers",
+                startWith: "$parent",
+                connectFromField: "parent",
+                connectToField: "_id",
+                as: "parentContainers",
+              },
+            },
+          ]).session(session);
+
+          if (containerHierarchy.length > 0) {
+            // Get all container IDs in the hierarchy (including direct parent)
+            const containerIds = [
+              updatedContainer.parent.toString(),
+              ...containerHierarchy[0].parentContainers.map((c) =>
+                c._id.toString()
+              ),
+            ];
+
+            // Find all purchases for these containers
+            const purchases = await Purchase.find({
+              container: {
+                $in: containerIds.map((id) => new mongoose.Types.ObjectId(id)),
+              },
+              type: "containerPurchase",
+            }).session(session);
+
+            // Get student IDs from these purchases
+            const studentIdsFromPurchases = purchases.map((p) =>
+              p.student.toString()
+            );
+
+            // Combine with direct access student IDs, removing duplicates
+            studentIdsWithAccess = [
+              ...new Set([...studentIdsWithAccess, ...studentIdsFromPurchases]),
+            ];
+          }
+        }
+
+        console.log(
+          `Found ${studentIdsWithAccess.length} students with access to updated lecture ${req.params.lectureId} (direct or through purchase)`
+        );
+
+        if (studentIdsWithAccess.length > 0) {
+          const io = req.app.get("io");
+          if (!io) {
+            console.log("Socket.IO instance not found");
+            return;
+          }
+
+          // Create notification message based on what was updated
+          let updateDescription = "Content was updated";
+          if (name) updateDescription = "Title was updated";
+          if (description) updateDescription = "Description was updated";
+          if (videoLink) updateDescription = "Video link was updated";
+          if (examConfig) updateDescription = "Exam requirements were updated";
+          if (homeworkConfig)
+            updateDescription = "Homework requirements were updated";
+
+          // Prepare notification data
+          const notificationData = {
+            title: template.title,
+            message: template.message
+              .replace("{lecture}", updatedContainer.name || "lecture")
+              .replace("{update}", updateDescription),
+            type: "lecture_updated",
+            relatedId: updatedContainer._id,
+          };
+
+          console.log(
+            "Creating lecture update notifications with data:",
+            notificationData
+          );
+
+          // Create notifications for all students
+          const notificationsToCreate = studentIdsWithAccess.map(
+            (studentId) => ({
+              userId: studentId,
+              ...notificationData,
+              isSent: false,
+            })
+          );
+
+          // Bulk create notifications
+          const createdNotifications = await Notification.insertMany(
+            notificationsToCreate,
+            { session }
+          );
+
+          console.log(
+            `Created ${createdNotifications.length} lecture update notifications`
+          );
+
+          // Attempt to send to online users
+          let sentCount = 0;
+          for (const studentId of studentIdsWithAccess) {
+            // Check if student is online
+            if (io.sockets.adapter.rooms.has(studentId.toString())) {
+              console.log(
+                `Student ${studentId} is online, sending lecture update notification`
+              );
+
+              // Find notification for this student
+              const notification = createdNotifications.find(
+                (n) => n.userId.toString() === studentId.toString()
+              );
+
+              if (notification) {
+                // Send notification
+                io.to(studentId.toString()).emit("lectureUpdate", {
+                  title: notification.title,
+                  message: notification.message,
+                  type: notification.type,
+                  subjectId: notification.relatedId,
+                  notificationId: notification._id,
+                  createdAt: notification.createdAt,
+                });
+
+                // Mark as sent
+                await Notification.findByIdAndUpdate(
+                  notification._id,
+                  { isSent: true },
+                  { session }
+                );
+
+                sentCount++;
+              }
+            }
+          }
+
+          console.log(
+            `Sent ${sentCount} lecture update notifications in real-time`
+          );
+        } else {
+          console.log("No students have access to this lecture yet");
+        }
+      }
+    } catch (notificationError) {
+      console.error("Error sending notifications:", notificationError);
+      // Continue without failing - notifications are not critical
     }
 
     await session.commitTransaction();
@@ -536,7 +695,7 @@ exports.deletelecture = catchAsync(async (req, res, next) => {
     if (!lecture) {
       throw new AppError("Lecture not found", 404);
     }
-    
+
     // Remove this lecture from its parent container's children array if it has a parent
     if (lecture.parent) {
       const parent = await Container.findById(lecture.parent).session(session);
@@ -547,10 +706,10 @@ exports.deletelecture = catchAsync(async (req, res, next) => {
         await parent.save({ session });
       }
     }
-    
+
     // Delete the actual lecture
     await Lecture.findByIdAndDelete(lectureId).session(session);
-    
+
     await session.commitTransaction();
     res.status(204).json({ status: "success", data: null });
   } catch (error) {

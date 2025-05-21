@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { getAllLecturers } from "../../../../routes/fetch-users";
-import { getAllLevels } from "../../../../routes/levels";
-import { getAllSubjects } from "../../../../routes/courses";
-import StudentForm from "./StudentForm";
-import ParentForm from "./ParentForm";
-import LecturerForm from "./LecturerForm";
-import AssistantForm from "./AssistantForm";
-import BulkCreateUsers from "./BulkCreateUsers";
+"use client"
 
-const CreateUserModal = ({ 
-  isOpen, 
-  onClose, 
-  onCreateUser, 
-  error 
-}) => {
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
+import { getAllLecturers } from "../../../../routes/fetch-users"
+import { getAllLevels } from "../../../../routes/levels"
+import { getAllSubjects } from "../../../../routes/courses"
+import StudentForm from "./StudentForm"
+import ParentForm from "./ParentForm"
+import LecturerForm from "./LecturerForm"
+import AssistantForm from "./AssistantForm"
+import BulkCreateUsers from "./BulkCreateUsers"
+import { governments, getAdministrationZonesForGovernment } from "../../../../constants/locations"
+const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
+  const { t, i18n } = useTranslation("createUser")
+  const isRTL = i18n.language === "ar"
+
   const initialUserState = {
     role: "student",
     name: "",
@@ -33,130 +34,131 @@ const CreateUserModal = ({
     expertise: "",
     assignedLecturer: "",
     sequencedId: "",
-  };
+    government: "",
+    administrationZone: "",
+  }
 
-  const [userData, setUserData] = useState(initialUserState);
-  const [formError, setFormError] = useState("");
-  const [isBulkMode, setIsBulkMode] = useState(false);
-  const [levels, setLevels] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [lecturers, setLecturers] = useState([]);
-  const [loadingDropdowns, setLoadingDropdowns] = useState(false);
+  const [userData, setUserData] = useState(initialUserState)
+  const [formError, setFormError] = useState("")
+  const [isBulkMode, setIsBulkMode] = useState(false)
+  const [levels, setLevels] = useState([])
+  const [subjects, setSubjects] = useState([])
+  const [lecturers, setLecturers] = useState([])
+  const [loadingDropdowns, setLoadingDropdowns] = useState(false)
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setUserData(initialUserState);
-      setFormError("");
-      setIsBulkMode(false);
-      fetchDropdownData();
+      setUserData(initialUserState)
+      setFormError("")
+      setIsBulkMode(false)
+      fetchDropdownData()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Fetch data for dropdowns
   const fetchDropdownData = async () => {
-    setLoadingDropdowns(true);
+    setLoadingDropdowns(true)
     try {
-      const levelsResult = await getAllLevels();
+      const levelsResult = await getAllLevels()
       if (levelsResult.success) {
-        setLevels(levelsResult.data.levels || []);
+        setLevels(levelsResult.data || [])
       } else {
-        console.error("Failed to fetch levels:", levelsResult.error);
+        console.error("Failed to fetch levels:", levelsResult.error)
       }
-      
-      const subjectsResult = await getAllSubjects();
+
+      const subjectsResult = await getAllSubjects()
       if (subjectsResult.success) {
-        setSubjects(subjectsResult.data || []);
+        setSubjects(subjectsResult.data || [])
       } else {
-        console.error("Failed to fetch subjects:", subjectsResult.error);
+        console.error("Failed to fetch subjects:", subjectsResult.error)
       }
-      
-      const lecturersResult = await getAllLecturers();
+
+      const lecturersResult = await getAllLecturers()
       if (lecturersResult.success) {
-        setLecturers(lecturersResult.data || []);
+        setLecturers(lecturersResult.data || [])
       } else {
-        console.error("Failed to fetch lecturers:", lecturersResult.error);
+        console.error("Failed to fetch lecturers:", lecturersResult.error)
       }
     } catch (error) {
-      setFormError("فشل في تحميل بيانات القوائم المنسدلة");
-      console.error("Error fetching dropdown data:", error);
+      setFormError(t("errors.failedToLoadDropdowns"))
+      console.error("Error fetching dropdown data:", error)
     } finally {
-      setLoadingDropdowns(false);
+      setLoadingDropdowns(false)
     }
-  };
+  }
 
   // Display error from parent component
   useEffect(() => {
     if (error) {
-      setFormError(typeof error === "string" ? error : error.message || "فشل في إنشاء المستخدم");
+      setFormError(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
     }
-  }, [error]);
+  }, [error, t])
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setUserData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const validateForm = () => {
     // Email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(userData.email)) {
-      return "البريد الإلكتروني غير صالح";
+      return t("validation.invalidEmail")
     }
 
     // Password match and length
     if (userData.password !== userData.confirmPassword) {
-      return "كلمات المرور غير متطابقة";
+      return t("validation.passwordsDoNotMatch")
     }
     if (userData.password.length < 6) {
-      return "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+      return t("validation.passwordTooShort")
     }
 
     // Role-specific validations
     if (userData.role === "student") {
       if (!userData.level) {
-        return "الرجاء تحديد المستوى الدراسي";
+        return t("validation.levelRequired")
       }
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return "رقم الهاتف غير صالح (10-15 أرقام)";
+        return t("validation.invalidPhoneNumber")
       }
     }
 
     if (userData.role === "parent") {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return "رقم الهاتف غير صالح (10-15 أرقام)";
+        return t("validation.invalidPhoneNumber")
       }
     }
 
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
-        return "الرجاء إدخال المواد الدراسية";
+        return t("validation.subjectsRequired")
       }
     }
 
     if (userData.role === "assistant") {
       if (!userData.assignedLecturer) {
-        return "الرجاء تحديد المعلم المسؤول";
+        return t("validation.lecturerRequired")
       }
     }
 
-    return "";
-  };
+    return ""
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormError("");
+    e.preventDefault()
+    setFormError("")
 
-    const validationError = validateForm();
+    const validationError = validateForm()
     if (validationError) {
-      setFormError(validationError);
-      return;
+      setFormError(validationError)
+      return
     }
 
-    const filteredData = filterDataByRole(userData);
-    console.log("Filtered Data sent to backend:", filteredData); // Log data for debugging
-    onCreateUser(filteredData);
-  };
+    const filteredData = filterDataByRole(userData)// Log data for debugging
+    onCreateUser(filteredData)
+  }
 
   const filterDataByRole = (data) => {
     const commonFields = {
@@ -166,7 +168,7 @@ const CreateUserModal = ({
       password: data.password,
       confirmPassword: data.confirmPassword,
       gender: data.gender,
-    };
+    }
 
     switch (data.role) {
       case "student":
@@ -180,58 +182,56 @@ const CreateUserModal = ({
           faction: data.faction || undefined,
           school: data.school || undefined,
           parent: data.parent || undefined,
-        };
-      
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
+        }
+
       case "parent":
         return {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
-        };
-      
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
+        }
+
       case "lecturer":
         return {
           ...commonFields,
           subject: data.subject || [],
           bio: data.bio || undefined,
           expertise: data.expertise || undefined,
-        };
-      
+          government: data.government || undefined,
+          administrationZone: data.administrationZone || undefined,
+        }
+
       case "assistant":
         return {
           ...commonFields,
           assignedLecturer: data.assignedLecturer || undefined,
-        };
-      
+        }
+
       case "subadmin":
       case "moderator":
-        return commonFields;
-      
-      default:
-        return commonFields;
-    }
-  };
+        return commonFields
 
-  if (!isOpen) return null;
+      default:
+        return commonFields
+    }
+  }
+
+  if (!isOpen) return null
 
   return (
-    <div className="modal modal-open">
+    <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"}>
       <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-xl mb-4">
-          {isBulkMode ? "إنشاء مستخدمين بالجملة" : "إنشاء مستخدم جديد"}
-        </h3>
+        <h3 className="font-bold text-xl mb-4">{isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}</h3>
 
         <div className="tabs tabs-border mb-4">
-          <button
-            className={`tab ${!isBulkMode ? "tab-active" : ""}`}
-            onClick={() => setIsBulkMode(false)}
-          >
-            إنشاء مستخدم واحد
+          <button className={`tab ${!isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(false)}>
+            {t("tabs.createSingleUser")}
           </button>
-          <button
-            className={`tab ${isBulkMode ? "tab-active" : ""}`}
-            onClick={() => setIsBulkMode(true)}
-          >
-            إنشاء بالجملة
+          <button className={`tab ${isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(true)}>
+            {t("tabs.bulkCreate")}
           </button>
         </div>
 
@@ -240,7 +240,7 @@ const CreateUserModal = ({
             <span>{formError}</span>
           </div>
         )}
-        
+
         {isBulkMode ? (
           <BulkCreateUsers />
         ) : loadingDropdowns ? (
@@ -253,7 +253,7 @@ const CreateUserModal = ({
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">نوع الحساب</span>
+                    <span className="label-text">{t("fields.accountType")}</span>
                   </label>
                   <select
                     name="role"
@@ -262,13 +262,15 @@ const CreateUserModal = ({
                     onChange={handleChange}
                     required
                   >
-                    <option value="" disabled>اختر نوع الحساب</option>
-                    <option value="subadmin">مدير فرعي</option>
-                    <option value="moderator">مشرف</option>
-                    <option value="assistant">مساعد</option>
-                    <option value="student">طالب</option>
-                    <option value="parent">ولي أمر</option>
-                    <option value="lecturer">معلم</option>
+                    <option value="" disabled>
+                      {t("placeholders.selectAccountType")}
+                    </option>
+                    <option value="subadmin">{t("roles.subadmin")}</option>
+                    <option value="moderator">{t("roles.moderator")}</option>
+                    <option value="assistant">{t("roles.assistant")}</option>
+                    <option value="student">{t("roles.student")}</option>
+                    <option value="parent">{t("roles.parent")}</option>
+                    <option value="lecturer">{t("roles.lecturer")}</option>
                   </select>
                 </div>
               </div>
@@ -276,7 +278,7 @@ const CreateUserModal = ({
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">الجنس</span>
+                    <span className="label-text">{t("fields.gender")}</span>
                   </label>
                   <select
                     name="gender"
@@ -285,8 +287,8 @@ const CreateUserModal = ({
                     onChange={handleChange}
                     required
                   >
-                    <option value="male">ذكر</option>
-                    <option value="female">أنثى</option>
+                    <option value="male">{t("gender.male")}</option>
+                    <option value="female">{t("gender.female")}</option>
                   </select>
                 </div>
               </div>
@@ -295,7 +297,7 @@ const CreateUserModal = ({
             <div className="form-control">
               <div className="flex flex-col gap-2">
                 <label className="label">
-                  <span className="label-text">الاسم</span>
+                  <span className="label-text">{t("fields.name")}</span>
                 </label>
                 <input
                   type="text"
@@ -311,7 +313,7 @@ const CreateUserModal = ({
             <div className="form-control">
               <div className="flex flex-col gap-2">
                 <label className="label">
-                  <span className="label-text">البريد الإلكتروني</span>
+                  <span className="label-text">{t("fields.email")}</span>
                 </label>
                 <input
                   type="email"
@@ -328,7 +330,7 @@ const CreateUserModal = ({
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">كلمة المرور</span>
+                    <span className="label-text">{t("fields.password")}</span>
                   </label>
                   <input
                     type="password"
@@ -344,7 +346,7 @@ const CreateUserModal = ({
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">تأكيد كلمة المرور</span>
+                    <span className="label-text">{t("fields.confirmPassword")}</span>
                   </label>
                   <input
                     type="password"
@@ -359,35 +361,37 @@ const CreateUserModal = ({
             </div>
 
             {userData.role === "student" && (
-              <StudentForm userData={userData} handleChange={handleChange} levels={levels} />
+              <StudentForm userData={userData} handleChange={handleChange} levels={levels} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "parent" && (
-              <ParentForm userData={userData} handleChange={handleChange} />
+              <ParentForm userData={userData} handleChange={handleChange} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "lecturer" && (
-              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} />
+              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
             )}
             {userData.role === "assistant" && (
-              <AssistantForm userData={userData} handleChange={handleChange} lecturers={lecturers} />
+              <AssistantForm
+                userData={userData}
+                handleChange={handleChange}
+                lecturers={lecturers}
+                t={t}
+                isRTL={isRTL}
+              />
             )}
 
             <div className="modal-action">
               <button type="button" className="btn" onClick={onClose}>
-                إلغاء
+                {t("buttons.cancel")}
               </button>
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
-                disabled={loadingDropdowns}
-              >
-                إنشاء
+              <button type="submit" className="btn btn-primary" disabled={loadingDropdowns}>
+                {t("buttons.create")}
               </button>
             </div>
           </form>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CreateUserModal;
+export default CreateUserModal

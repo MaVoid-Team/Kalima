@@ -133,12 +133,26 @@ export const bulkCreateUsers = async (formData) => {
         ...getAuthHeader(),
         "Content-Type": "multipart/form-data",
       },
-    });
-    return { success: true, data: response.data };
+    })
+    return { success: true, data: response.data }
   } catch (error) {
-    return `Failed to bulk create users: ${error.message}`
+    console.error("Bulk create users error:", error)
+
+    // Handle different error scenarios
+    if (error.response) {
+      // The server responded with a status code outside the 2xx range
+      const errorMessage =
+        error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`
+      return { success: false, error: errorMessage }
+    } else if (error.request) {
+      // The request was made but no response was received
+      return { success: false, error: "No response from server. Please check your connection." }
+    } else {
+      // Something happened in setting up the request
+      return { success: false, error: `Failed to send request: ${error.message}` }
+    }
   }
-};
+}
 
 // --------END CREATE USER--------
 

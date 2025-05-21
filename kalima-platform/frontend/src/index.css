@@ -2,6 +2,42 @@
 @plugin "daisyui" {
   themes: all;
 }
+
+@plugin "daisyui/theme" {
+  name: "a7a";
+  default: true;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(14% 0 0);
+  --color-base-200: oklch(20% 0 0);
+  --color-base-300: oklch(26% 0 0);
+  --color-base-content: oklch(97% 0 0);
+  --color-primary: oklch(79% 0.184 86.047);
+  --color-primary-content: oklch(98% 0.026 102.212);
+  --color-secondary: oklch(69% 0.17 162.48);
+  --color-secondary-content: oklch(97% 0.021 166.113);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(26% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(54% 0.245 262.881);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(62% 0.194 149.214);
+  --color-success-content: oklch(98% 0.018 155.826);
+  --color-warning: oklch(64% 0.222 41.116);
+  --color-warning-content: oklch(98% 0.016 73.684);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 2rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 1;
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }

@@ -5,7 +5,7 @@
     "like": "Like",
     "dislike": "Dislike",
     "share": "Share",
-    "attachments": "Attachments",
+
     "homeworks": "Homeworks",
     "exams": "Exams",
     "settings": "Settings",
@@ -81,6 +81,85 @@
         "name": "Mona Yehia",
         "bio": "German language assistant focused on grammar, conversation, and test prep."
       }
-    ]
+    ],
+    "common": {
+    "name": "Name",
+    "type": "Type",
+    "subject": "Subject",
+    "level": "Level",
+    "price": "Price",
+    "actions": "Actions",
+    "details": "Details",
+    "notAvailable": "N/A",
+    "pricePoints": "{{price}} points",
+    "free": "Free",
+    "noDescription": "No description",
+    "noSubject": "No subject",
+    "view": "View",
+    "student": "Student",
+    "lecture": "Lecture",
+    "score": "Score",
+    "status": "Status",
+    "submittedAt": "Submitted At",
+    "unknown": "Unknown",
+    "scoreFormat": "{{score}}/{{maxScore}} ({{percentage}}%)",
+    "passed": "Passed",
+    "failed": "Failed",
+    "loading": "Loading dashboard data...",
+    "search": "Search...",
+    "expertise": "Expertise"
+  },
+  "errors": {
+    "fetchFailed": "Failed to fetch dashboard data",
+    "occurred": "An error occurred while fetching data",
+    "noData": "No data available"
+  },
+  "containers": {
+    "title": "Containers",
+    "notFound": "No containers found"
+  },
+  "lectures": {
+    "title": "Lectures",
+    "views": "{{count}} views",
+    "hasExam": "Has Exam",
+    "viewData": "View Lecture Data",
+    "goToLecture": "Go To Lecture",
+    "notFound": "No lectures found"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "fileName": "File Name",
+    "uploadedOn": "Uploaded On",
+    "notFound": "No attachments found"
+  },
+  "examSubmissions": {
+    "title": "Exam Submissions",
+    "notFound": "No exam submissions found"
+  },
+  "homeworkSubmissions": {
+    "title": "Homework Submissions",
+    "notFound": "No homework submissions found"
+  },
+  "stats": {
+    "title": "Statistics",
+    "totalLectures": "Total Lectures",
+    "lectureViews": "Lecture Views",
+    "examSubmissions": "Exam Submissions",
+    "homeworkSubmissions": "Homework Submissions",
+    "attachments": "Attachments"
+  },
+  "tabs": {
+    "containers": "Containers",
+    "lectures": "Lectures",
+    "attachments": "Attachments",
+    "examSubmissions": "Exam Submissions",
+    "homeworkSubmissions": "Homework Submissions"
+  },
+  "roles": {
+    "admin": "Admin",
+    "lecturer": "Lecturer",
+    "student": "Student",
+    "assistant": "Assistant"
+  }
   }
   

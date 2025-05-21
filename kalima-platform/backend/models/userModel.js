@@ -5,17 +5,32 @@ const addressSchema = new mongoose.Schema({
   city: String,
   governorate: String,
 });
-
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    gender: { type: String, enum: ["male", "female","not determined"], required: true, lowercase: true },
+    gender: { type: String, enum: ["male", "female", "not determined"], required: true, lowercase: true },
     email: { type: String, unique: true, required: true },
     address: addressSchema,
     referralSource: String,
     password: { type: String, required: true }, // Added password field
     passwordChangedAt: Date,
-    isEmailVerified: { type: Boolean, default: false }
+    isEmailVerified: { type: Boolean, default: false },
+    //  government: {
+    // type: String,
+    // required: [true, 'Government is required.'],
+    // enum: {
+    //   values: governments,
+    //   message: '"{VALUE}" is not a supported government.'
+    // }
+    // },
+    //  administrationZone: {
+    //   type: String,
+    //   required: [true, 'Administration zone is required.'],
+    //   enum: {
+    //     values: egyptEducationalAdministrationZones,
+    //     message: '"{VALUE}" is not a supported administration zone.'
+    //   }
+    // },
   },
   {
     discriminatorKey: "role", // Sets the name of the discriminator identifier filed.
@@ -34,22 +49,22 @@ userSchema.pre("save",async function (next){
 })
 */
 
-userSchema.pre("save",function(next){
-  if(!this.isModified("password")||this.isNew) return next();
-  this.passwordChangedAt = new Date(Date.now()-1000);
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+  this.passwordChangedAt = new Date(Date.now() - 1000);
   next();
 })
 
-userSchema.methods.comparePassword = async function (candidatePassword,userPassword){
-  return await bcrypt.compare(candidatePassword,userPassword);
+userSchema.methods.comparePassword = async function (candidatePassword, userPassword) {
+  return await bcrypt.compare(candidatePassword, userPassword);
 }
 
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp){
-  if(this.passwordChangedAt){
-    const changeTimestamp = Math.floor(this.passwordChangedAt.getTime()/1000);
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changeTimestamp = Math.floor(this.passwordChangedAt.getTime() / 1000);
     return JWTTimestamp < changeTimestamp;
   };
-   return false;
+  return false;
 }
 
 

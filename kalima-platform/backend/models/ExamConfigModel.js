@@ -1,3 +1,4 @@
+// ExamConfigModel.js
 const mongoose = require("mongoose");
 
 const lecturerExamConfigSchema = new mongoose.Schema(
@@ -12,6 +13,12 @@ const lecturerExamConfigSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    type: {
+      type: String,
+      required: true,
+      enum: ["exam", "homework"],
+      default: "exam"
+    },
     description: {
       type: String,
       trim: true,
@@ -23,19 +30,19 @@ const lecturerExamConfigSchema = new mongoose.Schema(
     studentIdentifierColumn: {
       type: String,
       required: true,
-      default: "Email Address", // Default column name in Google Forms
+      default: "Email Address",
     },
     scoreColumn: {
       type: String,
       required: true,
-      default: "Score", // Default column name for score
+      default: "Score",
     },
     defaultPassingThreshold: {
       type: Number,
       required: true,
       min: 0,
       max: 100,
-      default: 60, // Default passing threshold at 60%
+      default: 60,
     },
     isActive: {
       type: Boolean,
