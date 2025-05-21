@@ -16,6 +16,8 @@ const studentValidation = userValidation.concat(
     faction: Joi.string().optional(),
     school: Joi.string().hex().length(24).optional(),
     parent: Joi.string().hex().length(24).optional(),
+    government: Joi.string().required(),
+    administrationZone: Joi.string().required()
   })
 );
 

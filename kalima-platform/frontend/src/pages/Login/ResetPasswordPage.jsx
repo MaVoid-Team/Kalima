@@ -5,7 +5,7 @@ import { resetPassword } from '../../routes/auth-services';
 import WaveBackground from './WaveBackground';
 
 const ResetPassword = () => {
-  const { t, i18n } = useTranslation("resetPassword");
+  const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === 'ar';
   const navigate = useNavigate();
   const location = useLocation();

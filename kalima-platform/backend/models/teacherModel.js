@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
+const { uniqueId } = require("lodash");
+const AppError = require("../utils/appError");
+const Government = require("./governmentModel");
 
 const lecturerPointsSchema = new mongoose.Schema(
   {
@@ -21,18 +24,112 @@ const teacherSchema = new mongoose.Schema(
     faction: String,
     phoneNumber: { type: String, required: true },
     subject: { type: String, required: true },
-    level: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Level",
+    level: [
+      {
+        type: String,
+        enum: ["primary", "preparatory", "secondary"],
+        required: true,
+      },
+    ],
+    socialMedia: [
+      {
+        platform: {
+          type: String,
+          enum: [
+            "Facebook",
+            "Instagram",
+            "Twitter",
+            "LinkedIn",
+            "TikTok",
+            "YouTube",
+            "WhatsApp",
+            "Telegram",
+          ],
+          required: false,
+        },
+        account: {
+          type: String,
+          required: false,
+        },
+      },
+    ],
+    phoneNumber2: {
+      type: String,
+      required: false,
+      unique: true,
+      default: null,
+      sparse: true,
+      trim: true,
+    },
+    teachesAtType: {
+      type: String,
+      enum: ["Center", "School", "Both"],
       required: true,
     },
-    school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
+    centers: [{ type: String }], // Array of strings for center names
+    school: { type: String },
     lecturerPoints: [lecturerPointsSchema],
+    government: { type: String, required: true },
+    administrationZone: { type: String, required: true },
   },
   {
     timestamps: true,
   }
 );
+
+// Custom validation for conditional required fields
+teacherSchema.pre("validate", function (next) {
+  if (
+    (this.teachesAtType === "Center" || this.teachesAtType === "Both") &&
+    (!this.centers || this.centers.length === 0)
+  ) {
+    this.invalidate(
+      "centers",
+      "At least one center is required if teachesAtType is 'Center' or 'Both'."
+    );
+  }
+  if (
+    (this.teachesAtType === "School" || this.teachesAtType === "Both") &&
+    (!this.school || this.school.trim() === "")
+  ) {
+    this.invalidate(
+      "school",
+      "School is required if teachesAtType is 'School' or 'Both'."
+    );
+  }
+  next();
+});
+teacherSchema.pre("save", function (next) {
+  if (
+    this.phoneNumber2 &&
+    this.phoneNumber &&
+    this.phoneNumber.trim() === this.phoneNumber2.trim()
+  ) {
+    this.invalidate(
+      "phoneNumber2",
+      "Phone number 2 must be different from phone number 1."
+    );
+    return next(
+      new AppError("Phone number 2 must be different from phone number 1.", 400)
+    );
+  }
+  next();
+});
+teacherSchema.pre("validate", async function (next) {
+  if (this.government && this.administrationZone) {
+    const gov = await Government.findOne({ name: this.government });
+    if (!gov) {
+      this.invalidate("government", "Selected government does not exist.");
+    } else if (!gov.administrationZone.includes(this.administrationZone)) {
+      this.invalidate(
+        "zone",
+        "Selected zone does not belong to the selected government."
+      );
+    }
+  }
+  next();
+});
+
 teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
@@ -55,6 +152,11 @@ teacherSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
 
 // Helper method to use points for a specific lecturer
 teacherSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
+  // Special case - if trying to deduct 0 points, always succeed
+  if (pointsToUse === 0) {
+    return true;
+  }
+
   const lecturerPointsEntry = this.lecturerPoints.find(
     (entry) => entry.lecturer.toString() === lecturerId.toString()
   );

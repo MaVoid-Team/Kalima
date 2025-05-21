@@ -14,20 +14,48 @@
     "addLecturer": "إضافة محاضر"
     },
     "lecturersList": {
-      "title": "المحاضرين",
-        "searchPlaceholder": "البحث عن محاضر",
-        "addLecturer": "إضافة محاضر",
-        "subjects": "المواد",
-        "noSubjects": "لا توجد مواد",
-        "viewDetails": "عرض التفاصيل",
-        "noLecturers": "لا يوجد محاضرين"
+       "title": "المحاضرون",
+      "searchPlaceholder": "ابحث عن محاضرين...",
+      "addLecturer": "إضافة محاضر",
+      "noLecturers": "لا يوجد محاضرون",
+      "subjects": "المواد",
+      "noSubjects": "لا توجد مواد معينة",
+      "viewDetails": "عرض التفاصيل",
+      
+      "lecturerAddedSuccess": "تم إضافة المحاضر بنجاح",
+      "lecturerAddedError": "فشل إضافة المحاضر",
+      "subjectAddedSuccess": "تم إضافة المادة بنجاح",
+      "subjectAddedError": "فشل إضافة المادة",
+      
+      "lecturerName": "اسم المحاضر",
+      "lecturerNamePlaceholder": "أدخل اسم المحاضر",
+      "lecturerPhone": "رقم الهاتف",
+      "lecturerPhonePlaceholder": "أدخل رقم الهاتف",
+      "lecturerSubjects": "المواد",
+      "selectSubject": "اختر مادة",
+      
+      "addNewSubject": "إضافة مادة جديدة",
+      "newSubjectPlaceholder": "أدخل اسم المادة",
+      "addSubjectButton": "إضافة المادة",
+      
+      "submitLecturer": "إضافة المحاضر",
+      "cancel": "إلغاء"
     },
-    "courseList": {
-      "title": "الدورات",
-      "addCourse": "إضافة دورة",
-      "noCourses": "لا توجد دورات متاحة",
+    
+     "courseList": {
+      "title": "جدول المحاضرات",
       "addLecture": "إضافة محاضرة",
-      "noLessons": "لا توجد محاضرات"
+      "noLessons": "لا توجد دروس",
+      "filters": {
+        "allLevels": "جميع المستويات",
+        "allLecturers": "جميع المحاضرين"
+      },
+      "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+      },
+      "na": "غير متوفر"
+    
     },
     "barCodeScanner": {
       "title": "قارئ رمز الاستجابة السريعة",
@@ -178,6 +206,7 @@
   },
   "courseCard": {
   "session": "الحصة {{session}}",
+  "showDetails" : "اظهار التفاصيل",
   "types": {
     "lecture": "محاضرة",
     "tutorial": "تمرين",
@@ -288,5 +317,31 @@
     "homework": ":الواجبات المنزلية",
     "total": ":المجموع الكلي",
     "viewReport": "عرض التقرير"
+  },
+
+   "revenue": {
+    "loading": "جاري التحميل...",
+    "error": "فشل تحميل بيانات الإيرادات",
+    "summary": {
+      "totalRevenue": "إجمالي الإيرادات",
+      "lessonRevenue": "إيرادات الدروس",
+      "bookletRevenue": "إيرادات الكتيبات",
+      "attendancesPaid": "الحضور المدفوع"
+    },
+    "paymentTypes": {
+      "cash": "نقدي",
+      "card": "بطاقة",
+      "transfer": "تحويل",
+      "daily": "يومي",
+      "multi-session": "جلسات متعددة"
+    },
+    "withBookletSuffix": "(مع كتيب)",
+    "labels": {
+      "count": "العدد",
+      "lessonRev": "إيراد الدروس",
+      "bookletRev": "إيراد الكتيبات",
+      "totalRev": "إجمالي الإيراد"
+    }
   }
+  
 }

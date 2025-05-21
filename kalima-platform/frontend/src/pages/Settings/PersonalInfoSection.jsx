@@ -4,6 +4,7 @@ import SectionHeader from "./SectionHeader"
 import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
+import { Check, X } from "lucide-react"
 
 function PersonalInfoSection() {
   const { t, i18n } = useTranslation("settings")
@@ -94,75 +95,75 @@ function PersonalInfoSection() {
 
   // Handle save changes
   const handleSave = async (field) => {
-    // Set update status to loading
-    setUpdateStatus({
-      loading: true,
-      success: false,
-      error: null,
-      field
-    })
+  // Set update status to loading
+  setUpdateStatus({
+    loading: true,
+    success: false,
+    error: null,
+    field
+  });
 
-    try {
-      // Map form field names to API field names
-      const fieldMapping = {
-        fullName: 'name',
-        phoneNumber: 'phoneNumber',
-        email: 'email'
-      }
+  try {
+    // Map form field names to API field names
+    const fieldMapping = {
+      fullName: 'name',
+      phoneNumber: 'phoneNumber',
+      email: 'email'
+    };
 
-      // Create update data object with the correct field name
-      const updateData = {
+    // Create update data object with the correct field name
+    const updateData = {
+      [fieldMapping[field]]: formData[field]
+    };
+
+    // Call the update API using the new service
+    const result = await updateCurrentUser(updateData);
+
+    if (result.success) {
+      // Update local userData state
+      setUserData(prev => ({
+        ...prev,
         [fieldMapping[field]]: formData[field]
-      }
+      }));
 
-      // Call the update API
-      const result = await updateCurrentUser(updateData)
+      // Set success status
+      setUpdateStatus({
+        loading: false,
+        success: true,
+        error: null,
+        field
+      });
 
-      if (result.success) {
-        // Update local userData state
-        setUserData(prev => ({
+      // Exit edit mode
+      toggleEdit(field);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setUpdateStatus(prev => ({
           ...prev,
-          [fieldMapping[field]]: formData[field]
-        }))
-
-        // Set success status
-        setUpdateStatus({
-          loading: false,
-          success: true,
-          error: null,
-          field
-        })
-
-        // Exit edit mode
-        toggleEdit(field)
-
-        // Clear success message after 3 seconds
-        setTimeout(() => {
-          setUpdateStatus(prev => ({
-            ...prev,
-            success: false,
-            field: null
-          }))
-        }, 3000)
-      } else {
-        // Set error status
-        setUpdateStatus({
-          loading: false,
           success: false,
-          error: result.error || "Failed to update",
-          field
-        })
-      }
-    } catch (error) {
-      console.error("Error updating user data:", error)
+          field: null
+        }));
+      }, 3000);
+    } else {
+      // Set error status
       setUpdateStatus({
         loading: false,
         success: false,
-        error: "An unexpected error occurred",
+        error: result.error || "Failed to update",
         field
-      })
+      });
     }
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    setUpdateStatus({
+      loading: false,
+      success: false,
+      error: "An unexpected error occurred",
+      field
+    });
   }
+};
 
   // Get all translations under personalInfo namespace
   const personalInfo = t('personalInfo', { returnObjects: true })
@@ -212,7 +213,7 @@ function PersonalInfoSection() {
 
           {/* User Role Badge */}
           <div className="mb-4 flex justify-end">
-            <div className="badge badge-primary badge-lg">{userData?.role}</div>
+            <div className="badge badge-primary badge-lg">{t(`role.${userData?.role?.toLowerCase()}`, {ns:"common"})}</div>
           </div>
 
           {/* Full Name Field */}
@@ -230,14 +231,14 @@ function PersonalInfoSection() {
                     onClick={() => handleSave('fullName')}
                     disabled={updateStatus.loading}
                   >
-                    {personalInfo.buttons.save}
+                    <Check className="w-4 h-4" />
                   </button>
                   <button 
                     className="btn btn-sm btn-outline" 
                     onClick={() => toggleEdit('fullName')}
                     disabled={updateStatus.loading && updateStatus.field === 'fullName'}
                   >
-                    {personalInfo.buttons.cancel}
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
@@ -282,14 +283,14 @@ function PersonalInfoSection() {
                     onClick={() => handleSave('phoneNumber')}
                     disabled={updateStatus.loading}
                   >
-                    {personalInfo.buttons.save}
+                    <Check className="w-4 h-4" />
                   </button>
                   <button 
                     className="btn btn-sm btn-outline" 
                     onClick={() => toggleEdit('phoneNumber')}
                     disabled={updateStatus.loading && updateStatus.field === 'phoneNumber'}
                   >
-                    {personalInfo.buttons.cancel}
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
@@ -334,14 +335,14 @@ function PersonalInfoSection() {
                     onClick={() => handleSave('email')}
                     disabled={updateStatus.loading}
                   >
-                    {personalInfo.buttons.save}
+                    <Check className="w-4 h-4" />
                   </button>
                   <button 
                     className="btn btn-sm btn-outline" 
                     onClick={() => toggleEdit('email')}
                     disabled={updateStatus.loading && updateStatus.field === 'email'}
                   >
-                    {personalInfo.buttons.cancel}
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
@@ -393,11 +394,11 @@ function PersonalInfoSection() {
           {userData?.role === 'Student' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.generalPoints || 'General Points'}</div>
+                <div className="stat-title">{personalInfo.labels.generalPoints || t('General Points')}</div>
                 <div className="stat-value">{userData.generalPoints || 0}</div>
               </div>
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.totalPoints || 'Total Points'}</div>
+                <div className="stat-title">{personalInfo.labels.totalPoints || t('Total Points')}</div>
                 <div className="stat-value">{userData.totalPoints || 0}</div>
               </div>
             </div>

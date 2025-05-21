@@ -1,118 +1,138 @@
-import { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import LanguageSwitcher from './LanguageSwitcher';
-import { isLoggedIn, getUserDashboard, logoutUser } from '../routes/auth-services';
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import LanguageSwitcher from "./LanguageSwitcher";
+import NotificationCenter from "./NotificationCenter";
+import {
+  isLoggedIn,
+  getUserDashboard,
+  logoutUser,
+} from "../routes/auth-services";
 
 const NavBar = () => {
-  const { t, i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation("common");
   const [menuOpen, setMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const isAr = i18n.language === 'ar';
+  const [userId, setUserId] = useState(null);
+  const isAr = i18n.language === "ar";
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
-
+  const navigate = useNavigate();
   const fetchUserRole = async () => {
     if (isLoggedIn()) {
       try {
         const result = await getUserDashboard();
         if (result.success) {
           setUserRole(result.data.data.userInfo.role);
+          setUserId(result.data.data.userInfo.id);
         } else {
           setUserRole(null);
+          setUserId(null);
         }
       } catch (err) {
         setUserRole(null);
+        setUserId(null);
         console.error(err);
       }
     } else {
       setUserRole(null);
+      setUserId(null);
     }
   };
 
   useEffect(() => {
     fetchUserRole();
 
-    // Listen for login status changes
     const handleStorageChange = () => {
       fetchUserRole();
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    const handleCustomAuthChange = () => {
+      fetchUserRole();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("user-auth-changed", handleCustomAuthChange);
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("user-auth-changed", handleCustomAuthChange);
     };
   }, []);
-
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuOpen && 
-          !navbarRef.current?.contains(event.target) && 
-          !menuRef.current?.contains(event.target)) {
+      if (
+        menuOpen &&
+        !navbarRef.current?.contains(event.target) &&
+        !menuRef.current?.contains(event.target)
+      ) {
         setMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [menuOpen]);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
+    document.body.style.overflow = menuOpen ? "hidden" : "auto";
   }, [menuOpen]);
 
   const handleLogout = async () => {
     try {
       await logoutUser();
       setUserRole(null);
+      setUserId(null);
       setMenuOpen(false);
+      navigate("/");
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error("Logout failed:", err);
     }
   };
 
   const getDashboardPath = (role) => {
     switch (role) {
-      case 'Student':
-        return '/dashboard/student-dashboard/promo-codes';
-      case 'Lecturer':
-        return '/dashboard/lecturer-dashboard';
-      case 'Admin':
-      case 'Moderator':
-      case 'Subadmin':
-        return '/dashboard/admin-dashboard';
-      case 'Assistant':
-        return '/dashboard/assistant-dashboard';
+      case "Student":
+        return "/dashboard/student-dashboard/promo-codes";
+      case "Lecturer":
+        return "/dashboard/lecturer-dashboard";
+      case "Admin":
+      case "Moderator":
+      case "Subadmin":
+        return "/dashboard/admin-dashboard";
+      case "Assistant":
+        return "/dashboard/assistant-dashboard";
       default:
-        return '/';
+        return "/";
     }
   };
 
   const navItems = [
-    { key: 'homepage', path: '/' },
-    { key: 'educationalCourses', path: '/courses' },
-    { key: 'teachers', path: '/teachers' },
-    { key: 'lectures', path: '/lectures' },
-    { key: 'Packages', path: '/packages' },
+    { key: "homepage", path: "/" },
+    { key: "educationalCourses", path: "/courses" },
+    { key: "teachers", path: "/teachers" },
+    { key: "lectures", path: "/lectures" },
+    { key: "Packages", path: "/packages" },
   ];
 
   const authItems = [
-    { key: 'signup', path: '/register' },
-    { key: 'signin', path: '/login' },
+    { key: "signup", path: "/register" },
+    { key: "signin", path: "/login" },
   ];
 
   return (
-    <div className="navbar top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky" dir={isAr ? 'rtl' : 'ltr'}>
+    <div
+      className="navbar top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky"
+      dir={isAr ? "rtl" : "ltr"}
+    >
       <div ref={navbarRef} className="flex-1 flex justify-between items-center">
         {/* Left side - Logo and navigation items */}
         <div className="flex items-center gap-4">
           {/* Mobile menu button */}
-          <div>
-            
-          </div>
+          <div></div>
           <button
             className="btn btn-ghost lg:hidden"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -132,19 +152,19 @@ const NavBar = () => {
               />
             </svg>
           </button>
-          
+
           {/* Logo */}
           <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
-            <img 
-              src="/Kalima.png" 
-              alt="Logo" 
+            <img
+              src="/Kalima.png"
+              alt="Logo"
               className="w-10 h-10 rounded-full"
             />
             <span className="text-xl font-bold text-primary ml-2">
-              {t('logoText')}
+              {t("logoText")}
             </span>
           </Link>
-          
+
           {/* Desktop Navigation Items */}
           <div className="hidden lg:flex xl:gap-4 ml-4 rounded-2xl">
             {navItems.map((item) => (
@@ -157,8 +177,11 @@ const NavBar = () => {
               </Link>
             ))}
             {userRole && (
-              <Link to={getDashboardPath(userRole)} className="btn btn-ghost rounded-2xl">
-                {t('dashboard')}
+              <Link
+                to={getDashboardPath(userRole)}
+                className="btn btn-ghost rounded-2xl"
+              >
+                {t("dashboard")}
               </Link>
             )}
             <LanguageSwitcher />
@@ -166,20 +189,23 @@ const NavBar = () => {
         </div>
 
         {/* Auth buttons - Desktop */}
-        <div className="flex-none hidden lg:flex gap-2 ml-4">
+        <div className="flex-none hidden lg:flex items-center gap-2 ml-4">
+          {userId && <NotificationCenter userId={userId} />}
           {userRole ? (
             <button
               onClick={handleLogout}
               className="btn btn-outline rounded-2xl"
             >
-              {t('logout')}
+              {t("logout")}
             </button>
           ) : (
             authItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
-                className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} rounded-2xl`}
+                className={`btn ${
+                  item.key === "signup" ? "btn-primary" : "btn-outline"
+                } rounded-2xl`}
               >
                 {t(item.key)}
               </Link>
@@ -192,28 +218,34 @@ const NavBar = () => {
       {menuOpen && (
         <>
           {/* Backdrop overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setMenuOpen(false)}
           ></div>
-          
+
           {/* Drawer */}
           <div
             ref={menuRef}
-            className={`lg:hidden w-1/2 sm:w-1/3 fixed ${isAr ? 'right-0' : 'left-0'} top-0 h-full bg-base-100 z-50 overflow-y-auto transition-transform duration-300 ease-in-out`}
-            dir={isAr ? 'rtl' : 'ltr'}
+            className={`lg:hidden w-1/2 sm:w-1/3 fixed ${
+              isAr ? "right-0" : "left-0"
+            } top-0 h-full bg-base-100 z-50 overflow-y-auto transition-transform duration-300 ease-in-out`}
+            dir={isAr ? "rtl" : "ltr"}
           >
             <div className="p-4 space-y-4 h-full">
               {/* Mobile menu header */}
               <div className="flex items-center justify-around mb-6">
-                <Link to="/" className="flex items-center gap-2" onClick={() => setMenuOpen(false)}>
-                  <img 
-                    src="/Kalima.png" 
-                    alt="Logo" 
+                <Link
+                  to="/"
+                  className="flex items-center gap-2"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <img
+                    src="/Kalima.png"
+                    alt="Logo"
                     className="w-10 h-10 rounded-full"
                   />
                   <span className="text-xl font-bold text-primary">
-                    {t('logoText')}
+                    {t("logoText")}
                   </span>
                 </Link>
                 <button
@@ -241,47 +273,53 @@ const NavBar = () => {
               <ul className="menu menu-lg p-0 [&_li>*]:rounded-lg">
                 {navItems.map((item) => (
                   <li key={item.key}>
-                    <Link
-                      to={item.path}
-                      onClick={() => setMenuOpen(false)}
-                    >
+                    <Link to={item.path} onClick={() => setMenuOpen(false)}>
                       {t(item.key)}
                     </Link>
                   </li>
                 ))}
-                
+
                 {userRole && (
                   <li>
                     <Link
                       to={getDashboardPath(userRole)}
                       onClick={() => setMenuOpen(false)}
                     >
-                      {t('dashboard')}
+                      {t("dashboard")}
                     </Link>
                   </li>
                 )}
               </ul>
-              
+
               <div className="divider"></div>
-              
+
               <div className="flex flex-col gap-2">
                 <div className="mb-4">
                   <LanguageSwitcher />
                 </div>
-                
+
+                {userId && (
+                  <div className="flex py-2">
+                    <NotificationCenter userId={userId} />
+                    <span className="ml-2">{t("notifications")}</span>
+                  </div>
+                )}
+
                 {userRole ? (
                   <button
                     onClick={handleLogout}
                     className="btn btn-outline w-full justify-start"
                   >
-                    {t('logout')}
+                    {t("logout")}
                   </button>
                 ) : (
                   authItems.map((item) => (
                     <Link
                       key={item.key}
                       to={item.path}
-                      className={`btn ${item.key === 'signup' ? 'btn-primary' : 'btn-outline'} w-full justify-start`}
+                      className={`btn ${
+                        item.key === "signup" ? "btn-primary" : "btn-outline"
+                      } w-full justify-start`}
                       onClick={() => setMenuOpen(false)}
                     >
                       {t(item.key)}

@@ -8,25 +8,44 @@ const QueryFeatures = require("../utils/queryFeatures");
 
 exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
   const { student, lecture } = req.body;
-
-  // Check if the lecture requires an exam
-  const lectureDoc = await Lecture.findById(lecture).populate("examConfig");
+  // Check if the lecture requires exam or homework
+  const lectureDoc = await Lecture.findById(lecture)
+    .populate("examConfig")
+    .populate("homeworkConfig");
   if (!lectureDoc) {
     return next(new AppError("Lecture not found", 404));
   }
 
-  // If lecture requires an exam, verify that student has passed it
+  // If lecture requires exam, verify that student has passed it
   if (lectureDoc.requiresExam) {
     const examSubmission = await StudentExamSubmission.findOne({
       student,
       lecture,
       passed: true,
+      type: "exam",
     });
 
     if (!examSubmission) {
       return next(
         new AppError(
           "You must pass the exam before accessing this lecture",
+          403
+        )
+      );
+    }
+  }
+
+  if (lectureDoc.requiresHomework) {
+    const homeworkSubmission = await StudentExamSubmission.findOne({
+      student,
+      lecture,
+      passed: true,
+      type: "homework",
+    });
+    if (!homeworkSubmission) {
+      return next(
+        new AppError(
+          "You must pass the homework before accessing this lecture",
           403
         )
       );
@@ -105,51 +124,76 @@ exports.deleteStudentLectureAccess = catchAsync(async (req, res, next) => {
 exports.checkLectureAccess = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
   const studentId = req.user._id;
-
-  // Get the lecture
-  const lecture = await Lecture.findById(lectureId).populate("examConfig");
+  // Get the lecture and populate both configs
+  const lecture = await Lecture.findById(lectureId)
+    .populate("examConfig")
+    .populate("homeworkConfig");
   if (!lecture) {
     return next(new AppError("Lecture not found", 404));
   }
 
-  // Check if lecture requires an exam
-  if (lecture.requiresExam) {
-    // Verify student has passed the exam
-    const examSubmission = await StudentExamSubmission.findOne({
-      student: studentId,
-      lecture: lectureId,
-      passed: true,
-    });
+  // Check requirements
+  if (lecture.requiresExam || lecture.requiresHomework) {
+    const results = {
+      exam: lecture.requiresExam ? {
+        required: true,
+        passed: false,
+        url: lecture.examConfig ? lecture.examConfig.formUrl : null,
+        passingThreshold: lecture.examConfig ? lecture.examConfig.defaultPassingThreshold : 60
+      } : null,
+      homework: lecture.requiresHomework ? {
+        required: true,
+        passed: false,
+        url: lecture.homeworkConfig ? lecture.homeworkConfig.formUrl : null,
+        passingThreshold: lecture.homeworkConfig ? lecture.homeworkConfig.defaultPassingThreshold : 60
+      } : null
+    };
 
-    // If no passing exam submission, provide exam information
-    if (!examSubmission) {
-      return res.status(403).json({
+    // Check exam if required
+    if (lecture.requiresExam) {
+      const examSubmission = await StudentExamSubmission.findOne({
+        student: studentId,
+        lecture: lectureId,
+        type: "exam",
+        passed: true,
+      });
+      results.exam.passed = !!examSubmission;
+    }
+
+    // Check homework if required
+    if (lecture.requiresHomework) {
+      const homeworkSubmission = await StudentExamSubmission.findOne({
+        student: studentId,
+        lecture: lectureId,
+        type: "homework",
+        passed: true,
+      });
+      results.homework.passed = !!homeworkSubmission;
+    }
+
+    // If any required submission is not passed, return restricted access
+    if ((lecture.requiresExam && !results.exam.passed) || 
+        (lecture.requiresHomework && !results.homework.passed)) {
+      return res.status(200).json({
         status: "restricted",
-        message: "You must pass the exam before accessing this lecture",
-        data: {
-          requiresExam: true,
-          examUrl: lecture.examConfig ? lecture.examConfig.formUrl : null,
-          passingThreshold:
-            lecture.passingThreshold ||
-            (lecture.examConfig
-              ? lecture.examConfig.defaultPassingThreshold
-              : 60),
-        },
+        message: "You must complete all required submissions before accessing this lecture",
+        data: results
       });
     }
   }
 
   // If exam is passed or not required, check standard access permissions
   // Rest of your existing access control logic would go here
-
-  // For now, return success and indicate exam is passed
+  // Return success with exam and homework status
   res.status(200).json({
     status: "success",
     message: "Access granted",
     data: {
       hasAccess: true,
       requiresExam: lecture.requiresExam,
+      requiresHomework: lecture.requiresHomework,
       examPassed: lecture.requiresExam ? true : undefined,
+      homeworkPassed: lecture.requiresHomework ? true : undefined
     },
   });
 });
@@ -157,29 +201,30 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
 // Get student lecture access by lecture ID
 exports.getLectureAccessByLectureId = catchAsync(async (req, res, next) => {
   const { lectureId } = req.params;
-  
+
   // Verify lecture exists
   const lecture = await Lecture.findById(lectureId);
   if (!lecture) {
     return next(new AppError("Lecture not found", 404));
   }
-  
+
   // Find all access records for this lecture
-  const accessRecords = await StudentLectureAccess.find({ lecture: lectureId })
-    .populate({
-      path: 'student',
-      select: 'name email' // Include student details you want to return
-    });
-  
+  const accessRecords = await StudentLectureAccess.find({
+    lecture: lectureId,
+  }).populate({
+    path: "student",
+    select: "name email", // Include student details you want to return
+  });
+
   res.status(200).json({
     status: "success",
     results: accessRecords.length,
     data: {
       lecture: {
         _id: lecture._id,
-        name: lecture.name
+        name: lecture.name,
       },
-      accessRecords
-    }
+      accessRecords,
+    },
   });
 });

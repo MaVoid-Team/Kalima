@@ -68,7 +68,6 @@ exports.requestPasswordReset = catchAsync(async (req, res, next) => {
     console.log(`Password reset OTP sent to ${email}`);
   } catch (error) {
     console.error('Error sending email:', error);
-    console.log(`OTP for ${email}: ${otp}`); // For development/testing only
   }
 
   // Return success regardless of email sending status (for security)

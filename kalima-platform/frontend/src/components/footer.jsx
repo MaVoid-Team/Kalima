@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Music2,Youtube } from 'lucide-react';
 import { Link } from "react-router-dom";
 
 export default function Footer() {
@@ -13,9 +13,25 @@ export default function Footer() {
           {/* Contact Info */}
           <div className={isRTL ? 'text-right' : 'text-left'}>
             <h3 className="text-xl font-bold mb-4">{t('contact')}</h3>
-            <p className="mb-2">01021554154</p>
-            <p className="mb-4">01158551515</p>
+            <p className="mb-2">01027314148</p>
             <h4 className="text-lg font-bold mb-2">{t('followUs')}</h4>
+            <div className='flex gap-4 '>
+              <a href="https://www.facebook.com/kalima010" target="_blank" rel="noopener noreferrer">
+                <Facebook className="w-5 h-5 hover:text-blue-600 transition-colors" />
+              </a>
+              <a target="_blank" rel="noopener noreferrer">
+                <Instagram className="w-5 h-5 hover:text-pink-500 transition-colors" />
+              </a>
+              <a href="https://www.youtube.com/@kalima1" target="_blank" rel="noopener noreferrer">
+                <Youtube className="w-5 h-5 hover:text-red-500 transition-colors" />
+              </a>
+              <a target="_blank" rel="noopener noreferrer">
+                <Twitter className="w-5 h-5 hover:text-blue-400 transition-colors" />
+              </a>
+              <a target="_blank" rel="noopener noreferrer">
+                <Music2 className="w-5 h-5 hover:text-pink-500 transition-colors" />
+              </a>
+            </div>
           </div>
 
           {/* Links */}

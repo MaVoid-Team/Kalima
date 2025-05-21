@@ -15,10 +15,15 @@ router
 router
   .route("/:userId")
   .get(userController.getUser)
-  .patch(validateUser, userController.updateUser)
+  .patch(
+    validateUser,
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    userController.updateUser
+  )
   .delete(
     verifyJWT,
-    authController.verifyRoles("Admin"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     userController.deleteUser
   );
 
@@ -35,6 +40,12 @@ router.use(verifyJWT);
 
 // Get current user's data (for student/parent only)
 router.get("/me/dashboard", userController.getMyData);
+
+// Get parent's children data with detailed information
+router.get("/me/children", userController.getParentChildrenData);
+
+// Update current user profile information
+router.patch("/me/update", userController.updateMe);
 
 router.route("/update/password").patch(userController.changePassword);
 

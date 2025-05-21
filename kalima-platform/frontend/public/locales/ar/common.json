@@ -30,8 +30,21 @@
       "3rd Preparatory": "الصف الثالث الإعدادي",
       "1st Secondary": "الصف الأول الثانوي",
       "2nd Secondary": "الصف الثاني الثانوي",
-      "3rd Secondary": "الصف الثالث الثانوي"
+      "3rd Secondary": "الصف الثالث الثانوي",
+      "undefined": "غير محدد"
 },
+  "role" :{
+    "student": "طالب",
+    "teacher": "معلم",
+    "admin": "مسؤول",
+    "assistnat": "مساعد"
+  },
+  "passwordStrength": {
+    "label": "القوّة:",
+    "weak": "ضعيف",
+    "medium": "متوسّط",
+    "strong": "قوي"
+  },
   "dashboard": "لوحة القيادة",
   "profile": "معلوماتي",
   "courses": "كورساتي",
@@ -49,5 +62,6 @@
   "myDashboard": "لوحة التحكم",
   "Packages": "الباقات",
   "select": "اختر",
-  "Create": "اضافة"
+  "Create": "اضافة",
+  "MyLectures": "محاضراتي"
   }

@@ -1,61 +1,131 @@
+"use client"
+
 import { useTranslation } from "react-i18next"
+import { useState, useEffect, useRef } from "react"
+import QRCode from "qrcode"
 
 export function AppDownloadSection() {
   const { t, i18n } = useTranslation("home")
   const isRTL = i18n.language === "ar"
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const appDownloadUrl = "https://play.google.com/apps/test/com.kalimatest.mavoid/8"
+  const qrCodeRef = useRef(null)
+
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        // Generate QR code as data URL
+        const dataUrl = await QRCode.toDataURL(appDownloadUrl, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        })
+
+        setQrCodeDataUrl(dataUrl)
+        setIsLoading(false)
+      } catch (err) {
+        console.error("Error generating QR code:", err)
+        setError("Failed to generate QR code")
+        setIsLoading(false)
+      }
+    }
+
+    generateQRCode()
+  }, [appDownloadUrl])
 
   return (
-    <div className="w-full px-4 sm:px-6 md:px-8 py-12">
-      <section
-        className="border-yellow-500 border-4 rounded-full max-w-7xl mx-auto p-4 sm:p-6 md:p-8"
-        dir={isRTL ? "rtl" : "ltr"}
-      >
-        <div className="container mx-auto">
-          <div className="flex flex-row justify-between items-center">
-            {/* Image Section - Order changes based on RTL */}
-            <div className={`flex justify-center ${isRTL ? "md:order-1" : "md:order-2"}`}>
-              <div className="relative">
-                <img
-                  src="/qr-code.png"
-                  alt="Mobile App"
-                  className="h-60 sm:h-70 md:h-80 object-contain md:hover:scale-150 animate-none transition-all duration-500"
-                />
-                <div
-                  className={`absolute -top-4 ${isRTL ? "-right-4" : "-left-4"} w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 border-2 border-dashed border-primary rounded-full`}
-                ></div>
-                <div
-                  className={`absolute -bottom-4 ${isRTL ? "-left-4" : "-right-4"} w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 border-2 border-dashed border-primary rounded-full`}
-                ></div>
-              </div>
-            </div>
+    <div className="w-full py-16 overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* Yellow border overlay */}
+        <div className="absolute inset-0 border-4 border-primary rounded-[3rem] -z-0"></div>
 
-            {/* Text Content - Order changes based on RTL */}
-            <div className={`${isRTL ? "text-right md:order-2" : "text-left md:order-1"}`}>
-              <h2 className="text-2xl sm:text-3xl md:text-6xl font-bold mb-2 sm:mb-4">
-                {t("appDownload.title")}
-                <span className="text-primary"> {t("appDownload.now")}</span>
+        {/* Blue accent dots */}
+        <div className="absolute top-0 right-0 w-24 h-24 rounded-full border-4 border-dashed border-blue-500 opacity-30 -translate-y-1/4 translate-x-1/4"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full border-4 border-dashed border-blue-500 opacity-30 translate-y-1/4 -translate-x-1/4"></div>
+
+        <div className="relative z-10 py-8 md:py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+            {/* Text Content */}
+            <div className={`text-center md:text-left md:w-1/2 ${isRTL ? "md:order-2" : "md:order-1"}`}>
+              <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isRTL ? "text-right" : "text-left"}`}>
+                <span>{t("appDownload.title") || "Download"}</span>{" "}
+                <span>{t("appDownload.now") || "Our App Now"}</span>
               </h2>
-              <p className="mb-4 sm:mb-6 text-base-content/80 sm:text-xl md:text-3xl mt-14 px-4 hidden md:block">
-                {t("appDownload.content1")}
-                <span className="text-primary text-3xl hidden md:block"> {t("appDownload.now")}</span> {t("appDownload.content2")}
-                <span className="text-primary text-3xl hidden md:block"> {t("appDownload.everywhere")}</span>
+
+              <p className={`text-lg md:text-xl mb-6 ${isRTL ? "text-right" : "text-left"}`}>
+                {t("appDownload.content1") || "Best free educational app. Download our app"}{" "}
+                <span className="text-primary">{t("appDownload.now") || "now"}</span>{" "}
+                {t("appDownload.content2") || "on your mobile to learn"}{" "}
+                <span className="text-primary">{t("appDownload.everywhere") || "everywhere"}</span>
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Curved Arrow - Responsive positioning */}
-        <div className="relative mt-4 flex">
-          <div className={`h-16 sm:h-20 md:h-24 w-16 sm:w-20 md:w-24 ${isRTL ? "ml-auto" : "mr-auto"} animate-pulse`}>
-            <img
-              src="curved-arrow-services.png"
-              alt="curved-arrow"
-              className={`transform ${isRTL ? "" : "scale-x-[-1]"} translate-y-8 sm:translate-y-16 md:translate-y-24 ${isRTL ? "-translate-x-1/4" : "translate-x-1/4"}`}
-            />
+            {/* QR Code Section */}
+            <div className={`md:w-1/2 flex justify-center ${isRTL ? "md:order-1" : "md:order-2"}`}>
+              <div className="relative p-2 bg-white rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
+                {isLoading ? (
+                  <div className="h-48 w-48 md:h-64 md:w-64 flex items-center justify-center bg-gray-100">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                  </div>
+                ) : error ? (
+                  <div className="h-48 w-48 md:h-64 md:w-64 flex items-center justify-center bg-gray-100 text-red-500">
+                    <div className="text-center p-4">
+                      <p>{error}</p>
+                      <button
+                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={() => {
+                          setIsLoading(true)
+                          QRCode.toDataURL(appDownloadUrl, {
+                            width: 300,
+                            margin: 2,
+                          })
+                            .then((url) => {
+                              setQrCodeDataUrl(url)
+                              setIsLoading(false)
+                              setError(null)
+                            })
+                            .catch((err) => {
+                              setError("Failed to generate QR code")
+                              setIsLoading(false)
+                            })
+                        }}
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative group">
+                    <img
+                      ref={qrCodeRef}
+                      src={qrCodeDataUrl || "/placeholder.svg"}
+                      alt="Download App QR Code"
+                      className="h-48 w-48 md:h-64 md:w-64 object-contain"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 transition-opacity duration-300">
+                      <p className="text-white font-bold bg-blue-500 px-3 py-1 rounded">
+                        {t("appDownload.scan") || "Scan Me"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Decorative elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-secondary rounded-full"></div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-secondary rounded-full"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }
-

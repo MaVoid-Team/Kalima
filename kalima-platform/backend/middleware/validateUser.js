@@ -42,7 +42,6 @@ const validateUser = catchAsync(async (req, res, next) => {
   req.body.password = password
   req.body.role = role
   req.body.confirmPassword = confirmPassword // Add confirmPassword back to the request body
-
   /* Depending if the request was a patch to update a user
   A copy of the schema is made with optional fields.  */
 
@@ -50,10 +49,18 @@ const validateUser = catchAsync(async (req, res, next) => {
   let error;
   schema = roleSchemas[role.toLowerCase()]
   if (req.method === "PATCH") {
+    // Create a partial schema where all fields are optional
     const partialSchema = schema.fork(
       Object.keys(schema.describe().keys),
       (field) => field.optional() // Make all fields optional
     );
+    
+    // For role field specifically, we need to handle it specially for moderator/subadmin
+    if (role.toLowerCase() === 'moderator' || role.toLowerCase() === 'subadmin') {
+      // Override role in the request body to ensure it matches exactly what validation expects
+      req.body.role = role.toLowerCase();
+    }
+    
     error = partialSchema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true, // Ignore fields not in the schema

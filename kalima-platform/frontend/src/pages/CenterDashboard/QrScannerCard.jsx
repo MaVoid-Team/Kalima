@@ -48,7 +48,6 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
         .then(() => {
           isRunningRef.current = true
           setLoading(false)
-          console.log("Scanner started successfully")
         })
         .catch((err) => {
           setError(translations.cameraError || "Could not access camera. Please check permissions.")
@@ -70,7 +69,6 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
         scannerRef.current
           .stop()
           .then(() => {
-            console.log("Scanner stopped successfully")
           })
           .catch((err) => {
             console.warn("Error stopping scanner (handled):", err)
@@ -101,7 +99,6 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
       // Try to stop scanner
       if (scannerRef.current) {
         scannerRef.current.stop()
-        console.log("Scanner stopped after successful scan")
       }
     } catch (err) {
       console.warn("Error stopping scanner after scan (handled):", err)
@@ -132,7 +129,6 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
 
   const onScanError = (error) => {
     // Don't show errors for normal scanning attempts
-    console.log("Scan error (normal during scanning):", error)
   }
 
   const resetScanner = () => {

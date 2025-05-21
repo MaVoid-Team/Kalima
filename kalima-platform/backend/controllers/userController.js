@@ -5,10 +5,15 @@ const Lecturer = require("../models/lecturerModel.js");
 const Student = require("../models/studentModel.js");
 const Teacher = require("../models/teacherModel.js");
 const Assistant = require("../models/assistantModel.js");
+const Moderator = require("../models/moderatorModel.js");
+const SubAdmin = require("../models/subAdminModel.js");
 const Purchase = require("../models/purchaseModel.js");
 const Code = require("../models/codeModel.js");
 const StudentLectureAccess = require("../models/studentLectureAccessModel.js");
+const StudentExamSubmission = require("../models/studentExamSubmissionModel.js");
 const Container = require("../models/containerModel.js");
+const Lecture = require("../models/LectureModel.js");
+const Attachment = require("../models/attachmentModel.js");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
@@ -117,12 +122,12 @@ const updateUser = catchAsync(async (req, res, next) => {
     }
     req.body.children = childrenById;
   }
-
   const updatedUser = {
     name,
     email,
     address,
     children: childrenById,
+    role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
 
@@ -389,6 +394,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         totalPoints: student.totalPoints || 0,
         hobbies: student.hobbies,
         faction: student.faction,
+        sequencedId : student.sequencedId
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -539,6 +545,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: teacher.level,
         faction: teacher.faction,
         school: teacher.school,
+        ...teacher,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -568,26 +575,161 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!admin) {
         return next(new AppError("User not found", 404));
-      }
-
-      // No additional fields needed for admin roles
+      }      // No additional fields needed for admin roles
       break;
-
+      
     case "Assistant":
-      // Find assistant with related lecturer
+      // Find assistant with related lecturer and all lecture data
       const assistant = await Assistant.findById(userId)
-        .populate("assignedLecturer", "name expertise")
+        .populate({
+          path: "assignedLecturer",
+          select: "name expertise bio profilePicture"
+        })
         .lean();
 
       if (!assistant) {
         return next(new AppError("Assistant not found", 404));
       }
 
-      // Add assistant-specific fields
+      // Add assistant-specific fields to the response
       responseData.userInfo = {
         ...responseData.userInfo,
         assignedLecturer: assistant.assignedLecturer,
+        profilePicture: assistant.profilePicture
       };
+
+      // Only fetch additional data if no specific fields were requested or the relevant fields were included
+      if (!fields || fields.includes("lecturerContainers") || fields.includes("lectures")) {
+        // Get containers (courses, terms, etc.) created by the assigned lecturer
+        const containers = await Container.find({ createdBy: assistant.assignedLecturer._id })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .lean();
+        
+        responseData.lecturerContainers = containers;
+      }
+
+      if (!fields || fields.includes("lectures")) {
+        // Get all lectures from the assigned lecturer
+        const lectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+          .populate("subject", "name")
+          .populate("level", "name")
+          .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
+          .lean();
+        
+        responseData.lectures = lectures;
+      }
+
+      if (!fields || fields.includes("attachments")) {
+        // Get all attachments related to lecturer's lectures
+        const lecturerLectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+          .select("_id")
+          .lean();
+        
+        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        
+        const attachments = await Attachment.find({ lectureId: { $in: lectureIds } })
+          .populate("lectureId", "name")
+          .populate("studentId", "name")
+          .lean();
+        
+        responseData.attachments = attachments;
+      }
+
+      if (!fields || fields.includes("examSubmissions")) {
+        // Get exam submissions for lectures created by the assigned lecturer
+        const lecturerLectures = !responseData.lectures ? 
+          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
+          responseData.lectures;
+        
+        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        
+        const examSubmissions = await StudentExamSubmission.find({ 
+          lecture: { $in: lectureIds },
+          type: "exam"
+        })
+          .populate("student", "name sequencedId")
+          .populate("lecture", "name")
+          .populate("config", "name type")
+          .lean();
+        
+        responseData.examSubmissions = examSubmissions;
+      }      if (!fields || fields.includes("homeworkSubmissions")) {
+        // Get homework submissions for lectures created by the assigned lecturer
+        const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ? 
+          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
+          (responseData.lectures || responseData.examSubmissions);
+        
+        // Get lecture IDs, handling both direct lecture objects and exam submission objects
+        const lectureIds = lecturerLectures.map(lecture => {
+          if (lecture._id) return lecture._id;
+          if (lecture.lecture && lecture.lecture._id) return lecture.lecture._id;
+          return lecture;
+        }).filter(id => id); // Filter out any undefined values
+        
+        const homeworkSubmissions = await StudentExamSubmission.find({ 
+          lecture: { $in: lectureIds },
+          type: "homework"
+        })
+          .populate("student", "name sequencedId")
+          .populate("lecture", "name")
+          .populate("config", "name type")
+          .lean();
+        
+        responseData.homeworkSubmissions = homeworkSubmissions;
+      }
+
+      if (!fields || fields.includes("stats")) {
+        // Calculate statistics about lecturer's content and student engagement
+        const stats = {
+          totalLectures: 0,
+          totalStudentExamSubmissions: 0,
+          totalStudentHomeworkSubmissions: 0,
+          totalAttachments: 0,
+          lectureViews: 0
+        };
+        
+        if (responseData.lectures) {
+          stats.totalLectures = responseData.lectures.length;
+          stats.lectureViews = responseData.lectures.reduce(
+            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+          );
+        } else {
+          const lectureCount = await Lecture.countDocuments({ 
+            createdBy: assistant.assignedLecturer._id 
+          });
+          stats.totalLectures = lectureCount;
+          
+          const lectures = await Lecture.find({ 
+            createdBy: assistant.assignedLecturer._id 
+          }).select("numberOfViews").lean();
+          
+          stats.lectureViews = lectures.reduce(
+            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+          );
+        }
+          stats.totalStudentExamSubmissions = responseData.examSubmissions ? 
+          responseData.examSubmissions.length : 
+          await StudentExamSubmission.countDocuments({ 
+            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
+            type: "exam"
+          });
+          
+        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions ? 
+          responseData.homeworkSubmissions.length : 
+          await StudentExamSubmission.countDocuments({ 
+            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
+            type: "homework"
+          });
+          
+        stats.totalAttachments = responseData.attachments ? 
+          responseData.attachments.length : 
+          await Attachment.countDocuments({ 
+            lectureId: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") }
+          });
+          
+        responseData.stats = stats;
+      }
       break;
 
     default:
@@ -791,6 +933,246 @@ const getStudentParentAdditionalData = async (
   return responseData;
 };
 
+/**
+ * Get parent's children data with detailed information
+ * This allows a parent to see information about their children
+ */
+const getParentChildrenData = catchAsync(async (req, res, next) => {
+  // Get parent ID from authenticated user
+  const parentId = req.user._id;
+
+  // Check if user is a parent
+  if (req.user.role !== "Parent") {
+    return next(new AppError("Only parents can access their children's data", 403));
+  }
+
+  // Find parent with children and get IDs
+  const parent = await Parent.findById(parentId).lean();
+
+  if (!parent) {
+    return next(new AppError("Parent not found", 404));
+  }
+
+  if (!parent.children || parent.children.length === 0) {
+    return res.status(200).json({
+      status: "success",
+      results: 0,
+      data: {
+        children: []
+      }
+    });
+  }  // Find all children with detailed information
+  const children = await Student.find({ _id: { $in: parent.children } })
+    .populate("level", "name")
+    .select("name level sequencedId hobbies faction generalPoints totalPoints")
+    .lean();
+
+  // For each child, get additional data like purchase history
+  const childrenWithData = await Promise.all(
+    children.map(async (child) => {
+      // Get purchase history
+      const purchaseHistory = await Purchase.find({ student: child._id })
+        .populate({
+          path: "container",
+          select: "name type price subject level",
+          populate: [
+            { path: "subject", select: "name" },
+            { path: "level", select: "name" }
+          ]
+        })
+        .sort({ createdAt: -1 })
+        .lean();
+
+      // Get lecture access
+      const lectureAccess = await StudentLectureAccess.find({ student: child._id })
+        .populate("lecture", "name")
+        .lean();
+        
+      // Get exam scores with lecture information
+      const examScores = await StudentExamSubmission.find({ student: child._id })
+        .populate({
+          path: "lecture",
+          select: "name description"
+        })
+        .sort({ submittedAt: -1 })
+        .lean();      // Get redeemed promo codes
+      const redeemedCodes = await Code.find({
+        redeemedBy: child._id,
+        isRedeemed: true
+      }).lean();
+      
+      // Return child with additional data
+      return {
+        ...child,
+        purchaseHistory,
+        lectureAccess,
+        redeemedCodes,
+        examScores // Include exam scores in the response
+      };
+    })
+  );
+
+  res.status(200).json({
+    status: "success",
+    results: childrenWithData.length,
+    data: {
+      children: childrenWithData
+    }
+  });
+});
+
+/**
+ * Update the currently logged in user information
+ * Allows users to update their own profile information (except password)
+ */
+const updateMe = catchAsync(async (req, res, next) => {
+  // 1) Check if password is being updated
+  if (req.body.password) {
+    return next(
+      new AppError("This route is not for password updates. Please use /update/password", 400)
+    );
+  }
+
+  // 2) Get user ID from authenticated user
+  const userId = req.user._id;
+  const userRole = req.user.role;
+
+  // 3) Filter out unwanted fields that shouldn't be updated
+  const filteredBody = {};
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address'];
+  
+  // Only copy allowed fields from req.body to filteredBody
+  Object.keys(req.body).forEach(field => {
+    if (allowedFields.includes(field)) {
+      filteredBody[field] = req.body[field];
+    }
+  });
+  // Handle special case for Parent role - adding children by sequenced ID
+  if (userRole === "Parent" && req.body.children) {
+    const childrenIds = req.body.children;
+    
+    // Get current children
+    const currentParent = await Parent.findById(userId).lean();
+    const currentChildren = currentParent?.children || [];
+    
+    // Track children to add
+    const childrenToAdd = [...currentChildren]; // Start with existing children
+    
+    // For each child ID (which could be a sequenced ID or MongoDB ID)
+    for (let childId of childrenIds) {
+      let child;
+
+      // Check if it's a MongoDB Object ID
+      const isMongoId = mongoose.Types.ObjectId.isValid(childId);
+      if (isMongoId) {
+        // Find by MongoDB ID
+        child = await Student.findById(childId).lean();
+      } else {
+        // Find by sequenced ID
+        child = await Student.findOne({ sequencedId: childId }).lean();
+      }
+
+      if (child) {
+        // Check if child is already in the list to avoid duplicates
+        const childIdStr = child._id.toString();
+        const alreadyAdded = childrenToAdd.some(id => id.toString() === childIdStr);
+        
+        if (!alreadyAdded) {
+          childrenToAdd.push(child._id); // Always store MongoDB IDs in the database
+        }
+      } else {
+        return next(new AppError(`No student found with ID: ${childId}`, 404));
+      }
+    }
+
+    // Add children IDs to filteredBody (don't replace if empty array was provided)
+    if (childrenToAdd.length > 0) {
+      filteredBody.children = childrenToAdd;
+    }
+  }
+
+  // 4) Update user document based on their role
+  let updatedUser;
+
+  switch (userRole) {
+    case "Student":
+      updatedUser = await Student.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Parent":
+      updatedUser = await Parent.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .populate({
+          path: "children",
+          select: "name level sequencedId", // Include sequencedId in the populated result
+        })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Lecturer":
+      // For lecturers, we might want to allow updating bio and expertise
+      if (req.body.bio) filteredBody.bio = req.body.bio;
+      if (req.body.expertise) filteredBody.expertise = req.body.expertise;
+
+      updatedUser = await Lecturer.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Teacher":
+      updatedUser = await Teacher.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Assistant":
+      updatedUser = await Assistant.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+      break;
+
+    case "Admin":
+    case "SubAdmin":
+    case "Moderator":
+    default:
+      // For other roles, use the basic User model
+      updatedUser = await User.findByIdAndUpdate(userId, filteredBody, {
+        new: true,
+        runValidators: true,
+      })
+        .select("-password -passwordChangedAt")
+        .lean();
+  }
+
+  if (!updatedUser) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: updatedUser
+    }
+  });
+});
+
 module.exports = {
   getAllUsers,
   getAllUsersByRole,
@@ -801,4 +1183,6 @@ module.exports = {
   changePassword,
   uploadFileForBulkCreation,
   getMyData,
+  getParentChildrenData,
+  updateMe
 };

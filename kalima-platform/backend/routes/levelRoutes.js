@@ -5,16 +5,27 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-
 router
   .route("/")
-  .post(verifyJWT, authController.verifyRoles("Admin", "SubAdmin"),levelController.createLevel)
-  .get(levelController.getAllLevels);
+  .get(levelController.getAllLevels)
+  .post(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.createLevel
+  );
 
 router
   .route("/:id")
   .get(levelController.getLevelById)
-  .patch(verifyJWT, authController.verifyRoles("Admin", "SubAdmin"),levelController.updateLevelById)
-  .delete(verifyJWT, authController.verifyRoles("Admin", "SubAdmin"),levelController.deleteLevelById);
+  .patch(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.updateLevelById
+  )
+  .delete(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin"),
+    levelController.deleteLevelById
+  );
 
 module.exports = router;

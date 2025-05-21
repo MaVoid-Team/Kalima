@@ -9,6 +9,20 @@
       "sendOffer": "ارسل عرضك الان!",
       "promo": "كود خاص",
       "discount": "خصم",
+      "editUser": {
+        "title": "تعديل المستخدم",
+        "name": "الاسم",
+        "namePlaceholder": "الاسم",
+        "phone": "رقم الهاتف",
+        "phonePlaceholder": "رقم الهاتف",
+        "email": "البريد الالكتروني",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "كلمة المرور",
+        "passwordHint": "يرجى ادخال كلمة المرور",
+        "save": "حفظ",
+        "cancel": "الغاء"
+      },
+     
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
         "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
@@ -22,15 +36,23 @@
         "codesGenerated": "تم إنشاء أكواد الخصم بنجاح"
       },
       "form": {
-        "pointsAmount": "قيمة النقاط",
+        "pointsAmount": "مقدار النقاط",
         "numCodes": "عدد الأكواد",
         "codeType": "نوع الكود",
         "general": "عام",
-        "specific": "محدد لمحاضر",
-        "promo": "كود خاص",
+        "specific": "مخصص",
+        "promo": "ترويجي",
         "lecturer": "المحاضر",
-        "lecturerPlaceholder": "اختر محاضر"
+        "lecturerPlaceholder": "اختر محاضر",
+        "generateQrCodes": "إنشاء رموز QR",
+        "qrCodeDescription": "إنشاء رموز QR لاستخدام الأكواد بسهولة",
+        "qrCodeSize": "حجم رمز QR"
       },
+      
+      "printQrCodes": "طباعة رموز QR",
+      "downloadAllQrCodes": "تحميل جميع رموز QR",
+    
+      "points": "نقاط",
       "userManagement": {
         "title": "سجل الاجراءات",
         "createUser": "إنشاء مستخدم جديد",
@@ -42,7 +64,7 @@
         "phoneLabel": "رقم الهاتف",
         "phonePlaceholder": "ادخل رقم الهاتف",
         "messageLabel": "الرسالة (اختياري)",
-        "messagePlaceholder": "اكتب رسالتك هنا...",
+        "placeholder": "اكتب رسالتك هنا...",
         "cancel": "إلغاء",
         "send": "إرسال"
       },
@@ -89,7 +111,8 @@
     },
     "actions": {
       "delete": "حذف",
-      "edit": "تعديل"
+      "edit": "تعديل",
+      "cancel": "إلغاء"
     },
     "pagination": {
       "previous": "السابق",
@@ -129,15 +152,19 @@
       
       "roles": {
         "admin": "مسؤول",
+        "subadmin": "مسؤول فرعي",
         "lecturer": "معلم",
-        "student": "طالب"
+        "student": "طالب",
+        "teacher": "معلم",
+        "assistant": "مساعد"
       },
       
       "actions": {
         "create": "إنشاء",
         "read": "قراءة",
         "update": "تعديل",
-        "delete": "حذف"
+        "delete": "حذف",
+        "cancel": "إلغاء"
       },
       
       "resources": {
@@ -145,7 +172,14 @@
         "lecture": "درس",
         "user": "مستخدم",
         "timetable": "جدول زمني",
-        "center": "مركز" 
+        "center": "مركز" ,
+        "code": "كود",
+        "promoCode": "كود ترويجي", 
+        "admin": "أدمن",
+        "assistant": "مساعد",
+        "parent": "ولي أمر",
+        "package": "باقات",
+        "lesson": "درس"
       },
       "idDisplay": "ID: {{id}}",
       
@@ -174,14 +208,20 @@
       "status": " الحالة",
       "redeemedAt": "تم استرداده في",
       "redeemedBy": "تم الاسترداد بواسطة",
-      "noCodes": "لم يتم العثور على أكواد ترويجية"
+      "noCodes": "لم يتم العثور على أكواد ترويجية",
+      "actions": "الإجراءات"
     },
     "filters": {
       "allStatuses": "كل الحالات",
       "redeemed": "مسترد",
       "active": "نشط",
       "redeemedBy": "تم استرداده بواسطة",
-      "apply": "تطبيق"
+      "apply": "تطبيق",
+      "allStudents": "كل الطلاب",
+      "all": "كل الانواع",
+      "general": "عام",
+      "specific": "مخصص",
+      "promo": "ترويجي"
     },
     "pagination": {
       "previous": "السابق",
@@ -195,5 +235,21 @@
     },
     "errors": {
       "fetchPromo": "فشل في جلب الأكواد الترويجية"
-    }
+    },
+    "revenue": {
+      "errorLoadingRevenue": "خطأ في تحميل بيانات الإيرادات",
+      "lecturerRevenue": "إيرادات المحاضر",
+      "revenueSummary": "ملخص الإيرادات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "currency": "جنيه",
+      "totalPurchases": "إجمالي المشتريات",
+      "monthsWithRevenue": "أشهر بها إيرادات",
+      "purchaseCount": "عدد المشتريات",
+      "noRevenueData": "لا توجد بيانات إيرادات لهذا المحاضر"
+    },
+     "modals" : {
+        "confirmDelete": " حذف هذا الكود؟",
+        "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟"
+
+      }
   }

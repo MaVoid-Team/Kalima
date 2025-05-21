@@ -48,7 +48,6 @@ exports.createAssistant = catchAsync(async (req, res, next) => {
         profilePicture: req.body.profilePicture || null,
     };
     
-    console.log("File received:", req.file);
     
     if (req.file) {
         try {
@@ -69,7 +68,6 @@ exports.createAssistant = catchAsync(async (req, res, next) => {
                 );
             });
             
-            console.log("Cloudinary result:", imageUploadResult);
             
             if (imageUploadResult && imageUploadResult.secure_url) {
                 // Set profilePicture as an object with url and publicId properties
@@ -84,11 +82,9 @@ exports.createAssistant = catchAsync(async (req, res, next) => {
         }
     }
     
-    console.log("Assistant data before creation:", assistantData);
     
     const assistant = await Assistant.create(assistantData);
     
-    console.log("Created assistant:", assistant);
     
     res.status(201).json({
         status: "success",
