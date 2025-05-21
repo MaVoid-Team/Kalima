@@ -195,9 +195,7 @@ const MyLecturesPage = () => {
     setError(null)
 
     try {
-      console.log("Creating lecture with data:", lectureData)
       const response = await createLecture(lectureData)
-      console.log("Create lecture response:", response)
 
       if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || "فشل في إنشاء المحاضرة")
@@ -218,14 +216,12 @@ const MyLecturesPage = () => {
       // Handle attachment after successful lecture creation
       if (attachmentFile && lectureId) {
         try {
-          console.log("Uploading attachment for lecture ID:", lectureId)
           const attachmentData = {
             type: attachmentType,
             attachment: attachmentFile,
           }
 
           const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
-          console.log("Attachment upload response:", attachmentResponse)
         } catch (attachmentError) {
           console.error("Error uploading attachment:", attachmentError)
           setError(`تم إنشاء المحاضرة ولكن فشل تحميل المرفق: ${attachmentError.message}`)

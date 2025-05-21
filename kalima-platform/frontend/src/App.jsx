@@ -49,6 +49,22 @@ function App() {
   const isRTL = i18n.language === "ar";
 
   useEffect(() => {
+    const handleContextMenu = (e) => e.preventDefault();
+    const disableDrag = () => {
+      document.querySelectorAll("img").forEach((img) => {
+        img.setAttribute("draggable", "false");
+      });
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    disableDrag(); // On mount
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
+
+  useEffect(() => {
     const isDashboardRoute = location.pathname.startsWith("/dashboard/");
     setShowSidebar(isDashboardRoute);
 

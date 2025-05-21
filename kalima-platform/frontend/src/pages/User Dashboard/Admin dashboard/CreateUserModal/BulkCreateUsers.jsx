@@ -47,15 +47,7 @@ const BulkCreateUsers = () => {
       formData.append("accountType", accountType)
       formData.append("file", file)
 
-      console.log("Submitting form data:", {
-        accountType,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-      })
-
       const result = await bulkCreateUsers(formData)
-      console.log("API Response:", result)
 
       if (result.success) {
         setSuccess(t("success.usersCreated"))

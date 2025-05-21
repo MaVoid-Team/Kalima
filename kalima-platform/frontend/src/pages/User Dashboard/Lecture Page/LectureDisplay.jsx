@@ -235,10 +235,6 @@ const LectureDisplay = () => {
 
             if (lecturePurchase) {
               setPurchaseId(lecturePurchase._id);
-              console.log(
-                "Found purchase ID for lecture:",
-                lecturePurchase._id
-              );
             } else {
               console.log(
                 "No purchase found for this lecture in purchase history"
@@ -284,7 +280,6 @@ const LectureDisplay = () => {
       try {
         const result = await getLectureAttachments(lectureId);
         if (result.status === "success") {
-          console.log("FULL API RESPONSE:", result);
 
           // Set the entire data object with all attachment types
           setAttachments(result.data);
@@ -297,7 +292,6 @@ const LectureDisplay = () => {
             ...(result.data.booklets || []),
           ];
 
-          console.log("ALL ATTACHMENTS ARRAY:", allAttachmentsArray);
           setAllAttachments(allAttachmentsArray);
         } else {
           console.error("Failed to fetch attachments:", result.message);
@@ -339,11 +333,9 @@ const LectureDisplay = () => {
 
       // Step 1: Check all submissions (exam and homework)
       const verificationResult = await verifyExamSubmission(lectureId);
-      console.log("Submissions verification result:", verificationResult);
 
       // Step 2: Check lecture access requirements
       const accessResult = await checkLectureAccess(lectureId);
-      console.log("Lecture access result:", accessResult);
 
       if (accessResult.status === "restricted") {
         // Handle exam requirements
@@ -375,7 +367,6 @@ const LectureDisplay = () => {
             homeworkUrl: accessResult.data.homework.url,
             homeworkType: "homework",
           });
-          console.log(homeworkData)
 
           // Check homework submission status
           if (verificationResult.data?.homework?.passed) {
@@ -440,15 +431,10 @@ const LectureDisplay = () => {
             lectureId,
             purchaseId
           );
-          console.log("Student lecture access check result:", result);
 
           if (result.success && result.data) {
             // The access data is directly in result.data.access
             if (result.data.access) {
-              console.log(
-                "Setting remaining views to:",
-                result.data.access.remainingViews
-              );
               // Only set the studentLectureAccessId, don't update remainingViews yet
               setStudentLectureAccessId(result.data.access._id)
               setAccessDataLoaded(true)
@@ -607,7 +593,6 @@ const LectureDisplay = () => {
 
         if (response.success) {
           // The updated data is directly in response.data
-          console.log("Updated remaining views:", response.data.remainingViews);
           setRemainingViews(response.data.remainingViews);
 
           if (response.data.remainingViews <= 0) {

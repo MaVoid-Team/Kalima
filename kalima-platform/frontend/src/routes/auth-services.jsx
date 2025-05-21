@@ -846,16 +846,6 @@ export const debugAuthState = () => {
   const isLoggedInStatus = isLoggedIn();
   const user = getUserFromToken();
 
-  console.group("Auth State Debug");
-  console.log("Has Token:", !!token);
-  if (token) {
-    console.log("Token (first 10 chars):", token.substring(0, 10) + "...");
-    console.log("Is Near Expiry:", isTokenNearExpiry(token));
-  }
-  console.log("Is Logged In:", isLoggedInStatus);
-  console.log("User Data:", user);
-  console.groupEnd();
-
   return {
     hasToken: !!token,
     isLoggedIn: isLoggedInStatus,

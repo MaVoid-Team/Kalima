@@ -60,7 +60,6 @@ export const purchaseContainer = async (containerId) => {
         }
       }
     )
-    console.log("Purchase container response:", response);
     return response;
     
   } catch (error) {
@@ -292,7 +291,6 @@ export const getLecturesByContainerId = async (containerId) => {
     const containerData = containerResponse.data
     const childrenArray = containerData?.children || containerData?.container?.children || []
 
-    console.log("Children array:", childrenArray)
 
     if (!childrenArray.length) {
       return { data: { lectures: [] } }

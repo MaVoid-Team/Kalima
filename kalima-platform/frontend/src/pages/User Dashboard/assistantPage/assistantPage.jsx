@@ -42,7 +42,6 @@ const AssistantPage = () => {
         const result = await getUserDashboard()
         if (result.success) {
           setDashboardData(result.data.data)
-          console.log(dashboardData)
         } else {
           setError(result.error || t("errors.fetchFailed"))
         }

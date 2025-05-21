@@ -84,10 +84,8 @@ const ContainerDetailsPage = () => {
     setCreationError("")
 
     try {
-      console.log("Creating lecture with data:", lectureData)
 
       const response = await createLecture(lectureData)
-      console.log("Create lecture response:", response)
 
       if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || "Failed to create lecture")
@@ -115,14 +113,12 @@ const ContainerDetailsPage = () => {
             throw new Error("Failed to extract lecture ID from response")
           }
 
-          console.log("Uploading attachment for lecture ID:", lectureId)
           const attachmentData = {
             type: attachmentType,
             attachment: attachmentFile,
           }
 
           const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
-          console.log("Attachment upload response:", attachmentResponse)
         } catch (attachmentError) {
           console.error("Error uploading attachment:", attachmentError)
           setCreationError(`Lecture created but failed to upload attachment: ${attachmentError.message}`)
@@ -145,11 +141,8 @@ const ContainerDetailsPage = () => {
     setCreationError("")
 
     try {
-      console.log("Creating container with data:", containerData)
 
       const response = await createContainer(containerData)
-      console.log("Create container response:", response)
-
       if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || `Failed to create ${containerData.type}`)
       }

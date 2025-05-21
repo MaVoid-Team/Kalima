@@ -32,8 +32,6 @@ const ContainersPage = () => {
           }
         });
 
-        console.log("Dashboard data:", result.data.data);
-
         if (result.success) {
           const { userInfo } = result.data.data;
           setUserRole(userInfo.role);
