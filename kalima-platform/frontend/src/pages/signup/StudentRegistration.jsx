@@ -327,11 +327,11 @@ export default function StudentRegistration() {
           throw new Error("Invalid role selected")
       }
 
-      const url = `${apiUrl}/register`;
-      const response = await axios.post(url, payload);
-      navigate('/login', { 
-        state: { message: 'Registration successful' } 
-      });
+      const url = `${apiUrl}/register`
+      const response = await axios.post(url, payload)
+      navigate("/login", {
+        state: { message: "Registration successful" },
+      })
     } catch (error) {
       let errorMessage = t("errors.unexpectedError")
       const fieldErrors = {}

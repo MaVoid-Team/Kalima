@@ -88,7 +88,7 @@ export const deletePackage = async (packageId) => {
 
 export const purchasePackage = async (packageId) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/purchases/package`, {
+    const response = await axios.post(`${API_URL}/purchases/package`, {
       packageId: packageId,
     }, {
       withCredentials: true,

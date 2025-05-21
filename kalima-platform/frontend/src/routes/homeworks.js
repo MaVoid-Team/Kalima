@@ -24,9 +24,7 @@ export const uploadHomework = async (lectureId, homeworkData) => {
     formData.append("file", homeworkData.attachment); // Changed from attachment to file to match backend
 
     const response = await axios.post(
-      `${
-        import.meta.env.VITE_API_URL
-      }/api/v1/attachments/upload-homework/${lectureId}`,
+      `${import.meta.env.VITE_API_URL}/lectures/${lectureId}/homework`,
       formData,
       {
         headers: {
@@ -84,9 +82,7 @@ export const getLectureHomeworks = async (
     const { limit, page } = options;
 
     const response = await axios.get(
-      `${
-        import.meta.env.VITE_API_URL
-      }/api/v1/lectures/${lectureId}/homework?limit=${limit}&page=${page}`,
+      `${import.meta.env.VITE_API_URL}/lectures/${lectureId}/homework?limit=${limit}&page=${page}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
