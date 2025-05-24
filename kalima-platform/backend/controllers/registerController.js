@@ -41,55 +41,78 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   // Only validate government and administration zone for specific roles
   if (govAdminRequiredRoles.includes(role.toLowerCase())) {
-    if (!government) {
+    if (!government || !government.trim()) {
       return next(new AppError("Government is required.", 400));
     }
-    if (!administrationZone) {
+    if (!administrationZone || !administrationZone.trim()) {
       return next(new AppError("Administration zone is required.", 400));
     }
-    
+
     try {
-      // Validate government from database (case-insensitive)
-      const govDoc = await Government.findOne({ 
-        name: { $regex: new RegExp(`^${government}$`, 'i') }
+      const normalizedGovernment = government.trim();
+      const normalizedAdministrationZone = administrationZone.trim();
+
+      const govDoc = await Government.findOne({
+        name: { $regex: new RegExp(`^${normalizedGovernment}$`, "i") },
       });
-      
+
       if (!govDoc) {
+        // Get all available governments for better error message  // ← Enhanced error message
+        const availableGovs = await Government.find({}, "name").lean();
+        const govNames = availableGovs.map((g) => g.name).join(", ");
 
-        return next(new AppError(`Invalid government: ${government}.`, 400));
+        return next(
+          new AppError(
+            `Invalid government: ${normalizedGovernment}. Available governments: ${govNames}`, // ← Better error with options
+            400
+          )
+        );
       }
-      
+
       // Handle case where administrationZone is missing in the Government document
-      if (!govDoc.administrationZone || !Array.isArray(govDoc.administrationZone)) {
-
-        return next(new AppError(`No administration zones defined for government: ${government}.`, 400));
+      if (
+        !govDoc.administrationZone ||
+        !Array.isArray(govDoc.administrationZone)
+      ) {
+        return next(
+          new AppError(
+            `No administration zones defined for government: ${government}.`,
+            400
+          )
+        );
       }
-      
-      // Accept the zone if it exists in either the Government or AdministrationZone collection
-      const normalizedZone = administrationZone.trim();
-      
       // First check if the zone exists in the Government document
       const zoneExistsInGov = govDoc.administrationZone.some(
-        zone => zone && zone.toLowerCase().trim() === normalizedZone.toLowerCase()
+        (zone) =>
+          zone &&
+          zone.toLowerCase().trim() ===
+            normalizedAdministrationZone.toLowerCase() // ← Use normalized value
       );
-      
-      if (zoneExistsInGov) {
-        // Zone found in government document, proceed with user creation
-        console.log(`Found zone in government: ${normalizedZone}`);
-      } else {
-        // If not found in government, check AdministrationZone collection
-        const zoneDoc = await AdministrationZone.findOne({ 
-          name: { $regex: new RegExp(`^${normalizedZone}$`, 'i') }
+
+      if (!zoneExistsInGov) {
+        // ← Simplified logic, removed console.log
+        // If not found in government, check AdministrationZone collection as fallback
+        const zoneDoc = await AdministrationZone.findOne({
+          name: {
+            $regex: new RegExp(`^${normalizedAdministrationZone}$`, "i"),
+          }, // ← Use normalized value
         });
-        
+
         if (!zoneDoc) {
-          return next(new AppError(`Administration zone "${administrationZone}" not found for government: ${government}.`, 400));
+          return next(
+            new AppError(
+              `Administration zone "${administrationZone}" not found for government: ${government}.`,
+              400
+            )
+          );
         }
-        
+
         // Zone is valid, but not in government - could add it to government here if needed
       }
     } catch (error) {
-      return next(new AppError(`Error validating location data: ${error.message}`, 500));
+      return next(
+        new AppError(`Error validating location data: ${error.message}`, 500)
+      );
     }
   }
   // Validate password
@@ -207,28 +230,23 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
       // Validate centers
       if (
-        (newUser.teachesAtType === "Center" ||
-          newUser.teachesAtType === "Both") &&
+        newUser.teachesAtType === "Center" &&
         (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
       ) {
         return next(
           new AppError(
-            "At least one center is required if teachesAtType is 'Center' or 'Both'",
+            "At least one center is required if teachesAtType is 'Center'",
             400
           )
         );
       }
       // Validate school
       if (
-        (newUser.teachesAtType === "School" ||
-          newUser.teachesAtType === "Both") &&
+        newUser.teachesAtType === "School" &&
         (!newUser.school || newUser.school.trim() === "")
       ) {
         return next(
-          new AppError(
-            "School is required if teachesAtType is 'School' or 'Both'",
-            400
-          )
+          new AppError("School is required if teachesAtType is 'School'", 400)
         );
       }
       // Validate socialMedia (optional, but if present, must be array of {platform, account})
