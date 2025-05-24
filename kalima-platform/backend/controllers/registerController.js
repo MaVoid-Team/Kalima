@@ -89,11 +89,14 @@ const registerNewUser = catchAsync(async (req, res, next) => {
             normalizedAdministrationZone.toLowerCase() // ← Use normalized value
       );
 
-      if (!zoneExistsInGov) {  // ← Simplified logic, removed console.log
-    // If not found in government, check AdministrationZone collection as fallback
-    const zoneDoc = await AdministrationZone.findOne({ 
-      name: { $regex: new RegExp(`^${normalizedAdministrationZone}$`, 'i') }  // ← Use normalized value
-    });
+      if (!zoneExistsInGov) {
+        // ← Simplified logic, removed console.log
+        // If not found in government, check AdministrationZone collection as fallback
+        const zoneDoc = await AdministrationZone.findOne({
+          name: {
+            $regex: new RegExp(`^${normalizedAdministrationZone}$`, "i"),
+          }, // ← Use normalized value
+        });
 
         if (!zoneDoc) {
           return next(
@@ -227,28 +230,23 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
       // Validate centers
       if (
-        (newUser.teachesAtType === "Center" ||
-          newUser.teachesAtType === "Both") &&
+        newUser.teachesAtType === "Center" &&
         (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
       ) {
         return next(
           new AppError(
-            "At least one center is required if teachesAtType is 'Center' or 'Both'",
+            "At least one center is required if teachesAtType is 'Center'",
             400
           )
         );
       }
       // Validate school
       if (
-        (newUser.teachesAtType === "School" ||
-          newUser.teachesAtType === "Both") &&
+        newUser.teachesAtType === "School" &&
         (!newUser.school || newUser.school.trim() === "")
       ) {
         return next(
-          new AppError(
-            "School is required if teachesAtType is 'School' or 'Both'",
-            400
-          )
+          new AppError("School is required if teachesAtType is 'School'", 400)
         );
       }
       // Validate socialMedia (optional, but if present, must be array of {platform, account})
