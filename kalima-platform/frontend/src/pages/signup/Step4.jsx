@@ -1,4 +1,5 @@
 "use client"
+import { Link } from "react-router-dom"
 
 const ReviewItem = ({ label, value }) => (
   <div>
@@ -91,6 +92,7 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
 
           {formData.role === "parent" && <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />}
         </div>
+                  <p className="font-bold mt-10">by signing up, you agree to our <span className="underline text-blue-600"><Link to={"/privacy-policy"}>privacy Policy</Link></span></p>
       </div>
     </div>
   )
