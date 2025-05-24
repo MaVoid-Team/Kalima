@@ -1,11 +1,103 @@
 import { useState, useEffect } from 'react';
-import { governments, getAdministrationZonesForGovernment } from "../../constants/locations"
+import { getAllGovernments, getGovernmentZones } from '../../routes/governments';
 
 export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels  }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [governments, setGovernments] = useState([]);
+  const [administrationZones, setAdministrationZones] = useState([]);
+  const [zonesLoading, setZonesLoading] = useState(false);
 
-  
+  // Fetch governments on component mount
+  useEffect(() => {
+    const loadGovernments = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await getAllGovernments();
+        
+        if (result.success) {
+          setGovernments(result.data);
+        } else {
+          setError(result.error);
+          console.error('Failed to load governments:', result.error);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error('Failed to load governments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGovernments();
+  }, []);
+
+  // Fetch administration zones when government changes
+  useEffect(() => {
+    const loadZones = async () => {
+      if (!formData.government) {
+        setAdministrationZones([]);
+        return;
+      }
+
+      try {
+        setZonesLoading(true);
+        const result = await getGovernmentZones(formData.government);
+        
+        if (result.success) {
+          setAdministrationZones(result.data);
+        } else {
+          console.error('Failed to load administration zones:', result.error);
+          setAdministrationZones([]);
+        }
+      } catch (err) {
+        console.error('Failed to load administration zones:', err);
+        setAdministrationZones([]);
+      } finally {
+        setZonesLoading(false);
+      }
+    };
+
+    loadZones();
+  }, [formData.government]);
+
+  // Clear administration zone when government changes
+  const handleGovernmentChange = (e) => {
+    handleInputChange(e);
+    // Reset administration zone when government changes
+    if (formData.administrationZone) {
+      handleInputChange({
+        target: {
+          name: 'administrationZone',
+          value: ''
+        }
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <div className="flex items-center justify-center py-8">
+          <div className="loading loading-spinner loading-lg"></div>
+          <span className="ml-2">{t('common.loading') || 'Loading...'}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-2">
+        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <div className="alert alert-error">
+          <span>{t('errors.loadingFailed') || 'Failed to load data:'} {error}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
@@ -111,12 +203,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
             name="government"
             className={`select select-bordered w-2/3 lg:w-1/2 ${errors.government ? "select-error animate-shake" : ""}`}
             value={formData.government || ""}
-            onChange={handleInputChange}
+            onChange={handleGovernmentChange}
           >
             <option value="">{t("form.selectGovernment") || "Select Government"}</option>
             {governments.map((government) => (
-              <option key={government} value={government}>
-                {government}
+              <option key={government._id} value={government.name}>
+                {government.name}
               </option>
             ))}
           </select>
@@ -136,14 +228,19 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
               <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
             </label>
             <select
-              disabled={!formData.government}
+              disabled={!formData.government || zonesLoading}
               name="administrationZone"
               className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
               value={formData.administrationZone || ""}
               onChange={handleInputChange}
             >
-              <option value="">{t("form.selectAdministrationZone") || "Select Administration Zone"}</option>
-              {getAdministrationZonesForGovernment(formData.government).map((zone) => (
+              <option value="">
+                {zonesLoading 
+                  ? (t("common.loading") || "Loading...") 
+                  : (t("form.selectAdministrationZone") || "Select Administration Zone")
+                }
+              </option>
+              {administrationZones.map((zone) => (
                 <option key={zone} value={zone}>
                   {zone}
                 </option>
