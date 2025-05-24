@@ -60,6 +60,7 @@ export default function Footer() {
           <p className="text-sm">
             @Copyright 2025 <Link className="text-primary" to={'/'}>Kalima</Link> | Developed by <Link className="text-primary" to={'/'}>Kalima</Link> team, All rights reserved.
           </p>
+          <p className='font-bold text-sm'><Link to={"/privacy-policy"} className='underline text-blue-600'>Privacy Policy</Link></p>
         </div>
       </div>
     </footer>
