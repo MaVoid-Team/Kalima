@@ -40,6 +40,7 @@ const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDe
 const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
 const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
 const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
+const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 
 function App() {
   const location = useLocation();
@@ -136,6 +137,7 @@ function App() {
             <Route path="/" element={<Services />} />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/teachers" element={<Teachers />} />
+            <Route path="privacy-policy" element={<PrivacyPolicy />} />
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
