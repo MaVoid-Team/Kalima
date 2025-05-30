@@ -44,6 +44,7 @@ const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
 const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
 const reportRouter = require("./routes/reportRoutes.js");
+const ecSectionRouter = require("./routes/ec.sectionRoutes.js");
 
 // New routes for exam and homework functionality
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
@@ -117,6 +118,7 @@ app.use("/api/v1/exam-submissions", studentExamSubmissionRouter);
 app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
 app.use("/api/v1/governments", governmentRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/sections", ecSectionRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
