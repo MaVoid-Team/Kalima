@@ -58,6 +58,11 @@ const studentSchema = new mongoose.Schema(
     },
     government: { type: String, required: true },
     administrationZone: { type: String, required: true },
+     userSeria: {
+      type: String,
+      unique: true,
+      index: true
+    },
   },
 
   {
@@ -110,6 +115,33 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   lecturerPointsEntry.points -= pointsToUse;
   return true; // Successfully used points
 };
+
+studentSchema.pre('save', async function(next) {
+  if (this.isNew && !this.userSeria) {
+    try {
+      // Get the count of existing students to generate next number
+      const count = await mongoose.model('Student').countDocuments();
+      // Generate userSeria with format ST + 3-digit number (ST001, ST002, etc.)
+      this.userSeria = `ST${String(count + 1).padStart(3, '0')}`;
+      
+      // Check if this userSeria already exists (for race condition safety)
+      const existingStudent = await mongoose.model('Student').findOne({ userSeria: this.userSeria });
+      if (existingStudent) {
+        // If it exists, find the highest number and increment
+        const allStudents = await mongoose.model('Student').find({}, 'userSeria').lean();
+        const numbers = allStudents
+          .map(s => parseInt(s.userSeria.replace('ST', '')))
+          .filter(n => !isNaN(n));
+        
+        const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+        this.userSeria = `ST${String(maxNumber + 1).padStart(3, '0')}`;
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
+});
 
 // Pre-validate hook to ensure the selected zone belongs to the selected government
 studentSchema.pre("validate", async function (next) {
