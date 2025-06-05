@@ -44,8 +44,10 @@ const pricingRuleRouter = require("./routes/pricingRuleRoutes");
 const attachmentRouter = require("./routes/attachmentRoutes.js");
 const groupedLessonsRouter = require("./routes/groupedLessonsRoutes.js");
 const reportRouter = require("./routes/reportRoutes.js");
+// Importing e-commerce related routes
 const ecSectionRouter = require("./routes/ec.sectionRoutes.js");
-
+const ecProductRouter = require("./routes/ec.productRoutes.js");
+const ecBookRouter = require("./routes/ec.bookRoutes.js");
 // New routes for exam and homework functionality
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
@@ -54,6 +56,7 @@ const seedInitialAdminDirect = require("./utils/seeds/seedInitialAdminDirect");
 const seedNotificationTemplates = require("./utils/seeds/seedNotificationTemplates");
 const governmentRoutes = require("./routes/governmentRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+
 
 connectDB();
 
@@ -119,6 +122,9 @@ app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
 app.use("/api/v1/governments", governmentRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/sections", ecSectionRouter);
+// Mount the new e-commerce product and book routes
+app.use("/api/v1/products", ecProductRouter);
+app.use("/api/v1/books", ecBookRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
@@ -203,8 +209,8 @@ mongoose.connection.once("open", () => {
                   : notification.type === "new_container"
                     ? "newContainer"
                     : notification.type === "new_attachment" ||
-                        notification.type === "new_attachment_assignment" ||
-                        notification.type === "new_exam"
+                      notification.type === "new_attachment_assignment" ||
+                      notification.type === "new_exam"
                       ? "newAttachment"
                       : notification.type === "lecture_updated"
                         ? "lectureUpdate"
