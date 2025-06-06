@@ -110,11 +110,6 @@ export function AppDownloadSection() {
                       alt="Download App QR Code"
                       className="h-48 w-48 md:h-64 md:w-64 object-contain"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black bg-opacity-30 transition-opacity duration-300">
-                      <p className="text-white font-bold bg-blue-500 px-3 py-1 rounded">
-                        {t("appDownload.scan") || "Scan Me"}
-                      </p>
-                    </div>
                   </div>
                 )}
 

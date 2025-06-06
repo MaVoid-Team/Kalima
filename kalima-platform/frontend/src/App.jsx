@@ -41,6 +41,7 @@ const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/Ad
 const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
 const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
+const Market = lazy(() => import("./pages/KalimaStore/Market"));
 
 function App() {
   const location = useLocation();
@@ -49,21 +50,21 @@ function App() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
-  useEffect(() => {
-    const handleContextMenu = (e) => e.preventDefault();
-    const disableDrag = () => {
-      document.querySelectorAll("img").forEach((img) => {
-        img.setAttribute("draggable", "false");
-      });
-    };
+  // useEffect(() => {
+  //   const handleContextMenu = (e) => e.preventDefault();
+  //   const disableDrag = () => {
+  //     document.querySelectorAll("img").forEach((img) => {
+  //       img.setAttribute("draggable", "false");
+  //     });
+  //   };
 
-    document.addEventListener("contextmenu", handleContextMenu);
-    disableDrag(); // On mount
+  //   document.addEventListener("contextmenu", handleContextMenu);
+  //   disableDrag(); // On mount
 
-    return () => {
-      document.removeEventListener("contextmenu", handleContextMenu);
-    };
-  }, []);
+  //   return () => {
+  //     document.removeEventListener("contextmenu", handleContextMenu);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const isDashboardRoute = location.pathname.startsWith("/dashboard/");
@@ -138,6 +139,7 @@ function App() {
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/market" element={<Market />} />
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
@@ -159,7 +161,6 @@ function App() {
               path="package-details/:packageId"
               element={<PackageDetails />}
             />
-            <Route path="/packages" element={<PackagesPage />} />
             <Route path="/packages" element={<PackagesPage />} />
             <Route
               path="/package-details/:packageId"
