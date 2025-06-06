@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/ec.productController");
 const multer = require("multer");
+const authController = require("../controllers/authController");
 const path = require("path");
 const verifyJWT = require("../middleware/verifyJWT");
 const { uploadProductFilesMiddleware } = require("../utils/upload files/uploadProductFiles");

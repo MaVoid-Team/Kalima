@@ -53,7 +53,9 @@ exports.createECBook = async (req, res, next) => {
 // Get all ECBooks
 exports.getAllECBooks = async (req, res) => {
     try {
-        const books = await ECBook.find({}, "-__v").populate("subject", "name").select("-__v");
+        const books = await ECBook.find({}, "-__v")
+            .populate({ path: "subject", model: "Subject", select: "name" })
+            .select("-__v");
         res.status(200).json({
             status: "success",
             results: books.length,

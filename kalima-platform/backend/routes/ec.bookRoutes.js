@@ -3,7 +3,7 @@ const router = express.Router();
 const ecBookController = require("../controllers/ec.bookController");
 const verifyJWT = require("../middleware/verifyJWT");
 const { uploadProductFilesMiddleware } = require("../utils/upload files/uploadProductFiles");
-
+const authController = require("../controllers/authController");
 
 
 router
