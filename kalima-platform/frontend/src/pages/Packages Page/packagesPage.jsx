@@ -32,8 +32,8 @@ const PackagesPage = () => {
       try {
         // Fetch packages
         const packagesResponse = await fetchPackages()
-        setPackages(packagesResponse.data)
-        setFilteredPackages(packagesResponse.data)
+        setPackages(packagesResponse.data.packages)
+        setFilteredPackages(packagesResponse.data.packages)
 
         // Fetch user data
         try {
