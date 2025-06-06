@@ -25,12 +25,14 @@ const upload = multer({
 });
 
 // All routes require authentication
-router.use(verifyJWT);
+
 
 router
     .route("/")
     .get(productController.getAllProducts)
     .post(
+        verifyJWT,
+        authController.verifyRoles("Admin", "SubAdmin"),
         uploadProductFilesMiddleware, // handles both thumbnail and sample
         productController.createProduct
     );
@@ -39,9 +41,14 @@ router
     .route("/:id")
     .get(productController.getProductById)
     .patch(
+        verifyJWT,
+        authController.verifyRoles("Admin", "SubAdmin"),
         uploadProductFilesMiddleware, // handles both thumbnail and sample
         productController.updateProduct
     )
-    .delete(productController.deleteProduct);
+    .delete(
+        verifyJWT,
+        authController.verifyRoles("Admin", "SubAdmin"),
+        productController.deleteProduct);
 
 module.exports = router;
