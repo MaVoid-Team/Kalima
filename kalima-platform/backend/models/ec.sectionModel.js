@@ -26,4 +26,14 @@ const sectionSchema = new mongoose.Schema(
   }
 );
 
+// Virtual populate for products
+sectionSchema.virtual("products", {
+  ref: "Product",
+  localField: "_id",
+  foreignField: "section",
+});
+
+sectionSchema.set("toObject", { virtuals: true });
+sectionSchema.set("toJSON", { virtuals: true });
+
 module.exports = mongoose.model("ECSection", sectionSchema);

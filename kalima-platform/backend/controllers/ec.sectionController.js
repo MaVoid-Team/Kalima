@@ -42,6 +42,20 @@ exports.getSectionById = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get section by ID with products
+exports.getSectionWithProducts = catchAsync(async (req, res, next) => {
+  const section = await ECSection.findById(req.params.id).populate("products");
+  if (!section) {
+    return next(new AppError("No section found with that ID", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      section,
+    },
+  });
+});
+
 // Update section
 exports.updateSection = catchAsync(async (req, res, next) => {
   const section = await ECSection.findByIdAndUpdate(req.params.id, req.body, {

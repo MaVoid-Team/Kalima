@@ -25,4 +25,6 @@ router
     ecSectionController.deleteSection
   );
 
+router.get('/:id/products', ecSectionController.getSectionWithProducts);
+
 module.exports = router;
