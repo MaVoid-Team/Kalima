@@ -13,127 +13,93 @@ const Market = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sections, setSections] = useState([])
-  const [products, setProducts] = useState([])
-  const [books, setBooks] = useState([])
   const [allItems, setAllItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [itemsPerPage] = useState(9) // Adjust based on your preference
+  const [totalResults, setTotalResults] = useState(0)
+  const [itemsPerPage] = useState(9)
 
-  // Fetch initial data
+  // Fetch sections on component mount
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchSections = async () => {
       try {
-        setLoading(true)
-        setError(null)
-
-        // Fetch sections
         const sectionsResponse = await getAllSections()
         if (sectionsResponse.status === "success") {
           setSections(sectionsResponse.data.sections)
         }
-
-        // Fetch products and books with pagination
-        const [productsResponse, booksResponse] = await Promise.all([
-          getAllProducts({ page: currentPage, limit: itemsPerPage }),
-          getAllBooks({ page: currentPage, limit: itemsPerPage }),
-        ])
-
-        if (productsResponse.status === "success") {
-          setProducts(productsResponse.data.products)
-        }
-
-        if (booksResponse.status === "success") {
-          setBooks(booksResponse.data.books)
-        }
-
-        // Combine products and books for display
-        const combinedItems = [...(productsResponse.data?.products || []), ...(booksResponse.data?.books || [])]
-        setAllItems(combinedItems)
-
-        // Calculate total pages based on total results
-        const totalProductsCount = productsResponse.results || 0
-        const totalBooksCount = booksResponse.results || 0
-        const totalItemsCount = totalProductsCount + totalBooksCount
-        setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
       } catch (err) {
-        setError(err.message)
-        console.error("Error fetching market data:", err)
-      } finally {
-        setLoading(false)
+        console.error("Error fetching sections:", err)
       }
     }
 
-    fetchInitialData()
-  }, [currentPage, itemsPerPage])
+    fetchSections()
+  }, [])
 
-  // Handle tab change and filter by section
+  // Fetch data based on active tab and current page
   useEffect(() => {
-    const filterBySection = async () => {
-      if (activeTab === "all") {
-        try {
-          setLoading(true)
-          // Reset to first page when changing filters
-          setCurrentPage(1)
-
-          // Fetch all items with pagination
-          const [productsResponse, booksResponse] = await Promise.all([
-            getAllProducts({ page: 1, limit: itemsPerPage }),
-            getAllBooks({ page: 1, limit: itemsPerPage }),
-          ])
-
-          const combinedItems = [...(productsResponse.data?.products || []), ...(booksResponse.data?.books || [])]
-          setAllItems(combinedItems)
-
-          // Update total pages
-          const totalProductsCount = productsResponse.results || 0
-          const totalBooksCount = booksResponse.results || 0
-          const totalItemsCount = totalProductsCount + totalBooksCount
-          setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
-        } catch (err) {
-          console.error("Error fetching all items:", err)
-        } finally {
-          setLoading(false)
-        }
-        return
-      }
-
+    const fetchData = async () => {
       try {
         setLoading(true)
-        // Reset to first page when changing filters
-        setCurrentPage(1)
+        setError(null)
 
-        // Find the selected section
-        const selectedSection = sections.find((section) => section._id === activeTab)
-        if (!selectedSection) return
+        if (activeTab === "all") {
+          // Fetch all products and books
+          const [productsResponse, booksResponse] = await Promise.all([
+            getAllProducts({ page: currentPage, limit: itemsPerPage }),
+            getAllBooks({ page: currentPage, limit: itemsPerPage }),
+          ])
 
-        // Fetch products and books for the selected section with pagination
-        const [sectionProducts, sectionBooks] = await Promise.all([
-          getProductsBySection(selectedSection._id, { page: 1, limit: itemsPerPage }),
-          getBooksBySection(selectedSection._id, { page: 1, limit: itemsPerPage }),
-        ])
+          const products = productsResponse.data?.products || []
+          const books = booksResponse.data?.books || []
+          const combinedItems = [...products, ...books]
 
-        const combinedItems = [...(sectionProducts.data?.products || []), ...(sectionBooks.data?.books || [])]
-        setAllItems(combinedItems)
+          setAllItems(combinedItems)
 
-        // Update total pages
-        const totalProductsCount = sectionProducts.results || 0
-        const totalBooksCount = sectionBooks.results || 0
-        const totalItemsCount = totalProductsCount + totalBooksCount
-        setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
+          // Calculate total results and pages
+          const totalProductsCount = productsResponse.results || 0
+          const totalBooksCount = booksResponse.results || 0
+          const totalCount = totalProductsCount + totalBooksCount
+          setTotalResults(totalCount)
+          setTotalPages(Math.ceil(totalCount / itemsPerPage) || 1)
+        } else {
+          // Fetch products and books for specific section
+          const [sectionProductsResponse, sectionBooksResponse] = await Promise.all([
+            getProductsBySection(activeTab, { page: currentPage, limit: itemsPerPage }),
+            getBooksBySection(activeTab, { page: currentPage, limit: itemsPerPage }),
+          ])
+
+          // Handle the new API response structure for section products
+          const sectionProducts = sectionProductsResponse.data?.section?.products || []
+          const sectionBooks = sectionBooksResponse.data?.books || []
+          const combinedItems = [...sectionProducts, ...sectionBooks]
+
+          setAllItems(combinedItems)
+
+          // For section-specific data, we might need to handle pagination differently
+          // Since the new API returns all products in the section, we'll handle pagination client-side for now
+          const totalCount = combinedItems.length
+          setTotalResults(totalCount)
+          setTotalPages(Math.ceil(totalCount / itemsPerPage) || 1)
+        }
       } catch (err) {
-        console.error("Error filtering by section:", err)
+        setError(err.message)
+        console.error("Error fetching data:", err)
       } finally {
         setLoading(false)
       }
     }
 
-    if (sections.length > 0) {
-      filterBySection()
+    if (sections.length > 0 || activeTab === "all") {
+      fetchData()
     }
-  }, [activeTab, sections, products, books, itemsPerPage])
+  }, [activeTab, currentPage, itemsPerPage, sections.length])
+
+  // Reset to first page when changing tabs
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [activeTab])
 
   // Create categories array with "All" option and fetched sections
   const categories = [
@@ -141,15 +107,23 @@ const Market = () => {
     ...sections.map((section) => ({
       id: section._id,
       name: section.name,
-      icon: "📚", // You can map different icons based on section type
+      icon: "📚",
     })),
   ]
 
-  // Filter items based on search query
+  // Filter items based on search query and handle pagination for filtered results
   const filteredItems = allItems.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesSearch
   })
+
+  // Handle client-side pagination for filtered results
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedItems = searchQuery ? filteredItems.slice(startIndex, endIndex) : filteredItems
+
+  // Update total pages based on filtered results
+  const effectiveTotalPages = searchQuery ? Math.ceil(filteredItems.length / itemsPerPage) || 1 : totalPages
 
   if (loading && allItems.length === 0) {
     return (
@@ -225,7 +199,10 @@ const Market = () => {
                 type="text"
                 placeholder="What are you looking for?"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setCurrentPage(1) // Reset to first page when searching
+                }}
                 className="input input-bordered w-full pl-12 focus:border-primary focus:ring-primary"
               />
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
@@ -253,6 +230,21 @@ const Market = () => {
         </div>
       </div>
 
+      {/* Results Info */}
+      <div className="max-w-7xl mx-auto px-4 py-2">
+        <div className="text-sm text-gray-600">
+          {searchQuery ? (
+            <span>
+              Found {filteredItems.length} results for "{searchQuery}"
+            </span>
+          ) : (
+            <span>
+              Showing {paginatedItems.length} of {totalResults} items
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* Products Grid */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {loading && (
@@ -262,7 +254,7 @@ const Market = () => {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
+          {paginatedItems.map((item) => (
             <div
               key={item._id}
               className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
@@ -320,68 +312,67 @@ const Market = () => {
         </div>
 
         {/* Empty State */}
-        {filteredItems.length === 0 && !loading && (
+        {paginatedItems.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
             <h3 className="text-xl font-semibold mb-2">No items found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            <p className="text-gray-500">
+              {searchQuery ? "Try adjusting your search terms" : "Try adjusting your filter criteria"}
+            </p>
           </div>
         )}
 
         {/* Pagination */}
-        <div className="flex justify-center mt-12">
-          <div className="join">
-            <button
-              className="join-item btn rounded-full"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+        {effectiveTotalPages > 1 && (
+          <div className="flex justify-center mt-12">
+            <div className="join">
+              <button
+                className="join-item btn rounded-full"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || loading}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
 
-            {/* Generate page buttons dynamically */}
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              // Show current page and nearby pages
-              let pageToShow
-              if (totalPages <= 5) {
-                // If 5 or fewer pages, show all
-                pageToShow = i + 1
-              } else if (currentPage <= 3) {
-                // If near start, show first 5 pages
-                pageToShow = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                // If near end, show last 5 pages
-                pageToShow = totalPages - 4 + i
-              } else {
-                // Otherwise show current page and 2 on each side
-                pageToShow = currentPage - 2 + i
-              }
+              {/* Generate page buttons dynamically */}
+              {Array.from({ length: Math.min(effectiveTotalPages, 5) }, (_, i) => {
+                let pageToShow
+                if (effectiveTotalPages <= 5) {
+                  pageToShow = i + 1
+                } else if (currentPage <= 3) {
+                  pageToShow = i + 1
+                } else if (currentPage >= effectiveTotalPages - 2) {
+                  pageToShow = effectiveTotalPages - 4 + i
+                } else {
+                  pageToShow = currentPage - 2 + i
+                }
 
-              return (
-                <button
-                  key={pageToShow}
-                  className={`join-item btn rounded-full ${currentPage === pageToShow ? "btn-primary" : ""}`}
-                  onClick={() => setCurrentPage(pageToShow)}
-                  disabled={loading}
-                >
-                  {pageToShow}
-                </button>
-              )
-            })}
+                return (
+                  <button
+                    key={pageToShow}
+                    className={`join-item btn rounded-full ${currentPage === pageToShow ? "btn-primary" : ""}`}
+                    onClick={() => setCurrentPage(pageToShow)}
+                    disabled={loading}
+                  >
+                    {pageToShow}
+                  </button>
+                )
+              })}
 
-            <button
-              className="join-item btn rounded-full"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages || loading}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              <button
+                className="join-item btn rounded-full"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, effectiveTotalPages))}
+                disabled={currentPage === effectiveTotalPages || loading}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

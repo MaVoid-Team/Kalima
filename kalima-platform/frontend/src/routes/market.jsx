@@ -54,23 +54,6 @@ export const getAllProducts = async (queryParams = {}) => {
   }
 };
 
-// Function to get products by section
-export const getProductsBySection = async (sectionId, queryParams = {}) => {
-  try {
-    const response = await axios.get(`${API_URL}/api/v1/products`, {
-      params: { section: sectionId, ...queryParams },
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching products by section: ${error.message}`);
-    throw error;
-  }
-};
-
 // Function to get books by section
 export const getBooksBySection = async (sectionId, queryParams = {}) => {
   try {
@@ -87,3 +70,19 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
     throw error;
   }
 };
+
+export const getProductsBySection = async (sectionId, queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/sections/${sectionId}/products`, {
+      params: queryParams,
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching products by section: ${error.message}`)
+    throw error
+  }
+}
