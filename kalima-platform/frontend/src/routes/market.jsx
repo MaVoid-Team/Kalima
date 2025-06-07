@@ -54,6 +54,38 @@ export const getAllProducts = async (queryParams = {}) => {
   }
 };
 
+// Function to get a book by ID
+export const getBookById = async (bookId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/books/${bookId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching book by ID: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to get a product by ID
+export const getProductById = async (productId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/products/${productId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching product by ID: ${error.message}`)
+    throw error
+  }
+}
+
 // Function to get books by section
 export const getBooksBySection = async (sectionId, queryParams = {}) => {
   try {
