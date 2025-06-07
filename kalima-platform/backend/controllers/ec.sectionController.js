@@ -44,7 +44,11 @@ exports.getSectionById = catchAsync(async (req, res, next) => {
 
 // Get section by ID with products
 exports.getSectionWithProducts = catchAsync(async (req, res, next) => {
-  const section = await ECSection.findById(req.params.id).populate("products");
+  const section = await ECSection.findById(req.params.id).populate({
+    path: "products",
+    select:
+      "title serial thumbnail sample section price paymentNumber discountPercentage priceAfterDiscount createdBy updatedBy", // Explicitly include all relevant fields
+  });
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
