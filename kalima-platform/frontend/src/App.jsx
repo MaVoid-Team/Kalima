@@ -43,6 +43,7 @@ const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture P
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
+const AdminPanel = lazy(() => import("./pages/KalimaStore/AdminPanel"));
 
 function App() {
   const location = useLocation();
@@ -219,7 +220,10 @@ function App() {
               path="/dashboard/admin-dashboard/lectures-page"
               element={<MyLecturesPage />}
             />
-
+            <Route
+              path="/dashboard/admin-dashboard/store-dashboard"
+              element={<AdminPanel />}
+            />
             {/* Lecturer Routes */}
             <Route
               path="/dashboard/lecturer-dashboard"

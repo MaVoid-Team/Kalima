@@ -219,7 +219,7 @@ const Market = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="px-4 py-4 border-b">
+      <div className="px-4 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex gap-4 items-center">
             <div className="flex-1 relative">
