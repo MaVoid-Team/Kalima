@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   getAllSections,
@@ -15,16 +15,43 @@ const Market = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sections, setSections] = useState([])
-  const [products, setProducts] = useState([])
-  const [books, setBooks] = useState([])
-  const [allItems, setAllItems] = useState([])
+  const [allProducts, setAllProducts] = useState([]) // Store all products
+  const [allBooks, setAllBooks] = useState([]) // Store all books
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [itemsPerPage] = useState(6) // Adjust based on your preference
+  const [itemsPerPage] = useState(6)
 
-  // Fetch initial data
+  // Combine all items based on active tab
+  const allItems = useMemo(() => {
+    if (activeTab === "all") {
+      return [...allProducts, ...allBooks]
+    }
+    return [
+      ...allProducts.filter(product => product.section?._id === activeTab),
+      ...allBooks.filter(book => book.section?._id === activeTab)
+    ]
+  }, [activeTab, allProducts, allBooks])
+
+  // Filter items based on search query
+  const filteredItems = useMemo(() => {
+    return allItems.filter((item) => 
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [allItems, searchQuery])
+
+  // Calculate paginated items
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredItems.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredItems, currentPage, itemsPerPage])
+
+  // Calculate total pages
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredItems.length / itemsPerPage) || 1
+  }, [filteredItems.length, itemsPerPage])
+
+  // Fetch all data initially
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -37,29 +64,19 @@ const Market = () => {
           setSections(sectionsResponse.data.sections)
         }
 
-        // Fetch products and books with pagination
+        // Fetch all products and books (without pagination)
         const [productsResponse, booksResponse] = await Promise.all([
-          getAllProducts({ page: currentPage, limit: itemsPerPage }),
-          getAllBooks({ page: currentPage, limit: itemsPerPage }),
+          getAllProducts(),
+          getAllBooks(),
         ])
 
         if (productsResponse.status === "success") {
-          setProducts(productsResponse.data.products)
+          setAllProducts(productsResponse.data.products)
         }
 
         if (booksResponse.status === "success") {
-          setBooks(booksResponse.data.books)
+          setAllBooks(booksResponse.data.books)
         }
-
-        // Combine products and books for display
-        const combinedItems = [...(productsResponse.data?.products || []), ...(booksResponse.data?.books || [])]
-        setAllItems(combinedItems)
-
-        // Calculate total pages based on total results
-        const totalProductsCount = productsResponse.results || 0
-        const totalBooksCount = booksResponse.results || 0
-        const totalItemsCount = totalProductsCount + totalBooksCount
-        setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
       } catch (err) {
         setError(err.message)
         console.error("Error fetching market data:", err)
@@ -69,73 +86,12 @@ const Market = () => {
     }
 
     fetchInitialData()
-  }, [currentPage, itemsPerPage])
+  }, [])
 
-  // Handle tab change and filter by section
+  // Reset to first page when filters change
   useEffect(() => {
-    const filterBySection = async () => {
-      if (activeTab === "all") {
-        try {
-          setLoading(true)
-          // Reset to first page when changing filters
-          setCurrentPage(1)
-
-          // Fetch all items with pagination
-          const [productsResponse, booksResponse] = await Promise.all([
-            getAllProducts({ page: 1, limit: itemsPerPage }),
-            getAllBooks({ page: 1, limit: itemsPerPage }),
-          ])
-
-          const combinedItems = [...(productsResponse.data?.products || []), ...(booksResponse.data?.books || [])]
-          setAllItems(combinedItems)
-
-          // Update total pages
-          const totalProductsCount = productsResponse.results || 0
-          const totalBooksCount = booksResponse.results || 0
-          const totalItemsCount = totalProductsCount + totalBooksCount
-          setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
-        } catch (err) {
-          console.error("Error fetching all items:", err)
-        } finally {
-          setLoading(false)
-        }
-        return
-      }
-
-      try {
-        setLoading(true)
-        // Reset to first page when changing filters
-        setCurrentPage(1)
-
-        // Find the selected section
-        const selectedSection = sections.find((section) => section._id === activeTab)
-        if (!selectedSection) return
-
-        // Fetch products and books for the selected section with pagination
-        const [sectionProducts, sectionBooks] = await Promise.all([
-          getProductsBySection(selectedSection._id, { page: 1, limit: itemsPerPage }),
-          getBooksBySection(selectedSection._id, { page: 1, limit: itemsPerPage }),
-        ])
-
-        const combinedItems = [...(sectionProducts.data?.products || []), ...(sectionBooks.data?.books || [])]
-        setAllItems(combinedItems)
-
-        // Update total pages
-        const totalProductsCount = sectionProducts.results || 0
-        const totalBooksCount = sectionBooks.results || 0
-        const totalItemsCount = totalProductsCount + totalBooksCount
-        setTotalPages(Math.ceil(totalItemsCount / itemsPerPage) || 1)
-      } catch (err) {
-        console.error("Error filtering by section:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (sections.length > 0) {
-      filterBySection()
-    }
-  }, [activeTab, sections, products, books, itemsPerPage])
+    setCurrentPage(1)
+  }, [activeTab, searchQuery])
 
   // Create categories array with "All" option and fetched sections
   const categories = [
@@ -143,17 +99,11 @@ const Market = () => {
     ...sections.map((section) => ({
       id: section._id,
       name: section.name,
-      icon: "📚", // You can map different icons based on section type
+      icon: "📚",
     })),
   ]
 
-  // Filter items based on search query
-  const filteredItems = allItems.filter((item) => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesSearch
-  })
-
-  if (loading && allItems.length === 0) {
+  if (loading && allProducts.length === 0 && allBooks.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
@@ -188,8 +138,8 @@ const Market = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <div className="py-6 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-6">
+        <div className="md:max-w-7xl lg:max-w-7xl max-w-3xl mx-auto">
+          <div className="flex flex-wrap items-center gap-2 mb-6">
             <img src="/bookshelf.png" alt="Books illustration" className="h-24 w-auto" />
             <h1 className="text-lg font-semibold flex-1 text-center md:text-right">
               Everything a teacher and student needs in one place
@@ -200,8 +150,8 @@ const Market = () => {
 
       {/* Category Tabs */}
       <div className="bg-primary px-4 py-2">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex overflow-x-auto scrollbar-hide gap-1">
+        <div className="md:max-w-7xl lg:max-w-7xl sm:max-w-3xl mx-auto">
+          <div className="flex flex-wrap overflow-x-auto scrollbar-hide gap-1">
             {categories.map((category) => (
               <button
                 key={category.id}
@@ -264,7 +214,7 @@ const Market = () => {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item) => (
+          {paginatedItems.map((item) => (
             <div
               key={item._id}
               className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
@@ -337,59 +287,42 @@ const Market = () => {
         )}
 
         {/* Pagination */}
-        <div className="flex justify-center mt-12">
-          <div className="join">
-            <button
-              className="join-item btn rounded-full"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-12">
+            <div className="join">
+              <button
+                className="join-item btn rounded-full"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || loading}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
 
-            {/* Generate page buttons dynamically */}
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              // Show current page and nearby pages
-              let pageToShow
-              if (totalPages <= 5) {
-                // If 5 or fewer pages, show all
-                pageToShow = i + 1
-              } else if (currentPage <= 3) {
-                // If near start, show first 5 pages
-                pageToShow = i + 1
-              } else if (currentPage >= totalPages - 2) {
-                // If near end, show last 5 pages
-                pageToShow = totalPages - 4 + i
-              } else {
-                // Otherwise show current page and 2 on each side
-                pageToShow = currentPage - 2 + i
-              }
-
-              return (
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
-                  key={pageToShow}
-                  className={`join-item btn rounded-full ${currentPage === pageToShow ? "btn-primary" : ""}`}
-                  onClick={() => setCurrentPage(pageToShow)}
+                  key={page}
+                  className={`join-item btn rounded-full ${currentPage === page ? "btn-primary" : ""}`}
+                  onClick={() => setCurrentPage(page)}
                   disabled={loading}
                 >
-                  {pageToShow}
+                  {page}
                 </button>
-              )
-            })}
+              ))}
 
-            <button
-              className="join-item btn rounded-full"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages || loading}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              <button
+                className="join-item btn rounded-full"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages || loading}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
