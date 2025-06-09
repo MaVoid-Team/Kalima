@@ -160,8 +160,8 @@ const AdminPanel = () => {
         if (sampleInput) sampleInput.value = ""
 
         // Refresh data
-        await fetchData()
         alert("Product created successfully!")
+        await fetchData()
       }
     } catch (err) {
       console.error("Error creating product:", err)
@@ -197,8 +197,8 @@ const AdminPanel = () => {
           thumbnail: "logo",
         })
         // Refresh data
-        await fetchData()
         alert("Section created successfully!")
+        await fetchData()
       }
     } catch (err) {
       console.error("Error creating section:", err)
@@ -243,8 +243,8 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
         })
-        await fetchData()
         alert("Section updated successfully!")
+        await fetchData()
       }
     } catch (err) {
       console.error("Error updating section:", err)
@@ -265,8 +265,8 @@ const AdminPanel = () => {
       if (response.status === "success") {
         setShowDeleteModal(false)
         setSectionToDelete(null)
-        await fetchData()
         alert("Section deleted successfully!")
+        await fetchData()
       }
     } catch (err) {
       console.error("Error deleting section:", err)
@@ -501,7 +501,7 @@ const AdminPanel = () => {
         </div>
 
         {/* Category Cards */}
-        <div className="mb-12">
+        {/* <div className="mb-12">
           <p className="text-center mb-8">
             You can download any section or add new sections to the available sections below.
           </p>
@@ -523,7 +523,7 @@ const AdminPanel = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Forms Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -716,7 +716,7 @@ const AdminPanel = () => {
                     ></textarea>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="label">
                       <span className="label-text font-medium">Thumbnail</span>
                     </label>
@@ -727,7 +727,7 @@ const AdminPanel = () => {
                       value={sectionForm.thumbnail}
                       onChange={(e) => setSectionForm({ ...sectionForm, thumbnail: e.target.value })}
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Arrow decoration */}
