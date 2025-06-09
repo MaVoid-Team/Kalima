@@ -21,7 +21,12 @@ const parentSchema = new mongoose.Schema({
   // Array of lecturer-specific point balances
   lecturerPoints: [lecturerPointsSchema],
   government: { type: String, required: true },
-  administrationZone: { type: String, required: true }
+  administrationZone: { type: String, required: true },
+    userSeria: {
+    type: String,
+    unique: true,
+    index: true
+  },
 }, {
   timestamps: true
 });
@@ -65,6 +70,34 @@ parentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   lecturerPointsEntry.points -= pointsToUse;
   return true; // Successfully used points
 };
+
+parentSchema.pre('save', async function(next) {
+  if (this.isNew && !this.userSeria) {
+    try {
+      // Get the count of existing parents to generate next number
+      const count = await mongoose.model('Parent').countDocuments();
+      // Generate userSeria with format PA + 3-digit number (PA001, PA002, etc.)
+      this.userSeria = `PA${String(count + 1).padStart(3, '0')}`;
+      
+      // Check if this userSeria already exists (for race condition safety)
+      const existingParent = await mongoose.model('Parent').findOne({ userSeria: this.userSeria });
+      if (existingParent) {
+        // If it exists, find the highest number and increment
+        const allParents = await mongoose.model('Parent').find({}, 'userSeria').lean();
+        const numbers = allParents
+          .map(p => parseInt(p.userSeria.replace('PA', '')))
+          .filter(n => !isNaN(n));
+        
+        const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+        this.userSeria = `PA${String(maxNumber + 1).padStart(3, '0')}`;
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+  next();
+});
+
 
 parentSchema.pre("validate", async function (next) {
   if (this.government && this.zone) {

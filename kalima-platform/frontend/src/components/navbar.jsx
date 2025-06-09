@@ -8,6 +8,8 @@ import {
   getUserDashboard,
   logoutUser,
 } from "../routes/auth-services";
+import { FaCartPlus, FaHome, FaBook, FaChalkboardTeacher, FaBox, FaVideo } from "react-icons/fa";
+import { Layout } from "lucide-react";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
@@ -111,11 +113,12 @@ const NavBar = () => {
   };
 
   const navItems = [
-    { key: "homepage", path: "/" },
-    { key: "educationalCourses", path: "/courses" },
-    { key: "teachers", path: "/teachers" },
-    { key: "lectures", path: "/lectures" },
-    { key: "Packages", path: "/packages" },
+    { key: "homepage", path: "/", icon: FaHome },
+    { key: "educationalCourses", path: "/courses", icon: FaBook },
+    { key: "teachers", path: "/teachers", icon: FaChalkboardTeacher },
+    { key: "lectures", path: "/lectures", icon: FaVideo },
+    { key: "Packages", path: "/packages", icon: FaBox },
+    { key: "market", path: "/market", icon: FaCartPlus },
   ];
 
   const authItems = [
@@ -171,9 +174,11 @@ const NavBar = () => {
               <Link
                 key={item.key}
                 to={item.path}
-                className="btn btn-ghost font-medium rounded-2xl transition-colors"
+                icon={item.icon}
+                className={`btn btn-ghost font-medium rounded-2xl transition-colors ${item.key === "market" ? "bg-primary/70" : ""}`}
               >
                 {t(item.key)}
+                {item.icon && <item.icon className="inline-block ml-1" />}
               </Link>
             ))}
             {userRole && (
@@ -182,6 +187,7 @@ const NavBar = () => {
                 className="btn btn-ghost rounded-2xl"
               >
                 {t("dashboard")}
+                <Layout className="inline-block mr-1" />
               </Link>
             )}
             <LanguageSwitcher />
