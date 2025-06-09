@@ -13,7 +13,8 @@ import {
   FaUserTie,
   FaUserGraduate,
   FaUserShield,
-  FaCalendar
+  FaCalendar,
+  FaStore
 } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
@@ -137,6 +138,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         icon: <FaGraduationCap className="w-5 h-5" />, 
         path: '/dashboard/admin-dashboard/lectures-page' 
       },
+      {
+        id: 'store-dashboard',
+        title: t('storeDashboard') || 'Store Dashboard',
+        icon: <FaStore className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/store-dashboard'
+      }
     ];
 
     // Lecturer-specific menu items
