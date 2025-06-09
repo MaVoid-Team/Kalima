@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Function to get all sections (categories)
 export const getAllSections = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/sections`, {
+    const response = await axios.get(`${API_URL}/sections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -23,7 +23,7 @@ export const getAllSections = async (queryParams = {}) => {
 // Function to get all books
 export const getAllBooks = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books`, {
+    const response = await axios.get(`${API_URL}/books`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -40,7 +40,7 @@ export const getAllBooks = async (queryParams = {}) => {
 // Function to get all products
 export const getAllProducts = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/products`, {
+    const response = await axios.get(`${API_URL}/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -57,7 +57,7 @@ export const getAllProducts = async (queryParams = {}) => {
 // Function to get a book by ID
 export const getBookById = async (bookId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books/${bookId}`, {
+    const response = await axios.get(`${API_URL}/books/${bookId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -73,7 +73,7 @@ export const getBookById = async (bookId) => {
 // Function to get a product by ID
 export const getProductById = async (productId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/products/${productId}`, {
+    const response = await axios.get(`${API_URL}/products/${productId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -89,7 +89,7 @@ export const getProductById = async (productId) => {
 // Function to get books by section
 export const getBooksBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books`, {
+    const response = await axios.get(`${API_URL}/books`, {
       params: { section: sectionId, ...queryParams },
       withCredentials: true,
       headers: {
@@ -105,7 +105,7 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
 
 export const getProductsBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/sections/${sectionId}/products`, {
+    const response = await axios.get(`${API_URL}/sections/${sectionId}/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -120,7 +120,7 @@ export const getProductsBySection = async (sectionId, queryParams = {}) => {
 }
 export const createSection = async (sectionData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/sections`, sectionData, {
+    const response = await axios.post(`${API_URL}/sections`, sectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -137,7 +137,7 @@ export const createSection = async (sectionData) => {
 // Function to update a section
 export const updateSection = async (sectionId, updateData) => {
   try {
-    const response = await axios.patch(`${API_URL}/api/v1/sections/${sectionId}`, updateData, {
+    const response = await axios.patch(`${API_URL}/sections/${sectionId}`, updateData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -154,7 +154,7 @@ export const updateSection = async (sectionId, updateData) => {
 // Function to delete a section
 export const deleteSection = async (sectionId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/sections/${sectionId}`, {
+    const response = await axios.delete(`${API_URL}/sections/${sectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -186,7 +186,7 @@ export const createProduct = async (productData) => {
       formData.append('sample', productData.sample)
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/products`, formData, {
+    const response = await axios.post(`${API_URL}/products`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
