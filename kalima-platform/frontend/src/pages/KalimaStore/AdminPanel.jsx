@@ -141,7 +141,7 @@ const AdminPanel = () => {
         sample: productForm.sample,
       })
 
-      if (response.status === "success") {
+      if (response.message === "Product created successfully") {
         // Reset form
         setProductForm({
           title: "",
