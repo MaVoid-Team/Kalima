@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { getBookById, getProductById } from "../../routes/market"
 
 const ProductDetails = () => {
+  const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
+  const isRTL = i18n.language === "ar"
+
   const [uploadedFile, setUploadedFile] = useState(null)
   const [dragActive, setDragActive] = useState(false)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [copySuccess, setCopySuccess] = useState(false)
-  
+
   const { id, type } = useParams() // type should be 'book' or 'product'
   const navigate = useNavigate()
 
@@ -19,7 +23,7 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchItemData = async () => {
       if (!id || !type) {
-        setError("Invalid product ID or type")
+        setError(t("errors.invalidProductInfo"))
         setLoading(false)
         return
       }
@@ -29,30 +33,30 @@ const ProductDetails = () => {
         setError(null)
 
         let response
-        if (type === 'book') {
+        if (type === "book") {
           response = await getBookById(id)
-        } else if (type === 'product') {
+        } else if (type === "product") {
           response = await getProductById(id)
         } else {
-          throw new Error("Invalid item type")
+          throw new Error(t("errors.invalidItemType"))
         }
 
         if (response.status === "success") {
           const itemData = response.data.book || response.data.product
           setProduct(itemData)
         } else {
-          throw new Error("Failed to fetch item data")
+          throw new Error(t("errors.fetchFailed"))
         }
       } catch (err) {
         setError(err.message)
-        console.error("Error fetching item data:", err)
+        console.error(t("errors.fetchErrorLog"), err)
       } finally {
         setLoading(false)
       }
     }
 
     fetchItemData()
-  }, [id, type])
+  }, [id, type, t])
 
   const handleCopyNumber = async () => {
     try {
@@ -60,7 +64,7 @@ const ProductDetails = () => {
       setCopySuccess(true)
       setTimeout(() => setCopySuccess(false), 2000)
     } catch (err) {
-      console.error("Failed to copy payment number:", err)
+      console.error(t("errors.copyFailed"), err)
     }
   }
 
@@ -92,7 +96,7 @@ const ProductDetails = () => {
 
   const handleSubmit = () => {
     // Handle form submission logic here
-    console.log("Submitting purchase with file:", uploadedFile)
+    console.log(t("logs.submittingPurchase"), uploadedFile)
     // You can add API call to submit the purchase request
   }
 
@@ -103,7 +107,7 @@ const ProductDetails = () => {
     if (product.section && product.section.name) {
       return product.section.name
     }
-    return type === 'book' ? 'Book' : 'Product'
+    return type === "book" ? t("product.types.book") : t("product.types.product")
   }
 
   const getDisplayPrice = () => {
@@ -143,11 +147,11 @@ const ProductDetails = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">Error!</h3>
-            <div className="text-xs">{error || "Product not found"}</div>
+            <h3 className="font-bold">{t("errors.title")}</h3>
+            <div className="text-xs">{error || t("errors.productNotFound")}</div>
           </div>
           <button onClick={() => navigate(-1)} className="btn btn-sm">
-            Go Back
+            {t("navigation.goBack")}
           </button>
         </div>
       </div>
@@ -155,23 +159,29 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* Header */}
       <div className="py-6 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center relative">
             <button
               onClick={() => navigate(-1)}
-              className="absolute left-0 btn btn-ghost btn-sm"
+              className={`absolute ${isRTL ? "right-0" : "left-0"} btn btn-ghost btn-sm`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                style={{ transform: isRTL ? "rotate(180deg)" : "none" }}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back
+              {t("navigation.back")}
             </button>
-            <div className="absolute left-20 w-16 h-1 bg-yellow-500 rounded"></div>
-            <h1 className="text-2xl font-bold text-center">Purchase Details</h1>
-            <div className="absolute right-0">
+            <div className={`absolute ${isRTL ? "right-20" : "left-20"} w-16 h-1 bg-yellow-500 rounded`}></div>
+            <h1 className="text-2xl font-bold text-center">{t("header.purchaseDetails")}</h1>
+            <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
               <div className="grid grid-cols-4 gap-1 rounded-full">
                 {Array.from({ length: 16 }, (_, i) => (
                   <div key={i} className="w-2 h-2 bg-red-400 rounded-full animate-float-up-dottedball"></div>
@@ -186,21 +196,25 @@ const ProductDetails = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Image */}
-          <div className="flex justify-center lg:justify-end">
+          <div className={`flex justify-center ${isRTL ? "lg:justify-start" : "lg:justify-end"}`}>
             <div className="relative">
               <img
-                src={product.thumbnail}
+                src={product.thumbnail || "/placeholder.svg"}
                 alt={product.title}
                 className="w-full max-w-sm h-auto object-contain rounded-lg shadow-lg"
               />
               {/* Decorative dot */}
-              <div className="absolute -bottom-4 left-8 w-4 h-4 bg-yellow-500 rounded-full animate-float-zigzag"></div>
-              
+              <div
+                className={`absolute -bottom-4 ${isRTL ? "right-8" : "left-8"} w-4 h-4 bg-yellow-500 rounded-full animate-float-zigzag`}
+              ></div>
+
               {/* Discount Badge */}
               {hasDiscount() && (
-                <div className="absolute top-4 left-4">
-                  <div className="bg-primary px-3 py-1 rounded-br-2xl text-sm font-medium text-white">
-                    Discount
+                <div className={`absolute top-4 ${isRTL ? "right-4" : "left-4"}`}>
+                  <div
+                    className={`bg-primary px-3 py-1 ${isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"} text-sm font-medium text-white`}
+                  >
+                    {t("product.discount")}
                     <br />
                     <span className="text-lg font-bold">{product.discountPercentage}%</span>
                   </div>
@@ -211,31 +225,37 @@ const ProductDetails = () => {
 
           {/* Product Details */}
           <div className="space-y-6">
-            <div className="text-center lg:text-right">
-              <h2 className="text-3xl font-bold mb-2">Details</h2>
+            <div className={`text-center ${isRTL ? "lg:text-left" : "lg:text-right"}`}>
+              <h2 className="text-3xl font-bold mb-2">{t("product.details")}</h2>
 
               <div className="space-y-4">
                 <div>
-                  <span className="text-primary font-semibold">Product Name</span>
+                  <span className="text-primary font-semibold">{t("product.name")}</span>
                   <p className="text-lg font-medium">{product.title}</p>
                 </div>
 
                 <div>
-                  <span className="text-primary font-semibold">Category</span>
+                  <span className="text-primary font-semibold">{t("product.category")}</span>
                   <p className="text-sm">{getItemCategory()}</p>
                 </div>
 
                 <div>
-                  <span className="text-primary font-semibold">Serial Number</span>
+                  <span className="text-primary font-semibold">{t("product.serialNumber")}</span>
                   <p className="text-sm font-mono">{product.serial}</p>
                 </div>
 
                 <div className="mt-4">
-                  <span className="text-primary font-semibold">Product Price</span>
-                  <div className="flex items-center justify-center lg:justify-end gap-2">
-                    <p className="text-2xl font-bold">{getDisplayPrice()} ج</p>
+                  <span className="text-primary font-semibold">{t("product.price")}</span>
+                  <div
+                    className={`flex items-center ${isRTL ? "lg:justify-start" : "lg:justify-end"} justify-center gap-2`}
+                  >
+                    <p className="text-2xl font-bold">
+                      {getDisplayPrice()} {t("product.currency")}
+                    </p>
                     {hasDiscount() && (
-                      <p className="text-lg line-through text-gray-500">{product.price} ج</p>
+                      <p className="text-lg line-through text-gray-500">
+                        {product.price} {t("product.currency")}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -251,7 +271,7 @@ const ProductDetails = () => {
             <button
               onClick={handleCopyNumber}
               className={`btn btn-primary bg-primary hover:bg-primary/80 px-8 py-3 text-xl font-bold rounded-lg inline-flex items-center gap-3 transition-all ${
-                copySuccess ? 'btn-success' : ''
+                copySuccess ? "btn-success" : ""
               }`}
             >
               {product.paymentNumber}
@@ -264,32 +284,34 @@ const ProductDetails = () => {
                 />
               </svg>
             </button>
-            {copySuccess && (
-              <p className="mt-2 text-success font-semibold">Payment number copied!</p>
-            )}
-            <p className="mt-2">Send the specified amount to the above number</p>
+            {copySuccess && <p className="mt-2 text-success font-semibold">{t("payment.numberCopied")}</p>}
+            <p className="mt-2">{t("payment.sendAmount")}</p>
           </div>
 
           {/* Purchase Steps */}
-          <div className="text-center lg:text-right space-y-4">
-            <h3 className="text-2xl font-bold">Purchase Steps</h3>
+          <div className={`text-center ${isRTL ? "lg:text-left" : "lg:text-right"} space-y-4`}>
+            <h3 className="text-2xl font-bold">{t("purchaseSteps.title")}</h3>
 
             <div className="space-y-3">
-              <div className="flex items-center justify-center lg:justify-end gap-3">
+              <div
+                className={`flex items-center ${isRTL ? "lg:justify-start" : "lg:justify-end"} justify-center gap-3`}
+              >
                 <span className="text-primary">💳</span>
-                <p>Send the amount via electronic wallet or instapay</p>
+                <p>{t("purchaseSteps.step1")}</p>
               </div>
 
-              <div className="flex items-center justify-center lg:justify-end gap-3">
+              <div
+                className={`flex items-center ${isRTL ? "lg:justify-start" : "lg:justify-end"} justify-center gap-3`}
+              >
                 <span className="text-primary">📱</span>
-                <p>Take a screenshot after completing the transfer process</p>
+                <p>{t("purchaseSteps.step2")}</p>
               </div>
             </div>
           </div>
 
           {/* Upload Section */}
           <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold">Upload Transfer Screenshot Here</h3>
+            <h3 className="text-2xl font-bold">{t("upload.title")}</h3>
 
             <div
               className={`border-2 border-dashed rounded-lg p-8 transition-colors ${
@@ -316,22 +338,22 @@ const ProductDetails = () => {
 
                 {uploadedFile ? (
                   <div className="space-y-2">
-                    <p className="font-semibold text-primary">File uploaded successfully!</p>
+                    <p className="font-semibold text-primary">{t("upload.fileSuccess")}</p>
                     <p className="text-sm">{uploadedFile.name}</p>
                     <button onClick={() => setUploadedFile(null)} className="text-sm text-red-500 hover:text-red-700">
-                      Remove file
+                      {t("upload.removeFile")}
                     </button>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <p>Drag and drop your screenshot here</p>
-                    <p className="text-sm">Maximum file size: 1 GB</p>
+                    <p>{t("upload.dragDrop")}</p>
+                    <p className="text-sm">{t("upload.maxFileSize")}</p>
                   </div>
                 )}
 
                 <input type="file" id="file-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
                 <label htmlFor="file-upload" className="btn btn-outline btn-primary cursor-pointer">
-                  Add Image
+                  {t("upload.addImage")}
                 </label>
               </div>
             </div>
@@ -339,8 +361,8 @@ const ProductDetails = () => {
 
           {/* Response Time Notice */}
           <div className="text-center space-y-2">
-            <p>Please note that we will respond after uploading the screenshot</p>
-            <p>Response will be within 1-2 hours during business hours</p>
+            <p>{t("response.note")}</p>
+            <p>{t("response.timeframe")}</p>
           </div>
 
           {/* Submit Button */}
@@ -350,7 +372,7 @@ const ProductDetails = () => {
               className="btn btn-primary bg-primary hover:bg-primary/80 px-12 py-3 text-lg font-semibold rounded-lg"
               disabled={!uploadedFile}
             >
-              Done
+              {t("buttons.done")}
             </button>
           </div>
         </div>
