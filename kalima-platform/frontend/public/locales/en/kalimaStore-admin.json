@@ -1,0 +1,99 @@
+{
+  "stats": {
+    "totalSales": "Total Sales",
+    "pendingApplications": "Pending Applications",
+    "numberOfProducts": "Number of Products",
+    "numberOfSections": "Number of Sections"
+  },
+  "categories": {
+    "designsSection": "Designs Section",
+    "designsDescription": "Design templates and resources",
+    "coursesSection": "Courses Section",
+    "coursesDescription": "Educational courses and materials",
+    "giftsSection": "Gifts Section",
+    "giftsDescription": "Gift items and packages",
+    "printingSection": "Printing Section",
+    "printingDescription": "Printing services and materials"
+  },
+  "sectionsManagement": {
+    "title": "Sections Management",
+    "searchPlaceholder": "Search sections...",
+    "table": {
+      "name": "Name",
+      "sectionNumber": "Section Number",
+      "numberOfProducts": "Number of Products",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "forms": {
+    "createProduct": {
+      "title": "Create New Product",
+      "submitButton": "Create Product",
+      "fields": {
+        "title": "Product Title",
+        "serial": "Serial",
+        "section": "Section",
+        "price": "Price",
+        "discountPercentage": "Discount Percentage",
+        "paymentNumber": "Payment Number",
+        "thumbnail": "Product Thumbnail",
+        "sampleFile": "Sample File"
+      },
+      "placeholders": {
+        "title": "Enter product title",
+        "serial": "Enter serial number",
+        "section": "Select section",
+        "paymentNumber": "Enter payment number"
+      },
+      "hints": {
+        "thumbnail": "Upload product thumbnail (max 5MB)",
+        "sampleFile": "Upload sample file"
+      }
+    },
+    "createSection": {
+      "title": "Create Section",
+      "submitButton": "Create Section",
+      "fields": {
+        "name": "Section Name",
+        "number": "Section Number",
+        "description": "Description",
+        "thumbnail": "Thumbnail"
+      },
+      "placeholders": {
+        "name": "Enter section name",
+        "number": "Enter section number",
+        "description": "Enter section description",
+        "thumbnail": "Enter thumbnail name"
+      }
+    }
+  },
+  "modals": {
+    "editSection": {
+      "title": "Edit Section",
+      "cancelButton": "Cancel",
+      "updateButton": "Update Section"
+    },
+    "deleteSection": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete the section \"{{sectionName}}\"? This action cannot be undone.",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete"
+    }
+  },
+  "alerts": {
+    "fillRequiredFields": "Please fill in all required fields",
+    "productCreatedSuccess": "Product created successfully!",
+    "productCreateError": "Error creating product: ",
+    "sectionCreatedSuccess": "Section created successfully!",
+    "sectionCreateError": "Error creating section: ",
+    "sectionUpdatedSuccess": "Section updated successfully!",
+    "sectionUpdateError": "Error updating section: ",
+    "sectionDeletedSuccess": "Section deleted successfully!",
+    "sectionDeleteError": "Error deleting section: "
+  },
+  "error": {
+    "title": "Error!"
+  }
+}

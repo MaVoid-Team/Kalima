@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import {
   getAllSections,
   getAllBooks,
@@ -12,6 +13,9 @@ import {
 } from "../../routes/market"
 
 const AdminPanel = () => {
+  const { t, i18n } = useTranslation("kalimaStore-admin")
+  const isRTL = i18n.language === "ar"
+
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProductType, setSelectedProductType] = useState("")
   const [selectedSectionType, setSelectedSectionType] = useState("")
@@ -124,7 +128,7 @@ const AdminPanel = () => {
       !productForm.price ||
       !productForm.paymentNumber
     ) {
-      alert("Please fill in all required fields")
+      alert(t("alerts.fillRequiredFields"))
       return
     }
 
@@ -160,12 +164,12 @@ const AdminPanel = () => {
         if (sampleInput) sampleInput.value = ""
 
         // Refresh data
-        alert("Product created successfully!")
+        alert(t("alerts.productCreatedSuccess"))
         await fetchData()
       }
     } catch (err) {
       console.error("Error creating product:", err)
-      alert("Error creating product: " + err.message)
+      alert(t("alerts.productCreateError") + err.message)
     } finally {
       setActionLoading(false)
     }
@@ -175,7 +179,7 @@ const AdminPanel = () => {
   const handleCreateSection = async (e) => {
     e.preventDefault()
     if (!sectionForm.name || !sectionForm.description || !sectionForm.number) {
-      alert("Please fill in all required fields")
+      alert(t("alerts.fillRequiredFields"))
       return
     }
 
@@ -197,12 +201,12 @@ const AdminPanel = () => {
           thumbnail: "logo",
         })
         // Refresh data
-        alert("Section created successfully!")
+        alert(t("alerts.sectionCreatedSuccess"))
         await fetchData()
       }
     } catch (err) {
       console.error("Error creating section:", err)
-      alert("Error creating section: " + err.message)
+      alert(t("alerts.sectionCreateError") + err.message)
     } finally {
       setActionLoading(false)
     }
@@ -243,12 +247,12 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
         })
-        alert("Section updated successfully!")
+        alert(t("alerts.sectionUpdatedSuccess"))
         await fetchData()
       }
     } catch (err) {
       console.error("Error updating section:", err)
-      alert("Error updating section: " + err.message)
+      alert(t("alerts.sectionUpdateError") + err.message)
     } finally {
       setActionLoading(false)
     }
@@ -265,12 +269,12 @@ const AdminPanel = () => {
       if (response.status === "success") {
         setShowDeleteModal(false)
         setSectionToDelete(null)
-        alert("Section deleted successfully!")
+        alert(t("alerts.sectionDeletedSuccess"))
         await fetchData()
       }
     } catch (err) {
       console.error("Error deleting section:", err)
-      alert("Error deleting section: " + err.message)
+      alert(t("alerts.sectionDeleteError") + err.message)
     } finally {
       setActionLoading(false)
     }
@@ -300,28 +304,28 @@ const AdminPanel = () => {
   // Stats data with real values
   const statsData = [
     {
-      title: "Total Sales",
+      title: t("stats.totalSales"),
       value: `${stats.totalSales}`,
       icon: "💰",
       bgColor: "bg-green-800/50",
       textColor: "text-white",
     },
     {
-      title: "Pending Applications",
+      title: t("stats.pendingApplications"),
       value: stats.pendingApplications.toString(),
       icon: "⏳",
       bgColor: "bg-orange-800/50",
       textColor: "text-white",
     },
     {
-      title: "Number of Products",
+      title: t("stats.numberOfProducts"),
       value: stats.totalProducts.toString(),
       icon: "📦",
       bgColor: "bg-blue-800/50",
       textColor: "text-white",
     },
     {
-      title: "Number of Sections",
+      title: t("stats.numberOfSections"),
       value: stats.totalSections.toString(),
       icon: "📚",
       bgColor: "bg-purple-800/50",
@@ -340,28 +344,28 @@ const AdminPanel = () => {
 
     return [
       {
-        title: "Designs Section",
+        title: t("categories.designsSection"),
         count: designSections.length,
         icon: "🎨",
-        description: "Design templates and resources",
+        description: t("categories.designsDescription"),
       },
       {
-        title: "Courses Section",
+        title: t("categories.coursesSection"),
         count: courseSections.length,
         icon: "📚",
-        description: "Educational courses and materials",
+        description: t("categories.coursesDescription"),
       },
       {
-        title: "Gifts Section",
+        title: t("categories.giftsSection"),
         count: giftSections.length,
         icon: "🎁",
-        description: "Gift items and packages",
+        description: t("categories.giftsDescription"),
       },
       {
-        title: "Printing Section",
+        title: t("categories.printingSection"),
         count: printingSections.length,
         icon: "🖨️",
-        description: "Printing services and materials",
+        description: t("categories.printingDescription"),
       },
     ]
   }
@@ -392,7 +396,7 @@ const AdminPanel = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">Error!</h3>
+            <h3 className="font-bold">{t("error.title")}</h3>
             <div className="text-xs">{error}</div>
           </div>
         </div>
@@ -401,7 +405,7 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* Stats Cards */}
       <div className="px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -426,11 +430,11 @@ const AdminPanel = () => {
         <div className="mb-12">
           <div className="flex items-center justify-center relative mb-8">
             {/* Decorative elements */}
-            <div className="absolute left-10">
+            <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
               <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
             </div>
-            <h2 className="text-3xl font-bold text-center">Sections Management</h2>
-            <div className="absolute right-0">
+            <h2 className="text-3xl font-bold text-center">{t("sectionsManagement.title")}</h2>
+            <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
               <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
             </div>
           </div>
@@ -440,12 +444,16 @@ const AdminPanel = () => {
             <div className="relative w-full max-w-md">
               <input
                 type="text"
-                placeholder="Search sections..."
+                placeholder={t("sectionsManagement.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input input-bordered w-full pl-4 pr-12"
+                className={`input input-bordered w-full ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
               />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm">🔍</button>
+              <button
+                className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm`}
+              >
+                🔍
+              </button>
             </div>
           </div>
 
@@ -455,10 +463,10 @@ const AdminPanel = () => {
               <table className="table w-full">
                 <thead>
                   <tr>
-                    <th className="text-center">Name</th>
-                    <th className="text-center">Section Number</th>
-                    <th className="text-center">Number of Products</th>
-                    <th className="text-center">Actions</th>
+                    <th className="text-center">{t("sectionsManagement.table.name")}</th>
+                    <th className="text-center">{t("sectionsManagement.table.sectionNumber")}</th>
+                    <th className="text-center">{t("sectionsManagement.table.numberOfProducts")}</th>
+                    <th className="text-center">{t("sectionsManagement.table.actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -473,6 +481,7 @@ const AdminPanel = () => {
                             className="btn btn-ghost btn-sm"
                             onClick={() => handleEditSection(section)}
                             disabled={actionLoading}
+                            title={t("sectionsManagement.table.edit")}
                           >
                             ✏️
                           </button>
@@ -483,6 +492,7 @@ const AdminPanel = () => {
                               setShowDeleteModal(true)
                             }}
                             disabled={actionLoading}
+                            title={t("sectionsManagement.table.delete")}
                           >
                             🗑️
                           </button>
@@ -494,36 +504,11 @@ const AdminPanel = () => {
               </table>
             </div>
             {/* Decorative dots */}
-            <div className="absolute bottom-4 right-4">
+            <div className={`absolute bottom-4 ${isRTL ? "left-4" : "right-4"}`}>
               <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-down-dottedball" />
             </div>
           </div>
         </div>
-
-        {/* Category Cards */}
-        {/* <div className="mb-12">
-          <p className="text-center mb-8">
-            You can download any section or add new sections to the available sections below.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {getCategoryData().map((category, index) => (
-              <div key={index} className="card shadow-lg border-2 border-primary">
-                <div className="card-body p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">{category.title}</h3>
-                    <div className="text-3xl">{category.icon}</div>
-                  </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold">{category.count}</span>
-                    <span className="text-sm">Number of Sections</span>
-                  </div>
-                  <p className="text-sm mb-4">{category.description}</p>
-                  <button className="btn btn-primary w-full">View Section</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
 
         {/* Forms Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -532,20 +517,24 @@ const AdminPanel = () => {
             <div className="card-body p-6">
               <form onSubmit={handleCreateProduct}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold">Create New Product</h3>
+                  <h3 className="text-2xl font-bold">{t("forms.createProduct.title")}</h3>
                   <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-                    {actionLoading ? <span className="loading loading-spinner loading-sm"></span> : "Create Product"}
+                    {actionLoading ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      t("forms.createProduct.submitButton")
+                    )}
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Product Title *</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.title")} *</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter product title"
+                      placeholder={t("forms.createProduct.placeholders.title")}
                       className="input input-bordered w-full"
                       value={productForm.title}
                       onChange={(e) => setProductForm({ ...productForm, title: e.target.value })}
@@ -555,11 +544,11 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Serial *</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.serial")} *</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter serial number"
+                      placeholder={t("forms.createProduct.placeholders.serial")}
                       className="input input-bordered w-full"
                       value={productForm.serial}
                       onChange={(e) => setProductForm({ ...productForm, serial: e.target.value })}
@@ -569,7 +558,7 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Section *</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.section")} *</span>
                     </label>
                     <select
                       className="select select-bordered w-full"
@@ -577,7 +566,7 @@ const AdminPanel = () => {
                       onChange={(e) => setProductForm({ ...productForm, section: e.target.value })}
                       required
                     >
-                      <option value="">Select section</option>
+                      <option value="">{t("forms.createProduct.placeholders.section")}</option>
                       {sections.map((section) => (
                         <option key={section._id} value={section._id}>
                           {section.name}
@@ -588,7 +577,7 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Price *</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.price")} *</span>
                     </label>
                     <input
                       type="number"
@@ -602,7 +591,9 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Discount Percentage</span>
+                      <span className="label-text font-medium">
+                        {t("forms.createProduct.fields.discountPercentage")}
+                      </span>
                     </label>
                     <input
                       type="number"
@@ -615,11 +606,11 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Payment Number *</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.paymentNumber")} *</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter payment number"
+                      placeholder={t("forms.createProduct.placeholders.paymentNumber")}
                       className="input input-bordered w-full"
                       value={productForm.paymentNumber}
                       onChange={(e) => setProductForm({ ...productForm, paymentNumber: e.target.value })}
@@ -629,7 +620,7 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Product Thumbnail</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.thumbnail")}</span>
                     </label>
                     <input
                       type="file"
@@ -638,12 +629,12 @@ const AdminPanel = () => {
                       accept="image/*"
                       onChange={(e) => handleFileChange(e, "thumbnail")}
                     />
-                    <p className="text-xs mt-1">Upload product thumbnail (max 5MB)</p>
+                    <p className="text-xs mt-1">{t("forms.createProduct.hints.thumbnail")}</p>
                   </div>
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Sample File</span>
+                      <span className="label-text font-medium">{t("forms.createProduct.fields.sampleFile")}</span>
                     </label>
                     <input
                       type="file"
@@ -651,12 +642,12 @@ const AdminPanel = () => {
                       className="file-input file-input-bordered w-full"
                       onChange={(e) => handleFileChange(e, "sample")}
                     />
-                    <p className="text-xs mt-1">Upload sample file</p>
+                    <p className="text-xs mt-1">{t("forms.createProduct.hints.sampleFile")}</p>
                   </div>
                 </div>
 
                 {/* Decorative elements */}
-                <div className="absolute bottom-4 left-4">
+                <div className={`absolute bottom-4 ${isRTL ? "right-4" : "left-4"}`}>
                   <img src="/waves.png" alt="Decorative zigzag" className="w-16 h-full animate-float-zigzag" />
                 </div>
               </form>
@@ -668,20 +659,24 @@ const AdminPanel = () => {
             <div className="card-body p-6">
               <form onSubmit={handleCreateSection}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold">Create Section</h3>
+                  <h3 className="text-2xl font-bold">{t("forms.createSection.title")}</h3>
                   <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-                    {actionLoading ? <span className="loading loading-spinner loading-sm"></span> : "Create Section"}
+                    {actionLoading ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      t("forms.createSection.submitButton")
+                    )}
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Section Name *</span>
+                      <span className="label-text font-medium">{t("forms.createSection.fields.name")} *</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter section name"
+                      placeholder={t("forms.createSection.placeholders.name")}
                       className="input input-bordered w-full"
                       value={sectionForm.name}
                       onChange={(e) => setSectionForm({ ...sectionForm, name: e.target.value })}
@@ -691,11 +686,11 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Section Number *</span>
+                      <span className="label-text font-medium">{t("forms.createSection.fields.number")} *</span>
                     </label>
                     <input
                       type="number"
-                      placeholder="Enter section number"
+                      placeholder={t("forms.createSection.placeholders.number")}
                       className="input input-bordered w-full"
                       value={sectionForm.number}
                       onChange={(e) => setSectionForm({ ...sectionForm, number: e.target.value })}
@@ -705,29 +700,16 @@ const AdminPanel = () => {
 
                   <div>
                     <label className="label">
-                      <span className="label-text font-medium">Description *</span>
+                      <span className="label-text font-medium">{t("forms.createSection.fields.description")} *</span>
                     </label>
                     <textarea
-                      placeholder="Enter section description"
+                      placeholder={t("forms.createSection.placeholders.description")}
                       className="textarea textarea-bordered w-full h-32"
                       value={sectionForm.description}
                       onChange={(e) => setSectionForm({ ...sectionForm, description: e.target.value })}
                       required
                     ></textarea>
                   </div>
-
-                  {/* <div>
-                    <label className="label">
-                      <span className="label-text font-medium">Thumbnail</span>
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter thumbnail name"
-                      className="input input-bordered w-full"
-                      value={sectionForm.thumbnail}
-                      onChange={(e) => setSectionForm({ ...sectionForm, thumbnail: e.target.value })}
-                    />
-                  </div> */}
                 </div>
 
                 {/* Arrow decoration */}
@@ -741,10 +723,10 @@ const AdminPanel = () => {
 
         {/* Bottom decorative elements */}
         <div className="relative">
-          <div className="absolute bottom-16 left-10">
+          <div className={`absolute bottom-16 ${isRTL ? "right-10" : "left-10"}`}>
             <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-up-dottedball" />
           </div>
-          <div className="absolute bottom-8 right-10">
+          <div className={`absolute bottom-8 ${isRTL ? "left-10" : "right-10"}`}>
             <img src="/ring.png" alt="Decorative circle" className="w-16 h-full animate-float-down-dottedball" />
           </div>
         </div>
@@ -754,16 +736,16 @@ const AdminPanel = () => {
       {showEditModal && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Edit Section</h3>
+            <h3 className="font-bold text-lg mb-4">{t("modals.editSection.title")}</h3>
             <form onSubmit={handleUpdateSection}>
               <div className="space-y-4">
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Section Name *</span>
+                    <span className="label-text font-medium">{t("forms.createSection.fields.name")} *</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter section name"
+                    placeholder={t("forms.createSection.placeholders.name")}
                     className="input input-bordered w-full"
                     value={sectionForm.name}
                     onChange={(e) => setSectionForm({ ...sectionForm, name: e.target.value })}
@@ -773,11 +755,11 @@ const AdminPanel = () => {
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Section Number *</span>
+                    <span className="label-text font-medium">{t("forms.createSection.fields.number")} *</span>
                   </label>
                   <input
                     type="number"
-                    placeholder="Enter section number"
+                    placeholder={t("forms.createSection.placeholders.number")}
                     className="input input-bordered w-full"
                     value={sectionForm.number}
                     onChange={(e) => setSectionForm({ ...sectionForm, number: e.target.value })}
@@ -787,10 +769,10 @@ const AdminPanel = () => {
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Description *</span>
+                    <span className="label-text font-medium">{t("forms.createSection.fields.description")} *</span>
                   </label>
                   <textarea
-                    placeholder="Enter section description"
+                    placeholder={t("forms.createSection.placeholders.description")}
                     className="textarea textarea-bordered w-full h-24"
                     value={sectionForm.description}
                     onChange={(e) => setSectionForm({ ...sectionForm, description: e.target.value })}
@@ -800,11 +782,11 @@ const AdminPanel = () => {
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Thumbnail</span>
+                    <span className="label-text font-medium">{t("forms.createSection.fields.thumbnail")}</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter thumbnail name"
+                    placeholder={t("forms.createSection.placeholders.thumbnail")}
                     className="input input-bordered w-full"
                     value={sectionForm.thumbnail}
                     onChange={(e) => setSectionForm({ ...sectionForm, thumbnail: e.target.value })}
@@ -827,10 +809,14 @@ const AdminPanel = () => {
                     })
                   }}
                 >
-                  Cancel
+                  {t("modals.editSection.cancelButton")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-                  {actionLoading ? <span className="loading loading-spinner loading-sm"></span> : "Update Section"}
+                  {actionLoading ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    t("modals.editSection.updateButton")
+                  )}
                 </button>
               </div>
             </form>
@@ -842,10 +828,8 @@ const AdminPanel = () => {
       {showDeleteModal && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg">Confirm Delete</h3>
-            <p className="py-4">
-              Are you sure you want to delete the section "{sectionToDelete?.name}"? This action cannot be undone.
-            </p>
+            <h3 className="font-bold text-lg">{t("modals.deleteSection.title")}</h3>
+            <p className="py-4">{t("modals.deleteSection.message", { sectionName: sectionToDelete?.name })}</p>
             <div className="modal-action">
               <button
                 className="btn"
@@ -854,10 +838,14 @@ const AdminPanel = () => {
                   setSectionToDelete(null)
                 }}
               >
-                Cancel
+                {t("modals.deleteSection.cancelButton")}
               </button>
               <button className="btn btn-error" onClick={handleDeleteSection} disabled={actionLoading}>
-                {actionLoading ? <span className="loading loading-spinner loading-sm"></span> : "Delete"}
+                {actionLoading ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  t("modals.deleteSection.deleteButton")
+                )}
               </button>
             </div>
           </div>
