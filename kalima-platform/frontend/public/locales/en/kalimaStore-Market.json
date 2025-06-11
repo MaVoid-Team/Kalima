@@ -9,6 +9,10 @@
   "search": {
     "placeholder": "What are you looking for?"
   },
+  "sections": {
+    "Designs": "Designs",
+    "Books": "Books"
+  },
   "product": {
     "discounts": "Discounts",
     "currency": "ج",
