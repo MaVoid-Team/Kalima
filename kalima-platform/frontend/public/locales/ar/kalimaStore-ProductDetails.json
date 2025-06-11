@@ -1,0 +1,58 @@
+{
+  "header": {
+    "purchaseDetails": "تفاصيل الشراء"
+  },
+  "navigation": {
+    "back": "رجوع",
+    "goBack": "العودة"
+  },
+  "product": {
+    "details": "التفاصيل",
+    "name": "اسم المنتج",
+    "category": "الفئة",
+    "serialNumber": "الرقم التسلسلي",
+    "price": "سعر المنتج",
+    "discount": "خصم",
+    "currency": "ج",
+    "types": {
+      "book": "كتاب",
+      "product": "منتج"
+    }
+  },
+  "payment": {
+    "numberCopied": "تم نسخ رقم الدفع!",
+    "sendAmount": "أرسل المبلغ المحدد إلى الرقم أعلاه"
+  },
+  "purchaseSteps": {
+    "title": "خطوات الشراء",
+    "step1": "أرسل المبلغ عبر المحفظة الإلكترونية أو انستاباي",
+    "step2": "التقط لقطة شاشة بعد إتمام عملية التحويل"
+  },
+  "upload": {
+    "title": "قم بتحميل لقطة شاشة التحويل هنا",
+    "dragDrop": "اسحب وأفلت لقطة الشاشة هنا",
+    "maxFileSize": "الحد الأقصى لحجم الملف: 1 جيجابايت",
+    "fileSuccess": "تم تحميل الملف بنجاح!",
+    "removeFile": "إزالة الملف",
+    "addImage": "إضافة صورة"
+  },
+  "response": {
+    "note": "يرجى ملاحظة أننا سنرد بعد تحميل لقطة الشاشة",
+    "timeframe": "سيكون الرد خلال 1-2 ساعة خلال ساعات العمل"
+  },
+  "buttons": {
+    "done": "تم"
+  },
+  "errors": {
+    "title": "خطأ!",
+    "invalidProductInfo": "معرف المنتج أو النوع غير صالح",
+    "invalidItemType": "نوع العنصر غير صالح",
+    "fetchFailed": "فشل في جلب بيانات العنصر",
+    "fetchErrorLog": "خطأ في جلب بيانات العنصر:",
+    "copyFailed": "فشل في نسخ رقم الدفع:",
+    "productNotFound": "المنتج غير موجود"
+  },
+  "logs": {
+    "submittingPurchase": "جاري إرسال الشراء مع الملف:"
+  }
+}
