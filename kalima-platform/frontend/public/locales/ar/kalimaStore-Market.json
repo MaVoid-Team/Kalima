@@ -14,6 +14,10 @@
     "currency": "ج",
     "viewDetails": "عرض التفاصيل"
   },
+  "sections": {
+    "Designs": "تصاميم",
+    "Books": "كتب"
+  },
   "emptyState": {
     "title": "لم يتم العثور على عناصر",
     "description": "حاول تعديل معايير البحث أو التصفية"
