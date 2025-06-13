@@ -143,7 +143,10 @@ exports.deleteProduct = async (req, res) => {
         if (product.sample && fs.existsSync(product.sample)) {
             fs.unlinkSync(product.sample);
         }
-        res.status(204).json({ message: "Product deleted" });
+        res.status(200).json({
+            status: "success",
+            message: "Product deleted"
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
