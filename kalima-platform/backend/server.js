@@ -49,6 +49,7 @@ const ecSectionRouter = require("./routes/ec.sectionRoutes.js");
 const ecProductRouter = require("./routes/ec.productRoutes.js");
 const ecBookRouter = require("./routes/ec.bookRoutes.js");
 const ecPurchaseRouter = require("./routes/ec.purchaseRoutes.js");
+const acPurchaseRouter = require("./routes/ac.purchaseRoutes.js");
 // New routes for exam and homework functionality
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
@@ -126,6 +127,8 @@ app.use("/api/v1/sections", ecSectionRouter);
 app.use("/api/v1/products", ecProductRouter);
 app.use("/api/v1/books", ecBookRouter);
 app.use("/api/v1/ec/purchases", ecPurchaseRouter);
+
+app.use("/api/v1/ac/purchases", acPurchaseRouter);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
