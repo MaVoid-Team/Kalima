@@ -58,7 +58,7 @@ const studentSchema = new mongoose.Schema(
     },
     government: { type: String, required: true },
     administrationZone: { type: String, required: true },
-     userSeria: {
+    userSerial: {
       type: String,
       unique: true,
       index: true
@@ -116,25 +116,25 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   return true; // Successfully used points
 };
 
-studentSchema.pre('save', async function(next) {
-  if (this.isNew && !this.userSeria) {
+studentSchema.pre('save', async function (next) {
+  if (this.isNew && !this.userSerial) {
     try {
       // Get the count of existing students to generate next number
       const count = await mongoose.model('Student').countDocuments();
-      // Generate userSeria with format ST + 3-digit number (ST001, ST002, etc.)
-      this.userSeria = `ST${String(count + 1).padStart(3, '0')}`;
-      
-      // Check if this userSeria already exists (for race condition safety)
-      const existingStudent = await mongoose.model('Student').findOne({ userSeria: this.userSeria });
+      // Generate userSerial with format ST + 3-digit number (ST001, ST002, etc.)
+      this.userSerial = `ST${String(count + 1).padStart(3, '0')}`;
+
+      // Check if this userSerial already exists (for race condition safety)
+      const existingStudent = await mongoose.model('Student').findOne({ userSerial: this.userSerial });
       if (existingStudent) {
         // If it exists, find the highest number and increment
-        const allStudents = await mongoose.model('Student').find({}, 'userSeria').lean();
+        const allStudents = await mongoose.model('Student').find({}, 'userSerial').lean();
         const numbers = allStudents
-          .map(s => parseInt(s.userSeria.replace('ST', '')))
+          .map(s => parseInt(s.userSerial.replace('ST', '')))
           .filter(n => !isNaN(n));
-        
+
         const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-        this.userSeria = `ST${String(maxNumber + 1).padStart(3, '0')}`;
+        this.userSerial = `ST${String(maxNumber + 1).padStart(3, '0')}`;
       }
     } catch (error) {
       return next(error);
