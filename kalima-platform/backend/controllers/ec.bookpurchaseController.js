@@ -1,13 +1,14 @@
-const ExtendedECPurchase = require("../models/ac.purchaseModel");
+const ECBookPurchase = require("../models/ec.bookpurchaseModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
+const { uploadPaymentScreenshotToCloudinary } = require("../utils/upload files/uploadFiles");
 
-// Get all extended EC purchases
-exports.getAllExtendedECPurchases = catchAsync(async (req, res, next) => {
-  let query = ExtendedECPurchase.find();
+// Get all book purchases
+exports.getAllBookPurchases = catchAsync(async (req, res, next) => {
+  let query = ECBookPurchase.find();
 
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -15,7 +16,7 @@ exports.getAllExtendedECPurchases = catchAsync(async (req, res, next) => {
     .paginate();
 
   // Get total count for pagination (before applying pagination)
-  const totalPurchases = await ExtendedECPurchase.countDocuments(
+  const totalPurchases = await ECBookPurchase.countDocuments(
     features.query.getFilter()
   );
 
@@ -42,16 +43,16 @@ exports.getAllExtendedECPurchases = catchAsync(async (req, res, next) => {
   });
 });
 
-// Get extended EC purchase by ID
-exports.getExtendedECPurchaseById = catchAsync(async (req, res, next) => {
-  const purchase = await ExtendedECPurchase.findById(req.params.id).populate([
+// Get book purchase by ID
+exports.getBookPurchaseById = catchAsync(async (req, res, next) => {
+  const purchase = await ECBookPurchase.findById(req.params.id).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
     { path: "productId", select: "title serial price section thumbnail" },
   ]);
 
   if (!purchase) {
-    return next(new AppError("No extended EC purchase found with that ID", 404));
+    return next(new AppError("No book purchase found with that ID", 404));
   }
 
   res.status(200).json({
@@ -62,39 +63,48 @@ exports.getExtendedECPurchaseById = catchAsync(async (req, res, next) => {
   });
 });
 
-// Create new extended EC purchase
-exports.createExtendedECPurchase = catchAsync(async (req, res, next) => {
+// Create new book purchase
+exports.createBookPurchase = catchAsync(async (req, res, next) => {
+  // Handle payment screenshot upload
+  let paymentScreenshotUrl = null;
+  if (req.file && req.file.fieldname === "paymentScreenshot") {
+    paymentScreenshotUrl = await uploadPaymentScreenshotToCloudinary(req.file, "book-purchases", next);
+    req.body.paymentScreenshot = paymentScreenshotUrl;
+  } else if (!req.body.paymentScreenshot) {
+    return next(new AppError("Payment screenshot is required", 400));
+  }
+
   const product = await ECProduct.findById(req.body.productId).populate(
     "section",
     "number"
   );
-      console.log(req.body.productId);
 
   if (!product) {
     return next(new AppError("No product found with that ID", 404));
   }
 
-  if (req.body.confirmedBy) {
-    return next(new AppError("Extended EC purchase cannot be confirmed at creation", 400));
+  if (product.__t !== "ECBook") {
+    return next(new AppError("This endpoint is only for book purchases.", 400));
   }
 
-  // Validate required extended fields
-  if (!req.body.NameOnBook || !req.body.NumberOnBook || !req.body.SName) {
-    return next(new AppError("NameOnBook, NumberOnBook, and Snumber are required", 400));
+  if (!req.body.nameOnBook || !req.body.numberOnBook || !req.body.seriesName) {
+    return next(
+      new AppError("nameOnBook, numberOnBook, and seriesName are required", 400)
+    );
   }
 
   // Set the creator
-  console.log("Creating extended EC purchase with user:", req.user._id);
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
   req.body.productName = product.title;
-  req.body.price = product.price;
-  req.body.purchaseSerial = `${req.user.sequencedId}-${product.section.number}-${product.serial}`;
-  
-  const purchase = await ExtendedECPurchase.create(req.body);
-  
+  req.body.price = product.priceAfterDiscount;
+  req.body.paymentNumber = product.paymentNumber;
+  req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
+
+  const purchase = await ECBookPurchase.create(req.body);
+
   if (!purchase) {
-    return next(new AppError("Extended EC purchase creation failed", 400));
+    return next(new AppError("Book purchase creation failed", 400));
   }
 
   res.status(201).json({
@@ -105,24 +115,41 @@ exports.createExtendedECPurchase = catchAsync(async (req, res, next) => {
   });
 });
 
-// Update extended EC purchase
-exports.updateExtendedECPurchase = catchAsync(async (req, res, next) => {
+// Update book purchase
+exports.updateBookPurchase = catchAsync(async (req, res, next) => {
   // Remove fields that shouldn't be updated directly
   delete req.body.createdBy;
   delete req.body.createdAt;
   delete req.body.purchaseSerial; // Prevent manual serial modification
 
-  const purchase = await ExtendedECPurchase.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  }).populate([
+  // Only allow updating these fields
+  const updatableFields = [
+    "nameOnBook",
+    "numberOnBook",
+    "seriesName",
+    "paymentScreenshot",
+    "numberTransferredFrom"
+  ];
+  const updateData = {};
+  updatableFields.forEach((field) => {
+    if (req.body[field] !== undefined) updateData[field] = req.body[field];
+  });
+
+  const purchase = await ECBookPurchase.findByIdAndUpdate(
+    req.params.id,
+    { $set: updateData },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
     { path: "productId", select: "title serial price section thumbnail" },
   ]);
 
   if (!purchase) {
-    return next(new AppError("No extended EC purchase found with that ID", 404));
+    return next(new AppError("No book purchase found with that ID", 404));
   }
 
   res.status(200).json({
@@ -133,9 +160,9 @@ exports.updateExtendedECPurchase = catchAsync(async (req, res, next) => {
   });
 });
 
-// Confirm extended EC purchase
-exports.confirmExtendedECPurchase = catchAsync(async (req, res, next) => {
-  const purchase = await ExtendedECPurchase.findByIdAndUpdate(
+// Confirm book purchase
+exports.confirmBookPurchase = catchAsync(async (req, res, next) => {
+  const purchase = await ECBookPurchase.findByIdAndUpdate(
     req.params.id,
     {
       confirmed: true,
@@ -152,7 +179,7 @@ exports.confirmExtendedECPurchase = catchAsync(async (req, res, next) => {
   ]);
 
   if (!purchase) {
-    return next(new AppError("No extended EC purchase found with that ID", 404));
+    return next(new AppError("No book purchase found with that ID", 404));
   }
 
   res.status(200).json({
@@ -164,8 +191,8 @@ exports.confirmExtendedECPurchase = catchAsync(async (req, res, next) => {
 });
 
 // Delete extended EC purchase
-exports.deleteExtendedECPurchase = catchAsync(async (req, res, next) => {
-  const purchase = await ExtendedECPurchase.findByIdAndDelete(req.params.id);
+exports.deleteBookPurchase = catchAsync(async (req, res, next) => {
+  const purchase = await ECBookPurchase.findByIdAndDelete(req.params.id);
 
   if (!purchase) {
     return next(new AppError("No extended EC purchase found with that ID", 404));
@@ -178,8 +205,8 @@ exports.deleteExtendedECPurchase = catchAsync(async (req, res, next) => {
 });
 
 // Get extended EC purchase statistics
-exports.getExtendedECPurchaseStats = catchAsync(async (req, res, next) => {
-  const stats = await ExtendedECPurchase.aggregate([
+exports.getBookPurchaseStats = catchAsync(async (req, res, next) => {
+  const stats = await ECBookPurchase.aggregate([
     {
       $group: {
         _id: null,
@@ -199,7 +226,7 @@ exports.getExtendedECPurchaseStats = catchAsync(async (req, res, next) => {
     },
   ]);
 
-  const monthlyStats = await ExtendedECPurchase.aggregate([
+  const monthlyStats = await ECBookPurchase.aggregate([
     {
       $group: {
         _id: {
@@ -241,7 +268,7 @@ exports.getExtendedECPurchaseStats = catchAsync(async (req, res, next) => {
 });
 
 // Get extended EC purchases by user
-exports.getExtendedECPurchasesByUser = catchAsync(async (req, res, next) => {
+exports.getBookPurchaseByUser = catchAsync(async (req, res, next) => {
   if (req.user.role === "Parent" || "Student" || "Teacher") {
     req.body.userId = req.user._id;
   } else {
@@ -249,13 +276,13 @@ exports.getExtendedECPurchasesByUser = catchAsync(async (req, res, next) => {
       req.body.userId = req.params.userId;
     }
   }
-  
+
   if (!req.body.userId) {
     return next(new AppError("User ID is required to get extended EC purchases", 400));
   }
 
   // Build base query with userId filter
-  let query = ExtendedECPurchase.find({ createdBy: req.body.userId });
+  let query = ECBookPurchase.find({ createdBy: req.body.userId });
 
   // Apply QueryFeatures for filtering, sorting, and pagination
   const features = new QueryFeatures(query, req.query)
@@ -264,7 +291,7 @@ exports.getExtendedECPurchasesByUser = catchAsync(async (req, res, next) => {
     .paginate();
 
   // Get total count for pagination (before applying pagination)
-  const totalPurchases = await ExtendedECPurchase.countDocuments({
+  const totalPurchases = await ECBookPurchase.countDocuments({
     createdBy: req.body.userId,
     ...features.query.getFilter(),
   });
@@ -293,9 +320,9 @@ exports.getExtendedECPurchasesByUser = catchAsync(async (req, res, next) => {
 });
 
 // Search extended EC purchases by serial
-exports.searchExtendedECBySerial = catchAsync(async (req, res, next) => {
+exports.searchBookPurchaseBySerial = catchAsync(async (req, res, next) => {
   const { serial } = req.params;
-  const purchase = await ExtendedECPurchase.findOne({
+  const purchase = await ECBookPurchase.findOne({
     purchaseSerial: serial,
   }).populate([
     { path: "createdBy", select: "name email role" },
