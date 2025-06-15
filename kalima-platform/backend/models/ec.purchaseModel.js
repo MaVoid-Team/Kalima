@@ -69,6 +69,13 @@ const ecPurchaseSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+
+    // Payment screenshot (URL or file path)
+    paymentScreenshot: {
+      type: String,
+      required: [true, "Payment screenshot is required"],
+      trim: true,
+    },
   },
   {
     timestamps: true,
