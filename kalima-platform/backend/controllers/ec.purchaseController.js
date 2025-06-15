@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
+const { uploadPaymentScreenshotToCloudinary } = require("../utils/upload files/uploadFiles");
 
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
@@ -70,6 +71,14 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
 
 // Create new purchase
 exports.createPurchase = catchAsync(async (req, res, next) => {
+  // Handle payment screenshot upload
+  let paymentScreenshotUrl = null;
+  if (req.file && req.file.fieldname === "paymentScreenshot") {
+    paymentScreenshotUrl = await uploadPaymentScreenshotToCloudinary(req.file, "purchases", next);
+    req.body.paymentScreenshot = paymentScreenshotUrl;
+  } else if (!req.body.paymentScreenshot) {
+    return next(new AppError("Payment screenshot is required", 400));
+  }
   const product = await ECProduct.findById(req.body.productId).populate(
     "section",
     "number"
@@ -116,6 +125,10 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 
 // Update purchase
 exports.updatePurchase = catchAsync(async (req, res, next) => {
+  // Handle payment screenshot update
+  if (req.file && req.file.fieldname === "paymentScreenshot") {
+    req.body.paymentScreenshot = await uploadPaymentScreenshotToCloudinary(req.file, "purchases", next);
+  }
   // Remove fields that shouldn't be updated directly
   delete req.body.createdBy;
   delete req.body.createdAt;

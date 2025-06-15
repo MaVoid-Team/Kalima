@@ -2,6 +2,7 @@ const express = require("express");
 const ecPurchaseController = require("../controllers/ec.purchaseController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
+const { uploadPaymentScreenshotMiddleware } = require("../utils/upload files/uploadFiles");
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router
   .get(ecPurchaseController.getAllPurchases)
   .post(
     authController.verifyRoles("Parent", "Student", "Teacher"),
+    uploadPaymentScreenshotMiddleware,
     ecPurchaseController.createPurchase
   );
 
@@ -52,6 +54,7 @@ router
   .get(ecPurchaseController.getPurchaseById)
   .patch(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    uploadPaymentScreenshotMiddleware,
     ecPurchaseController.updatePurchase
   )
   .delete(
