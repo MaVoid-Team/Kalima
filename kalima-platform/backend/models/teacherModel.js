@@ -71,7 +71,7 @@ const teacherSchema = new mongoose.Schema(
     lecturerPoints: [lecturerPointsSchema],
     government: { type: String, required: true },
     administrationZone: { type: String, required: true },
-    userSeria: {
+    userSerial: {
       type: String,
       unique: true,
       index: true,
@@ -82,7 +82,7 @@ const teacherSchema = new mongoose.Schema(
   }
 );
 teacherSchema.pre("save", async function (next) {
-  if (this.isNew && !this.userSeria) {
+  if (this.isNew && !this.userSerial) {
     try {
       let subjectPrefix = "";
 
@@ -108,40 +108,40 @@ teacherSchema.pre("save", async function (next) {
         .model("Teacher")
         .find(
           {
-            userSeria: { $regex: `^${subjectPrefix}` },
+            userSerial: { $regex: `^${subjectPrefix}` },
           },
-          "userSeria"
+          "userSerial"
         )
         .lean();
 
       // Extract numbers and find the next available number
       const numbers = existingTeachers
-        .map((t) => parseInt(t.userSeria.replace(subjectPrefix, "")))
+        .map((t) => parseInt(t.userSerial.replace(subjectPrefix, "")))
         .filter((n) => !isNaN(n));
 
       const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
 
-      // Generate userSeria with format [SubjectPrefix] + 3-digit number (MA001, EN002, etc.)
-      this.userSeria = `${subjectPrefix}${String(nextNumber).padStart(3, "0")}`;
+      // Generate userSerial with format [SubjectPrefix] + 3-digit number (MA001, EN002, etc.)
+      this.userSerial = `${subjectPrefix}${String(nextNumber).padStart(3, "0")}`;
 
       // Double-check for uniqueness (race condition safety)
-      const existingWithSameSeria = await mongoose.model("Teacher").findOne({
-        userSeria: this.userSeria,
+      const existingWithSameSerial = await mongoose.model("Teacher").findOne({
+        userSerial: this.userSerial,
       });
 
-      if (existingWithSameSeria) {
+      if (existingWithSameSerial) {
         // If collision occurs, increment and try again
         const allTeachers = await mongoose
           .model("Teacher")
-          .find({}, "userSeria")
+          .find({}, "userSerial")
           .lean();
         const allNumbers = allTeachers
-          .filter((t) => t.userSeria.startsWith(subjectPrefix))
-          .map((t) => parseInt(t.userSeria.replace(subjectPrefix, "")))
+          .filter((t) => t.userSerial.startsWith(subjectPrefix))
+          .map((t) => parseInt(t.userSerial.replace(subjectPrefix, "")))
           .filter((n) => !isNaN(n));
 
         const maxNumber = allNumbers.length > 0 ? Math.max(...allNumbers) : 0;
-        this.userSeria = `${subjectPrefix}${String(maxNumber + 1).padStart(3, "0")}`;
+        this.userSerial = `${subjectPrefix}${String(maxNumber + 1).padStart(3, "0")}`;
       }
     } catch (error) {
       return next(error);
