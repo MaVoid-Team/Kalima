@@ -71,68 +71,77 @@ const teacherSchema = new mongoose.Schema(
     lecturerPoints: [lecturerPointsSchema],
     government: { type: String, required: true },
     administrationZone: { type: String, required: true },
-      userSeria: {
+    userSeria: {
       type: String,
       unique: true,
-      index: true
+      index: true,
     },
   },
   {
     timestamps: true,
   }
 );
-teacherSchema.pre('save', async function(next) {
+teacherSchema.pre("save", async function (next) {
   if (this.isNew && !this.userSeria) {
     try {
-      let subjectPrefix = '';
-      
+      let subjectPrefix = "";
+
       // If subject is an ObjectId, look up the subject name
       if (mongoose.Types.ObjectId.isValid(this.subject)) {
         const Subject = require("./subjectModel"); // Assuming you have a subject model
         const subjectDoc = await Subject.findById(this.subject);
-        
+
         if (subjectDoc && subjectDoc.name) {
           // Extract first two letters from subject name
           subjectPrefix = subjectDoc.name.substring(0, 2).toUpperCase();
         } else {
           // Fallback if subject not found
-          subjectPrefix = 'TC'; // Teacher Code
+          subjectPrefix = "TC"; // Teacher Code
         }
       } else {
         // If subject is a string, use first two letters
         subjectPrefix = this.subject.substring(0, 2).toUpperCase();
       }
-      
+
       // Get count of existing teachers with the same subject prefix
-      const existingTeachers = await mongoose.model('Teacher').find({
-        userSeria: { $regex: `^${subjectPrefix}` }
-      }, 'userSeria').lean();
-      
+      const existingTeachers = await mongoose
+        .model("Teacher")
+        .find(
+          {
+            userSeria: { $regex: `^${subjectPrefix}` },
+          },
+          "userSeria"
+        )
+        .lean();
+
       // Extract numbers and find the next available number
       const numbers = existingTeachers
-        .map(t => parseInt(t.userSeria.replace(subjectPrefix, '')))
-        .filter(n => !isNaN(n));
-      
+        .map((t) => parseInt(t.userSeria.replace(subjectPrefix, "")))
+        .filter((n) => !isNaN(n));
+
       const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
-      
+
       // Generate userSeria with format [SubjectPrefix] + 3-digit number (MA001, EN002, etc.)
-      this.userSeria = `${subjectPrefix}${String(nextNumber).padStart(3, '0')}`;
-      
+      this.userSeria = `${subjectPrefix}${String(nextNumber).padStart(3, "0")}`;
+
       // Double-check for uniqueness (race condition safety)
-      const existingWithSameSeria = await mongoose.model('Teacher').findOne({ 
-        userSeria: this.userSeria 
+      const existingWithSameSeria = await mongoose.model("Teacher").findOne({
+        userSeria: this.userSeria,
       });
-      
+
       if (existingWithSameSeria) {
         // If collision occurs, increment and try again
-        const allTeachers = await mongoose.model('Teacher').find({}, 'userSeria').lean();
+        const allTeachers = await mongoose
+          .model("Teacher")
+          .find({}, "userSeria")
+          .lean();
         const allNumbers = allTeachers
-          .filter(t => t.userSeria.startsWith(subjectPrefix))
-          .map(t => parseInt(t.userSeria.replace(subjectPrefix, '')))
-          .filter(n => !isNaN(n));
-        
+          .filter((t) => t.userSeria.startsWith(subjectPrefix))
+          .map((t) => parseInt(t.userSeria.replace(subjectPrefix, "")))
+          .filter((n) => !isNaN(n));
+
         const maxNumber = allNumbers.length > 0 ? Math.max(...allNumbers) : 0;
-        this.userSeria = `${subjectPrefix}${String(maxNumber + 1).padStart(3, '0')}`;
+        this.userSeria = `${subjectPrefix}${String(maxNumber + 1).padStart(3, "0")}`;
       }
     } catch (error) {
       return next(error);
