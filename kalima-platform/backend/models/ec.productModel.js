@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    description: { type: String, required: [true, "Description is required"], trim: true },
   },
   {
     timestamps: { createdAt: true, updatedAt: true },
