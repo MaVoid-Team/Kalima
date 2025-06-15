@@ -23,7 +23,10 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   const purchases = await features.query.populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   // Calculate pagination info
@@ -47,7 +50,10 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
   const purchase = await ECPurchase.findById(req.params.id).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   if (!purchase) {
@@ -76,12 +82,25 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     return next(new AppError("Purchase cannot be confirmed at creation", 400));
   }
   // Set the creator
-  console.log("Creating purchase with user:", req.user._id);
+
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
-  req.body.productName = product.title; // Use product title as name
-  req.body.price = product.price;
-  req.body.purchaseSerial = `${req.user.sequencedId}-${product.section.number}-${product.serial}`;
+  req.body.productName = product.title;
+  req.body.price = product.priceAfterDiscount;
+  req.body.paymentNumber = product.paymentNumber;
+  if (!req.user.userSerial) {
+    return next(
+      new AppError("User serial is required to create a purchase", 400)
+    );
+  }
+  if (!product.section.number) {
+    return next(new AppError("Product section number is required", 400));
+  }
+  if (!product.serial) {
+    return next(new AppError("Product serial is required", 400));
+  }
+
+  req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
   const purchase = await ECPurchase.create(req.body); // Populate the created purchase
   if (!purchase) {
     return next(new AppError("Purchase creation failed", 400));
@@ -108,7 +127,10 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   }).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   if (!purchase) {
@@ -138,7 +160,10 @@ exports.confirmPurchase = catchAsync(async (req, res, next) => {
   ).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   if (!purchase) {
@@ -261,7 +286,10 @@ exports.getPurchasesByUser = catchAsync(async (req, res, next) => {
   const purchases = await features.query.populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   // Calculate pagination info
@@ -288,7 +316,10 @@ exports.searchBySerial = catchAsync(async (req, res, next) => {
   }).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
-    { path: "productId", select: "title serial price section thumbnail" },
+    {
+      path: "productId",
+      select: "title serial priceAfterDiscount section thumbnail",
+    },
   ]);
 
   if (!purchase) {

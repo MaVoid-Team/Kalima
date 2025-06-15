@@ -44,24 +44,24 @@ const studentSchema = new mongoose.Schema(
     // Flag for tracking if a promo code has been used
     hasPromoCode: {
       type: Boolean,
-      default: false
+      default: false,
     },
     // Track if the promo code has been used for a purchase
     hasUsedPromoCode: {
       type: Boolean,
-      default: false
+      default: false,
     },
     // Track promo code points separately
     promoPoints: {
       type: Number,
-      default: 0
+      default: 0,
     },
     government: { type: String, required: true },
     administrationZone: { type: String, required: true },
-     userSeria: {
+    userSeria: {
       type: String,
       unique: true,
-      index: true
+      index: true,
     },
   },
 
@@ -116,25 +116,30 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   return true; // Successfully used points
 };
 
-studentSchema.pre('save', async function(next) {
+studentSchema.pre("save", async function (next) {
   if (this.isNew && !this.userSeria) {
     try {
       // Get the count of existing students to generate next number
-      const count = await mongoose.model('Student').countDocuments();
+      const count = await mongoose.model("Student").countDocuments();
       // Generate userSeria with format ST + 3-digit number (ST001, ST002, etc.)
-      this.userSeria = `ST${String(count + 1).padStart(3, '0')}`;
-      
+      this.userSeria = `ST${String(count + 1).padStart(3, "0")}`;
+
       // Check if this userSeria already exists (for race condition safety)
-      const existingStudent = await mongoose.model('Student').findOne({ userSeria: this.userSeria });
+      const existingStudent = await mongoose
+        .model("Student")
+        .findOne({ userSeria: this.userSeria });
       if (existingStudent) {
         // If it exists, find the highest number and increment
-        const allStudents = await mongoose.model('Student').find({}, 'userSeria').lean();
+        const allStudents = await mongoose
+          .model("Student")
+          .find({}, "userSeria")
+          .lean();
         const numbers = allStudents
-          .map(s => parseInt(s.userSeria.replace('ST', '')))
-          .filter(n => !isNaN(n));
-        
+          .map((s) => parseInt(s.userSeria.replace("ST", "")))
+          .filter((n) => !isNaN(n));
+
         const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-        this.userSeria = `ST${String(maxNumber + 1).padStart(3, '0')}`;
+        this.userSeria = `ST${String(maxNumber + 1).padStart(3, "0")}`;
       }
     } catch (error) {
       return next(error);

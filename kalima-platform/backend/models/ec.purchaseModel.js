@@ -29,10 +29,16 @@ const ecPurchaseSchema = new mongoose.Schema(
       min: [0, "Price cannot be negative"],
     },
 
-    // Payment transfer information
+    // Payment number that the user transfer from
     numberTransferredFrom: {
       type: String,
       required: [true, "Transfer number is required"],
+      trim: true,
+    },
+    // Payment number that the user transfer to
+    paymentNumber: {
+      type: String,
+      required: [true, "Payment Number  number is required"],
       trim: true,
     },
 
