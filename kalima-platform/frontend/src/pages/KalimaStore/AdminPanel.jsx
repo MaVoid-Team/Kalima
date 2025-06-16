@@ -10,23 +10,32 @@ import {
   updateSection,
   deleteSection,
   createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductById,
+  createBook,
 } from "../../routes/market"
+import { getAllSubjects } from "../../routes/courses"
+import Orders from "./Orders"
 
 const AdminPanel = () => {
   const { t, i18n } = useTranslation("kalimaStore-admin")
   const isRTL = i18n.language === "ar"
 
   const [searchQuery, setSearchQuery] = useState("")
+  const [productSearchQuery, setProductSearchQuery] = useState("")
   const [selectedProductType, setSelectedProductType] = useState("")
   const [selectedSectionType, setSelectedSectionType] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState("product")
 
   // Real data states
   const [sections, setSections] = useState([])
   const [books, setBooks] = useState([])
   const [products, setProducts] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [stats, setStats] = useState({
     totalSales: 0,
     pendingApplications: 0,
@@ -53,10 +62,28 @@ const AdminPanel = () => {
     sample: null,
   })
 
+  const [bookForm, setBookForm] = useState({
+    title: "",
+    serial: "",
+    section: "",
+    price: "",
+    discountPercentage: "",
+    subject: "",
+    paymentNumber: "",
+    description: "",
+    thumbnail: null,
+    sample: null,
+  })
+
+  // Modal states
   const [editingSection, setEditingSection] = useState(null)
+  const [editingProduct, setEditingProduct] = useState(null)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [sectionToDelete, setSectionToDelete] = useState(null)
+  const [showEditProductModal, setShowEditProductModal] = useState(false)
+  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
+  const [productToDelete, setProductToDelete] = useState(null)
 
   // Fetch data on component mount
   useEffect(() => {
@@ -69,10 +96,11 @@ const AdminPanel = () => {
       setError(null)
 
       // Fetch all data in parallel
-      const [sectionsResponse, booksResponse, productsResponse] = await Promise.all([
+      const [sectionsResponse, booksResponse, productsResponse, subjectsResponse] = await Promise.all([
         getAllSections(),
         getAllBooks(),
         getAllProducts(),
+        getAllSubjects(),
       ])
 
       // Process sections data
@@ -90,8 +118,13 @@ const AdminPanel = () => {
         setProducts(productsResponse.data.products)
       }
 
+      // Process subjects data
+      if (subjectsResponse.success) {
+        setSubjects(subjectsResponse.data)
+      }
+
       // Calculate statistics
-      const totalProducts = (booksResponse.data?.books?.length || 0) + (productsResponse.data?.products?.length || 0)
+      const totalProducts = (productsResponse.results || 0)
       const totalSections = sectionsResponse.data?.sections?.length || 0
 
       // Calculate total sales (sum of all product prices)
@@ -115,6 +148,67 @@ const AdminPanel = () => {
       console.error("Error fetching admin data:", err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCreateBook = async (e) => {
+    e.preventDefault()
+    if (
+      !bookForm.title ||
+      !bookForm.serial ||
+      !bookForm.section ||
+      !bookForm.price ||
+      !bookForm.paymentNumber ||
+      !bookForm.subject
+    ) {
+      alert(t("alerts.fillRequiredFields"))
+      return
+    }
+
+    try {
+      setActionLoading(true)
+      const response = await createBook({
+        title: bookForm.title,
+        serial: bookForm.serial,
+        section: bookForm.section,
+        price: bookForm.price,
+        discountPercentage: bookForm.discountPercentage || "0",
+        paymentNumber: bookForm.paymentNumber,
+        subject: bookForm.subject,
+        description: bookForm.description,
+        thumbnail: bookForm.thumbnail,
+        sample: bookForm.sample,
+      })
+
+      if (response.message === "ECBook created successfully") {
+        // Reset form
+        setBookForm({
+          title: "",
+          serial: "",
+          section: "",
+          price: "",
+          discountPercentage: "",
+          subject: "",
+          paymentNumber: "",
+          description: "",
+          thumbnail: null,
+          sample: null,
+        })
+        // Reset file inputs
+        const thumbnailInput = document.getElementById("book-thumbnail")
+        const sampleInput = document.getElementById("book-sample")
+        if (thumbnailInput) thumbnailInput.value = ""
+        if (sampleInput) sampleInput.value = ""
+
+        // Refresh data
+        alert(t("alerts.bookCreatedSuccess"))
+        await fetchData()
+      }
+    } catch (err) {
+      console.error("Error creating book:", err)
+      alert(t("alerts.bookCreateError") + err.message)
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -170,6 +264,105 @@ const AdminPanel = () => {
     } catch (err) {
       console.error("Error creating product:", err)
       alert(t("alerts.productCreateError") + err.message)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Handle edit product
+  const handleEditProduct = async (product) => {
+    try {
+      setActionLoading(true)
+      // Get the latest product data
+      const response = await getProductById(product._id)
+      if (response.status === "success") {
+        const productData = response.data.product
+        setEditingProduct(productData)
+        setProductForm({
+          title: productData.title,
+          serial: productData.serial,
+          section: productData.section._id || productData.section,
+          price: productData.price.toString(),
+          discountPercentage: productData.discountPercentage ? productData.discountPercentage.toString() : "",
+          paymentNumber: productData.paymentNumber,
+          thumbnail: null, // We don't set the file objects here
+          sample: null,
+        })
+        setShowEditProductModal(true)
+      }
+    } catch (err) {
+      console.error("Error fetching product details:", err)
+      alert(t("alerts.productFetchError") + err.message)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Handle update product
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault()
+    if (!editingProduct) return
+
+    try {
+      setActionLoading(true)
+      const response = await updateProduct(editingProduct._id, {
+        title: productForm.title,
+        serial: productForm.serial,
+        section: productForm.section,
+        price: productForm.price,
+        discountPercentage: productForm.discountPercentage,
+        paymentNumber: productForm.paymentNumber,
+        thumbnail: productForm.thumbnail,
+        sample: productForm.sample,
+      })
+
+      if (response.status === "success") {
+        setShowEditProductModal(false)
+        setEditingProduct(null)
+        setProductForm({
+          title: "",
+          serial: "",
+          section: "",
+          price: "",
+          discountPercentage: "",
+          paymentNumber: "",
+          thumbnail: null,
+          sample: null,
+        })
+        // Reset file inputs
+        const thumbnailInput = document.getElementById("edit-product-thumbnail")
+        const sampleInput = document.getElementById("edit-product-sample")
+        if (thumbnailInput) thumbnailInput.value = ""
+        if (sampleInput) sampleInput.value = ""
+
+        alert(t("alerts.productUpdatedSuccess"))
+        await fetchData()
+      }
+    } catch (err) {
+      console.error("Error updating product:", err)
+      alert(t("alerts.productUpdateError") + err.message)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  // Handle delete product
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return
+
+    try {
+      setActionLoading(true)
+      const response = await deleteProduct(productToDelete._id)
+
+      if (response.status === "success") {
+        setShowDeleteProductModal(false)
+        setProductToDelete(null)
+        alert(t("alerts.productDeletedSuccess"))
+        await fetchData()
+      }
+    } catch (err) {
+      console.error("Error deleting product:", err)
+      alert(t("alerts.productDeleteError") + err.message)
     } finally {
       setActionLoading(false)
     }
@@ -266,7 +459,7 @@ const AdminPanel = () => {
       setActionLoading(true)
       const response = await deleteSection(sectionToDelete._id)
 
-      if (response.status === "success") {
+      if (response) {
         setShowDeleteModal(false)
         setSectionToDelete(null)
         alert(t("alerts.sectionDeletedSuccess"))
@@ -281,13 +474,22 @@ const AdminPanel = () => {
   }
 
   // Handle file input changes
-  const handleFileChange = (e, fieldName) => {
+  const handleFileChange = (e, fieldName, formType = "product") => {
     const file = e.target.files[0]
-    setProductForm({ ...productForm, [fieldName]: file })
+    if (formType === "product") {
+      setProductForm({ ...productForm, [fieldName]: file })
+    } else if (formType === "book") {
+      setBookForm({ ...bookForm, [fieldName]: file })
+    }
   }
 
   // Filter sections based on search
   const filteredSections = sections.filter((section) => section.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  // Filter products based on search
+  const filteredProducts = products.filter((product) =>
+    product.title.toLowerCase().includes(productSearchQuery.toLowerCase()),
+  )
 
   // Calculate products per section
   const sectionsWithCounts = filteredSections.map((section) => {
@@ -300,6 +502,31 @@ const AdminPanel = () => {
       productCount: sectionProducts.length + sectionBooks.length,
     }
   })
+
+  // Get section name by ID
+  const getSectionName = (sectionId) => {
+    const section = sections.find(
+      (s) => s._id === sectionId || (typeof sectionId === "object" && s._id === sectionId._id),
+    )
+    return section ? section.name : t("products.unknownSection")
+  }
+
+  // Get subject name by ID
+  const getSubjectName = (subjectId) => {
+    const subject = subjects.find(
+      (s) => s._id === subjectId || (typeof subjectId === "object" && s._id === subjectId._id),
+    )
+    return subject ? subject.name : "Unknown Subject"
+  }
+
+  // Format price with discount
+  const formatPrice = (price, discountPercentage) => {
+    if (!discountPercentage || discountPercentage <= 0) {
+      return price
+    }
+    const discountAmount = (price * discountPercentage) / 100
+    return (price - discountAmount).toFixed(2)
+  }
 
   // Stats data with real values
   const statsData = [
@@ -319,7 +546,7 @@ const AdminPanel = () => {
     },
     {
       title: t("stats.numberOfProducts"),
-      value: stats.totalProducts.toString(),
+      value: stats.totalProducts,
       icon: "📦",
       bgColor: "bg-blue-800/50",
       textColor: "text-white",
@@ -332,43 +559,6 @@ const AdminPanel = () => {
       textColor: "text-white",
     },
   ]
-
-  // Group sections by type for category cards
-  const getCategoryData = () => {
-    const designSections = sections.filter((section) => section.name.toLowerCase().includes("design"))
-    const courseSections = sections.filter(
-      (section) => section.name.toLowerCase().includes("course") || section.name.toLowerCase().includes("math"),
-    )
-    const giftSections = sections.filter((section) => section.name.toLowerCase().includes("gift"))
-    const printingSections = sections.filter((section) => section.name.toLowerCase().includes("print"))
-
-    return [
-      {
-        title: t("categories.designsSection"),
-        count: designSections.length,
-        icon: "🎨",
-        description: t("categories.designsDescription"),
-      },
-      {
-        title: t("categories.coursesSection"),
-        count: courseSections.length,
-        icon: "📚",
-        description: t("categories.coursesDescription"),
-      },
-      {
-        title: t("categories.giftsSection"),
-        count: giftSections.length,
-        icon: "🎁",
-        description: t("categories.giftsDescription"),
-      },
-      {
-        title: t("categories.printingSection"),
-        count: printingSections.length,
-        icon: "🖨️",
-        description: t("categories.printingDescription"),
-      },
-    ]
-  }
 
   if (loading) {
     return (
@@ -406,24 +596,139 @@ const AdminPanel = () => {
 
   return (
     <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      <Orders />
       {/* Stats Cards */}
       <div className="px-4 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {statsData.map((stat, index) => (
-            <div key={index} className={`card shadow-lg ${stat.bgColor} ${stat.textColor}`}>
-              <div className="card-body p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
-                    {stat.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-medium opacity-90">{stat.title}</h3>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  </div>
-                </div>
-              </div>
+
+        {/* Products Management */}
+        <div className="mb-12">
+          <div className="flex items-center justify-center relative mb-8">
+            {/* Decorative elements */}
+            <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
+              <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
             </div>
-          ))}
+            <h2 className="text-3xl font-bold text-center">{t("productsManagement.title") || "Products Management"}</h2>
+            <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
+              <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder={t("productsManagement.searchPlaceholder") || "Search products..."}
+                value={productSearchQuery}
+                onChange={(e) => setProductSearchQuery(e.target.value)}
+                className={`input input-bordered w-full ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
+              />
+              <button
+                className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm`}
+              >
+                🔍
+              </button>
+            </div>
+          </div>
+
+          {/* Products Table */}
+          <div className="card shadow-lg overflow-hidden relative">
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr>
+                    <th className="text-center">{t("productsManagement.table.thumbnail") || "Thumbnail"}</th>
+                    <th className="text-center">{t("productsManagement.table.title") || "Title"}</th>
+                    <th className="text-center">{t("productsManagement.table.serial") || "Serial"}</th>
+                    <th className="text-center">{t("productsManagement.table.section") || "Section"}</th>
+                    <th className="text-center">Subject</th>
+                    <th className="text-center">{t("productsManagement.table.price") || "Price"}</th>
+                    <th className="text-center">{t("productsManagement.table.discount") || "Discount"}</th>
+                    <th className="text-center">{t("productsManagement.table.finalPrice") || "Final Price"}</th>
+                    <th className="text-center">{t("productsManagement.table.actions") || "Actions"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product._id}>
+                      <td className="text-center">
+                        <div className="avatar">
+                          <div className="w-12 h-12 rounded">
+                            <img
+                              src={product.thumbnail || "/placeholder.svg?height=48&width=48"}
+                              alt={product.title}
+                              onError={(e) => {
+                                e.target.onerror = null
+                                e.target.src = "/placeholder.svg?height=48&width=48"
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-center font-medium">{product.title}</td>
+                      <td className="text-center">{product.serial}</td>
+                      <td className="text-center">{getSectionName(product.section)}</td>
+                      <td className="text-center">{product.subject ? getSubjectName(product.subject) : "-"}</td>
+                      <td className="text-center">{product.price}</td>
+                      <td className="text-center">
+                        {product.discountPercentage > 0 ? `${product.discountPercentage}%` : "-"}
+                      </td>
+                      <td className="text-center">
+                        {product.discountPercentage > 0 ? (
+                          <div className="flex flex-col items-center">
+                            <span className="font-medium">
+                              {formatPrice(product.price, product.discountPercentage)}
+                            </span>
+                            <span className="text-xs line-through text-gray-500">{product.price}</span>
+                          </div>
+                        ) : (
+                          product.price
+                        )}
+                      </td>
+                      <td className="text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            title={t("productsManagement.table.edit") || "Edit"}
+                            onClick={() => handleEditProduct(product)}
+                            disabled={actionLoading}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            title={t("productsManagement.table.delete") || "Delete"}
+                            onClick={() => {
+                              setProductToDelete(product)
+                              setShowDeleteProductModal(true)
+                            }}
+                            disabled={actionLoading}
+                          >
+                            🗑️
+                          </button>
+                          <button className="btn btn-ghost btn-sm" title={t("productsManagement.table.view") || "View"}>
+                            👁️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Empty state */}
+            {filteredProducts.length === 0 && (
+              <div className="py-8 text-center">
+                <p className="text-gray-500">{t("productsManagement.noProducts") || "No products found"}</p>
+              </div>
+            )}
+
+            {/* Decorative dots */}
+            <div className={`absolute bottom-4 ${isRTL ? "left-4" : "right-4"}`}>
+              <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-down-dottedball" />
+            </div>
+          </div>
         </div>
 
         {/* Sections Management */}
@@ -509,20 +814,39 @@ const AdminPanel = () => {
             </div>
           </div>
         </div>
-
         {/* Forms Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Create New Product Form */}
+          {/* Create Product/Book Form with Tabs */}
           <div className="card shadow-lg relative">
             <div className="card-body p-6">
-              <form onSubmit={handleCreateProduct}>
+              {/* Tab Navigation */}
+              <div className="tabs tabs-border mb-6">
+                <button
+                  className={`tab ${activeTab === "product" ? "tab-active" : ""}`}
+                  onClick={() => setActiveTab("product")}
+                >
+                  {t("forms.createProduct.title")}
+                </button>
+                <button
+                  className={`tab ${activeTab === "book" ? "tab-active" : ""}`}
+                  onClick={() => setActiveTab("book")}
+                >
+                  Create Book
+                </button>
+              </div>
+
+              <form onSubmit={activeTab === "product" ? handleCreateProduct : handleCreateBook}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold">{t("forms.createProduct.title")}</h3>
+                  <h3 className="text-2xl font-bold">
+                    {activeTab === "product" ? t("forms.createProduct.title") : "Create Book"}
+                  </h3>
                   <button type="submit" className="btn btn-primary" disabled={actionLoading}>
                     {actionLoading ? (
                       <span className="loading loading-spinner loading-sm"></span>
-                    ) : (
+                    ) : activeTab === "product" ? (
                       t("forms.createProduct.submitButton")
+                    ) : (
+                      "Create Book"
                     )}
                   </button>
                 </div>
@@ -536,8 +860,14 @@ const AdminPanel = () => {
                       type="text"
                       placeholder={t("forms.createProduct.placeholders.title")}
                       className="input input-bordered w-full"
-                      value={productForm.title}
-                      onChange={(e) => setProductForm({ ...productForm, title: e.target.value })}
+                      value={activeTab === "product" ? productForm.title : bookForm.title}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, title: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, title: e.target.value })
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -550,8 +880,14 @@ const AdminPanel = () => {
                       type="text"
                       placeholder={t("forms.createProduct.placeholders.serial")}
                       className="input input-bordered w-full"
-                      value={productForm.serial}
-                      onChange={(e) => setProductForm({ ...productForm, serial: e.target.value })}
+                      value={activeTab === "product" ? productForm.serial : bookForm.serial}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, serial: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, serial: e.target.value })
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -562,8 +898,14 @@ const AdminPanel = () => {
                     </label>
                     <select
                       className="select select-bordered w-full"
-                      value={productForm.section}
-                      onChange={(e) => setProductForm({ ...productForm, section: e.target.value })}
+                      value={activeTab === "product" ? productForm.section : bookForm.section}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, section: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, section: e.target.value })
+                        }
+                      }}
                       required
                     >
                       <option value="">{t("forms.createProduct.placeholders.section")}</option>
@@ -575,6 +917,28 @@ const AdminPanel = () => {
                     </select>
                   </div>
 
+                  {/* Subject field - only for books */}
+                  {activeTab === "book" && (
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">Subject *</span>
+                      </label>
+                      <select
+                        className="select select-bordered w-full"
+                        value={bookForm.subject}
+                        onChange={(e) => setBookForm({ ...bookForm, subject: e.target.value })}
+                        required
+                      >
+                        <option value="">Select subject</option>
+                        {subjects.map((subject) => (
+                          <option key={subject._id} value={subject._id}>
+                            {subject.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <div>
                     <label className="label">
                       <span className="label-text font-medium">{t("forms.createProduct.fields.price")} *</span>
@@ -583,8 +947,14 @@ const AdminPanel = () => {
                       type="number"
                       placeholder="0.00"
                       className="input input-bordered w-full"
-                      value={productForm.price}
-                      onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                      value={activeTab === "product" ? productForm.price : bookForm.price}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, price: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, price: e.target.value })
+                        }
+                      }}
                       required
                     />
                   </div>
@@ -599,8 +969,14 @@ const AdminPanel = () => {
                       type="number"
                       placeholder="0"
                       className="input input-bordered w-full"
-                      value={productForm.discountPercentage}
-                      onChange={(e) => setProductForm({ ...productForm, discountPercentage: e.target.value })}
+                      value={activeTab === "product" ? productForm.discountPercentage : bookForm.discountPercentage}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, discountPercentage: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, discountPercentage: e.target.value })
+                        }
+                      }}
                     />
                   </div>
 
@@ -612,11 +988,33 @@ const AdminPanel = () => {
                       type="text"
                       placeholder={t("forms.createProduct.placeholders.paymentNumber")}
                       className="input input-bordered w-full"
-                      value={productForm.paymentNumber}
-                      onChange={(e) => setProductForm({ ...productForm, paymentNumber: e.target.value })}
+                      value={activeTab === "product" ? productForm.paymentNumber : bookForm.paymentNumber}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm({ ...productForm, paymentNumber: e.target.value })
+                        } else {
+                          setBookForm({ ...bookForm, paymentNumber: e.target.value })
+                        }
+                      }}
                       required
                     />
                   </div>
+
+                  {/* Book-specific description field */}
+                  {activeTab === "book" && (
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">Description *</span>
+                      </label>
+                      <textarea
+                        placeholder="Enter book description..."
+                        className="textarea textarea-bordered w-full h-32"
+                        value={bookForm.description || ""}
+                        onChange={(e) => setBookForm({ ...bookForm, description: e.target.value })}
+                        required
+                      ></textarea>
+                    </div>
+                  )}
 
                   <div>
                     <label className="label">
@@ -624,10 +1022,10 @@ const AdminPanel = () => {
                     </label>
                     <input
                       type="file"
-                      id="product-thumbnail"
+                      id={`${activeTab}-thumbnail`}
                       className="file-input file-input-bordered w-full"
                       accept="image/*"
-                      onChange={(e) => handleFileChange(e, "thumbnail")}
+                      onChange={(e) => handleFileChange(e, "thumbnail", activeTab)}
                     />
                     <p className="text-xs mt-1">{t("forms.createProduct.hints.thumbnail")}</p>
                   </div>
@@ -638,9 +1036,9 @@ const AdminPanel = () => {
                     </label>
                     <input
                       type="file"
-                      id="product-sample"
+                      id={`${activeTab}-sample`}
                       className="file-input file-input-bordered w-full"
-                      onChange={(e) => handleFileChange(e, "sample")}
+                      onChange={(e) => handleFileChange(e, "sample", activeTab)}
                     />
                     <p className="text-xs mt-1">{t("forms.createProduct.hints.sampleFile")}</p>
                   </div>
@@ -824,7 +1222,168 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Edit Product Modal */}
+      {showEditProductModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">{t("modals.editProduct.title") || "Edit Product"}</h3>
+            <form onSubmit={handleUpdateProduct}>
+              <div className="space-y-4">
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.title")} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t("forms.createProduct.placeholders.title")}
+                    className="input input-bordered w-full"
+                    value={productForm.title}
+                    onChange={(e) => setProductForm({ ...productForm, title: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.serial")} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t("forms.createProduct.placeholders.serial")}
+                    className="input input-bordered w-full"
+                    value={productForm.serial}
+                    onChange={(e) => setProductForm({ ...productForm, serial: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.section")} *</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={productForm.section}
+                    onChange={(e) => setProductForm({ ...productForm, section: e.target.value })}
+                    required
+                  >
+                    <option value="">{t("forms.createProduct.placeholders.section")}</option>
+                    {sections.map((section) => (
+                      <option key={section._id} value={section._id}>
+                        {section.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.price")} *</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    className="input input-bordered w-full"
+                    value={productForm.price}
+                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.discountPercentage")}</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className="input input-bordered w-full"
+                    value={productForm.discountPercentage}
+                    onChange={(e) => setProductForm({ ...productForm, discountPercentage: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.paymentNumber")} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t("forms.createProduct.placeholders.paymentNumber")}
+                    className="input input-bordered w-full"
+                    value={productForm.paymentNumber}
+                    onChange={(e) => setProductForm({ ...productForm, paymentNumber: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.thumbnail")}</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="edit-product-thumbnail"
+                    className="file-input file-input-bordered w-full"
+                    accept="image/*"
+                    onChange={(e) => handleFileChange(e, "thumbnail")}
+                  />
+                  <p className="text-xs mt-1">
+                    {t("modals.editProduct.leaveEmptyToKeep") || "Leave empty to keep current thumbnail"}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.sampleFile")}</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="edit-product-sample"
+                    className="file-input file-input-bordered w-full"
+                    onChange={(e) => handleFileChange(e, "sample")}
+                  />
+                  <p className="text-xs mt-1">
+                    {t("modals.editProduct.leaveEmptyToKeep") || "Leave empty to keep current sample file"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="modal-action">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setShowEditProductModal(false)
+                    setEditingProduct(null)
+                    setProductForm({
+                      title: "",
+                      serial: "",
+                      section: "",
+                      price: "",
+                      discountPercentage: "",
+                      paymentNumber: "",
+                      thumbnail: null,
+                      sample: null,
+                    })
+                  }}
+                >
+                  {t("modals.editProduct.cancelButton") || "Cancel"}
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+                  {actionLoading ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    t("modals.editProduct.updateButton") || "Update Product"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Section Confirmation Modal */}
       {showDeleteModal && (
         <div className="modal modal-open">
           <div className="modal-box">
@@ -845,6 +1404,37 @@ const AdminPanel = () => {
                   <span className="loading loading-spinner loading-sm"></span>
                 ) : (
                   t("modals.deleteSection.deleteButton")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Product Confirmation Modal */}
+      {showDeleteProductModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">{t("modals.deleteProduct.title") || "Confirm Delete"}</h3>
+            <p className="py-4">
+              {t("modals.deleteProduct.message", { productName: productToDelete?.title }) ||
+                `Are you sure you want to delete the product "${productToDelete?.title}"? This action cannot be undone.`}
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn"
+                onClick={() => {
+                  setShowDeleteProductModal(false)
+                  setProductToDelete(null)
+                }}
+              >
+                {t("modals.deleteProduct.cancelButton") || "Cancel"}
+              </button>
+              <button className="btn btn-error" onClick={handleDeleteProduct} disabled={actionLoading}>
+                {actionLoading ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  t("modals.deleteProduct.deleteButton") || "Delete"
                 )}
               </button>
             </div>
