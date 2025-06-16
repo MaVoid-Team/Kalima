@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Function to get all sections (categories)
 export const getAllSections = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/sections`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/sections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -23,7 +23,7 @@ export const getAllSections = async (queryParams = {}) => {
 // Function to get all books
 export const getAllBooks = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/books`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -40,7 +40,7 @@ export const getAllBooks = async (queryParams = {}) => {
 // Function to get all products
 export const getAllProducts = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/products`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -57,7 +57,7 @@ export const getAllProducts = async (queryParams = {}) => {
 // Function to get a book by ID
 export const getBookById = async (bookId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books/${bookId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/books/${bookId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -73,7 +73,7 @@ export const getBookById = async (bookId) => {
 // Function to get a product by ID
 export const getProductById = async (productId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/products/${productId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/products/${productId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -89,7 +89,7 @@ export const getProductById = async (productId) => {
 // Function to get books by section
 export const getBooksBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/books`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/books`, {
       params: { section: sectionId, ...queryParams },
       withCredentials: true,
       headers: {
@@ -105,7 +105,7 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
 
 export const getProductsBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/sections/${sectionId}/products`, {
+    const response = await axios.get(`${API_URL}/api/v1/ec/sections/${sectionId}/products`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -120,7 +120,7 @@ export const getProductsBySection = async (sectionId, queryParams = {}) => {
 }
 export const createSection = async (sectionData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/sections`, sectionData, {
+    const response = await axios.post(`${API_URL}/api/v1/ec/sections`, sectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -137,7 +137,7 @@ export const createSection = async (sectionData) => {
 // Function to update a section
 export const updateSection = async (sectionId, updateData) => {
   try {
-    const response = await axios.patch(`${API_URL}/api/v1/sections/${sectionId}`, updateData, {
+    const response = await axios.patch(`${API_URL}/api/v1/ec/sections/${sectionId}`, updateData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -154,7 +154,7 @@ export const updateSection = async (sectionId, updateData) => {
 // Function to delete a section
 export const deleteSection = async (sectionId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/sections/${sectionId}`, {
+    const response = await axios.delete(`${API_URL}/api/v1/ec/sections/${sectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -186,7 +186,7 @@ export const createProduct = async (productData) => {
       formData.append('sample', productData.sample)
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/products`, formData, {
+    const response = await axios.post(`${API_URL}/api/v1/ec/products`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -196,6 +196,144 @@ export const createProduct = async (productData) => {
     return response.data
   } catch (error) {
     console.error(`Error creating product: ${error.message}`)
+    throw error
+  }
+}
+
+export const createBook = async (bookData) => {
+  try {
+    const formData = new FormData()
+
+    // Append all the form fields
+    formData.append("title", bookData.title)
+    formData.append("serial", bookData.serial)
+    formData.append("section", bookData.section)
+    formData.append("price", bookData.price)
+    formData.append("discountPercentage", bookData.discountPercentage)
+    formData.append("subject", bookData.subject)
+    formData.append("paymentNumber", bookData.paymentNumber)
+    formData.append("description", bookData.description)
+
+    // Append files if they exist
+    if (bookData.thumbnail) {
+      formData.append("thumbnail", bookData.thumbnail)
+    }
+    if (bookData.sample) {
+      formData.append("sample", bookData.sample)
+    }
+
+    const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error creating book: ${error.message}`)
+    throw error
+  }
+}
+
+export const updateProduct = async (productId, productData) => {
+  try {
+    const formData = new FormData()
+
+    // Append all the form fields that are provided
+    if (productData.title) formData.append("title", productData.title)
+    if (productData.serial) formData.append("serial", productData.serial)
+    if (productData.section) formData.append("section", productData.section)
+    if (productData.price) formData.append("price", productData.price)
+    if (productData.discountPercentage) formData.append("discountPercentage", productData.discountPercentage)
+    if (productData.paymentNumber) formData.append("paymentNumber", productData.paymentNumber)
+
+    // Append files if they exist
+    if (productData.thumbnail) {
+      formData.append("thumbnail", productData.thumbnail)
+    }
+    if (productData.sample) {
+      formData.append("sample", productData.sample)
+    }
+
+    const response = await axios.patch(`${API_URL}/api/v1/ec/products/${productId}`, formData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error updating product: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to delete a product
+export const deleteProduct = async (productId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/api/v1/ec/products/${productId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error deleting product: ${error.message}`)
+    throw error
+  }
+}
+
+export const purchaseProduct = async (purchaseData) => {
+  try {
+    const formData = new FormData()
+    
+    formData.append("productId", purchaseData.productId)
+    formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
+    if (purchaseData.paymentScreenshot) {
+      formData.append("paymentScreenshot", purchaseData.paymentScreenshot)
+    }
+
+    const response = await axios.post(`${API_URL}/api/v1/ec/purchases/`, formData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error purchasing product: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to purchase a book
+export const purchaseBook = async (purchaseData) => {
+  try {
+    const formData = new FormData()
+    
+    formData.append("productId", purchaseData.productId)
+    formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
+    if (purchaseData.paymentScreenshot) {
+      formData.append("paymentScreenshot", purchaseData.paymentScreenshot)
+    }
+    formData.append("nameOnBook", purchaseData.nameOnBook)
+    formData.append("numberOnBook", purchaseData.numberOnBook)
+    formData.append("seriesName", purchaseData.seriesName)
+
+    const response = await axios.post(`${API_URL}/api/v1/ec/book-purchases/`, formData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error purchasing book: ${error.message}`)
     throw error
   }
 }
