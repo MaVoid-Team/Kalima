@@ -1,0 +1,33 @@
+{
+  "hero": {
+    "booksIllustration": "رسم توضيحي للكتب",
+    "tagline": "كل ما يحتاجه المعلم والطالب في مكان واحد"
+  },
+  "categories": {
+    "allSections": "جميع الأقسام"
+  },
+  "search": {
+    "placeholder": "ماذا تبحث عنه؟"
+  },
+  "product": {
+    "discounts": "خصومات",
+    "currency": "ج",
+    "viewDetails": "عرض التفاصيل"
+  },
+  "sections": {
+    "Designs": "تصاميم",
+    "Books": "كتب"
+  },
+  "emptyState": {
+    "title": "لم يتم العثور على عناصر",
+    "description": "حاول تعديل معايير البحث أو التصفية"
+  },
+  "pagination": {
+    "previous": "الصفحة السابقة",
+    "next": "الصفحة التالية"
+  },
+  "errors": {
+    "loadingError": "خطأ في تحميل بيانات السوق",
+    "fetchErrorLog": "خطأ في جلب بيانات السوق:"
+  }
+}

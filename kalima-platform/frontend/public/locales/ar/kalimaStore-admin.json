@@ -1,0 +1,99 @@
+{
+  "stats": {
+    "totalSales": "إجمالي المبيعات",
+    "pendingApplications": "الطلبات المعلقة",
+    "numberOfProducts": "عدد المنتجات",
+    "numberOfSections": "عدد الأقسام"
+  },
+  "categories": {
+    "designsSection": "قسم التصاميم",
+    "designsDescription": "قوالب التصميم والموارد",
+    "coursesSection": "قسم الدورات",
+    "coursesDescription": "الدورات التعليمية والمواد",
+    "giftsSection": "قسم الهدايا",
+    "giftsDescription": "عناصر الهدايا والحزم",
+    "printingSection": "قسم الطباعة",
+    "printingDescription": "خدمات ومواد الطباعة"
+  },
+  "sectionsManagement": {
+    "title": "إدارة الأقسام",
+    "searchPlaceholder": "البحث في الأقسام...",
+    "table": {
+      "name": "الاسم",
+      "sectionNumber": "رقم القسم",
+      "numberOfProducts": "عدد المنتجات",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "forms": {
+    "createProduct": {
+      "title": "إنشاء منتج جديد",
+      "submitButton": "إنشاء منتج",
+      "fields": {
+        "title": "عنوان المنتج",
+        "serial": "الرقم التسلسلي",
+        "section": "القسم",
+        "price": "السعر",
+        "discountPercentage": "نسبة الخصم",
+        "paymentNumber": "رقم الدفع",
+        "thumbnail": "صورة المنتج المصغرة",
+        "sampleFile": "ملف العينة"
+      },
+      "placeholders": {
+        "title": "أدخل عنوان المنتج",
+        "serial": "أدخل الرقم التسلسلي",
+        "section": "اختر القسم",
+        "paymentNumber": "أدخل رقم الدفع"
+      },
+      "hints": {
+        "thumbnail": "رفع صورة المنتج المصغرة (الحد الأقصى 5 ميجابايت)",
+        "sampleFile": "رفع ملف العينة"
+      }
+    },
+    "createSection": {
+      "title": "إنشاء قسم",
+      "submitButton": "إنشاء قسم",
+      "fields": {
+        "name": "اسم القسم",
+        "number": "رقم القسم",
+        "description": "الوصف",
+        "thumbnail": "الصورة المصغرة"
+      },
+      "placeholders": {
+        "name": "أدخل اسم القسم",
+        "number": "أدخل رقم القسم",
+        "description": "أدخل وصف القسم",
+        "thumbnail": "أدخل اسم الصورة المصغرة"
+      }
+    }
+  },
+  "modals": {
+    "editSection": {
+      "title": "تعديل القسم",
+      "cancelButton": "إلغاء",
+      "updateButton": "تحديث القسم"
+    },
+    "deleteSection": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد من أنك تريد حذف القسم \"{{sectionName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancelButton": "إلغاء",
+      "deleteButton": "حذف"
+    }
+  },
+  "alerts": {
+    "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "productCreatedSuccess": "تم إنشاء المنتج بنجاح!",
+    "productCreateError": "خطأ في إنشاء المنتج: ",
+    "sectionCreatedSuccess": "تم إنشاء القسم بنجاح!",
+    "sectionCreateError": "خطأ في إنشاء القسم: ",
+    "sectionUpdatedSuccess": "تم تحديث القسم بنجاح!",
+    "sectionUpdateError": "خطأ في تحديث القسم: ",
+    "sectionDeletedSuccess": "تم حذف القسم بنجاح!",
+    "sectionDeleteError": "خطأ في حذف القسم: "
+  },
+  "error": {
+    "title": "خطأ!"
+  }
+}

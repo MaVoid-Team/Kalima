@@ -63,5 +63,7 @@
   "Packages": "Packages",
   "select": "Select",
   "Create": "Create",
-  "MyLectures": "My Lectures"
+  "MyLectures": "My Lectures",
+  "storeDashboard": "Store Dashboard",
+  "market": "Market"
 }

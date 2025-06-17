@@ -22,7 +22,7 @@ const parentSchema = new mongoose.Schema({
   lecturerPoints: [lecturerPointsSchema],
   government: { type: String, required: true },
   administrationZone: { type: String, required: true },
-    userSeria: {
+  userSerial: {
     type: String,
     unique: true,
     index: true
@@ -71,25 +71,25 @@ parentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   return true; // Successfully used points
 };
 
-parentSchema.pre('save', async function(next) {
-  if (this.isNew && !this.userSeria) {
+parentSchema.pre('save', async function (next) {
+  if (this.isNew && !this.userSerial) {
     try {
       // Get the count of existing parents to generate next number
       const count = await mongoose.model('Parent').countDocuments();
-      // Generate userSeria with format PA + 3-digit number (PA001, PA002, etc.)
-      this.userSeria = `PA${String(count + 1).padStart(3, '0')}`;
-      
-      // Check if this userSeria already exists (for race condition safety)
-      const existingParent = await mongoose.model('Parent').findOne({ userSeria: this.userSeria });
+      // Generate userSerial with format PA + 3-digit number (PA001, PA002, etc.)
+      this.userSerial = `PA${String(count + 1).padStart(3, '0')}`;
+
+      // Check if this userSerial already exists (for race condition safety)
+      const existingParent = await mongoose.model('Parent').findOne({ userSerial: this.userSerial });
       if (existingParent) {
         // If it exists, find the highest number and increment
-        const allParents = await mongoose.model('Parent').find({}, 'userSeria').lean();
+        const allParents = await mongoose.model('Parent').find({}, 'userSerial').lean();
         const numbers = allParents
-          .map(p => parseInt(p.userSeria.replace('PA', '')))
+          .map(p => parseInt(p.userSerial.replace('PA', '')))
           .filter(n => !isNaN(n));
-        
+
         const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-        this.userSeria = `PA${String(maxNumber + 1).padStart(3, '0')}`;
+        this.userSerial = `PA${String(maxNumber + 1).padStart(3, '0')}`;
       }
     } catch (error) {
       return next(error);

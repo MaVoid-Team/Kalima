@@ -48,6 +48,47 @@ const uploadFileToCloudinary = async (file, folder, next) => {
   return result.secure_url;
 };
 
+// For payment screenshot (image)
+const allowedImageTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/jpg",
+];
 
+const uploadPaymentScreenshotMiddleware = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (allowedImageTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new AppError("Invalid file type for payment screenshot", 400),
+        false
+      );
+    }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+}).single("paymentScreenshot");
 
-module.exports = { uploadFileToCloudinary, uploadFileMiddleware };
+const uploadPaymentScreenshotToCloudinary = async (file, folder, next) => {
+  if (!file || !file.buffer) {
+    return next(new AppError("No file buffer found for upload", 400));
+  }
+  const base64File = `data:${file.mimetype};base64,${file.buffer.toString(
+    "base64"
+  )}`;
+  const result = await cloudinary.uploader.upload(base64File, {
+    folder,
+    resource_type: "image",
+  });
+  return result.secure_url;
+};
+
+module.exports = {
+  uploadFileMiddleware,
+  uploadFileToCloudinary,
+  uploadPaymentScreenshotMiddleware,
+  uploadPaymentScreenshotToCloudinary,
+};

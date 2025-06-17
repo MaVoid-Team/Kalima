@@ -1,0 +1,33 @@
+{
+  "hero": {
+    "booksIllustration": "Books illustration",
+    "tagline": "Everything a teacher and student needs in one place"
+  },
+  "categories": {
+    "allSections": "All Sections"
+  },
+  "search": {
+    "placeholder": "What are you looking for?"
+  },
+  "sections": {
+    "Designs": "Designs",
+    "Books": "Books"
+  },
+  "product": {
+    "discounts": "Discounts",
+    "currency": "ج",
+    "viewDetails": "View Details"
+  },
+  "emptyState": {
+    "title": "No items found",
+    "description": "Try adjusting your search or filter criteria"
+  },
+  "pagination": {
+    "previous": "Previous page",
+    "next": "Next page"
+  },
+  "errors": {
+    "loadingError": "Error loading market data",
+    "fetchErrorLog": "Error fetching market data:"
+  }
+}

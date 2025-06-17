@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // Create ECBook
 exports.createECBook = async (req, res, next) => {
     try {
-        const { title, serial, section, price, paymentNumber, discountPercentage, subject } = req.body;
+        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description } = req.body;
         const createdBy = req.user._id;
         let sample, thumbnail;
         // Handle sample PDF
@@ -39,6 +39,7 @@ exports.createECBook = async (req, res, next) => {
             subject,
             thumbnail,
             sample,
+            description,
             createdBy
         });
         res.status(201).json({
@@ -54,7 +55,7 @@ exports.createECBook = async (req, res, next) => {
 exports.getAllECBooks = async (req, res) => {
     try {
         const books = await ECBook.find({}, "-__v")
-            .populate({ path: "subject", model: "Subject", select: "name" })
+            .populate({ path: "subject", model: "Subject", select: "name" }).populate({ path: "section", model: "ECSection", select: "number" })
             .select("-__v");
         res.status(200).json({
             status: "success",
