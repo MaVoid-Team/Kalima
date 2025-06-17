@@ -2,16 +2,14 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import {
-  getAllSections,
-  getAllBooks,
-  getAllProducts,
-  getProductsBySection,
-  getBooksBySection,
-} from "../../routes/market"
+import { useTranslation } from "react-i18next"
+import { getAllSections, getAllBooks, getAllProducts } from "../../routes/market"
 
 const Market = () => {
+  const { t, i18n } = useTranslation("kalimaStore-Market")
+  const isRTL = i18n.language === "ar"
   const navigate = useNavigate()
+
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sections, setSections] = useState([])
@@ -28,16 +26,14 @@ const Market = () => {
       return [...allProducts, ...allBooks]
     }
     return [
-      ...allProducts.filter(product => product.section?._id === activeTab),
-      ...allBooks.filter(book => book.section?._id === activeTab)
+      ...allProducts.filter((product) => product.section?._id === activeTab),
+      ...allBooks.filter((book) => book.section?._id === activeTab),
     ]
   }, [activeTab, allProducts, allBooks])
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
-    return allItems.filter((item) => 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    return allItems.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
   }, [allItems, searchQuery])
 
   // Calculate paginated items
@@ -65,10 +61,7 @@ const Market = () => {
         }
 
         // Fetch all products and books (without pagination)
-        const [productsResponse, booksResponse] = await Promise.all([
-          getAllProducts(),
-          getAllBooks(),
-        ])
+        const [productsResponse, booksResponse] = await Promise.all([getAllProducts(), getAllBooks()])
 
         if (productsResponse.status === "success") {
           setAllProducts(productsResponse.data.products)
@@ -79,14 +72,14 @@ const Market = () => {
         }
       } catch (err) {
         setError(err.message)
-        console.error("Error fetching market data:", err)
+        console.error(t("errors.fetchErrorLog"), err)
       } finally {
         setLoading(false)
       }
     }
 
     fetchInitialData()
-  }, [])
+  }, [t])
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -95,10 +88,10 @@ const Market = () => {
 
   // Create categories array with "All" option and fetched sections
   const categories = [
-    { id: "all", name: "All Sections", icon: "☰" },
+    { id: "all", name: t("categories.allSections"), icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
-      name: section.name,
+      name: t(`sections.${section.name}`),
       icon: "📚",
     })),
   ]
@@ -128,21 +121,23 @@ const Market = () => {
               d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>Error loading market data: {error}</span>
+          <span>
+            {t("errors.loadingError")}: {error}
+          </span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* Hero Section */}
       <div className="py-6 px-4">
         <div className="md:max-w-7xl lg:max-w-7xl max-w-3xl mx-auto">
           <div className="flex flex-wrap items-center gap-2 mb-6">
-            <img src="/bookshelf.png" alt="Books illustration" className="h-24 w-auto" />
-            <h1 className="text-lg font-semibold flex-1 text-center md:text-right">
-              Everything a teacher and student needs in one place
+            <img src="/bookshelf.png" alt={t("hero.booksIllustration")} className="h-24 w-auto" />
+            <h1 className={`text-lg font-semibold flex-1 text-center ${isRTL ? "md:text-left" : "md:text-right"}`}>
+              {t("hero.tagline")}
             </h1>
           </div>
         </div>
@@ -156,11 +151,11 @@ const Market = () => {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors border-r-2 border-secondary ${
-                  activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"
-                }`}
+                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${
+                  isRTL ? "border-l-2" : "border-r-2"
+                } border-secondary ${activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"}`}
               >
-                <span className="mr-2">{category.icon}</span>
+                <span className={`${isRTL ? "ml-2" : "mr-2"}`}>{category.icon}</span>
                 {category.name}
               </button>
             ))}
@@ -175,12 +170,14 @@ const Market = () => {
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder="What are you looking for?"
+                placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input input-bordered w-full pl-12 focus:border-primary focus:ring-primary"
+                className={`input input-bordered w-full ${
+                  isRTL ? "pr-12" : "pl-12"
+                } focus:border-primary focus:ring-primary`}
               />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+              <div className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 transform -translate-y-1/2`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -221,9 +218,13 @@ const Market = () => {
             >
               {/* Discount Badge */}
               {item.discountPercentage && item.discountPercentage > 0 && (
-                <div className="absolute top-4 left-4 z-10">
-                  <div className="bg-primary px-3 py-1 rounded-br-2xl text-sm font-medium">
-                    Discounts
+                <div className={`absolute top-4 ${isRTL ? "right-4" : "left-4"} z-10`}>
+                  <div
+                    className={`bg-primary px-3 py-1 ${
+                      isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
+                    } text-sm font-medium`}
+                  >
+                    {t("product.discounts")}
                     <br />
                     <span className="text-lg font-bold">{item.discountPercentage}%</span>
                   </div>
@@ -232,8 +233,12 @@ const Market = () => {
 
               {/* Subject Badge for Books */}
               {item.__t === "ECBook" && item.subject && (
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="bg-secondary px-2 py-1 rounded-bl-2xl text-xs font-medium">
+                <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} z-10`}>
+                  <div
+                    className={`bg-secondary px-2 py-1 ${
+                      isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                    } text-xs font-medium`}
+                  >
                     {item.subject.name || item.subject}
                   </div>
                 </div>
@@ -253,11 +258,17 @@ const Market = () => {
                 <div className="flex items-center gap-2 mb-4">
                   {item.priceAfterDiscount && item.priceAfterDiscount < item.price ? (
                     <>
-                      <span className="text-2xl font-bold text-primary">{item.priceAfterDiscount} ج</span>
-                      <span className="text-sm line-through text-gray-500">{item.price} ج</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {item.priceAfterDiscount} {t("product.currency")}
+                      </span>
+                      <span className="text-sm line-through text-gray-500">
+                        {item.price} {t("product.currency")}
+                      </span>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold text-primary">{item.price} ج</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {item.price} {t("product.currency")}
+                    </span>
                   )}
                 </div>
 
@@ -269,7 +280,7 @@ const Market = () => {
                     }}
                     className="btn btn-primary bg-primary border-primary hover:bg-primary/50 w-full"
                   >
-                    View Details
+                    {t("product.viewDetails")}
                   </button>
                 </div>
               </div>
@@ -281,8 +292,8 @@ const Market = () => {
         {filteredItems.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📚</div>
-            <h3 className="text-xl font-semibold mb-2">No items found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            <h3 className="text-xl font-semibold mb-2">{t("emptyState.title")}</h3>
+            <p className="text-gray-500">{t("emptyState.description")}</p>
           </div>
         )}
 
@@ -294,8 +305,15 @@ const Market = () => {
                 className="join-item btn rounded-full"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1 || loading}
+                title={t("pagination.previous")}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{ transform: isRTL ? "rotate(180deg)" : "none" }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -315,8 +333,15 @@ const Market = () => {
                 className="join-item btn rounded-full"
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages || loading}
+                title={t("pagination.next")}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{ transform: isRTL ? "rotate(180deg)" : "none" }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>

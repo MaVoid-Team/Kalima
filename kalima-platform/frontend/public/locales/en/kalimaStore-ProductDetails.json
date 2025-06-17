@@ -1,0 +1,58 @@
+{
+  "header": {
+    "purchaseDetails": "Purchase Details"
+  },
+  "navigation": {
+    "back": "Back",
+    "goBack": "Go Back"
+  },
+  "product": {
+    "details": "Details",
+    "name": "Product Name",
+    "category": "Category",
+    "serialNumber": "Serial Number",
+    "price": "Product Price",
+    "discount": "Discount",
+    "currency": "ج",
+    "types": {
+      "book": "Book",
+      "product": "Product"
+    }
+  },
+  "payment": {
+    "numberCopied": "Payment number copied!",
+    "sendAmount": "Send the specified amount to the above number"
+  },
+  "purchaseSteps": {
+    "title": "Purchase Steps",
+    "step1": "Send the amount via electronic wallet or instapay",
+    "step2": "Take a screenshot after completing the transfer process"
+  },
+  "upload": {
+    "title": "Upload Transfer Screenshot Here",
+    "dragDrop": "Drag and drop your screenshot here",
+    "maxFileSize": "Maximum file size: 1 GB",
+    "fileSuccess": "File uploaded successfully!",
+    "removeFile": "Remove file",
+    "addImage": "Add Image"
+  },
+  "response": {
+    "note": "Please note that we will respond after uploading the screenshot",
+    "timeframe": "Response will be within 1-2 hours during business hours"
+  },
+  "buttons": {
+    "done": "Done"
+  },
+  "errors": {
+    "title": "Error!",
+    "invalidProductInfo": "Invalid product ID or type",
+    "invalidItemType": "Invalid item type",
+    "fetchFailed": "Failed to fetch item data",
+    "fetchErrorLog": "Error fetching item data:",
+    "copyFailed": "Failed to copy payment number:",
+    "productNotFound": "Product not found"
+  },
+  "logs": {
+    "submittingPurchase": "Submitting purchase with file:"
+  }
+}
