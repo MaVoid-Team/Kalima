@@ -15,7 +15,7 @@ export const getAllProductPurchases = async (queryParams = {}) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/purchases/`, {
+    const response = await axios.get(`${API_URL}/ec/purchases/`, {
       params: {
         limit: 6, // Fixed limit as requested
         ...queryParams,
@@ -45,7 +45,7 @@ export const getAllBookPurchases = async (queryParams = {}) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/book-purchases/`, {
+    const response = await axios.get(`${API_URL}/ec/book-purchases/`, {
       params: {
         limit: 6, // Fixed limit as requested
         ...queryParams,
@@ -76,7 +76,7 @@ export const confirmProductPurchase = async (purchaseId) => {
     }
 
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/purchases/${purchaseId}/confirm`,
+      `${API_URL}/ec/purchases/${purchaseId}/confirm`,
       {},
       {
         withCredentials: true,
@@ -107,7 +107,7 @@ export const confirmBookPurchase = async (purchaseId) => {
     }
 
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/book-purchases/${purchaseId}/confirm`,
+      `${API_URL}/ec/book-purchases/${purchaseId}/confirm`,
       {},
       {
         withCredentials: true,
