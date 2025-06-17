@@ -222,7 +222,7 @@ export const createBook = async (bookData) => {
       formData.append("sample", bookData.sample)
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
+    const response = await axios.post(`${API_URL}/ec/books`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -256,7 +256,7 @@ export const updateProduct = async (productId, productData) => {
       formData.append("sample", productData.sample)
     }
 
-    const response = await axios.patch(`${API_URL}/api/v1/ec/products/${productId}`, formData, {
+    const response = await axios.patch(`${API_URL}/ec/products/${productId}`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -273,7 +273,7 @@ export const updateProduct = async (productId, productData) => {
 // Function to delete a product
 export const deleteProduct = async (productId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/products/${productId}`, {
+    const response = await axios.delete(`${API_URL}/ec/products/${productId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -296,7 +296,7 @@ export const purchaseProduct = async (purchaseData) => {
       formData.append("paymentScreenshot", purchaseData.paymentScreenshot)
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/purchases/`, formData, {
+    const response = await axios.post(`${API_URL}/ec/purchases/`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -324,7 +324,7 @@ export const purchaseBook = async (purchaseData) => {
     formData.append("numberOnBook", purchaseData.numberOnBook)
     formData.append("seriesName", purchaseData.seriesName)
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/book-purchases/`, formData, {
+    const response = await axios.post(`${API_URL}/ec/book-purchases/`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
