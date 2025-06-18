@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { FiX, FiFileText, FiChevronDown, FiUser, FiEdit, FiRotateCw, FiSearch } from "react-icons/fi";
-import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from "react-icons/fa";
-import { getAuditLogs } from "../../../routes/auditlog";
-import { useTranslation } from "react-i18next";
+"use client"
+
+import { useState, useEffect } from "react"
+import { FiX, FiFileText, FiChevronDown, FiEdit, FiRotateCw, FiSearch } from "react-icons/fi"
+import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle, FaDownload, FaFileExport } from "react-icons/fa"
+import { getAuditLogs } from "../../../routes/auditlog"
+import { useTranslation } from "react-i18next"
 
 const AuditLog = () => {
-  const { t, i18n } = useTranslation('admin');
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { t, i18n } = useTranslation("admin")
+  const [logs, setLogs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [isExporting, setIsExporting] = useState(false)
   // NOTE: keys now match server-side param names
   const [filters, setFilters] = useState({
     user: "",
@@ -17,147 +20,407 @@ const AuditLog = () => {
     resource_type: "",
     status: "",
     startDate: "",
-    endDate: ""
-  });
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const isRTL = i18n.language === 'ar';
-  const dir = isRTL ? 'rtl' : 'ltr';
+    endDate: "",
+  })
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [allLogs, setAllLogs] = useState([]) // Store all logs for export
+  const isRTL = i18n.language === "ar"
+  const dir = isRTL ? "rtl" : "ltr"
+
   // Fetch audit logs on component mount and when filters change
   useEffect(() => {
     const fetchAuditLogs = async () => {
-      setLoading(true);
+      setLoading(true)
       try {
-        const params = { page, limit, ...Object.fromEntries(
-          Object.entries(filters).filter(([, v]) => v !== "")
-        )};
-        const response = await getAuditLogs(params.page, params.limit, params);
+        const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")) }
+        const response = await getAuditLogs(params.page, params.limit, params)
         if (response.status === "success") {
-          setLogs(response.data.logs || []);
-          setError(null);
+          setLogs(response.data.logs || [])
+          setError(null)
         } else {
-          setError(response.error);
-          setLogs([]);
+          setError(response.error)
+          setLogs([])
         }
       } catch (e) {
-        setError("Error fetching logs");
+        setError("Error fetching logs")
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchAuditLogs();
-  }, [page, limit, filters]);
-  const translate = (category, key) => t(`admin.auditlog.${category}.${key}`);
-  const translateStatus = (status) => translate('status', status.toLowerCase());
-  const translateAction = (action) => translate('actions', action.toLowerCase());
-  const translateResource = (resource) => translate('resources', resource.toLowerCase());
-  const translateRole = (role) => translate('roles', role.toLowerCase());
+    }
+    fetchAuditLogs()
+  }, [page, limit, filters])
+
+  // Fetch all logs for export (without pagination)
+  const fetchAllLogs = async () => {
+    try {
+      const params = { ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")) }
+      const response = await getAuditLogs(1, 10000, params) // Large limit to get all logs
+      if (response.status === "success") {
+        return response.data.logs || []
+      }
+      return []
+    } catch (e) {
+      console.error("Error fetching all logs:", e)
+      return []
+    }
+  }
+
+  const translate = (category, key) => t(`admin.auditlog.${category}.${key}`)
+  const translateStatus = (status) => translate("status", status.toLowerCase())
+  const translateAction = (action) => translate("actions", action.toLowerCase())
+  const translateResource = (resource) => translate("resources", resource.toLowerCase())
+  const translateRole = (role) => translate("roles", role.toLowerCase())
 
   useEffect(() => {
     const fetch = async () => {
-      const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([,v]) => v)) };
-      const res = await getAuditLogs(page, limit, params);
-      if (res.status === "success") setLogs(res.data.logs);
-    };
-    fetch();
-  }, [page, filters ,limit]);
-  const handleFilterChange = (key, value) => setFilters(prev => ({ ...prev, [key]: value }));
-  const applyFilters = () => setPage(1);
+      const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v)) }
+      const res = await getAuditLogs(page, limit, params)
+      if (res.status === "success") setLogs(res.data.logs)
+    }
+    fetch()
+  }, [page, filters, limit])
+
+  const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }))
+  const applyFilters = () => setPage(1)
+
+  // Export functionality
+  const convertToCSV = (data) => {
+    const headers = [
+      t("admin.auditlog.export.user") || "User",
+      t("admin.auditlog.export.role") || "Role",
+      t("admin.auditlog.export.action") || "Action",
+      t("admin.auditlog.export.resource") || "Resource",
+      t("admin.auditlog.export.resourceDetails") || "Resource Details",
+      t("admin.auditlog.export.status") || "Status",
+      t("admin.auditlog.export.timestamp") || "Timestamp",
+      t("admin.auditlog.export.ipAddress") || "IP Address",
+      t("admin.auditlog.export.userAgent") || "User Agent",
+      t("admin.auditlog.export.description") || "Description",
+    ]
+
+    const csvContent = [
+      headers.join(","),
+      ...data.map((log) => {
+        const resourceDetails =
+          log.resource?.details?.name || log.resource?.name || (log.resource?.id ? `ID: ${log.resource.id}` : "")
+
+        return [
+          `"${log.user?.name || t("admin.auditlog.status.unknown") || "Unknown"}"`,
+          `"${log.user?.role ? translateRole(log.user.role) : ""}"`,
+          `"${translateAction(log.action)}"`,
+          `"${log.resource?.type ? t(`admin.auditlog.resources.${log.resource.type}`) : ""}"`,
+          `"${resourceDetails}"`,
+          `"${translateStatus(log.status)}"`,
+          `"${new Date(log.timestamp).toLocaleString(i18n.language)}"`,
+          `"${log.ipAddress || ""}"`,
+          `"${log.userAgent || ""}"`,
+          `"${log.description || ""}"`,
+        ].join(",")
+      }),
+    ].join("\n")
+
+    return csvContent
+  }
+
+  const exportToCSV = async (exportAll = false) => {
+    setIsExporting(true)
+
+    try {
+      const dataToExport = exportAll ? await fetchAllLogs() : logs
+
+      if (dataToExport.length === 0) {
+        alert(t("admin.auditlog.export.noData") || "No data to export")
+        return
+      }
+
+      const csvContent = convertToCSV(dataToExport)
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const link = document.createElement("a")
+
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = exportAll ? `audit-logs-all-${timestamp}.csv` : `audit-logs-filtered-${timestamp}.csv`
+
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Show success message
+        const successMessage = exportAll
+          ? t("admin.auditlog.export.successAll") || `Successfully exported ${dataToExport.length} audit logs`
+          : t("admin.auditlog.export.successFiltered") ||
+            `Successfully exported ${dataToExport.length} filtered audit logs`
+
+        alert(successMessage)
+      }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.auditlog.export.error") || "Failed to export audit logs. Please try again.")
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const exportToJSON = async (exportAll = false) => {
+    setIsExporting(true)
+
+    try {
+      const dataToExport = exportAll ? await fetchAllLogs() : logs
+
+      if (dataToExport.length === 0) {
+        alert(t("admin.auditlog.export.noData") || "No data to export")
+        return
+      }
+
+      // Clean and format data for JSON export
+      const jsonData = dataToExport.map((log) => {
+        const resourceDetails =
+          log.resource?.details?.name || log.resource?.name || (log.resource?.id ? `ID: ${log.resource.id}` : "")
+
+        return {
+          id: log._id,
+          user: {
+            name: log.user?.name || "Unknown",
+            role: log.user?.role || "",
+            userId: log.user?.userId || "",
+          },
+          action: log.action,
+          actionTranslated: translateAction(log.action),
+          resource: {
+            type: log.resource?.type || "",
+            typeTranslated: log.resource?.type ? t(`admin.auditlog.resources.${log.resource.type}`) : "",
+            details: resourceDetails,
+            id: log.resource?.id || "",
+          },
+          status: log.status,
+          statusTranslated: translateStatus(log.status),
+          timestamp: log.timestamp,
+          timestampFormatted: new Date(log.timestamp).toLocaleString(i18n.language),
+          ipAddress: log.ipAddress || "",
+          userAgent: log.userAgent || "",
+          description: log.description || "",
+          metadata: log.metadata || {},
+        }
+      })
+
+      const jsonContent = JSON.stringify(jsonData, null, 2)
+
+      // Create blob and download
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
+      const link = document.createElement("a")
+
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = exportAll ? `audit-logs-all-${timestamp}.json` : `audit-logs-filtered-${timestamp}.json`
+
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Show success message
+        const successMessage = exportAll
+          ? t("admin.auditlog.export.successAll") || `Successfully exported ${dataToExport.length} audit logs`
+          : t("admin.auditlog.export.successFiltered") ||
+            `Successfully exported ${dataToExport.length} filtered audit logs`
+
+        alert(successMessage)
+      }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.auditlog.export.error") || "Failed to export audit logs. Please try again.")
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   // Prepare label text based on current selection
   const userNameMap = logs.reduce((m, log) => {
-    if (log.user?.userId) m[log.user.userId] = log.user.name;
-    return m;
-  }, {});
-  const selectedUserLabel = filters.userId ? (userNameMap[filters.userId] || 'مستخدم غير معروف') : 'المستخدم';
+    if (log.user?.userId) m[log.user.userId] = log.user.name
+    return m
+  }, {})
+  const selectedUserLabel = filters.userId ? userNameMap[filters.userId] || "مستخدم غير معروف" : "المستخدم"
   const selectedRoleLabel = filters.role
-    ? (filters.role === 'Admin' ? 'مسؤول' : filters.role === 'Lecturer' ? 'معلم' : 'طالب')
-    : 'الصلاحية';
+    ? filters.role === "Admin"
+      ? "مسؤول"
+      : filters.role === "Lecturer"
+        ? "معلم"
+        : "طالب"
+    : "الصلاحية"
   const selectedActionLabel = filters.action
-    ? (filters.action === 'read' ? 'قراءة' : filters.action === 'update' ? 'تعديل' : filters.action === 'delete' ? 'حذف' : 'إنشاء')
-    : 'العملية';
+    ? filters.action === "read"
+      ? "قراءة"
+      : filters.action === "update"
+        ? "تعديل"
+        : filters.action === "delete"
+          ? "حذف"
+          : "إنشاء"
+    : "العملية"
   const selectedResourceLabel = filters.resourceType
-    ? (filters.resourceType === 'container' ? 'كورس'
-       : filters.resourceType === 'lecture' ? 'درس'
-       : filters.resourceType === 'user' ? 'مستخدم'
-       : 'جدول زمني')
-    : 'العنصر المتأثر';
-  const selectedStatusLabel = filters.status
-    ? (filters.status === 'success' ? 'نجاح' : 'فشل')
-    : 'الحالة'; 
-
-
+    ? filters.resourceType === "container"
+      ? "كورس"
+      : filters.resourceType === "lecture"
+        ? "درس"
+        : filters.resourceType === "user"
+          ? "مستخدم"
+          : "جدول زمني"
+    : "العنصر المتأثر"
+  const selectedStatusLabel = filters.status ? (filters.status === "success" ? "نجاح" : "فشل") : "الحالة"
 
   // Format date for display
-  const formatDate = (dateString) => 
-    new Date(dateString).toLocaleDateString(i18n.language);
-    
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString(i18n.language)
+
   const formatTime = (dateString) =>
     new Date(dateString).toLocaleTimeString(i18n.language, {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
   // Get icon for action type
   const getActionIcon = (action) => {
     switch (action) {
-      case 'delete':
+      case "delete":
         return (
           <div className="badge badge-error badge-sm p-3">
             <FiX className="h-4 w-4 text-white" />
           </div>
-        );
-      case 'update':
-      case 'edit':
+        )
+      case "update":
+      case "edit":
         return (
           <div className="badge badge-warning badge-sm p-3">
             <FiEdit className="h-4 w-4 text-white" />
           </div>
-        );
-      case 'read':
+        )
+      case "read":
         return (
           <div className="badge badge-neutral badge-sm p-3">
             <FiFileText className="h-4 w-4 text-white" />
           </div>
-        );
+        )
       default:
         return (
           <div className="badge badge-info badge-sm p-3">
             <FiRotateCw className="h-4 w-4 text-white" />
           </div>
-        );
+        )
     }
-  };
+  }
 
   // Get icon for status
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'success':
-        return <FaCheckCircle className="h-5 w-5 text-success" />;
-      case 'pending':
-        return <FaHourglassHalf className="h-5 w-5 text-amber-700" />;
-      case 'failed':
-        return <FaExclamationTriangle className="h-5 w-5 text-warning" />;
+      case "success":
+        return <FaCheckCircle className="h-5 w-5 text-success" />
+      case "pending":
+        return <FaHourglassHalf className="h-5 w-5 text-amber-700" />
+      case "failed":
+        return <FaExclamationTriangle className="h-5 w-5 text-warning" />
       default:
-        return <FaCheckCircle className="h-5 w-5 text-success" />;
+        return <FaCheckCircle className="h-5 w-5 text-success" />
     }
-  };
+  }
 
   return (
     <div className="mx-auto w-full max-w-full p-4 md:p-8 lg:p-20 bg-base-100 min-h-screen bg-gradient-to-br" dir={dir}>
       {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">{t('admin.auditlog.title')}</h1>
-        <p className="text-gray-600 mt-2">{t('admin.auditlog.subtitle')}</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">{t("admin.auditlog.title")}</h1>
+          <p className="text-gray-600 mt-2">{t("admin.auditlog.subtitle")}</p>
+        </div>
+
+        {/* Export Dropdown */}
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+            {isExporting ? (
+              <>
+                <span className="loading loading-spinner loading-sm"></span>
+                {t("admin.auditlog.export.exporting") || "Exporting..."}
+              </>
+            ) : (
+              <>
+                <FaDownload className="mr-2" />
+                {t("admin.auditlog.export.export") || "Export Logs"}
+              </>
+            )}
+          </div>
+          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+            <li className="menu-title">
+              <span>{t("admin.auditlog.export.csvFormat") || "CSV Format"}</span>
+            </li>
+            <li>
+              <button onClick={() => exportToCSV(false)} disabled={isExporting || logs.length === 0}>
+                <FaFileExport className="mr-2" />
+                {t("admin.auditlog.export.exportFiltered") || "Export Current View"} ({logs.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => exportToCSV(true)} disabled={isExporting}>
+                <FaFileExport className="mr-2" />
+                {t("admin.auditlog.export.exportAll") || "Export All Logs"}
+              </button>
+            </li>
+            <div className="divider my-1"></div>
+            <li className="menu-title">
+              <span>{t("admin.auditlog.export.jsonFormat") || "JSON Format"}</span>
+            </li>
+            <li>
+              <button onClick={() => exportToJSON(false)} disabled={isExporting || logs.length === 0}>
+                <FaFileExport className="mr-2" />
+                {t("admin.auditlog.export.exportFiltered") || "Export Current View"} ({logs.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => exportToJSON(true)} disabled={isExporting}>
+                <FaFileExport className="mr-2" />
+                {t("admin.auditlog.export.exportAll") || "Export All Logs"}
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
+
+      {/* Export Summary */}
+      {(Object.values(filters).some((v) => v !== "") || logs.length > 0) && (
+        <div className="alert alert-info mb-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="stroke-current shrink-0 w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span>
+            {Object.values(filters).some((v) => v !== "")
+              ? `${t("admin.auditlog.export.filterInfo") || "Filters applied:"} ${logs.length} ${t("admin.auditlog.export.of") || "of"} ${t("admin.auditlog.export.totalLogs") || "total logs shown"}`
+              : `${t("admin.auditlog.export.showing") || "Showing"} ${logs.length} ${t("admin.auditlog.export.logs") || "audit logs"}`}
+          </span>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="mb-6">
         <div className="relative">
-          <input 
-            type="text"
-            placeholder={t('admin.auditlog.search')} 
-            className="input input-bordered w-full pr-10" 
-          />
+          <input type="text" placeholder={t("admin.auditlog.search")} className="input input-bordered w-full pr-10" />
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
       </div>
@@ -168,12 +431,16 @@ const AuditLog = () => {
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
-            <span>{filters.user || t('admin.auditlog.filters.user')}</span>
+            <span>{filters.user || t("admin.auditlog.filters.user")}</span>
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><button onClick={() => handleFilterChange('user', '')}>{t('admin.auditlog.filters.all')}</button></li>
-            {[...new Set(logs.map(l => l.user?.name))].map((name, i) => (
-              <li key={i}><button onClick={() => handleFilterChange('user', name)}>{name}</button></li>
+            <li>
+              <button onClick={() => handleFilterChange("user", "")}>{t("admin.auditlog.filters.all")}</button>
+            </li>
+            {[...new Set(logs.map((l) => l.user?.name))].map((name, i) => (
+              <li key={i}>
+                <button onClick={() => handleFilterChange("user", name)}>{name}</button>
+              </li>
             ))}
           </ul>
         </div>
@@ -182,15 +449,15 @@ const AuditLog = () => {
         <div className="dropdown dropdown-end bg-base-100">
           <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
-            <span>{filters.role || t('admin.auditlog.filters.role')}</span>
+            <span>{filters.role || t("admin.auditlog.filters.role")}</span>
           </label>
           <ul tabIndex={1} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><button onClick={() => handleFilterChange('role', '')}>{t('admin.auditlog.filters.all')}</button></li>
-            {['admin','lecturer','student'].map(role => (
+            <li>
+              <button onClick={() => handleFilterChange("role", "")}>{t("admin.auditlog.filters.all")}</button>
+            </li>
+            {["admin", "lecturer", "student"].map((role) => (
               <li key={role}>
-                <button onClick={() => handleFilterChange('role', role)}>
-                  {translateRole(role)}
-                </button>
+                <button onClick={() => handleFilterChange("role", role)}>{translateRole(role)}</button>
               </li>
             ))}
           </ul>
@@ -200,15 +467,15 @@ const AuditLog = () => {
         <div className="dropdown dropdown-end bg-base-100">
           <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
-            <span>{filters.action || t('admin.auditlog.filters.action')}</span>
+            <span>{filters.action || t("admin.auditlog.filters.action")}</span>
           </label>
           <ul tabIndex={2} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><button onClick={() => handleFilterChange('action', '')}>{t('admin.auditlog.filters.all')}</button></li>
-            {['create','read','update','delete'].map(action => (
+            <li>
+              <button onClick={() => handleFilterChange("action", "")}>{t("admin.auditlog.filters.all")}</button>
+            </li>
+            {["create", "read", "update", "delete"].map((action) => (
               <li key={action}>
-                <button onClick={() => handleFilterChange('action', action)}>
-                  {translateAction(action)}
-                </button>
+                <button onClick={() => handleFilterChange("action", action)}>{translateAction(action)}</button>
               </li>
             ))}
           </ul>
@@ -217,7 +484,7 @@ const AuditLog = () => {
         {/* Apply Button */}
         <button className="btn btn-info text-white rounded-full gap-2" onClick={applyFilters}>
           <FiRotateCw className="h-5 w-5" />
-          <span>{t('admin.auditlog.filters.apply')}</span>
+          <span>{t("admin.auditlog.filters.apply")}</span>
         </button>
       </div>
 
@@ -226,14 +493,14 @@ const AuditLog = () => {
         <input
           type="date"
           className="input input-bordered"
-          onChange={(e) => handleFilterChange('startDate', e.target.value)}
-          placeholder={t('admin.auditlog.filters.date')}
+          onChange={(e) => handleFilterChange("startDate", e.target.value)}
+          placeholder={t("admin.auditlog.filters.date")}
         />
-        <span>{t('admin.auditlog.filters.to')}</span>
+        <span>{t("admin.auditlog.filters.to")}</span>
         <input
           type="date"
           className="input input-bordered"
-          onChange={(e) => handleFilterChange('endDate', e.target.value)}
+          onChange={(e) => handleFilterChange("endDate", e.target.value)}
         />
       </div>
 
@@ -253,98 +520,109 @@ const AuditLog = () => {
 
       {/* Logs Table */}
       {!loading && !error && (
-  <div className="overflow-x-auto">
-    <table className="table w-full">
-      <thead>
-        <tr>
-          {['user', 'action', 'datetime'].map(header => (
-            <th key={header} className={`${isRTL ? 'text-right' : 'text-left'} text-sm`}>
-              {t(`admin.auditlog.columns.${header}`)}
-            </th>
-          ))}
-          {['role', 'resource', 'status'].map(header => (
-            <th key={header} className={`${isRTL ? 'text-right' : 'text-left'} text-sm hidden sm:table-cell`}>
-              {t(`admin.auditlog.columns.${header}`)}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {logs.length === 0 ? (
-          <tr>
-            <td colSpan="6" className="text-center py-8 text-sm">
-              {t('admin.auditlog.noRecords')}
-            </td>
-          </tr>
-        ) : (
-          logs.map(log => (
-            <tr key={log._id} className="hover">
-              <td className="text-sm py-2">{log.user?.name || t('admin.auditlog.status.unknown')}</td>
-              <td className="text-sm py-2">
-                <div className="flex items-center gap-2">
-                  {getActionIcon(log.action)}
-                  {translateAction(log.action)}
-                </div>
-              </td>
-              <td className="text-sm py-2">
-                <div className="flex flex-col">
-                  <span>{formatDate(log.timestamp)}</span>
-                  <span>{formatTime(log.timestamp)}</span>
-                </div>
-              </td>
-              <td className="text-sm py-2 hidden sm:table-cell">
-                {translateRole(log.user?.role)}
-              </td>
-              <td className="text-sm py-2 hidden sm:table-cell">
-              {log.resource?.type ? (
-                <div className="flex items-center gap-2">
-                  <span>
-                    {t(`admin.auditlog.resources.${log.resource.type}`)}
-                    {log.resource.details?.name && `: ${log.resource.details.name}`}
-                    {!log.resource.details?.name && log.resource.name && `: ${log.resource.name}`}
-                    {!log.resource.details?.name && !log.resource.name && log.resource.id && ` (${t('admin.auditlog.idDisplay', { id: log.resource.id })}`}
-                  </span>
-                </div>
-              ) : '-'}
-            </td>
-              <td className="text-sm py-2 hidden sm:table-cell">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(log.status)}
-                  {translateStatus(log.status)}
-                </div>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-)}
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                {["user", "action", "datetime"].map((header) => (
+                  <th key={header} className={`${isRTL ? "text-right" : "text-left"} text-sm`}>
+                    {t(`admin.auditlog.columns.${header}`)}
+                  </th>
+                ))}
+                {["role", "resource", "status"].map((header) => (
+                  <th key={header} className={`${isRTL ? "text-right" : "text-left"} text-sm hidden sm:table-cell`}>
+                    {t(`admin.auditlog.columns.${header}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-8 text-sm">
+                    <div className="flex flex-col items-center justify-center text-base-content/60">
+                      <div className="bg-base-200 p-4 rounded-full mb-4">
+                        <FiFileText className="w-8 h-8 text-base-content/60" />
+                      </div>
+                      <p className="text-lg font-medium mb-2">{t("admin.auditlog.noRecords")}</p>
+                      <p className="text-sm opacity-70 max-w-md">
+                        {Object.values(filters).some((v) => v !== "")
+                          ? t("admin.auditlog.noRecordsFiltered") ||
+                            "No audit logs match your current filters. Try adjusting your search criteria."
+                          : t("admin.auditlog.noRecordsYet") ||
+                            "No audit logs have been recorded yet. Activity will appear here once users start interacting with the system."}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log) => (
+                  <tr key={log._id} className="hover">
+                    <td className="text-sm py-2">{log.user?.name || t("admin.auditlog.status.unknown")}</td>
+                    <td className="text-sm py-2">
+                      <div className="flex items-center gap-2">
+                        {getActionIcon(log.action)}
+                        {translateAction(log.action)}
+                      </div>
+                    </td>
+                    <td className="text-sm py-2">
+                      <div className="flex flex-col">
+                        <span>{formatDate(log.timestamp)}</span>
+                        <span className="text-xs opacity-70">{formatTime(log.timestamp)}</span>
+                      </div>
+                    </td>
+                    <td className="text-sm py-2 hidden sm:table-cell">{translateRole(log.user?.role)}</td>
+                    <td className="text-sm py-2 hidden sm:table-cell">
+                      {log.resource?.type ? (
+                        <div className="flex items-center gap-2">
+                          <span>
+                            {t(`admin.auditlog.resources.${log.resource.type}`)}
+                            {log.resource.details?.name && `: ${log.resource.details.name}`}
+                            {!log.resource.details?.name && log.resource.name && `: ${log.resource.name}`}
+                            {!log.resource.details?.name &&
+                              !log.resource.name &&
+                              log.resource.id &&
+                              ` (${t("admin.auditlog.idDisplay", { id: log.resource.id })}`}
+                          </span>
+                        </div>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="text-sm py-2 hidden sm:table-cell">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(log.status)}
+                        {translateStatus(log.status)}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
       {!loading && !error && logs.length > 0 && (
         <div className="flex justify-center mt-8">
           <div className="btn-group">
-            <button 
-              className="btn btn-outline" 
-              onClick={() => setPage(p => Math.max(p - 1, 1))}
+            <button
+              className="btn btn-outline"
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
             >
-              {t('admin.auditlog.pagination.previous')}
+              {t("admin.auditlog.pagination.previous")}
             </button>
             <button className="btn btn-outline">{page}</button>
-            <button 
-              className="btn btn-outline" 
-              onClick={() => setPage(p => p + 1)}
-              disabled={logs.length < limit}
-            >
-              {t('admin.auditlog.pagination.next')}
+            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
+              {t("admin.auditlog.pagination.next")}
             </button>
           </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AuditLog;
+export default AuditLog
