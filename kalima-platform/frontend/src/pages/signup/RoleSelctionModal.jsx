@@ -2,25 +2,26 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ChevronRight, GraduationCap, Users, BookOpen, X } from "lucide-react"
+import { ChevronRight, GraduationCap, Users, BookOpen, X, BookA } from "lucide-react"
 import {useNavigate} from "react-router-dom"
+import { ImMan } from "react-icons/im"
 
 // Role icons and colors mapping
 const roleConfig = {
   student: {
     icon: GraduationCap,
-    color: "bg-gradient-to-r from-blue-500 to-cyan-400",
-    hoverColor: "hover:from-blue-600 hover:to-cyan-500",
+    color: "bg-gradient-to-r from-primary/30 to-secondary/60",
+    hoverColor: "hover:from-primary/60 hover:to-secondary/80",
   },
   parent: {
-    icon: Users,
-    color: "bg-gradient-to-r from-purple-500 to-pink-400",
-    hoverColor: "hover:from-purple-600 hover:to-pink-500",
+    icon: ImMan,
+    color: "bg-gradient-to-r from-primary/30 to-secondary/60",
+    hoverColor: "hover:from-primary/60 hover:to-secondary/80",
   },
   teacher: {
-    icon: BookOpen,
-    color: "bg-gradient-to-r from-amber-500 to-orange-400",
-    hoverColor: "hover:from-amber-600 hover:to-orange-500",
+    icon: BookA,
+    color: "bg-gradient-to-r from-primary/30 to-secondary/60",
+    hoverColor: "hover:from-primary/60 hover:to-secondary/80",
   },
 }
 
@@ -75,15 +76,6 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
             {t("roleSelection.title")}
           </motion.h3>
 
-          <motion.p
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-center text-secondary-content mb-8"
-          >
-            {t("roleSelection.description")}
-          </motion.p>
-
           <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col gap-4">
             {["student", "parent", "teacher"].map((role) => {
               const RoleIcon = roleConfig[role].icon
@@ -105,7 +97,6 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
 
                   <div className="flex-1 ">
                     <h4 className="font-bold text-lg">{t(`role.${role}`)}</h4>
-                    <p className="text-sm text-white/90">{t(`roleSelection.${role}Desc`)}</p>
                   </div>
 
                   <motion.div

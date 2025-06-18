@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
+import { FaDownload, FaFileExport } from "react-icons/fa"
 import {
   getAllSections,
   getAllBooks,
@@ -30,6 +31,7 @@ const AdminPanel = () => {
   const [error, setError] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("product")
+  const [isExporting, setIsExporting] = useState(false)
 
   // Real data states
   const [sections, setSections] = useState([])
@@ -148,6 +150,262 @@ const AdminPanel = () => {
       console.error("Error fetching admin data:", err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Export functionality
+  const convertToCSV = (data, type) => {
+    let headers = []
+    let csvContent = ""
+
+    switch (type) {
+      case "products":
+        headers = [
+          t("export.title") || "Title",
+          t("export.serial") || "Serial",
+          t("export.section") || "Section",
+          t("export.subject") || "Subject",
+          t("export.price") || "Price",
+          t("export.discount") || "Discount %",
+          t("export.finalPrice") || "Final Price",
+          t("export.paymentNumber") || "Payment Number",
+          t("export.type") || "Type",
+          t("export.createdDate") || "Created Date",
+        ]
+
+        const allProducts = [...products, ...books]
+        csvContent = [
+          headers.join(","),
+          ...allProducts.map((item) => {
+            const isBook = books.some((book) => book._id === item._id)
+            const finalPrice = item.discountPercentage > 0 
+              ? formatPrice(item.price, item.discountPercentage) 
+              : item.price
+
+            return [
+              `"${item.title || ""}"`,
+              `"${item.serial || ""}"`,
+              `"${getSectionName(item.section)}"`,
+              `"${isBook && item.subject ? getSubjectName(item.subject) : "-"}"`,
+              `"${item.price || 0}"`,
+              `"${item.discountPercentage || 0}"`,
+              `"${finalPrice}"`,
+              `"${item.paymentNumber || ""}"`,
+              `"${isBook ? "Book" : "Product"}"`,
+              `"${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}"`,
+            ].join(",")
+          }),
+        ].join("\n")
+        break
+
+      case "sections":
+        headers = [
+          t("export.name") || "Name",
+          t("export.number") || "Number",
+          t("export.description") || "Description",
+          t("export.productCount") || "Product Count",
+          t("export.thumbnail") || "Thumbnail",
+          t("export.createdDate") || "Created Date",
+        ]
+
+        csvContent = [
+          headers.join(","),
+          ...sectionsWithCounts.map((section) =>
+            [
+              `"${section.name || ""}"`,
+              `"${section.number || ""}"`,
+              `"${section.description || ""}"`,
+              `"${section.productCount || 0}"`,
+              `"${section.thumbnail || ""}"`,
+              `"${section.createdAt ? new Date(section.createdAt).toLocaleDateString() : ""}"`,
+            ].join(",")
+          ),
+        ].join("\n")
+        break
+
+      case "books":
+        headers = [
+          t("export.title") || "Title",
+          t("export.serial") || "Serial",
+          t("export.section") || "Section",
+          t("export.subject") || "Subject",
+          t("export.price") || "Price",
+          t("export.discount") || "Discount %",
+          t("export.finalPrice") || "Final Price",
+          t("export.description") || "Description",
+          t("export.paymentNumber") || "Payment Number",
+          t("export.createdDate") || "Created Date",
+        ]
+
+        csvContent = [
+          headers.join(","),
+          ...books.map((book) => {
+            const finalPrice = book.discountPercentage > 0 
+              ? formatPrice(book.price, book.discountPercentage) 
+              : book.price
+
+            return [
+              `"${book.title || ""}"`,
+              `"${book.serial || ""}"`,
+              `"${getSectionName(book.section)}"`,
+              `"${book.subject ? getSubjectName(book.subject) : ""}"`,
+              `"${book.price || 0}"`,
+              `"${book.discountPercentage || 0}"`,
+              `"${finalPrice}"`,
+              `"${book.description || ""}"`,
+              `"${book.paymentNumber || ""}"`,
+              `"${book.createdAt ? new Date(book.createdAt).toLocaleDateString() : ""}"`,
+            ].join(",")
+          }),
+        ].join("\n")
+        break
+
+      default:
+        return ""
+    }
+
+    return csvContent
+  }
+
+  const exportToCSV = async (type) => {
+    setIsExporting(true)
+
+    try {
+      const csvContent = convertToCSV(null, type)
+
+      if (!csvContent) {
+        throw new Error("No data to export")
+      }
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const link = document.createElement("a")
+
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = `${type}-${timestamp}.csv`
+
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Show success message
+        const dataCount = type === "products" ? products.length + books.length : 
+                         type === "sections" ? sections.length : books.length
+        const successMessage = t("export.successMessage") || `Successfully exported ${dataCount} ${type}`
+        alert(successMessage)
+      }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("export.error") || "Failed to export data. Please try again.")
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const exportToJSON = async (type) => {
+    setIsExporting(true)
+
+    try {
+      let jsonData = []
+
+      switch (type) {
+        case "products":
+          const allProducts = [...products, ...books]
+          jsonData = allProducts.map((item) => {
+            const isBook = books.some((book) => book._id === item._id)
+            const finalPrice = item.discountPercentage > 0 
+              ? formatPrice(item.price, item.discountPercentage) 
+              : item.price
+
+            return {
+              id: item._id,
+              title: item.title || "",
+              serial: item.serial || "",
+              section: getSectionName(item.section),
+              subject: isBook && item.subject ? getSubjectName(item.subject) : null,
+              price: item.price || 0,
+              discountPercentage: item.discountPercentage || 0,
+              finalPrice: finalPrice,
+              paymentNumber: item.paymentNumber || "",
+              type: isBook ? "Book" : "Product",
+              description: item.description || "",
+              createdAt: item.createdAt || "",
+            }
+          })
+          break
+
+        case "sections":
+          jsonData = sectionsWithCounts.map((section) => ({
+            id: section._id,
+            name: section.name || "",
+            number: section.number || "",
+            description: section.description || "",
+            productCount: section.productCount || 0,
+            thumbnail: section.thumbnail || "",
+            createdAt: section.createdAt || "",
+          }))
+          break
+
+        case "books":
+          jsonData = books.map((book) => {
+            const finalPrice = book.discountPercentage > 0 
+              ? formatPrice(book.price, book.discountPercentage) 
+              : book.price
+
+            return {
+              id: book._id,
+              title: book.title || "",
+              serial: book.serial || "",
+              section: getSectionName(book.section),
+              subject: book.subject ? getSubjectName(book.subject) : "",
+              price: book.price || 0,
+              discountPercentage: book.discountPercentage || 0,
+              finalPrice: finalPrice,
+              description: book.description || "",
+              paymentNumber: book.paymentNumber || "",
+              createdAt: book.createdAt || "",
+            }
+          })
+          break
+
+        default:
+          throw new Error("Invalid export type")
+      }
+
+      const jsonContent = JSON.stringify(jsonData, null, 2)
+
+      // Create blob and download
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
+      const link = document.createElement("a")
+
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute("href", url)
+
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = `${type}-${timestamp}.json`
+
+        link.setAttribute("download", filename)
+        link.style.visibility = "hidden"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        // Show success message
+        const successMessage = t("export.successMessage") || `Successfully exported ${jsonData.length} ${type}`
+        alert(successMessage)
+      }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("export.error") || "Failed to export data. Please try again.")
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -597,6 +855,117 @@ const AdminPanel = () => {
   return (
     <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       <Orders />
+      
+      {/* Export Section */}
+      <div className="px-4 py-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{t("adminPanel.title") || "Admin Panel"}</h1>
+            <p className="text-base-content/70">{t("adminPanel.subtitle") || "Manage products, books, and sections"}</p>
+          </div>
+
+          {/* Export Dropdown */}
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+              {isExporting ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  {t("export.exporting") || "Exporting..."}
+                </>
+              ) : (
+                <>
+                  <FaDownload className="mr-2" />
+                  {t("export.export") || "Export Data"}
+                </>
+              )}
+            </div>
+            <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+              <li className="menu-title">
+                <span>{t("export.csvFormat") || "CSV Format"}</span>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToCSV("products")} 
+                  disabled={isExporting || (products.length + books.length) === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.allProducts") || "All Products & Books"} ({products.length + books.length})
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToCSV("books")} 
+                  disabled={isExporting || books.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.booksOnly") || "Books Only"} ({books.length})
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToCSV("sections")} 
+                  disabled={isExporting || sections.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.sections") || "Sections"} ({sections.length})
+                </button>
+              </li>
+              <div className="divider my-1"></div>
+              <li className="menu-title">
+                <span>{t("export.jsonFormat") || "JSON Format"}</span>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToJSON("products")} 
+                  disabled={isExporting || (products.length + books.length) === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.allProducts") || "All Products & Books"} ({products.length + books.length})
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToJSON("books")} 
+                  disabled={isExporting || books.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.booksOnly") || "Books Only"} ({books.length})
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => exportToJSON("sections")} 
+                  disabled={isExporting || sections.length === 0}
+                >
+                  <FaFileExport className="mr-2" />
+                  {t("export.sections") || "Sections"} ({sections.length})
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Export Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="stat bg-primary/10 rounded-lg p-4">
+            <div className="stat-title">{t("export.totalProducts") || "Total Products"}</div>
+            <div className="stat-value text-primary">{products.length}</div>
+          </div>
+          <div className="stat bg-secondary/10 rounded-lg p-4">
+            <div className="stat-title">{t("export.totalBooks") || "Total Books"}</div>
+            <div className="stat-value text-secondary">{books.length}</div>
+          </div>
+          <div className="stat bg-accent/10 rounded-lg p-4">
+            <div className="stat-title">{t("export.totalSections") || "Total Sections"}</div>
+            <div className="stat-value text-accent">{sections.length}</div>
+          </div>
+          <div className="stat bg-info/10 rounded-lg p-4">
+            <div className="stat-title">{t("export.totalItems") || "Total Items"}</div>
+            <div className="stat-value text-info">{products.length + books.length + sections.length}</div>
+          </div>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="px-4 py-8">
 

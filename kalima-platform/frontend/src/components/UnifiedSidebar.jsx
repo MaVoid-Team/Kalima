@@ -18,7 +18,7 @@ import {
 } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
-import { Edit } from 'lucide-react';
+import { Edit, Lightbulb } from 'lucide-react';
 
 const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
   const { t, i18n } = useTranslation('common');
@@ -143,6 +143,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('storeDashboard') || 'Store Dashboard',
         icon: <FaStore className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/store-dashboard'
+      },
+      {
+        id: 'signed-lecturers',
+        title: t('signedLecturers') || 'Signed Lecturers',
+        icon: <Lightbulb className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/signed-lecturers'
       }
     ];
 
