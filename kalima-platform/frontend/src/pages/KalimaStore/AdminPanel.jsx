@@ -104,6 +104,10 @@ const AdminPanel = () => {
         getAllProducts(),
         getAllSubjects(),
       ])
+      console.log("Sections Response:", sectionsResponse)
+      console.log("Books Response:", booksResponse)
+      console.log("Products Response:", productsResponse)
+      console.log("Subjects Response:", subjectsResponse)
 
       // Process sections data
       if (sectionsResponse.status === "success") {

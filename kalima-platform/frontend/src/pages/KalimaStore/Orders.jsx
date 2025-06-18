@@ -70,6 +70,7 @@ const Orders = () => {
       // For now, we'll filter client-side after getting the combined results
 
       const response = await getAllPurchases(queryParams)
+      console.log("Fetched orders response:", response)
 
       if (response.success) {
         let purchases = response.data.purchases
