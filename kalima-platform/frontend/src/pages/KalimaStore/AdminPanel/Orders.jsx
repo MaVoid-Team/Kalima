@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { getAllPurchases, confirmProductPurchase, confirmBookPurchase } from "../../routes/orders"
+import { getAllPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-admin")
