@@ -14,7 +14,7 @@ function isValidPDF(file) {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description } = req.body;
+        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
         let sample, imageUrl;
         if (req.files && req.files.sample && req.files.sample[0]) {
@@ -42,6 +42,7 @@ exports.createProduct = async (req, res, next) => {
             paymentNumber,
             discountPercentage,
             description,
+            whatsAppNumber,
             createdBy,
         });
 
@@ -94,7 +95,7 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, paymentNumber, discountPercentage, serial, description } = req.body;
+        const { title, section, price, paymentNumber, discountPercentage, serial, description, whatsAppNumber } = req.body;
         const updatedBy = req.user._id;
         let update = {
             title,
@@ -105,6 +106,7 @@ exports.updateProduct = async (req, res) => {
             serial,
             description,
             updatedBy,
+            whatsAppNumber,
             updatedAt: new Date(),
         };
         // Handle PDF sample update

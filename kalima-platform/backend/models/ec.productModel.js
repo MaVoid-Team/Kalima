@@ -23,6 +23,11 @@ const productSchema = new mongoose.Schema(
     },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     description: { type: String, required: [true, "Description is required"], trim: true },
+    whatsAppNumber: {
+      type: String,
+      required: [true, "WhatsApp number is required"],
+      trim: true,
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: true },

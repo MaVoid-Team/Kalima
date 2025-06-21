@@ -5,6 +5,11 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+// Get all sections visible to the current user's role
+router.get('/allowed', verifyJWT, ecSectionController.getAllowedSections);
+// Get section by ID only if allowed for current user's role
+router.get('/allowed/:id', verifyJWT, ecSectionController.getSectionByIdAllowed);
+
 router.route("/").get(ecSectionController.getAllSections).post(
   verifyJWT,
   authController.verifyRoles("Admin", "SubAdmin"),
