@@ -325,7 +325,7 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
     await handleCSV(req.file.buffer, accountType, res, next);
   } else if (
     fileType ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     fileType === "application/vnd.ms-excel"
   ) {
     await handleExcel(req.file.buffer, accountType, res, next);
@@ -394,7 +394,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         totalPoints: student.totalPoints || 0,
         hobbies: student.hobbies,
         faction: student.faction,
-        sequencedId : student.sequencedId
+        sequencedId: student.sequencedId
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -577,7 +577,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         return next(new AppError("User not found", 404));
       }      // No additional fields needed for admin roles
       break;
-      
+
     case "Assistant":
       // Find assistant with related lecturer and all lecture data
       const assistant = await Assistant.findById(userId)
@@ -605,7 +605,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("subject", "name")
           .populate("level", "name")
           .lean();
-        
+
         responseData.lecturerContainers = containers;
       }
 
@@ -616,7 +616,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("level", "name")
           .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
           .lean();
-        
+
         responseData.lectures = lectures;
       }
 
@@ -625,26 +625,26 @@ const getMyData = catchAsync(async (req, res, next) => {
         const lecturerLectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
           .select("_id")
           .lean();
-        
+
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
-        
+
         const attachments = await Attachment.find({ lectureId: { $in: lectureIds } })
           .populate("lectureId", "name")
           .populate("studentId", "name")
           .lean();
-        
+
         responseData.attachments = attachments;
       }
 
       if (!fields || fields.includes("examSubmissions")) {
         // Get exam submissions for lectures created by the assigned lecturer
-        const lecturerLectures = !responseData.lectures ? 
+        const lecturerLectures = !responseData.lectures ?
           await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
           responseData.lectures;
-        
+
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
-        
-        const examSubmissions = await StudentExamSubmission.find({ 
+
+        const examSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
           type: "exam"
         })
@@ -652,22 +652,22 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("lecture", "name")
           .populate("config", "name type")
           .lean();
-        
+
         responseData.examSubmissions = examSubmissions;
-      }      if (!fields || fields.includes("homeworkSubmissions")) {
+      } if (!fields || fields.includes("homeworkSubmissions")) {
         // Get homework submissions for lectures created by the assigned lecturer
-        const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ? 
+        const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ?
           await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
           (responseData.lectures || responseData.examSubmissions);
-        
+
         // Get lecture IDs, handling both direct lecture objects and exam submission objects
         const lectureIds = lecturerLectures.map(lecture => {
           if (lecture._id) return lecture._id;
           if (lecture.lecture && lecture.lecture._id) return lecture.lecture._id;
           return lecture;
         }).filter(id => id); // Filter out any undefined values
-        
-        const homeworkSubmissions = await StudentExamSubmission.find({ 
+
+        const homeworkSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
           type: "homework"
         })
@@ -675,7 +675,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("lecture", "name")
           .populate("config", "name type")
           .lean();
-        
+
         responseData.homeworkSubmissions = homeworkSubmissions;
       }
 
@@ -688,46 +688,46 @@ const getMyData = catchAsync(async (req, res, next) => {
           totalAttachments: 0,
           lectureViews: 0
         };
-        
+
         if (responseData.lectures) {
           stats.totalLectures = responseData.lectures.length;
           stats.lectureViews = responseData.lectures.reduce(
             (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
           );
         } else {
-          const lectureCount = await Lecture.countDocuments({ 
-            createdBy: assistant.assignedLecturer._id 
+          const lectureCount = await Lecture.countDocuments({
+            createdBy: assistant.assignedLecturer._id
           });
           stats.totalLectures = lectureCount;
-          
-          const lectures = await Lecture.find({ 
-            createdBy: assistant.assignedLecturer._id 
+
+          const lectures = await Lecture.find({
+            createdBy: assistant.assignedLecturer._id
           }).select("numberOfViews").lean();
-          
+
           stats.lectureViews = lectures.reduce(
             (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
           );
         }
-          stats.totalStudentExamSubmissions = responseData.examSubmissions ? 
-          responseData.examSubmissions.length : 
-          await StudentExamSubmission.countDocuments({ 
+        stats.totalStudentExamSubmissions = responseData.examSubmissions ?
+          responseData.examSubmissions.length :
+          await StudentExamSubmission.countDocuments({
             lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
             type: "exam"
           });
-          
-        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions ? 
-          responseData.homeworkSubmissions.length : 
-          await StudentExamSubmission.countDocuments({ 
+
+        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions ?
+          responseData.homeworkSubmissions.length :
+          await StudentExamSubmission.countDocuments({
             lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
             type: "homework"
           });
-          
-        stats.totalAttachments = responseData.attachments ? 
-          responseData.attachments.length : 
-          await Attachment.countDocuments({ 
+
+        stats.totalAttachments = responseData.attachments ?
+          responseData.attachments.length :
+          await Attachment.countDocuments({
             lectureId: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") }
           });
-          
+
         responseData.stats = stats;
       }
       break;
@@ -987,7 +987,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
       const lectureAccess = await StudentLectureAccess.find({ student: child._id })
         .populate("lecture", "name")
         .lean();
-        
+
       // Get exam scores with lecture information
       const examScores = await StudentExamSubmission.find({ student: child._id })
         .populate({
@@ -1000,7 +1000,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         redeemedBy: child._id,
         isRedeemed: true
       }).lean();
-      
+
       // Return child with additional data
       return {
         ...child,
@@ -1040,7 +1040,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
   const allowedFields = ['name', 'email', 'phoneNumber', 'address'];
-  
+
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {
     if (allowedFields.includes(field)) {
@@ -1050,14 +1050,14 @@ const updateMe = catchAsync(async (req, res, next) => {
   // Handle special case for Parent role - adding children by sequenced ID
   if (userRole === "Parent" && req.body.children) {
     const childrenIds = req.body.children;
-    
+
     // Get current children
     const currentParent = await Parent.findById(userId).lean();
     const currentChildren = currentParent?.children || [];
-    
+
     // Track children to add
     const childrenToAdd = [...currentChildren]; // Start with existing children
-    
+
     // For each child ID (which could be a sequenced ID or MongoDB ID)
     for (let childId of childrenIds) {
       let child;
@@ -1076,7 +1076,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         // Check if child is already in the list to avoid duplicates
         const childIdStr = child._id.toString();
         const alreadyAdded = childrenToAdd.some(id => id.toString() === childIdStr);
-        
+
         if (!alreadyAdded) {
           childrenToAdd.push(child._id); // Always store MongoDB IDs in the database
         }
@@ -1173,6 +1173,28 @@ const updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
+// Confirm a teacher account (admin only)
+const confirmTeacher = catchAsync(async (req, res, next) => {
+  const teacherId = req.params.id;
+  const adminId = req.user._id;
+
+  const teacher = await Teacher.findByIdAndUpdate(
+    teacherId,
+    { confrimed: true, confrimedBy: adminId },
+    { new: true, runValidators: true }
+  ).select("-password");
+
+  if (!teacher) {
+    return next(new AppError("Teacher not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Teacher confirmed successfully",
+    data: { teacher }
+  });
+});
+
 module.exports = {
   getAllUsers,
   getAllUsersByRole,
@@ -1184,5 +1206,6 @@ module.exports = {
   uploadFileForBulkCreation,
   getMyData,
   getParentChildrenData,
-  updateMe
+  updateMe,
+  confirmTeacher
 };

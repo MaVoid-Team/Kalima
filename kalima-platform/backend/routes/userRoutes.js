@@ -49,4 +49,12 @@ router.patch("/me/update", userController.updateMe);
 
 router.route("/update/password").patch(userController.changePassword);
 
+// Confirm a teacher (admin/subadmin/moderator only)
+router.patch(
+  "/teachers/:id/confirm",
+  verifyJWT,
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+  userController.confirmTeacher
+);
+
 module.exports = router;
