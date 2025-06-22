@@ -36,25 +36,33 @@ router.get(
   couponController.getUsedCoupons
 );
 
-// Get coupon by ID
-router.get(
-  "/:id",
-  authController.verifyRoles("admin", "subadmin", "moderator"),
-  couponController.getCouponById
-);
-
-// Use a coupon (available to students)
+// Use a coupon
 router.post(
   "/use",
-  authController.verifyRoles("student"),
+  authController.verifyRoles("student", "parent", "teacher"),
   couponController.useCoupon
 );
 
 // Validate a coupon (available to students)
 router.post(
   "/validate",
-  authController.verifyRoles("student"),
+  authController.verifyRoles("student", "parent", "teacher", "admin", "subadmin", "moderator"),
   couponController.validateCoupon
+);
+
+
+// Delete coupon (admin and subadmin only)
+router.delete(
+  "/:id",
+  authController.verifyRoles("admin", "subadmin"),
+  couponController.deleteCoupon
+);
+
+// Get coupon by ID
+router.get(
+  "/:id",
+  authController.verifyRoles("admin", "subadmin", "moderator"),
+  couponController.getCouponById
 );
 
 module.exports = router;

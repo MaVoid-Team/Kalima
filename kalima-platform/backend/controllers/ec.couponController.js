@@ -4,26 +4,26 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/userModel");
 
 exports.createCoupon = catchAsync(async (req, res, next) => {
-  const { value, createdFor, expirationDays } = req.body;
+  const { value, expirationDays, couponCode } = req.body;
 
   // Validate the target user exists
-  const targetUser = await User.findOne({ userSerial: createdFor });
-  if (!targetUser) {
-    return next(
-      new AppError("No user found with the provided userSerial", 404)
-    );
-  }
-
   const expirationDate = expirationDays
     ? new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000)
     : undefined;
 
   const couponData = {
     value,
-    createdFor,
     createdBy: req.user._id,
     expirationDate,
   };
+
+  // If couponCode is provided, use it (for admin bulk/manual creation)
+  if (couponCode) {
+    couponData.couponCode = couponCode;
+  } else {
+    // Always generate a code if not provided (controller fallback)
+    couponData.couponCode = await ECCoupon.generateCouponCode();
+  }
 
   const coupon = await ECCoupon.create(couponData);
 
@@ -84,7 +84,9 @@ exports.getCouponById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    data: coupon,
+    data: {
+      coupon,
+    },
   });
 });
 
@@ -110,12 +112,13 @@ exports.useCoupon = catchAsync(async (req, res, next) => {
   }
 
   // Check if coupon is for the current user
-  const currentUser = await User.findById(req.user._id);
-  if (coupon.createdFor !== currentUser.userSerial) {
-    return next(new AppError("This coupon is not valid for your account", 403));
-  }
+  // const currentUser = await User.findById(req.user._id);
+  // if (coupon.createdFor !== currentUser.userSerial) {
+  //   return next(new AppError("This coupon is not valid for your account", 403));
+  // }
 
-  const updatedCoupon = await coupon.markAsUsed(purchaseId);
+  // Pass userId to markAsUsed
+  const updatedCoupon = await coupon.markAsUsed(purchaseId, req.user._id);
 
   res.status(200).json({
     status: "success",
@@ -144,12 +147,6 @@ exports.validateCoupon = catchAsync(async (req, res, next) => {
     return next(new AppError("This coupon has expired", 400));
   }
 
-  // Check if coupon is for the current user
-  const currentUser = await User.findById(req.user._id);
-  if (coupon.createdFor !== currentUser.userSerial) {
-    return next(new AppError("This coupon is not valid for your account", 403));
-  }
-
   res.status(200).json({
     status: "success",
     data: {
@@ -158,3 +155,16 @@ exports.validateCoupon = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.deleteCoupon = catchAsync(async (req, res, next) => {
+  const coupon = await ECCoupon.findByIdAndDelete(req.params.id);
+  if (!coupon) {
+    return next(new AppError("No coupon found with that ID", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    message: "Coupon deleted successfully",
+    data: null,
+  });
+});
+
