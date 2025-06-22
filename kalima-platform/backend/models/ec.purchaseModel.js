@@ -46,7 +46,7 @@ const ecPurchaseSchema = new mongoose.Schema(
     purchaseSerial: {
       type: String,
       required: [true, "Purchase serial is required"],
-      unique: true,
+      unique: false, // Allow duplicates
       trim: true,
     },
 
@@ -84,14 +84,15 @@ const ecPurchaseSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for better performance
-ecPurchaseSchema.index({ purchaseSerial: 1 }, { unique: true });
 // ecPurchaseSchema.index({ userName: 1 });
 // ecPurchaseSchema.index({ productName: 1 });
 ecPurchaseSchema.index({ productId: 1 });
 ecPurchaseSchema.index({ confirmed: 1 });
 ecPurchaseSchema.index({ createdBy: 1 });
 ecPurchaseSchema.index({ createdAt: -1 });
+
+// Remove unique index for purchaseSerial if present
+// ecPurchaseSchema.index({ purchaseSerial: 1 }, { unique: true });
 
 // Virtual to get formatted creation date
 ecPurchaseSchema.virtual("formattedCreatedAt").get(function () {

@@ -137,7 +137,7 @@ const uploadPaymentScreenshotToDisk = multer({
     destination: dynamicDestination,
     filename: function (req, file, cb) {
       const ext = file.mimetype.split("/")[1];
-      cb(null, `${Date.now()}-${file.fieldname}.${ext}`);
+      cb(null, `${Date.now()}-paymentScreenShot.${ext}`);
     },
   }),
   fileFilter: (req, file, cb) => {
@@ -145,7 +145,7 @@ const uploadPaymentScreenshotToDisk = multer({
     else cb(new AppError("Invalid file type for payment screenshot", 400), false);
   },
   limits: { fileSize: 5 * 1024 * 1024 },
-}).single("paymentScreenshot");
+}).single("paymentScreenShot");
 
 // 6. Product files upload (thumbnail image + sample PDF)
 const uploadProductFilesToDisk = multer({
