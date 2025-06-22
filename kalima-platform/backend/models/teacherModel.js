@@ -85,6 +85,10 @@ const teacherSchema = new mongoose.Schema(
       ref: "User",
       required: false,
     },
+    profilePic: {
+      type: String, // local file path
+      trim: true,
+    },
   },
   {
     timestamps: true,

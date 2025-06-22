@@ -67,6 +67,10 @@ const studentSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    profilePic: {
+      type: String, // local file path
+      trim: true,
+    },
   },
 
   {

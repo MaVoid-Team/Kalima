@@ -4,7 +4,6 @@ const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
-const { uploadPaymentScreenshotToCloudinary } = require("../utils/upload files/uploadFiles");
 
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
@@ -72,12 +71,13 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
 // Create new purchase
 exports.createPurchase = catchAsync(async (req, res, next) => {
   // Handle payment screenshot upload
-  let paymentScreenshotUrl = null;
-  if (req.file && req.file.fieldname === "paymentScreenshot") {
-    paymentScreenshotUrl = await uploadPaymentScreenshotToCloudinary(req.file, "purchases", next);
-    req.body.paymentScreenshot = paymentScreenshotUrl;
-  } else if (!req.body.paymentScreenshot) {
-    return next(new AppError("Payment screenshot is required", 400));
+  let paymentScreenShotPath = null;
+  if (req.file && req.file.fieldname === "paymentScreenShot") {
+    paymentScreenShotPath = req.file.path;
+    req.body.paymentScreenShot = paymentScreenShotPath;
+  } else if (!req.body.paymentScreenShot) {
+    // If not uploaded, set to null (model will error if required)
+    req.body.paymentScreenShot = null;
   }
   const product = await ECProduct.findById(req.body.productId).populate(
     "section",
@@ -126,8 +126,10 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 // Update purchase
 exports.updatePurchase = catchAsync(async (req, res, next) => {
   // Handle payment screenshot update
-  if (req.file && req.file.fieldname === "paymentScreenshot") {
-    req.body.paymentScreenshot = await uploadPaymentScreenshotToCloudinary(req.file, "purchases", next);
+  if (req.file && req.file.fieldname === "paymentScreenShot") {
+    req.body.paymentScreenShot = req.file.path;
+  } else if (typeof req.body.paymentScreenShot === 'undefined') {
+    req.body.paymentScreenShot = null;
   }
   // Remove fields that shouldn't be updated directly
   delete req.body.createdBy;
