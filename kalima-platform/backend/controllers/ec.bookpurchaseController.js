@@ -4,7 +4,6 @@ const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
-const { uploadPaymentScreenshotToCloudinary } = require("../utils/upload files/uploadFiles");
 
 // Get all book purchases
 exports.getAllBookPurchases = catchAsync(async (req, res, next) => {
@@ -66,10 +65,10 @@ exports.getBookPurchaseById = catchAsync(async (req, res, next) => {
 // Create new book purchase
 exports.createBookPurchase = catchAsync(async (req, res, next) => {
   // Handle payment screenshot upload
-  let paymentScreenshotUrl = null;
+  let paymentScreenshotPath = null;
   if (req.file && req.file.fieldname === "paymentScreenshot") {
-    paymentScreenshotUrl = await uploadPaymentScreenshotToCloudinary(req.file, "book-purchases", next);
-    req.body.paymentScreenshot = paymentScreenshotUrl;
+    paymentScreenshotPath = req.file.path;
+    req.body.paymentScreenshot = paymentScreenshotPath;
   } else if (!req.body.paymentScreenshot) {
     return next(new AppError("Payment screenshot is required", 400));
   }

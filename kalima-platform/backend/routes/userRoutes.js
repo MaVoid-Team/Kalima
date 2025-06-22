@@ -4,7 +4,7 @@ const userController = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const verifyJWT = require("../middleware/verifyJWT");
 const uploadFileMiddleware =
-  require("../utils/upload files/uploadFiles").uploadFileMiddleware;
+  require("../utils/upload files/uploadFiles").uploadFileToDisk;
 const authController = require("../controllers/authController");
 // Routes that don't require authentication
 router

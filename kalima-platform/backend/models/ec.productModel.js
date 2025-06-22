@@ -5,8 +5,11 @@ const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     serial: { type: String, required: true },
-    thumbnail: { type: String, required: true }, // Store Cloudinary URL for product image
-    sample: { type: String }, // PDF file path or URL
+    thumbnail: { type: String, required: true }, // Store local file path for product image
+    sample: { type: String }, // Store local file path for sample PDF
+    gallery: [{
+      type: String,
+    }], // Array of local file paths for gallery images
     section: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ECSection",
