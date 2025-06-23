@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./userModel");
+const { required } = require("joi");
 const mongooseSequence = require("mongoose-sequence")(mongoose);
 
 const lecturerPointsSchema = new mongoose.Schema(
@@ -24,7 +25,10 @@ const studentSchema = new mongoose.Schema(
       ref: "Level",
       required: true,
     },
-    hobbies: [String],
+    hobbies: {
+      required: false,
+      type: [String]
+    },
     parentPhoneNumber: String,
     faction: String,
     phoneNumber: { type: String, required: true },
@@ -62,6 +66,10 @@ const studentSchema = new mongoose.Schema(
       type: String,
       unique: true,
       index: true,
+    },
+    profilePic: {
+      type: String, // local file path
+      trim: true,
     },
   },
 

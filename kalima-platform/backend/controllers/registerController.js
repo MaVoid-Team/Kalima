@@ -86,7 +86,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         (zone) =>
           zone &&
           zone.toLowerCase().trim() ===
-            normalizedAdministrationZone.toLowerCase() // ← Use normalized value
+          normalizedAdministrationZone.toLowerCase() // ← Use normalized value
       );
 
       if (!zoneExistsInGov) {
@@ -174,6 +174,15 @@ const registerNewUser = catchAsync(async (req, res, next) => {
   }
   const hashedPwd = await bcrypt.hash(password, 12);
 
+  let profilePicPath = null;
+  if (req.file && req.file.fieldname === "profilePic") {
+    profilePicPath = req.file.path;
+  }
+  // Always set profilePic, null if not uploaded
+  if (!profilePicPath) {
+    profilePicPath = null;
+  }
+
   const newUser = {
     name,
     email: email.toLowerCase().trim(),
@@ -191,6 +200,10 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   if (phoneNumber) {
     newUser.phoneNumber = phoneNumber;
+  }
+
+  if (profilePicPath !== undefined) {
+    newUser.profilePic = profilePicPath;
   }
 
   let user;

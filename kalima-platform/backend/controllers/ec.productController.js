@@ -1,7 +1,6 @@
 const ECProduct = require("../models/ec.productModel");
 const path = require("path");
 const fs = require("fs");
-const { uploadProductImageMiddleware, uploadProductImageToCloudinary } = require("../utils/upload files/uploadProductImage");
 
 // Helper to check PDF file size (max 50MB)
 function isValidPDF(file) {
@@ -14,34 +13,37 @@ function isValidPDF(file) {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description } = req.body;
+        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
-        let sample, imageUrl;
+        let sample, imageUrl, gallery = [];
         if (req.files && req.files.sample && req.files.sample[0]) {
             const file = req.files.sample[0];
             if (file.mimetype !== "application/pdf" || file.size > 50 * 1024 * 1024) {
                 return res.status(400).json({ message: "Sample must be a PDF and <= 50MB" });
             }
-            // Upload PDF to Cloudinary and get the URL
-            const { uploadPDFToCloudinary } = require("../utils/upload files/uploadPDF");
-            sample = await uploadPDFToCloudinary(file, "products", next);
+            sample = file.path;
         } else {
             return res.status(400).json({ message: "Sample PDF is required" });
         }
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
-            imageUrl = await uploadProductImageToCloudinary(req.files.thumbnail[0], "products", next);
+            imageUrl = req.files.thumbnail[0].path;
+        }
+        if (req.files && req.files.gallery) {
+            gallery = req.files.gallery.map(file => file.path);
         }
         const product = await ECProduct.create({
             title,
             subtitle,
             thumbnail: imageUrl,
             sample,
+            gallery,
             section,
             serial,
             price,
             paymentNumber,
             discountPercentage,
             description,
+            whatsAppNumber,
             createdBy,
         });
 
@@ -94,7 +96,7 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, paymentNumber, discountPercentage, serial, description } = req.body;
+        const { title, section, price, paymentNumber, discountPercentage, serial, description, whatsAppNumber } = req.body;
         const updatedBy = req.user._id;
         let update = {
             title,
@@ -105,6 +107,7 @@ exports.updateProduct = async (req, res) => {
             serial,
             description,
             updatedBy,
+            whatsAppNumber,
             updatedAt: new Date(),
         };
         // Handle PDF sample update
@@ -113,12 +116,11 @@ exports.updateProduct = async (req, res) => {
             if (file.mimetype !== "application/pdf" || file.size > 50 * 1024 * 1024) {
                 return res.status(400).json({ message: "Sample must be a PDF and <= 50MB" });
             }
-            const { uploadPDFToCloudinary } = require("../utils/upload files/uploadPDF");
-            update.sample = await uploadPDFToCloudinary(file, "products", () => { });
+            update.sample = file.path;
         }
         // Handle image thumbnail update
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
-            update.thumbnail = await uploadProductImageToCloudinary(req.files.thumbnail[0], "products", () => { });
+            update.thumbnail = req.files.thumbnail[0].path;
         }
         const product = await ECProduct.findByIdAndUpdate(
             req.params.id,

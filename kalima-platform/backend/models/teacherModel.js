@@ -76,6 +76,19 @@ const teacherSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    confrimed: {
+      type: Boolean,
+      default: false,
+    },
+    confrimedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    profilePic: {
+      type: String, // local file path
+      trim: true,
+    },
   },
   {
     timestamps: true,

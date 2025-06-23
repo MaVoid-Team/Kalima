@@ -20,6 +20,7 @@ const AdminModals = ({
   setProductForm,
   onUpdateProduct,
   sections = [],
+  subjects = [],
   onFileChange,
 
   // Delete Section Modal
@@ -57,8 +58,11 @@ const AdminModals = ({
       price: "",
       discountPercentage: "",
       paymentNumber: "",
+      whatsAppNumber: "",
+      description: "",
       thumbnail: null,
       sample: null,
+      gallery: [],
     })
   }
 
@@ -160,10 +164,10 @@ const AdminModals = ({
       {/* Edit Product Modal */}
       {showEditProductModal && (
         <div className="modal modal-open">
-          <div className="modal-box">
+          <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg mb-4">{t("modals.editProduct.title") || "Edit Product"}</h3>
             <form onSubmit={onUpdateProduct}>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-96 overflow-y-auto">
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">{t("forms.createProduct.fields.title") || "Title"} *</span>
@@ -262,6 +266,35 @@ const AdminModals = ({
                   />
                 </div>
 
+                {/* WhatsApp Number field */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">WhatsApp Number *</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter WhatsApp number"
+                    className="input input-bordered w-full"
+                    value={productForm?.whatsAppNumber || ""}
+                    onChange={(e) => setProductForm?.({ ...productForm, whatsAppNumber: e.target.value })}
+                    required
+                  />
+                </div>
+
+                {/* Description field */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Description *</span>
+                  </label>
+                  <textarea
+                    placeholder="Enter product description..."
+                    className="textarea textarea-bordered w-full h-24"
+                    value={productForm?.description || ""}
+                    onChange={(e) => setProductForm?.({ ...productForm, description: e.target.value })}
+                    required
+                  ></textarea>
+                </div>
+
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">
@@ -294,6 +327,24 @@ const AdminModals = ({
                   />
                   <p className="text-xs mt-1">
                     {t("modals.editProduct.leaveEmptyToKeep") || "Leave empty to keep current sample file"}
+                  </p>
+                </div>
+
+                {/* Gallery field */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Gallery Images</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="edit-product-gallery"
+                    className="file-input file-input-bordered w-full"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => onFileChange?.(e, "gallery", "product")}
+                  />
+                  <p className="text-xs mt-1">
+                    {t("modals.editProduct.leaveEmptyToKeep") || "Leave empty to keep current gallery images"}
                   </p>
                 </div>
               </div>

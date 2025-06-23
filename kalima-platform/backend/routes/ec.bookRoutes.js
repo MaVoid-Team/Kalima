@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ecBookController = require("../controllers/ec.bookController");
 const verifyJWT = require("../middleware/verifyJWT");
-const { uploadProductFilesMiddleware } = require("../utils/upload files/uploadProductFiles");
+const { uploadProductFilesToDisk } = require("../utils/upload files/uploadFiles");
 const authController = require("../controllers/authController");
 
 
@@ -12,7 +12,7 @@ router
     .post(
         verifyJWT,
         authController.verifyRoles("Admin", "SubAdmin"),
-        uploadProductFilesMiddleware, // handles both thumbnail and sample
+        uploadProductFilesToDisk, // handles both thumbnail and sample
         ecBookController.createECBook
     );
 
@@ -22,7 +22,7 @@ router
     .patch(
         verifyJWT,
         authController.verifyRoles("Admin", "SubAdmin"),
-        uploadProductFilesMiddleware, // handles both thumbnail and sample
+        uploadProductFilesToDisk, // handles both thumbnail and sample
         ecBookController.updateECBook
     )
     .delete(

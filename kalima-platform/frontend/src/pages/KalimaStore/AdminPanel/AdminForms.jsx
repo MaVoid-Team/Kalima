@@ -27,7 +27,7 @@ const AdminForms = ({
       <div className="card shadow-lg relative">
         <div className="card-body p-6">
           {/* Tab Navigation */}
-          <div className="tabs tabs-border mb-6">
+          <div className="tabs tabs-boxed mb-6">
             <button
               className={`tab ${activeTab === "product" ? "tab-active" : ""}`}
               onClick={() => setActiveTab?.("product")}
@@ -61,6 +61,7 @@ const AdminForms = ({
             </div>
 
             <div className="space-y-4">
+              {/* Title Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("forms.createProduct.fields.title") || "Title"} *</span>
@@ -81,6 +82,7 @@ const AdminForms = ({
                 />
               </div>
 
+              {/* Serial Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("forms.createProduct.fields.serial") || "Serial"} *</span>
@@ -101,6 +103,24 @@ const AdminForms = ({
                 />
               </div>
 
+              {/* Thumbnail Field */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">
+                    {t("forms.createProduct.fields.thumbnail") || "Thumbnail"}
+                  </span>
+                </label>
+                <input
+                  type="file"
+                  id={`${activeTab}-thumbnail`}
+                  className="file-input file-input-bordered w-full"
+                  accept="image/*"
+                  onChange={(e) => onFileChange?.(e, "thumbnail", activeTab)}
+                />
+                <p className="text-xs mt-1">{t("forms.createProduct.hints.thumbnail") || "Upload thumbnail image"}</p>
+              </div>
+
+              {/* Section Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
@@ -130,6 +150,51 @@ const AdminForms = ({
                 </select>
               </div>
 
+              {/* Price Field */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">{t("forms.createProduct.fields.price") || "Price"} *</span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="0.00"
+                  className="input input-bordered w-full"
+                  value={activeTab === "product" ? productForm?.price || "" : bookForm?.price || ""}
+                  onChange={(e) => {
+                    if (activeTab === "product") {
+                      setProductForm?.({ ...productForm, price: e.target.value })
+                    } else {
+                      setBookForm?.({ ...bookForm, price: e.target.value })
+                    }
+                  }}
+                  required
+                />
+              </div>
+
+              {/* Discount Percentage Field */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">
+                    {t("forms.createProduct.fields.discountPercentage") || "Discount Percentage"}
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  className="input input-bordered w-full"
+                  value={
+                    activeTab === "product" ? productForm?.discountPercentage || "" : bookForm?.discountPercentage || ""
+                  }
+                  onChange={(e) => {
+                    if (activeTab === "product") {
+                      setProductForm?.({ ...productForm, discountPercentage: e.target.value })
+                    } else {
+                      setBookForm?.({ ...bookForm, discountPercentage: e.target.value })
+                    }
+                  }}
+                />
+              </div>
+
               {/* Subject field - only for books */}
               {activeTab === "book" && (
                 <div>
@@ -156,49 +221,7 @@ const AdminForms = ({
                 </div>
               )}
 
-              <div>
-                <label className="label">
-                  <span className="label-text font-medium">{t("forms.createProduct.fields.price") || "Price"} *</span>
-                </label>
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  className="input input-bordered w-full"
-                  value={activeTab === "product" ? productForm?.price || "" : bookForm?.price || ""}
-                  onChange={(e) => {
-                    if (activeTab === "product") {
-                      setProductForm?.({ ...productForm, price: e.target.value })
-                    } else {
-                      setBookForm?.({ ...bookForm, price: e.target.value })
-                    }
-                  }}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="label">
-                  <span className="label-text font-medium">
-                    {t("forms.createProduct.fields.discountPercentage") || "Discount Percentage"}
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  className="input input-bordered w-full"
-                  value={
-                    activeTab === "product" ? productForm?.discountPercentage || "" : bookForm?.discountPercentage || ""
-                  }
-                  onChange={(e) => {
-                    if (activeTab === "product") {
-                      setProductForm?.({ ...productForm, discountPercentage: e.target.value })
-                    } else {
-                      setBookForm?.({ ...bookForm, discountPercentage: e.target.value })
-                    }
-                  }}
-                />
-              </div>
-
+              {/* Payment Number Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
@@ -221,40 +244,25 @@ const AdminForms = ({
                 />
               </div>
 
-              {/* Book-specific description field */}
-              {activeTab === "book" && (
+              {/* WhatsApp Number field - only for products */}
+              {activeTab === "product" && (
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">
-                      {t("forms.createBook.fields.description") || "Description"} *
-                    </span>
+                    <span className="label-text font-medium">WhatsApp Number *</span>
                   </label>
-                  <textarea
-                    placeholder={t("forms.createBook.placeholders.description") || "Enter book description..."}
-                    className="textarea textarea-bordered w-full h-32"
-                    value={bookForm?.description || ""}
-                    onChange={(e) => setBookForm?.({ ...bookForm, description: e.target.value })}
+                  <input
+                    type="text"
+                    placeholder="Enter WhatsApp number"
+                    className="input input-bordered w-full"
+                    value={productForm?.whatsAppNumber || ""}
+                    onChange={(e) => setProductForm?.({ ...productForm, whatsAppNumber: e.target.value })}
                     required
-                  ></textarea>
+                  />
+                  <p className="text-xs mt-1">Enter the WhatsApp number for customer contact</p>
                 </div>
               )}
 
-              <div>
-                <label className="label">
-                  <span className="label-text font-medium">
-                    {t("forms.createProduct.fields.thumbnail") || "Thumbnail"}
-                  </span>
-                </label>
-                <input
-                  type="file"
-                  id={`${activeTab}-thumbnail`}
-                  className="file-input file-input-bordered w-full"
-                  accept="image/*"
-                  onChange={(e) => onFileChange?.(e, "thumbnail", activeTab)}
-                />
-                <p className="text-xs mt-1">{t("forms.createProduct.hints.thumbnail") || "Upload thumbnail image"}</p>
-              </div>
-
+              {/* Sample File Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
@@ -269,6 +277,67 @@ const AdminForms = ({
                 />
                 <p className="text-xs mt-1">{t("forms.createProduct.hints.sampleFile") || "Upload sample file"}</p>
               </div>
+
+              {/* Description Field - Required for both products and books */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">
+                    {activeTab === "product" ? "Description" : t("forms.createBook.fields.description") || "Description"} *
+                  </span>
+                </label>
+                <textarea
+                  placeholder={
+                    activeTab === "product" 
+                      ? "Enter product description..." 
+                      : t("forms.createBook.placeholders.description") || "Enter book description..."
+                  }
+                  className="textarea textarea-bordered w-full h-32"
+                  value={activeTab === "product" ? productForm?.description || "" : bookForm?.description || ""}
+                  onChange={(e) => {
+                    if (activeTab === "product") {
+                      setProductForm?.({ ...productForm, description: e.target.value })
+                    } else {
+                      setBookForm?.({ ...bookForm, description: e.target.value })
+                    }
+                  }}
+                  required
+                />
+                <p className="text-xs mt-1">
+                  {activeTab === "product" 
+                    ? "Provide a detailed description of the product" 
+                    : "Provide a detailed description of the book"}
+                </p>
+              </div>
+
+              {/* Gallery field - only for products */}
+              {activeTab === "product" && (
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Gallery Images</span>
+                  </label>
+                  <input
+                    type="file"
+                    id="product-gallery"
+                    className="file-input file-input-bordered w-full"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => onFileChange?.(e, "gallery", "product")}
+                  />
+                  <p className="text-xs mt-1">Upload multiple images for the product gallery</p>
+                  {productForm?.gallery && productForm.gallery.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-sm font-medium">Selected files: {productForm.gallery.length}</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {Array.from(productForm.gallery).map((file, index) => (
+                          <div key={index} className="badge badge-outline">
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Decorative elements */}
