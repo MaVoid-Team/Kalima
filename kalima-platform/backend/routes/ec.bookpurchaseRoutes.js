@@ -2,7 +2,7 @@ const express = require("express");
 const ecBookPurchaseController = require("../controllers/ec.bookpurchaseController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
-const { uploadPaymentScreenshotMiddleware } = require("../utils/upload files/uploadFiles");
+const { uploadPaymentScreenshotToDisk } = require("../utils/upload files/uploadFiles");
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router
   .get(ecBookPurchaseController.getAllBookPurchases)
   .post(
     authController.verifyRoles("Parent", "Student", "Teacher"),
-    uploadPaymentScreenshotMiddleware,
+    uploadPaymentScreenshotToDisk,
     ecBookPurchaseController.createBookPurchase
   );
 
@@ -47,7 +47,7 @@ router
   .get(ecBookPurchaseController.getBookPurchaseById)
   .patch(
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    uploadPaymentScreenshotMiddleware,
+    uploadPaymentScreenshotToDisk,
     ecBookPurchaseController.updateBookPurchase
   )
   .delete(

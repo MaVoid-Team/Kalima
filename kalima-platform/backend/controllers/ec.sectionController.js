@@ -89,3 +89,48 @@ exports.deleteSection = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Get section by ID only if allowed for current user's role
+exports.getSectionByIdAllowed = catchAsync(async (req, res, next) => {
+  const userRole = req.user && req.user.role;
+  if (!userRole) {
+    return next(new AppError("User role not found in request", 401));
+  }
+  // Debug log
+  console.log('User role:', userRole, 'Section ID:', req.params.id);
+  const section = await ECSection.findOne({
+    _id: req.params.id,
+    allowedFor: { $elemMatch: { $eq: userRole } },
+  });
+  if (section) {
+    console.log('Section allowedFor:', section.allowedFor);
+  }
+  if (!section) {
+    return next(new AppError("No section found with that ID for your role", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      section,
+    },
+  });
+});
+
+// Get all sections visible to the current user's role
+exports.getAllowedSections = catchAsync(async (req, res, next) => {
+  const userRole = req.user && req.user.role;
+  if (!userRole) {
+    return next(new AppError("User role not found in request", 401));
+  }
+  const sections = await ECSection.find({ allowedFor: { $elemMatch: { $eq: userRole } } });
+  res.status(200).json({
+    status: "success",
+    results: sections.length,
+    data: {
+      sections,
+    },
+  });
+});
+
+// Export all controller functions using the exports object
+module.exports = exports;
