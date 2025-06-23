@@ -16,7 +16,7 @@ import PurchaseForm from "./components/PurchaseForm"
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
   const isRTL = i18n.language === "ar"
-
+  const [uploadedFiles, setUploadedFiles] = useState(null)
   const [uploadedFile, setUploadedFile] = useState(null)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
