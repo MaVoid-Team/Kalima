@@ -12,6 +12,7 @@ const mongoose = require("mongoose");
 const corsOptions = require("./config/corsOptions.js");
 const cookieParser = require("cookie-parser");
 const auditLogger = require("./middleware/auditLogger");
+const path = require("path");
 
 const containerRouter = require("./routes/containerRoutes");
 const lectureRouter = require("./routes/lectureRoutes");
@@ -131,6 +132,8 @@ app.use("/api/v1/ec/books", ecBookRouter);
 app.use("/api/v1/ec/purchases", ecPurchaseRouter);
 app.use("/api/v1/ec/book-purchases", ecBookPurchaseRouter);
 app.use("/api/v1/ec/coupons", ecCouponRouter);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
