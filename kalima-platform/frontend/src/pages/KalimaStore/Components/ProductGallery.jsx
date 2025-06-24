@@ -6,15 +6,17 @@ const ProductGallery = ({ gallery = [], title }) => {
   const [selectedImage, setSelectedImage] = useState(0)
 
   const convertPathToUrl = (filePath) => {
-  if (!filePath) return null;
-  if (filePath.startsWith("http")) return filePath;
+  if (!filePath) return null
+  if (filePath.startsWith("http")) return filePath
 
-  const normalizedPath = filePath.replace(/\\/g, "/");
-  const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
-  const baseUrl = API_URL.replace(/\/$/, "");
+  const normalizedPath = filePath.replace(/\\/g, "/")
 
-  return `${baseUrl}/${normalizedPath}`;
-};
+  // Force base URL to not include /api or /api/v1
+  const API_URL = import.meta.env.VITE_API_URL
+  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "")
+
+  return `${baseUrl}/${normalizedPath}`
+}
 
   const galleryImages = (gallery || [])
     .map((img, index) => ({
@@ -59,7 +61,7 @@ const ProductGallery = ({ gallery = [], title }) => {
           <div className="mb-6">
             <div className="aspect-square w-full bg-base-200 rounded-lg overflow-hidden">
               <img
-                src={galleryImages[selectedImage]?.url || "/placeholder.svg?height=400&width=400"}
+                src={galleryImages[selectedImage]?.url}
                 alt={galleryImages[selectedImage]?.alt || title}
                 className="w-full h-full object-cover"
               />
