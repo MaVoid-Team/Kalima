@@ -7,13 +7,28 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
   const [downloadLoading, setDownloadLoading] = useState(false)
 
+  // Helper to convert local path to full URL
+  const convertPathToUrl = (filePath) => {
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
+
+    const normalizedPath = filePath.replace(/\\/g, "/")
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+    const baseUrl = API_URL.replace(/\/$/, "")
+    const filename = normalizedPath.split("/").pop()
+
+    return `${baseUrl}/uploads/docs/${filename}`
+  }
+
+  const fileUrl = convertPathToUrl(sample)
+
   const handleDownloadSample = async () => {
-    if (!sample) return
+    if (!fileUrl) return
 
     try {
       setDownloadLoading(true)
 
-      const response = await fetch(sample)
+      const response = await fetch(fileUrl)
       const blob = await response.blob()
 
       const url = window.URL.createObjectURL(blob)

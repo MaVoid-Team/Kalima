@@ -6,16 +6,15 @@ const ProductGallery = ({ gallery = [], title }) => {
   const [selectedImage, setSelectedImage] = useState(0)
 
   const convertPathToUrl = (filePath) => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
+  if (!filePath) return null;
+  if (filePath.startsWith("http")) return filePath;
 
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const filename = normalizedPath.split("/").pop()
+  const normalizedPath = filePath.replace(/\\/g, "/");
+  const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+  const baseUrl = API_URL.replace(/\/$/, "");
 
-    return `${baseUrl}/uploads/product_gallery/${filename}`
-  }
+  return `${baseUrl}/${normalizedPath}`;
+};
 
   const galleryImages = (gallery || [])
     .map((img, index) => ({

@@ -223,16 +223,6 @@ const ProductDetails = () => {
       {/* Header Component */}
       <ProductHeader onBack={() => navigate(-1)} isRTL={isRTL} />
 
-      {/* Debug Info (remove in production) */}
-      <div className="max-w-7xl mx-auto px-4 py-2">
-        <div className="alert alert-info">
-          <div className="text-sm">
-            <strong>Debug Info:</strong> ID: {product._id} | __t: {product.__t || "undefined"} | Determined Type:{" "}
-            {displayType} | URL Type: {type}
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Product Overview */}
