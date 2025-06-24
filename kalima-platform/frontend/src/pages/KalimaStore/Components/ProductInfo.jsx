@@ -5,14 +5,24 @@ import { useTranslation } from "react-i18next"
 const ProductInfo = ({ product, type, isRTL }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
 
+  // Determine actual type from product data
+  const getActualType = () => {
+    if (product && product.__t === "ECBook") {
+      return "book"
+    }
+    return "product"
+  }
+
+  const actualType = getActualType()
+
   const getItemCategory = () => {
-    if (product.__t === "ECBook" && product.subject) {
+    if (actualType === "book" && product.subject) {
       return product.subject.name || product.subject
     }
     if (product.section && product.section.name) {
       return product.section.name
     }
-    return type === "book" ? t("product.types.book") : t("product.types.product")
+    return actualType === "book" ? t("product.types.book") : t("product.types.product")
   }
 
   const getDisplayPrice = () => {
@@ -32,10 +42,11 @@ const ProductInfo = ({ product, type, isRTL }) => {
       <div>
         <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
         <div className="flex flex-wrap gap-2">
-          <div className={`badge ${type === "book" ? "badge-success" : "badge-info"}`}>
-            {type === "book" ? "📚 Book" : "📦 Product"}
+          <div className={`badge ${actualType === "book" ? "badge-success" : "badge-info"}`}>
+            {actualType === "book" ? "📚 Book" : "📦 Product"}
           </div>
           <div className="badge badge-outline">{getItemCategory()}</div>
+          {product.__t && <div className="badge badge-ghost text-xs">__t: {product.__t}</div>}
         </div>
       </div>
 
@@ -73,6 +84,26 @@ const ProductInfo = ({ product, type, isRTL }) => {
                 <span className="font-semibold">Description</span>
               </div>
               <p className="leading-relaxed">{product.description}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Subject info for books */}
+        {actualType === "book" && product.subject && (
+          <div className="card bg-base-200">
+            <div className="card-body p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                <span className="font-semibold">Subject</span>
+              </div>
+              <p className="text-lg">{product.subject.name}</p>
             </div>
           </div>
         )}

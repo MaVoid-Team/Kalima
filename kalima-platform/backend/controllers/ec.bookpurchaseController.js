@@ -65,11 +65,11 @@ exports.getBookPurchaseById = catchAsync(async (req, res, next) => {
 // Create new book purchase
 exports.createBookPurchase = catchAsync(async (req, res, next) => {
   // Handle payment screenshot upload
-  let paymentScreenshotPath = null;
-  if (req.file && req.file.fieldname === "paymentScreenshot") {
-    paymentScreenshotPath = req.file.path;
-    req.body.paymentScreenshot = paymentScreenshotPath;
-  } else if (!req.body.paymentScreenshot) {
+  let paymentScreenShotPath = null;
+  if (req.file && req.file.fieldname === "paymentScreenShot") {
+    paymentScreenShotPath = req.file.path;
+    req.body.paymentScreenShot = paymentScreenShotPath;
+  } else if (!req.body.paymentScreenShot) {
     return next(new AppError("Payment screenshot is required", 400));
   }
 
@@ -126,7 +126,7 @@ exports.updateBookPurchase = catchAsync(async (req, res, next) => {
     "nameOnBook",
     "numberOnBook",
     "seriesName",
-    "paymentScreenshot",
+    "paymentScreenShot", // <-- fixed field name
     "numberTransferredFrom"
   ];
   const updateData = {};

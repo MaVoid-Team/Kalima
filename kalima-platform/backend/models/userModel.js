@@ -77,4 +77,12 @@ const User = mongoose.model("User", userSchema);
 User.levels = ["grade 4", "grade 5", "grade 6", "first preparatory", "second preparatory", "third preparatory", "first secondary",
   "second secondary", "third secondary"]
 
+userSchema.index(
+  { phoneNumber2: 1 },
+  {
+    unique: true,
+    sparse: true,
+    name: 'phoneNumber2_sparse_unique'
+  }
+);
 module.exports = User;

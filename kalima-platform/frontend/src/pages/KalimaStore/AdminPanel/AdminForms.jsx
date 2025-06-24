@@ -244,8 +244,7 @@ const AdminForms = ({
                 />
               </div>
 
-              {/* WhatsApp Number field - only for products */}
-              {activeTab === "product" && (
+              {/* WhatsApp Number field - for both fields */}
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">WhatsApp Number *</span>
@@ -260,7 +259,6 @@ const AdminForms = ({
                   />
                   <p className="text-xs mt-1">Enter the WhatsApp number for customer contact</p>
                 </div>
-              )}
 
               {/* Sample File Field */}
               <div>

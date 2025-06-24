@@ -56,9 +56,6 @@ const teacherSchema = new mongoose.Schema(
     phoneNumber2: {
       type: String,
       required: false,
-      unique: true,
-      default: null,
-      sparse: true,
       trim: true,
     },
     teachesAtType: {
@@ -94,6 +91,8 @@ const teacherSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+
 teacherSchema.pre("save", async function (next) {
   if (this.isNew && !this.userSerial) {
     try {
