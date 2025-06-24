@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import { getAllPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
+import { getAllProductPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-admin")
@@ -31,21 +31,23 @@ const Orders = () => {
     books: 0,
   })
 
-  // Fetch orders when component mounts or pagination/filters change
-  useEffect(() => {
-    fetchOrders()
-  }, [currentPage, statusFilter, typeFilter])
+  // Add debounced search state
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
 
-  // Reset to page 1 when search query changes
+  // Debounce search query and reset page
   useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1)
-    } else {
-      fetchOrders()
-    }
-  }, [searchQuery])
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+      // Reset to page 1 when search changes
+      if (searchQuery !== debouncedSearchQuery && currentPage !== 1) {
+        setCurrentPage(1)
+      }
+    }, 500) // 500ms delay
 
-  const fetchOrders = async () => {
+    return () => clearTimeout(timer)
+  }, [searchQuery, debouncedSearchQuery, currentPage])
+
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -53,12 +55,11 @@ const Orders = () => {
       // Build query parameters for server-side filtering and pagination
       const queryParams = {
         page: currentPage,
-        limit: 6, // Fixed limit as requested
       }
 
       // Add search query if provided
-      if (searchQuery.trim()) {
-        queryParams.search = searchQuery.trim()
+      if (debouncedSearchQuery.trim()) {
+        queryParams.search = debouncedSearchQuery.trim()
       }
 
       // Add status filter if not "all"
@@ -66,15 +67,13 @@ const Orders = () => {
         queryParams.confirmed = statusFilter === "confirmed"
       }
 
-      // Note: Type filter might need to be handled differently depending on your API
-      // For now, we'll filter client-side after getting the combined results
-
-      const response = await getAllPurchases(queryParams)
+      // Note: We'll handle type filtering client-side since the API might not support it
+      const response = await getAllProductPurchases(queryParams)
 
       if (response.success) {
-        let purchases = response.data.purchases
+        let purchases = response.data.data.purchases
 
-        // Apply type filter client-side (since we're combining two different endpoints)
+        // Apply type filter client-side
         if (typeFilter !== "all") {
           if (typeFilter === "book") {
             purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
@@ -87,11 +86,12 @@ const Orders = () => {
         setTotalPages(response.data.totalPages)
         setTotalPurchases(response.data.totalPurchases)
 
-        // Calculate statistics from current page data
-        const confirmed = purchases.filter((order) => order.confirmed).length
-        const pending = purchases.filter((order) => !order.confirmed).length
-        const products = purchases.filter((order) => !order.__t || order.__t !== "ECBookPurchase").length
-        const books = purchases.filter((order) => order.__t === "ECBookPurchase").length
+        // Calculate statistics from ALL data (not just filtered)
+        const allPurchases = response.data.data.purchases
+        const confirmed = allPurchases.filter((order) => order.confirmed).length
+        const pending = allPurchases.filter((order) => !order.confirmed).length
+        const products = allPurchases.filter((order) => !order.__t || order.__t !== "ECBookPurchase").length
+        const books = allPurchases.filter((order) => order.__t === "ECBookPurchase").length
 
         setStats({
           total: response.data.totalPurchases,
@@ -109,7 +109,12 @@ const Orders = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery])
+
+  // Fetch orders when dependencies change
+  useEffect(() => {
+    fetchOrders()
+  }, [fetchOrders])
 
   const handleConfirmOrder = async (order) => {
     try {
@@ -167,6 +172,10 @@ const Orders = () => {
   const formatPrice = (price) => {
     return `${price} ج`
   }
+
+  const handleSearchChange = useCallback((e) => {
+    setSearchQuery(e.target.value)
+  }, [])
 
   if (loading) {
     return (
@@ -292,7 +301,7 @@ const Orders = () => {
                 placeholder="Search by user name, product name, or serial..."
                 className="input input-bordered w-full"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
               />
             </div>
 
@@ -404,10 +413,10 @@ const Orders = () => {
                       >
                         👁️
                       </button>
-                      {order.paymentScreenshot && (
+                      {order.paymentScreenShot && (
                         <button
                           className="btn btn-ghost btn-sm"
-                          onClick={() => handleViewPaymentScreenshot(order.paymentScreenshot)}
+                          onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
                           title="View Payment Screenshot"
                         >
                           🖼️
@@ -577,11 +586,11 @@ const Orders = () => {
                   <p>
                     <strong>Transferred From:</strong> {selectedOrder.numberTransferredFrom}
                   </p>
-                  {selectedOrder.paymentScreenshot && (
+                  {selectedOrder.paymentScreenShot && (
                     <div className="mt-2">
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => handleViewPaymentScreenshot(selectedOrder.paymentScreenshot)}
+                        onClick={() => handleViewPaymentScreenshot(selectedOrder.paymentScreenShot)}
                       >
                         View Payment Screenshot
                       </button>
