@@ -91,7 +91,6 @@ const ProductsManagement = ({
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">{t("productsManagement.table.thumbnail") || "Thumbnail"}</th>
                 <th className="text-center">{t("productsManagement.table.title") || "Title"}</th>
                 <th className="text-center">{t("productsManagement.table.serial") || "Serial"}</th>
                 <th className="text-center">{t("productsManagement.table.section") || "Section"}</th>
@@ -108,20 +107,6 @@ const ProductsManagement = ({
 
                 return (
                   <tr key={product._id}>
-                    <td className="text-center">
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded">
-                          <img
-                            src={getFileUrl(product?.thumbnail) || "/placeholder.svg?height=48&width=48"}
-                            alt={product?.title || "Product"}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/placeholder.svg?height=48&width=48";
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </td>
                     <td className="text-center font-medium">{product?.title || "N/A"}</td>
                     <td className="text-center">{product?.serial || "N/A"}</td>
                     <td className="text-center">{getSectionName(product?.section)}</td>
