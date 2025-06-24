@@ -15,6 +15,12 @@ const ProductsManagement = ({
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
 
+  const getFileUrl = (filename) => {
+    if (!filename) return null;
+    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || "";
+    return `${baseURL}/uploads/product_thumbnail/${filename}`;
+  };
+
   // Helper functions with error handling
   const getSectionName = (sectionId) => {
     if (!sectionId) return t("products.unknownSection") || "Unknown Section"
@@ -106,11 +112,11 @@ const ProductsManagement = ({
                       <div className="avatar">
                         <div className="w-12 h-12 rounded">
                           <img
-                            src={product?.thumbnail || "/placeholder.svg?height=48&width=48"}
+                            src={getFileUrl(product?.thumbnail) || "/placeholder.svg?height=48&width=48"}
                             alt={product?.title || "Product"}
                             onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = "/placeholder.svg?height=48&width=48"
+                              e.target.onerror = null;
+                              e.target.src = "/placeholder.svg?height=48&width=48";
                             }}
                           />
                         </div>

@@ -9,16 +9,16 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
 
   // Helper to convert local path to full URL
   const convertPathToUrl = (filePath) => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
+  if (!filePath) return null
+  if (filePath.startsWith("http")) return filePath
 
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const filename = normalizedPath.split("/").pop()
+  const normalizedPath = filePath.replace(/\\/g, "/")
+  const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1
 
-    return `${baseUrl}/uploads/docs/${filename}`
-  }
+  const filename = normalizedPath.split("/").pop()
+  return `${baseUrl}/uploads/docs/${filename}`
+}
 
   const fileUrl = convertPathToUrl(sample)
 

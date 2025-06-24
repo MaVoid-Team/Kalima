@@ -155,9 +155,14 @@ const Orders = () => {
     setShowDetailsModal(true)
   }
 
-  const handleViewPaymentScreenshot = (screenshotUrl) => {
-    window.open(screenshotUrl, "_blank")
-  }
+  const handleViewPaymentScreenshot = (screenshotFilename) => {
+    if (!screenshotFilename) return;
+
+    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || "";
+    const fullUrl = `${baseURL}/uploads/payment_screenshots/${screenshotFilename}`;
+
+    window.open(fullUrl, "_blank");
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
