@@ -93,7 +93,7 @@ const uploadMultipleImagesToDisk = multer({
     else cb(new AppError("Invalid image type", 400), false);
   },
   limits: { fileSize: 3 * 1024 * 1024 },
-}).array("gallery", 3);
+}).array("gallery", 5); // Allow up to 5 gallery images
 
 // 3. Single document upload (PDF, DOC, DOCX, image)
 const uploadSingleDocToDisk = multer({
@@ -152,8 +152,7 @@ const uploadProductFilesToDisk = multer({
   storage: multer.diskStorage({
     destination: dynamicDestination,
     filename: function (req, file, cb) {
-      const ext = file.mimetype.split("/")[1] || "bin";
-      cb(null, `${Date.now()}-${file.fieldname}.${ext}`);
+      cb(null, `${file.fieldname}-${file.originalname}`); // Prefix field name to original file name
     },
   }),
   fileFilter: (req, file, cb) => {
@@ -167,7 +166,7 @@ const uploadProductFilesToDisk = multer({
       cb(new AppError("Invalid file type for field: " + file.fieldname, 400), false);
     }
   },
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 75 * 1024 * 1024 },
 }).fields([
   { name: "thumbnail", maxCount: 1 },
   { name: "sample", maxCount: 1 },
