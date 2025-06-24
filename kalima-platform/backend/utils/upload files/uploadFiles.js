@@ -152,8 +152,7 @@ const uploadProductFilesToDisk = multer({
   storage: multer.diskStorage({
     destination: dynamicDestination,
     filename: function (req, file, cb) {
-      const ext = file.mimetype.split("/")[1] || "bin";
-      cb(null, `${Date.now()}-${file.fieldname}.${ext}`);
+      cb(null, `${file.fieldname}-${file.originalname}`); // Prefix field name to original file name
     },
   }),
   fileFilter: (req, file, cb) => {
