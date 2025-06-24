@@ -169,21 +169,33 @@ export const deleteSection = async (sectionId) => {
 export const createProduct = async (productData) => {
   try {
     const formData = new FormData()
-    
-    // Append all the form fields
-    formData.append('title', productData.title)
-    formData.append('serial', productData.serial)
-    formData.append('section', productData.section)
-    formData.append('price', productData.price)
-    formData.append('discountPercentage', productData.discountPercentage)
-    formData.append('paymentNumber', productData.paymentNumber)
-    
+
+    // Append all the required form fields
+    formData.append("title", productData.title)
+    formData.append("serial", productData.serial)
+    formData.append("section", productData.section)
+    formData.append("price", productData.price)
+    formData.append("discountPercentage", productData.discountPercentage || "0")
+    formData.append("paymentNumber", productData.paymentNumber)
+
+    // NEW REQUIRED FIELDS
+    formData.append("whatsAppNumber", productData.whatsAppNumber)
+    formData.append("description", productData.description)
+
     // Append files if they exist
     if (productData.thumbnail) {
-      formData.append('thumbnail', productData.thumbnail)
+      formData.append("thumbnail", productData.thumbnail)
     }
     if (productData.sample) {
-      formData.append('sample', productData.sample)
+      formData.append("sample", productData.sample)
+    }
+
+    // Handle gallery files (multiple files)
+    if (productData.gallery && productData.gallery.length > 0) {
+      // If gallery is a FileList or array of files
+      for (let i = 0; i < productData.gallery.length; i++) {
+        formData.append("gallery", productData.gallery[i])
+      }
     }
 
     const response = await axios.post(`${API_URL}/ec/products`, formData, {
@@ -213,6 +225,7 @@ export const createBook = async (bookData) => {
     formData.append("subject", bookData.subject)
     formData.append("paymentNumber", bookData.paymentNumber)
     formData.append("description", bookData.description)
+    formData.append("whatsAppNumber", bookData.whatsAppNumber)
 
     // Append files if they exist
     if (bookData.thumbnail) {
@@ -292,8 +305,8 @@ export const purchaseProduct = async (purchaseData) => {
     
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
-    if (purchaseData.paymentScreenshot) {
-      formData.append("paymentScreenshot", purchaseData.paymentScreenshot)
+    if (purchaseData.paymentScreenShot) {
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
 
     const response = await axios.post(`${API_URL}/ec/purchases/`, formData, {
@@ -313,12 +326,13 @@ export const purchaseProduct = async (purchaseData) => {
 // Function to purchase a book
 export const purchaseBook = async (purchaseData) => {
   try {
+    console.log("Purchase Data:", purchaseData)
     const formData = new FormData()
     
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
-    if (purchaseData.paymentScreenshot) {
-      formData.append("paymentScreenshot", purchaseData.paymentScreenshot)
+    if (purchaseData.paymentScreenShot) {
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
     formData.append("nameOnBook", purchaseData.nameOnBook)
     formData.append("numberOnBook", purchaseData.numberOnBook)

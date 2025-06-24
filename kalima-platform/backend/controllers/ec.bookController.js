@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // Create ECBook
 exports.createECBook = async (req, res, next) => {
     try {
-        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description } = req.body;
+        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
         let sample, thumbnail;
         // Handle sample PDF
@@ -15,8 +15,8 @@ exports.createECBook = async (req, res, next) => {
             if (file.mimetype !== "application/pdf" || file.size > 50 * 1024 * 1024) {
                 return res.status(400).json({ message: "Sample must be a PDF and <= 50MB" });
             }
-            const { uploadPDFToCloudinary } = require("../utils/upload files/uploadPDF");
-            sample = await uploadPDFToCloudinary(file, "books", next);
+            // Use local file path from multer
+            sample = file.path;
         } else {
             // Debug: log files object
             console.log('req.files:', req.files);
@@ -24,8 +24,9 @@ exports.createECBook = async (req, res, next) => {
         }
         // Handle thumbnail image
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
-            const { uploadProductImageToCloudinary } = require("../utils/upload files/uploadProductImage");
-            thumbnail = await uploadProductImageToCloudinary(req.files.thumbnail[0], "books", next);
+            const file = req.files.thumbnail[0];
+            // Use local file path from multer
+            thumbnail = file.path;
         } else {
             return res.status(400).json({ message: "Thumbnail image is required" });
         }
@@ -40,6 +41,7 @@ exports.createECBook = async (req, res, next) => {
             thumbnail,
             sample,
             description,
+            whatsAppNumber,
             createdBy
         });
         res.status(201).json({
