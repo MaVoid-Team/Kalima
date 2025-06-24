@@ -35,7 +35,11 @@ services:
     networks:
       - app-network
     volumes:
-      - uploads:/app/uploads
+      - uploads:/app/public/uploads
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   uploads:
