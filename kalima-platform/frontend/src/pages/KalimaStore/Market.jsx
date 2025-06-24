@@ -20,16 +20,16 @@ const Market = () => {
   const [itemsPerPage] = useState(6)
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
-    if (!filePath) return null
-    if (filePath.startsWith("http")) return filePath
+  if (!filePath) return null
+  if (filePath.startsWith("http")) return filePath
 
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
-    const filename = normalizedPath.split("/").pop()
+  const normalizedPath = filePath.replace(/\\/g, "/")
+  const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1
 
-    return `${baseUrl}/uploads/${folder}/${filename}`
-  }
+  const filename = normalizedPath.split("/").pop()
+  return `${baseUrl}/uploads/${folder}/${filename}`
+}
 
   // Filter products based on active tab
   const filteredBySection = useMemo(() => {
@@ -251,16 +251,10 @@ const Market = () => {
               <figure className="px-4 pt-4">
                 <img
                   src={
-                    convertPathToUrl(item.thumbnail, "product_thumbnails") ||
-                    "/placeholder.svg?height=200&width=200" ||
-                    "/placeholder.svg"
+                    convertPathToUrl(item.thumbnail, "product_thumbnails")
                   }
                   alt={item.title}
                   className="rounded-xl w-full h-48 object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src = "/placeholder.svg?height=200&width=200"
-                  }}
                 />
               </figure>
 
