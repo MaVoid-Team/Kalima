@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { getAllSections, getAllBooks, getAllProducts } from "../../routes/market"
+import { getAllSections, getAllProducts } from "../../routes/market"
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market")
@@ -13,28 +13,36 @@ const Market = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sections, setSections] = useState([])
-  const [allProducts, setAllProducts] = useState([]) // Store all products
-  const [allBooks, setAllBooks] = useState([]) // Store all books
+  const [allProducts, setAllProducts] = useState([]) // Store all products only
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(6)
 
-  // Combine all items based on active tab
-  const allItems = useMemo(() => {
+  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
+
+    const normalizedPath = filePath.replace(/\\/g, "/")
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+    const baseUrl = API_URL.replace(/\/$/, "")
+    const filename = normalizedPath.split("/").pop()
+
+    return `${baseUrl}/uploads/${folder}/${filename}`
+  }
+
+  // Filter products based on active tab
+  const filteredBySection = useMemo(() => {
     if (activeTab === "all") {
-      return [...allProducts, ...allBooks]
+      return allProducts
     }
-    return [
-      ...allProducts.filter((product) => product.section?._id === activeTab),
-      ...allBooks.filter((book) => book.section?._id === activeTab),
-    ]
-  }, [activeTab, allProducts, allBooks])
+    return allProducts.filter((product) => product.section?._id === activeTab)
+  }, [activeTab, allProducts])
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
-    return allItems.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
-  }, [allItems, searchQuery])
+    return filteredBySection.filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
+  }, [filteredBySection, searchQuery])
 
   // Calculate paginated items
   const paginatedItems = useMemo(() => {
@@ -47,7 +55,7 @@ const Market = () => {
     return Math.ceil(filteredItems.length / itemsPerPage) || 1
   }, [filteredItems.length, itemsPerPage])
 
-  // Fetch all data initially
+  // Fetch all data initially - ONLY PRODUCTS
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -60,15 +68,11 @@ const Market = () => {
           setSections(sectionsResponse.data.sections)
         }
 
-        // Fetch all products and books (without pagination)
-        const [productsResponse, booksResponse] = await Promise.all([getAllProducts(), getAllBooks()])
+        // Fetch ONLY products (removed books fetching)
+        const productsResponse = await getAllProducts()
 
         if (productsResponse.status === "success") {
           setAllProducts(productsResponse.data.products)
-        }
-
-        if (booksResponse.status === "success") {
-          setAllBooks(booksResponse.data.books)
         }
       } catch (err) {
         setError(err.message)
@@ -96,7 +100,7 @@ const Market = () => {
     })),
   ]
 
-  if (loading && allProducts.length === 0 && allBooks.length === 0) {
+  if (loading && allProducts.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
@@ -231,7 +235,7 @@ const Market = () => {
                 </div>
               )}
 
-              {/* Subject Badge for Books */}
+              {/* Type Badge - Show if it's actually a book (has __t: "ECBook") */}
               {item.__t === "ECBook" && item.subject && (
                 <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} z-10`}>
                   <div
@@ -239,16 +243,24 @@ const Market = () => {
                       isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
                     } text-xs font-medium`}
                   >
-                    {item.subject.name || item.subject}
+                    📚 {item.subject.name || item.subject}
                   </div>
                 </div>
               )}
 
               <figure className="px-4 pt-4">
                 <img
-                  src={item.thumbnail || "/placeholder.svg?height=200&width=200"}
+                  src={
+                    convertPathToUrl(item.thumbnail, "product_thumbnails") ||
+                    "/placeholder.svg?height=200&width=200" ||
+                    "/placeholder.svg"
+                  }
                   alt={item.title}
                   className="rounded-xl w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = "/placeholder.svg?height=200&width=200"
+                  }}
                 />
               </figure>
 
@@ -275,6 +287,7 @@ const Market = () => {
                 <div className="card-actions w-full">
                   <button
                     onClick={() => {
+                      // Determine type from the item data itself, not assumptions
                       const itemType = item.__t === "ECBook" ? "book" : "product"
                       navigate(`/market/product-details/${itemType}/${item._id}`)
                     }}
@@ -291,7 +304,7 @@ const Market = () => {
         {/* Empty State */}
         {filteredItems.length === 0 && !loading && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📚</div>
+            <div className="text-6xl mb-4">📦</div>
             <h3 className="text-xl font-semibold mb-2">{t("emptyState.title")}</h3>
             <p className="text-gray-500">{t("emptyState.description")}</p>
           </div>

@@ -171,7 +171,7 @@ const uploadProductFilesToDisk = multer({
 }).fields([
   { name: "thumbnail", maxCount: 1 },
   { name: "sample", maxCount: 1 },
-  { name: "gallery", maxCount: 5 } // Allow up to 10 gallery images
+  { name: "gallery", maxCount: 5 }
 ]);
 
 module.exports = {
