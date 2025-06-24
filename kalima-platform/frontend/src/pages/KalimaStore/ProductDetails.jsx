@@ -6,17 +6,17 @@ import { useTranslation } from "react-i18next"
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
 
 // Import components
-import ProductHeader from "./Components/ProductHeader"
-import ProductGallery from "./Components/ProductGallery"
-import SampleDownload from "./Components/SampleDownload"
-import ProductInfo from "./Components/ProductInfo"
-import PaymentSection from "./Components/PaymentSection"
-import PurchaseForm from "./Components/PurchaseForm"
+import ProductHeader from "./components/ProductHeader"
+import ProductGallery from "./components/ProductGallery"
+import SampleDownload from "./components/SampleDownload"
+import ProductInfo from "./components/ProductInfo"
+import PaymentSection from "./components/PaymentSection"
+import PurchaseForm from "./components/PurchaseForm"
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
   const isRTL = i18n.language === "ar"
-  const [uploadedFiles, setUploadedFiles] = useState(null)
+
   const [uploadedFile, setUploadedFile] = useState(null)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -34,10 +34,20 @@ const ProductDetails = () => {
   const { id, type } = useParams()
   const navigate = useNavigate()
 
+  // Determine the actual item type from the API response
+  const getItemType = (item) => {
+    // If __t exists and equals "ECBook", it's a book
+    if (item && item.__t === "ECBook") {
+      return "book"
+    }
+    // Otherwise, it's a product
+    return "product"
+  }
+
   // Fetch product/book data
   useEffect(() => {
     const fetchItemData = async () => {
-      if (!id || !type) {
+      if (!id) {
         setError(t("errors.invalidProductInfo"))
         setLoading(false)
         return
@@ -48,17 +58,25 @@ const ProductDetails = () => {
         setError(null)
 
         let response
+        // Try to fetch as the type specified in URL first, but we'll determine actual type from response
         if (type === "book") {
           response = await getBookById(id)
-        } else if (type === "product") {
-          response = await getProductById(id)
         } else {
-          throw new Error(t("errors.invalidItemType"))
+          // Default to trying product first, then book if it fails
+          try {
+            response = await getProductById(id)
+          } catch (productError) {
+            console.log("Failed to fetch as product, trying as book:", productError.message)
+            response = await getBookById(id)
+          }
         }
 
         if (response.status === "success") {
           const itemData = response.data.book || response.data.product
           setProduct(itemData)
+
+          // Log the actual type determined from the response
+          const actualType = getItemType(itemData)
         } else {
           throw new Error(t("errors.fetchFailed"))
         }
@@ -74,47 +92,71 @@ const ProductDetails = () => {
   }, [id, type, t])
 
   const handleSubmit = async () => {
+    if (!product) {
+      alert("Product data not loaded")
+      return
+    }
+
+    // Determine the actual type from the product data, not the URL
+    const actualType = getItemType(product)
+
+
+
     if (!uploadedFile) {
-      alert(t("errors.noFileSelected"))
+      alert(t("errors.noFileSelected") || "Please select a payment screenshot")
       return
     }
 
     if (!purchaseForm.numberTransferredFrom) {
-      alert(t("errors.noTransferNumber"))
+      alert(t("errors.noTransferNumber") || "Please enter the transfer number")
       return
     }
 
-    if (type === "book") {
+    // Validate book-specific fields if it's actually a book
+    if (actualType === "book") {
       if (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName) {
-        alert(t("errors.fillBookFields"))
+        alert(t("errors.fillBookFields") || "Please fill in all book fields")
         return
       }
     }
 
     try {
+
       setPurchaseLoading(true)
 
       const purchaseData = {
         productId: product._id,
         numberTransferredFrom: purchaseForm.numberTransferredFrom,
-        paymentScreenshot: uploadedFile,
+        paymentScreenShot: uploadedFile,
       }
 
-      if (type === "book") {
+      // Add book-specific fields if it's a book
+      if (actualType === "book") {
         purchaseData.nameOnBook = purchaseForm.nameOnBook
         purchaseData.numberOnBook = purchaseForm.numberOnBook
         purchaseData.seriesName = purchaseForm.seriesName
       }
 
       let response
-      if (type === "book") {
+
+
+      // Use the actual type determined from the API response
+      if (actualType === "book") {
+
         response = await purchaseBook(purchaseData)
+        
+
       } else {
         response = await purchaseProduct(purchaseData)
+
       }
 
+
+
       if (response.status === "success" || response.message) {
-        alert(t("success.purchaseSubmitted"))
+        alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!")
+
+        // Reset form
         setUploadedFile(null)
         setPurchaseForm({
           numberTransferredFrom: "",
@@ -122,16 +164,31 @@ const ProductDetails = () => {
           numberOnBook: "",
           seriesName: "",
         })
+
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
+
+
+      } else {
+        throw new Error("Unexpected response format")
       }
     } catch (err) {
-      console.error("Error submitting purchase:", err)
-      alert(t("errors.purchaseSubmissionFailed") + err.message)
+      console.error("💥 Error submitting purchase:", err)
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      })
+
+      const errorMessage = err.response?.data?.message || err.message || "Unknown error occurred"
+      alert((t("errors.purchaseSubmissionFailed") || "Purchase submission failed: ") + errorMessage)
     } finally {
       setPurchaseLoading(false)
     }
   }
+
+  // Get the actual type for display purposes
+  const displayType = product ? getItemType(product) : type
 
   if (loading) {
     return (
@@ -166,6 +223,16 @@ const ProductDetails = () => {
       {/* Header Component */}
       <ProductHeader onBack={() => navigate(-1)} isRTL={isRTL} />
 
+      {/* Debug Info (remove in production) */}
+      <div className="max-w-7xl mx-auto px-4 py-2">
+        <div className="alert alert-info">
+          <div className="text-sm">
+            <strong>Debug Info:</strong> ID: {product._id} | __t: {product.__t || "undefined"} | Determined Type:{" "}
+            {displayType} | URL Type: {type}
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Product Overview */}
@@ -176,13 +243,13 @@ const ProductDetails = () => {
               <div className="p-8 lg:p-12">
                 <ProductGallery gallery={product.gallery} title={product.title} />
                 <div className="mt-8">
-                  <SampleDownload sample={product.sample} title={product.title} type={type} isRTL={isRTL} />
+                  <SampleDownload sample={product.sample} title={product.title} type={displayType} isRTL={isRTL} />
                 </div>
               </div>
 
               {/* Right Column - Product Info */}
               <div className="p-8 lg:p-12 border-l border-base-200">
-                <ProductInfo product={product} type={type} isRTL={isRTL} />
+                <ProductInfo product={product} type={displayType} isRTL={isRTL} />
               </div>
             </div>
           </div>
@@ -199,7 +266,7 @@ const ProductDetails = () => {
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <PurchaseForm
-              type={type}
+              type={displayType}
               purchaseForm={purchaseForm}
               setPurchaseForm={setPurchaseForm}
               uploadedFile={uploadedFile}
