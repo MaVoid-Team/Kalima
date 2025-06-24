@@ -34,7 +34,8 @@ services:
       - EMAIL_FROM=${EMAIL_FROM}
     networks:
       - app-network
+    volumes:
+      - uploads:/app/uploads
 
-networks:
-  app-network:
-    driver: bridge
+volumes:
+  uploads:
