@@ -66,6 +66,7 @@ const AdminPanel = () => {
     description: "",
     thumbnail: null,
     sample: null,
+    gallery: [],
   })
 
   // Modal states
@@ -232,6 +233,9 @@ const AdminPanel = () => {
         paymentNumber: productForm.paymentNumber,
         thumbnail: productForm.thumbnail,
         sample: productForm.sample,
+        gallery: productForm.gallery,
+        whatsAppNumber: productForm.whatsAppNumber,
+        description: productForm.description,
       })
 
       if (response?.message === "Product created successfully" || response?.status === "success") {
@@ -485,11 +489,18 @@ const AdminPanel = () => {
   }
 
   const handleFileChange = (e, fieldName, formType = "product") => {
-    const file = e.target.files?.[0]
+    const files = e.target.files
+
     if (formType === "product") {
-      setProductForm({ ...productForm, [fieldName]: file })
+      setProductForm((prev) => ({
+        ...prev,
+        [fieldName]: fieldName === "gallery" ? files : files[0],
+      }))
     } else if (formType === "book") {
-      setBookForm({ ...bookForm, [fieldName]: file })
+      setBookForm((prev) => ({
+        ...prev,
+        [fieldName]: fieldName === "gallery" ? files : files[0],
+      }))
     }
   }
 
