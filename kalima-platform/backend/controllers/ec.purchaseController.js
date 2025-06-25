@@ -1,4 +1,5 @@
 const ECPurchase = require("../models/ec.purchaseModel");
+const ECCoupon = require("../models/ec.couponModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
@@ -23,6 +24,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   const purchases = await features.query.populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "couponCode", select: "couponCode value expirationDate" },
     {
       path: "productId",
       select: "title serial priceAfterDiscount section thumbnail",
@@ -50,6 +52,8 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
   const purchase = await ECPurchase.findById(req.params.id).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "couponCode", select: "couponCode value expirationDate" },
+
     {
       path: "productId",
       select: "title serial priceAfterDiscount section thumbnail",
@@ -90,6 +94,19 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   if (req.body.confirmedBy) {
     return next(new AppError("Purchase cannot be confirmed at creation", 400));
   }
+  let coupon;
+  if (req.body.couponCode) {
+    coupon = await ECCoupon.findOne({
+      couponCode: req.body.couponCode.toString(),
+    });
+    if (!coupon) {
+      return next(new AppError("Invalid or expired coupon code", 400));
+    }
+    // Check if the coupon is already used
+    if (coupon.isActive === false) {
+      return next(new AppError("Coupon code has already been used", 400));
+    }
+  }
   // Set the creator
 
   req.body.createdBy = req.user._id;
@@ -97,6 +114,16 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   req.body.productName = product.title;
   req.body.price = product.priceAfterDiscount;
   req.body.paymentNumber = product.paymentNumber;
+  req.body.finalPrice = req.body.price * 1 - (coupon ? coupon.value * 1 : 0);
+
+  // Set coupon ID instead of coupon code string
+  if (coupon) {
+    console.log("Coupon found:", coupon);
+    req.body.couponCode = coupon._id;
+  } else {
+    delete req.body.couponCode; // Remove couponCode if no coupon is used
+  }
+
   if (!req.user.userSerial) {
     return next(
       new AppError("User serial is required to create a purchase", 400)
@@ -114,11 +141,15 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   if (!purchase) {
     return next(new AppError("Purchase creation failed", 400));
   }
-
+  if (purchase && coupon) {
+    // Mark the coupon as used
+    await coupon.markAsUsed(purchase._id, req.user._id);
+  }
   res.status(201).json({
     status: "success",
     data: {
       purchase,
+      coupon: coupon ? coupon._id : null, // Return coupon ID if used
     },
   });
 });
@@ -128,13 +159,15 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   // Handle payment screenshot update
   if (req.file && req.file.fieldname === "paymentScreenShot") {
     req.body.paymentScreenShot = req.file.path;
-  } else if (typeof req.body.paymentScreenShot === 'undefined') {
+  } else if (typeof req.body.paymentScreenShot === "undefined") {
     req.body.paymentScreenShot = null;
   }
   // Remove fields that shouldn't be updated directly
   delete req.body.createdBy;
   delete req.body.createdAt;
   delete req.body.purchaseSerial; // Prevent manual serial modification
+  delete req.body.finalPrice;
+  delete req.body.couponCode;
 
   const purchase = await ECPurchase.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -272,7 +305,7 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
 
 // Get purchases by user
 exports.getPurchasesByUser = catchAsync(async (req, res, next) => {
-  if (req.user.role === "Parent" || "Student" || "Teacher") {
+  if (["Parent", "Student", "Teacher"].includes(req.user.role)) {
     req.body.userId = req.user._id;
   } else {
     if (req.params.userId) {
@@ -301,6 +334,7 @@ exports.getPurchasesByUser = catchAsync(async (req, res, next) => {
   const purchases = await features.query.populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "couponCode", select: "couponCode value expirationDate" },
     {
       path: "productId",
       select: "title serial priceAfterDiscount section thumbnail",
@@ -331,6 +365,7 @@ exports.searchBySerial = catchAsync(async (req, res, next) => {
   }).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "couponCode", select: "couponCode value expirationDate" },
     {
       path: "productId",
       select: "title serial priceAfterDiscount section thumbnail",

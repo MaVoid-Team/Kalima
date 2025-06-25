@@ -76,6 +76,22 @@ const ecPurchaseSchema = new mongoose.Schema(
       required: [true, "Payment screenshot is required"],
       trim: true,
     },
+    notes: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    couponCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ECCoupon",
+      default: null,
+    },
+    finalPrice: {
+      type: Number,
+      required: [true, "Final price is required"],
+      min: [0, "Final price cannot be negative"],
+      default: 0,
+    },
   },
   {
     timestamps: true,

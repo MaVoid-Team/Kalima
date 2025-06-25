@@ -3,11 +3,23 @@ class QueryFeatures {
     this.query = query;
     this.queryString = queryString;
   }
-
   filter() {
     const queryObj = { ...this.queryString };
     const excludedFields = ["page", "limit", "sort", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
+
+    // Handle ObjectId fields that might be passed as "null" string
+    const objectIdFields = [
+      "couponCode",
+      "createdBy",
+      "confirmedBy",
+      "productId",
+    ];
+    objectIdFields.forEach((field) => {
+      if (queryObj[field] === "null") {
+        queryObj[field] = null;
+      }
+    });
 
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
