@@ -218,10 +218,10 @@ const PurchaseForm = ({
           />
         </svg>
         <div>
-          <h4 className="font-semibold">Processing Time</h4>
+          <h4 className="font-semibold">{t("purchaseForm.processingTimeTitle")}</h4>
           <p>
-            After submitting your purchase request, our team will review and process your order. You can expect a
-            response within <strong>1-2 hours during business hours</strong>.
+            {t("purchaseForm.processingTimeDesc")}
+            <strong>1-2 {t("purchaseForm.hours")}</strong>
           </p>
         </div>
       </div>
