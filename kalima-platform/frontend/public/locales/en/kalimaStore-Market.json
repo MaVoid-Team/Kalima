@@ -1,20 +1,21 @@
 {
   "hero": {
-    "booksIllustration": "Books illustration",
-    "tagline": "Everything a teacher and student needs in one place"
+    "booksIllustration": "Books Illustration",
+    "tagline": "Discover and purchase products and books from all sections."
   },
   "categories": {
     "allSections": "All Sections"
   },
   "search": {
-    "placeholder": "What are you looking for?"
+    "placeholder": "Search for products..."
   },
   "sections": {
     "Designs": "Designs",
-    "Books": "Books"
+    "Books": "Books",
+    "default": "Section"
   },
   "product": {
-    "discounts": "Discounts",
+    "discounts": "Discount",
     "currency": "ج",
     "viewDetails": "View Details"
   },
@@ -23,11 +24,20 @@
     "description": "Try adjusting your search or filter criteria"
   },
   "pagination": {
-    "previous": "Previous page",
-    "next": "Next page"
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   },
   "errors": {
-    "loadingError": "Error loading market data",
-    "fetchErrorLog": "Error fetching market data:"
+    "loadingError": "Error loading data",
+    "fetchErrorLog": "Error fetching data:"
+  },
+  "empty": {
+    "noProducts": "No products found.",
+    "tryDifferentSearch": "Try a different search term."
+  },
+  "navigation": {
+    "goBack": "Go Back"
   }
 }
