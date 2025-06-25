@@ -18,8 +18,9 @@ const couponSchema = new mongoose.Schema(
         validator: function (v) {
           return /^[A-Z0-9]{8}$/.test(v);
         },
-        message: props => `${props.value} is not a valid coupon code! Must be 8 alphanumeric characters.`
-      }
+        message: (props) =>
+          `${props.value} is not a valid coupon code! Must be 8 alphanumeric characters.`,
+      },
     },
     isActive: {
       type: Boolean,
@@ -58,6 +59,7 @@ const couponSchema = new mongoose.Schema(
 // Index for active coupons
 couponSchema.index({ isActive: 1 });
 couponSchema.index({ expirationDate: 1 });
+couponSchema.index({ couponCode: 1 });
 
 // Virtual for checking if coupon is expired
 couponSchema.virtual("isExpired").get(function () {
@@ -68,8 +70,8 @@ couponSchema.virtual("isExpired").get(function () {
 couponSchema.virtual("expirationDateFormatted").get(function () {
   if (!this.expirationDate) return null;
   const d = new Date(this.expirationDate);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
   const year = d.getFullYear();
   return `${day}-${month}-${year}`;
 });
@@ -92,12 +94,12 @@ couponSchema.pre("save", async function (next) {
 
 // Static method to generate random coupon code
 couponSchema.statics.generateCouponCode = async function () {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code;
   let exists;
 
   do {
-    code = '';
+    code = "";
     for (let i = 0; i < 8; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
