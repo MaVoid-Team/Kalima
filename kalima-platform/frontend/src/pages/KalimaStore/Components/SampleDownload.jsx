@@ -57,9 +57,9 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
         <div className="card bg-base-200 border-2 border-dashed border-base-300">
           <div className="card-body text-center">
             <div className="text-6xl mb-4">📄</div>
-            <h5 className="text-lg font-semibold mb-2">No Sample Available</h5>
+            <h5 className="text-lg font-semibold mb-2">{t("sample.noSample")}</h5>
             <p className="text-base-content/70">
-              This {type === "book" ? "book" : "product"} doesn't have a sample available for download.
+              {t("sample.noSampleDesc", { type: t(type === "book" ? "product.types.book" : "product.types.product") })}
             </p>
           </div>
         </div>
@@ -75,22 +75,22 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-4-4m4 4l4-4m-6 4h8" />
             </svg>
-            Sample Available
+            {t("sample.available")}
           </h4>
         </div>
 
         <div className="card-body text-center">
           <div className="text-6xl mb-4">📋</div>
-          <h5 className="text-xl font-semibold mb-2">PDF Sample</h5>
+          <h5 className="text-xl font-semibold mb-2">{t("sample.pdf")}</h5>
           <p className="mb-6 leading-relaxed">
-            Download a sample of this {type === "book" ? "book" : "product"} to preview the content before purchasing.
+            {t("sample.downloadDesc", { type: t(type === "book" ? "product.types.book" : "product.types.product") })}
           </p>
 
           <button onClick={handleDownloadSample} disabled={downloadLoading} className="btn btn-primary btn-lg">
             {downloadLoading ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                Downloading...
+                {t("sample.downloading")}
               </>
             ) : (
               <>
@@ -102,7 +102,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
                     d="M12 10v6m0 0l-4-4m4 4l4-4m-6 4h8"
                   />
                 </svg>
-                Download Sample PDF
+                {t("sample.downloadButton")}
               </>
             )}
           </button>
@@ -117,7 +117,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
               />
             </svg>
             <span className="text-sm">
-              File will be downloaded as: {title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_sample.pdf
+              {t("sample.fileWillBeDownloadedAs", { filename: title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + "_sample.pdf" })}
             </span>
           </div>
         </div>
