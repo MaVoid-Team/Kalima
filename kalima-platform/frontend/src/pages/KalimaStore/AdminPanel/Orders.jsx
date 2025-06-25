@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { getAllProductPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
 
 const Orders = () => {
-  const { t, i18n } = useTranslation("kalimaStore-admin")
+  const { t, i18n } = useTranslation("kalimaStore-orders")
   const isRTL = i18n.language === "ar"
 
   const [orders, setOrders] = useState([])
@@ -138,13 +138,13 @@ const Orders = () => {
           pending: prevStats.pending - 1,
         }))
 
-        alert("Order confirmed successfully!")
+        alert(t("alerts.orderConfirmed"))
       } else {
         throw new Error(response.error)
       }
     } catch (err) {
       console.error("Error confirming order:", err)
-      alert("Failed to confirm order: " + err.message)
+      alert(t("alerts.failedToConfirm") + err.message)
     } finally {
       setConfirmLoading({ ...confirmLoading, [order._id]: false })
     }
@@ -203,11 +203,11 @@ const Orders = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">Error Loading Orders</h3>
+            <h3 className="font-bold">{t("errorLoadingOrders")}</h3>
             <div className="text-xs">{error}</div>
           </div>
           <button onClick={fetchOrders} className="btn btn-sm">
-            Retry
+            {t("retry")}
           </button>
         </div>
       </div>
@@ -221,7 +221,7 @@ const Orders = () => {
         <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
           <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
         </div>
-        <h1 className="text-3xl font-bold text-center">Orders Management</h1>
+        <h1 className="text-3xl font-bold text-center">{t("ordersManagement")}</h1>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
           <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
         </div>
@@ -234,7 +234,7 @@ const Orders = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📦</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">Total Orders</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.totalOrders")}</h3>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
@@ -246,7 +246,7 @@ const Orders = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">✅</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">Confirmed</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmed")}</h3>
                 <p className="text-2xl font-bold">{stats.confirmed}</p>
               </div>
             </div>
@@ -258,7 +258,7 @@ const Orders = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">⏳</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">Pending</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.pending")}</h3>
                 <p className="text-2xl font-bold">{stats.pending}</p>
               </div>
             </div>
@@ -270,7 +270,7 @@ const Orders = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📚</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">Books</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.books")}</h3>
                 <p className="text-2xl font-bold">{stats.books}</p>
               </div>
             </div>
@@ -282,7 +282,7 @@ const Orders = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">🛍️</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">Products</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.products")}</h3>
                 <p className="text-2xl font-bold">{stats.products}</p>
               </div>
             </div>
@@ -298,7 +298,7 @@ const Orders = () => {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Search by user name, product name, or serial..."
+                placeholder={t("searchPlaceholder")}
                 className="input input-bordered w-full"
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -312,9 +312,9 @@ const Orders = () => {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
-                <option value="all">All Status</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="pending">Pending</option>
+                <option value="all">{t("filters.allStatus")}</option>
+                <option value="confirmed">{t("filters.confirmed")}</option>
+                <option value="pending">{t("filters.pending")}</option>
               </select>
             </div>
 
@@ -325,16 +325,16 @@ const Orders = () => {
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
               >
-                <option value="all">All Types</option>
-                <option value="book">Books</option>
-                <option value="product">Products</option>
+                <option value="all">{t("filters.allTypes")}</option>
+                <option value="book">{t("filters.books")}</option>
+                <option value="product">{t("filters.products")}</option>
               </select>
             </div>
 
             {/* Refresh Button */}
             <button onClick={fetchOrders} className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
-              Refresh
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "\ud83d\udd04"}
+              {t("refresh")}
             </button>
           </div>
         </div>
@@ -346,14 +346,14 @@ const Orders = () => {
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">Product</th>
-                <th className="text-center">Customer</th>
-                <th className="text-center">Type</th>
-                <th className="text-center">Price</th>
-                <th className="text-center">Transfer From</th>
-                <th className="text-center">Status</th>
-                <th className="text-center">Date</th>
-                <th className="text-center">Actions</th>
+                <th className="text-center">{t("table.product")}</th>
+                <th className="text-center">{t("table.customer")}</th>
+                <th className="text-center">{t("table.type")}</th>
+                <th className="text-center">{t("table.price")}</th>
+                <th className="text-center">{t("table.transferFrom")}</th>
+                <th className="text-center">{t("table.status")}</th>
+                <th className="text-center">{t("table.date")}</th>
+                <th className="text-center">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -388,7 +388,7 @@ const Orders = () => {
                   </td>
                   <td className="text-center">
                     <div className={`badge ${getOrderType(order) === "Book" ? "badge-primary" : "badge-secondary"}`}>
-                      {getOrderType(order)}
+                      {t(getOrderType(order) === "Book" ? "table.book" : "table.productType")}
                     </div>
                   </td>
                   <td className="text-center font-bold">{formatPrice(order.price)}</td>
@@ -396,11 +396,11 @@ const Orders = () => {
                   <td className="text-center">
                     {order.confirmed ? (
                       <div className="flex flex-col items-center gap-1">
-                        <div className="badge badge-success">Confirmed</div>
-                        {order.confirmedBy && <div className="text-xs opacity-50">by {order.confirmedBy.name}</div>}
+                        <div className="badge badge-success">{t("table.confirmed")}</div>
+                        {order.confirmedBy && <div className="text-xs opacity-50">{t("table.by")} {order.confirmedBy.name}</div>}
                       </div>
                     ) : (
-                      <div className="badge badge-warning">Pending</div>
+                      <div className="badge badge-warning">{t("table.pending")}</div>
                     )}
                   </td>
                   <td className="text-center text-sm">{order.formattedCreatedAt}</td>
@@ -409,7 +409,7 @@ const Orders = () => {
                       <button
                         className="btn btn-ghost btn-sm"
                         onClick={() => handleViewDetails(order)}
-                        title="View Details"
+                        title={t("table.viewDetails")}
                       >
                         👁️
                       </button>
@@ -417,7 +417,7 @@ const Orders = () => {
                         <button
                           className="btn btn-ghost btn-sm"
                           onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
-                          title="View Payment Screenshot"
+                          title={t("table.viewPaymentScreenshot")}
                         >
                           🖼️
                         </button>
@@ -427,7 +427,7 @@ const Orders = () => {
                           className="btn btn-success btn-sm"
                           onClick={() => handleConfirmOrder(order)}
                           disabled={confirmLoading[order._id]}
-                          title="Confirm Order"
+                          title={t("table.confirmOrder")}
                         >
                           {confirmLoading[order._id] ? (
                             <span className="loading loading-spinner loading-xs"></span>
@@ -448,8 +448,8 @@ const Orders = () => {
         {orders.length === 0 && (
           <div className="py-8 text-center">
             <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-xl font-semibold mb-2">No orders found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            <h3 className="text-xl font-semibold mb-2">{t("table.noOrdersFound")}</h3>
+            <p className="text-gray-500">{t("table.tryAdjustingSearch")}</p>
           </div>
         )}
       </div>
@@ -467,7 +467,7 @@ const Orders = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Previous
+              {t("table.previous")}
             </button>
 
             {/* Page Numbers */}
@@ -501,7 +501,7 @@ const Orders = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages || loading}
             >
-              Next
+              {t("table.next")}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -510,7 +510,7 @@ const Orders = () => {
 
           {/* Pagination Info */}
           <div className="text-sm text-gray-600">
-            Page {currentPage} of {totalPages} ({totalPurchases} total orders)
+            {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
           </div>
         </div>
       )}
@@ -519,20 +519,20 @@ const Orders = () => {
       {showDetailsModal && selectedOrder && (
         <div className="modal modal-open">
           <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-lg mb-4">Order Details</h3>
+            <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
 
             <div className="space-y-4">
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Order ID</span>
+                    <span className="label-text font-medium">{t("table.orderID")}</span>
                   </label>
                   <p className="font-mono text-sm">{selectedOrder._id}</p>
                 </div>
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Purchase Serial</span>
+                    <span className="label-text font-medium">{t("table.purchaseSerial")}</span>
                   </label>
                   <p className="font-mono text-sm">{selectedOrder.purchaseSerial}</p>
                 </div>
@@ -541,17 +541,17 @@ const Orders = () => {
               {/* Customer Info */}
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">Customer Information</span>
+                  <span className="label-text font-medium">{t("table.customerInfo")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>Name:</strong> {selectedOrder.userName}
+                    <strong>{t("table.name")}:</strong> {selectedOrder.userName}
                   </p>
                   <p>
-                    <strong>Email:</strong> {selectedOrder.createdBy?.email}
+                    <strong>{t("table.email")}:</strong> {selectedOrder.createdBy?.email}
                   </p>
                   <p>
-                    <strong>Role:</strong> {selectedOrder.createdBy?.role}
+                    <strong>{t("table.role")}:</strong> {selectedOrder.createdBy?.role}
                   </p>
                 </div>
               </div>
@@ -559,17 +559,17 @@ const Orders = () => {
               {/* Product Info */}
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">Product Information</span>
+                  <span className="label-text font-medium">{t("table.productInfo")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>Name:</strong> {selectedOrder.productName}
+                    <strong>{t("table.name")}:</strong> {selectedOrder.productName}
                   </p>
                   <p>
-                    <strong>Type:</strong> {getOrderType(selectedOrder)}
+                    <strong>{t("table.type")}:</strong> {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
                   </p>
                   <p>
-                    <strong>Price:</strong> {formatPrice(selectedOrder.price)}
+                    <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
                 </div>
               </div>
@@ -577,14 +577,14 @@ const Orders = () => {
               {/* Payment Info */}
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">Payment Information</span>
+                  <span className="label-text font-medium">{t("table.paymentInfo")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>Payment Number:</strong> {selectedOrder.paymentNumber}
+                    <strong>{t("table.paymentNumber")}:</strong> {selectedOrder.paymentNumber}
                   </p>
                   <p>
-                    <strong>Transferred From:</strong> {selectedOrder.numberTransferredFrom}
+                    <strong>{t("table.transferredFrom")}:</strong> {selectedOrder.numberTransferredFrom}
                   </p>
                   {selectedOrder.paymentScreenShot && (
                     <div className="mt-2">
@@ -592,7 +592,7 @@ const Orders = () => {
                         className="btn btn-primary btn-sm"
                         onClick={() => handleViewPaymentScreenshot(selectedOrder.paymentScreenShot)}
                       >
-                        View Payment Screenshot
+                        {t("table.viewPaymentScreenshot")}
                       </button>
                     </div>
                   )}
@@ -603,17 +603,17 @@ const Orders = () => {
               {selectedOrder.__t === "ECBookPurchase" && (
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Book Information</span>
+                    <span className="label-text font-medium">{t("table.bookInfo")}</span>
                   </label>
                   <div className="bg-base-200 p-3 rounded">
                     <p>
-                      <strong>Name on Book:</strong> {selectedOrder.nameOnBook}
+                      <strong>{t("table.nameOnBook")}:</strong> {selectedOrder.nameOnBook}
                     </p>
                     <p>
-                      <strong>Number on Book:</strong> {selectedOrder.numberOnBook}
+                      <strong>{t("table.numberOnBook")}:</strong> {selectedOrder.numberOnBook}
                     </p>
                     <p>
-                      <strong>Series Name:</strong> {selectedOrder.seriesName}
+                      <strong>{t("table.seriesName")}:</strong> {selectedOrder.seriesName}
                     </p>
                   </div>
                 </div>
@@ -622,18 +622,18 @@ const Orders = () => {
               {/* Status Info */}
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">Status Information</span>
+                  <span className="label-text font-medium">{t("table.statusInfo")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>Status:</strong> {selectedOrder.confirmed ? "Confirmed" : "Pending"}
+                    <strong>{t("table.status")}:</strong> {selectedOrder.confirmed ? t("table.confirmed") : t("table.pending")}
                   </p>
                   <p>
-                    <strong>Created:</strong> {selectedOrder.formattedCreatedAt}
+                    <strong>{t("table.created")}:</strong> {selectedOrder.formattedCreatedAt}
                   </p>
                   {selectedOrder.confirmedBy && (
                     <p>
-                      <strong>Confirmed by:</strong> {selectedOrder.confirmedBy.name}
+                      <strong>{t("table.confirmedBy")}:</strong> {selectedOrder.confirmedBy.name}
                     </p>
                   )}
                 </div>
@@ -648,7 +648,7 @@ const Orders = () => {
                   setSelectedOrder(null)
                 }}
               >
-                Close
+                {t("table.close")}
               </button>
               {!selectedOrder.confirmed && (
                 <button
@@ -663,7 +663,7 @@ const Orders = () => {
                   {confirmLoading[selectedOrder._id] ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    "Confirm Order"
+                    t("table.confirmOrder")
                   )}
                 </button>
               )}
