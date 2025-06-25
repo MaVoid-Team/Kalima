@@ -25,7 +25,10 @@
       "actions": "Actions",
       "edit": "Edit",
       "delete": "Delete"
-    }
+    },
+    "noSectionsAvailable": "No sections available",
+    "noSections": "No sections found",
+    "tryDifferentSearch": "Try a different search term"
   },
   "forms": {
     "createProduct": {
@@ -80,6 +83,18 @@
       "message": "Are you sure you want to delete the section \"{{sectionName}}\"? This action cannot be undone.",
       "cancelButton": "Cancel",
       "deleteButton": "Delete"
+    },
+    "editProduct": {
+      "title": "Edit Product",
+      "cancelButton": "Cancel",
+      "updateButton": "Update Product",
+      "leaveEmptyToKeep": "Leave empty to keep current value"
+    },
+    "deleteProduct": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete the product \"{{productName}}\"? This action cannot be undone.",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete"
     }
   },
   "alerts": {
@@ -95,5 +110,50 @@
   },
   "error": {
     "title": "Error!"
+  },
+  "productsManagement": {
+    "title": "Products Management",
+    "searchPlaceholder": "Search products...",
+    "table": {
+      "thumbnail": "Thumbnail",
+      "title": "Title",
+      "serial": "Serial",
+      "section": "Section",
+      "price": "Price",
+      "discount": "Discount",
+      "finalPrice": "Final Price",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "view": "View"
+    },
+    "noProductsAvailable": "No products available",
+    "noProducts": "No products found",
+    "tryDifferentSearch": "Try a different search term"
+  },
+  "export": {
+    "title": "Title",
+    "serial": "Serial",
+    "section": "Section",
+    "subject": "Subject",
+    "price": "Price",
+    "discount": "Discount %",
+    "finalPrice": "Final Price",
+    "paymentNumber": "Payment Number",
+    "type": "Type",
+    "createdDate": "Created Date",
+    "name": "Name",
+    "number": "Number",
+    "description": "Description",
+    "productCount": "Product Count",
+    "thumbnail": "Thumbnail",
+    "error": "Failed to export data. Please try again.",
+    "totalProducts": "Total Products",
+    "totalBooks": "Total Books",
+    "totalSections": "Total Sections",
+    "totalItems": "Total Items"
+  },
+  "products": {
+    "unknownSection": "Unknown Section"
   }
 }
