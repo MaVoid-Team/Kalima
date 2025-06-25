@@ -25,7 +25,10 @@
       "actions": "الإجراءات",
       "edit": "تعديل",
       "delete": "حذف"
-    }
+    },
+    "noSectionsAvailable": "لا توجد أقسام متاحة",
+    "noSections": "لم يتم العثور على أقسام",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف"
   },
   "forms": {
     "createProduct": {
@@ -80,6 +83,18 @@
       "message": "هل أنت متأكد من أنك تريد حذف القسم \"{{sectionName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
       "cancelButton": "إلغاء",
       "deleteButton": "حذف"
+    },
+    "editProduct": {
+      "title": "تعديل المنتج",
+      "cancelButton": "إلغاء",
+      "updateButton": "تحديث المنتج",
+      "leaveEmptyToKeep": "اتركه فارغًا للاحتفاظ بالقيمة الحالية"
+    },
+    "deleteProduct": {
+      "title": "تأكيد الحذف",
+      "message": "هل أنت متأكد أنك تريد حذف المنتج \"{{productName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancelButton": "إلغاء",
+      "deleteButton": "حذف"
     }
   },
   "alerts": {
@@ -95,5 +110,50 @@
   },
   "error": {
     "title": "خطأ!"
+  },
+  "productsManagement": {
+    "title": "إدارة المنتجات",
+    "searchPlaceholder": "ابحث في المنتجات...",
+    "table": {
+      "thumbnail": "صورة مصغرة",
+      "title": "العنوان",
+      "serial": "الرقم التسلسلي",
+      "section": "القسم",
+      "price": "السعر",
+      "discount": "الخصم",
+      "finalPrice": "السعر النهائي",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "view": "عرض"
+    },
+    "noProductsAvailable": "لا توجد منتجات متاحة",
+    "noProducts": "لم يتم العثور على منتجات",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف"
+  },
+  "export": {
+    "title": "العنوان",
+    "serial": "الرقم التسلسلي",
+    "section": "القسم",
+    "subject": "المادة",
+    "price": "السعر",
+    "discount": "نسبة الخصم %",
+    "finalPrice": "السعر النهائي",
+    "paymentNumber": "رقم الدفع",
+    "type": "النوع",
+    "createdDate": "تاريخ الإنشاء",
+    "name": "الاسم",
+    "number": "الرقم",
+    "description": "الوصف",
+    "productCount": "عدد المنتجات",
+    "thumbnail": "الصورة المصغرة",
+    "error": "فشل في تصدير البيانات. يرجى المحاولة مرة أخرى.",
+    "totalProducts": "إجمالي المنتجات",
+    "totalBooks": "إجمالي الكتب",
+    "totalSections": "إجمالي الأقسام",
+    "totalItems": "إجمالي العناصر"
+  },
+  "products": {
+    "unknownSection": "قسم غير معروف"
   }
 }
