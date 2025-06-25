@@ -113,7 +113,10 @@
     "orBrowse": "or click to browse files",
     "maxFileSize": "Maximum file size: 10MB • Supported: JPG, PNG, PDF",
     "chooseFile": "Choose File",
-    "submit": "Submit Purchase"
+    "submit": "Submit Purchase",
+    "processingTimeTitle": "Processing Time",
+    "processingTimeDesc": "After submitting your purchase request, our team will review and process your order. You can expect a response within ",
+    "hours": "hours during business hours"
   },
   "sample": {
     "noSample": "No Sample Available",
