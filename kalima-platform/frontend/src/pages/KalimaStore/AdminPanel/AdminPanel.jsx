@@ -26,7 +26,11 @@ const AdminPanel = () => {
   const isRTL = i18n.language === "ar"
 
   // Use custom hook for data management
-  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts } =
+  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts,productsPagination,
+    productsLoading,
+    goToPage,
+    changeItemsPerPage,
+    searchProducts, } =
     useAdminData()
 
   // Local state
@@ -573,6 +577,11 @@ const AdminPanel = () => {
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
+            productsPagination={productsPagination}
+            productsLoading={productsLoading}
+            onPageChange={goToPage}
+            onItemsPerPageChange={changeItemsPerPage}
+            onSearch={searchProducts}
           />
 
           <SectionsManagement
