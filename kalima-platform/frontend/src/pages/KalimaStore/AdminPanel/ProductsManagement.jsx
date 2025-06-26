@@ -1,5 +1,6 @@
 "use client"
 import { useTranslation } from "react-i18next"
+import { useState, useEffect } from "react"
 
 const ProductsManagement = ({
   products = [],
@@ -12,8 +13,26 @@ const ProductsManagement = ({
   onDeleteProduct,
   actionLoading,
   isRTL,
+  // Pagination props
+  productsPagination,
+  productsLoading,
+  onPageChange,
+  onItemsPerPageChange,
+  onSearch,
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
+  const [searchInput, setSearchInput] = useState(productSearchQuery || "")
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (onSearch && searchInput !== productSearchQuery) {
+        onSearch(searchInput)
+      }
+    }, 500) // 500ms delay
+
+    return () => clearTimeout(timeoutId)
+  }, [searchInput, onSearch, productSearchQuery])
 
   const getFileUrl = (filename) => {
     if (!filename) return null;
@@ -48,11 +67,108 @@ const ProductsManagement = ({
     return (price - discountAmount).toFixed(2)
   }
 
-  // Filter products with error handling
-  const filteredProducts = (products || []).filter((product) => {
-    if (!product?.title) return false
-    return product.title.toLowerCase().includes((productSearchQuery || "").toLowerCase())
-  })
+  // Pagination component
+  const PaginationControls = () => {
+    const { currentPage, totalPages, totalItems, itemsPerPage, hasNextPage, hasPrevPage } = productsPagination
+
+    const getPageNumbers = () => {
+      const pages = []
+      const maxVisiblePages = 5
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+      const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1)
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+      }
+      return pages
+    }
+
+    return (
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+        {/* Items per page selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">{t("pagination.itemsPerPage") || "Items per page:"}</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => onItemsPerPageChange?.(Number(e.target.value))}
+            className="select select-bordered select-sm"
+            disabled={productsLoading}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+
+        {/* Pagination info */}
+        <div className="text-sm text-gray-600">
+          {t("pagination.showing") || "Showing"} {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} -{" "}
+          {Math.min(currentPage * itemsPerPage, totalItems)} {t("pagination.of") || "of"} {totalItems}{" "}
+          {t("pagination.items") || "items"}
+        </div>
+
+        {/* Pagination buttons */}
+        <div className="flex items-center gap-1">
+          {/* First page */}
+          <button
+            onClick={() => onPageChange?.(1)}
+            disabled={!hasPrevPage || productsLoading}
+            className="btn btn-sm btn-outline"
+            title={t("pagination.firstPage") || "First page"}
+          >
+            ⟪
+          </button>
+
+          {/* Previous page */}
+          <button
+            onClick={() => onPageChange?.(currentPage - 1)}
+            disabled={!hasPrevPage || productsLoading}
+            className="btn btn-sm btn-outline"
+            title={t("pagination.previousPage") || "Previous page"}
+          >
+            ⟨
+          </button>
+
+          {/* Page numbers */}
+          {getPageNumbers().map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => onPageChange?.(pageNum)}
+              disabled={productsLoading}
+              className={`btn btn-sm ${pageNum === currentPage ? "btn-primary" : "btn-outline"}`}
+            >
+              {pageNum}
+            </button>
+          ))}
+
+          {/* Next page */}
+          <button
+            onClick={() => onPageChange?.(currentPage + 1)}
+            disabled={!hasNextPage || productsLoading}
+            className="btn btn-sm btn-outline"
+            title={t("pagination.nextPage") || "Next page"}
+          >
+            ⟩
+          </button>
+
+          {/* Last page */}
+          <button
+            onClick={() => onPageChange?.(totalPages)}
+            disabled={!hasNextPage || productsLoading}
+            className="btn btn-sm btn-outline"
+            title={t("pagination.lastPage") || "Last page"}
+          >
+            ⟫
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="mb-12">
@@ -73,20 +189,29 @@ const ProductsManagement = ({
           <input
             type="text"
             placeholder={t("productsManagement.searchPlaceholder") || "Search products..."}
-            value={productSearchQuery || ""}
-            onChange={(e) => setProductSearchQuery?.(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className={`input input-bordered w-full ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
+            disabled={productsLoading}
           />
           <button
             className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm`}
+            disabled={productsLoading}
           >
-            🔍
+            {productsLoading ? <span className="loading loading-spinner loading-xs"></span> : "🔍"}
           </button>
         </div>
       </div>
 
       {/* Products Table */}
       <div className="card shadow-lg overflow-hidden relative">
+        {/* Loading overlay */}
+        {productsLoading && (
+          <div className="absolute inset-0 bg-base-100 bg-opacity-50 flex items-center justify-center z-10">
+            <div className="loading loading-spinner loading-lg"></div>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
@@ -102,7 +227,7 @@ const ProductsManagement = ({
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => {
+              {products.map((product) => {
                 if (!product?._id) return null
 
                 return (
@@ -133,7 +258,7 @@ const ProductsManagement = ({
                           className="btn btn-ghost btn-sm"
                           title={t("productsManagement.table.edit") || "Edit"}
                           onClick={() => onEditProduct?.(product)}
-                          disabled={actionLoading}
+                          disabled={actionLoading || productsLoading}
                         >
                           ✏️
                         </button>
@@ -141,11 +266,15 @@ const ProductsManagement = ({
                           className="btn btn-ghost btn-sm"
                           title={t("productsManagement.table.delete") || "Delete"}
                           onClick={() => onDeleteProduct?.(product)}
-                          disabled={actionLoading}
+                          disabled={actionLoading || productsLoading}
                         >
                           🗑️
                         </button>
-                        <button className="btn btn-ghost btn-sm" title={t("productsManagement.table.view") || "View"}>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          title={t("productsManagement.table.view") || "View"}
+                          disabled={productsLoading}
+                        >
                           👁️
                         </button>
                       </div>
@@ -158,18 +287,25 @@ const ProductsManagement = ({
         </div>
 
         {/* Empty state */}
-        {filteredProducts.length === 0 && (
+        {!productsLoading && products.length === 0 && (
           <div className="py-8 text-center">
             <p className="text-gray-500">
-              {products.length === 0
-                ? t("productsManagement.noProductsAvailable") || "No products available"
-                : t("productsManagement.noProducts") || "No products found"}
+              {searchInput
+                ? t("productsManagement.noProducts") || "No products found"
+                : t("productsManagement.noProductsAvailable") || "No products available"}
             </p>
-            {productSearchQuery && (
+            {searchInput && (
               <p className="text-sm text-gray-400 mt-2">
                 {t("productsManagement.tryDifferentSearch") || "Try a different search term"}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!productsLoading && products.length > 0 && productsPagination && (
+          <div className="p-4 border-t">
+            <PaginationControls />
           </div>
         )}
 

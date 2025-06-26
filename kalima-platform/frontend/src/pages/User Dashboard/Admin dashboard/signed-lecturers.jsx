@@ -9,7 +9,7 @@ import { getAllLecturers } from "../../../routes/fetch-users"
 import { getUserDashboard } from "../../../routes/auth-services"
 
 const SignedLecturers = () => {
-  const { t, i18n } = useTranslation("admin")
+  const { t, i18n } = useTranslation("admin-signedLecturers")
   const isRTL = i18n.language === "ar"
   const dir = isRTL ? "rtl" : "ltr"
   const navigate = useNavigate()

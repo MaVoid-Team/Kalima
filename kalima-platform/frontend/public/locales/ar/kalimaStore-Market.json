@@ -1,33 +1,43 @@
 {
   "hero": {
     "booksIllustration": "رسم توضيحي للكتب",
-    "tagline": "كل ما يحتاجه المعلم والطالب في مكان واحد"
+    "tagline": "اكتشف واشترِ المنتجات والكتب من جميع الأقسام."
   },
   "categories": {
     "allSections": "جميع الأقسام"
   },
   "search": {
-    "placeholder": "ماذا تبحث عنه؟"
+    "placeholder": "ابحث عن المنتجات..."
   },
   "product": {
-    "discounts": "خصومات",
+    "discounts": "خصم",
     "currency": "ج",
     "viewDetails": "عرض التفاصيل"
   },
   "sections": {
     "Designs": "تصاميم",
-    "Books": "كتب"
+    "Books": "كتب",
+    "default": "القسم"
   },
   "emptyState": {
     "title": "لم يتم العثور على عناصر",
     "description": "حاول تعديل معايير البحث أو التصفية"
   },
   "pagination": {
-    "previous": "الصفحة السابقة",
-    "next": "الصفحة التالية"
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة",
+    "of": "من"
   },
   "errors": {
-    "loadingError": "خطأ في تحميل بيانات السوق",
-    "fetchErrorLog": "خطأ في جلب بيانات السوق:"
+    "loadingError": "خطأ في تحميل البيانات",
+    "fetchErrorLog": "خطأ في جلب البيانات:"
+  },
+  "empty": {
+    "noProducts": "لم يتم العثور على منتجات.",
+    "tryDifferentSearch": "جرب مصطلح بحث مختلف."
+  },
+  "navigation": {
+    "goBack": "العودة"
   }
 }

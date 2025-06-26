@@ -43,7 +43,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
         <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
         <div className="flex flex-wrap gap-2">
           <div className={`badge ${actualType === "book" ? "badge-success" : "badge-info"}`}>
-            {actualType === "book" ? "📚 Book" : "📦 Product"}
+            {actualType === "book" ? `📚 ${t("product.types.book")}` : `📦 ${t("product.types.product")}`}
           </div>
           <div className="badge badge-outline">{getItemCategory()}</div>
           {product.__t && <div className="badge badge-ghost text-xs">__t: {product.__t}</div>}
@@ -63,11 +63,11 @@ const ProductInfo = ({ product, type, isRTL }) => {
                   d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
                 />
               </svg>
-              <span className="font-semibold">Serial Number</span>
+              <span className="font-semibold">{t("product.serial")}</span>
             </div>
             <p className="font-mono text-lg">{product.serial}</p>
           </div>
-                    <div className="card-body p-4">
+          <div className="card-body p-4">
             <div className="flex items-center gap-2 mb-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -77,7 +77,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
                   d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
                 />
               </svg>
-              <span className="font-semibold">Whatsapp Number (for any questions)</span>
+              <span className="font-semibold">{t("product.whatsapp")}</span>
             </div>
             <p className="font-mono text-lg">{product.whatsAppNumber}</p>
           </div>
@@ -95,7 +95,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <span className="font-semibold">Description</span>
+                <span className="font-semibold">{t("product.description")}</span>
               </div>
               <p className="leading-relaxed">{product.description}</p>
             </div>
@@ -115,7 +115,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
-                <span className="font-semibold">Subject</span>
+                <span className="font-semibold">{t("product.subject")}</span>
               </div>
               <p className="text-lg">{product.subject.name}</p>
             </div>
@@ -128,7 +128,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
         <div className="card-body">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm opacity-90 mb-1">Price</p>
+              <p className="text-sm opacity-90 mb-1">{t("product.price")}</p>
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold">
                   {getDisplayPrice()} {t("product.currency")}
@@ -143,9 +143,9 @@ const ProductInfo = ({ product, type, isRTL }) => {
 
             {hasDiscount() && (
               <div className="text-right">
-                <div className="badge badge-error badge-lg font-bold">{product.discountPercentage}% OFF</div>
+                <div className="badge badge-error badge-lg font-bold">{product.discountPercentage}% {t("product.off")}</div>
                 <p className="text-sm opacity-90 mt-1">
-                  Save {(product.price - getDisplayPrice()).toFixed(2)} {t("product.currency")}
+                  {t("product.save", { amount: (product.price - getDisplayPrice()).toFixed(2), currency: t("product.currency") })}
                 </p>
               </div>
             )}
@@ -162,8 +162,8 @@ const ProductInfo = ({ product, type, isRTL }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <div>
-                <p className="font-semibold">Instant Access</p>
-                <p className="text-sm opacity-90">Download immediately</p>
+                <p className="font-semibold">{t("product.instantAccess")}</p>
+                <p className="text-sm opacity-90">{t("product.downloadImmediately")}</p>
               </div>
             </div>
           </div>
@@ -181,8 +181,8 @@ const ProductInfo = ({ product, type, isRTL }) => {
                 />
               </svg>
               <div>
-                <p className="font-semibold">Secure Payment</p>
-                <p className="text-sm opacity-90">Safe & protected</p>
+                <p className="font-semibold">{t("product.securePayment")}</p>
+                <p className="text-sm opacity-90">{t("product.safeProtected")}</p>
               </div>
             </div>
           </div>

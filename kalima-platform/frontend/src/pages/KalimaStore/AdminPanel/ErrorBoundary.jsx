@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { withTranslation } from "react-i18next"
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -21,6 +22,7 @@ class ErrorBoundary extends React.Component {
   }
 
   render() {
+    const { t } = this.props;
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center">
@@ -39,10 +41,10 @@ class ErrorBoundary extends React.Component {
               />
             </svg>
             <div>
-              <h3 className="font-bold">Something went wrong</h3>
-              <div className="text-xs">{this.state.error?.message || "An unexpected error occurred"}</div>
+              <h3 className="font-bold">{t("errorTitle")}</h3>
+              <div className="text-xs">{this.state.error?.message || t("unexpectedError")}</div>
               <button className="btn btn-sm btn-outline mt-2" onClick={() => window.location.reload()}>
-                Reload Page
+                {t("reloadButton")}
               </button>
             </div>
           </div>
@@ -54,4 +56,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default ErrorBoundary
+export default withTranslation("kalimaStore-errorBoundary")(ErrorBoundary)
