@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const ProductGallery = ({ gallery = [], title }) => {
   const [selectedImage, setSelectedImage] = useState(0)
+  const { t } = useTranslation("kalimaStore-ProductDetails")
 
   const convertPathToUrl = (filePath) => {
   if (!filePath) return null
@@ -31,8 +33,8 @@ const ProductGallery = ({ gallery = [], title }) => {
         <div className="card bg-base-200 border-2 border-dashed border-base-300">
           <div className="card-body text-center">
             <div className="text-6xl mb-4">🖼️</div>
-            <h5 className="text-lg font-semibold mb-2">No Gallery Images</h5>
-            <p className="text-base-content/70">No gallery images available for this product.</p>
+            <h5 className="text-lg font-semibold mb-2">{t("gallery.noImages")}</h5>
+            <p className="text-base-content/70">{t("gallery.noImagesDesc")}</p>
           </div>
         </div>
       </div>
@@ -52,7 +54,7 @@ const ProductGallery = ({ gallery = [], title }) => {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            Product Gallery
+            {t("gallery.title")}
           </h4>
         </div>
 
@@ -96,7 +98,7 @@ const ProductGallery = ({ gallery = [], title }) => {
               {/* Image Counter */}
               <div className="text-center">
                 <div className="badge badge-outline">
-                  {selectedImage + 1} of {galleryImages.length}
+                  {t("gallery.imageCounter", { current: selectedImage + 1, total: galleryImages.length })}
                 </div>
               </div>
             </div>

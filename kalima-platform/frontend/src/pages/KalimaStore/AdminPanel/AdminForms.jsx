@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const AdminForms = ({
@@ -20,6 +21,120 @@ const AdminForms = ({
   isRTL,
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
+
+  // Upload progress states
+  const [uploadProgress, setUploadProgress] = useState({
+    thumbnail: { file: null, uploading: false, progress: 0, completed: false, error: null },
+    sample: { file: null, uploading: false, progress: 0, completed: false, error: null },
+    gallery: { files: [], uploading: false, progress: 0, completed: false, error: null },
+  })
+
+  // Handle file selection with progress tracking
+  const handleFileSelect = (e, fieldName, formType) => {
+    const files = e.target.files
+    const file = files[0]
+
+    if (!file) return
+
+    // Update form state
+    if (formType === "product") {
+      setProductForm?.((prev) => ({
+        ...prev,
+        [fieldName]: fieldName === "gallery" ? files : file,
+      }))
+    } else if (formType === "book") {
+      setBookForm?.((prev) => ({
+        ...prev,
+        [fieldName]: fieldName === "gallery" ? files : file,
+      }))
+    }
+
+    // Update upload progress state
+    setUploadProgress((prev) => ({
+      ...prev,
+      [fieldName]: {
+        file: fieldName === "gallery" ? files : file,
+        uploading: false,
+        progress: 0,
+        completed: false,
+        error: null,
+      },
+    }))
+
+    // Call original file change handler
+    onFileChange?.(e, fieldName, formType)
+  }
+
+  // Handle upload completion
+  const handleUploadComplete = (response, fieldName) => {
+    setUploadProgress((prev) => ({
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        uploading: false,
+        progress: 100,
+        completed: true,
+        error: null,
+      },
+    }))
+
+    // Update form with server response if needed
+    const currentForm = activeTab === "product" ? productForm : bookForm
+    const setCurrentForm = activeTab === "product" ? setProductForm : setBookForm
+
+    if (response?.url || response?.path) {
+      setCurrentForm?.((prev) => ({
+        ...prev,
+        [`${fieldName}Url`]: response.url || response.path,
+      }))
+    }
+  }
+
+  // Handle upload error
+  const handleUploadError = (error, fieldName) => {
+    setUploadProgress((prev) => ({
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        uploading: false,
+        error: error,
+      },
+    }))
+  }
+
+  // Simulate upload progress (replace with actual upload endpoint)
+  const simulateUpload = (file, fieldName) => {
+    if (!file) return
+
+    setUploadProgress((prev) => ({
+      ...prev,
+      [fieldName]: {
+        ...prev[fieldName],
+        uploading: true,
+        progress: 0,
+        error: null,
+      },
+    }))
+
+    // Simulate progress
+    let progress = 0
+    const interval = setInterval(() => {
+      progress += Math.random() * 15
+      if (progress >= 100) {
+        progress = 100
+        clearInterval(interval)
+        handleUploadComplete({ url: `uploaded/${file.name}` }, fieldName)
+      }
+
+      setUploadProgress((prev) => ({
+        ...prev,
+        [fieldName]: {
+          ...prev[fieldName],
+          progress: Math.round(progress),
+        },
+      }))
+    }, 200)
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -103,11 +218,11 @@ const AdminForms = ({
                 />
               </div>
 
-              {/* Thumbnail Field */}
+              {/* Thumbnail Field with Progress */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
-                    {t("forms.createProduct.fields.thumbnail") || "Thumbnail"}
+                    {t("forms.createProduct.fields.thumbnail") || "Thumbnail"} *
                   </span>
                 </label>
                 <input
@@ -115,9 +230,76 @@ const AdminForms = ({
                   id={`${activeTab}-thumbnail`}
                   className="file-input file-input-bordered w-full"
                   accept="image/*"
-                  onChange={(e) => onFileChange?.(e, "thumbnail", activeTab)}
+                  onChange={(e) => handleFileSelect(e, "thumbnail", activeTab)}
                 />
-                <p className="text-xs mt-1">{t("forms.createProduct.hints.thumbnail") || "Upload thumbnail image"}</p>
+                <p className="text-xs mt-1 text-gray-500">
+                  {t("forms.createProduct.hints.thumbnail") || "Upload thumbnail image (JPG, PNG, WebP)"}
+                </p>
+
+                {/* Thumbnail Upload Progress */}
+                {uploadProgress.thumbnail.file && (
+                  <div className="mt-3 p-3 bg-base-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium truncate max-w-48">
+                          {uploadProgress.thumbnail.file.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ({(uploadProgress.thumbnail.file.size / 1024 / 1024).toFixed(2)} MB)
+                        </div>
+                      </div>
+
+                      {uploadProgress.thumbnail.completed && (
+                        <div className="flex items-center gap-1 text-success">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span className="text-xs">Ready</span>
+                        </div>
+                      )}
+
+                      {!uploadProgress.thumbnail.completed && (
+                        <button
+                          type="button"
+                          onClick={() => simulateUpload(uploadProgress.thumbnail.file, "thumbnail")}
+                          className="btn btn-xs btn-primary"
+                          disabled={uploadProgress.thumbnail.uploading}
+                        >
+                          {uploadProgress.thumbnail.uploading ? (
+                            <>
+                              <span className="loading loading-spinner loading-xs"></span>
+                              {uploadProgress.thumbnail.progress}%
+                            </>
+                          ) : (
+                            "Upload"
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          uploadProgress.thumbnail.error
+                            ? "bg-error"
+                            : uploadProgress.thumbnail.completed
+                              ? "bg-success"
+                              : "bg-primary"
+                        }`}
+                        style={{ width: `${uploadProgress.thumbnail.progress}%` }}
+                      ></div>
+                    </div>
+
+                    {uploadProgress.thumbnail.error && (
+                      <div className="mt-2 text-xs text-error">{uploadProgress.thumbnail.error}</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Section Field */}
@@ -149,6 +331,32 @@ const AdminForms = ({
                   )}
                 </select>
               </div>
+
+              {/* Subject field - only for books */}
+              {activeTab === "book" && (
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">
+                      {t("forms.createBook.fields.subject") || "Subject"} *
+                    </span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={bookForm?.subject || ""}
+                    onChange={(e) => setBookForm?.({ ...bookForm, subject: e.target.value })}
+                    required
+                  >
+                    <option value="">{t("forms.createBook.placeholders.subject") || "Select subject"}</option>
+                    {(subjects || []).map((subject) =>
+                      subject?._id && subject?.name ? (
+                        <option key={subject._id} value={subject._id}>
+                          {subject.name}
+                        </option>
+                      ) : null,
+                    )}
+                  </select>
+                </div>
+              )}
 
               {/* Price Field */}
               <div>
@@ -195,32 +403,6 @@ const AdminForms = ({
                 />
               </div>
 
-              {/* Subject field - only for books */}
-              {activeTab === "book" && (
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      {t("forms.createBook.fields.subject") || "Subject"} *
-                    </span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full"
-                    value={bookForm?.subject || ""}
-                    onChange={(e) => setBookForm?.({ ...bookForm, subject: e.target.value })}
-                    required
-                  >
-                    <option value="">{t("forms.createBook.placeholders.subject") || "Select subject"}</option>
-                    {(subjects || []).map((subject) =>
-                      subject?._id && subject?.name ? (
-                        <option key={subject._id} value={subject._id}>
-                          {subject.name}
-                        </option>
-                      ) : null,
-                    )}
-                  </select>
-                </div>
-              )}
-
               {/* Payment Number Field */}
               <div>
                 <label className="label">
@@ -244,23 +426,29 @@ const AdminForms = ({
                 />
               </div>
 
-              {/* WhatsApp Number field - for both fields */}
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">WhatsApp Number *</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter WhatsApp number"
-                    className="input input-bordered w-full"
-                    value={productForm?.whatsAppNumber || ""}
-                    onChange={(e) => setProductForm?.({ ...productForm, whatsAppNumber: e.target.value })}
-                    required
-                  />
-                  <p className="text-xs mt-1">Enter the WhatsApp number for customer contact</p>
-                </div>
+              {/* WhatsApp Number field */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">WhatsApp Number *</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter WhatsApp number"
+                  className="input input-bordered w-full"
+                  value={activeTab === "product" ? productForm?.whatsAppNumber || "" : bookForm?.whatsAppNumber || ""}
+                  onChange={(e) => {
+                    if (activeTab === "product") {
+                      setProductForm?.({ ...productForm, whatsAppNumber: e.target.value })
+                    } else {
+                      setBookForm?.({ ...bookForm, whatsAppNumber: e.target.value })
+                    }
+                  }}
+                  required
+                />
+                <p className="text-xs mt-1 text-gray-500">Enter the WhatsApp number for customer contact</p>
+              </div>
 
-              {/* Sample File Field */}
+              {/* Sample File Field with Progress */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
@@ -271,22 +459,91 @@ const AdminForms = ({
                   type="file"
                   id={`${activeTab}-sample`}
                   className="file-input file-input-bordered w-full"
-                  onChange={(e) => onFileChange?.(e, "sample", activeTab)}
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleFileSelect(e, "sample", activeTab)}
                 />
-                <p className="text-xs mt-1">{t("forms.createProduct.hints.sampleFile") || "Upload sample file"}</p>
+                <p className="text-xs mt-1 text-gray-500">
+                  {t("forms.createProduct.hints.sampleFile") || "Upload sample file (PDF, DOC, DOCX)"}
+                </p>
+
+                {/* Sample Upload Progress */}
+                {uploadProgress.sample.file && (
+                  <div className="mt-3 p-3 bg-base-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-medium truncate max-w-48">{uploadProgress.sample.file.name}</div>
+                        <div className="text-xs text-gray-500">
+                          ({(uploadProgress.sample.file.size / 1024 / 1024).toFixed(2)} MB)
+                        </div>
+                      </div>
+
+                      {uploadProgress.sample.completed && (
+                        <div className="flex items-center gap-1 text-success">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span className="text-xs">Ready</span>
+                        </div>
+                      )}
+
+                      {!uploadProgress.sample.completed && (
+                        <button
+                          type="button"
+                          onClick={() => simulateUpload(uploadProgress.sample.file, "sample")}
+                          className="btn btn-xs btn-primary"
+                          disabled={uploadProgress.sample.uploading}
+                        >
+                          {uploadProgress.sample.uploading ? (
+                            <>
+                              <span className="loading loading-spinner loading-xs"></span>
+                              {uploadProgress.sample.progress}%
+                            </>
+                          ) : (
+                            "Upload"
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          uploadProgress.sample.error
+                            ? "bg-error"
+                            : uploadProgress.sample.completed
+                              ? "bg-success"
+                              : "bg-primary"
+                        }`}
+                        style={{ width: `${uploadProgress.sample.progress}%` }}
+                      ></div>
+                    </div>
+
+                    {uploadProgress.sample.error && (
+                      <div className="mt-2 text-xs text-error">{uploadProgress.sample.error}</div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Description Field - Required for both products and books */}
+              {/* Description Field */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
-                    {activeTab === "product" ? "Description" : t("forms.createBook.fields.description") || "Description"} *
+                    {activeTab === "product"
+                      ? "Description"
+                      : t("forms.createBook.fields.description") || "Description"}{" "}
+                    *
                   </span>
                 </label>
                 <textarea
                   placeholder={
-                    activeTab === "product" 
-                      ? "Enter product description..." 
+                    activeTab === "product"
+                      ? "Enter product description..."
                       : t("forms.createBook.placeholders.description") || "Enter book description..."
                   }
                   className="textarea textarea-bordered w-full h-32"
@@ -300,9 +557,9 @@ const AdminForms = ({
                   }}
                   required
                 />
-                <p className="text-xs mt-1">
-                  {activeTab === "product" 
-                    ? "Provide a detailed description of the product" 
+                <p className="text-xs mt-1 text-gray-500">
+                  {activeTab === "product"
+                    ? "Provide a detailed description of the product"
                     : "Provide a detailed description of the book"}
                 </p>
               </div>
@@ -319,9 +576,9 @@ const AdminForms = ({
                     className="file-input file-input-bordered w-full"
                     accept="image/*"
                     multiple
-                    onChange={(e) => onFileChange?.(e, "gallery", "product")}
+                    onChange={(e) => handleFileSelect(e, "gallery", "product")}
                   />
-                  <p className="text-xs mt-1">Upload multiple images for the product gallery</p>
+                  <p className="text-xs mt-1 text-gray-500">Upload multiple images for the product gallery</p>
                   {productForm?.gallery && productForm.gallery.length > 0 && (
                     <div className="mt-2">
                       <p className="text-sm font-medium">Selected files: {productForm.gallery.length}</p>

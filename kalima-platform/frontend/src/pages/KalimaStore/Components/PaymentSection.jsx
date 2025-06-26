@@ -21,14 +21,14 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
     <div className="text-center space-y-8">
       {/* Section Header */}
       <div>
-        <h2 className="text-3xl font-bold mb-4">Payment Information</h2>
-        <p className="text-lg">Follow these simple steps to complete your purchase</p>
+        <h2 className="text-3xl font-bold mb-4">{t("paymentSection.title")}</h2>
+        <p className="text-lg">{t("paymentSection.subtitle")}</p>
       </div>
 
       {/* Payment Number Card */}
       <div className="card bg-primary text-primary-content">
         <div className="card-body">
-          <p className="text-sm opacity-90 mb-2">Payment Number</p>
+          <p className="text-sm opacity-90 mb-2">{t("paymentSection.paymentNumber")}</p>
           <button
             onClick={handleCopyNumber}
             className={`btn btn-lg font-mono text-2xl ${
@@ -45,8 +45,8 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
               />
             </svg>
           </button>
-          {copySuccess && <p className="text-sm opacity-90 mt-2">✓ Copied to clipboard!</p>}
-          <p className="opacity-90 mt-2">Click to copy the payment number</p>
+          {copySuccess && <p className="text-sm opacity-90 mt-2">{t("paymentSection.copied")}</p>}
+          <p className="opacity-90 mt-2">{t("paymentSection.copyHint")}</p>
         </div>
       </div>
 
@@ -57,8 +57,8 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
             <div className="flex items-start gap-4">
               <div className="badge badge-primary badge-lg">1</div>
               <div className="text-left">
-                <h3 className="font-semibold mb-2">Send Payment</h3>
-                <p>Transfer the exact amount to the payment number above using your preferred payment method.</p>
+                <h3 className="font-semibold mb-2">{t("paymentSection.step1.title")}</h3>
+                <p>{t("paymentSection.step1.desc")}</p>
               </div>
             </div>
           </div>
@@ -69,8 +69,8 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
             <div className="flex items-start gap-4">
               <div className="badge badge-secondary badge-lg">2</div>
               <div className="text-left">
-                <h3 className="font-semibold mb-2">Upload Screenshot</h3>
-                <p>Take a screenshot of your payment confirmation and upload it in the form below.</p>
+                <h3 className="font-semibold mb-2">{t("paymentSection.step2.title")}</h3>
+                <p>{t("paymentSection.step2.desc")}</p>
               </div>
             </div>
           </div>
@@ -88,11 +88,8 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
           />
         </svg>
         <div>
-          <h4 className="font-semibold">Important Note</h4>
-          <p>
-            Please ensure you send the exact amount and include the payment screenshot. We will process your order
-            within 1-2 hours during business hours.
-          </p>
+          <h4 className="font-semibold">{t("paymentSection.noteTitle")}</h4>
+          <p>{t("paymentSection.noteDesc")}</p>
         </div>
       </div>
     </div>

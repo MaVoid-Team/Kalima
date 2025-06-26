@@ -1,7 +1,7 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL
 
 // Function to get all sections (categories)
 export const getAllSections = async (queryParams = {}) => {
@@ -12,15 +12,15 @@ export const getAllSections = async (queryParams = {}) => {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    });
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error(`Error fetching sections: ${error.message}`);
-    throw error;
+    console.error(`Error fetching sections: ${error.message}`)
+    throw error
   }
-};
+}
 
-// Function to get all books
+// Function to get all books with pagination support
 export const getAllBooks = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/ec/books`, {
@@ -29,15 +29,15 @@ export const getAllBooks = async (queryParams = {}) => {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    });
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error(`Error fetching books: ${error.message}`);
-    throw error;
+    console.error(`Error fetching books: ${error.message}`)
+    throw error
   }
-};
+}
 
-// Function to get all products
+// Function to get all products with pagination support
 export const getAllProducts = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/ec/products`, {
@@ -46,13 +46,13 @@ export const getAllProducts = async (queryParams = {}) => {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    });
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error(`Error fetching products: ${error.message}`);
-    throw error;
+    console.error(`Error fetching products: ${error.message}`)
+    throw error
   }
-};
+}
 
 // Function to get a book by ID
 export const getBookById = async (bookId) => {
@@ -95,13 +95,13 @@ export const getBooksBySection = async (sectionId, queryParams = {}) => {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
-    });
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error(`Error fetching books by section: ${error.message}`);
-    throw error;
+    console.error(`Error fetching books by section: ${error.message}`)
+    throw error
   }
-};
+}
 
 export const getProductsBySection = async (sectionId, queryParams = {}) => {
   try {
@@ -118,13 +118,14 @@ export const getProductsBySection = async (sectionId, queryParams = {}) => {
     throw error
   }
 }
+
 export const createSection = async (sectionData) => {
   try {
     const response = await axios.post(`${API_URL}/ec/sections`, sectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     })
     return response.data
@@ -141,7 +142,7 @@ export const updateSection = async (sectionId, updateData) => {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     })
     return response.data
@@ -166,6 +167,7 @@ export const deleteSection = async (sectionId) => {
     throw error
   }
 }
+
 export const createProduct = async (productData) => {
   try {
     const formData = new FormData()
@@ -302,7 +304,7 @@ export const deleteProduct = async (productId) => {
 export const purchaseProduct = async (purchaseData) => {
   try {
     const formData = new FormData()
-    
+
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
     if (purchaseData.paymentScreenShot) {
@@ -328,7 +330,7 @@ export const purchaseBook = async (purchaseData) => {
   try {
     console.log("Purchase Data:", purchaseData)
     const formData = new FormData()
-    
+
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
     if (purchaseData.paymentScreenShot) {

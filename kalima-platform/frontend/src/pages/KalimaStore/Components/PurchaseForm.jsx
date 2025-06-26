@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const PurchaseForm = ({
   type,
@@ -12,6 +13,7 @@ const PurchaseForm = ({
   purchaseLoading,
 }) => {
   const [dragActive, setDragActive] = useState(false)
+  const { t } = useTranslation("kalimaStore-ProductDetails")
 
   const handleDrag = (e) => {
     e.preventDefault()
@@ -43,8 +45,8 @@ const PurchaseForm = ({
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-4">Complete Your Purchase</h2>
-        <p className="text-lg">Fill in the details below to finalize your order</p>
+        <h2 className="text-3xl font-bold mb-4">{t("purchaseForm.title")}</h2>
+        <p className="text-lg">{t("purchaseForm.subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -53,18 +55,18 @@ const PurchaseForm = ({
           {/* Transfer Number */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-semibold">Transfer Number *</span>
+              <span className="label-text font-semibold">{t("purchaseForm.transferNumber")}</span>
             </label>
             <input
               type="text"
-              placeholder="Enter the number you transferred from"
+              placeholder={t("purchaseForm.transferNumberPlaceholder")}
               className="input input-bordered input-lg"
               value={purchaseForm.numberTransferredFrom}
               onChange={(e) => setPurchaseForm({ ...purchaseForm, numberTransferredFrom: e.target.value })}
               required
             />
             <label className="label">
-              <span className="label-text-alt">The phone number or account you sent payment from</span>
+              <span className="label-text-alt">{t("purchaseForm.transferNumberHint")}</span>
             </label>
           </div>
 
@@ -81,17 +83,17 @@ const PurchaseForm = ({
                       d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.832 18.477 19.246 18 17.5 18c-1.746 0-3.332.477-4.5 1.253"
                     />
                   </svg>
-                  Book Personalization
+                  {t("purchaseForm.bookPersonalization")}
                 </h3>
 
                 <div className="space-y-4">
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">Name on Book *</span>
+                      <span className="label-text font-semibold">{t("purchaseForm.nameOnBook")}</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter name to appear on the book"
+                      placeholder={t("purchaseForm.nameOnBookPlaceholder")}
                       className="input input-bordered bg-base-100 text-base-content"
                       value={purchaseForm.nameOnBook}
                       onChange={(e) => setPurchaseForm({ ...purchaseForm, nameOnBook: e.target.value })}
@@ -101,11 +103,11 @@ const PurchaseForm = ({
 
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">Number on Book *</span>
+                      <span className="label-text font-semibold">{t("purchaseForm.numberOnBook")}</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter number to appear on the book"
+                      placeholder={t("purchaseForm.numberOnBookPlaceholder")}
                       className="input input-bordered bg-base-100 text-base-content"
                       value={purchaseForm.numberOnBook}
                       onChange={(e) => setPurchaseForm({ ...purchaseForm, numberOnBook: e.target.value })}
@@ -115,11 +117,11 @@ const PurchaseForm = ({
 
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">Series Name *</span>
+                      <span className="label-text font-semibold">{t("purchaseForm.seriesName")}</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter series name"
+                      placeholder={t("purchaseForm.seriesNamePlaceholder")}
                       className="input input-bordered bg-base-100 text-base-content"
                       value={purchaseForm.seriesName}
                       onChange={(e) => setPurchaseForm({ ...purchaseForm, seriesName: e.target.value })}
@@ -135,7 +137,7 @@ const PurchaseForm = ({
         {/* Upload Section */}
         <div className="form-control">
           <label className="label">
-            <span className="label-text font-semibold">Payment Screenshot *</span>
+            <span className="label-text font-semibold">{t("purchaseForm.paymentScreenshot")}</span>
           </label>
 
           <div
@@ -156,19 +158,19 @@ const PurchaseForm = ({
 
               {uploadedFile ? (
                 <div className="space-y-3">
-                  <p className="font-semibold text-success">File uploaded successfully!</p>
+                  <p className="font-semibold text-success">{t("purchaseForm.fileUploaded")}</p>
                   <p className="text-sm bg-base-100 rounded-lg px-3 py-2 inline-block">📎 {uploadedFile.name}</p>
                   <button onClick={() => setUploadedFile(null)} className="btn btn-error btn-sm">
-                    Remove file
+                    {t("purchaseForm.removeFile")}
                   </button>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
-                    <p className="text-lg font-medium">Drag and drop your payment screenshot here</p>
-                    <p className="text-sm opacity-70">or click to browse files</p>
+                    <p className="text-lg font-medium">{t("purchaseForm.dragDrop")}</p>
+                    <p className="text-sm opacity-70">{t("purchaseForm.orBrowse")}</p>
                   </div>
-                  <div className="text-xs opacity-50">Maximum file size: 10MB • Supported: JPG, PNG, PDF</div>
+                  <div className="text-xs opacity-50">{t("purchaseForm.maxFileSize")}</div>
                 </div>
               )}
 
@@ -182,7 +184,7 @@ const PurchaseForm = ({
 
               {!uploadedFile && (
                 <label htmlFor="file-upload" className="btn btn-outline cursor-pointer">
-                  Choose File
+                  {t("purchaseForm.chooseFile")}
                 </label>
               )}
             </div>
@@ -198,17 +200,9 @@ const PurchaseForm = ({
           disabled={!uploadedFile || !purchaseForm.numberTransferredFrom || purchaseLoading}
         >
           {purchaseLoading ? (
-            <>
-              <span className="loading loading-spinner loading-sm"></span>
-              Processing...
-            </>
+            <span className="loading loading-spinner loading-sm"></span>
           ) : (
-            <>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Submit Purchase
-            </>
+            t("purchaseForm.submit")
           )}
         </button>
       </div>
@@ -224,10 +218,10 @@ const PurchaseForm = ({
           />
         </svg>
         <div>
-          <h4 className="font-semibold">Processing Time</h4>
+          <h4 className="font-semibold">{t("purchaseForm.processingTimeTitle")}</h4>
           <p>
-            After submitting your purchase request, our team will review and process your order. You can expect a
-            response within <strong>1-2 hours during business hours</strong>.
+            {t("purchaseForm.processingTimeDesc")}
+            <strong>1-2 {t("purchaseForm.hours")}</strong>
           </p>
         </div>
       </div>

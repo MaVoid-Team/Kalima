@@ -4,7 +4,7 @@
   },
   "navigation": {
     "back": "رجوع",
-    "goBack": "العودة"
+    "goBack": "العودة "
   },
   "product": {
     "details": "التفاصيل",
@@ -17,11 +17,44 @@
     "types": {
       "book": "كتاب",
       "product": "منتج"
-    }
+    },
+    "serial": "الرقم التسلسلي",
+    "whatsapp": "رقم الواتساب (للاستفسارات)",
+    "description": "الوصف",
+    "subject": "المادة",
+    "off": "خصم",
+    "save": "وفر {{amount}} {{currency}}",
+    "instantAccess": "وصول فوري",
+    "downloadImmediately": "تحميل فوري",
+    "securePayment": "دفع آمن",
+    "safeProtected": "آمن ومحمي"
   },
   "payment": {
     "numberCopied": "تم نسخ رقم الدفع!",
     "sendAmount": "أرسل المبلغ المحدد إلى الرقم أعلاه"
+  },
+  "paymentSection": {
+    "title": "معلومات الدفع",
+    "subtitle": "اتبع هذه الخطوات البسيطة لإكمال عملية الشراء",
+    "paymentNumber": "رقم الدفع",
+    "copied": "تم النسخ إلى الحافظة!",
+    "copyHint": "انقر لنسخ رقم الدفع",
+    "step1": {
+      "title": "إرسال الدفع",
+      "desc": "حوّل المبلغ المحدد إلى رقم الدفع أعلاه باستخدام طريقة الدفع المفضلة لديك."
+    },
+    "step2": {
+      "title": "رفع لقطة الشاشة",
+      "desc": "التقط لقطة شاشة لتأكيد الدفع وقم برفعها في النموذج أدناه."
+    },
+    "noteTitle": "ملاحظة هامة",
+    "noteDesc": "يرجى التأكد من إرسال المبلغ الصحيح وإرفاق لقطة الدفع. سنقوم بمعالجة طلبك خلال 1-2 ساعة في أوقات العمل."
+  },
+  "gallery": {
+    "noImages": "لا توجد صور معرض",
+    "noImagesDesc": "لا توجد صور معرض متاحة لهذا المنتج.",
+    "title": "معرض المنتج",
+    "imageCounter": "{{current}} من {{total}}"
   },
   "purchaseSteps": {
     "title": "خطوات الشراء",
@@ -44,15 +77,55 @@
     "done": "تم"
   },
   "errors": {
+    "invalidProductInfo": "معلومات المنتج غير صالحة.",
+    "fetchFailed": "فشل في جلب تفاصيل المنتج.",
+    "fetchErrorLog": "خطأ في جلب تفاصيل المنتج:",
+    "noFileSelected": "يرجى اختيار صورة الدفع.",
+    "noTransferNumber": "يرجى إدخال رقم التحويل.",
+    "fillBookFields": "يرجى ملء جميع حقول الكتاب.",
+    "purchaseSubmissionFailed": "فشل في إرسال الشراء: ",
     "title": "خطأ!",
-    "invalidProductInfo": "معرف المنتج أو النوع غير صالح",
-    "invalidItemType": "نوع العنصر غير صالح",
-    "fetchFailed": "فشل في جلب بيانات العنصر",
-    "fetchErrorLog": "خطأ في جلب بيانات العنصر:",
-    "copyFailed": "فشل في نسخ رقم الدفع:",
-    "productNotFound": "المنتج غير موجود"
+    "productNotFound": "لم يتم العثور على المنتج."
+  },
+  "success": {
+    "purchaseSubmitted": "تم إرسال الشراء بنجاح!"
   },
   "logs": {
     "submittingPurchase": "جاري إرسال الشراء مع الملف:"
+  },
+  "purchaseForm": {
+    "title": "أكمل عملية الشراء",
+    "subtitle": "املأ التفاصيل أدناه لإتمام الطلب",
+    "transferNumber": "رقم التحويل *",
+    "transferNumberPlaceholder": "أدخل الرقم الذي حولت منه",
+    "transferNumberHint": "رقم الهاتف أو الحساب الذي أرسلت منه الدفع",
+    "bookPersonalization": "تخصيص الكتاب",
+    "nameOnBook": "الاسم على الكتاب *",
+    "nameOnBookPlaceholder": "أدخل الاسم الذي سيظهر على الكتاب",
+    "numberOnBook": "الرقم على الكتاب *",
+    "numberOnBookPlaceholder": "أدخل الرقم الذي سيظهر على الكتاب",
+    "seriesName": "اسم السلسلة *",
+    "seriesNamePlaceholder": "أدخل اسم السلسلة",
+    "paymentScreenshot": "لقطة شاشة الدفع *",
+    "fileUploaded": "تم رفع الملف بنجاح!",
+    "removeFile": "إزالة الملف",
+    "dragDrop": "اسحب وأفلت لقطة شاشة الدفع هنا",
+    "orBrowse": "أو انقر لتصفح الملفات",
+    "maxFileSize": "الحد الأقصى لحجم الملف: 10 ميجابايت • المدعوم: JPG, PNG, PDF",
+    "chooseFile": "اختر ملفًا",
+    "submit": "إرسال الشراء",
+    "processingTimeTitle": "مدة المعالجة",
+    "processingTimeDesc": "بعد إرسال طلب الشراء الخاص بك، سيقوم فريقنا بمراجعة ومعالجة طلبك. يمكنك توقع الرد خلال ",
+    "hours": "ساعة في أوقات العمل"
+  },
+  "sample": {
+    "noSample": "لا يوجد ملف عينة",
+    "noSampleDesc": "هذا الـ{{type}} لا يحتوي على عينة متاحة للتحميل.",
+    "available": "عينة متاحة",
+    "pdf": "عينة PDF",
+    "downloadDesc": "قم بتحميل عينة من هذا الـ{{type}} لمعاينة المحتوى قبل الشراء.",
+    "downloadButton": "تحميل عينة PDF",
+    "downloading": "جاري التحميل...",
+    "fileWillBeDownloadedAs": "سيتم تحميل الملف باسم: {{filename}}"
   }
 }
