@@ -6,7 +6,7 @@ exports.createECBook = async (req, res, next) => {
     try {
         const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, gallery, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
-        let sample, thumbnail;
+        let sample, thumbnail, galleryArr = [];
         // Handle sample PDF
         if (req.files && req.files.sample && req.files.sample[0]) {
             const file = req.files.sample[0];
@@ -30,6 +30,12 @@ exports.createECBook = async (req, res, next) => {
         } else {
             return res.status(400).json({ message: "Thumbnail image is required" });
         }
+        // Handle gallery images
+        if (req.files && req.files.gallery) {
+            galleryArr = req.files.gallery.map(file => file.path);
+        } else if (gallery) {
+            galleryArr = Array.isArray(gallery) ? gallery : [gallery];
+        }
         const newBook = await ECBook.create({
             title,
             serial,
@@ -41,7 +47,7 @@ exports.createECBook = async (req, res, next) => {
             thumbnail,
             sample,
             description,
-            gallery,
+            gallery: galleryArr,
             whatsAppNumber,
             createdBy
         });
