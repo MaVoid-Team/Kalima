@@ -14,4 +14,7 @@ router.get('/stats', authController.verifyRoles("Admin", "SubAdmin"),
 router.post('/recalculate', authController.verifyRoles("Admin", "SubAdmin"),
     ecReferralController.recalculateAllSuccessfulInvites);
 
+// GET /api/v1/ec/referrals/:userId/stats (admin/subadmin only)
+router.get('/:userId/stats', authController.verifyRoles("Admin", "SubAdmin"), ecReferralController.getECReferralStatsByUser);
+
 module.exports = router;

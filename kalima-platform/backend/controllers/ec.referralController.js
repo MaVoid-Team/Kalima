@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const ECPurchase = require("../models/ec.purchaseModel");
+const mongoose = require("mongoose");
 const Student = require("../models/studentModel");
 const Parent = require("../models/parentModel");
 const Teacher = require("../models/teacherModel");
@@ -91,6 +92,49 @@ exports.recalculateAllSuccessfulInvites = async (req, res, next) => {
         }
         await Promise.all(allUpdates);
         res.status(200).json({ status: "success", message: "All successfulInvites counters recalculated." });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Get EC referral stats for a specific inviter by their user ID
+exports.getECReferralStatsByUser = async (req, res, next) => {
+    try {
+        const inviterId = req.params.userId;
+        const invitedWithECPurchase = await User.aggregate([
+            { $match: { referredBy: { $ne: null } } },
+            {
+                $lookup: {
+                    from: "ecpurchases",
+                    localField: "_id",
+                    foreignField: "createdBy",
+                    as: "ecPurchases"
+                }
+            },
+            { $match: { "ecPurchases.0": { $exists: true } } },
+            { $group: { _id: "$referredBy", count: { $sum: 1 } } },
+            { $match: { _id: new mongoose.Types.ObjectId(inviterId) } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "inviter"
+                }
+            },
+            { $unwind: "$inviter" },
+            {
+                $project: {
+                    _id: 0,
+                    inviterId: "$inviter._id",
+                    inviterName: "$inviter.name",
+                    inviterEmail: "$inviter.email",
+                    inviterSerial: "$inviter.userSerial",
+                    inviteCount: "$count"
+                }
+            }
+        ]);
+        res.status(200).json({ status: "success", data: invitedWithECPurchase[0] || null });
     } catch (err) {
         next(err);
     }
