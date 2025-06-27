@@ -57,6 +57,9 @@ const AdminPanel = () => {
     paymentNumber: "",
     thumbnail: null,
     sample: null,
+    gallery: [],
+    whatsAppNumber: "",
+    description: "",
   })
 
   const [bookForm, setBookForm] = useState({
@@ -67,10 +70,11 @@ const AdminPanel = () => {
     discountPercentage: "",
     subject: "",
     paymentNumber: "",
-    description: "",
     thumbnail: null,
     sample: null,
     gallery: [],
+    whatsAppNumber: "",
+    description: "",
   })
 
   // Modal states
@@ -177,6 +181,8 @@ const AdminPanel = () => {
         description: bookForm.description,
         thumbnail: bookForm.thumbnail,
         sample: bookForm.sample,
+        gallery: bookForm.gallery,
+        whatsAppNumber: bookForm.whatsAppNumber,
       })
 
       if (response?.message === "ECBook created successfully" || response?.status === "success") {
@@ -192,6 +198,8 @@ const AdminPanel = () => {
           description: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
         })
 
         // Reset file inputs
@@ -253,6 +261,9 @@ const AdminPanel = () => {
           paymentNumber: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
+          description: "",
         })
 
         // Reset file inputs
@@ -296,6 +307,9 @@ const AdminPanel = () => {
           paymentNumber: productData.paymentNumber || "",
           thumbnail: null,
           sample: null,
+          gallery: productData.gallery || [],
+          whatsAppNumber: productData.whatsAppNumber || "",
+          description: productData.description || "",
         })
         setShowEditProductModal(true)
       } else {
@@ -324,6 +338,9 @@ const AdminPanel = () => {
         paymentNumber: productForm.paymentNumber,
         thumbnail: productForm.thumbnail,
         sample: productForm.sample,
+        gallery: productForm.gallery,
+        whatsAppNumber: productForm.whatsAppNumber,
+        description: productForm.description,
       })
 
       if (response?.status === "success") {
@@ -338,6 +355,9 @@ const AdminPanel = () => {
           paymentNumber: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
+          description: "",
         })
 
         // Reset file inputs
