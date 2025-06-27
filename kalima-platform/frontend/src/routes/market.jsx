@@ -236,6 +236,12 @@ export const createBook = async (bookData) => {
     if (bookData.sample) {
       formData.append("sample", bookData.sample)
     }
+    if (bookData.gallery && bookData.gallery.length > 0) {
+      // If gallery is a FileList or array of files
+      for (let i = 0; i < bookData.gallery.length; i++) {
+        formData.append("gallery", bookData.gallery[i])
+      }
+    }
     const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
       withCredentials: true,
       headers: {

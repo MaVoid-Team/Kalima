@@ -24,7 +24,7 @@ export default function AdminCreate() {
   const [activeForm, setActiveForm] = useState("subject") // 'subject', 'package', or 'level'
 
   // Subject form state
-  const [subjectData, setSubjectData] = useState({ name: "" })
+  const [subjectData, setSubjectData] = useState({ name: "", nameAR: "" })
 
   // Package form state
   const [packageData, setPackageData] = useState({
@@ -122,7 +122,7 @@ export default function AdminCreate() {
       const response = await createSubject(subjectData)
       if (response.success) {
         setSuccess(t("success.subjectCreated"))
-        setSubjectData({ name: "" })
+        setSubjectData({ name: "", nameAR: "" })
         const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
           setSubjects(updatedSubjects.data)
@@ -277,9 +277,9 @@ export default function AdminCreate() {
   }
 
   return (
-    <div 
-    className={`container mx-auto p-4 sm:p-6 max-w-4xl `}
-    dir={isRTL ? "rtl" : "ltr"}>
+    <div
+      className={`container mx-auto p-4 sm:p-6 max-w-4xl `}
+      dir={isRTL ? "rtl" : "ltr"}>
       <h1 className="text-3xl font-bold mb-6">
         {t("createNew")} {t(`forms.${activeForm}.title`)}
       </h1>
@@ -335,7 +335,16 @@ export default function AdminCreate() {
               <input
                 type="text"
                 value={subjectData.name}
-                onChange={(e) => setSubjectData({ name: e.target.value })}
+                onChange={(e) => setSubjectData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder={t("forms.subject.namePlaceholder")}
+                className="input input-bordered w-full"
+                required
+              />
+
+              <input
+                type="text"
+                value={subjectData.nameAR}
+                onChange={(e) => setSubjectData(prev => ({ ...prev, nameAR: e.target.value }))}
                 placeholder={t("forms.subject.namePlaceholder")}
                 className="input input-bordered w-full"
                 required

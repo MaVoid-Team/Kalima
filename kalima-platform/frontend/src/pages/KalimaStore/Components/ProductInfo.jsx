@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslation } from "react-i18next"
+import { FaWhatsapp } from "react-icons/fa"
 
 const ProductInfo = ({ product, type, isRTL }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
@@ -46,7 +47,6 @@ const ProductInfo = ({ product, type, isRTL }) => {
             {actualType === "book" ? `📚 ${t("product.types.book")}` : `📦 ${t("product.types.product")}`}
           </div>
           <div className="badge badge-outline">{getItemCategory()}</div>
-          {product.__t && <div className="badge badge-ghost text-xs">__t: {product.__t}</div>}
         </div>
       </div>
 
@@ -55,28 +55,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
         <div className="card bg-base-200">
           <div className="card-body p-4">
             <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-                />
-              </svg>
-              <span className="font-semibold">{t("product.serial")}</span>
-            </div>
-            <p className="font-mono text-lg">{product.serial}</p>
-          </div>
-          <div className="card-body p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-                />
-              </svg>
+              <FaWhatsapp className="w-5 h-5 text-green-500" />
               <span className="font-semibold">{t("product.whatsapp")}</span>
             </div>
             <p className="font-mono text-lg">{product.whatsAppNumber}</p>
