@@ -12,8 +12,8 @@ exports.createECBook = async (req, res, next) => {
             const file = req.files.sample[0];
             // Debug: log file info
             console.log('Sample file:', file);
-            if (file.mimetype !== "application/pdf" || file.size > 50 * 1024 * 1024) {
-                return res.status(400).json({ message: "Sample must be a PDF and <= 50MB" });
+            if (file.mimetype !== "application/pdf" || file.size > 75 * 1024 * 1024) {
+                return res.status(400).json({ message: "Sample must be a PDF and <= 75MB" });
             }
             // Use local file path from multer
             sample = file.path;
