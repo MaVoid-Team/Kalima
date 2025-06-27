@@ -1039,7 +1039,7 @@ const updateMe = catchAsync(async (req, res, next) => {
 
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
-  const allowedFields = ['name', 'email', 'phoneNumber', 'address'];
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial'];
 
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {

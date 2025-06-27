@@ -71,6 +71,8 @@ const studentSchema = new mongoose.Schema(
       type: String, // local file path
       trim: true,
     },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    successfulInvites: { type: Number, default: 0 }
   },
 
   {
