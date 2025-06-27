@@ -7,7 +7,12 @@ const subjectSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-
+    nameAR: {
+      type: String,
+      required: [true, "Please enter subject name in Arabiccan "],
+      trim: true,
+      unique: true,
+    },
     level: [
       {
         type: mongoose.Schema.Types.ObjectId,
