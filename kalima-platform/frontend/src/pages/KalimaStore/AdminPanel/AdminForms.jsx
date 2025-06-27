@@ -708,7 +708,7 @@ const EnhancedAdminForms = ({
                 </div>
 
                 {/* Gallery field - only for products */}
-                {activeTab === "product" &&
+                {
                   renderFileUpload(
                     "gallery",
                     "Gallery Images",
