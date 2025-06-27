@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // Create ECBook
 exports.createECBook = async (req, res, next) => {
     try {
-        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, whatsAppNumber } = req.body;
+        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, gallery, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
         let sample, thumbnail;
         // Handle sample PDF
@@ -41,6 +41,7 @@ exports.createECBook = async (req, res, next) => {
             thumbnail,
             sample,
             description,
+            gallery,
             whatsAppNumber,
             createdBy
         });
