@@ -108,7 +108,6 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     }
   }
   // Set the creator
-
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
   req.body.productName = product.title;
@@ -145,6 +144,41 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     // Mark the coupon as used
     await coupon.markAsUsed(purchase._id, req.user._id);
   }
+
+  // --- Referral successful invite logic ---
+  // Only increment inviter's successfulInvites if this is the first purchase for the referred user
+  if (req.user.referredBy) {
+    const purchaseCount = await ECPurchase.countDocuments({ createdBy: req.user._id });
+    if (purchaseCount === 1) {
+      // Find the inviter's role (Student, Parent, Teacher)
+      const User = require("../models/userModel");
+      const Student = require("../models/studentModel");
+      const Parent = require("../models/parentModel");
+      const Teacher = require("../models/teacherModel");
+      const inviter = await User.findById(req.user.referredBy);
+      if (inviter) {
+        let Model;
+        switch (inviter.role) {
+          case "Student":
+            Model = Student;
+            break;
+          case "Parent":
+            Model = Parent;
+            break;
+          case "Teacher":
+            Model = Teacher;
+            break;
+          default:
+            Model = null;
+        }
+        if (Model) {
+          await Model.findByIdAndUpdate(inviter._id, { $inc: { successfulInvites: 1 } });
+        }
+      }
+    }
+  }
+  // --- End referral logic ---
+
   res.status(201).json({
     status: "success",
     data: {
