@@ -140,6 +140,11 @@
     "completingProcess": "Completing the process",
     "errorDuringSubmission": "An error occurred during submission"
   },
+  "progressBar": {
+    "overallProgress": "Overall Progress",
+    "uploadFailed": "Upload Failed",
+    "uploadCompletedSuccessfully": "Upload Completed Successfully!"
+  },
   "modals": {
     "editSection": {
       "title": "Edit Section",
