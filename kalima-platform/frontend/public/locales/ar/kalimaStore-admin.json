@@ -13,7 +13,7 @@
     "giftsSection": "قسم الهدايا",
     "giftsDescription": "عناصر الهدايا والحزم",
     "printingSection": "قسم الطباعة",
-    "printingDescription": "خدمات ومواد الطباعة"
+    "printingDescription": "خدمات ومواد الطباعة "
   },
   "sectionsManagement": {
     "title": "إدارة الأقسام",
@@ -41,18 +41,58 @@
         "price": "السعر",
         "discountPercentage": "نسبة الخصم",
         "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
         "thumbnail": "صورة المنتج المصغرة",
-        "sampleFile": "ملف العينة"
+        "sampleFile": "ملف العينة",
+        "description": "الوصف",
+        "gallery": "صور المعرض"
       },
       "placeholders": {
         "title": "أدخل عنوان المنتج",
         "serial": "أدخل الرقم التسلسلي",
         "section": "اختر القسم",
-        "paymentNumber": "أدخل رقم الدفع"
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف المنتج..."
       },
       "hints": {
         "thumbnail": "رفع صورة المنتج المصغرة (الحد الأقصى 5 ميجابايت)",
-        "sampleFile": "رفع ملف العينة"
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "gallery": "رفع صور متعددة لمعرض المنتج",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للمنتج"
+      }
+    },
+    "createBook": {
+      "title": "إنشاء كتاب",
+      "submitButton": "إنشاء كتاب",
+      "fields": {
+        "title": "عنوان الكتاب",
+        "serial": "الرقم التسلسلي",
+        "section": "القسم",
+        "subject": "المادة",
+        "price": "السعر",
+        "discountPercentage": "نسبة الخصم",
+        "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
+        "thumbnail": "صورة الكتاب المصغرة",
+        "sampleFile": "ملف العينة",
+        "description": "الوصف"
+      },
+      "placeholders": {
+        "title": "أدخل عنوان الكتاب",
+        "serial": "أدخل الرقم التسلسلي",
+        "section": "اختر القسم",
+        "subject": "اختر المادة",
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف الكتاب..."
+      },
+      "hints": {
+        "thumbnail": "رفع صورة الكتاب المصغرة (الحد الأقصى 5 ميجابايت)",
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للكتاب"
       }
     },
     "createSection": {
@@ -71,6 +111,34 @@
         "thumbnail": "أدخل اسم الصورة المصغرة"
       }
     }
+  },
+  "fileUpload": {
+    "uploaded": "تم الرفع",
+    "upload": "رفع",
+    "uploadAll": "رفع الكل",
+    "uploading": "جاري الرفع...",
+    "uploadingFiles": "جاري رفع الملفات...",
+    "complete": "مكتمل",
+    "allFilesUploaded": "تم رفع جميع الملفات",
+    "filesSelected": "ملفات محددة",
+    "total": "المجموع:"
+  },
+  "progressSteps": {
+    "validatingFormData": "التحقق من بيانات النموذج",
+    "checkingRequiredFields": "التحقق من جميع الحقول المطلوبة",
+    "preparingFiles": "تحضير الملفات",
+    "processingUploadedFiles": "معالجة الملفات المرفوعة",
+    "uploadingFiles": "رفع الملفات",
+    "sendingFilesToServer": "إرسال الملفات إلى الخادم",
+    "creatingProduct": "إنشاء المنتج",
+    "creatingBook": "إنشاء الكتاب",
+    "creatingSection": "إنشاء القسم",
+    "submittingProductData": "إرسال بيانات المنتج",
+    "submittingBookData": "إرسال بيانات الكتاب",
+    "submittingSectionData": "إرسال بيانات القسم",
+    "finalizing": "إنهاء",
+    "completingProcess": "إكمال العملية",
+    "errorDuringSubmission": "حدث خطأ أثناء الإرسال"
   },
   "modals": {
     "editSection": {
