@@ -315,6 +315,9 @@ export const purchaseProduct = async (purchaseData) => {
     if (purchaseData.paymentScreenShot) {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
+    if (purchaseData.notes) {
+      formData.append("notes", purchaseData.notes)
+    }
 
     const response = await axios.post(`${API_URL}/api/v1/ec/purchases/`, formData, {
       withCredentials: true,

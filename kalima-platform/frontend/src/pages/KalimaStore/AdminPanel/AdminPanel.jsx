@@ -20,6 +20,7 @@ import SectionsManagement from "./SectionsManagement"
 import AdminForms from "./AdminForms"
 import AdminModals from "./AdminModals"
 import ErrorBoundary from "./ErrorBoundary"
+import CreateCoupons from "./CreateCoupouns"
 
 const AdminPanel = () => {
   const { t, i18n } = useTranslation("kalimaStore-admin")
@@ -606,6 +607,10 @@ const AdminPanel = () => {
               setShowDeleteModal(true)
             }}
             actionLoading={actionLoading}
+            isRTL={isRTL}
+          />
+
+          <CreateCoupons
             isRTL={isRTL}
           />
 
