@@ -87,16 +87,16 @@ const AuditLog = () => {
   // Export functionality
   const convertToCSV = (data) => {
     const headers = [
-      t("admin.auditlog.export.user") || "User",
-      t("admin.auditlog.export.role") || "Role",
-      t("admin.auditlog.export.action") || "Action",
-      t("admin.auditlog.export.resource") || "Resource",
-      t("admin.auditlog.export.resourceDetails") || "Resource Details",
-      t("admin.auditlog.export.status") || "Status",
-      t("admin.auditlog.export.timestamp") || "Timestamp",
-      t("admin.auditlog.export.ipAddress") || "IP Address",
-      t("admin.auditlog.export.userAgent") || "User Agent",
-      t("admin.auditlog.export.description") || "Description",
+      t("admin.auditlog.export.user"),
+      t("admin.auditlog.export.role"),
+      t("admin.auditlog.export.action"),
+      t("admin.auditlog.export.resource"),
+      t("admin.auditlog.export.resourceDetails"),
+      t("admin.auditlog.export.status"),
+      t("admin.auditlog.export.timestamp"),
+      t("admin.auditlog.export.ipAddress"),
+      t("admin.auditlog.export.userAgent"),
+      t("admin.auditlog.export.description"),
     ]
 
     const csvContent = [
@@ -130,7 +130,7 @@ const AuditLog = () => {
       const dataToExport = exportAll ? await fetchAllLogs() : logs
 
       if (dataToExport.length === 0) {
-        alert(t("admin.auditlog.export.noData") || "No data to export")
+        alert(t("admin.auditlog.export.noData"))
         return
       }
 
@@ -155,15 +155,14 @@ const AuditLog = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.auditlog.export.successAll") || `Successfully exported ${dataToExport.length} audit logs`
-          : t("admin.auditlog.export.successFiltered") ||
-            `Successfully exported ${dataToExport.length} filtered audit logs`
+          ? t("admin.auditlog.export.successAll", { count: dataToExport.length })
+          : t("admin.auditlog.export.successFiltered", { count: dataToExport.length })
 
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.auditlog.export.error") || "Failed to export audit logs. Please try again.")
+      alert(t("admin.auditlog.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -176,7 +175,7 @@ const AuditLog = () => {
       const dataToExport = exportAll ? await fetchAllLogs() : logs
 
       if (dataToExport.length === 0) {
-        alert(t("admin.auditlog.export.noData") || "No data to export")
+        alert(t("admin.auditlog.export.noData"))
         return
       }
 
@@ -232,15 +231,14 @@ const AuditLog = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.auditlog.export.successAll") || `Successfully exported ${dataToExport.length} audit logs`
-          : t("admin.auditlog.export.successFiltered") ||
-            `Successfully exported ${dataToExport.length} filtered audit logs`
+          ? t("admin.auditlog.export.successAll", { count: dataToExport.length })
+          : t("admin.auditlog.export.successFiltered", { count: dataToExport.length })
 
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.auditlog.export.error") || "Failed to export audit logs. Please try again.")
+      alert(t("admin.auditlog.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -348,45 +346,45 @@ const AuditLog = () => {
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.auditlog.export.exporting") || "Exporting..."}
+                {t("admin.auditlog.export.exporting")}
               </>
             ) : (
               <>
                 <FaDownload className="mr-2" />
-                {t("admin.auditlog.export.export") || "Export Logs"}
+                {t("admin.auditlog.export.export")}
               </>
             )}
           </div>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
             <li className="menu-title">
-              <span>{t("admin.auditlog.export.csvFormat") || "CSV Format"}</span>
+              <span>{t("admin.auditlog.export.csvFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToCSV(false)} disabled={isExporting || logs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportFiltered") || "Export Current View"} ({logs.length})
+                {t("admin.auditlog.export.exportFiltered")} ({logs.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToCSV(true)} disabled={isExporting}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportAll") || "Export All Logs"}
+                {t("admin.auditlog.export.exportAll")}
               </button>
             </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
-              <span>{t("admin.auditlog.export.jsonFormat") || "JSON Format"}</span>
+              <span>{t("admin.auditlog.export.jsonFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToJSON(false)} disabled={isExporting || logs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportFiltered") || "Export Current View"} ({logs.length})
+                {t("admin.auditlog.export.exportFiltered")} ({logs.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToJSON(true)} disabled={isExporting}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportAll") || "Export All Logs"}
+                {t("admin.auditlog.export.exportAll")}
               </button>
             </li>
           </ul>
@@ -411,8 +409,8 @@ const AuditLog = () => {
           </svg>
           <span>
             {Object.values(filters).some((v) => v !== "")
-              ? `${t("admin.auditlog.export.filterInfo") || "Filters applied:"} ${logs.length} ${t("admin.auditlog.export.of") || "of"} ${t("admin.auditlog.export.totalLogs") || "total logs shown"}`
-              : `${t("admin.auditlog.export.showing") || "Showing"} ${logs.length} ${t("admin.auditlog.export.logs") || "audit logs"}`}
+              ? `${t("admin.auditlog.export.filterInfo")} ${logs.length} ${t("admin.auditlog.export.of")} ${t("admin.auditlog.export.totalLogs")}`
+              : `${t("admin.auditlog.export.showing")} ${logs.length} ${t("admin.auditlog.export.logs")}`}
           </span>
         </div>
       )}
