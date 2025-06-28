@@ -164,14 +164,21 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       new AppError("User serial is required to create a purchase", 400)
     );
   }
-  if (!product.section.number) {
+  // Get section number robustly from product data
+  let sectionNumber = null;
+  if (product.section && typeof product.section === "object" && product.section.number) {
+    sectionNumber = product.section.number;
+  } else if (product.sectionNumber) {
+    sectionNumber = product.sectionNumber;
+  }
+  if (!sectionNumber) {
     return next(new AppError("Product section number is required", 400));
   }
   if (!product.serial) {
     return next(new AppError("Product serial is required", 400));
   }
 
-  req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
+  req.body.purchaseSerial = `${req.user.userSerial}-${sectionNumber}-${product.serial}`;
 
   // Support notes and adminNotes fields
   if (typeof req.body.notes === "undefined") req.body.notes = null;
@@ -459,5 +466,43 @@ exports.searchBySerial = catchAsync(async (req, res, next) => {
     data: {
       purchase,
     },
+  });
+});
+
+// Get stats for every product: product name, section, total value, and number of purchases
+exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
+  const stats = await ECPurchase.aggregate([
+    {
+      $group: {
+        _id: "$productId",
+        totalPurchases: { $sum: 1 },
+        totalValue: { $sum: "$finalPrice" },
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "productInfo"
+      }
+    },
+    { $unwind: "$productInfo" },
+    {
+      $project: {
+        _id: 0,
+        productId: "$_id",
+        productName: "$productInfo.title",
+        productSection: "$productInfo.section",
+        totalPurchases: 1,
+        totalValue: 1
+      }
+    },
+    { $sort: { totalPurchases: -1 } }
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    data: stats,
   });
 });

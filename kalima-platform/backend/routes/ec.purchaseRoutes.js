@@ -27,6 +27,12 @@ router
     ecPurchaseController.getPurchaseStats
   );
 
+// Product purchase stats route
+router.route("/product-purchase-stats").get(
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+  ecPurchaseController.getProductPurchaseStats
+);
+
 router.route("/myPurchases").get(ecPurchaseController.getPurchasesByUser);
 // Search by serial number
 router.route("/search/serial/:serial").get(ecPurchaseController.searchBySerial);
