@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { getAllProductPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
@@ -100,6 +100,11 @@ const Orders = () => {
     }
   }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery])
 
+  // Memoize the refresh function to prevent unnecessary re-renders
+  const handleRefresh = useCallback(() => {
+    fetchOrders()
+  }, [fetchOrders])
+
   useEffect(() => {
     fetchOrders()
   }, [fetchOrders])
@@ -165,6 +170,15 @@ const Orders = () => {
   const formatPrice = (price) => {
     return `${price} ج`
   }
+
+  // Memoize order items to prevent unnecessary re-renders
+  const memoizedOrders = useMemo(() => {
+    return orders.map((order) => ({
+      ...order,
+      orderType: getOrderType(order),
+      formattedPrice: formatPrice(order.price)
+    }))
+  }, [orders])
 
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value)
@@ -287,14 +301,23 @@ const Orders = () => {
       <div className="card shadow-lg mb-6">
         <div className="card-body p-4">
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <input
                 type="text"
                 placeholder={t("searchPlaceholder")}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full pr-12"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
+              {searchQuery && (
+                <button 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm"
+                  onClick={() => setSearchQuery("")}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             <div className="min-w-40">
@@ -321,7 +344,7 @@ const Orders = () => {
               </select>
             </div>
 
-            <button onClick={fetchOrders} className="btn btn-primary" disabled={loading}>
+            <button onClick={handleRefresh} className="btn btn-primary" disabled={loading}>
               {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
               {t("refresh")}
             </button>
@@ -346,111 +369,130 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td className="text-center">
-                    <div className="flex items-center gap-3 justify-center">
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded">
-                          <img
-                            src={order.productId?.thumbnail || "/placeholder.svg?height=48&width=48"}
-                            alt={order.productName}
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = "/placeholder.svg?height=48&width=48"
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="text-left">
-                        <div className="font-bold text-sm">{order.productName}</div>
-                        <div className="text-xs opacity-50">{order.purchaseSerial}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="text-center">
-                    <div>
-                      <div className="font-medium">{order.userName}</div>
-                      <div className="text-xs opacity-50">{order.createdBy?.email}</div>
-                      <div className="text-xs opacity-50">{order.createdBy?.role}</div>
-                    </div>
-                  </td>
-
-                  <td className="text-center">
-                    <div className={`badge ${getOrderType(order) === "Book" ? "badge-primary" : "badge-secondary"}`}>
-                      {t(getOrderType(order) === "Book" ? "table.book" : "table.productType")}
-                    </div>
-                  </td>
-
-                  <td className="text-center font-bold">{formatPrice(order.price)}</td>
-                  <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
-
-                  <td className="text-center">
-                    {order.confirmed ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="badge badge-success">{t("table.confirmed")}</div>
-                        {order.confirmedBy && (
-                          <div className="text-xs opacity-50">
-                            {t("table.by")} {order.confirmedBy.name}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="badge badge-warning">{t("table.pending")}</div>
-                    )}
-                  </td>
-
-                  <td className="text-center text-sm">{order.formattedCreatedAt}</td>
-
-                  <td className="text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => handleViewDetails(order)}
-                        title={t("table.viewDetails")}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
-                      {order.paymentScreenShot && (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
-                          title={t("table.viewPaymentScreenshot")}
-                        >
-                          <Image className="w-3 h-3" />
-                        </button>
-                      )}
-
-                      {order.numberTransferredFrom && (
-                        <button
-                          className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
-                          onClick={() => handleWhatsAppContact(order)}
-                          title={t("table.contactWhatsApp") || "Contact via WhatsApp"}
-                        >
-                          <FaWhatsapp />
-                        </button>
-                      )}
-
-                      {!order.confirmed && (
-                        <button
-                          className="btn btn-success btn-sm"
-                          onClick={() => handleConfirmOrder(order)}
-                          disabled={confirmLoading[order._id]}
-                          title={t("table.confirmOrder")}
-                        >
-                          {confirmLoading[order._id] ? (
-                            <span className="loading loading-spinner loading-xs"></span>
-                          ) : (
-                            <Check className="w-4 h-4" />
-                          )}
-                        </button>
-                      )}
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan="8" className="text-center py-8">
+                    <div className="loading loading-spinner loading-lg"></div>
+                    <p className="mt-2 text-gray-500">{t("loading") || "Loading orders..."}</p>
                   </td>
                 </tr>
-              ))}
+              ) : memoizedOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="text-center py-8">
+                    <p className="text-gray-500">
+                      {searchQuery || statusFilter !== "all" || typeFilter !== "all"
+                        ? t("noOrdersFound") || "No orders found matching your criteria"
+                        : t("noOrdersAvailable") || "No orders available"}
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                memoizedOrders.map((order) => (
+                  <tr key={order._id}>
+                    <td className="text-center">
+                      <div className="flex items-center gap-3 justify-center">
+                        <div className="avatar">
+                          <div className="w-12 h-12 rounded">
+                            <img
+                              src={order.productId?.thumbnail || "/placeholder.svg?height=48&width=48"}
+                              alt={order.productName}
+                              onError={(e) => {
+                                e.target.onerror = null
+                                e.target.src = "/placeholder.svg?height=48&width=48"
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <div className="font-bold text-sm">{order.productName}</div>
+                          <div className="text-xs opacity-50">{order.purchaseSerial}</div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="text-center">
+                      <div>
+                        <div className="font-medium">{order.userName}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.email}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.role}</div>
+                      </div>
+                    </td>
+
+                    <td className="text-center">
+                      <div className={`badge ${order.orderType === "Book" ? "badge-primary" : "badge-secondary"}`}>
+                        {t(order.orderType === "Book" ? "table.book" : "table.productType")}
+                      </div>
+                    </td>
+
+                    <td className="text-center font-bold">{order.formattedPrice}</td>
+                    <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
+
+                    <td className="text-center">
+                      {order.confirmed ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="badge badge-success">{t("table.confirmed")}</div>
+                          {order.confirmedBy && (
+                            <div className="text-xs opacity-50">
+                              {t("table.by")} {order.confirmedBy.name}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="badge badge-warning">{t("table.pending")}</div>
+                      )}
+                    </td>
+
+                    <td className="text-center text-sm">{order.formattedCreatedAt}</td>
+
+                    <td className="text-center">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => handleViewDetails(order)}
+                          title={t("table.viewDetails")}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        {order.paymentScreenShot && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
+                            title={t("table.viewPaymentScreenshot")}
+                          >
+                            <Image className="w-3 h-3" />
+                          </button>
+                        )}
+
+                        {order.numberTransferredFrom && (
+                          <button
+                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
+                            onClick={() => handleWhatsAppContact(order)}
+                            title={t("table.contactWhatsApp") || "Contact via WhatsApp"}
+                          >
+                            <FaWhatsapp />
+                          </button>
+                        )}
+
+                        {!order.confirmed && (
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => handleConfirmOrder(order)}
+                            disabled={confirmLoading[order._id]}
+                            title={t("table.confirmOrder")}
+                          >
+                            {confirmLoading[order._id] ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
