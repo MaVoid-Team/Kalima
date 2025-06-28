@@ -22,6 +22,9 @@
   "sectionsManagement": {
     "title": "Sections Management",
     "searchPlaceholder": "Search sections...",
+    "totalSections": "Total sections",
+    "filtered": "Filtered",
+    "search": "Search",
     "table": {
       "name": "Name",
       "sectionNumber": "Section Number",
@@ -247,5 +250,17 @@
   "validation": {
     "invalidProductSelected": "Invalid product selected",
     "invalidSectionSelected": "Invalid section selected"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "perPage": "per page",
+    "next": "Next",
+    "previous": "Previous",
+    "first": "First",
+    "last": "Last",
+    "page": "Page",
+    "goToPage": "Go to page",
+    "itemsPerPage": "{{count}} per page"
   }
 }
