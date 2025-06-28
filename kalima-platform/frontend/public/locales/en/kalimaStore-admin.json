@@ -41,18 +41,58 @@
         "price": "Price",
         "discountPercentage": "Discount Percentage",
         "paymentNumber": "Payment Number",
+        "whatsAppNumber": "WhatsApp Number",
         "thumbnail": "Product Thumbnail",
-        "sampleFile": "Sample File"
+        "sampleFile": "Sample File",
+        "description": "Description",
+        "gallery": "Gallery Images"
       },
       "placeholders": {
         "title": "Enter product title",
         "serial": "Enter serial number",
         "section": "Select section",
-        "paymentNumber": "Enter payment number"
+        "paymentNumber": "Enter payment number",
+        "whatsAppNumber": "Enter WhatsApp number",
+        "description": "Enter product description..."
       },
       "hints": {
         "thumbnail": "Upload product thumbnail (max 5MB)",
-        "sampleFile": "Upload sample file"
+        "sampleFile": "Upload sample file (PDF, DOC, DOCX)",
+        "gallery": "Upload multiple images for the product gallery",
+        "whatsAppNumber": "Enter the WhatsApp number for customer contact",
+        "description": "Provide a detailed description of the product"
+      }
+    },
+    "createBook": {
+      "title": "Create Book",
+      "submitButton": "Create Book",
+      "fields": {
+        "title": "Book Title",
+        "serial": "Serial",
+        "section": "Section",
+        "subject": "Subject",
+        "price": "Price",
+        "discountPercentage": "Discount Percentage",
+        "paymentNumber": "Payment Number",
+        "whatsAppNumber": "WhatsApp Number",
+        "thumbnail": "Book Thumbnail",
+        "sampleFile": "Sample File",
+        "description": "Description"
+      },
+      "placeholders": {
+        "title": "Enter book title",
+        "serial": "Enter serial number",
+        "section": "Select section",
+        "subject": "Select subject",
+        "paymentNumber": "Enter payment number",
+        "whatsAppNumber": "Enter WhatsApp number",
+        "description": "Enter book description..."
+      },
+      "hints": {
+        "thumbnail": "Upload book thumbnail (max 5MB)",
+        "sampleFile": "Upload sample file (PDF, DOC, DOCX)",
+        "whatsAppNumber": "Enter the WhatsApp number for customer contact",
+        "description": "Provide a detailed description of the book"
       }
     },
     "createSection": {
@@ -71,6 +111,34 @@
         "thumbnail": "Enter thumbnail name"
       }
     }
+  },
+  "fileUpload": {
+    "uploaded": "Uploaded",
+    "upload": "Upload",
+    "uploadAll": "Upload All",
+    "uploading": "Uploading...",
+    "uploadingFiles": "Uploading files...",
+    "complete": "Complete",
+    "allFilesUploaded": "All files uploaded",
+    "filesSelected": "files selected",
+    "total": "Total:"
+  },
+  "progressSteps": {
+    "validatingFormData": "Validating Form Data",
+    "checkingRequiredFields": "Checking all required fields",
+    "preparingFiles": "Preparing Files",
+    "processingUploadedFiles": "Processing uploaded files",
+    "uploadingFiles": "Uploading Files",
+    "sendingFilesToServer": "Sending files to server",
+    "creatingProduct": "Creating Product",
+    "creatingBook": "Creating Book",
+    "creatingSection": "Creating Section",
+    "submittingProductData": "Submitting Product data",
+    "submittingBookData": "Submitting Book data",
+    "submittingSectionData": "Submitting Section data",
+    "finalizing": "Finalizing",
+    "completingProcess": "Completing the process",
+    "errorDuringSubmission": "An error occurred during submission"
   },
   "modals": {
     "editSection": {
