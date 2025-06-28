@@ -31,12 +31,23 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     { keywords: ["package", "packages"], type: "package" },
     { keywords: ["attendance"], type: "attendance" },
     { keywords: ["revenue"], type: "revenue" },
-    { keywords: ["pricing-rule", "pricing-rules"], type: "pricingRule" } // Added pricing rule type
+    { keywords: ["sections"], type: "ec.section" },
+    { keywords: ["products"], type: "ec.product" },
+    { keywords: ["purchases"], type: "ec.purchase" }
   ];
   
-  // Find matching resource type
+  // Find matching resource type - special handling for e-commerce routes
   for (const resource of resourceIdentifiers) {
-    if (resource.keywords.some(keyword => pathSegments.some(segment => 
+    // Special check for e-commerce routes
+    if (resource.type.startsWith("ec.") && pathSegments.includes("ec")) {
+      if (resource.keywords.some(keyword => pathSegments.some(segment => 
+        segment.toLowerCase() === keyword.toLowerCase()))) {
+        resourceType = resource.type;
+        break;
+      }
+    }
+    // Regular check for other routes
+    else if (!resource.type.startsWith("ec.") && resource.keywords.some(keyword => pathSegments.some(segment => 
       segment.toLowerCase() === keyword.toLowerCase()))) {
       resourceType = resource.type;
       break;
@@ -75,6 +86,29 @@ const createAuditLogEntry = async (req, res, originalRes) => {
   // Handle special case for center operations
   let specialAction = null;
   let specialResource = null;
+  
+  // Special case for e-commerce purchase operations
+  if (resourceType === "ec.purchase") {
+    // Check for purchase confirmation
+    if (pathSegments.includes("confirm") && req.method === "PATCH") {
+      specialAction = "update";
+      specialResource = {
+        type: "ec.purchase",
+        id: req.params.id,
+        name: `Purchase confirmation by ${req.user.name}`
+      };
+    }
+    // Check for note addition (PATCH with notes in body)
+    else if (req.method === "PATCH" && (req.body.notes || req.body.adminNotes)) {
+      specialAction = "update";
+      const noteType = req.body.adminNotes ? "admin note" : "note";
+      specialResource = {
+        type: "ec.purchase",
+        id: req.params.id,
+        name: `Added ${noteType} to purchase`
+      };
+    }
+  }
   
   // Special case for center-related endpoints
   if (resourceType === "center") {
@@ -152,11 +186,17 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       } else if (resData.breakdown) {
         resourceName += ` (Breakdown)`;
       }
-    } else if (resourceType === "pricingRule" && resData.pricingRule) { // Handle pricing rule responses
-      resourceId = resourceId || resData.pricingRule._id;
-      resourceName = `Pricing Rule ${resData.pricingRule._id}`; // Use ID or description
-      if (resData.pricingRule.description) {
-        resourceName += ` (${resData.pricingRule.description})`;
+    } else if (resourceType === "ec.section" && resData.section) { // Handle e-commerce section responses
+      resourceId = resourceId || resData.section._id;
+      resourceName = resData.section.name || `E-commerce Section ${resData.section._id}`;
+    } else if (resourceType === "ec.product" && resData.product) { // Handle e-commerce product responses
+      resourceId = resourceId || resData.product._id;
+      resourceName = resData.product.title || resData.product.name || `E-commerce Product ${resData.product._id}`;
+    } else if (resourceType === "ec.purchase" && resData.purchase) { // Handle e-commerce purchase responses
+      resourceId = resourceId || resData.purchase._id;
+      resourceName = `Purchase ${resData.purchase.purchaseSerial || resData.purchase._id}`;
+      if (resData.purchase.productName) {
+        resourceName += ` (${resData.purchase.productName})`;
       }
     } else if (resData.codes && resData.codes.length > 0) {
       resourceName = `${resData.codes.length} codes`;
@@ -185,7 +225,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
   
   // Additional extraction from request body for create/update operations
   if ((req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') && !resourceName) {
-    resourceName = req.body.name;
+    resourceName = req.body.name || req.body.title;
   }
   
   // Special case for DELETE operations
@@ -198,7 +238,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     isDeleteOperation || // DELETE operations are successful if status code is in 2xx range
     methodToAction[req.method] === 'read' || 
     resourceId || 
-    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.pricingRule))
+    (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.section || resData.product || resData.purchase))
   );
   
   // Use special resource and action if defined

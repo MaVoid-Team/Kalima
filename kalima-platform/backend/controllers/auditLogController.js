@@ -15,6 +15,9 @@ const Admin = require("../models/adminModel");
 const Lecturer = require("../models/lecturerModel");
 const Package = require("../models/packageModel");
 const Lesson = require("../models/lessonModel");
+const ECSection = require("../models/ec.sectionModel");
+const ECProduct = require("../models/ec.productModel");
+const ECPurchase = require("../models/ec.purchaseModel");
 
 // Helper function to enrich audit logs with readable resource data
 const enrichAuditLogs = async (logs) => {
@@ -146,6 +149,52 @@ const enrichAuditLogs = async (logs) => {
             }
             break;
             
+          case "ec.section":
+            const ecSection = await ECSection.findById(resourceId).lean();
+            if (ecSection) {
+              enrichedLog.resource.details = {
+                name: ecSection.name,
+                description: ecSection.description,
+                isActive: ecSection.isActive,
+                allowedRoles: ecSection.allowedRoles
+              };
+            }
+            break;
+            
+          case "ec.product":
+            const ecProduct = await ECProduct.findById(resourceId)
+              .populate("section", "name")
+              .lean();
+            if (ecProduct) {
+              enrichedLog.resource.details = {
+                title: ecProduct.title,
+                description: ecProduct.description,
+                price: ecProduct.price,
+                section: ecProduct.section?.name || "Unknown",
+                isActive: ecProduct.isActive
+              };
+            }
+            break;
+            
+          case "ec.purchase":
+            const ecPurchase = await ECPurchase.findById(resourceId)
+              .populate("productId", "title")
+              .populate("createdBy", "name email")
+              .populate("confirmedBy", "name email")
+              .lean();
+            if (ecPurchase) {
+              enrichedLog.resource.details = {
+                purchaseSerial: ecPurchase.purchaseSerial,
+                productName: ecPurchase.productName || ecPurchase.productId?.title,
+                price: ecPurchase.price,
+                userName: ecPurchase.userName,
+                confirmed: ecPurchase.confirmed,
+                confirmedBy: ecPurchase.confirmedBy?.name || null,
+                createdBy: ecPurchase.createdBy?.name || "Unknown"
+              };
+            }
+            break;
+            
           default:
             // No additional details for unhandled resource types
             break;
@@ -197,7 +246,7 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin", 
     "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson"
+    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
   ];
   
   if (!validResourceTypes.includes(resourceType)) {
@@ -266,7 +315,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin", 
     "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson"
+    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
   ];
   
   if (!validResourceTypes.includes(resourceType)) {
