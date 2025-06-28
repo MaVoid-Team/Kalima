@@ -92,6 +92,10 @@ exports.createBookPurchase = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Support notes and adminNotes fields
+  if (typeof req.body.notes === "undefined") req.body.notes = null;
+  if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
+
   // Set the creator
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
@@ -126,8 +130,10 @@ exports.updateBookPurchase = catchAsync(async (req, res, next) => {
     "nameOnBook",
     "numberOnBook",
     "seriesName",
-    "paymentScreenShot", // <-- fixed field name
-    "numberTransferredFrom"
+    "paymentScreenShot",
+    "numberTransferredFrom",
+    "notes",
+    "adminNotes"
   ];
   const updateData = {};
   updatableFields.forEach((field) => {
