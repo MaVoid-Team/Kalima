@@ -616,6 +616,7 @@ const Orders = () => {
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
+                  <p className="text-lg opacity-50"><strong>{t("table.notes")}:</strong> {selectedOrder.notes}</p>
                 </div>
               </div>
 

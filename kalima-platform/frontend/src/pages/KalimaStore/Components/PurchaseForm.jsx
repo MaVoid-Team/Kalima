@@ -141,13 +141,12 @@ const PurchaseForm = ({
           </label>
 
           <div
-            className={`border-2 border-dashed rounded-lg p-8 transition-all ${
-              dragActive
+            className={`border-2 border-dashed rounded-lg p-8 transition-all ${dragActive
                 ? "border-primary bg-primary/10"
                 : uploadedFile
                   ? "border-success bg-success/10"
                   : "border-base-300 bg-base-200 hover:bg-base-300"
-            }`}
+              }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -189,6 +188,19 @@ const PurchaseForm = ({
               )}
             </div>
           </div>
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-semibold">{t("purchaseForm.notes")}</span>
+          </label>
+          <input
+            type="text"
+            placeholder={t("purchaseForm.notesPlaceholder")}
+            className="input input-bordered bg-base-100 text-base-content"
+            value={purchaseForm.notes}
+            onChange={(e) => setPurchaseForm({ ...purchaseForm, notes: e.target.value })}
+            required
+          />
         </div>
       </div>
 

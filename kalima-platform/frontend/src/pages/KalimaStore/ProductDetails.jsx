@@ -29,6 +29,7 @@ const ProductDetails = () => {
     nameOnBook: "",
     numberOnBook: "",
     seriesName: "",
+    notes: "", // Add notes field
   })
 
   const { id, type } = useParams()
@@ -128,6 +129,7 @@ const ProductDetails = () => {
         productId: product._id,
         numberTransferredFrom: purchaseForm.numberTransferredFrom,
         paymentScreenShot: uploadedFile,
+        notes: purchaseForm.notes || "", // Add notes if provided
       }
 
       // Add book-specific fields if it's a book
@@ -135,6 +137,7 @@ const ProductDetails = () => {
         purchaseData.nameOnBook = purchaseForm.nameOnBook
         purchaseData.numberOnBook = purchaseForm.numberOnBook
         purchaseData.seriesName = purchaseForm.seriesName
+        purchaseData.notes = purchaseForm.notes || "" // Add notes if provided
       }
       let response
 
@@ -162,6 +165,7 @@ const ProductDetails = () => {
           nameOnBook: "",
           numberOnBook: "",
           seriesName: "",
+          notes: "", // Reset notes field
         })
 
         const fileInput = document.getElementById("file-upload")
