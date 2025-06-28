@@ -1,0 +1,651 @@
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { useTranslation } from "react-i18next"
+import { getAllStats, getProductStats } from "../../routes/orders"
+import {
+  TrendingUp,
+  DollarSign,
+  ShoppingCart,
+  CheckCircle,
+  Clock,
+  BarChart3,
+  Calendar,
+  Filter,
+  X,
+  Package,
+  Target,
+  Award,
+} from "lucide-react"
+
+const StoreAnalytics = () => {
+  const { t, i18n } = useTranslation("kalimaStore-analytics")
+  const isRTL = i18n.language === "ar"
+
+  // Loading states
+  const [overviewLoading, setOverviewLoading] = useState(true)
+  const [productStatsLoading, setProductStatsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Data states
+  const [overviewStats, setOverviewStats] = useState({
+    totalPurchases: 0,
+    confirmedPurchases: 0,
+    pendingPurchases: 0,
+    totalRevenue: 0,
+    confirmedRevenue: 0,
+    averagePrice: 0,
+  })
+  const [monthlyStats, setMonthlyStats] = useState([])
+  const [productStats, setProductStats] = useState([])
+  const [filteredProductStats, setFilteredProductStats] = useState([])
+
+  // Filter states
+  const [selectedMonth, setSelectedMonth] = useState("all")
+  const [revenueFilter, setRevenueFilter] = useState("all") // all, high, medium, low
+  const [confirmationFilter, setConfirmationFilter] = useState("all") // all, confirmed, pending
+  const [searchQuery, setSearchQuery] = useState("")
+
+  // Generate month options from monthly stats
+  const generateMonthOptions = useCallback(() => {
+    const options = [{ value: "all", label: t("filters.allMonths") || "All Months" }]
+
+    monthlyStats.forEach((stat) => {
+      const date = new Date(stat._id.year, stat._id.month - 1, 1)
+      const monthName = date.toLocaleDateString(i18n.language, {
+        year: "numeric",
+        month: "long",
+      })
+
+      options.push({
+        value: `${stat._id.year}-${stat._id.month}`,
+        label: monthName,
+        data: stat,
+      })
+    })
+
+    return options
+  }, [monthlyStats, i18n.language, t])
+
+  // Fetch overview and monthly stats
+  const fetchOverviewStats = useCallback(async () => {
+    try {
+      setOverviewLoading(true)
+      setError(null)
+
+      const response = await getAllStats()
+
+      if (response.success) {
+        const { overview, monthlyStats } = response.data.data
+        setOverviewStats(overview)
+        setMonthlyStats(monthlyStats || [])
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (err) {
+      setError(err.message)
+      console.error("Error fetching overview stats:", err)
+    } finally {
+      setOverviewLoading(false)
+    }
+  }, [])
+
+  // Fetch product stats
+  const fetchProductStats = useCallback(async () => {
+    try {
+      setProductStatsLoading(true)
+
+      const response = await getProductStats()
+
+      if (response.success) {
+        setProductStats(response.data.data || [])
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (err) {
+      console.error("Error fetching product stats:", err)
+    } finally {
+      setProductStatsLoading(false)
+    }
+  }, [])
+
+  // Filter product stats based on current filters
+  const applyFilters = useCallback(() => {
+    let filtered = [...productStats]
+
+    // Search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter((product) => product.productName.toLowerCase().includes(searchQuery.toLowerCase()))
+    }
+
+    // Revenue filter
+    if (revenueFilter !== "all") {
+      const maxRevenue = Math.max(...productStats.map((p) => p.totalValue))
+      const threshold = maxRevenue / 3
+
+      filtered = filtered.filter((product) => {
+        switch (revenueFilter) {
+          case "high":
+            return product.totalValue >= threshold * 2
+          case "medium":
+            return product.totalValue >= threshold && product.totalValue < threshold * 2
+          case "low":
+            return product.totalValue < threshold
+          default:
+            return true
+        }
+      })
+    }
+
+    // Sort by total purchases (descending)
+    filtered.sort((a, b) => b.totalPurchases - a.totalPurchases)
+
+    setFilteredProductStats(filtered)
+  }, [productStats, searchQuery, revenueFilter])
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchOverviewStats()
+    fetchProductStats()
+  }, [fetchOverviewStats, fetchProductStats])
+
+  // Apply filters when dependencies change
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
+
+  // Handle month filter change
+  const handleMonthFilterChange = (monthValue) => {
+    setSelectedMonth(monthValue)
+
+    if (monthValue === "all") {
+      // Use overall stats
+      const overview = overviewStats
+      setOverviewStats(overview)
+    } else {
+      // Find specific month stats
+      const monthData = monthlyStats.find((stat) => `${stat._id.year}-${stat._id.month}` === monthValue)
+
+      if (monthData) {
+        setOverviewStats({
+          totalPurchases: monthData.count,
+          confirmedPurchases: monthData.confirmedCount,
+          pendingPurchases: monthData.count - monthData.confirmedCount,
+          totalRevenue: monthData.revenue,
+          confirmedRevenue: monthData.confirmedRevenue,
+          averagePrice: monthData.count > 0 ? monthData.revenue / monthData.count : 0,
+        })
+      }
+    }
+  }
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedMonth("all")
+    setRevenueFilter("all")
+    setConfirmationFilter("all")
+    setSearchQuery("")
+    handleMonthFilterChange("all")
+  }
+
+  // Check if any filters are active
+  const hasActiveFilters =
+    selectedMonth !== "all" || revenueFilter !== "all" || confirmationFilter !== "all" || searchQuery.trim() !== ""
+
+  // Format currency
+  const formatPrice = (price) => {
+    return `${Math.round(price)} ج`
+  }
+
+  // Calculate performance metrics
+  const getPerformanceMetrics = () => {
+    if (productStats.length === 0) return { topProduct: null, totalProducts: 0, averagePerProduct: 0 }
+
+    const topProduct = productStats.reduce((max, product) =>
+      product.totalPurchases > max.totalPurchases ? product : max,
+    )
+
+    const totalProducts = productStats.length
+    const averagePerProduct = productStats.reduce((sum, product) => sum + product.totalPurchases, 0) / totalProducts
+
+    return { topProduct, totalProducts, averagePerProduct }
+  }
+
+  const performanceMetrics = getPerformanceMetrics()
+
+  if (overviewLoading && productStatsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg mb-4"></div>
+          <p className="text-lg">{t("loading") || "Loading analytics..."}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="alert alert-error max-w-md">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div>
+            <h3 className="font-bold">{t("errorLoadingAnalytics") || "Error Loading Analytics"}</h3>
+            <div className="text-xs">{error}</div>
+          </div>
+          <button onClick={() => window.location.reload()} className="btn btn-sm">
+            {t("retry") || "Retry"}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`min-h-screen p-6 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      {/* Header */}
+      <div className="flex items-center justify-center relative mb-8">
+        <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
+          <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
+        </div>
+        <h1 className="text-3xl font-bold text-center flex items-center gap-3">
+          <BarChart3 className="w-8 h-8 text-primary" />
+          {t("title") || "Store Analytics"}
+        </h1>
+        <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
+          <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="card shadow-lg mb-6">
+        <div className="card-body p-4">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold">{t("filters.title") || "Filters"}</h3>
+              {(overviewLoading || productStatsLoading) && <span className="loading loading-spinner loading-sm"></span>}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+              {/* Month Filter */}
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <select
+                  className="select select-bordered select-sm"
+                  value={selectedMonth}
+                  onChange={(e) => handleMonthFilterChange(e.target.value)}
+                >
+                  {generateMonthOptions().map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Revenue Filter */}
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <select
+                  className="select select-bordered select-sm"
+                  value={revenueFilter}
+                  onChange={(e) => setRevenueFilter(e.target.value)}
+                >
+                  <option value="all">{t("filters.allRevenue") || "All Revenue"}</option>
+                  <option value="high">{t("filters.highRevenue") || "High Revenue"}</option>
+                  <option value="medium">{t("filters.mediumRevenue") || "Medium Revenue"}</option>
+                  <option value="low">{t("filters.lowRevenue") || "Low Revenue"}</option>
+                </select>
+              </div>
+
+              {/* Search */}
+              <input
+                type="text"
+                placeholder={t("searchProducts") || "Search products..."}
+                className="input input-bordered input-sm flex-1 min-w-48"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+
+              {hasActiveFilters && (
+                <button className="btn btn-ghost btn-sm" onClick={clearFilters}>
+                  <X className="w-4 h-4" />
+                  {t("clearFilters") || "Clear"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Active Filters Indicator */}
+      {hasActiveFilters && (
+        <div className="card shadow-lg mb-6">
+          <div className="card-body p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Filter className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">{t("activeFilters") || "Active Filters"}:</span>
+
+              {selectedMonth !== "all" && (
+                <div className="badge badge-primary gap-2">
+                  {generateMonthOptions().find((opt) => opt.value === selectedMonth)?.label}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => handleMonthFilterChange("all")} />
+                </div>
+              )}
+
+              {revenueFilter !== "all" && (
+                <div className="badge badge-secondary gap-2">
+                  {t(`filters.${revenueFilter}Revenue`)}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setRevenueFilter("all")} />
+                </div>
+              )}
+
+              {searchQuery.trim() && (
+                <div className="badge badge-accent gap-2">
+                  Search: "{searchQuery}"
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setSearchQuery("")} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Overview Statistics Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        {/* Total Purchases */}
+        <div className="card bg-blue-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.totalPurchases") || "Total Purchases"}</h3>
+                <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.totalPurchases}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Confirmed Purchases */}
+        <div className="card bg-green-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmed") || "Confirmed"}</h3>
+                <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.confirmedPurchases}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pending Purchases */}
+        <div className="card bg-orange-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.pending") || "Pending"}</h3>
+                <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.pendingPurchases}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Revenue */}
+        <div className="card bg-emerald-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.totalRevenue") || "Total Revenue"}</h3>
+                <p className="text-2xl font-bold">
+                  {overviewLoading ? "..." : formatPrice(overviewStats.totalRevenue)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Confirmed Revenue */}
+        <div className="card bg-teal-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmedRevenue") || "Confirmed Revenue"}</h3>
+                <p className="text-2xl font-bold">
+                  {overviewLoading ? "..." : formatPrice(overviewStats.confirmedRevenue)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Average Price */}
+        <div className="card bg-indigo-600 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📊</div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.averagePrice") || "Average Price"}</h3>
+                <p className="text-2xl font-bold">
+                  {overviewLoading ? "..." : formatPrice(Math.round(overviewStats.averagePrice))}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Performance Insights */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        {/* Top Performing Product */}
+        <div className="card bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Award className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium opacity-90">{t("insights.topProduct") || "Top Product"}</h3>
+                <p className="text-lg font-bold truncate">
+                  {productStatsLoading ? "..." : performanceMetrics.topProduct?.productName || "N/A"}
+                </p>
+                <p className="text-xs opacity-75">
+                  {productStatsLoading ? "" : `${performanceMetrics.topProduct?.totalPurchases || 0} purchases`}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Products */}
+        <div className="card bg-gradient-to-r from-cyan-600 to-cyan-700 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Package className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("insights.totalProducts") || "Total Products"}</h3>
+                <p className="text-2xl font-bold">{productStatsLoading ? "..." : performanceMetrics.totalProducts}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Average per Product */}
+        <div className="card bg-gradient-to-r from-pink-600 to-pink-700 text-white shadow-lg">
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Target className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium opacity-90">{t("insights.avgPerProduct") || "Avg per Product"}</h3>
+                <p className="text-2xl font-bold">
+                  {productStatsLoading ? "..." : Math.round(performanceMetrics.averagePerProduct)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Performance Table */}
+      <div className="card shadow-lg overflow-hidden">
+        <div className="card-header p-4 border-b border-base-200">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-primary" />
+            {t("productPerformance") || "Product Performance"}
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th className="text-center">{t("table.rank") || "Rank"}</th>
+                <th className="text-center">{t("table.productName") || "Product Name"}</th>
+                <th className="text-center">{t("table.totalPurchases") || "Total Purchases"}</th>
+                <th className="text-center">{t("table.totalValue") || "Total Value"}</th>
+                <th className="text-center">{t("table.avgValue") || "Avg Value"}</th>
+                <th className="text-center">{t("table.performance") || "Performance"}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productStatsLoading ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-8">
+                    <div className="loading loading-spinner loading-lg"></div>
+                  </td>
+                </tr>
+              ) : filteredProductStats.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-8">
+                    <div className="text-6xl mb-4">📊</div>
+                    <h3 className="text-xl font-semibold mb-2">{t("table.noData") || "No Data Found"}</h3>
+                    <p className="text-gray-500">{t("table.tryAdjustingFilters") || "Try adjusting your filters"}</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredProductStats.map((product, index) => {
+                  const avgValue = product.totalPurchases > 0 ? product.totalValue / product.totalPurchases : 0
+                  const maxPurchases = Math.max(...filteredProductStats.map((p) => p.totalPurchases))
+                  const performancePercentage = maxPurchases > 0 ? (product.totalPurchases / maxPurchases) * 100 : 0
+
+                  return (
+                    <tr key={product.productId} className="hover">
+                      <td className="text-center">
+                        <div className="flex items-center justify-center">
+                          {index === 0 && <Award className="w-4 h-4 text-yellow-500 mr-1" />}
+                          <span className="font-bold">{index + 1}</span>
+                        </div>
+                      </td>
+                      <td className="text-center">
+                        <div className="font-medium">{product.productName}</div>
+                        <div className="text-xs opacity-50 font-mono">{product.productId}</div>
+                      </td>
+                      <td className="text-center">
+                        <div className="badge badge-primary">{product.totalPurchases}</div>
+                      </td>
+                      <td className="text-center font-bold">{formatPrice(product.totalValue)}</td>
+                      <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
+                      <td className="text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-20 bg-base-200 rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all"
+                              style={{ width: `${performancePercentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-medium">{Math.round(performancePercentage)}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Monthly Trends Section */}
+      {monthlyStats.length > 1 && (
+        <div className="card shadow-lg mt-8">
+          <div className="card-header p-4 border-b border-base-200">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              {t("monthlyTrends") || "Monthly Trends"}
+            </h2>
+          </div>
+          <div className="card-body p-4">
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr>
+                    <th>{t("table.month") || "Month"}</th>
+                    <th className="text-center">{t("table.totalPurchases") || "Total Purchases"}</th>
+                    <th className="text-center">{t("table.confirmed") || "Confirmed"}</th>
+                    <th className="text-center">{t("table.revenue") || "Revenue"}</th>
+                    <th className="text-center">{t("table.confirmedRevenue") || "Confirmed Revenue"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {monthlyStats.map((stat) => {
+                    const date = new Date(stat._id.year, stat._id.month - 1, 1)
+                    const monthName = date.toLocaleDateString(i18n.language, {
+                      year: "numeric",
+                      month: "long",
+                    })
+
+                    return (
+                      <tr key={`${stat._id.year}-${stat._id.month}`} className="hover">
+                        <td className="font-medium">{monthName}</td>
+                        <td className="text-center">
+                          <div className="badge badge-outline">{stat.count}</div>
+                        </td>
+                        <td className="text-center">
+                          <div className="badge badge-success">{stat.confirmedCount}</div>
+                        </td>
+                        <td className="text-center font-bold">{formatPrice(stat.revenue)}</td>
+                        <td className="text-center font-bold text-success">{formatPrice(stat.confirmedRevenue)}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default StoreAnalytics

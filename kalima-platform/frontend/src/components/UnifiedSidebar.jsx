@@ -16,7 +16,7 @@ import {
   FaCalendar,
   FaStore
 } from 'react-icons/fa';
-import { MdDashboard } from 'react-icons/md';
+import { MdAnalytics, MdDashboard, MdNumbers } from 'react-icons/md';
 import { getUserDashboard, logoutUser } from '../routes/auth-services';
 import { Edit, Lightbulb } from 'lucide-react';
 
@@ -149,7 +149,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('signedLecturers') || 'Signed Lecturers',
         icon: <Lightbulb className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/signed-lecturers'
-      }
+      },
+      {
+        id: 'store-analytics',
+        title: t('Analytics') || 'Analytics',
+        icon: <MdAnalytics className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/store-analytics'
+      },
     ];
 
     // Lecturer-specific menu items
