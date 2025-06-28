@@ -167,7 +167,7 @@ const CreateCoupons = () => {
   // Handle create coupon
   const handleCreateCoupon = async () => {
     if (!createForm.value || !createForm.expirationDays) {
-      alert(t("alerts.fillAllFields") || "Please fill all fields")
+      alert(t("alerts.fillAllFields"))
       return
     }
 
@@ -182,7 +182,7 @@ const CreateCoupons = () => {
       const response = await createCoupon(couponData)
 
       if (response.success) {
-        alert(t("alerts.couponCreated") || "Coupon created successfully!")
+        alert(t("alerts.couponCreated"))
         setShowCreateModal(false)
         setCreateForm({ value: "", expirationDays: "" })
         setCurrentPage(1) // Reset to first page to see new coupon
@@ -191,7 +191,7 @@ const CreateCoupons = () => {
         throw new Error(response.error)
       }
     } catch (err) {
-      alert(t("alerts.createFailed") || "Failed to create coupon: " + err.message)
+      alert(t("alerts.createFailed") + err.message)
     } finally {
       setCreateLoading(false)
     }
@@ -207,7 +207,7 @@ const CreateCoupons = () => {
       const response = await deleteCoupon(selectedCoupon._id)
 
       if (response.success) {
-        alert(t("alerts.couponDeleted") || "Coupon deleted successfully!")
+        alert(t("alerts.couponDeleted"))
         setShowDeleteModal(false)
         setSelectedCoupon(null)
 
@@ -223,7 +223,7 @@ const CreateCoupons = () => {
         throw new Error(response.error)
       }
     } catch (err) {
-      alert(t("alerts.deleteFailed") || "Failed to delete coupon: " + err.message)
+      alert(t("alerts.deleteFailed") + err.message)
     } finally {
       setDeleteLoading({ ...deleteLoading, [selectedCoupon._id]: false })
     }
@@ -232,7 +232,7 @@ const CreateCoupons = () => {
   // Handle copy coupon code
   const handleCopyCouponCode = (couponCode) => {
     navigator.clipboard.writeText(couponCode)
-    alert(t("alerts.codeCopied") || "Coupon code copied to clipboard!")
+    alert(t("alerts.codeCopied"))
   }
 
   // Get coupon status
@@ -249,13 +249,13 @@ const CreateCoupons = () => {
 
     switch (status) {
       case "active":
-        return <div className="badge badge-success">{t("status.active") || "Active"}</div>
+        return <div className="badge badge-success">{t("status.active")}</div>
       case "used":
-        return <div className="badge badge-warning">{t("status.used") || "Used"}</div>
+        return <div className="badge badge-warning">{t("status.used")}</div>
       case "expired":
-        return <div className="badge badge-error">{t("status.expired") || "Expired"}</div>
+        return <div className="badge badge-error">{t("status.expired")}</div>
       default:
-        return <div className="badge badge-ghost">{t("status.inactive") || "Inactive"}</div>
+        return <div className="badge badge-ghost">{t("status.inactive")}</div>
     }
   }
 
@@ -274,7 +274,7 @@ const CreateCoupons = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-lg">{t("loading") || "Loading coupons..."}</p>
+          <p className="text-lg">{t("loading")}</p>
         </div>
       </div>
     )
@@ -298,11 +298,11 @@ const CreateCoupons = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">{t("errorLoadingCoupons") || "Error Loading Coupons"}</h3>
+            <h3 className="font-bold">{t("errorLoadingCoupons")}</h3>
             <div className="text-xs">{error}</div>
           </div>
           <button onClick={() => window.location.reload()} className="btn btn-sm">
-            {t("retry") || "Retry"}
+            {t("retry")}
           </button>
         </div>
       </div>
@@ -318,7 +318,7 @@ const CreateCoupons = () => {
         </div>
         <h1 className="text-3xl font-bold text-center flex items-center gap-3">
           <Ticket className="w-8 h-8 text-primary" />
-          {t("title") || "Coupon Management"}
+          {t("title")}
         </h1>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
           <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
@@ -340,7 +340,7 @@ const CreateCoupons = () => {
                 <Ticket className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.total") || "Total Coupons"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.total")}</h3>
                 <p className="text-2xl font-bold">{loading ? "..." : stats.total}</p>
               </div>
             </div>
@@ -360,7 +360,7 @@ const CreateCoupons = () => {
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.active") || "Active"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.active")}</h3>
                 <p className="text-2xl font-bold">{loading ? "..." : stats.active}</p>
               </div>
             </div>
@@ -380,7 +380,7 @@ const CreateCoupons = () => {
                 <XCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.used") || "Used"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.used")}</h3>
                 <p className="text-2xl font-bold">{loading ? "..." : stats.used}</p>
               </div>
             </div>
@@ -400,7 +400,7 @@ const CreateCoupons = () => {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.expired") || "Expired"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.expired")}</h3>
                 <p className="text-2xl font-bold">{loading ? "..." : stats.expired}</p>
               </div>
             </div>
@@ -414,7 +414,7 @@ const CreateCoupons = () => {
           <div className="card-body p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Filter className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">{t("activeFilters") || "Active Filters"}:</span>
+              <span className="text-sm font-medium">{t("activeFilters")}:</span>
 
               {statusFilter !== "all" && (
                 <div className="badge badge-primary gap-2">
@@ -431,7 +431,7 @@ const CreateCoupons = () => {
               )}
 
               <button className="btn btn-ghost btn-xs ml-2" onClick={clearFilters}>
-                {t("clearFilters") || "Clear All"}
+                {t("clearFilters")}
               </button>
             </div>
           </div>
@@ -448,7 +448,7 @@ const CreateCoupons = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder={t("searchPlaceholder") || "Search by code, creator, or value..."}
+                  placeholder={t("searchPlaceholder")}
                   className="input input-bordered w-full pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -461,17 +461,17 @@ const CreateCoupons = () => {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
-                <option value="all">{t("filters.all") || "All Coupons"}</option>
-                <option value="active">{t("filters.active") || "Active"}</option>
-                <option value="used">{t("filters.used") || "Used"}</option>
-                <option value="expired">{t("filters.expired") || "Expired"}</option>
+                <option value="all">{t("filters.all")}</option>
+                <option value="active">{t("filters.active")}</option>
+                <option value="used">{t("filters.used")}</option>
+                <option value="expired">{t("filters.expired")}</option>
               </select>
             </div>
 
             {/* Create Button */}
             <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
               <Plus className="w-4 h-4" />
-              {t("createCoupon") || "Create Coupon"}
+              {t("createCoupon")}
             </button>
           </div>
         </div>
@@ -483,13 +483,13 @@ const CreateCoupons = () => {
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">{t("table.code") || "Coupon Code"}</th>
-                <th className="text-center">{t("table.value") || "Value"}</th>
-                <th className="text-center">{t("table.status") || "Status"}</th>
-                <th className="text-center">{t("table.expiration") || "Expiration"}</th>
-                <th className="text-center">{t("table.createdBy") || "Created By"}</th>
-                <th className="text-center">{t("table.usedBy") || "Used By"}</th>
-                <th className="text-center">{t("table.actions") || "Actions"}</th>
+                <th className="text-center">{t("table.code")}</th>
+                <th className="text-center">{t("table.value")}</th>
+                <th className="text-center">{t("table.status")}</th>
+                <th className="text-center">{t("table.expiration")}</th>
+                <th className="text-center">{t("table.createdBy")}</th>
+                <th className="text-center">{t("table.usedBy")}</th>
+                <th className="text-center">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -503,13 +503,12 @@ const CreateCoupons = () => {
                 <tr>
                   <td colSpan="7" className="text-center py-8">
                     <div className="text-6xl mb-4">🎫</div>
-                    <h3 className="text-xl font-semibold mb-2">{t("table.noCoupons") || "No Coupons Found"}</h3>
-                    <p className="text-gray-500">{t("table.tryAdjustingFilters") || "Try adjusting your filters"}</p>
+                    <h3 className="text-xl font-semibold mb-2">{t("table.noCoupons")}</h3>
+                    <p className="text-gray-500">{t("table.tryAdjustingFilters")}</p>
                   </td>
                 </tr>
               ) : (
                 paginatedCoupons.map((coupon) => (
-                  // ... existing table row content remains the same
                   <tr key={coupon._id} className="hover">
                     <td className="text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -517,7 +516,7 @@ const CreateCoupons = () => {
                         <button
                           className="btn btn-ghost btn-xs"
                           onClick={() => handleCopyCouponCode(coupon.couponCode)}
-                          title={t("copyCode") || "Copy code"}
+                          title={t("copyCode")}
                         >
                           <Copy className="w-3 h-3" />
                         </button>
@@ -559,7 +558,7 @@ const CreateCoupons = () => {
                             setSelectedCoupon(coupon)
                             setShowDetailsModal(true)
                           }}
-                          title={t("viewDetails") || "View details"}
+                          title={t("viewDetails")}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -570,7 +569,7 @@ const CreateCoupons = () => {
                             setShowDeleteModal(true)
                           }}
                           disabled={deleteLoading[coupon._id]}
-                          title={t("deleteCoupon") || "Delete coupon"}
+                          title={t("deleteCoupon")}
                         >
                           {deleteLoading[coupon._id] ? (
                             <span className="loading loading-spinner loading-xs"></span>
@@ -600,7 +599,7 @@ const CreateCoupons = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              {t("pagination.previous") || "Previous"}
+              {t("pagination.previous")}
             </button>
 
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -633,7 +632,7 @@ const CreateCoupons = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages || loading}
             >
-              {t("pagination.next") || "Next"}
+              {t("pagination.next")}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -641,10 +640,10 @@ const CreateCoupons = () => {
           </div>
 
           <div className="text-sm text-gray-600">
-            {t("pagination.showing") || "Showing"}{" "}
+            {t("pagination.showing")}{" "}
             {Math.min((currentPage - 1) * itemsPerPage + 1, filteredCoupons.length)} -{" "}
-            {Math.min(currentPage * itemsPerPage, filteredCoupons.length)} {t("pagination.of") || "of"}{" "}
-            {filteredCoupons.length} {t("pagination.coupons") || "coupons"}
+            {Math.min(currentPage * itemsPerPage, filteredCoupons.length)} {t("pagination.of")}{" "}
+            {filteredCoupons.length} {t("pagination.coupons")}
           </div>
         </div>
       )}
@@ -653,12 +652,12 @@ const CreateCoupons = () => {
       {showCreateModal && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">{t("createCoupon") || "Create New Coupon"}</h3>
+            <h3 className="font-bold text-lg mb-4">{t("createCoupon")}</h3>
 
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">{t("form.value") || "Coupon Value"} *</span>
+                  <span className="label-text font-medium">{t("form.value")} *</span>
                 </label>
                 <input
                   type="number"
@@ -668,13 +667,13 @@ const CreateCoupons = () => {
                   onChange={(e) => setCreateForm({ ...createForm, value: e.target.value })}
                 />
                 <label className="label">
-                  <span className="label-text-alt">{t("form.valueHint") || "Discount amount"}</span>
+                  <span className="label-text-alt">{t("form.valueHint")}</span>
                 </label>
               </div>
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">{t("form.expirationDays") || "Expiration Days"} *</span>
+                  <span className="label-text font-medium">{t("form.expirationDays")} *</span>
                 </label>
                 <input
                   type="number"
@@ -684,7 +683,7 @@ const CreateCoupons = () => {
                   onChange={(e) => setCreateForm({ ...createForm, expirationDays: e.target.value })}
                 />
                 <label className="label">
-                  <span className="label-text-alt">{t("form.daysHint") || "Days until expiration"}</span>
+                  <span className="label-text-alt">{t("form.daysHint")}</span>
                 </label>
               </div>
             </div>
@@ -697,10 +696,10 @@ const CreateCoupons = () => {
                   setCreateForm({ value: "", expirationDays: "" })
                 }}
               >
-                {t("cancel") || "Cancel"}
+                {t("cancel")}
               </button>
               <button className="btn btn-primary" onClick={handleCreateCoupon} disabled={createLoading}>
-                {createLoading ? <span className="loading loading-spinner loading-sm"></span> : t("create") || "Create"}
+                {createLoading ? <span className="loading loading-spinner loading-sm"></span> : t("create")}
               </button>
             </div>
           </div>
@@ -711,10 +710,10 @@ const CreateCoupons = () => {
       {showDeleteModal && selectedCoupon && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">{t("deleteCoupon") || "Delete Coupon"}</h3>
+            <h3 className="font-bold text-lg mb-4">{t("deleteCoupon")}</h3>
 
             <p className="mb-4">
-              {t("deleteConfirmation") || "Are you sure you want to delete this coupon?"} <br />
+              {t("deleteConfirmation")} <br />
               <strong>Code:</strong> {selectedCoupon.couponCode} <br />
               <strong>Value:</strong> {selectedCoupon.value}
             </p>
@@ -727,7 +726,7 @@ const CreateCoupons = () => {
                   setSelectedCoupon(null)
                 }}
               >
-                {t("cancel") || "Cancel"}
+                {t("cancel")}
               </button>
               <button
                 className="btn btn-error"
@@ -737,7 +736,7 @@ const CreateCoupons = () => {
                 {deleteLoading[selectedCoupon._id] ? (
                   <span className="loading loading-spinner loading-sm"></span>
                 ) : (
-                  t("delete") || "Delete"
+                  t("delete")
                 )}
               </button>
             </div>
@@ -749,13 +748,13 @@ const CreateCoupons = () => {
       {showDetailsModal && selectedCoupon && (
         <div className="modal modal-open">
           <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-lg mb-4">{t("couponDetails") || "Coupon Details"}</h3>
+            <h3 className="font-bold text-lg mb-4">{t("couponDetails")}</h3>
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("details.code") || "Coupon Code"}</span>
+                    <span className="label-text font-medium">{t("details.code")}</span>
                   </label>
                   <div className="flex items-center gap-2">
                     <code className="bg-base-200 px-3 py-2 rounded font-mono">{selectedCoupon.couponCode}</code>
@@ -770,7 +769,7 @@ const CreateCoupons = () => {
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("details.value") || "Value"}</span>
+                    <span className="label-text font-medium">{t("details.value")}</span>
                   </label>
                   <p className="text-2xl font-bold text-primary">{selectedCoupon.value}</p>
                 </div>
@@ -778,7 +777,7 @@ const CreateCoupons = () => {
 
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">{t("details.status") || "Status"}</span>
+                  <span className="label-text font-medium">{t("details.status")}</span>
                 </label>
                 <div>{getStatusBadge(selectedCoupon)}</div>
               </div>
@@ -786,14 +785,14 @@ const CreateCoupons = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("details.created") || "Created"}</span>
+                    <span className="label-text font-medium">{t("details.created")}</span>
                   </label>
                   <p>{new Date(selectedCoupon.createdAt).toLocaleDateString()}</p>
                 </div>
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("details.expiration") || "Expiration"}</span>
+                    <span className="label-text font-medium">{t("details.expiration")}</span>
                   </label>
                   <p>{selectedCoupon.expirationDateFormatted}</p>
                 </div>
@@ -801,17 +800,17 @@ const CreateCoupons = () => {
 
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">{t("details.createdBy") || "Created By"}</span>
+                  <span className="label-text font-medium">{t("details.createdBy")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>{t("details.name") || "Name"}:</strong> {selectedCoupon.createdBy?.name}
+                    <strong>{t("details.name")}:</strong> {selectedCoupon.createdBy?.name}
                   </p>
                   <p>
-                    <strong>{t("details.email") || "Email"}:</strong> {selectedCoupon.createdBy?.email}
+                    <strong>{t("details.email")}:</strong> {selectedCoupon.createdBy?.email}
                   </p>
                   <p>
-                    <strong>{t("details.role") || "Role"}:</strong> {selectedCoupon.createdBy?.role}
+                    <strong>{t("details.role")}:</strong> {selectedCoupon.createdBy?.role}
                   </p>
                 </div>
               </div>
@@ -819,16 +818,16 @@ const CreateCoupons = () => {
               {selectedCoupon.usedBy && (
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("details.usageInfo") || "Usage Information"}</span>
+                    <span className="label-text font-medium">{t("details.usageInfo")}</span>
                   </label>
                   <div className="bg-base-200 p-3 rounded">
                     <p>
-                      <strong>{t("details.usedAt") || "Used At"}:</strong>{" "}
+                      <strong>{t("details.usedAt")}:</strong>{" "}
                       {new Date(selectedCoupon.usedAt).toLocaleDateString()}
                     </p>
                     {selectedCoupon.appliedToPurchase && (
                       <p>
-                        <strong>{t("details.appliedTo") || "Applied to Purchase"}:</strong>{" "}
+                        <strong>{t("details.appliedTo")}:</strong>{" "}
                         {selectedCoupon.appliedToPurchase}
                       </p>
                     )}
@@ -845,7 +844,7 @@ const CreateCoupons = () => {
                   setSelectedCoupon(null)
                 }}
               >
-                {t("close") || "Close"}
+                {t("close")}
               </button>
             </div>
           </div>

@@ -191,15 +191,15 @@ const UserManagementTable = () => {
   // Export functionality
   const convertToCSV = (data) => {
     const headers = [
-      t("admin.export.name") || "Name",
-      t("admin.export.email") || "Email",
-      t("admin.export.phone") || "Phone Number",
-      t("admin.export.role") || "Role",
-      t("admin.export.status") || "Status",
-      t("admin.export.government") || "Government",
-      t("admin.export.administrationZone") || "Administration Zone",
-      t("admin.export.sequenceId") || "Sequence ID",
-      t("admin.export.joinedDate") || "Joined Date",
+      t("admin.export.name"),
+      t("admin.export.email"),
+      t("admin.export.phone"),
+      t("admin.export.role"),
+      t("admin.export.status"),
+      t("admin.export.government"),
+      t("admin.export.administrationZone"),
+      t("admin.export.sequenceId"),
+      t("admin.export.joinedDate"),
     ]
 
     const csvContent = [
@@ -248,15 +248,15 @@ const UserManagementTable = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.export.successAll") || `Successfully exported ${dataToExport.length} users`
-          : t("admin.export.successFiltered") || `Successfully exported ${dataToExport.length} filtered users`
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
 
         // You can replace this with a toast notification if you have one
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.export.error") || "Failed to export users. Please try again.")
+      alert(t("admin.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -304,14 +304,14 @@ const UserManagementTable = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.export.successAll") || `Successfully exported ${dataToExport.length} users`
-          : t("admin.export.successFiltered") || `Successfully exported ${dataToExport.length} filtered users`
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
 
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.export.error") || "Failed to export users. Please try again.")
+      alert(t("admin.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -358,45 +358,45 @@ const UserManagementTable = () => {
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.export.exporting") || "Exporting..."}
+                {t("admin.export.exporting")}
               </>
             ) : (
               <>
                 <FaDownload className="mr-2" />
-                {t("admin.export.export") || "Export"}
+                {t("admin.export.export")}
               </>
             )}
           </div>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
             <li className="menu-title">
-              <span>{t("admin.export.csvFormat") || "CSV Format"}</span>
+              <span>{t("admin.export.csvFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered") || "Export Filtered"} ({filteredUsers.length})
+                {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll") || "Export All"} ({users.length})
+                {t("admin.export.exportAll")} ({users.length})
               </button>
             </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
-              <span>{t("admin.export.jsonFormat") || "JSON Format"}</span>
+              <span>{t("admin.export.jsonFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered") || "Export Filtered"} ({filteredUsers.length})
+                {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll") || "Export All"} ({users.length})
+                {t("admin.export.exportAll")} ({users.length})
               </button>
             </li>
           </ul>
@@ -482,8 +482,8 @@ const UserManagementTable = () => {
             ></path>
           </svg>
           <span>
-            {t("admin.export.filterInfo") || "Filters applied:"} {filteredUsers.length} {t("admin.export.of") || "of"}{" "}
-            {users.length} {t("admin.export.usersShown") || "users shown"}
+            {t("admin.export.filterInfo")} {filteredUsers.length} {t("admin.export.of")}{" "}
+            {users.length} {t("admin.export.usersShown")}
           </span>
         </div>
       )}
