@@ -9,6 +9,35 @@ const mongoose = require("mongoose");
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
   let query = ECPurchase.find();
+  let searchApplied = false;
+  let searchFilter = {};
+
+  // Handle search parameter
+  if (req.query.search) {
+    const searchTerm = req.query.search;
+    const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive search
+    
+    // Create search filter for multiple fields
+    searchFilter = {
+      $or: [
+        { productName: searchRegex },
+        { userName: searchRegex },
+        { purchaseSerial: searchRegex },
+        { numberTransferredFrom: searchRegex },
+        { 'createdBy.email': searchRegex },
+        { 'createdBy.name': searchRegex },
+        { 'productId.title': searchRegex },
+        { 'productId.serial': searchRegex }
+      ]
+    };
+    
+    // Apply search filter
+    query = query.find(searchFilter);
+    searchApplied = true;
+    
+    // Remove search from queryString to avoid conflicts with QueryFeatures
+    delete req.query.search;
+  }
 
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -16,8 +45,15 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     .paginate();
 
   // Get total count for pagination (before applying pagination)
+  let totalQuery = ECPurchase.find();
+  
+  // Apply search filter to total count if search was applied
+  if (searchApplied) {
+    totalQuery = totalQuery.find(searchFilter);
+  }
+  
   const totalPurchases = await ECPurchase.countDocuments(
-    features.query.getFilter()
+    totalQuery.getFilter ? totalQuery.getFilter() : totalQuery._conditions
   );
 
   // Apply population and execute query
