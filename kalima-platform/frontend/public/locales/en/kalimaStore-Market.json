@@ -12,7 +12,11 @@
   "sections": {
     "Designs": "Designs",
     "Books": "Books",
-    "default": "Section"
+    "default": "Section",
+    "Courses": "Courses",
+    "Gifts": "Gifts",
+    "Printing": "Printing",
+    "Software": "Software"
   },
   "product": {
     "discounts": "Discount",

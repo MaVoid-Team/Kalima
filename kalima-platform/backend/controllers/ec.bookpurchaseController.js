@@ -124,7 +124,8 @@ exports.updateBookPurchase = catchAsync(async (req, res, next) => {
   delete req.body.createdBy;
   delete req.body.createdAt;
   delete req.body.purchaseSerial; // Prevent manual serial modification
-
+  delete req.body.productId; // Prevent changing product after purchase
+  delete req.body.paymentScreenShot; // Prevent changing payment screenshot directly
   // Only allow updating these fields
   const updatableFields = [
     "nameOnBook",

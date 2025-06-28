@@ -706,8 +706,6 @@ const EnhancedAdminForms = ({
                       : t("forms.createBook.hints.description")}
                   </p>
                 </div>
-
-                {/* Gallery field - only for products */}
                 {
                   renderFileUpload(
                     "gallery",

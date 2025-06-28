@@ -1,6 +1,7 @@
 "use client"
 import { useTranslation } from "react-i18next"
 import { useState, useMemo, useCallback, memo } from "react"
+import { FaPencilAlt, FaTrash } from "react-icons/fa"
 
 const ProductsManagement = memo(({
   products = [],
@@ -220,7 +221,7 @@ const ProductsManagement = memo(({
                           disabled={actionLoading}
                           title={t("productsManagement.table.edit") || "Edit"}
                         >
-                          ✏️
+                          <FaPencilAlt />
                         </button>
                         <button
                           className="btn btn-ghost btn-sm"
@@ -228,7 +229,7 @@ const ProductsManagement = memo(({
                           disabled={actionLoading}
                           title={t("productsManagement.table.delete") || "Delete"}
                         >
-                          🗑️
+                          <FaTrash />
                         </button>
                       </div>
                     </td>
