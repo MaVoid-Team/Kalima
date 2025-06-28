@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import { getAllProductPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
+import { FaWhatsapp } from "react-icons/fa"
+import { Check, Eye, Image } from "lucide-react"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -13,14 +15,11 @@ const Orders = () => {
   const [error, setError] = useState(null)
   const [confirmLoading, setConfirmLoading] = useState({})
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all") // all, confirmed, pending
-  const [typeFilter, setTypeFilter] = useState("all") // all, product, book
-
-  // Server-side pagination states
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalPurchases, setTotalPurchases] = useState(0)
-
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [stats, setStats] = useState({
@@ -30,19 +29,15 @@ const Orders = () => {
     products: 0,
     books: 0,
   })
-
-  // Add debounced search state
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
 
-  // Debounce search query and reset page
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery)
-      // Reset to page 1 when search changes
       if (searchQuery !== debouncedSearchQuery && currentPage !== 1) {
         setCurrentPage(1)
       }
-    }, 500) // 500ms delay
+    }, 500)
 
     return () => clearTimeout(timer)
   }, [searchQuery, debouncedSearchQuery, currentPage])
@@ -52,28 +47,23 @@ const Orders = () => {
       setLoading(true)
       setError(null)
 
-      // Build query parameters for server-side filtering and pagination
       const queryParams = {
         page: currentPage,
       }
 
-      // Add search query if provided
       if (debouncedSearchQuery.trim()) {
         queryParams.search = debouncedSearchQuery.trim()
       }
 
-      // Add status filter if not "all"
       if (statusFilter !== "all") {
         queryParams.confirmed = statusFilter === "confirmed"
       }
 
-      // Note: We'll handle type filtering client-side since the API might not support it
       const response = await getAllProductPurchases(queryParams)
 
       if (response.success) {
         let purchases = response.data.data.purchases
 
-        // Apply type filter client-side
         if (typeFilter !== "all") {
           if (typeFilter === "book") {
             purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
@@ -86,7 +76,6 @@ const Orders = () => {
         setTotalPages(response.data.totalPages)
         setTotalPurchases(response.data.totalPurchases)
 
-        // Calculate statistics from ALL data (not just filtered)
         const allPurchases = response.data.data.purchases
         const confirmed = allPurchases.filter((order) => order.confirmed).length
         const pending = allPurchases.filter((order) => !order.confirmed).length
@@ -111,7 +100,6 @@ const Orders = () => {
     }
   }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery])
 
-  // Fetch orders when dependencies change
   useEffect(() => {
     fetchOrders()
   }, [fetchOrders])
@@ -128,16 +116,12 @@ const Orders = () => {
       }
 
       if (response.success) {
-        // Update the order in the local state
         setOrders((prevOrders) => prevOrders.map((o) => (o._id === order._id ? { ...o, confirmed: true } : o)))
-
-        // Update stats
         setStats((prevStats) => ({
           ...prevStats,
           confirmed: prevStats.confirmed + 1,
           pending: prevStats.pending - 1,
         }))
-
         alert(t("alerts.orderConfirmed"))
       } else {
         throw new Error(response.error)
@@ -157,6 +141,15 @@ const Orders = () => {
 
   const handleViewPaymentScreenshot = (screenshotUrl) => {
     window.open(screenshotUrl, "_blank")
+  }
+
+  const handleWhatsAppContact = (order) => {
+    const phoneNumber = order.numberTransferredFrom
+    const message = encodeURIComponent(
+      `Hello! This is regarding your order for ${order.productName} (Order ID: ${order.purchaseSerial}). How can we assist you?`,
+    )
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
+    window.open(whatsappUrl, "_blank")
   }
 
   const handlePageChange = (newPage) => {
@@ -294,7 +287,6 @@ const Orders = () => {
       <div className="card shadow-lg mb-6">
         <div className="card-body p-4">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1">
               <input
                 type="text"
@@ -305,7 +297,6 @@ const Orders = () => {
               />
             </div>
 
-            {/* Status Filter */}
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -318,7 +309,6 @@ const Orders = () => {
               </select>
             </div>
 
-            {/* Type Filter */}
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -331,9 +321,8 @@ const Orders = () => {
               </select>
             </div>
 
-            {/* Refresh Button */}
             <button onClick={fetchOrders} className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : "\ud83d\udd04"}
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
               {t("refresh")}
             </button>
           </div>
@@ -379,6 +368,7 @@ const Orders = () => {
                       </div>
                     </div>
                   </td>
+
                   <td className="text-center">
                     <div>
                       <div className="font-medium">{order.userName}</div>
@@ -386,24 +376,33 @@ const Orders = () => {
                       <div className="text-xs opacity-50">{order.createdBy?.role}</div>
                     </div>
                   </td>
+
                   <td className="text-center">
                     <div className={`badge ${getOrderType(order) === "Book" ? "badge-primary" : "badge-secondary"}`}>
                       {t(getOrderType(order) === "Book" ? "table.book" : "table.productType")}
                     </div>
                   </td>
+
                   <td className="text-center font-bold">{formatPrice(order.price)}</td>
                   <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
+
                   <td className="text-center">
                     {order.confirmed ? (
                       <div className="flex flex-col items-center gap-1">
                         <div className="badge badge-success">{t("table.confirmed")}</div>
-                        {order.confirmedBy && <div className="text-xs opacity-50">{t("table.by")} {order.confirmedBy.name}</div>}
+                        {order.confirmedBy && (
+                          <div className="text-xs opacity-50">
+                            {t("table.by")} {order.confirmedBy.name}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="badge badge-warning">{t("table.pending")}</div>
                     )}
                   </td>
+
                   <td className="text-center text-sm">{order.formattedCreatedAt}</td>
+
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
@@ -411,17 +410,29 @@ const Orders = () => {
                         onClick={() => handleViewDetails(order)}
                         title={t("table.viewDetails")}
                       >
-                        👁️
+                        <Eye className="w-4 h-4" />
                       </button>
+
                       {order.paymentScreenShot && (
                         <button
                           className="btn btn-ghost btn-sm"
                           onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
                           title={t("table.viewPaymentScreenshot")}
                         >
-                          🖼️
+                          <Image className="w-3 h-3" />
                         </button>
                       )}
+
+                      {order.numberTransferredFrom && (
+                        <button
+                          className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
+                          onClick={() => handleWhatsAppContact(order)}
+                          title={t("table.contactWhatsApp") || "Contact via WhatsApp"}
+                        >
+                          <FaWhatsapp />
+                        </button>
+                      )}
+
                       {!order.confirmed && (
                         <button
                           className="btn btn-success btn-sm"
@@ -432,7 +443,7 @@ const Orders = () => {
                           {confirmLoading[order._id] ? (
                             <span className="loading loading-spinner loading-xs"></span>
                           ) : (
-                            "✅"
+                            <Check className="w-4 h-4" />
                           )}
                         </button>
                       )}
@@ -444,7 +455,6 @@ const Orders = () => {
           </table>
         </div>
 
-        {/* Empty State */}
         {orders.length === 0 && (
           <div className="py-8 text-center">
             <div className="text-6xl mb-4">📦</div>
@@ -454,11 +464,10 @@ const Orders = () => {
         )}
       </div>
 
-      {/* Server-Side Pagination Controls */}
+      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-6">
           <div className="join">
-            {/* Previous Button */}
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage - 1)}
@@ -470,7 +479,6 @@ const Orders = () => {
               {t("table.previous")}
             </button>
 
-            {/* Page Numbers */}
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageToShow
               if (totalPages <= 5) {
@@ -495,7 +503,6 @@ const Orders = () => {
               )
             })}
 
-            {/* Next Button */}
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -508,7 +515,6 @@ const Orders = () => {
             </button>
           </div>
 
-          {/* Pagination Info */}
           <div className="text-sm text-gray-600">
             {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
           </div>
@@ -520,9 +526,7 @@ const Orders = () => {
         <div className="modal modal-open">
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
-
             <div className="space-y-4">
-              {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
@@ -538,7 +542,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Customer Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.customerInfo")}</span>
@@ -556,7 +559,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Product Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.productInfo")}</span>
@@ -566,7 +568,8 @@ const Orders = () => {
                     <strong>{t("table.name")}:</strong> {selectedOrder.productName}
                   </p>
                   <p>
-                    <strong>{t("table.type")}:</strong> {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
+                    <strong>{t("table.type")}:</strong>{" "}
+                    {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
                   </p>
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
@@ -574,7 +577,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Payment Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.paymentInfo")}</span>
@@ -599,7 +601,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Book-specific Info */}
               {selectedOrder.__t === "ECBookPurchase" && (
                 <div>
                   <label className="label">
@@ -619,14 +620,14 @@ const Orders = () => {
                 </div>
               )}
 
-              {/* Status Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.statusInfo")}</span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>{t("table.status")}:</strong> {selectedOrder.confirmed ? t("table.confirmed") : t("table.pending")}
+                    <strong>{t("table.status")}:</strong>{" "}
+                    {selectedOrder.confirmed ? t("table.confirmed") : t("table.pending")}
                   </p>
                   <p>
                     <strong>{t("table.created")}:</strong> {selectedOrder.formattedCreatedAt}

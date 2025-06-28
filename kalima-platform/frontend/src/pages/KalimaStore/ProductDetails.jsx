@@ -136,7 +136,6 @@ const ProductDetails = () => {
         purchaseData.numberOnBook = purchaseForm.numberOnBook
         purchaseData.seriesName = purchaseForm.seriesName
       }
-
       let response
 
 

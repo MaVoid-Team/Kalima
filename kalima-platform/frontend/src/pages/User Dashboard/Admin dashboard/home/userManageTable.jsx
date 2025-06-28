@@ -476,7 +476,7 @@ const UserManagementTable = () => {
         <table className="table w-full">
           <thead>
             <tr className={`${isRTL ? "text-right" : "text-left"}`}>
-              {["name", "phone", "accountType", "status", "actions"].map((header) => (
+              {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
                 <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
                   {t(`admin.table.${header}`)}
                 </th>
@@ -490,6 +490,9 @@ const UserManagementTable = () => {
                 <td className="py-4 whitespace-nowrap">{user.phoneNumber || t("admin.NA")}</td>
                 <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
                 <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
+                <td className="py-4 whitespace-nowrap">
+                  {user.successfulInvites || 0}
+                </td>
                 <td className="py-4 whitespace-nowrap">
                   <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
                     {isAdmin && (
@@ -545,7 +548,7 @@ const UserManagementTable = () => {
             <p className="text-sm opacity-70 max-w-md">
               {filters.name || filters.phone || filters.role || filters.status
                 ? t("admin.noUsersFiltered") ||
-                  "No users match your current filters. Try adjusting your search criteria."
+                "No users match your current filters. Try adjusting your search criteria."
                 : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
             </p>
           </div>

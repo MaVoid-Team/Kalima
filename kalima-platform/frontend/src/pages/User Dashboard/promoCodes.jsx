@@ -37,6 +37,7 @@ import { redeemPromoCode } from "../../routes/codes"
 import { getToken } from "../../routes/auth-services"
 import { updateCurrentUser } from "../../routes/update-user"
 import { useNavigate } from "react-router-dom"
+import ReferralSection from "./ReferralSection"
 
 const PromoCodes = () => {
   const { t, i18n } = useTranslation("promoCodes")
@@ -917,6 +918,7 @@ const PromoCodes = () => {
             <span>{fetchError}</span>
           </div>
         )}
+        {userInfo && !isParent && <ReferralSection userInfo={userInfo} onUserUpdate={updateCurrentUser} />}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
           {userInfo?.role === "Parent" ? (
             <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
