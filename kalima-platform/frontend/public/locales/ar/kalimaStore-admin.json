@@ -22,6 +22,9 @@
   "sectionsManagement": {
     "title": "إدارة الأقسام",
     "searchPlaceholder": "البحث في الأقسام...",
+    "totalSections": "إجمالي الأقسام",
+    "filtered": "مفلتر",
+    "search": "البحث",
     "table": {
       "name": "الاسم",
       "sectionNumber": "رقم القسم",
@@ -247,5 +250,17 @@
   "validation": {
     "invalidProductSelected": "تم تحديد منتج غير صالح",
     "invalidSectionSelected": "تم تحديد قسم غير صالح"
+  },
+  "pagination": {
+    "showing": "عرض",
+    "of": "من",
+    "perPage": "في الصفحة",
+    "next": "التالي",
+    "previous": "السابق",
+    "first": "الأول",
+    "last": "الأخير",
+    "page": "الصفحة",
+    "goToPage": "اذهب إلى الصفحة",
+    "itemsPerPage": "{{count}} في الصفحة"
   }
 }

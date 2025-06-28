@@ -1,7 +1,9 @@
 "use client"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const SectionsManagement = ({ sections = [], products = [], books = [], onEditSection, onDeleteSection, actionLoading = false, isRTL = false }) => {
+  const { t } = useTranslation("kalimaStore-admin")
   const [searchText, setSearchText] = useState("")
 
   // Simple filtering
@@ -33,7 +35,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
         <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
           <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
         </div>
-        <h2 className="text-3xl font-bold text-center">Sections Management</h2>
+        <h2 className="text-3xl font-bold text-center">{t("sectionsManagement.title")}</h2>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
           <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
         </div>
@@ -44,7 +46,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
         <div className="relative w-full max-w-md">
           <input
             type="text"
-            placeholder="Search sections..."
+            placeholder={t("sectionsManagement.searchPlaceholder")}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             className="input input-bordered w-full pl-4 pr-12"
@@ -57,7 +59,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
 
       {/* Debug Info */}
       <div className="text-center mb-4 text-sm text-gray-500">
-        Total sections: {sections.length} | Filtered: {sectionsWithCounts.length} | Search: "{searchText}"
+        {t("sectionsManagement.totalSections")}: {sections.length} | {t("sectionsManagement.filtered")}: {sectionsWithCounts.length} | {t("sectionsManagement.search")}: "{searchText}"
       </div>
 
       {/* Table */}
@@ -66,10 +68,10 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">Name</th>
-                <th className="text-center">Section Number</th>
-                <th className="text-center">Number of Products</th>
-                <th className="text-center">Actions</th>
+                <th className="text-center">{t("sectionsManagement.table.name")}</th>
+                <th className="text-center">{t("sectionsManagement.table.sectionNumber")}</th>
+                <th className="text-center">{t("sectionsManagement.table.numberOfProducts")}</th>
+                <th className="text-center">{t("sectionsManagement.table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -84,7 +86,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                         className="btn btn-ghost btn-sm"
                         onClick={() => onEditSection?.(section)}
                         disabled={actionLoading}
-                        title="Edit"
+                        title={t("sectionsManagement.table.edit")}
                       >
                         ✏️
                       </button>
@@ -92,7 +94,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                         className="btn btn-ghost btn-sm"
                         onClick={() => onDeleteSection?.(section)}
                         disabled={actionLoading}
-                        title="Delete"
+                        title={t("sectionsManagement.table.delete")}
                       >
                         🗑️
                       </button>
@@ -108,10 +110,10 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
         {sectionsWithCounts.length === 0 && (
           <div className="py-8 text-center">
             <p className="text-gray-500">
-              {sections.length === 0 ? "No sections available" : "No sections found"}
+              {sections.length === 0 ? t("sectionsManagement.noSectionsAvailable") : t("sectionsManagement.noSections")}
             </p>
             {searchText && (
-              <p className="text-sm text-gray-400 mt-2">Try a different search term</p>
+              <p className="text-sm text-gray-400 mt-2">{t("sectionsManagement.tryDifferentSearch")}</p>
             )}
           </div>
         )}
