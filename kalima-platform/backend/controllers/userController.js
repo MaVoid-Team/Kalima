@@ -366,6 +366,8 @@ const getMyData = catchAsync(async (req, res, next) => {
       name: req.user.name,
       email: req.user.email,
       role: userRole,
+      referredBy: req.user.referredBy || null,
+      profilePic: req.user.profilePic || null,
     },
   };
 
@@ -394,7 +396,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         totalPoints: student.totalPoints || 0,
         hobbies: student.hobbies,
         faction: student.faction,
-        sequencedId: student.sequencedId
+        sequencedId: student.sequencedId,
+        profilePic: student.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -439,6 +442,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: parent.level,
         children: parent.children,
         generalPoints: parent.generalPoints || 0,
+        profilePic: parent.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get parent purchases, redeemed codes, and lecture access (with query params)
@@ -472,7 +476,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         bio: lecturer.bio,
         expertise: lecturer.expertise,
-        expertise: lecturer.expertise,
+        profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
@@ -546,6 +550,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         faction: teacher.faction,
         school: teacher.school,
         ...teacher,
+        profilePic: teacher.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -575,7 +580,12 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!admin) {
         return next(new AppError("User not found", 404));
-      }      // No additional fields needed for admin roles
+      }
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        profilePic: admin.profilePic || responseData.userInfo.profilePic || null,
+      };
+      // No additional fields needed for admin roles
       break;
 
     case "Assistant":
@@ -595,7 +605,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       responseData.userInfo = {
         ...responseData.userInfo,
         assignedLecturer: assistant.assignedLecturer,
-        profilePicture: assistant.profilePicture
+        profilePic: assistant.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Only fetch additional data if no specific fields were requested or the relevant fields were included
@@ -739,6 +749,10 @@ const getMyData = catchAsync(async (req, res, next) => {
       if (!user) {
         return next(new AppError("User not found", 404));
       }
+      responseData.userInfo = {
+        ...responseData.userInfo,
+        profilePic: user.profilePic || responseData.userInfo.profilePic || null,
+      };
   }
 
   // Filter out fields that weren't requested (if fields parameter was provided)
@@ -1039,7 +1053,7 @@ const updateMe = catchAsync(async (req, res, next) => {
 
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
-  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial'];
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic'];
 
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {
@@ -1047,6 +1061,25 @@ const updateMe = catchAsync(async (req, res, next) => {
       filteredBody[field] = req.body[field];
     }
   });
+
+  // Handle referralSerial update: allow user to set referredBy if not already set
+  if (req.body.referralSerial) {
+    // Only allow setting referredBy if not already set
+    const currentUser = await User.findById(userId).select('referredBy');
+    if (!currentUser.referredBy) {
+      const inviter = await User.findOne({ userSerial: req.body.referralSerial });
+      if (inviter && inviter._id.toString() !== userId.toString()) {
+        filteredBody.referredBy = inviter._id;
+      } else if (inviter && inviter._id.toString() === userId.toString()) {
+        return next(new AppError("You cannot refer yourself.", 400));
+      } else {
+        return next(new AppError("Referral serial not found.", 400));
+      }
+    } else {
+      return next(new AppError("Referral code already set and cannot be changed.", 400));
+    }
+  }
+
   // Handle special case for Parent role - adding children by sequenced ID
   if (userRole === "Parent" && req.body.children) {
     const childrenIds = req.body.children;
