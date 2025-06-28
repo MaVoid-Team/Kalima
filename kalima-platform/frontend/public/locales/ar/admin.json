@@ -55,6 +55,7 @@
       "points": "نقاط",
       "userManagement": {
         "title": "سجل الاجراءات",
+        "subtitle": "إدارة وتصدير بيانات المستخدمين",
         "createUser": "إنشاء مستخدم جديد",
         "delete": "حذف",
         "edit": "تعديل"
@@ -281,5 +282,43 @@
         "confirmDelete": " حذف هذا الكود؟",
         "deleteCodeConfirm": "هل انت متاكد من رغبتك في حذف هذا الكود؟"
 
-      }
+      },
+    "export": {
+      "export": "تصدير",
+      "exporting": "جاري التصدير...",
+      "csvFormat": "تنسيق CSV",
+      "jsonFormat": "تنسيق JSON",
+      "exportFiltered": "تصدير المفلتر",
+      "exportAll": "تصدير الكل",
+      "successAll": "تم تصدير {{count}} مستخدم بنجاح",
+      "successFiltered": "تم تصدير {{count}} مستخدم مفلتر بنجاح",
+      "error": "فشل في تصدير المستخدمين. يرجى المحاولة مرة أخرى.",
+      "filterInfo": "المرشحات المطبقة:",
+      "of": "من",
+      "usersShown": "مستخدم معروض",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "role": "الدور",
+      "status": "الحالة",
+      "government": "المحافظة",
+      "administrationZone": "المنطقة الإدارية",
+      "sequenceId": "الرقم التسلسلي",
+      "joinedDate": "تاريخ الانضمام"
+    },
+
+    "noPhoneNumber": "لا يوجد رقم هاتف متاح",
+    "noUsers": "لم يتم العثور على مستخدمين",
+    "noUsersFiltered": "لا يوجد مستخدمين يطابقون المرشحات الحالية. جرب تعديل معايير البحث.",
+    "noUsersYet": "لم يسجل أي مستخدمين بعد. تحقق لاحقاً.",
+    "invites": {
+      "invite": "دعوة",
+      "invites": "دعوات"
+    },
+    "actions": {
+      "delete": "حذف",
+      "edit": "تعديل",
+      "cancel": "إلغاء",
+      "whatsapp": "إرسال رسالة واتساب"
+    }
   }
