@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import {
   createSection,
@@ -26,19 +26,18 @@ const AdminPanel = () => {
   const isRTL = i18n.language === "ar"
 
   // Use custom hook for data management
-  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts,productsPagination,
-    productsLoading,
-    goToPage,
-    changeItemsPerPage,
-    searchProducts, } =
+  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts } =
     useAdminData()
 
   // Local state
-  const [searchQuery, setSearchQuery] = useState("")
-  const [productSearchQuery, setProductSearchQuery] = useState("")
   const [actionLoading, setActionLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("product")
   const [isExporting, setIsExporting] = useState(false)
+
+  // Manual initial data fetch (since we removed auto-refresh)
+  useEffect(() => {
+    refetch()
+  }, [refetch])
 
   // Form states
   const [sectionForm, setSectionForm] = useState({
@@ -588,8 +587,6 @@ const AdminPanel = () => {
             books={books}
             sections={sections}
             subjects={subjects}
-            productSearchQuery={productSearchQuery}
-            setProductSearchQuery={setProductSearchQuery}
             onEditProduct={handleEditProduct}
             onDeleteProduct={(product) => {
               setProductToDelete(product)
@@ -597,19 +594,12 @@ const AdminPanel = () => {
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
-            productsPagination={productsPagination}
-            productsLoading={productsLoading}
-            onPageChange={goToPage}
-            onItemsPerPageChange={changeItemsPerPage}
-            onSearch={searchProducts}
           />
 
           <SectionsManagement
             sections={sections}
             products={products}
             books={books}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
             onEditSection={handleEditSection}
             onDeleteSection={(section) => {
               setSectionToDelete(section)
