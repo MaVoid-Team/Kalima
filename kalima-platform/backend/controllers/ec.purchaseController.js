@@ -136,6 +136,11 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   }
 
   req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
+
+  // Support notes and adminNotes fields
+  if (typeof req.body.notes === "undefined") req.body.notes = null;
+  if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
+
   const purchase = await ECPurchase.create(req.body); // Populate the created purchase
   if (!purchase) {
     return next(new AppError("Purchase creation failed", 400));
@@ -202,6 +207,9 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   delete req.body.purchaseSerial; // Prevent manual serial modification
   delete req.body.finalPrice;
   delete req.body.couponCode;
+
+  // Allow updating notes and adminNotes
+  // (no extra logic needed, just don't delete them)
 
   const purchase = await ECPurchase.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
