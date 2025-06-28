@@ -126,6 +126,8 @@
       "subtitle": "View and track all system activities",
       "search": "Search audit logs...",
       "noRecords": "No records available",
+      "noRecordsFiltered": "No audit logs match your current filters. Try adjusting your search criteria.",
+      "noRecordsYet": "No audit logs have been recorded yet. Activity will appear here once users start interacting with the system.",
       
       "filters": {
         "all": "All",
@@ -194,6 +196,34 @@
       "pagination": {
         "previous": "Previous",
         "next": "Next"
+      },
+
+      "export": {
+        "export": "Export Logs",
+        "exporting": "Exporting...",
+        "csvFormat": "CSV Format",
+        "jsonFormat": "JSON Format",
+        "exportFiltered": "Export Current View",
+        "exportAll": "Export All Logs",
+        "noData": "No data to export",
+        "successAll": "Successfully exported {{count}} audit logs",
+        "successFiltered": "Successfully exported {{count}} filtered audit logs",
+        "error": "Failed to export audit logs. Please try again.",
+        "filterInfo": "Filters applied:",
+        "showing": "Showing",
+        "logs": "audit logs",
+        "of": "of",
+        "totalLogs": "total logs shown",
+        "user": "User",
+        "role": "Role",
+        "action": "Action",
+        "resource": "Resource",
+        "resourceDetails": "Resource Details",
+        "status": "Status",
+        "timestamp": "Timestamp",
+        "ipAddress": "IP Address",
+        "userAgent": "User Agent",
+        "description": "Description"
       }
     }
   },
