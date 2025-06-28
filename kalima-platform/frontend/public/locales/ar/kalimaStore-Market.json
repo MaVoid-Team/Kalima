@@ -17,7 +17,11 @@
   "sections": {
     "Designs": "تصاميم",
     "Books": "كتب",
-    "default": "القسم"
+    "default": "القسم",
+    "Courses": "دورات",
+    "Gifts": "هدايا",
+    "Printing": "طباعة",
+    "Software": "برمجيات"
   },
   "emptyState": {
     "title": "لم يتم العثور على عناصر",

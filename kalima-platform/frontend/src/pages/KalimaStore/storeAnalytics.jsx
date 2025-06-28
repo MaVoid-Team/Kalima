@@ -48,7 +48,7 @@ const StoreAnalytics = () => {
 
   // Generate month options from monthly stats
   const generateMonthOptions = useCallback(() => {
-    const options = [{ value: "all", label: t("filters.allMonths") || "All Months" }]
+    const options = [{ value: "all", label: t("filters.allMonths") }]
 
     monthlyStats.forEach((stat) => {
       const date = new Date(stat._id.year, stat._id.month - 1, 1)
@@ -218,7 +218,7 @@ const StoreAnalytics = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-lg">{t("loading") || "Loading analytics..."}</p>
+          <p className="text-lg">{t("loading")}</p>
         </div>
       </div>
     )
@@ -242,11 +242,11 @@ const StoreAnalytics = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">{t("errorLoadingAnalytics") || "Error Loading Analytics"}</h3>
+            <h3 className="font-bold">{t("errorLoadingAnalytics")}</h3>
             <div className="text-xs">{error}</div>
           </div>
           <button onClick={() => window.location.reload()} className="btn btn-sm">
-            {t("retry") || "Retry"}
+            {t("retry")}
           </button>
         </div>
       </div>
@@ -262,7 +262,7 @@ const StoreAnalytics = () => {
         </div>
         <h1 className="text-3xl font-bold text-center flex items-center gap-3">
           <BarChart3 className="w-8 h-8 text-primary" />
-          {t("title") || "Store Analytics"}
+          {t("title")}
         </h1>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
           <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
@@ -275,7 +275,7 @@ const StoreAnalytics = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Filter className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">{t("filters.title") || "Filters"}</h3>
+              <h3 className="font-semibold">{t("filters.title")}</h3>
               {(overviewLoading || productStatsLoading) && <span className="loading loading-spinner loading-sm"></span>}
             </div>
 
@@ -304,17 +304,17 @@ const StoreAnalytics = () => {
                   value={revenueFilter}
                   onChange={(e) => setRevenueFilter(e.target.value)}
                 >
-                  <option value="all">{t("filters.allRevenue") || "All Revenue"}</option>
-                  <option value="high">{t("filters.highRevenue") || "High Revenue"}</option>
-                  <option value="medium">{t("filters.mediumRevenue") || "Medium Revenue"}</option>
-                  <option value="low">{t("filters.lowRevenue") || "Low Revenue"}</option>
+                  <option value="all">{t("filters.allRevenue")}</option>
+                  <option value="high">{t("filters.highRevenue")}</option>
+                  <option value="medium">{t("filters.mediumRevenue")}</option>
+                  <option value="low">{t("filters.lowRevenue")}</option>
                 </select>
               </div>
 
               {/* Search */}
               <input
                 type="text"
-                placeholder={t("searchProducts") || "Search products..."}
+                placeholder={t("searchProducts")}
                 className="input input-bordered input-sm flex-1 min-w-48"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -323,7 +323,7 @@ const StoreAnalytics = () => {
               {hasActiveFilters && (
                 <button className="btn btn-ghost btn-sm" onClick={clearFilters}>
                   <X className="w-4 h-4" />
-                  {t("clearFilters") || "Clear"}
+                  {t("clearFilters")}
                 </button>
               )}
             </div>
@@ -337,7 +337,7 @@ const StoreAnalytics = () => {
           <div className="card-body p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Filter className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">{t("activeFilters") || "Active Filters"}:</span>
+              <span className="text-sm font-medium">{t("activeFilters")}:</span>
 
               {selectedMonth !== "all" && (
                 <div className="badge badge-primary gap-2">
@@ -374,7 +374,7 @@ const StoreAnalytics = () => {
                 <ShoppingCart className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.totalPurchases") || "Total Purchases"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.totalPurchases")}</h3>
                 <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.totalPurchases}</p>
               </div>
             </div>
@@ -389,7 +389,7 @@ const StoreAnalytics = () => {
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmed") || "Confirmed"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmed")}</h3>
                 <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.confirmedPurchases}</p>
               </div>
             </div>
@@ -404,7 +404,7 @@ const StoreAnalytics = () => {
                 <Clock className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.pending") || "Pending"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.pending")}</h3>
                 <p className="text-2xl font-bold">{overviewLoading ? "..." : overviewStats.pendingPurchases}</p>
               </div>
             </div>
@@ -419,7 +419,7 @@ const StoreAnalytics = () => {
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.totalRevenue") || "Total Revenue"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.totalRevenue")}</h3>
                 <p className="text-2xl font-bold">
                   {overviewLoading ? "..." : formatPrice(overviewStats.totalRevenue)}
                 </p>
@@ -436,7 +436,7 @@ const StoreAnalytics = () => {
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmedRevenue") || "Confirmed Revenue"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmedRevenue")}</h3>
                 <p className="text-2xl font-bold">
                   {overviewLoading ? "..." : formatPrice(overviewStats.confirmedRevenue)}
                 </p>
@@ -451,7 +451,7 @@ const StoreAnalytics = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📊</div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.averagePrice") || "Average Price"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("stats.averagePrice")}</h3>
                 <p className="text-2xl font-bold">
                   {overviewLoading ? "..." : formatPrice(Math.round(overviewStats.averagePrice))}
                 </p>
@@ -471,7 +471,7 @@ const StoreAnalytics = () => {
                 <Award className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-medium opacity-90">{t("insights.topProduct") || "Top Product"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("insights.topProduct")}</h3>
                 <p className="text-lg font-bold truncate">
                   {productStatsLoading ? "..." : performanceMetrics.topProduct?.productName || "N/A"}
                 </p>
@@ -491,7 +491,7 @@ const StoreAnalytics = () => {
                 <Package className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("insights.totalProducts") || "Total Products"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("insights.totalProducts")}</h3>
                 <p className="text-2xl font-bold">{productStatsLoading ? "..." : performanceMetrics.totalProducts}</p>
               </div>
             </div>
@@ -506,7 +506,7 @@ const StoreAnalytics = () => {
                 <Target className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("insights.avgPerProduct") || "Avg per Product"}</h3>
+                <h3 className="text-sm font-medium opacity-90">{t("insights.avgPerProduct")}</h3>
                 <p className="text-2xl font-bold">
                   {productStatsLoading ? "..." : Math.round(performanceMetrics.averagePerProduct)}
                 </p>
@@ -521,7 +521,7 @@ const StoreAnalytics = () => {
         <div className="card-header p-4 border-b border-base-200">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-primary" />
-            {t("productPerformance") || "Product Performance"}
+            {t("productPerformance")}
           </h2>
         </div>
 
@@ -529,12 +529,12 @@ const StoreAnalytics = () => {
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">{t("table.rank") || "Rank"}</th>
-                <th className="text-center">{t("table.productName") || "Product Name"}</th>
-                <th className="text-center">{t("table.totalPurchases") || "Total Purchases"}</th>
-                <th className="text-center">{t("table.totalValue") || "Total Value"}</th>
-                <th className="text-center">{t("table.avgValue") || "Avg Value"}</th>
-                <th className="text-center">{t("table.performance") || "Performance"}</th>
+                <th className="text-center">{t("table.rank")}</th>
+                <th className="text-center">{t("table.productName")}</th>
+                <th className="text-center">{t("table.totalPurchases")}</th>
+                <th className="text-center">{t("table.totalValue")}</th>
+                <th className="text-center">{t("table.avgValue")}</th>
+                <th className="text-center">{t("table.performance")}</th>
               </tr>
             </thead>
             <tbody>
@@ -548,8 +548,8 @@ const StoreAnalytics = () => {
                 <tr>
                   <td colSpan="6" className="text-center py-8">
                     <div className="text-6xl mb-4">📊</div>
-                    <h3 className="text-xl font-semibold mb-2">{t("table.noData") || "No Data Found"}</h3>
-                    <p className="text-gray-500">{t("table.tryAdjustingFilters") || "Try adjusting your filters"}</p>
+                    <h3 className="text-xl font-semibold mb-2">{t("table.noData")}</h3>
+                    <p className="text-gray-500">{t("table.tryAdjustingFilters")}</p>
                   </td>
                 </tr>
               ) : (
@@ -601,7 +601,7 @@ const StoreAnalytics = () => {
           <div className="card-header p-4 border-b border-base-200">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
-              {t("monthlyTrends") || "Monthly Trends"}
+              {t("monthlyTrends")}
             </h2>
           </div>
           <div className="card-body p-4">
@@ -609,11 +609,11 @@ const StoreAnalytics = () => {
               <table className="table w-full">
                 <thead>
                   <tr>
-                    <th>{t("table.month") || "Month"}</th>
-                    <th className="text-center">{t("table.totalPurchases") || "Total Purchases"}</th>
-                    <th className="text-center">{t("table.confirmed") || "Confirmed"}</th>
-                    <th className="text-center">{t("table.revenue") || "Revenue"}</th>
-                    <th className="text-center">{t("table.confirmedRevenue") || "Confirmed Revenue"}</th>
+                    <th>{t("table.month")}</th>
+                    <th className="text-center">{t("table.totalPurchases")}</th>
+                    <th className="text-center">{t("table.confirmed")}</th>
+                    <th className="text-center">{t("table.revenue")}</th>
+                    <th className="text-center">{t("table.confirmedRevenue")}</th>
                   </tr>
                 </thead>
                 <tbody>
