@@ -1,4 +1,8 @@
 {
+  "adminPanel": {
+    "title": "Admin Panel",
+    "subtitle": "Manage products, books, and sections"
+  },
   "stats": {
     "totalSales": "Total Sales",
     "pendingApplications": "Pending Applications",
@@ -174,6 +178,13 @@
     "fillRequiredFields": "Please fill in all required fields",
     "productCreatedSuccess": "Product created successfully!",
     "productCreateError": "Error creating product: ",
+    "productUpdatedSuccess": "Product updated successfully!",
+    "productUpdateError": "Error updating product: ",
+    "productDeletedSuccess": "Product deleted successfully!",
+    "productDeleteError": "Error deleting product: ",
+    "productFetchError": "Error fetching product: ",
+    "bookCreatedSuccess": "Book created successfully!",
+    "bookCreateError": "Error creating book: ",
     "sectionCreatedSuccess": "Section created successfully!",
     "sectionCreateError": "Error creating section: ",
     "sectionUpdatedSuccess": "Section updated successfully!",
@@ -182,7 +193,8 @@
     "sectionDeleteError": "Error deleting section: "
   },
   "error": {
-    "title": "Error!"
+    "title": "Error!",
+    "retry": "Retry"
   },
   "productsManagement": {
     "title": "Products Management",
@@ -224,9 +236,16 @@
     "totalProducts": "Total Products",
     "totalBooks": "Total Books",
     "totalSections": "Total Sections",
-    "totalItems": "Total Items"
+    "totalItems": "Total Items",
+    "successMessage": "Successfully exported {{count}} {{type}}",
+    "export": "Export Data",
+    "exporting": "Exporting..."
   },
   "products": {
     "unknownSection": "Unknown Section"
+  },
+  "validation": {
+    "invalidProductSelected": "Invalid product selected",
+    "invalidSectionSelected": "Invalid section selected"
   }
 }
