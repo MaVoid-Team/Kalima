@@ -238,13 +238,13 @@ const Orders = () => {
         // Close modal
         setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
 
-        alert(t("alerts.notesSaved") || "Notes saved successfully!")
+        alert(t("alerts.notesSaved"))
       } else {
         throw new Error(response.error)
       }
     } catch (error) {
       console.error("Error saving notes:", error)
-      alert(t("alerts.failedToSaveNotes") || "Failed to save notes: " + error.message)
+      alert(t("alerts.failedToSaveNotes") + error.message)
     } finally {
       setNotesModal((prev) => ({ ...prev, loading: false }))
     }
@@ -252,7 +252,7 @@ const Orders = () => {
 
   const closeNotesModal = () => {
     if (notesModal.hasChanges) {
-      if (confirm(t("alerts.unsavedChanges") || "You have unsaved changes. Are you sure you want to close?")) {
+      if (confirm(t("alerts.unsavedChanges"))) {
         setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
       }
     } else {
@@ -457,7 +457,7 @@ const Orders = () => {
                 <th className="text-center">{t("table.price")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
-                <th className="text-center">{t("table.notes") || "Notes"}</th>
+                <th className="text-center">{t("table.notes")}</th>
                 <th className="text-center">{t("table.date")}</th>
                 <th className="text-center">{t("table.actions")}</th>
               </tr>
@@ -467,7 +467,7 @@ const Orders = () => {
                 <tr>
                   <td colSpan="9" className="text-center py-8">
                     <div className="loading loading-spinner loading-lg"></div>
-                    <p className="mt-2 text-gray-500">{t("loading") || "Loading orders..."}</p>
+                    <p className="mt-2 text-gray-500">{t("loading")}</p>
                   </td>
                 </tr>
               ) : memoizedOrders.length === 0 ? (
@@ -475,8 +475,8 @@ const Orders = () => {
                   <td colSpan="9" className="text-center py-8">
                     <p className="text-gray-500">
                       {searchQuery || statusFilter !== "all" || typeFilter !== "all"
-                        ? t("noOrdersFound") || "No orders found matching your criteria"
-                        : t("noOrdersAvailable") || "No orders available"}
+                        ? t("noOrdersFound")
+                        : t("noOrdersAvailable")}
                     </p>
                   </td>
                 </tr>
@@ -540,7 +540,7 @@ const Orders = () => {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-xs">{t("table.noNotes") || "No notes"}</span>
+                        <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
                       )}
                     </td>
                     <td className="text-center text-sm">{order.formattedCreatedAt}</td>
@@ -561,8 +561,8 @@ const Orders = () => {
                           onClick={() => openNotesModal(order)}
                           title={
                             order.adminNotes
-                              ? t("table.viewEditNotes") || "View/Edit Notes"
-                              : t("table.addNotes") || "Add Notes"
+                              ? t("table.viewEditNotes")
+                              : t("table.addNotes")
                           }
                         >
                           <Notebook className="w-4 h-4" />
@@ -585,7 +585,7 @@ const Orders = () => {
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
                             onClick={() => handleWhatsAppContact(order)}
-                            title={t("table.contactWhatsApp") || "Contact via WhatsApp"}
+                            title={t("table.contactWhatsApp")}
                           >
                             <FaWhatsapp />
                           </button>
@@ -688,7 +688,7 @@ const Orders = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-lg flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-primary" />
-                {t("table.adminNotes") || "Admin Notes"}
+                {t("table.adminNotes")}
               </h3>
               <button
                 className="btn btn-sm btn-circle btn-ghost"
@@ -702,14 +702,14 @@ const Orders = () => {
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">{t("table.notesLabel") || "Notes for this order"}</span>
+                  <span className="label-text font-medium">{t("table.notesLabel")}</span>
                   <span className="label-text-alt">
-                    {notesModal.notes.length}/500 {t("table.characters") || "characters"}
+                    {notesModal.notes.length}/500 {t("table.characters")}
                   </span>
                 </label>
                 <textarea
                   className="textarea textarea-bordered w-full h-32 resize-none"
-                  placeholder={t("table.notesPlaceholder") || "Add notes about this order..."}
+                  placeholder={t("table.notesPlaceholder")}
                   value={notesModal.notes}
                   onChange={(e) => handleNotesChange(e.target.value)}
                   maxLength={500}
@@ -732,14 +732,14 @@ const Orders = () => {
                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     ></path>
                   </svg>
-                  <span>{t("table.unsavedChanges") || "You have unsaved changes"}</span>
+                  <span>{t("table.unsavedChanges")}</span>
                 </div>
               )}
             </div>
 
             <div className="modal-action">
               <button className="btn" onClick={closeNotesModal} disabled={notesModal.loading}>
-                {t("table.cancel") || "Cancel"}
+                {t("table.cancel")}
               </button>
               <button
                 className="btn btn-primary"
@@ -749,12 +749,12 @@ const Orders = () => {
                 {notesModal.loading ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
-                    {t("table.saving") || "Saving..."}
+                    {t("table.saving")}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    {t("table.saveNotes") || "Save Notes"}
+                    {t("table.saveNotes")}
                   </>
                 )}
               </button>
@@ -820,7 +820,7 @@ const Orders = () => {
                   </p>
                   {selectedOrder.notes && (
                     <p>
-                      <strong>{t("table.customerNotes") || "Customer Notes"}:</strong> {selectedOrder.notes}
+                      <strong>{t("table.customerNotes")}:</strong> {selectedOrder.notes}
                     </p>
                   )}
                 </div>
@@ -873,18 +873,18 @@ const Orders = () => {
                 <label className="label">
                   <span className="label-text font-medium flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" />
-                    {t("table.adminNotes") || "Admin Notes"}
+                    {t("table.adminNotes")}
                   </span>
                   <button className="btn btn-xs btn-primary" onClick={() => openNotesModal(selectedOrder)}>
                     <Edit3 className="w-3 h-3" />
-                    {t("table.edit") || "Edit"}
+                    {t("table.edit")}
                   </button>
                 </label>
                 <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (
                     <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
                   ) : (
-                    <p className="text-gray-500 italic">{t("table.noAdminNotes") || "No admin notes added yet"}</p>
+                    <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
                   )}
                 </div>
               </div>

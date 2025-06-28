@@ -16,7 +16,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   if (req.query.search) {
     const searchTerm = req.query.search;
     const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive search
-    
+
     // Create search filter for multiple fields
     searchFilter = {
       $or: [
@@ -30,11 +30,11 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         { 'productId.serial': searchRegex }
       ]
     };
-    
+
     // Apply search filter
     query = query.find(searchFilter);
     searchApplied = true;
-    
+
     // Remove search from queryString to avoid conflicts with QueryFeatures
     delete req.query.search;
   }
@@ -46,12 +46,12 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
   // Get total count for pagination (before applying pagination)
   let totalQuery = ECPurchase.find();
-  
+
   // Apply search filter to total count if search was applied
   if (searchApplied) {
     totalQuery = totalQuery.find(searchFilter);
   }
-  
+
   const totalPurchases = await ECPurchase.countDocuments(
     totalQuery.getFilter ? totalQuery.getFilter() : totalQuery._conditions
   );
@@ -250,7 +250,7 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   delete req.body.purchaseSerial; // Prevent manual serial modification
   delete req.body.finalPrice;
   delete req.body.couponCode;
-
+  delete req.body.paymentScreenShot;
   // Allow updating notes and adminNotes
   // (no extra logic needed, just don't delete them)
 
