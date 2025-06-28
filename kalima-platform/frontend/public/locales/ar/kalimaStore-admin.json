@@ -1,4 +1,8 @@
 {
+  "adminPanel": {
+    "title": "لوحة الإدارة",
+    "subtitle": "إدارة المنتجات والكتب والأقسام"
+  },
   "stats": {
     "totalSales": "إجمالي المبيعات",
     "pendingApplications": "الطلبات المعلقة",
@@ -174,6 +178,13 @@
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "productCreatedSuccess": "تم إنشاء المنتج بنجاح!",
     "productCreateError": "خطأ في إنشاء المنتج: ",
+    "productUpdatedSuccess": "تم تحديث المنتج بنجاح!",
+    "productUpdateError": "خطأ في تحديث المنتج: ",
+    "productDeletedSuccess": "تم حذف المنتج بنجاح!",
+    "productDeleteError": "خطأ في حذف المنتج: ",
+    "productFetchError": "خطأ في جلب المنتج: ",
+    "bookCreatedSuccess": "تم إنشاء الكتاب بنجاح!",
+    "bookCreateError": "خطأ في إنشاء الكتاب: ",
     "sectionCreatedSuccess": "تم إنشاء القسم بنجاح!",
     "sectionCreateError": "خطأ في إنشاء القسم: ",
     "sectionUpdatedSuccess": "تم تحديث القسم بنجاح!",
@@ -182,7 +193,8 @@
     "sectionDeleteError": "خطأ في حذف القسم: "
   },
   "error": {
-    "title": "خطأ!"
+    "title": "خطأ!",
+    "retry": "إعادة المحاولة"
   },
   "productsManagement": {
     "title": "إدارة المنتجات",
@@ -224,9 +236,16 @@
     "totalProducts": "إجمالي المنتجات",
     "totalBooks": "إجمالي الكتب",
     "totalSections": "إجمالي الأقسام",
-    "totalItems": "إجمالي العناصر"
+    "totalItems": "إجمالي العناصر",
+    "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
+    "export": "تصدير البيانات",
+    "exporting": "جاري التصدير..."
   },
   "products": {
     "unknownSection": "قسم غير معروف"
+  },
+  "validation": {
+    "invalidProductSelected": "تم تحديد منتج غير صالح",
+    "invalidSectionSelected": "تم تحديد قسم غير صالح"
   }
 }

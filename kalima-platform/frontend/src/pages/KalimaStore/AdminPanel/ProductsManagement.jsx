@@ -1,6 +1,6 @@
 "use client"
 import { useTranslation } from "react-i18next"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 
 const ProductsManagement = ({
   products = [],
@@ -22,17 +22,57 @@ const ProductsManagement = ({
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
   const [searchInput, setSearchInput] = useState(productSearchQuery || "")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
-  // Debounced search
+  // Combine products and books for display
+  const allItems = useMemo(() => {
+    const productsWithType = products.map(product => ({ ...product, type: 'product' }))
+    const booksWithType = books.map(book => ({ ...book, type: 'book' }))
+    return [...productsWithType, ...booksWithType]
+  }, [products, books])
+
+  // Filter items based on search
+  const filteredItems = useMemo(() => {
+    if (!searchInput.trim()) return allItems
+    
+    const searchTerm = searchInput.toLowerCase()
+    return allItems.filter(item => 
+      item.title?.toLowerCase().includes(searchTerm) ||
+      item.serial?.toLowerCase().includes(searchTerm) ||
+      item.description?.toLowerCase().includes(searchTerm)
+    )
+  }, [allItems, searchInput])
+
+  // Paginate filtered items
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredItems.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredItems, currentPage, itemsPerPage])
+
+  // Calculate pagination info
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage)
+  const hasNextPage = currentPage < totalPages
+  const hasPrevPage = currentPage > 1
+
+  // Update search query when input changes
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (onSearch && searchInput !== productSearchQuery) {
-        onSearch(searchInput)
+      if (searchInput !== productSearchQuery) {
+        setProductSearchQuery?.(searchInput)
+        setCurrentPage(1) // Reset to first page when searching
       }
-    }, 500) // 500ms delay
+    }, 300) // 300ms delay
 
     return () => clearTimeout(timeoutId)
-  }, [searchInput, onSearch, productSearchQuery])
+  }, [searchInput, productSearchQuery, setProductSearchQuery])
+
+  // Sync search input when productSearchQuery changes from parent
+  useEffect(() => {
+    if (productSearchQuery !== searchInput) {
+      setSearchInput(productSearchQuery || "")
+    }
+  }, [productSearchQuery, searchInput])
 
   // Helper functions with error handling
   const getSectionName = (sectionId) => {
@@ -61,10 +101,20 @@ const ProductsManagement = ({
     return (price - discountAmount).toFixed(2)
   }
 
+  // Pagination handlers
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  const changeItemsPerPage = (newLimit) => {
+    setItemsPerPage(newLimit)
+    setCurrentPage(1) // Reset to first page when changing items per page
+  }
+
   // Pagination component
   const PaginationControls = () => {
-    const { currentPage, totalPages, totalItems, itemsPerPage, hasNextPage, hasPrevPage } = productsPagination
-
     const getPageNumbers = () => {
       const pages = []
       const maxVisiblePages = 5
@@ -85,12 +135,11 @@ const ProductsManagement = ({
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
         {/* Items per page selector */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">{t("pagination.itemsPerPage") || "Items per page:"}</span>
+          <span className="text-sm text-gray-600">Items per page:</span>
           <select
             value={itemsPerPage}
-            onChange={(e) => onItemsPerPageChange?.(Number(e.target.value))}
+            onChange={(e) => changeItemsPerPage(Number(e.target.value))}
             className="select select-bordered select-sm"
-            disabled={productsLoading}
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -101,29 +150,28 @@ const ProductsManagement = ({
 
         {/* Pagination info */}
         <div className="text-sm text-gray-600">
-          {t("pagination.showing") || "Showing"} {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} -{" "}
-          {Math.min(currentPage * itemsPerPage, totalItems)} {t("pagination.of") || "of"} {totalItems}{" "}
-          {t("pagination.items") || "items"}
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredItems.length)} -{" "}
+          {Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length} items
         </div>
 
         {/* Pagination buttons */}
         <div className="flex items-center gap-1">
           {/* First page */}
           <button
-            onClick={() => onPageChange?.(1)}
-            disabled={!hasPrevPage || productsLoading}
+            onClick={() => goToPage(1)}
+            disabled={!hasPrevPage}
             className="btn btn-sm btn-outline"
-            title={t("pagination.firstPage") || "First page"}
+            title="First page"
           >
             ⟪
           </button>
 
           {/* Previous page */}
           <button
-            onClick={() => onPageChange?.(currentPage - 1)}
-            disabled={!hasPrevPage || productsLoading}
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={!hasPrevPage}
             className="btn btn-sm btn-outline"
-            title={t("pagination.previousPage") || "Previous page"}
+            title="Previous page"
           >
             ⟨
           </button>
@@ -132,8 +180,7 @@ const ProductsManagement = ({
           {getPageNumbers().map((pageNum) => (
             <button
               key={pageNum}
-              onClick={() => onPageChange?.(pageNum)}
-              disabled={productsLoading}
+              onClick={() => goToPage(pageNum)}
               className={`btn btn-sm ${pageNum === currentPage ? "btn-primary" : "btn-outline"}`}
             >
               {pageNum}
@@ -142,20 +189,20 @@ const ProductsManagement = ({
 
           {/* Next page */}
           <button
-            onClick={() => onPageChange?.(currentPage + 1)}
-            disabled={!hasNextPage || productsLoading}
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={!hasNextPage}
             className="btn btn-sm btn-outline"
-            title={t("pagination.nextPage") || "Next page"}
+            title="Next page"
           >
             ⟩
           </button>
 
           {/* Last page */}
           <button
-            onClick={() => onPageChange?.(totalPages)}
-            disabled={!hasNextPage || productsLoading}
+            onClick={() => goToPage(totalPages)}
+            disabled={!hasNextPage}
             className="btn btn-sm btn-outline"
-            title={t("pagination.lastPage") || "Last page"}
+            title="Last page"
           >
             ⟫
           </button>
@@ -222,7 +269,7 @@ const ProductsManagement = ({
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => {
+              {paginatedItems.map((product) => {
                 if (!product?._id) return null
 
                 return (
@@ -296,7 +343,7 @@ const ProductsManagement = ({
         </div>
 
         {/* Empty state */}
-        {!productsLoading && products.length === 0 && (
+        {!productsLoading && filteredItems.length === 0 && (
           <div className="py-8 text-center">
             <p className="text-gray-500">
               {searchInput
@@ -312,7 +359,7 @@ const ProductsManagement = ({
         )}
 
         {/* Pagination Controls */}
-        {!productsLoading && products.length > 0 && productsPagination && (
+        {!productsLoading && filteredItems.length > 0 && (
           <div className="p-4 border-t">
             <PaginationControls />
           </div>
