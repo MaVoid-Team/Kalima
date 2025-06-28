@@ -117,7 +117,6 @@ const NavBar = () => {
     { key: "educationalCourses", path: "/courses", icon: FaBook },
     { key: "teachers", path: "/teachers", icon: FaChalkboardTeacher },
     { key: "lectures", path: "/lectures", icon: FaVideo },
-    { key: "Packages", path: "/packages", icon: FaBox },
     { key: "market", path: "/market", icon: FaCartPlus },
   ];
 
