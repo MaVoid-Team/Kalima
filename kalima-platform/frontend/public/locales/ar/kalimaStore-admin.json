@@ -140,6 +140,11 @@
     "completingProcess": "إكمال العملية",
     "errorDuringSubmission": "حدث خطأ أثناء الإرسال"
   },
+  "progressBar": {
+    "overallProgress": "التقدم العام",
+    "uploadFailed": "فشل الرفع",
+    "uploadCompletedSuccessfully": "تم الرفع بنجاح!"
+  },
   "modals": {
     "editSection": {
       "title": "تعديل القسم",
