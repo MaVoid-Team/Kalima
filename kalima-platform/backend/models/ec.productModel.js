@@ -43,7 +43,9 @@ function setPriceAfterDiscount(next) {
   const price = typeof this.price === "number" ? this.price : 0;
   const discount =
     typeof this.discountPercentage === "number" ? this.discountPercentage : 0;
-  this.priceAfterDiscount = price - (price * discount) / 100;
+  // Ceil if there are decimals, else keep as is
+  let val = price - (price * discount) / 100;
+  this.priceAfterDiscount = (val % 1 === 0) ? val : Math.ceil(val);
   next();
 }
 productSchema.pre("save", setPriceAfterDiscount);
@@ -68,7 +70,9 @@ productSchema.pre("findOneAndUpdate", function (next) {
         : doc
           ? doc.discountPercentage
           : 0;
-    update.priceAfterDiscount = finalPrice - (finalPrice * finalDiscount) / 100;
+    // Ceil if there are decimals, else keep as is
+    let val = finalPrice - (finalPrice * finalDiscount) / 100;
+    update.priceAfterDiscount = (val % 1 === 0) ? val : Math.ceil(val);
     if (update.$set) update.$set.priceAfterDiscount = update.priceAfterDiscount;
     this.setUpdate(update);
     next();
