@@ -338,13 +338,23 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
         pendingPurchases: {
           $sum: { $cond: [{ $eq: ["$confirmed", false] }, 1, 0] },
         },
-        totalRevenue: { $sum: "$price" },
+        totalRevenue: { $sum: "$finalPrice" },
         confirmedRevenue: {
-          $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$price", 0] },
+          $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0] },
         },
-        averagePrice: { $avg: "$price" },
+        averagePrice: { $avg: "$finalPrice" }
       },
     },
+    {
+      $project: {
+        totalPurchases: 1,
+        confirmedPurchases: 1,
+        pendingPurchases: 1,
+        totalRevenue: 1,
+        confirmedRevenue: 1,
+        averagePrice: { $round: ["$averagePrice", 2] }
+      }
+    }
   ]);
 
   const monthlyStats = await ECPurchase.aggregate([
@@ -355,12 +365,12 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
           month: { $month: "$createdAt" },
         },
         count: { $sum: 1 },
-        revenue: { $sum: "$price" },
+        revenue: { $sum: "$finalPrice" },
         confirmedCount: {
           $sum: { $cond: [{ $eq: ["$confirmed", true] }, 1, 0] },
         },
         confirmedRevenue: {
-          $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$price", 0] },
+          $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0] },
         },
       },
     },
