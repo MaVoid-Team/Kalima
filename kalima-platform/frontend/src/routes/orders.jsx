@@ -108,7 +108,7 @@ export const getAllStats = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/purchases/stats`, {
+    const response = await axios.get(`${API_URL}/ec/purchases/stats`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -133,7 +133,7 @@ export const getProductStats = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/purchases/product-purchase-stats`, {
+    const response = await axios.get(`${API_URL}/ec/purchases/product-purchase-stats`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -159,7 +159,7 @@ export const updatePurchase = async(purchaseId, updateData) => {
     }
 
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/purchases/${purchaseId}`,
+      `${API_URL}/ec/purchases/${purchaseId}`,
       updateData,
       {
         withCredentials: true,
