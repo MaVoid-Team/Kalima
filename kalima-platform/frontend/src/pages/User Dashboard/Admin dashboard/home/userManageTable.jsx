@@ -22,6 +22,7 @@ const UserManagementTable = () => {
     phone: "",
     role: "",
     status: "",
+    successfulInvites: "", // Changed to empty string instead of 0
   })
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [whatsappModal, setWhatsappModal] = useState({
@@ -94,7 +95,11 @@ const UserManagementTable = () => {
         (!filters.name || user.name.toLowerCase().includes(filters.name.toLowerCase())) &&
         (!filters.phone || user.phoneNumber?.includes(filters.phone)) &&
         (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
-        (!filters.status || getStatus(user) === filters.status),
+        (!filters.status || getStatus(user) === filters.status) &&
+        (filters.successfulInvites === "" ||
+          (filters.successfulInvites === "5" ?
+            (user.successfulInvites || 0) >= 5 :
+            (user.successfulInvites || 0) === parseInt(filters.successfulInvites, 10)))
     )
     setFilteredUsers(filtered)
   }
@@ -186,15 +191,15 @@ const UserManagementTable = () => {
   // Export functionality
   const convertToCSV = (data) => {
     const headers = [
-      t("admin.export.name") || "Name",
-      t("admin.export.email") || "Email",
-      t("admin.export.phone") || "Phone Number",
-      t("admin.export.role") || "Role",
-      t("admin.export.status") || "Status",
-      t("admin.export.government") || "Government",
-      t("admin.export.administrationZone") || "Administration Zone",
-      t("admin.export.sequenceId") || "Sequence ID",
-      t("admin.export.joinedDate") || "Joined Date",
+      t("admin.export.name"),
+      t("admin.export.email"),
+      t("admin.export.phone"),
+      t("admin.export.role"),
+      t("admin.export.status"),
+      t("admin.export.government"),
+      t("admin.export.administrationZone"),
+      t("admin.export.sequenceId"),
+      t("admin.export.joinedDate"),
     ]
 
     const csvContent = [
@@ -243,15 +248,15 @@ const UserManagementTable = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.export.successAll") || `Successfully exported ${dataToExport.length} users`
-          : t("admin.export.successFiltered") || `Successfully exported ${dataToExport.length} filtered users`
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
 
         // You can replace this with a toast notification if you have one
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.export.error") || "Failed to export users. Please try again.")
+      alert(t("admin.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -299,14 +304,14 @@ const UserManagementTable = () => {
 
         // Show success message
         const successMessage = exportAll
-          ? t("admin.export.successAll") || `Successfully exported ${dataToExport.length} users`
-          : t("admin.export.successFiltered") || `Successfully exported ${dataToExport.length} filtered users`
+          ? t("admin.export.successAll", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length })
 
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.export.error") || "Failed to export users. Please try again.")
+      alert(t("admin.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -353,45 +358,45 @@ const UserManagementTable = () => {
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.export.exporting") || "Exporting..."}
+                {t("admin.export.exporting")}
               </>
             ) : (
               <>
                 <FaDownload className="mr-2" />
-                {t("admin.export.export") || "Export"}
+                {t("admin.export.export")}
               </>
             )}
           </div>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
             <li className="menu-title">
-              <span>{t("admin.export.csvFormat") || "CSV Format"}</span>
+              <span>{t("admin.export.csvFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered") || "Export Filtered"} ({filteredUsers.length})
+                {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll") || "Export All"} ({users.length})
+                {t("admin.export.exportAll")} ({users.length})
               </button>
             </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
-              <span>{t("admin.export.jsonFormat") || "JSON Format"}</span>
+              <span>{t("admin.export.jsonFormat")}</span>
             </li>
             <li>
               <button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered") || "Export Filtered"} ({filteredUsers.length})
+                {t("admin.export.exportFiltered")} ({filteredUsers.length})
               </button>
             </li>
             <li>
               <button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll") || "Export All"} ({users.length})
+                {t("admin.export.exportAll")} ({users.length})
               </button>
             </li>
           </ul>
@@ -436,6 +441,18 @@ const UserManagementTable = () => {
             <option value={t("admin.status.valid")}>{t("admin.status.valid")}</option>
             <option value={t("admin.status.missingData")}>{t("admin.status.missingData")}</option>
           </select>
+          <select
+            className="select select-bordered"
+            value={filters.successfulInvites}
+            onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
+          >
+            <option value="">{t("admin.filters.all")}</option>
+            <option value="1">1 {t("admin.invites.invite")}</option>
+            <option value="2">2 {t("admin.invites.invites")}</option>
+            <option value="3">3 {t("admin.invites.invites")}</option>
+            <option value="4">4 {t("admin.invites.invites")}</option>
+            <option value="5">5+ {t("admin.invites.invites")}</option>
+          </select>
         </div>
 
         <div className="flex gap-4">
@@ -465,8 +482,8 @@ const UserManagementTable = () => {
             ></path>
           </svg>
           <span>
-            {t("admin.export.filterInfo") || "Filters applied:"} {filteredUsers.length} {t("admin.export.of") || "of"}{" "}
-            {users.length} {t("admin.export.usersShown") || "users shown"}
+            {t("admin.export.filterInfo")} {filteredUsers.length} {t("admin.export.of")}{" "}
+            {users.length} {t("admin.export.usersShown")}
           </span>
         </div>
       )}
@@ -476,7 +493,7 @@ const UserManagementTable = () => {
         <table className="table w-full">
           <thead>
             <tr className={`${isRTL ? "text-right" : "text-left"}`}>
-              {["name", "phone", "accountType", "status", "actions"].map((header) => (
+              {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
                 <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
                   {t(`admin.table.${header}`)}
                 </th>
@@ -490,6 +507,9 @@ const UserManagementTable = () => {
                 <td className="py-4 whitespace-nowrap">{user.phoneNumber || t("admin.NA")}</td>
                 <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
                 <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
+                <td className="py-4 whitespace-nowrap">
+                  {user.successfulInvites || 0}
+                </td>
                 <td className="py-4 whitespace-nowrap">
                   <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
                     {isAdmin && (
@@ -545,7 +565,7 @@ const UserManagementTable = () => {
             <p className="text-sm opacity-70 max-w-md">
               {filters.name || filters.phone || filters.role || filters.status
                 ? t("admin.noUsersFiltered") ||
-                  "No users match your current filters. Try adjusting your search criteria."
+                "No users match your current filters. Try adjusting your search criteria."
                 : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
             </p>
           </div>

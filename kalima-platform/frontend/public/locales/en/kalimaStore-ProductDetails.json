@@ -79,10 +79,16 @@
     "fillBookFields": "Please fill in all book fields.",
     "purchaseSubmissionFailed": "Purchase submission failed: ",
     "title": "Error!",
-    "productNotFound": "Product not found."
+    "productNotFound": "Product not found.",
+    "noCouponCode": "Please enter a coupon code.",
+    "invalidCoupon": "Invalid or expired coupon.",
+    "invalidDiscountValue": "Invalid discount value received from server.",
+    "productDataNotLoaded": "Product data not loaded.",
+    "unknownError": "Unknown error occurred"
   },
   "success": {
-    "purchaseSubmitted": "Purchase submitted successfully!"
+    "purchaseSubmitted": "Purchase submitted successfully!",
+    "couponApplied": "Coupon applied successfully!"
   },
   "logs": {
     "submittingPurchase": "Submitting purchase with file:"
@@ -116,7 +122,14 @@
     "submit": "Submit Purchase",
     "processingTimeTitle": "Processing Time",
     "processingTimeDesc": "After submitting your purchase request, our team will review and process your order. You can expect a response within ",
-    "hours": "hours during business hours"
+    "hours": "hours during business hours",
+    "couponCode": "Coupon Code",
+    "couponCodePlaceholder": "Enter coupon",
+    "applyCoupon": "Apply",
+    "priceSummary": "Price Summary",
+    "originalPrice": "Original Price",
+    "discount": "Discount",
+    "total": "Total"
   },
   "sample": {
     "noSample": "No Sample Available",
@@ -127,5 +140,8 @@
     "downloadButton": "Download Sample PDF",
     "downloading": "Downloading...",
     "fileWillBeDownloadedAs": "File will be downloaded as: {{filename}}"
+  },
+  "loading": {
+    "productDetails": "Loading product details..."
   }
 }

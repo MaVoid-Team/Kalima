@@ -60,6 +60,7 @@ const seedNotificationTemplates = require("./utils/seeds/seedNotificationTemplat
 const governmentRoutes = require("./routes/governmentRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const ecCouponRouter = require("./routes/ec.couponRoutes");
+const ecReferralRoutes = require("./routes/ec.referralRoutes");
 
 
 connectDB();
@@ -127,12 +128,13 @@ app.use("/api/v1/assistant-homework", assistantHomeworkRouter);
 app.use("/api/v1/governments", governmentRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
 // Mount the new e-commerce product and book routes
-app.use("/api/v1/ec/sections", ecSectionRouter);
-app.use("/api/v1/ec/products", ecProductRouter);
+app.use("/api/v1/ec/sections", auditLogger, ecSectionRouter);
+app.use("/api/v1/ec/products", auditLogger, ecProductRouter);
 app.use("/api/v1/ec/books", ecBookRouter);
-app.use("/api/v1/ec/purchases", ecPurchaseRouter);
+app.use("/api/v1/ec/purchases", auditLogger, ecPurchaseRouter);
 app.use("/api/v1/ec/book-purchases", ecBookPurchaseRouter);
 app.use("/api/v1/ec/coupons", ecCouponRouter);
+app.use("/api/v1/ec/referrals", ecReferralRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

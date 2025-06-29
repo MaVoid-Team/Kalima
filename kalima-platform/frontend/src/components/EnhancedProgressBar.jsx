@@ -1,6 +1,7 @@
 "use client"
 
 import { CheckCircle, XCircle, AlertTriangle } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 const EnhancedProgressBar = ({
   isVisible,
@@ -12,6 +13,8 @@ const EnhancedProgressBar = ({
   onCancel,
   showCancel = true,
 }) => {
+  const { t } = useTranslation("kalimaStore-admin")
+  
   if (!isVisible) return null
 
   const getStepStatus = (stepIndex) => {
@@ -56,7 +59,7 @@ const EnhancedProgressBar = ({
         {/* Overall Progress */}
         <div className="mb-6">
           <div className="flex justify-between text-sm mb-2">
-            <span>Overall Progress</span>
+            <span>{t("progressBar.overallProgress")}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <progress
@@ -113,7 +116,7 @@ const EnhancedProgressBar = ({
           <div className="mt-4 p-3 bg-error/10 border border-error/20 rounded-lg">
             <div className="flex items-center space-x-2">
               <AlertTriangle className="w-4 h-4 text-error" />
-              <p className="text-sm text-error font-medium">Upload Failed</p>
+              <p className="text-sm text-error font-medium">{t("progressBar.uploadFailed")}</p>
             </div>
             <p className="text-sm text-error/80 mt-1">{error}</p>
           </div>
@@ -124,7 +127,7 @@ const EnhancedProgressBar = ({
           <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-lg">
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 text-success" />
-              <p className="text-sm text-success font-medium">Upload Completed Successfully!</p>
+              <p className="text-sm text-success font-medium">{t("progressBar.uploadCompletedSuccessfully")}</p>
             </div>
           </div>
         )}

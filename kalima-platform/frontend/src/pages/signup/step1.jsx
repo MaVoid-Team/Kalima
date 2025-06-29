@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllGovernments, getGovernmentZones } from '../../routes/governments';
 
-export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels  }) {
+export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [governments, setGovernments] = useState([]);
@@ -15,7 +15,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         setLoading(true);
         setError(null);
         const result = await getAllGovernments();
-        
+
         if (result.success) {
           setGovernments(result.data);
         } else {
@@ -44,7 +44,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       try {
         setZonesLoading(true);
         const result = await getGovernmentZones(formData.government);
-        
+
         if (result.success) {
           setAdministrationZones(result.data);
         } else {
@@ -119,11 +119,37 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           />
           {errors.fullName && (
             <span className="absolute bottom-0  text-error text-sm mt-1">
-             {t(`validation.${errors.fullName}`)}
+              {t(`validation.${errors.fullName}`)}
             </span>
           )}
         </div>
       </div>
+
+      <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t("form.profilePic") || "Profile Picture"}</span>
+          </label>
+          <input
+            type="file"
+            name="profilePic"
+            accept=".jpg,.jpeg,.png"
+            className="file-input file-input-bordered w-2/3 lg:w-1/2"
+            onChange={handleInputChange}
+          />
+          {formData.profilePic && (
+            <p className="text-xs mt-1 text-base-content/70">
+              Selected file: {formData.profilePic.name}
+            </p>
+          )}
+          {errors.profilePic && (
+            <span className="absolute bottom-0 text-error text-sm mt-1">
+              {t(`validation.${errors.profilePic}`)}
+            </span>
+          )}
+        </div>
+      </div>
+
 
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
@@ -159,41 +185,62 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           />
           {errors.phoneNumber && (
             <span className="absolute bottom-0  text-error text-sm mt-1">
-               {t(`validation.${errors.phoneNumber}`)}
+              {t(`validation.${errors.phoneNumber}`)}
             </span>
           )}
         </div>
       </div>
 
-       {role === 'teacher' && (
-        <>
-     <div className="form-control relative pb-5">
+      <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t('form.phoneNumber2')}</span>
+            <span className="label-text">{t('form.referralSerial')}</span>
           </label>
           <input
-            type="number"
-            name="phoneNumber2"
-            className={`input input-bordered w-2/3 lg:w-1/2 `}
-            value={formData.phoneNumber2}
+            type="text"
+            name="referralSerial"
+            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.referralSerial ? 'input-error animate-shake' : ''}`}
+            value={formData.referralSerial}
             onChange={handleInputChange}
             required
           />
-          <label className="label">
-            <span className="label-text">{t('form.optional')}</span>
-          </label>
-          {errors.phoneNumber2 && (
+          {errors.referralSerial && (
             <span className="absolute bottom-0  text-error text-sm mt-1">
-               {t(`validation.${errors.phoneNumber2}`)}
+              {t(`validation.${errors.referralSerial}`)}
             </span>
           )}
         </div>
       </div>
+
+      {role === 'teacher' && (
+        <>
+          <div className="form-control relative pb-5">
+            <div className="flex flex-col gap-2">
+              <label className="label">
+                <span className="label-text">{t('form.phoneNumber2')}</span>
+              </label>
+              <input
+                type="number"
+                name="phoneNumber2"
+                className={`input input-bordered w-2/3 lg:w-1/2 `}
+                value={formData.phoneNumber2}
+                onChange={handleInputChange}
+                required
+              />
+              <label className="label">
+                <span className="label-text">{t('form.optional')}</span>
+              </label>
+              {errors.phoneNumber2 && (
+                <span className="absolute bottom-0  text-error text-sm mt-1">
+                  {t(`validation.${errors.phoneNumber2}`)}
+                </span>
+              )}
+            </div>
+          </div>
         </>
       )}
 
-    {/* Government Selection */}
+      {/* Government Selection */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
@@ -221,68 +268,68 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       </div>
 
       {/* Administration Zone Selection - Only show if government is selected */}
-      
-        <div className="form-control relative pb-5">
-          <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
-            </label>
-            <select
-              disabled={!formData.government || zonesLoading}
-              name="administrationZone"
-              className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
-              value={formData.administrationZone || ""}
-              onChange={handleInputChange}
-            >
-              <option value="">
-                {zonesLoading 
-                  ? (t("common.loading") || "Loading...") 
-                  : (t("form.selectAdministrationZone") || "Select Administration Zone")
-                }
+
+      <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
+          </label>
+          <select
+            disabled={!formData.government || zonesLoading}
+            name="administrationZone"
+            className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
+            value={formData.administrationZone || ""}
+            onChange={handleInputChange}
+          >
+            <option value="">
+              {zonesLoading
+                ? (t("common.loading") || "Loading...")
+                : (t("form.selectAdministrationZone") || "Select Administration Zone")
+              }
+            </option>
+            {administrationZones.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
               </option>
-              {administrationZones.map((zone) => (
-                <option key={zone} value={zone}>
-                  {zone}
-                </option>
-              ))}
-            </select>
-            {errors.administrationZone && (
-              <span className="absolute bottom-0  text-error text-sm mt-1">
-                {t(`validation.${errors.administrationZone}`) || "Administration Zone is required"}
-              </span>
-            )}
-          </div>
+            ))}
+          </select>
+          {errors.administrationZone && (
+            <span className="absolute bottom-0  text-error text-sm mt-1">
+              {t(`validation.${errors.administrationZone}`) || "Administration Zone is required"}
+            </span>
+          )}
         </div>
-     
+      </div>
+
       {/* Student-specific fields */}
       {role === 'student' && (
         <>
-       <div className="form-control relative pb-5">
-          <div className="flex flex-col gap-2">
-            <label className="label">
-              <span className="label-text">{t('form.grade')}</span>
-            </label>
-            <select
-              name="level"
-              className={`select select-bordered w-2/3 lg:w-1/2 ${errors.level ? 'select-error animate-shake' : ''}`}
-              value={formData.level}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">{t('form.selectGrade')}</option>
-              {gradeLevels.map(level => (
-                <option key={level.value} value={level.value}>
-                  {t(`gradeLevels.${level.label}`)}
-                </option>
-              ))}
-            </select>
-            {errors.level && (
-              <span className="absolute bottom-0  text-error text-sm mt-1">
-                 {t(`validation.${errors.level}`)}
-              </span>
-            )}
+          <div className="form-control relative pb-5">
+            <div className="flex flex-col gap-2">
+              <label className="label">
+                <span className="label-text">{t('form.grade')}</span>
+              </label>
+              <select
+                name="level"
+                className={`select select-bordered w-2/3 lg:w-1/2 ${errors.level ? 'select-error animate-shake' : ''}`}
+                value={formData.level}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">{t('form.selectGrade')}</option>
+                {gradeLevels.map(level => (
+                  <option key={level.value} value={level.value}>
+                    {t(`gradeLevels.${level.label}`)}
+                  </option>
+                ))}
+              </select>
+              {errors.level && (
+                <span className="absolute bottom-0  text-error text-sm mt-1">
+                  {t(`validation.${errors.level}`)}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
         </>
       )}
     </div>
