@@ -236,8 +236,13 @@ export const createBook = async (bookData) => {
     if (bookData.sample) {
       formData.append("sample", bookData.sample)
     }
-
-    const response = await axios.post(`${API_URL}/ec/books`, formData, {
+    if (bookData.gallery && bookData.gallery.length > 0) {
+      // If gallery is a FileList or array of files
+      for (let i = 0; i < bookData.gallery.length; i++) {
+        formData.append("gallery", bookData.gallery[i])
+      }
+    }
+    const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -309,6 +314,9 @@ export const purchaseProduct = async (purchaseData) => {
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
     if (purchaseData.paymentScreenShot) {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
+    }
+    if (purchaseData.notes) {
+      formData.append("notes", purchaseData.notes)
     }
 
     const response = await axios.post(`${API_URL}/ec/purchases/`, formData, {

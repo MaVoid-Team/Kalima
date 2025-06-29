@@ -9,6 +9,35 @@ const mongoose = require("mongoose");
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
   let query = ECPurchase.find();
+  let searchApplied = false;
+  let searchFilter = {};
+
+  // Handle search parameter
+  if (req.query.search) {
+    const searchTerm = req.query.search;
+    const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive search
+
+    // Create search filter for multiple fields
+    searchFilter = {
+      $or: [
+        { productName: searchRegex },
+        { userName: searchRegex },
+        { purchaseSerial: searchRegex },
+        { numberTransferredFrom: searchRegex },
+        { 'createdBy.email': searchRegex },
+        { 'createdBy.name': searchRegex },
+        { 'productId.title': searchRegex },
+        { 'productId.serial': searchRegex }
+      ]
+    };
+
+    // Apply search filter
+    query = query.find(searchFilter);
+    searchApplied = true;
+
+    // Remove search from queryString to avoid conflicts with QueryFeatures
+    delete req.query.search;
+  }
 
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -16,8 +45,15 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     .paginate();
 
   // Get total count for pagination (before applying pagination)
+  let totalQuery = ECPurchase.find();
+
+  // Apply search filter to total count if search was applied
+  if (searchApplied) {
+    totalQuery = totalQuery.find(searchFilter);
+  }
+
   const totalPurchases = await ECPurchase.countDocuments(
-    features.query.getFilter()
+    totalQuery.getFilter ? totalQuery.getFilter() : totalQuery._conditions
   );
 
   // Apply population and execute query
@@ -108,7 +144,6 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     }
   }
   // Set the creator
-
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
   req.body.productName = product.title;
@@ -129,14 +164,26 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       new AppError("User serial is required to create a purchase", 400)
     );
   }
-  if (!product.section.number) {
+  // Get section number robustly from product data
+  let sectionNumber = null;
+  if (product.section && typeof product.section === "object" && product.section.number) {
+    sectionNumber = product.section.number;
+  } else if (product.sectionNumber) {
+    sectionNumber = product.sectionNumber;
+  }
+  if (!sectionNumber) {
     return next(new AppError("Product section number is required", 400));
   }
   if (!product.serial) {
     return next(new AppError("Product serial is required", 400));
   }
 
-  req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
+  req.body.purchaseSerial = `${req.user.userSerial}-${sectionNumber}-${product.serial}`;
+
+  // Support notes and adminNotes fields
+  if (typeof req.body.notes === "undefined") req.body.notes = null;
+  if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
+
   const purchase = await ECPurchase.create(req.body); // Populate the created purchase
   if (!purchase) {
     return next(new AppError("Purchase creation failed", 400));
@@ -145,6 +192,41 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     // Mark the coupon as used
     await coupon.markAsUsed(purchase._id, req.user._id);
   }
+
+  // --- Referral successful invite logic ---
+  // Only increment inviter's successfulInvites if this is the first purchase for the referred user
+  if (req.user.referredBy) {
+    const purchaseCount = await ECPurchase.countDocuments({ createdBy: req.user._id });
+    if (purchaseCount === 1) {
+      // Find the inviter's role (Student, Parent, Teacher)
+      const User = require("../models/userModel");
+      const Student = require("../models/studentModel");
+      const Parent = require("../models/parentModel");
+      const Teacher = require("../models/teacherModel");
+      const inviter = await User.findById(req.user.referredBy);
+      if (inviter) {
+        let Model;
+        switch (inviter.role) {
+          case "Student":
+            Model = Student;
+            break;
+          case "Parent":
+            Model = Parent;
+            break;
+          case "Teacher":
+            Model = Teacher;
+            break;
+          default:
+            Model = null;
+        }
+        if (Model) {
+          await Model.findByIdAndUpdate(inviter._id, { $inc: { successfulInvites: 1 } });
+        }
+      }
+    }
+  }
+  // --- End referral logic ---
+
   res.status(201).json({
     status: "success",
     data: {
@@ -168,6 +250,9 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   delete req.body.purchaseSerial; // Prevent manual serial modification
   delete req.body.finalPrice;
   delete req.body.couponCode;
+  delete req.body.paymentScreenShot;
+  // Allow updating notes and adminNotes
+  // (no extra logic needed, just don't delete them)
 
   const purchase = await ECPurchase.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -381,5 +466,43 @@ exports.searchBySerial = catchAsync(async (req, res, next) => {
     data: {
       purchase,
     },
+  });
+});
+
+// Get stats for every product: product name, section, total value, and number of purchases
+exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
+  const stats = await ECPurchase.aggregate([
+    {
+      $group: {
+        _id: "$productId",
+        totalPurchases: { $sum: 1 },
+        totalValue: { $sum: "$finalPrice" },
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "productInfo"
+      }
+    },
+    { $unwind: "$productInfo" },
+    {
+      $project: {
+        _id: 0,
+        productId: "$_id",
+        productName: "$productInfo.title",
+        productSection: "$productInfo.section",
+        totalPurchases: 1,
+        totalValue: 1
+      }
+    },
+    { $sort: { totalPurchases: -1 } }
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    data: stats,
   });
 });

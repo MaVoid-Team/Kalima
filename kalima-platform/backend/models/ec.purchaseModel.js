@@ -81,6 +81,11 @@ const ecPurchaseSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+    adminNotes: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     couponCode: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ECCoupon",

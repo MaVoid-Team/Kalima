@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import {
   createSection,
@@ -20,25 +20,25 @@ import SectionsManagement from "./SectionsManagement"
 import AdminForms from "./AdminForms"
 import AdminModals from "./AdminModals"
 import ErrorBoundary from "./ErrorBoundary"
+import CreateCoupons from "./CreateCoupouns"
 
 const AdminPanel = () => {
   const { t, i18n } = useTranslation("kalimaStore-admin")
   const isRTL = i18n.language === "ar"
 
   // Use custom hook for data management
-  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts,productsPagination,
-    productsLoading,
-    goToPage,
-    changeItemsPerPage,
-    searchProducts, } =
+  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts } =
     useAdminData()
 
   // Local state
-  const [searchQuery, setSearchQuery] = useState("")
-  const [productSearchQuery, setProductSearchQuery] = useState("")
   const [actionLoading, setActionLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("product")
   const [isExporting, setIsExporting] = useState(false)
+
+  // Manual initial data fetch (since we removed auto-refresh)
+  useEffect(() => {
+    refetch()
+  }, [refetch])
 
   // Form states
   const [sectionForm, setSectionForm] = useState({
@@ -57,6 +57,9 @@ const AdminPanel = () => {
     paymentNumber: "",
     thumbnail: null,
     sample: null,
+    gallery: [],
+    whatsAppNumber: "",
+    description: "",
   })
 
   const [bookForm, setBookForm] = useState({
@@ -67,10 +70,11 @@ const AdminPanel = () => {
     discountPercentage: "",
     subject: "",
     paymentNumber: "",
-    description: "",
     thumbnail: null,
     sample: null,
     gallery: [],
+    whatsAppNumber: "",
+    description: "",
   })
 
   // Modal states
@@ -106,12 +110,12 @@ const AdminPanel = () => {
 
         const dataCount =
           type === "products" ? products.length + books.length : type === "sections" ? sections.length : books.length
-        const successMessage = t("export.successMessage") || `Successfully exported ${dataCount} ${type}`
+        const successMessage = t("export.successMessage", { count: dataCount, type })
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("export.error") || "Failed to export data. Please try again.")
+      alert(t("export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -138,12 +142,12 @@ const AdminPanel = () => {
         document.body.removeChild(link)
         URL.revokeObjectURL(url)
 
-        const successMessage = t("export.successMessage") || `Successfully exported ${jsonData.length} ${type}`
+        const successMessage = t("export.successMessage", { count: jsonData.length, type })
         alert(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("export.error") || "Failed to export data. Please try again.")
+      alert(t("export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -160,7 +164,7 @@ const AdminPanel = () => {
       !bookForm.paymentNumber ||
       !bookForm.subject
     ) {
-      alert(t("alerts.fillRequiredFields") || "Please fill all required fields")
+      alert(t("alerts.fillRequiredFields"))
       return
     }
 
@@ -177,6 +181,8 @@ const AdminPanel = () => {
         description: bookForm.description,
         thumbnail: bookForm.thumbnail,
         sample: bookForm.sample,
+        gallery: bookForm.gallery,
+        whatsAppNumber: bookForm.whatsAppNumber,
       })
 
       if (response?.message === "ECBook created successfully" || response?.status === "success") {
@@ -192,6 +198,8 @@ const AdminPanel = () => {
           description: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
         })
 
         // Reset file inputs
@@ -200,14 +208,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = ""
         if (sampleInput) sampleInput.value = ""
 
-        alert(t("alerts.bookCreatedSuccess") || "Book created successfully")
+        alert(t("alerts.bookCreatedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to create book")
       }
     } catch (err) {
       console.error("Error creating book:", err)
-      alert((t("alerts.bookCreateError") || "Error creating book: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.bookCreateError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -222,7 +230,7 @@ const AdminPanel = () => {
       !productForm.price ||
       !productForm.paymentNumber
     ) {
-      alert(t("alerts.fillRequiredFields") || "Please fill all required fields")
+      alert(t("alerts.fillRequiredFields"))
       return
     }
 
@@ -253,6 +261,9 @@ const AdminPanel = () => {
           paymentNumber: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
+          description: "",
         })
 
         // Reset file inputs
@@ -261,14 +272,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = ""
         if (sampleInput) sampleInput.value = ""
 
-        alert(t("alerts.productCreatedSuccess") || "Product created successfully")
+        alert(t("alerts.productCreatedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to create product")
       }
     } catch (err) {
       console.error("Error creating product:", err)
-      alert((t("alerts.productCreateError") || "Error creating product: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.productCreateError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -276,7 +287,7 @@ const AdminPanel = () => {
 
   const handleEditProduct = async (product) => {
     if (!product?._id) {
-      alert("Invalid product selected")
+      alert(t("validation.invalidProductSelected"))
       return
     }
 
@@ -296,6 +307,9 @@ const AdminPanel = () => {
           paymentNumber: productData.paymentNumber || "",
           thumbnail: null,
           sample: null,
+          gallery: productData.gallery || [],
+          whatsAppNumber: productData.whatsAppNumber || "",
+          description: productData.description || "",
         })
         setShowEditProductModal(true)
       } else {
@@ -303,7 +317,7 @@ const AdminPanel = () => {
       }
     } catch (err) {
       console.error("Error fetching product details:", err)
-      alert((t("alerts.productFetchError") || "Error fetching product: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.productFetchError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -324,6 +338,9 @@ const AdminPanel = () => {
         paymentNumber: productForm.paymentNumber,
         thumbnail: productForm.thumbnail,
         sample: productForm.sample,
+        gallery: productForm.gallery,
+        whatsAppNumber: productForm.whatsAppNumber,
+        description: productForm.description,
       })
 
       if (response?.status === "success") {
@@ -338,6 +355,9 @@ const AdminPanel = () => {
           paymentNumber: "",
           thumbnail: null,
           sample: null,
+          gallery: [],
+          whatsAppNumber: "",
+          description: "",
         })
 
         // Reset file inputs
@@ -346,14 +366,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = ""
         if (sampleInput) sampleInput.value = ""
 
-        alert(t("alerts.productUpdatedSuccess") || "Product updated successfully")
+        alert(t("alerts.productUpdatedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to update product")
       }
     } catch (err) {
       console.error("Error updating product:", err)
-      alert((t("alerts.productUpdateError") || "Error updating product: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.productUpdateError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -369,14 +389,14 @@ const AdminPanel = () => {
       if (response?.status === "success" || response) {
         setShowDeleteProductModal(false)
         setProductToDelete(null)
-        alert(t("alerts.productDeletedSuccess") || "Product deleted successfully")
+        alert(t("alerts.productDeletedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to delete product")
       }
     } catch (err) {
       console.error("Error deleting product:", err)
-      alert((t("alerts.productDeleteError") || "Error deleting product: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.productDeleteError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -385,7 +405,7 @@ const AdminPanel = () => {
   const handleCreateSection = async (e) => {
     e.preventDefault()
     if (!sectionForm.name || !sectionForm.description || !sectionForm.number) {
-      alert(t("alerts.fillRequiredFields") || "Please fill all required fields")
+      alert(t("alerts.fillRequiredFields"))
       return
     }
 
@@ -405,14 +425,14 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
         })
-        alert(t("alerts.sectionCreatedSuccess") || "Section created successfully")
+        alert(t("alerts.sectionCreatedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to create section")
       }
     } catch (err) {
       console.error("Error creating section:", err)
-      alert((t("alerts.sectionCreateError") || "Error creating section: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.sectionCreateError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -420,7 +440,7 @@ const AdminPanel = () => {
 
   const handleEditSection = (section) => {
     if (!section?._id) {
-      alert("Invalid section selected")
+      alert(t("validation.invalidSectionSelected"))
       return
     }
 
@@ -456,14 +476,14 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
         })
-        alert(t("alerts.sectionUpdatedSuccess") || "Section updated successfully")
+        alert(t("alerts.sectionUpdatedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to update section")
       }
     } catch (err) {
       console.error("Error updating section:", err)
-      alert((t("alerts.sectionUpdateError") || "Error updating section: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.sectionUpdateError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -479,14 +499,14 @@ const AdminPanel = () => {
       if (response?.status === "success" || response) {
         setShowDeleteModal(false)
         setSectionToDelete(null)
-        alert(t("alerts.sectionDeletedSuccess") || "Section deleted successfully")
+        alert(t("alerts.sectionDeletedSuccess"))
         await refetch()
       } else {
         throw new Error(response?.error || "Failed to delete section")
       }
     } catch (err) {
       console.error("Error deleting section:", err)
-      alert((t("alerts.sectionDeleteError") || "Error deleting section: ") + (err?.message || "Unknown error"))
+      alert(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -536,10 +556,10 @@ const AdminPanel = () => {
             />
           </svg>
           <div>
-            <h3 className="font-bold">{t("error.title") || "Error"}</h3>
+            <h3 className="font-bold">{t("error.title")}</h3>
             <div className="text-xs">{error}</div>
             <button className="btn btn-sm btn-outline mt-2" onClick={() => refetch()}>
-              {t("error.retry") || "Retry"}
+              {t("error.retry")}
             </button>
           </div>
         </div>
@@ -568,8 +588,6 @@ const AdminPanel = () => {
             books={books}
             sections={sections}
             subjects={subjects}
-            productSearchQuery={productSearchQuery}
-            setProductSearchQuery={setProductSearchQuery}
             onEditProduct={handleEditProduct}
             onDeleteProduct={(product) => {
               setProductToDelete(product)
@@ -577,25 +595,22 @@ const AdminPanel = () => {
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
-            productsPagination={productsPagination}
-            productsLoading={productsLoading}
-            onPageChange={goToPage}
-            onItemsPerPageChange={changeItemsPerPage}
-            onSearch={searchProducts}
           />
 
           <SectionsManagement
             sections={sections}
             products={products}
             books={books}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
             onEditSection={handleEditSection}
             onDeleteSection={(section) => {
               setSectionToDelete(section)
               setShowDeleteModal(true)
             }}
             actionLoading={actionLoading}
+            isRTL={isRTL}
+          />
+
+          <CreateCoupons
             isRTL={isRTL}
           />
 

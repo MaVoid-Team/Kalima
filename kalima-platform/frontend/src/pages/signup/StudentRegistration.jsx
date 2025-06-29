@@ -61,6 +61,8 @@ export default function StudentRegistration() {
     socialMedia: [{ platform: "", account: "" }],
     government: "",
     administrationZone: "",
+    referralSerial: "",
+    profilePic: null,
   })
   const [errors, setErrors] = useState({})
   const [apiError, setApiError] = useState(null)
@@ -223,18 +225,25 @@ export default function StudentRegistration() {
   }
 
   const handleInputChange = (e) => {
-    try {
-      const { name, value, type } = e.target
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? e.target.checked : value,
-      }))
-      setErrors((prev) => ({ ...prev, [name]: undefined }))
-    } catch (error) {
-      console.error("Error handling input change:", error)
-      setApiError("Failed to process input")
-    }
+  try {
+    const { name, value, type, files } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox"
+        ? e.target.checked
+        : type === "file"
+        ? files[0] // File input handling
+        : value,
+    }));
+
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  } catch (error) {
+    console.error("Error handling input change:", error);
+    setApiError("Failed to process input");
   }
+};
+
 
   const handleChildrenChange = (index, value) => {
     try {
@@ -252,131 +261,137 @@ export default function StudentRegistration() {
   }
 
   const handleSubmit = async () => {
-    try {
-      setApiError(null)
-      setErrors({})
-      let payload
+  try {
+    setApiError(null);
+    setErrors({});
 
-      switch (formData.role) {
-        case "student":
-          payload = {
-            role: "student",
-            name: formData.fullName.trim(),
-            email: formData.email.toLowerCase().trim(),
-            password: formData.password,
-            confirmPassword: formData.confirmPassword,
-            level: formData.level,
-            hobbies: formData.hobbies
-              .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name || "")
-              .filter((name) => name !== ""),
-            parentPhoneNumber: formData.parentPhoneNumber,
-            phoneNumber: formData.phoneNumber,
-            faction: formData.faction || "Alpha",
-            gender: formData.gender,
-            government: formData.government,
-            administrationZone: formData.administrationZone,
-          }
-          break
+    const data = new FormData();
 
-        case "parent":
-          payload = {
-            role: "parent",
-            children: formData.children.filter((c) => c.trim() !== ""),
-            name: formData.fullName.trim(),
-            email: formData.email.toLowerCase().trim(),
-            password: formData.password,
-            confirmPassword: formData.confirmPassword,
-            phoneNumber: formData.phoneNumber,
+    // Common fields across all roles
+    data.append("role", formData.role);
+    data.append("name", formData.fullName.trim());
+    data.append("email", formData.email.toLowerCase().trim());
+    data.append("password", formData.password);
+    data.append("confirmPassword", formData.confirmPassword);
+    data.append("gender", formData.gender);
+    data.append("phoneNumber", formData.phoneNumber);
+    data.append("government", formData.government);
+    data.append("administrationZone", formData.administrationZone);
 
-            gender: formData.gender,
-            government: formData.government,
-            administrationZone: formData.administrationZone,
-          }
-          break
-
-        case "teacher":
-          payload = {
-            role: "teacher",
-            name: formData.fullName.trim(),
-            gender: formData.gender,
-            email: formData.email.toLowerCase().trim(),
-            password: formData.password,
-            confirmPassword: formData.confirmPassword,
-            phoneNumber: formData.phoneNumber,
-            phoneNumber2: formData.phoneNumber2,
-            subject: formData.subject.trim(),
-            level: formData.level,
-            teachesAtType: formData.teachesAtType,
-            centers:
-              formData.teachesAtType === "Center" || formData.teachesAtType === "Both"
-                ? formData.centers.filter((c) => c.trim() !== "")
-                : undefined,
-            school:
-              formData.teachesAtType === "School" || formData.teachesAtType === "Both"
-                ? formData.school.trim()
-                : undefined,
-            socialMedia: formData.socialMedia
-              .filter((s) => s.platform && s.account)
-              .map((s) => ({ platform: s.platform, account: s.account.trim() })),
-            government: formData.government,
-            administrationZone: formData.administrationZone,
-          }
-          break
-
-        default:
-          throw new Error("Invalid role selected")
-      }
-
-      const url = `${apiUrl}/register`
-      const response = await axios.post(url, payload)
-      navigate("/login", {
-        state: { message: "Registration successful" },
-      })
-    } catch (error) {
-      let errorMessage = t("errors.unexpectedError")
-      const fieldErrors = {}
-
-      if (error.response) {
-        const { status, data } = error.response
-
-        switch (status) {
-          case 400:
-            errorMessage = data.message || t("errors.invalidData")
-            if (data.message?.includes("phone number")) {
-              errorMessage = t("errors.phoneExists")
-            }
-            if (data.message?.includes("at least one special character")) {
-              errorMessage = t("errors.PasswordSpecialChar")
-            }
-            if (data.message?.includes("at least one uppercase")) {
-              errorMessage = t("errors.PasswordCapitalLetter")
-            }
-            if (data.field) {
-              fieldErrors[data.field] = data.errorKey || "invalidInput"
-            }
-            break
-          case 409:
-            errorMessage = data.message || t("errors.emailExists")
-            if (data.field) {
-              fieldErrors[data.field] = data.errorKey || "duplicate"
-            }
-            if (data.message?.includes("E-Mail")) {
-              errorMessage = t("errors.emailExists")
-            }
-            break
-
-          case 500:
-            errorMessage = t("errors.apiError")
-            break
-        }
-      } else if (error.request) {
-        errorMessage = t("errors.networkError")
-      }
-
-      setApiError(errorMessage)
-      setErrors(fieldErrors)
+    // Add profilePic if selected
+    if (formData.profilePic) {
+      data.append("profilePic", formData.profilePic);
     }
+
+    // Role-specific fields
+    switch (formData.role) {
+      case "student":
+        data.append("level", formData.level);
+        data.append("faction", formData.faction || "Alpha");
+        data.append("parentPhoneNumber", formData.parentPhoneNumber);
+
+        formData.hobbies
+          .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name)
+          .filter(Boolean)
+          .forEach((hobby, index) => {
+            data.append(`hobbies[${index}]`, hobby);
+          });
+        break;
+
+      case "parent":
+        formData.children
+          .filter((c) => c.trim() !== "")
+          .forEach((child, index) => {
+            data.append(`children[${index}]`, child.trim());
+          });
+        break;
+
+      case "teacher":
+        data.append("phoneNumber2", formData.phoneNumber2);
+        data.append("subject", formData.subject.trim());
+        data.append("level", formData.level);
+        data.append("teachesAtType", formData.teachesAtType);
+
+        if (["Center", "Both"].includes(formData.teachesAtType)) {
+          formData.centers
+            .filter((c) => c.trim() !== "")
+            .forEach((center, index) => {
+              data.append(`centers[${index}]`, center.trim());
+            });
+        }
+
+        if (["School", "Both"].includes(formData.teachesAtType)) {
+          data.append("school", formData.school.trim());
+        }
+
+        formData.socialMedia
+          .filter((s) => s.platform && s.account)
+          .forEach((social, index) => {
+            data.append(`socialMedia[${index}][platform]`, social.platform);
+            data.append(`socialMedia[${index}][account]`, social.account.trim());
+          });
+        break;
+
+      default:
+        throw new Error("Invalid role selected");
+    }
+
+    const url = `${apiUrl}/api/v1/register`;
+
+    const response = await axios.post(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    navigate("/login", {
+      state: { message: "Registration successful" },
+    });
+  } catch (error) {
+    let errorMessage = t("errors.unexpectedError");
+    const fieldErrors = {};
+
+    if (error.response) {
+      const { status, data } = error.response;
+
+      switch (status) {
+        case 400:
+          errorMessage = data.message || t("errors.invalidData");
+          if (data.message?.includes("phone number")) {
+            errorMessage = t("errors.phoneExists");
+          }
+          if (data.message?.includes("at least one special character")) {
+            errorMessage = t("errors.PasswordSpecialChar");
+          }
+          if (data.message?.includes("at least one uppercase")) {
+            errorMessage = t("errors.PasswordCapitalLetter");
+          }
+          if (data.field) {
+            fieldErrors[data.field] = data.errorKey || "invalidInput";
+          }
+          break;
+        case 409:
+          errorMessage = data.message || t("errors.emailExists");
+          if (data.field) {
+            fieldErrors[data.field] = data.errorKey || "duplicate";
+          }
+          if (data.message?.includes("E-Mail")) {
+            errorMessage = t("errors.emailExists");
+          }
+          break;
+        case 500:
+          errorMessage = t("errors.apiError");
+          break;
+      }
+    } else if (error.request) {
+      errorMessage = t("errors.networkError");
+    }
+
+    setApiError(errorMessage);
+    setErrors(fieldErrors);
   }
+};
+
 
   const renderStepContent = () => {
     try {

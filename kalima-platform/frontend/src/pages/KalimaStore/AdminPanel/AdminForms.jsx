@@ -151,14 +151,14 @@ const EnhancedAdminForms = ({
 
     // Define progress steps
     const steps = [
-      { title: "Validating Form Data", description: "Checking all required fields" },
-      { title: "Preparing Files", description: "Processing uploaded files" },
-      { title: "Uploading Files", description: "Sending files to server" },
-      { title: `Creating ${formType}`, description: `Submitting ${formType} data` },
-      { title: "Finalizing", description: "Completing the process" },
+      { title: t("progressSteps.validatingFormData"), description: t("progressSteps.checkingRequiredFields") },
+      { title: t("progressSteps.preparingFiles"), description: t("progressSteps.processingUploadedFiles") },
+      { title: t("progressSteps.uploadingFiles"), description: t("progressSteps.sendingFilesToServer") },
+      { title: t(`progressSteps.creating${formType}`), description: t(`progressSteps.submitting${formType}Data`) },
+      { title: t("progressSteps.finalizing"), description: t("progressSteps.completingProcess") },
     ]
 
-    progressTracker.startProgress(steps, `Creating ${formType}`)
+    progressTracker.startProgress(steps, t(`progressSteps.creating${formType}`))
 
     try {
       // Step 1: Validation
@@ -200,7 +200,7 @@ const EnhancedAdminForms = ({
         gallery: { files: [], uploaded: false, uploading: false, progress: 0, error: null, urls: [] },
       })
     } catch (error) {
-      progressTracker.setProgressError(error.message || "An error occurred during submission")
+      progressTracker.setProgressError(error.message || t("progressSteps.errorDuringSubmission"))
     }
   }
 
@@ -294,7 +294,7 @@ const EnhancedAdminForms = ({
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-xs">Uploaded</span>
+                        <span className="text-xs">{t("fileUpload.uploaded")}</span>
                       </div>
                     )}
 
@@ -305,7 +305,7 @@ const EnhancedAdminForms = ({
                         className="btn btn-xs btn-primary"
                       >
                         <Upload className="w-3 h-3 mr-1" />
-                        Upload
+                        {t("fileUpload.upload")}
                       </button>
                     )}
 
@@ -323,7 +323,7 @@ const EnhancedAdminForms = ({
                 {(uploadState.uploading || uploadState.uploaded) && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs">
-                      <span>{uploadState.uploading ? "Uploading..." : "Complete"}</span>
+                      <span>{uploadState.uploading ? t("fileUpload.uploading") : t("fileUpload.complete")}</span>
                       <span>{uploadState.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -352,9 +352,9 @@ const EnhancedAdminForms = ({
                       <ImageIcon className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-sm">{uploadState.files.length} files selected</p>
+                      <p className="font-medium text-sm">{uploadState.files.length} {t("fileUpload.filesSelected")}</p>
                       <p className="text-xs text-base-content/60">
-                        Total: {formatFileSize(uploadState.files.reduce((acc, file) => acc + file.size, 0))}
+                        {t("fileUpload.total")} {formatFileSize(uploadState.files.reduce((acc, file) => acc + file.size, 0))}
                       </p>
                     </div>
                   </div>
@@ -367,7 +367,7 @@ const EnhancedAdminForms = ({
                         className="btn btn-xs btn-primary"
                       >
                         <Upload className="w-3 h-3 mr-1" />
-                        Upload All
+                        {t("fileUpload.uploadAll")}
                       </button>
                     )}
 
@@ -395,7 +395,7 @@ const EnhancedAdminForms = ({
                 {(uploadState.uploading || uploadState.uploaded) && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs">
-                      <span>{uploadState.uploading ? "Uploading files..." : "All files uploaded"}</span>
+                      <span>{uploadState.uploading ? t("fileUpload.uploadingFiles") : t("fileUpload.allFilesUploaded")}</span>
                       <span>{uploadState.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -646,11 +646,11 @@ const EnhancedAdminForms = ({
                 {/* WhatsApp Number field */}
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">WhatsApp Number *</span>
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.whatsAppNumber")} *</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter WhatsApp number"
+                    placeholder={t("forms.createProduct.placeholders.whatsAppNumber")}
                     className="input input-bordered w-full"
                     value={activeTab === "product" ? productForm?.whatsAppNumber || "" : bookForm?.whatsAppNumber || ""}
                     onChange={(e) => {
@@ -662,7 +662,7 @@ const EnhancedAdminForms = ({
                     }}
                     required
                   />
-                  <p className="text-xs mt-1 text-gray-500">Enter the WhatsApp number for customer contact</p>
+                  <p className="text-xs mt-1 text-gray-500">{t("forms.createProduct.hints.whatsAppNumber")}</p>
                 </div>
 
                 {/* Sample File Upload */}
@@ -678,16 +678,16 @@ const EnhancedAdminForms = ({
                   <label className="label">
                     <span className="label-text font-medium">
                       {activeTab === "product"
-                        ? "Description"
-                        : t("forms.createBook.fields.description") || "Description"}{" "}
+                        ? t("forms.createProduct.fields.description")
+                        : t("forms.createBook.fields.description")}{" "}
                       *
                     </span>
                   </label>
                   <textarea
                     placeholder={
                       activeTab === "product"
-                        ? "Enter product description..."
-                        : t("forms.createBook.placeholders.description") || "Enter book description..."
+                        ? t("forms.createProduct.placeholders.description")
+                        : t("forms.createBook.placeholders.description")
                     }
                     className="textarea textarea-bordered w-full h-32"
                     value={activeTab === "product" ? productForm?.description || "" : bookForm?.description || ""}
@@ -702,18 +702,16 @@ const EnhancedAdminForms = ({
                   />
                   <p className="text-xs mt-1 text-gray-500">
                     {activeTab === "product"
-                      ? "Provide a detailed description of the product"
-                      : "Provide a detailed description of the book"}
+                      ? t("forms.createProduct.hints.description")
+                      : t("forms.createBook.hints.description")}
                   </p>
                 </div>
-
-                {/* Gallery field - only for products */}
-                {activeTab === "product" &&
+                {
                   renderFileUpload(
                     "gallery",
-                    "Gallery Images",
+                    t("forms.createProduct.fields.gallery"),
                     "image/*",
-                    "Upload multiple images for the product gallery",
+                    t("forms.createProduct.hints.gallery"),
                     true,
                   )}
               </div>
@@ -800,7 +798,7 @@ const EnhancedAdminForms = ({
       {/* Enhanced Progress Bar Modal */}
       <EnhancedProgressBar
         isVisible={progressTracker.isVisible}
-        title={`Creating ${activeTab === "product" ? "Product" : activeTab === "book" ? "Book" : "Section"}`}
+        title={t(`progressSteps.creating${activeTab === "product" ? "Product" : activeTab === "book" ? "Book" : "Section"}`)}
         steps={progressTracker.steps}
         currentStep={progressTracker.currentStep}
         progress={progressTracker.progress}

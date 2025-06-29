@@ -1,8 +1,15 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { getAllProductPurchases, confirmProductPurchase, confirmBookPurchase } from "../../../routes/orders"
+import {
+  getAllProductPurchases,
+  confirmProductPurchase,
+  confirmBookPurchase,
+  updatePurchase,
+} from "../../../routes/orders"
+import { FaWhatsapp } from "react-icons/fa"
+import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X } from "lucide-react"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -13,14 +20,11 @@ const Orders = () => {
   const [error, setError] = useState(null)
   const [confirmLoading, setConfirmLoading] = useState({})
   const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all") // all, confirmed, pending
-  const [typeFilter, setTypeFilter] = useState("all") // all, product, book
-
-  // Server-side pagination states
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalPurchases, setTotalPurchases] = useState(0)
-
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [stats, setStats] = useState({
@@ -30,19 +34,25 @@ const Orders = () => {
     products: 0,
     books: 0,
   })
-
-  // Add debounced search state
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
 
-  // Debounce search query and reset page
+  // Enhanced notes modal state
+  const [notesModal, setNotesModal] = useState({
+    isOpen: false,
+    orderId: null,
+    notes: "",
+    originalNotes: "",
+    loading: false,
+    hasChanges: false,
+  })
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery)
-      // Reset to page 1 when search changes
       if (searchQuery !== debouncedSearchQuery && currentPage !== 1) {
         setCurrentPage(1)
       }
-    }, 500) // 500ms delay
+    }, 500)
 
     return () => clearTimeout(timer)
   }, [searchQuery, debouncedSearchQuery, currentPage])
@@ -52,28 +62,23 @@ const Orders = () => {
       setLoading(true)
       setError(null)
 
-      // Build query parameters for server-side filtering and pagination
       const queryParams = {
         page: currentPage,
       }
 
-      // Add search query if provided
       if (debouncedSearchQuery.trim()) {
         queryParams.search = debouncedSearchQuery.trim()
       }
 
-      // Add status filter if not "all"
       if (statusFilter !== "all") {
         queryParams.confirmed = statusFilter === "confirmed"
       }
 
-      // Note: We'll handle type filtering client-side since the API might not support it
       const response = await getAllProductPurchases(queryParams)
 
       if (response.success) {
         let purchases = response.data.data.purchases
 
-        // Apply type filter client-side
         if (typeFilter !== "all") {
           if (typeFilter === "book") {
             purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
@@ -86,7 +91,6 @@ const Orders = () => {
         setTotalPages(response.data.totalPages)
         setTotalPurchases(response.data.totalPurchases)
 
-        // Calculate statistics from ALL data (not just filtered)
         const allPurchases = response.data.data.purchases
         const confirmed = allPurchases.filter((order) => order.confirmed).length
         const pending = allPurchases.filter((order) => !order.confirmed).length
@@ -111,7 +115,10 @@ const Orders = () => {
     }
   }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery])
 
-  // Fetch orders when dependencies change
+  const handleRefresh = useCallback(() => {
+    fetchOrders()
+  }, [fetchOrders])
+
   useEffect(() => {
     fetchOrders()
   }, [fetchOrders])
@@ -121,6 +128,7 @@ const Orders = () => {
       setConfirmLoading({ ...confirmLoading, [order._id]: true })
 
       let response
+
       if (order.__t === "ECBookPurchase") {
         response = await confirmBookPurchase(order._id)
       } else {
@@ -128,10 +136,8 @@ const Orders = () => {
       }
 
       if (response.success) {
-        // Update the order in the local state
         setOrders((prevOrders) => prevOrders.map((o) => (o._id === order._id ? { ...o, confirmed: true } : o)))
 
-        // Update stats
         setStats((prevStats) => ({
           ...prevStats,
           confirmed: prevStats.confirmed + 1,
@@ -167,6 +173,15 @@ const Orders = () => {
     window.open(normalizedPath, "_blank");
   };
 
+  const handleWhatsAppContact = (order) => {
+    const phoneNumber = order.numberTransferredFrom
+    const message = encodeURIComponent(
+      `Hello! This is regarding your order for ${order.productName} (Order ID: ${order.purchaseSerial}). How can we assist you?`,
+    )
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
+    window.open(whatsappUrl, "_blank")
+  }
+
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
       setCurrentPage(newPage)
@@ -180,6 +195,94 @@ const Orders = () => {
   const formatPrice = (price) => {
     return `${price} ج`
   }
+
+  // Enhanced notes functionality
+  const openNotesModal = (order) => {
+    const currentNotes = order.adminNotes || ""
+    setNotesModal({
+      isOpen: true,
+      orderId: order._id,
+      notes: currentNotes,
+      originalNotes: currentNotes,
+      loading: false,
+      hasChanges: false,
+    })
+  }
+
+  const handleNotesChange = (newNotes) => {
+    setNotesModal((prev) => ({
+      ...prev,
+      notes: newNotes,
+      hasChanges: newNotes !== prev.originalNotes,
+    }))
+  }
+
+  const handleSaveNotes = async () => {
+    if (!notesModal.hasChanges) {
+      setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+      return
+    }
+
+    try {
+      setNotesModal((prev) => ({ ...prev, loading: true }))
+
+      const response = await updatePurchase(notesModal.orderId, {
+        adminNotes: notesModal.notes,
+      })
+
+      if (response.success) {
+        // Update the orders list
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === notesModal.orderId ? { ...order, adminNotes: notesModal.notes } : order,
+          ),
+        )
+
+        // Update selected order if it's the same one
+        if (selectedOrder && selectedOrder._id === notesModal.orderId) {
+          setSelectedOrder((prev) => ({ ...prev, adminNotes: notesModal.notes }))
+        }
+
+        // Close modal
+        setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+
+        alert(t("alerts.notesSaved"))
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (error) {
+      console.error("Error saving notes:", error)
+      alert(t("alerts.failedToSaveNotes") + error.message)
+    } finally {
+      setNotesModal((prev) => ({ ...prev, loading: false }))
+    }
+  }
+
+  const closeNotesModal = () => {
+    if (notesModal.hasChanges) {
+      if (confirm(t("alerts.unsavedChanges"))) {
+        setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+      }
+    } else {
+      setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+    }
+  }
+
+  // Get notes preview for table display
+  const getNotesPreview = (notes) => {
+    if (!notes) return ""
+    return notes.length > 50 ? notes.substring(0, 50) + "..." : notes
+  }
+
+  // Memoize order items to prevent unnecessary re-renders
+  const memoizedOrders = useMemo(() => {
+    return orders.map((order) => ({
+      ...order,
+      orderType: getOrderType(order),
+      formattedPrice: formatPrice(order.price),
+      notesPreview: getNotesPreview(order.adminNotes),
+    }))
+  }, [orders])
 
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value)
@@ -302,18 +405,24 @@ const Orders = () => {
       <div className="card shadow-lg mb-6">
         <div className="card-body p-4">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <input
                 type="text"
                 placeholder={t("searchPlaceholder")}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full pr-12"
                 value={searchQuery}
                 onChange={handleSearchChange}
               />
+              {searchQuery && (
+                <button
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm"
+                  onClick={() => setSearchQuery("")}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
-
-            {/* Status Filter */}
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -325,8 +434,6 @@ const Orders = () => {
                 <option value="pending">{t("filters.pending")}</option>
               </select>
             </div>
-
-            {/* Type Filter */}
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -338,10 +445,8 @@ const Orders = () => {
                 <option value="product">{t("filters.products")}</option>
               </select>
             </div>
-
-            {/* Refresh Button */}
-            <button onClick={fetchOrders} className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : "\ud83d\udd04"}
+            <button onClick={handleRefresh} className="btn btn-primary" disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
               {t("refresh")}
             </button>
           </div>
@@ -360,87 +465,163 @@ const Orders = () => {
                 <th className="text-center">{t("table.price")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
+                <th className="text-center">{t("table.notes")}</th>
                 <th className="text-center">{t("table.date")}</th>
                 <th className="text-center">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td className="text-center">
-                    <div className="flex items-center gap-3 justify-center">
-                      <div className="text-left">
-                        <div className="font-bold text-sm">{order.productName}</div>
-                        <div className="text-xs opacity-50">{order.purchaseSerial}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div>
-                      <div className="font-medium">{order.userName}</div>
-                      <div className="text-xs opacity-50">{order.createdBy?.email}</div>
-                      <div className="text-xs opacity-50">{order.createdBy?.role}</div>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <div className={`badge ${getOrderType(order) === "Book" ? "badge-primary" : "badge-secondary"}`}>
-                      {t(getOrderType(order) === "Book" ? "table.book" : "table.productType")}
-                    </div>
-                  </td>
-                  <td className="text-center font-bold">{formatPrice(order.price)}</td>
-                  <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
-                  <td className="text-center">
-                    {order.confirmed ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="badge badge-success">{t("table.confirmed")}</div>
-                        {order.confirmedBy && <div className="text-xs opacity-50">{t("table.by")} {order.confirmedBy.name}</div>}
-                      </div>
-                    ) : (
-                      <div className="badge badge-warning">{t("table.pending")}</div>
-                    )}
-                  </td>
-                  <td className="text-center text-sm">{order.formattedCreatedAt}</td>
-                  <td className="text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => handleViewDetails(order)}
-                        title={t("table.viewDetails")}
-                      >
-                        👁️
-                      </button>
-                      {order.paymentScreenShot && (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
-                          title={t("table.viewPaymentScreenshot")}
-                        >
-                          🖼️
-                        </button>
-                      )}
-                      {!order.confirmed && (
-                        <button
-                          className="btn btn-success btn-sm"
-                          onClick={() => handleConfirmOrder(order)}
-                          disabled={confirmLoading[order._id]}
-                          title={t("table.confirmOrder")}
-                        >
-                          {confirmLoading[order._id] ? (
-                            <span className="loading loading-spinner loading-xs"></span>
-                          ) : (
-                            "✅"
-                          )}
-                        </button>
-                      )}
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan="9" className="text-center py-8">
+                    <div className="loading loading-spinner loading-lg"></div>
+                    <p className="mt-2 text-gray-500">{t("loading")}</p>
                   </td>
                 </tr>
-              ))}
+              ) : memoizedOrders.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="text-center py-8">
+                    <p className="text-gray-500">
+                      {searchQuery || statusFilter !== "all" || typeFilter !== "all"
+                        ? t("noOrdersFound")
+                        : t("noOrdersAvailable")}
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                memoizedOrders.map((order) => (
+                  <tr key={order._id}>
+                    <td className="text-center">
+                      <div className="flex items-center gap-3 justify-center">
+                        <div className="avatar">
+                          <div className="w-12 h-12 rounded">
+                            <img
+                              src={order.productId?.thumbnail || "/placeholder.svg?height=48&width=48"}
+                              alt={order.productName}
+                              onError={(e) => {
+                                e.target.onerror = null
+                                e.target.src = "/placeholder.svg?height=48&width=48"
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <div className="font-bold text-sm">{order.productName}</div>
+                          <div className="text-xs opacity-50">{order.purchaseSerial}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <div>
+                        <div className="font-medium">{order.userName}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.email}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.role}</div>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <div className={`badge ${order.orderType === "Book" ? "badge-primary" : "badge-secondary"}`}>
+                        {t(order.orderType === "Book" ? "table.book" : "table.productType")}
+                      </div>
+                    </td>
+                    <td className="text-center font-bold">{order.formattedPrice}</td>
+                    <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
+                    <td className="text-center">
+                      {order.confirmed ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="badge badge-success">{t("table.confirmed")}</div>
+                          {order.confirmedBy && (
+                            <div className="text-xs opacity-50">
+                              {t("table.by")} {order.confirmedBy.name}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="badge badge-warning">{t("table.pending")}</div>
+                      )}
+                    </td>
+                    <td className="text-center max-w-32">
+                      {order.adminNotes ? (
+                        <div className="tooltip tooltip-left" data-tip={order.adminNotes}>
+                          <div className="flex items-center gap-1 text-blue-600 cursor-help">
+                            <MessageSquare className="w-4 h-4" />
+                            <span className="text-xs truncate">{order.notesPreview}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
+                      )}
+                    </td>
+                    <td className="text-center text-sm">{order.formattedCreatedAt}</td>
+                    <td className="text-center">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => handleViewDetails(order)}
+                          title={t("table.viewDetails")}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          className={`btn btn-ghost btn-sm relative ${
+                            order.adminNotes ? "text-blue-600" : "text-gray-400"
+                          }`}
+                          onClick={() => openNotesModal(order)}
+                          title={
+                            order.adminNotes
+                              ? t("table.viewEditNotes")
+                              : t("table.addNotes")
+                          }
+                        >
+                          <Notebook className="w-4 h-4" />
+                          {order.adminNotes && (
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                          )}
+                        </button>
+
+                        {order.paymentScreenShot && (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
+                            title={t("table.viewPaymentScreenshot")}
+                          >
+                            <ImageIcon className="w-3 h-3" />
+                          </button>
+                        )}
+
+                        {order.numberTransferredFrom && (
+                          <button
+                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
+                            onClick={() => handleWhatsAppContact(order)}
+                            title={t("table.contactWhatsApp")}
+                          >
+                            <FaWhatsapp />
+                          </button>
+                        )}
+
+                        {!order.confirmed && (
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => handleConfirmOrder(order)}
+                            disabled={confirmLoading[order._id]}
+                            title={t("table.confirmOrder")}
+                          >
+                            {confirmLoading[order._id] ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
-        {/* Empty State */}
         {orders.length === 0 && (
           <div className="py-8 text-center">
             <div className="text-6xl mb-4">📦</div>
@@ -450,11 +631,10 @@ const Orders = () => {
         )}
       </div>
 
-      {/* Server-Side Pagination Controls */}
+      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-6">
           <div className="join">
-            {/* Previous Button */}
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage - 1)}
@@ -466,9 +646,9 @@ const Orders = () => {
               {t("table.previous")}
             </button>
 
-            {/* Page Numbers */}
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageToShow
+
               if (totalPages <= 5) {
                 pageToShow = i + 1
               } else if (currentPage <= 3) {
@@ -491,7 +671,6 @@ const Orders = () => {
               )
             })}
 
-            {/* Next Button */}
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -504,9 +683,90 @@ const Orders = () => {
             </button>
           </div>
 
-          {/* Pagination Info */}
           <div className="text-sm text-gray-600">
             {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Admin Notes Modal */}
+      {notesModal.isOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-primary" />
+                {t("table.adminNotes")}
+              </h3>
+              <button
+                className="btn btn-sm btn-circle btn-ghost"
+                onClick={closeNotesModal}
+                disabled={notesModal.loading}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium">{t("table.notesLabel")}</span>
+                  <span className="label-text-alt">
+                    {notesModal.notes.length}/500 {t("table.characters")}
+                  </span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered w-full h-32 resize-none"
+                  placeholder={t("table.notesPlaceholder")}
+                  value={notesModal.notes}
+                  onChange={(e) => handleNotesChange(e.target.value)}
+                  maxLength={500}
+                  disabled={notesModal.loading}
+                />
+              </div>
+
+              {notesModal.hasChanges && (
+                <div className="alert alert-info">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="stroke-current shrink-0 w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  <span>{t("table.unsavedChanges")}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-action">
+              <button className="btn" onClick={closeNotesModal} disabled={notesModal.loading}>
+                {t("table.cancel")}
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleSaveNotes}
+                disabled={notesModal.loading || !notesModal.hasChanges}
+              >
+                {notesModal.loading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    {t("table.saving")}
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    {t("table.saveNotes")}
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -518,7 +778,6 @@ const Orders = () => {
             <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
 
             <div className="space-y-4">
-              {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
@@ -526,6 +785,7 @@ const Orders = () => {
                   </label>
                   <p className="font-mono text-sm">{selectedOrder._id}</p>
                 </div>
+
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">{t("table.purchaseSerial")}</span>
@@ -534,7 +794,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Customer Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.customerInfo")}</span>
@@ -552,7 +811,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Product Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.productInfo")}</span>
@@ -562,15 +820,20 @@ const Orders = () => {
                     <strong>{t("table.name")}:</strong> {selectedOrder.productName}
                   </p>
                   <p>
-                    <strong>{t("table.type")}:</strong> {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
+                    <strong>{t("table.type")}:</strong>{" "}
+                    {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
                   </p>
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
+                  {selectedOrder.notes && (
+                    <p>
+                      <strong>{t("table.customerNotes")}:</strong> {selectedOrder.notes}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Payment Info */}
               <div>
                 <label className="label">
                   <span className="label-text font-medium">{t("table.paymentInfo")}</span>
@@ -595,7 +858,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {/* Book-specific Info */}
               {selectedOrder.__t === "ECBookPurchase" && (
                 <div>
                   <label className="label">
@@ -615,22 +877,22 @@ const Orders = () => {
                 </div>
               )}
 
-              {/* Status Info */}
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">{t("table.statusInfo")}</span>
+                  <span className="label-text font-medium flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4" />
+                    {t("table.adminNotes")}
+                  </span>
+                  <button className="btn btn-xs btn-primary" onClick={() => openNotesModal(selectedOrder)}>
+                    <Edit3 className="w-3 h-3" />
+                    {t("table.edit")}
+                  </button>
                 </label>
-                <div className="bg-base-200 p-3 rounded">
-                  <p>
-                    <strong>{t("table.status")}:</strong> {selectedOrder.confirmed ? t("table.confirmed") : t("table.pending")}
-                  </p>
-                  <p>
-                    <strong>{t("table.created")}:</strong> {selectedOrder.formattedCreatedAt}
-                  </p>
-                  {selectedOrder.confirmedBy && (
-                    <p>
-                      <strong>{t("table.confirmedBy")}:</strong> {selectedOrder.confirmedBy.name}
-                    </p>
+                <div className="bg-base-200 p-3 rounded min-h-16">
+                  {selectedOrder.adminNotes ? (
+                    <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
                   )}
                 </div>
               </div>

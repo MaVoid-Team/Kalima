@@ -4,16 +4,16 @@ const mongoose = require("mongoose");
 // Create ECBook
 exports.createECBook = async (req, res, next) => {
     try {
-        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, whatsAppNumber } = req.body;
+        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, gallery, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
-        let sample, thumbnail;
+        let sample, thumbnail, galleryArr = [];
         // Handle sample PDF
         if (req.files && req.files.sample && req.files.sample[0]) {
             const file = req.files.sample[0];
             // Debug: log file info
             console.log('Sample file:', file);
-            if (file.mimetype !== "application/pdf" || file.size > 50 * 1024 * 1024) {
-                return res.status(400).json({ message: "Sample must be a PDF and <= 50MB" });
+            if (file.mimetype !== "application/pdf" || file.size > 75 * 1024 * 1024) {
+                return res.status(400).json({ message: "Sample must be a PDF and <= 75MB" });
             }
             // Use local file path from multer
             sample = file.path;
@@ -30,6 +30,12 @@ exports.createECBook = async (req, res, next) => {
         } else {
             return res.status(400).json({ message: "Thumbnail image is required" });
         }
+        // Handle gallery images
+        if (req.files && req.files.gallery) {
+            galleryArr = req.files.gallery.map(file => file.path);
+        } else if (gallery) {
+            galleryArr = Array.isArray(gallery) ? gallery : [gallery];
+        }
         const newBook = await ECBook.create({
             title,
             serial,
@@ -41,6 +47,7 @@ exports.createECBook = async (req, res, next) => {
             thumbnail,
             sample,
             description,
+            gallery: galleryArr,
             whatsAppNumber,
             createdBy
         });

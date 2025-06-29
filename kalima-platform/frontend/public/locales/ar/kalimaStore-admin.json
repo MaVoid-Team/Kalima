@@ -1,4 +1,8 @@
 {
+  "adminPanel": {
+    "title": "لوحة الإدارة",
+    "subtitle": "إدارة المنتجات والكتب والأقسام"
+  },
   "stats": {
     "totalSales": "إجمالي المبيعات",
     "pendingApplications": "الطلبات المعلقة",
@@ -13,11 +17,14 @@
     "giftsSection": "قسم الهدايا",
     "giftsDescription": "عناصر الهدايا والحزم",
     "printingSection": "قسم الطباعة",
-    "printingDescription": "خدمات ومواد الطباعة"
+    "printingDescription": "خدمات ومواد الطباعة "
   },
   "sectionsManagement": {
     "title": "إدارة الأقسام",
     "searchPlaceholder": "البحث في الأقسام...",
+    "totalSections": "إجمالي الأقسام",
+    "filtered": "مفلتر",
+    "search": "البحث",
     "table": {
       "name": "الاسم",
       "sectionNumber": "رقم القسم",
@@ -41,18 +48,58 @@
         "price": "السعر",
         "discountPercentage": "نسبة الخصم",
         "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
         "thumbnail": "صورة المنتج المصغرة",
-        "sampleFile": "ملف العينة"
+        "sampleFile": "ملف العينة",
+        "description": "الوصف",
+        "gallery": "صور المعرض"
       },
       "placeholders": {
         "title": "أدخل عنوان المنتج",
         "serial": "أدخل الرقم التسلسلي",
         "section": "اختر القسم",
-        "paymentNumber": "أدخل رقم الدفع"
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف المنتج..."
       },
       "hints": {
         "thumbnail": "رفع صورة المنتج المصغرة (الحد الأقصى 5 ميجابايت)",
-        "sampleFile": "رفع ملف العينة"
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "gallery": "رفع صور متعددة لمعرض المنتج",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للمنتج"
+      }
+    },
+    "createBook": {
+      "title": "إنشاء كتاب",
+      "submitButton": "إنشاء كتاب",
+      "fields": {
+        "title": "عنوان الكتاب",
+        "serial": "الرقم التسلسلي",
+        "section": "القسم",
+        "subject": "المادة",
+        "price": "السعر",
+        "discountPercentage": "نسبة الخصم",
+        "paymentNumber": "رقم الدفع",
+        "whatsAppNumber": "رقم الواتساب",
+        "thumbnail": "صورة الكتاب المصغرة",
+        "sampleFile": "ملف العينة",
+        "description": "الوصف"
+      },
+      "placeholders": {
+        "title": "أدخل عنوان الكتاب",
+        "serial": "أدخل الرقم التسلسلي",
+        "section": "اختر القسم",
+        "subject": "اختر المادة",
+        "paymentNumber": "أدخل رقم الدفع",
+        "whatsAppNumber": "أدخل رقم الواتساب",
+        "description": "أدخل وصف الكتاب..."
+      },
+      "hints": {
+        "thumbnail": "رفع صورة الكتاب المصغرة (الحد الأقصى 5 ميجابايت)",
+        "sampleFile": "رفع ملف العينة (PDF, DOC, DOCX)",
+        "whatsAppNumber": "أدخل رقم الواتساب للتواصل مع العملاء",
+        "description": "قدم وصفاً مفصلاً للكتاب"
       }
     },
     "createSection": {
@@ -71,6 +118,39 @@
         "thumbnail": "أدخل اسم الصورة المصغرة"
       }
     }
+  },
+  "fileUpload": {
+    "uploaded": "تم الرفع",
+    "upload": "رفع",
+    "uploadAll": "رفع الكل",
+    "uploading": "جاري الرفع...",
+    "uploadingFiles": "جاري رفع الملفات...",
+    "complete": "مكتمل",
+    "allFilesUploaded": "تم رفع جميع الملفات",
+    "filesSelected": "ملفات محددة",
+    "total": "المجموع:"
+  },
+  "progressSteps": {
+    "validatingFormData": "التحقق من بيانات النموذج",
+    "checkingRequiredFields": "التحقق من جميع الحقول المطلوبة",
+    "preparingFiles": "تحضير الملفات",
+    "processingUploadedFiles": "معالجة الملفات المرفوعة",
+    "uploadingFiles": "رفع الملفات",
+    "sendingFilesToServer": "إرسال الملفات إلى الخادم",
+    "creatingProduct": "إنشاء المنتج",
+    "creatingBook": "إنشاء الكتاب",
+    "creatingSection": "إنشاء القسم",
+    "submittingProductData": "إرسال بيانات المنتج",
+    "submittingBookData": "إرسال بيانات الكتاب",
+    "submittingSectionData": "إرسال بيانات القسم",
+    "finalizing": "إنهاء",
+    "completingProcess": "إكمال العملية",
+    "errorDuringSubmission": "حدث خطأ أثناء الإرسال"
+  },
+  "progressBar": {
+    "overallProgress": "التقدم العام",
+    "uploadFailed": "فشل الرفع",
+    "uploadCompletedSuccessfully": "تم الرفع بنجاح!"
   },
   "modals": {
     "editSection": {
@@ -101,6 +181,13 @@
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "productCreatedSuccess": "تم إنشاء المنتج بنجاح!",
     "productCreateError": "خطأ في إنشاء المنتج: ",
+    "productUpdatedSuccess": "تم تحديث المنتج بنجاح!",
+    "productUpdateError": "خطأ في تحديث المنتج: ",
+    "productDeletedSuccess": "تم حذف المنتج بنجاح!",
+    "productDeleteError": "خطأ في حذف المنتج: ",
+    "productFetchError": "خطأ في جلب المنتج: ",
+    "bookCreatedSuccess": "تم إنشاء الكتاب بنجاح!",
+    "bookCreateError": "خطأ في إنشاء الكتاب: ",
     "sectionCreatedSuccess": "تم إنشاء القسم بنجاح!",
     "sectionCreateError": "خطأ في إنشاء القسم: ",
     "sectionUpdatedSuccess": "تم تحديث القسم بنجاح!",
@@ -109,7 +196,8 @@
     "sectionDeleteError": "خطأ في حذف القسم: "
   },
   "error": {
-    "title": "خطأ!"
+    "title": "خطأ!",
+    "retry": "إعادة المحاولة"
   },
   "productsManagement": {
     "title": "إدارة المنتجات",
@@ -151,9 +239,28 @@
     "totalProducts": "إجمالي المنتجات",
     "totalBooks": "إجمالي الكتب",
     "totalSections": "إجمالي الأقسام",
-    "totalItems": "إجمالي العناصر"
+    "totalItems": "إجمالي العناصر",
+    "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
+    "export": "تصدير البيانات",
+    "exporting": "جاري التصدير..."
   },
   "products": {
     "unknownSection": "قسم غير معروف"
+  },
+  "validation": {
+    "invalidProductSelected": "تم تحديد منتج غير صالح",
+    "invalidSectionSelected": "تم تحديد قسم غير صالح"
+  },
+  "pagination": {
+    "showing": "عرض",
+    "of": "من",
+    "perPage": "في الصفحة",
+    "next": "التالي",
+    "previous": "السابق",
+    "first": "الأول",
+    "last": "الأخير",
+    "page": "الصفحة",
+    "goToPage": "اذهب إلى الصفحة",
+    "itemsPerPage": "{{count}} في الصفحة"
   }
 }

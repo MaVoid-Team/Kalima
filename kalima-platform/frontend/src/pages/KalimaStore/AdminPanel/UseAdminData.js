@@ -18,32 +18,20 @@ export const useAdminData = () => {
     totalSections: 0,
   })
 
-  // Pagination state for products
-  const [productsPagination, setProductsPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-    hasNextPage: false,
-    hasPrevPage: false,
-  })
-
-  // Loading states for different operations
-  const [productsLoading, setProductsLoading] = useState(false)
-
   const fetchInitialData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Fetch sections, books, and subjects (these don't need pagination for admin)
-      const [sectionsResponse, booksResponse, subjectsResponse] = await Promise.all([
+      // Fetch all data
+      const [sectionsResponse, booksResponse, productsResponse, subjectsResponse] = await Promise.all([
         getAllSections(),
         getAllBooks(),
+        getAllProducts(),
         getAllSubjects(),
       ])
 
-      // Process sections data with error handling
+      // Process sections data
       if (sectionsResponse?.status === "success" && sectionsResponse?.data?.sections) {
         setSections(sectionsResponse.data.sections)
       } else {
@@ -51,7 +39,7 @@ export const useAdminData = () => {
         setSections([])
       }
 
-      // Process books data with error handling
+      // Process books data
       if (booksResponse?.status === "success" && booksResponse?.data?.books) {
         setBooks(booksResponse.data.books)
       } else {
@@ -59,7 +47,15 @@ export const useAdminData = () => {
         setBooks([])
       }
 
-      // Process subjects data with error handling
+      // Process products data
+      if (productsResponse?.status === "success" && productsResponse?.data?.products) {
+        setProducts(productsResponse.data.products)
+      } else {
+        console.warn("Products data not available:", productsResponse)
+        setProducts([])
+      }
+
+      // Process subjects data
       if (subjectsResponse?.success && subjectsResponse?.data) {
         setSubjects(subjectsResponse.data)
       } else {
@@ -67,125 +63,41 @@ export const useAdminData = () => {
         setSubjects([])
       }
 
-      // Calculate statistics with safe fallbacks
+      // Calculate statistics
       const totalSections = sectionsResponse?.data?.sections?.length || 0
+      const totalProducts = productsResponse?.data?.products?.length || 0
+      const totalBooks = booksResponse?.data?.books?.length || 0
 
-      // Calculate total sales with safe navigation
-      const booksTotal =
-        booksResponse?.data?.books?.reduce((sum, book) => sum + (book?.priceAfterDiscount || book?.price || 0), 0) || 0
+      const booksTotal = booksResponse?.data?.books?.reduce((sum, book) => sum + (book?.priceAfterDiscount || book?.price || 0), 0) || 0
+      const productsTotal = productsResponse?.data?.products?.reduce((sum, product) => sum + (product?.priceAfterDiscount || product?.price || 0), 0) || 0
 
-      setStats((prevStats) => ({
-        ...prevStats,
-        totalSales: booksTotal, // Will be updated when products are fetched
+      setStats({
+        totalSales: booksTotal + productsTotal,
         pendingApplications: 50, // This would come from a different API
+        totalProducts: totalProducts + totalBooks,
         totalSections: totalSections,
-      }))
+      })
     } catch (err) {
       console.error("Error fetching initial admin data:", err)
       setError(err?.message || "Failed to fetch data")
       // Set empty arrays as fallbacks
       setSections([])
       setBooks([])
+      setProducts([])
       setSubjects([])
     } finally {
       setLoading(false)
     }
   }
 
-  const fetchProducts = useCallback(async (page = 1, limit = 10, search = "") => {
-    try {
-      setProductsLoading(true)
-      setError(null)
-
-      const queryParams = {
-        page,
-        limit,
-        ...(search && { search }),
-      }
-
-      const productsResponse = await getAllProducts(queryParams)
-
-      // Process products data with error handling
-      if (productsResponse?.status === "success" && productsResponse?.data?.products) {
-        setProducts(productsResponse.data.products)
-
-        // Update pagination info
-        setProductsPagination({
-          currentPage: productsResponse.data.currentPage || page,
-          totalPages: productsResponse.data.totalPages || 1,
-          totalItems: productsResponse.data.totalProducts || productsResponse.results || 0,
-          itemsPerPage: limit,
-          hasNextPage: productsResponse.data.hasNextPage || false,
-          hasPrevPage: productsResponse.data.hasPrevPage || false,
-        })
-
-        // Update stats with products total
-        const productsTotal =
-          productsResponse?.data?.products?.reduce(
-            (sum, product) => sum + (product?.priceAfterDiscount || product?.price || 0),
-            0,
-          ) || 0
-
-        setStats((prevStats) => ({
-          ...prevStats,
-          totalProducts: productsResponse.data.totalProducts || productsResponse.results || 0,
-          totalSales: prevStats.totalSales + productsTotal,
-        }))
-      } else {
-        console.warn("Products data not available:", productsResponse)
-        setProducts([])
-        setProductsPagination((prev) => ({
-          ...prev,
-          currentPage: 1,
-          totalPages: 1,
-          totalItems: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-        }))
-      }
-    } catch (err) {
-      console.error("Error fetching products:", err)
-      setError(err?.message || "Failed to fetch products")
-      setProducts([])
-    } finally {
-      setProductsLoading(false)
-    }
-  }, [])
-
   const refetch = useCallback(async () => {
     await fetchInitialData()
-    await fetchProducts(productsPagination.currentPage, productsPagination.itemsPerPage)
-  }, [fetchProducts, productsPagination.currentPage, productsPagination.itemsPerPage])
-
-  // Pagination handlers
-  const goToPage = useCallback(
-    (page) => {
-      if (page >= 1 && page <= productsPagination.totalPages) {
-        fetchProducts(page, productsPagination.itemsPerPage)
-      }
-    },
-    [fetchProducts, productsPagination.totalPages, productsPagination.itemsPerPage],
-  )
-
-  const changeItemsPerPage = useCallback(
-    (newLimit) => {
-      setProductsPagination((prev) => ({ ...prev, itemsPerPage: newLimit }))
-      fetchProducts(1, newLimit) // Reset to first page when changing items per page
-    },
-    [fetchProducts],
-  )
-
-  const searchProducts = useCallback(
-    (searchQuery) => {
-      fetchProducts(1, productsPagination.itemsPerPage, searchQuery)
-    },
-    [fetchProducts, productsPagination.itemsPerPage],
-  )
-
-  useEffect(() => {
-    fetchInitialData()
-    fetchProducts() // Fetch first page of products
   }, [])
+
+  // REMOVED AUTO-REFRESH - Commented out the useEffect
+  // useEffect(() => {
+  //   fetchInitialData()
+  // }, [])
 
   return {
     loading,
@@ -199,12 +111,5 @@ export const useAdminData = () => {
     setSections,
     setBooks,
     setProducts,
-    // Products pagination
-    productsPagination,
-    productsLoading,
-    goToPage,
-    changeItemsPerPage,
-    searchProducts,
-    fetchProducts,
   }
 }

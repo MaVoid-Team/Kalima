@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
+import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
 
 // Import components
 import ProductHeader from "./Components/ProductHeader"
@@ -17,11 +19,21 @@ const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
   const isRTL = i18n.language === "ar"
 
-  const [uploadedFile, setUploadedFile] = useState(null)
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [purchaseLoading, setPurchaseLoading] = useState(false)
+  const [uploadedFile, setUploadedFile] = useState(null)
+
+  // Coupon and Price State
+  const [couponCode, setCouponCode] = useState("")
+  const [finalPrice, setFinalPrice] = useState(null)
+  const [couponValidation, setCouponValidation] = useState({
+    isValid: false,
+    message: "",
+    discount: 0,
+    loading: false,
+  })
 
   // Purchase form state
   const [purchaseForm, setPurchaseForm] = useState({
@@ -29,19 +41,14 @@ const ProductDetails = () => {
     nameOnBook: "",
     numberOnBook: "",
     seriesName: "",
+    notes: "",
   })
 
   const { id, type } = useParams()
   const navigate = useNavigate()
 
-  // Determine the actual item type from the API response
   const getItemType = (item) => {
-    // If __t exists and equals "ECBook", it's a book
-    if (item && item.__t === "ECBook") {
-      return "book"
-    }
-    // Otherwise, it's a product
-    return "product"
+    return item && item.__t === "ECBook" ? "book" : "product"
   }
 
   // Fetch product/book data
@@ -52,17 +59,13 @@ const ProductDetails = () => {
         setLoading(false)
         return
       }
-
       try {
         setLoading(true)
         setError(null)
-
         let response
-        // Try to fetch as the type specified in URL first, but we'll determine actual type from response
         if (type === "book") {
           response = await getBookById(id)
         } else {
-          // Default to trying product first, then book if it fails
           try {
             response = await getProductById(id)
           } catch (productError) {
@@ -74,9 +77,11 @@ const ProductDetails = () => {
         if (response.status === "success") {
           const itemData = response.data.book || response.data.product
           setProduct(itemData)
-
-          // Log the actual type determined from the response
-          const actualType = getItemType(itemData)
+          const initialDisplayPrice =
+            itemData.priceAfterDiscount && itemData.priceAfterDiscount < itemData.price
+              ? itemData.priceAfterDiscount
+              : itemData.price
+          setFinalPrice(initialDisplayPrice)
         } else {
           throw new Error(t("errors.fetchFailed"))
         }
@@ -87,50 +92,115 @@ const ProductDetails = () => {
         setLoading(false)
       }
     }
-
     fetchItemData()
   }, [id, type, t])
 
-  const handleSubmit = async () => {
-    if (!product) {
-      alert("Product data not loaded")
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      alert(t("errors.noCouponCode"))
+      return
+    }
+    setCouponValidation({ ...couponValidation, loading: true, message: "" })
+
+    const result = await validateCoupon(couponCode)
+
+    // This handles both network errors and API responses with status: "fail"
+    if (!result.success || result.data?.status === "fail") {
+      const errorMessage =
+        result.data?.message || result.error || t("errors.invalidCoupon")
+      setFinalPrice(product.price) // Reset price on invalid coupon
+      setCouponValidation({
+        isValid: false,
+        message: errorMessage,
+        discount: 0,
+        loading: false,
+      })
       return
     }
 
-    // Determine the actual type from the product data, not the URL
-    const actualType = getItemType(product)
+    // This handles a successful validation
+    if (result.data?.status === "success" && result.data?.data?.isValid) {
+      const couponData = result.data.data.coupon
+      const discountAmount = couponData.value // Assuming 'value' is a fixed discount amount
 
-
-
-    if (!uploadedFile) {
-      alert(t("errors.noFileSelected") || "Please select a payment screenshot")
-      return
-    }
-
-    if (!purchaseForm.numberTransferredFrom) {
-      alert(t("errors.noTransferNumber") || "Please enter the transfer number")
-      return
-    }
-
-    // Validate book-specific fields if it's actually a book
-    if (actualType === "book") {
-      if (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName) {
-        alert(t("errors.fillBookFields") || "Please fill in all book fields")
+      if (typeof discountAmount !== "number") {
+        setCouponValidation({
+          isValid: false,
+          message: t("errors.invalidDiscountValue"),
+          discount: 0,
+          loading: false,
+        })
         return
       }
+
+      const newPrice = finalPrice - discountAmount
+
+      setFinalPrice(newPrice < 0 ? 0 : newPrice)
+      setCouponValidation({
+        isValid: true,
+        message: t("success.couponApplied"),
+        discount: discountAmount,
+        loading: false,
+      })
+    } else {
+      // Fallback for any other unexpected success response format
+      setFinalPrice(product.price)
+      setCouponValidation({
+        isValid: false,
+        message: t("errors.invalidCoupon"),
+        discount: 0,
+        loading: false,
+      })
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setCouponCode("")
+    const initialDisplayPrice =
+      product.priceAfterDiscount && product.priceAfterDiscount < product.price
+        ? product.priceAfterDiscount
+        : product.price
+    setFinalPrice(initialDisplayPrice)
+    setCouponValidation({
+      isValid: false,
+      message: "",
+      discount: 0,
+      loading: false,
+    })
+  }
+
+  const handleSubmit = async () => {
+    if (!product) {
+      alert(t("errors.productDataNotLoaded"))
+      return
+    }
+    const actualType = getItemType(product)
+    if (!uploadedFile) {
+      alert(t("errors.noFileSelected"))
+      return
+    }
+    if (!purchaseForm.numberTransferredFrom) {
+      alert(t("errors.noTransferNumber"))
+      return
+    }
+    if (actualType === "book" && (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName)) {
+      alert(t("errors.fillBookFields"))
+      return
     }
 
     try {
-
       setPurchaseLoading(true)
-
       const purchaseData = {
         productId: product._id,
         numberTransferredFrom: purchaseForm.numberTransferredFrom,
         paymentScreenShot: uploadedFile,
+        notes: purchaseForm.notes || "",
       }
 
-      // Add book-specific fields if it's a book
+      if (couponValidation.isValid) {
+        purchaseData.couponCode = couponCode
+      }
+
       if (actualType === "book") {
         purchaseData.nameOnBook = purchaseForm.nameOnBook
         purchaseData.numberOnBook = purchaseForm.numberOnBook
@@ -138,24 +208,14 @@ const ProductDetails = () => {
       }
 
       let response
-
-
-      // Use the actual type determined from the API response
       if (actualType === "book") {
-
         response = await purchaseBook(purchaseData)
-        
-
       } else {
         response = await purchaseProduct(purchaseData)
-
       }
 
-
-
       if (response.status === "success" || response.message) {
-        alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!")
-
+        alert(t("success.purchaseSubmitted"))
         // Reset form
         setUploadedFile(null)
         setPurchaseForm({
@@ -163,31 +223,23 @@ const ProductDetails = () => {
           nameOnBook: "",
           numberOnBook: "",
           seriesName: "",
+          notes: "",
         })
-
+        handleRemoveCoupon() // Also reset coupon state
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
-
-
       } else {
         throw new Error("Unexpected response format")
       }
     } catch (err) {
       console.error("💥 Error submitting purchase:", err)
-      console.error("Error details:", {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status,
-      })
-
-      const errorMessage = err.response?.data?.message || err.message || "Unknown error occurred"
-      alert((t("errors.purchaseSubmissionFailed") || "Purchase submission failed: ") + errorMessage)
+      const errorMessage = err.response?.data?.message || err.message || t("errors.unknownError")
+      alert(t("errors.purchaseSubmissionFailed") + errorMessage)
     } finally {
       setPurchaseLoading(false)
     }
   }
 
-  // Get the actual type for display purposes
   const displayType = product ? getItemType(product) : type
 
   if (loading) {
@@ -195,7 +247,7 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-lg">Loading product details...</p>
+          <p className="text-lg">{t("loading.productDetails")}</p>
         </div>
       </div>
     )
@@ -220,39 +272,28 @@ const ProductDetails = () => {
 
   return (
     <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
-      {/* Header Component */}
       <ProductHeader onBack={() => navigate(-1)} isRTL={isRTL} />
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Product Overview */}
         <div className="card bg-base-100 shadow-xl mb-8">
           <div className="card-body p-0">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-0">
-              {/* Left Column - Gallery */}
               <div className="p-8 lg:p-12">
                 <ProductGallery gallery={product.gallery} title={product.title} />
                 <div className="mt-8">
                   <SampleDownload sample={product.sample} title={product.title} type={displayType} isRTL={isRTL} />
                 </div>
               </div>
-
-              {/* Right Column - Product Info */}
               <div className="p-8 lg:p-12 border-l border-base-200">
                 <ProductInfo product={product} type={displayType} isRTL={isRTL} />
               </div>
             </div>
           </div>
         </div>
-
-        {/* Payment Section */}
         <div className="card bg-base-100 shadow-xl mb-8">
           <div className="card-body">
             <PaymentSection paymentNumber={product.paymentNumber} isRTL={isRTL} />
           </div>
         </div>
-
-        {/* Purchase Form */}
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
             <PurchaseForm
@@ -263,6 +304,14 @@ const ProductDetails = () => {
               setUploadedFile={setUploadedFile}
               onSubmit={handleSubmit}
               purchaseLoading={purchaseLoading}
+              // Coupon and Price Props
+              productPrice={product.price}
+              finalPrice={finalPrice}
+              couponCode={couponCode}
+              setCouponCode={setCouponCode}
+              onValidateCoupon={handleValidateCoupon}
+              onRemoveCoupon={handleRemoveCoupon}
+              couponValidation={couponValidation}
             />
           </div>
         </div>

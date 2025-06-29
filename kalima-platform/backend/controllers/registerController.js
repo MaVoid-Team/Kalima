@@ -206,6 +206,15 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     newUser.profilePic = profilePicPath;
   }
 
+  // Referral logic: look up inviter by serial and set referredBy
+  if (req.body.referralSerial) {
+    const inviter = await User.findOne({ userSerial: req.body.referralSerial });
+    if (inviter) {
+      newUser.referredBy = inviter._id;
+    }
+    // Optionally, handle the case where the serial is invalid (show error or ignore)
+  }
+
   let user;
 
   switch (role.toLowerCase()) {

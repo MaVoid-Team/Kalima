@@ -1,4 +1,8 @@
 {
+  "adminPanel": {
+    "title": "Admin Panel",
+    "subtitle": "Manage products, books, and sections"
+  },
   "stats": {
     "totalSales": "Total Sales",
     "pendingApplications": "Pending Applications",
@@ -18,6 +22,9 @@
   "sectionsManagement": {
     "title": "Sections Management",
     "searchPlaceholder": "Search sections...",
+    "totalSections": "Total sections",
+    "filtered": "Filtered",
+    "search": "Search",
     "table": {
       "name": "Name",
       "sectionNumber": "Section Number",
@@ -41,18 +48,58 @@
         "price": "Price",
         "discountPercentage": "Discount Percentage",
         "paymentNumber": "Payment Number",
+        "whatsAppNumber": "WhatsApp Number",
         "thumbnail": "Product Thumbnail",
-        "sampleFile": "Sample File"
+        "sampleFile": "Sample File",
+        "description": "Description",
+        "gallery": "Gallery Images"
       },
       "placeholders": {
         "title": "Enter product title",
         "serial": "Enter serial number",
         "section": "Select section",
-        "paymentNumber": "Enter payment number"
+        "paymentNumber": "Enter payment number",
+        "whatsAppNumber": "Enter WhatsApp number",
+        "description": "Enter product description..."
       },
       "hints": {
         "thumbnail": "Upload product thumbnail (max 5MB)",
-        "sampleFile": "Upload sample file"
+        "sampleFile": "Upload sample file (PDF, DOC, DOCX)",
+        "gallery": "Upload multiple images for the product gallery",
+        "whatsAppNumber": "Enter the WhatsApp number for customer contact",
+        "description": "Provide a detailed description of the product"
+      }
+    },
+    "createBook": {
+      "title": "Create Book",
+      "submitButton": "Create Book",
+      "fields": {
+        "title": "Book Title",
+        "serial": "Serial",
+        "section": "Section",
+        "subject": "Subject",
+        "price": "Price",
+        "discountPercentage": "Discount Percentage",
+        "paymentNumber": "Payment Number",
+        "whatsAppNumber": "WhatsApp Number",
+        "thumbnail": "Book Thumbnail",
+        "sampleFile": "Sample File",
+        "description": "Description"
+      },
+      "placeholders": {
+        "title": "Enter book title",
+        "serial": "Enter serial number",
+        "section": "Select section",
+        "subject": "Select subject",
+        "paymentNumber": "Enter payment number",
+        "whatsAppNumber": "Enter WhatsApp number",
+        "description": "Enter book description..."
+      },
+      "hints": {
+        "thumbnail": "Upload book thumbnail (max 5MB)",
+        "sampleFile": "Upload sample file (PDF, DOC, DOCX)",
+        "whatsAppNumber": "Enter the WhatsApp number for customer contact",
+        "description": "Provide a detailed description of the book"
       }
     },
     "createSection": {
@@ -71,6 +118,39 @@
         "thumbnail": "Enter thumbnail name"
       }
     }
+  },
+  "fileUpload": {
+    "uploaded": "Uploaded",
+    "upload": "Upload",
+    "uploadAll": "Upload All",
+    "uploading": "Uploading...",
+    "uploadingFiles": "Uploading files...",
+    "complete": "Complete",
+    "allFilesUploaded": "All files uploaded",
+    "filesSelected": "files selected",
+    "total": "Total:"
+  },
+  "progressSteps": {
+    "validatingFormData": "Validating Form Data",
+    "checkingRequiredFields": "Checking all required fields",
+    "preparingFiles": "Preparing Files",
+    "processingUploadedFiles": "Processing uploaded files",
+    "uploadingFiles": "Uploading Files",
+    "sendingFilesToServer": "Sending files to server",
+    "creatingProduct": "Creating Product",
+    "creatingBook": "Creating Book",
+    "creatingSection": "Creating Section",
+    "submittingProductData": "Submitting Product data",
+    "submittingBookData": "Submitting Book data",
+    "submittingSectionData": "Submitting Section data",
+    "finalizing": "Finalizing",
+    "completingProcess": "Completing the process",
+    "errorDuringSubmission": "An error occurred during submission"
+  },
+  "progressBar": {
+    "overallProgress": "Overall Progress",
+    "uploadFailed": "Upload Failed",
+    "uploadCompletedSuccessfully": "Upload Completed Successfully!"
   },
   "modals": {
     "editSection": {
@@ -101,6 +181,13 @@
     "fillRequiredFields": "Please fill in all required fields",
     "productCreatedSuccess": "Product created successfully!",
     "productCreateError": "Error creating product: ",
+    "productUpdatedSuccess": "Product updated successfully!",
+    "productUpdateError": "Error updating product: ",
+    "productDeletedSuccess": "Product deleted successfully!",
+    "productDeleteError": "Error deleting product: ",
+    "productFetchError": "Error fetching product: ",
+    "bookCreatedSuccess": "Book created successfully!",
+    "bookCreateError": "Error creating book: ",
     "sectionCreatedSuccess": "Section created successfully!",
     "sectionCreateError": "Error creating section: ",
     "sectionUpdatedSuccess": "Section updated successfully!",
@@ -109,7 +196,8 @@
     "sectionDeleteError": "Error deleting section: "
   },
   "error": {
-    "title": "Error!"
+    "title": "Error!",
+    "retry": "Retry"
   },
   "productsManagement": {
     "title": "Products Management",
@@ -151,9 +239,28 @@
     "totalProducts": "Total Products",
     "totalBooks": "Total Books",
     "totalSections": "Total Sections",
-    "totalItems": "Total Items"
+    "totalItems": "Total Items",
+    "successMessage": "Successfully exported {{count}} {{type}}",
+    "export": "Export Data",
+    "exporting": "Exporting..."
   },
   "products": {
     "unknownSection": "Unknown Section"
+  },
+  "validation": {
+    "invalidProductSelected": "Invalid product selected",
+    "invalidSectionSelected": "Invalid section selected"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "perPage": "per page",
+    "next": "Next",
+    "previous": "Previous",
+    "first": "First",
+    "last": "Last",
+    "page": "Page",
+    "goToPage": "Go to page",
+    "itemsPerPage": "{{count}} per page"
   }
 }

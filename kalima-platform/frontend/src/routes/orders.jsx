@@ -101,3 +101,83 @@ export const confirmBookPurchase = async (purchaseId) => {
     }
   }
 }
+
+export const getAllStats = async () => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+
+    const response = await axios.get(`${API_URL}/api/v1/ec/purchases/stats`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to fetch stats: ${error.message}`,
+    }
+  }
+}
+
+export const getProductStats = async () => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+
+    const response = await axios.get(`${API_URL}/api/v1/ec/purchases/product-purchase-stats`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to fetch product stats: ${error.message}`,
+    }
+  }
+}
+
+export const updatePurchase = async(purchaseId, updateData) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+
+    const response = await axios.patch(
+      `${API_URL}/api/v1/ec/purchases/${purchaseId}`,
+      updateData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to update purchase: ${error.message}`,
+    }
+  }
+}
