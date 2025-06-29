@@ -230,7 +230,7 @@ const Market = () => {
                   >
                     {t("product.discounts")}
                     <br />
-                    <span className="text-lg font-bold">{item.discountPercentage}%</span>
+                    <span className="text-lg font-bold">{item.discountPercentage ? item.discountPercentage + "%" : ""}</span>
                   </div>
                 </div>
               )}
