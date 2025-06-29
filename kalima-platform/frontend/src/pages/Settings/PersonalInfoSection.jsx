@@ -217,7 +217,7 @@ function PersonalInfoSection() {
                 <img
                   src={
                     userData?.profilePic
-                      ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\\/g, "/")}`
+                      ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\/api(\/v1)?\/?$/, "")}`
                       : "/default-avatar.png"
                   }
                   alt={userData?.name || "User Avatar"}
