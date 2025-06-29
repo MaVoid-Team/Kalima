@@ -24,7 +24,7 @@ export default function AdminCreate() {
   const [activeForm, setActiveForm] = useState("subject") // 'subject', 'package', or 'level'
 
   // Subject form state
-  const [subjectData, setSubjectData] = useState({ name: "", nameAR: "" })
+  const [subjectData, setSubjectData] = useState({ name: ""})
 
   // Package form state
   const [packageData, setPackageData] = useState({
@@ -122,7 +122,7 @@ export default function AdminCreate() {
       const response = await createSubject(subjectData)
       if (response.success) {
         setSuccess(t("success.subjectCreated"))
-        setSubjectData({ name: "", nameAR: "" })
+        setSubjectData({ name: ""})
         const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
           setSubjects(updatedSubjects.data)
@@ -336,15 +336,6 @@ export default function AdminCreate() {
                 type="text"
                 value={subjectData.name}
                 onChange={(e) => setSubjectData(prev => ({ ...prev, name: e.target.value }))}
-                placeholder={t("forms.subject.namePlaceholder")}
-                className="input input-bordered w-full"
-                required
-              />
-
-              <input
-                type="text"
-                value={subjectData.nameAR}
-                onChange={(e) => setSubjectData(prev => ({ ...prev, nameAR: e.target.value }))}
                 placeholder={t("forms.subject.namePlaceholder")}
                 className="input input-bordered w-full"
                 required
