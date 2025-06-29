@@ -242,7 +242,7 @@ export const createBook = async (bookData) => {
         formData.append("gallery", bookData.gallery[i])
       }
     }
-    const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
+    const response = await axios.post(`${API_URL}/ec/books`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
