@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getToken, isLoggedIn } from "./auth-services";
-import api from "../services/errorHandling";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
