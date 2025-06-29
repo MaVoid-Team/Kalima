@@ -297,7 +297,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                     <img
                       src={
                         userData?.profilePic
-                          ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\/api(\/v1)?\/?$/, "")}`
+                          ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/^\/?(api\/v1\/?|api\/)/, "")}`
                           : "/default-avatar.png"
                       }
                       alt={userData?.name || "User Avatar"}
@@ -343,8 +343,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                 <Link
                   to={item.path}
                   className={`flex items-center justify-between py-3 px-4 hover:bg-base-200 transition-colors ${location.pathname === item.path
-                      ? `text-primary ${isRTL ? 'border-r-4' : 'border-l-4'} border-primary bg-primary/20 bg-opacity-10`
-                      : 'text-base-content'
+                    ? `text-primary ${isRTL ? 'border-r-4' : 'border-l-4'} border-primary bg-primary/20 bg-opacity-10`
+                    : 'text-base-content'
                     }`}
                   onClick={(e) => {
                     if (item.onClick) {
