@@ -168,6 +168,19 @@ function PersonalInfoSection() {
   // Get all translations under personalInfo namespace
   const personalInfo = t('personalInfo', { returnObjects: true })
 
+  const convertPathToUrl = (filePath) => {
+    if (!filePath) return null;
+    if (filePath.startsWith("http")) return filePath;
+
+    const normalizedPath = filePath.replace(/\\/g, "/");
+
+    // Remove `/api` or `/api/v1` from the end of the API base URL
+    const API_URL = import.meta.env.VITE_API_URL;
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
+
+    return `${baseUrl}/${normalizedPath}`;
+  };
+
   if (loading) {
     return (
       <div className="mb-8">
@@ -215,15 +228,12 @@ function PersonalInfoSection() {
             <div className="avatar">
               <div className="w-24 h-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                 <img
-                  src={
-                    userData?.profilePic
-                      ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\/api(\/v1)?\/?$/, "")}`
-                      : "/default-avatar.png"
-                  }
-                  alt={userData?.name || "User Avatar"}
-                  className="object-cover"
-                  style={{ objectFit: "cover" }}
-                />
+                      src={convertPathToUrl(userData?.profilePic)}
+                      alt={userData?.name || "User Avatar"}
+                      className="object-cover"
+                    style={{ objectFit: "cover" }}
+                    loading='lazy'
+                    />
               </div>
             </div>
           </div>
