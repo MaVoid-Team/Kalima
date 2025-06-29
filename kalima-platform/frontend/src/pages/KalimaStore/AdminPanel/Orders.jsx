@@ -279,7 +279,7 @@ const Orders = () => {
     return orders.map((order) => ({
       ...order,
       orderType: getOrderType(order),
-      formattedPrice: formatPrice(order.price),
+      formattedPrice: formatPrice(order.finalPrice),
       notesPreview: getNotesPreview(order.adminNotes),
     }))
   }, [orders])
