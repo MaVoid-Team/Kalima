@@ -93,6 +93,19 @@ const ProductsManagement = memo(({
     setCurrentPage(1) // Reset to first page when searching
   }, [])
 
+  const convertPathToUrl = (filePath) => {
+    if (!filePath) return null;
+    if (filePath.startsWith("http")) return filePath;
+
+    const normalizedPath = filePath.replace(/\\/g, "/");
+
+    // Remove `/api` or `/api/v1` from the end of the API base URL
+    const API_URL = import.meta.env.VITE_API_URL;
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
+
+    return `${baseUrl}/${normalizedPath}`;
+  };
+
   // Pagination Controls Component
   const PaginationControls = useMemo(() => (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -187,20 +200,6 @@ const ProductsManagement = memo(({
 
                 return (
                   <tr key={product._id}>
-                    <td className="text-center">
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded">
-                          <img
-                            src={product.thumbnail || "/placeholder.svg?height=48&width=48"}
-                            alt={product.title}
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = "/placeholder.svg?height=48&width=48"
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </td>
                     <td className="text-center font-medium">{product.title || "N/A"}</td>
                     <td className="text-center font-mono text-sm">{product.serial || "N/A"}</td>
                     <td className="text-center">{getSectionName(product.section)}</td>
