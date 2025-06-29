@@ -97,7 +97,7 @@ const ProductDetails = () => {
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
-      alert(t("errors.noCouponCode") || "Please enter a coupon code.")
+      alert(t("errors.noCouponCode"))
       return
     }
     setCouponValidation({ ...couponValidation, loading: true, message: "" })
@@ -107,7 +107,7 @@ const ProductDetails = () => {
     // This handles both network errors and API responses with status: "fail"
     if (!result.success || result.data?.status === "fail") {
       const errorMessage =
-        result.data?.message || result.error || t("errors.invalidCoupon") || "Invalid or expired coupon."
+        result.data?.message || result.error || t("errors.invalidCoupon")
       setFinalPrice(product.price) // Reset price on invalid coupon
       setCouponValidation({
         isValid: false,
@@ -126,7 +126,7 @@ const ProductDetails = () => {
       if (typeof discountAmount !== "number") {
         setCouponValidation({
           isValid: false,
-          message: "Invalid discount value received from server.",
+          message: t("errors.invalidDiscountValue"),
           discount: 0,
           loading: false,
         })
@@ -138,7 +138,7 @@ const ProductDetails = () => {
       setFinalPrice(newPrice < 0 ? 0 : newPrice)
       setCouponValidation({
         isValid: true,
-        message: t("success.couponApplied") || `Coupon applied successfully!`,
+        message: t("success.couponApplied"),
         discount: discountAmount,
         loading: false,
       })
@@ -147,7 +147,7 @@ const ProductDetails = () => {
       setFinalPrice(product.price)
       setCouponValidation({
         isValid: false,
-        message: t("errors.invalidCoupon") || "Invalid or expired coupon.",
+        message: t("errors.invalidCoupon"),
         discount: 0,
         loading: false,
       })
@@ -171,20 +171,20 @@ const ProductDetails = () => {
 
   const handleSubmit = async () => {
     if (!product) {
-      alert("Product data not loaded")
+      alert(t("errors.productDataNotLoaded"))
       return
     }
     const actualType = getItemType(product)
     if (!uploadedFile) {
-      alert(t("errors.noFileSelected") || "Please select a payment screenshot")
+      alert(t("errors.noFileSelected"))
       return
     }
     if (!purchaseForm.numberTransferredFrom) {
-      alert(t("errors.noTransferNumber") || "Please enter the transfer number")
+      alert(t("errors.noTransferNumber"))
       return
     }
     if (actualType === "book" && (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName)) {
-      alert(t("errors.fillBookFields") || "Please fill in all book fields")
+      alert(t("errors.fillBookFields"))
       return
     }
 
@@ -215,7 +215,7 @@ const ProductDetails = () => {
       }
 
       if (response.status === "success" || response.message) {
-        alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!")
+        alert(t("success.purchaseSubmitted"))
         // Reset form
         setUploadedFile(null)
         setPurchaseForm({
@@ -233,8 +233,8 @@ const ProductDetails = () => {
       }
     } catch (err) {
       console.error("💥 Error submitting purchase:", err)
-      const errorMessage = err.response?.data?.message || err.message || "Unknown error occurred"
-      alert((t("errors.purchaseSubmissionFailed") || "Purchase submission failed: ") + errorMessage)
+      const errorMessage = err.response?.data?.message || err.message || t("errors.unknownError")
+      alert(t("errors.purchaseSubmissionFailed") + errorMessage)
     } finally {
       setPurchaseLoading(false)
     }
@@ -247,7 +247,7 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg mb-4"></div>
-          <p className="text-lg">Loading product details...</p>
+          <p className="text-lg">{t("loading.productDetails")}</p>
         </div>
       </div>
     )

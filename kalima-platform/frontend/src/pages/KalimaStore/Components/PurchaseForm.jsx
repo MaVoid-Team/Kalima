@@ -192,12 +192,12 @@ const PurchaseForm = ({
           {/* Coupon Code Section */}
           <div className="form-control">
             <label className="label">
-              <span className="label-text font-semibold">{t("purchaseForm.couponCode", "Coupon Code")}</span>
+              <span className="label-text font-semibold">{t("purchaseForm.couponCode")}</span>
             </label>
             <div className="join w-full">
               <input
                 type="text"
-                placeholder={t("purchaseForm.couponCodePlaceholder", "Enter coupon")}
+                placeholder={t("purchaseForm.couponCodePlaceholder")}
                 className="input input-bordered join-item w-full"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -216,7 +216,7 @@ const PurchaseForm = ({
                   {couponValidation.loading ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    t("purchaseForm.applyCoupon", "Apply")
+                    t("purchaseForm.applyCoupon")
                   )}
                 </button>
               )}
@@ -236,15 +236,15 @@ const PurchaseForm = ({
       <div className="mt-8">
         <div className="max-w-md mx-auto">
           <div className="p-6 bg-base-200 rounded-lg space-y-3">
-            <h3 className="text-xl font-bold text-center mb-4">{t("purchaseForm.priceSummary", "Price Summary")}</h3>
+            <h3 className="text-xl font-bold text-center mb-4">{t("purchaseForm.priceSummary")}</h3>
             <div className="flex justify-between text-lg">
-              <span>{t("purchaseForm.originalPrice", "Original Price")}</span>
+              <span>{t("purchaseForm.originalPrice")}</span>
               <span>${productPrice?.toFixed(2)}</span>
             </div>
             {couponValidation.isValid && (
               <div className="flex justify-between text-lg text-success">
                 <span>
-                  {t("purchaseForm.discount", "Discount")}
+                  {t("purchaseForm.discount")}
                   {productPrice && couponValidation.discount && (
                     <span className="ml-1 text-sm font-bold">
                       ({((couponValidation.discount / productPrice) * 100).toFixed(1)}%)
@@ -256,7 +256,7 @@ const PurchaseForm = ({
             )}
             <div className="divider my-2"></div>
             <div className="flex justify-between text-2xl font-bold">
-              <span>{t("purchaseForm.total", "Total")}</span>
+              <span>{t("purchaseForm.total")}</span>
               <span>${finalPrice?.toFixed(2)}</span>
             </div>
           </div>

@@ -85,10 +85,16 @@
     "fillBookFields": "يرجى ملء جميع حقول الكتاب.",
     "purchaseSubmissionFailed": "فشل في إرسال الشراء: ",
     "title": "خطأ!",
-    "productNotFound": "لم يتم العثور على المنتج."
+    "productNotFound": "لم يتم العثور على المنتج.",
+    "noCouponCode": "يرجى إدخال رمز الكوبون.",
+    "invalidCoupon": "كوبون غير صالح أو منتهي الصلاحية.",
+    "invalidDiscountValue": "قيمة الخصم المستلمة من الخادم غير صالحة.",
+    "productDataNotLoaded": "بيانات المنتج غير محملة.",
+    "unknownError": "حدث خطأ غير معروف"
   },
   "success": {
-    "purchaseSubmitted": "تم إرسال الشراء بنجاح!"
+    "purchaseSubmitted": "تم إرسال الشراء بنجاح!",
+    "couponApplied": "تم تطبيق الكوبون بنجاح!"
   },
   "logs": {
     "submittingPurchase": "جاري إرسال الشراء مع الملف:"
@@ -116,7 +122,14 @@
     "submit": "إرسال الشراء",
     "processingTimeTitle": "مدة المعالجة",
     "processingTimeDesc": "بعد إرسال طلب الشراء الخاص بك، سيقوم فريقنا بمراجعة ومعالجة طلبك. يمكنك توقع الرد خلال ",
-    "hours": "ساعة في أوقات العمل"
+    "hours": "ساعة في أوقات العمل",
+    "couponCode": "رمز الكوبون",
+    "couponCodePlaceholder": "أدخل الكوبون",
+    "applyCoupon": "تطبيق",
+    "priceSummary": "ملخص السعر",
+    "originalPrice": "السعر الأصلي",
+    "discount": "الخصم",
+    "total": "المجموع"
   },
   "sample": {
     "noSample": "لا يوجد ملف عينة",
@@ -127,5 +140,8 @@
     "downloadButton": "تحميل عينة PDF",
     "downloading": "جاري التحميل...",
     "fileWillBeDownloadedAs": "سيتم تحميل الملف باسم: {{filename}}"
+  },
+  "loading": {
+    "productDetails": "جاري تحميل تفاصيل المنتج..."
   }
 }
