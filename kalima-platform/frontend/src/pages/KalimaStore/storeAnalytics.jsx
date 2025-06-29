@@ -568,7 +568,7 @@ const StoreAnalytics = () => {
                       </td>
                       <td className="text-center">
                         <div className="font-medium">{product.productName}</div>
-                        <div className="text-xs opacity-50 font-mono">{product.productId}</div>
+                        <div className="text-xs opacity-50 font-mono">{product.serial}</div>
                       </td>
                       <td className="text-center">
                         <div className="badge badge-primary">{product.totalPurchases}</div>
