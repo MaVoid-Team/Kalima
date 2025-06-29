@@ -49,21 +49,18 @@ const StoreAnalytics = () => {
   // Generate month options from monthly stats
   const generateMonthOptions = useCallback(() => {
     const options = [{ value: "all", label: t("filters.allMonths") }]
-
     monthlyStats.forEach((stat) => {
       const date = new Date(stat._id.year, stat._id.month - 1, 1)
       const monthName = date.toLocaleDateString(i18n.language, {
         year: "numeric",
         month: "long",
       })
-
       options.push({
         value: `${stat._id.year}-${stat._id.month}`,
         label: monthName,
         data: stat,
       })
     })
-
     return options
   }, [monthlyStats, i18n.language, t])
 
@@ -72,9 +69,7 @@ const StoreAnalytics = () => {
     try {
       setOverviewLoading(true)
       setError(null)
-
       const response = await getAllStats()
-
       if (response.success) {
         const { overview, monthlyStats } = response.data.data
         setOverviewStats(overview)
@@ -94,11 +89,11 @@ const StoreAnalytics = () => {
   const fetchProductStats = useCallback(async () => {
     try {
       setProductStatsLoading(true)
-
       const response = await getProductStats()
-
       if (response.success) {
-        setProductStats(response.data.data || [])
+        const productData = response.data.data || []
+        console.log("Raw product stats from API:", productData) // Debug log
+        setProductStats(productData)
       } else {
         throw new Error(response.error)
       }
@@ -112,6 +107,7 @@ const StoreAnalytics = () => {
   // Filter product stats based on current filters
   const applyFilters = useCallback(() => {
     let filtered = [...productStats]
+    console.log("Applying filters to product stats:", filtered) // Debug log
 
     // Search filter
     if (searchQuery.trim()) {
@@ -120,17 +116,18 @@ const StoreAnalytics = () => {
 
     // Revenue filter
     if (revenueFilter !== "all") {
-      const maxRevenue = Math.max(...productStats.map((p) => p.totalValue))
+      const maxRevenue = Math.max(...productStats.map((p) => p.totalValue || 0))
       const threshold = maxRevenue / 3
 
       filtered = filtered.filter((product) => {
+        const productValue = product.totalValue || 0
         switch (revenueFilter) {
           case "high":
-            return product.totalValue >= threshold * 2
+            return productValue >= threshold * 2
           case "medium":
-            return product.totalValue >= threshold && product.totalValue < threshold * 2
+            return productValue >= threshold && productValue < threshold * 2
           case "low":
-            return product.totalValue < threshold
+            return productValue < threshold
           default:
             return true
         }
@@ -138,8 +135,9 @@ const StoreAnalytics = () => {
     }
 
     // Sort by total purchases (descending)
-    filtered.sort((a, b) => b.totalPurchases - a.totalPurchases)
+    filtered.sort((a, b) => (b.totalPurchases || 0) - (a.totalPurchases || 0))
 
+    console.log("Filtered product stats:", filtered) // Debug log
     setFilteredProductStats(filtered)
   }, [productStats, searchQuery, revenueFilter])
 
@@ -157,7 +155,6 @@ const StoreAnalytics = () => {
   // Handle month filter change
   const handleMonthFilterChange = (monthValue) => {
     setSelectedMonth(monthValue)
-
     if (monthValue === "all") {
       // Use overall stats
       const overview = overviewStats
@@ -165,7 +162,6 @@ const StoreAnalytics = () => {
     } else {
       // Find specific month stats
       const monthData = monthlyStats.find((stat) => `${stat._id.year}-${stat._id.month}` === monthValue)
-
       if (monthData) {
         setOverviewStats({
           totalPurchases: monthData.count,
@@ -194,7 +190,8 @@ const StoreAnalytics = () => {
 
   // Format currency
   const formatPrice = (price) => {
-    return `${Math.round(price)} ج`
+    const numPrice = Number(price) || 0
+    return `${Math.round(numPrice)} ج`
   }
 
   // Calculate performance metrics
@@ -202,11 +199,12 @@ const StoreAnalytics = () => {
     if (productStats.length === 0) return { topProduct: null, totalProducts: 0, averagePerProduct: 0 }
 
     const topProduct = productStats.reduce((max, product) =>
-      product.totalPurchases > max.totalPurchases ? product : max,
+      (product.totalPurchases || 0) > (max.totalPurchases || 0) ? product : max,
     )
 
     const totalProducts = productStats.length
-    const averagePerProduct = productStats.reduce((sum, product) => sum + product.totalPurchases, 0) / totalProducts
+    const averagePerProduct =
+      productStats.reduce((sum, product) => sum + (product.totalPurchases || 0), 0) / totalProducts
 
     return { topProduct, totalProducts, averagePerProduct }
   }
@@ -278,7 +276,6 @@ const StoreAnalytics = () => {
               <h3 className="font-semibold">{t("filters.title")}</h3>
               {(overviewLoading || productStatsLoading) && <span className="loading loading-spinner loading-sm"></span>}
             </div>
-
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
               {/* Month Filter */}
               <div className="flex items-center gap-2">
@@ -295,7 +292,6 @@ const StoreAnalytics = () => {
                   ))}
                 </select>
               </div>
-
               {/* Revenue Filter */}
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
@@ -310,7 +306,6 @@ const StoreAnalytics = () => {
                   <option value="low">{t("filters.lowRevenue")}</option>
                 </select>
               </div>
-
               {/* Search */}
               <input
                 type="text"
@@ -319,7 +314,6 @@ const StoreAnalytics = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-
               {hasActiveFilters && (
                 <button className="btn btn-ghost btn-sm" onClick={clearFilters}>
                   <X className="w-4 h-4" />
@@ -338,21 +332,18 @@ const StoreAnalytics = () => {
             <div className="flex flex-wrap items-center gap-2">
               <Filter className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium">{t("activeFilters")}:</span>
-
               {selectedMonth !== "all" && (
                 <div className="badge badge-primary gap-2">
                   {generateMonthOptions().find((opt) => opt.value === selectedMonth)?.label}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => handleMonthFilterChange("all")} />
                 </div>
               )}
-
               {revenueFilter !== "all" && (
                 <div className="badge badge-secondary gap-2">
                   {t(`filters.${revenueFilter}Revenue`)}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setRevenueFilter("all")} />
                 </div>
               )}
-
               {searchQuery.trim() && (
                 <div className="badge badge-accent gap-2">
                   Search: "{searchQuery}"
@@ -524,7 +515,6 @@ const StoreAnalytics = () => {
             {t("productPerformance")}
           </h2>
         </div>
-
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
@@ -554,9 +544,19 @@ const StoreAnalytics = () => {
                 </tr>
               ) : (
                 filteredProductStats.map((product, index) => {
-                  const avgValue = product.totalPurchases > 0 ? product.totalValue / product.totalPurchases : 0
-                  const maxPurchases = Math.max(...filteredProductStats.map((p) => p.totalPurchases))
-                  const performancePercentage = maxPurchases > 0 ? (product.totalPurchases / maxPurchases) * 100 : 0
+                  const totalValue = Number(product.totalValue) || 0
+                  const totalPurchases = Number(product.totalPurchases) || 0
+                  const avgValue = totalPurchases > 0 ? totalValue / totalPurchases : 0
+                  const maxPurchases = Math.max(...filteredProductStats.map((p) => Number(p.totalPurchases) || 0))
+                  const performancePercentage = maxPurchases > 0 ? (totalPurchases / maxPurchases) * 100 : 0
+
+                  // Debug log for each product
+                  console.log(`Product ${product.productName}:`, {
+                    totalValue,
+                    totalPurchases,
+                    avgValue,
+                    rawProduct: product,
+                  })
 
                   return (
                     <tr key={product.productId} className="hover">
@@ -571,9 +571,12 @@ const StoreAnalytics = () => {
                         <div className="text-xs opacity-50 font-mono">{product.serial}</div>
                       </td>
                       <td className="text-center">
-                        <div className="badge badge-primary">{product.totalPurchases}</div>
+                        <div className="badge badge-primary">{totalPurchases}</div>
                       </td>
-                      <td className="text-center font-bold">{formatPrice(product.totalValue)}</td>
+                      <td className="text-center font-bold">
+                        <span className="text-success">{formatPrice(totalValue)}</span>
+                        <div className="text-xs opacity-50">Raw: {totalValue}</div>
+                      </td>
                       <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
                       <td className="text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -623,7 +626,6 @@ const StoreAnalytics = () => {
                       year: "numeric",
                       month: "long",
                     })
-
                     return (
                       <tr key={`${stat._id.year}-${stat._id.month}`} className="hover">
                         <td className="font-medium">{monthName}</td>
