@@ -530,7 +530,7 @@ const Orders = () => {
                     <td className="text-center max-w-32">
                       {order.adminNotes ? (
                         <div className="tooltip tooltip-left" data-tip={order.adminNotes}>
-                          <div className="flex items-center gap-1 text-blue-600 cursor-help overflow-auto">
+                          <div className="flex items-center gap-1 text-blue-600 cursor-help overflow-hidden max-w-4">
                             <MessageSquare className="w-4 h-4" />
                             <span className="text-xs truncate">{order.notesPreview}</span>
                           </div>
