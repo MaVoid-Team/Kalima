@@ -450,7 +450,7 @@ const Orders = () => {
       {/* Orders Table */}
       <div className="card shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="table w-full table-fixed">
+          <table className="table w-full table-fixed overflow-hidden">
             <thead>
               <tr>
                 <th className="text-center w-48">{t("table.product")}</th>
