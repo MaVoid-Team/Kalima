@@ -102,6 +102,20 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
+  const convertPathToUrl = (filePath) => {
+    if (!filePath) return null;
+    if (filePath.startsWith("http")) return filePath;
+
+    const normalizedPath = filePath.replace(/\\/g, "/");
+
+    // Remove `/api` or `/api/v1` from the end of the API base URL
+    const API_URL = import.meta.env.VITE_API_URL;
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
+
+    return `${baseUrl}/${normalizedPath}`;
+  };
+
+
   // Define menu items based on user role
   const getMenuItems = () => {
     const userRole = userData?.role || 'Guest';
@@ -295,14 +309,11 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
                 <div className="avatar">
                   <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                     <img
-                      src={
-                        userData?.profilePic
-                          ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/^\/api\/v1\//, "")}`
-                          : "/default-avatar.png"
-                      }
+                      src={convertPathToUrl(userData?.profilePic)}
                       alt={userData?.name || "User Avatar"}
                       className="object-cover"
-                      style={{ objectFit: "cover" }}
+                    style={{ objectFit: "cover" }}
+                    loading='lazy'
                     />
                   </div>
                 </div>
