@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
-import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
+import { validateCoupon } from "../../routes/marketCoupons" // Assuming this is the correct path
 
 // Import components
 import ProductHeader from "./components/ProductHeader"
@@ -147,8 +147,9 @@ const ProductDetails = () => {
         return
       }
 
-      // Apply discount to current finalPrice (which should be the display price)
-      const newPrice = finalPrice - discountAmount
+      // Apply discount to the base display price (price after initial discount)
+      const basePrice = getDisplayPrice(product)
+      const newPrice = basePrice - discountAmount
 
       setFinalPrice(newPrice < 0 ? 0 : newPrice)
       setCouponValidation({
