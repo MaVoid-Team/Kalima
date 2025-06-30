@@ -51,6 +51,14 @@ const ProductDetails = () => {
     return item && item.__t === "ECBook" ? "book" : "product"
   }
 
+  // Helper function to get the display price (priceAfterDiscount or original price)
+  const getDisplayPrice = (productData) => {
+    if (productData.priceAfterDiscount && productData.priceAfterDiscount < productData.price) {
+      return productData.priceAfterDiscount
+    }
+    return productData.price
+  }
+
   // Fetch product/book data
   useEffect(() => {
     const fetchItemData = async () => {
@@ -59,10 +67,12 @@ const ProductDetails = () => {
         setLoading(false)
         return
       }
+
       try {
         setLoading(true)
         setError(null)
         let response
+
         if (type === "book") {
           response = await getBookById(id)
         } else {
@@ -77,10 +87,9 @@ const ProductDetails = () => {
         if (response.status === "success") {
           const itemData = response.data.book || response.data.product
           setProduct(itemData)
-          const initialDisplayPrice =
-            itemData.priceAfterDiscount && itemData.priceAfterDiscount < itemData.price
-              ? itemData.priceAfterDiscount
-              : itemData.price
+
+          // Set initial price to the display price (priceAfterDiscount if available)
+          const initialDisplayPrice = getDisplayPrice(itemData)
           setFinalPrice(initialDisplayPrice)
         } else {
           throw new Error(t("errors.fetchFailed"))
@@ -92,6 +101,7 @@ const ProductDetails = () => {
         setLoading(false)
       }
     }
+
     fetchItemData()
   }, [id, type, t])
 
@@ -100,15 +110,19 @@ const ProductDetails = () => {
       alert(t("errors.noCouponCode"))
       return
     }
+
     setCouponValidation({ ...couponValidation, loading: true, message: "" })
 
     const result = await validateCoupon(couponCode)
 
     // This handles both network errors and API responses with status: "fail"
     if (!result.success || result.data?.status === "fail") {
-      const errorMessage =
-        result.data?.message || result.error || t("errors.invalidCoupon")
-      setFinalPrice(product.price) // Reset price on invalid coupon
+      const errorMessage = result.data?.message || result.error || t("errors.invalidCoupon")
+
+      // Reset to display price (priceAfterDiscount if available)
+      const resetPrice = getDisplayPrice(product)
+      setFinalPrice(resetPrice)
+
       setCouponValidation({
         isValid: false,
         message: errorMessage,
@@ -133,6 +147,7 @@ const ProductDetails = () => {
         return
       }
 
+      // Apply discount to current finalPrice (which should be the display price)
       const newPrice = finalPrice - discountAmount
 
       setFinalPrice(newPrice < 0 ? 0 : newPrice)
@@ -144,7 +159,8 @@ const ProductDetails = () => {
       })
     } else {
       // Fallback for any other unexpected success response format
-      setFinalPrice(product.price)
+      const resetPrice = getDisplayPrice(product)
+      setFinalPrice(resetPrice)
       setCouponValidation({
         isValid: false,
         message: t("errors.invalidCoupon"),
@@ -156,11 +172,11 @@ const ProductDetails = () => {
 
   const handleRemoveCoupon = () => {
     setCouponCode("")
-    const initialDisplayPrice =
-      product.priceAfterDiscount && product.priceAfterDiscount < product.price
-        ? product.priceAfterDiscount
-        : product.price
-    setFinalPrice(initialDisplayPrice)
+
+    // Reset to display price (priceAfterDiscount if available)
+    const resetPrice = getDisplayPrice(product)
+    setFinalPrice(resetPrice)
+
     setCouponValidation({
       isValid: false,
       message: "",
@@ -174,15 +190,19 @@ const ProductDetails = () => {
       alert(t("errors.productDataNotLoaded"))
       return
     }
+
     const actualType = getItemType(product)
+
     if (!uploadedFile) {
       alert(t("errors.noFileSelected"))
       return
     }
+
     if (!purchaseForm.numberTransferredFrom) {
       alert(t("errors.noTransferNumber"))
       return
     }
+
     if (actualType === "book" && (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName)) {
       alert(t("errors.fillBookFields"))
       return
@@ -190,6 +210,7 @@ const ProductDetails = () => {
 
     try {
       setPurchaseLoading(true)
+
       const purchaseData = {
         productId: product._id,
         numberTransferredFrom: purchaseForm.numberTransferredFrom,
@@ -197,10 +218,12 @@ const ProductDetails = () => {
         notes: purchaseForm.notes || "",
       }
 
-      if (couponValidation.isValid) {
-        purchaseData.couponCode = couponCode
+      // Add coupon code if valid
+      if (couponValidation.isValid && couponCode.trim()) {
+        purchaseData.couponCode = couponCode.trim()
       }
 
+      // Add book-specific fields if it's a book
       if (actualType === "book") {
         purchaseData.nameOnBook = purchaseForm.nameOnBook
         purchaseData.numberOnBook = purchaseForm.numberOnBook
@@ -216,6 +239,7 @@ const ProductDetails = () => {
 
       if (response.status === "success" || response.message) {
         alert(t("success.purchaseSubmitted"))
+
         // Reset form
         setUploadedFile(null)
         setPurchaseForm({
@@ -226,6 +250,7 @@ const ProductDetails = () => {
           notes: "",
         })
         handleRemoveCoupon() // Also reset coupon state
+
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
       } else {
@@ -306,6 +331,7 @@ const ProductDetails = () => {
               purchaseLoading={purchaseLoading}
               // Coupon and Price Props
               productPrice={product.price}
+              displayPrice={getDisplayPrice(product)}
               finalPrice={finalPrice}
               couponCode={couponCode}
               setCouponCode={setCouponCode}

@@ -309,14 +309,19 @@ export const deleteProduct = async (productId) => {
 export const purchaseProduct = async (purchaseData) => {
   try {
     const formData = new FormData()
-
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
+    
     if (purchaseData.paymentScreenShot) {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
+    
     if (purchaseData.notes) {
       formData.append("notes", purchaseData.notes)
+    }
+    
+    if (purchaseData.couponCode) {
+      formData.append("couponCode", purchaseData.couponCode)
     }
 
     const response = await axios.post(`${API_URL}/ec/purchases/`, formData, {
@@ -326,6 +331,7 @@ export const purchaseProduct = async (purchaseData) => {
         "Content-Type": "multipart/form-data",
       },
     })
+
     return response.data
   } catch (error) {
     console.error(`Error purchasing product: ${error.message}`)
@@ -336,7 +342,6 @@ export const purchaseProduct = async (purchaseData) => {
 // Function to purchase a book
 export const purchaseBook = async (purchaseData) => {
   try {
-    console.log("Purchase Data:", purchaseData)
     const formData = new FormData()
 
     formData.append("productId", purchaseData.productId)

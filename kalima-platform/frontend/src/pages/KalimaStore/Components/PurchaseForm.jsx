@@ -239,7 +239,7 @@ const PurchaseForm = ({
             <h3 className="text-xl font-bold text-center mb-4">{t("purchaseForm.priceSummary")}</h3>
             <div className="flex justify-between text-lg">
               <span>{t("purchaseForm.originalPrice")}</span>
-              <span>${productPrice?.toFixed(2)}</span>
+              <span>{productPrice?.toFixed(2)}</span>
             </div>
             {couponValidation.isValid && (
               <div className="flex justify-between text-lg text-success">
@@ -251,13 +251,13 @@ const PurchaseForm = ({
                     </span>
                   )}
                 </span>
-                <span>-${couponValidation.discount?.toFixed(2)}</span>
+                <span>-{couponValidation.discount?.toFixed(2)}</span>
               </div>
             )}
             <div className="divider my-2"></div>
             <div className="flex justify-between text-2xl font-bold">
               <span>{t("purchaseForm.total")}</span>
-              <span>${finalPrice?.toFixed(2)}</span>
+              <span>{finalPrice?.toFixed(2)}</span>
             </div>
           </div>
         </div>
