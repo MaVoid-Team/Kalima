@@ -997,7 +997,7 @@ const PromoCodes = () => {
                     <div
                       className="flex items-center gap-1 tooltip"
                       data-tip={
-                        t("profile.userSerialTooltip") || "You can use this to invite your friends to the platform and earn rewards"
+                        t("profile.userSerial") || "Send this to your friends to invite them to the platform and win rewards"
                       }
                     >
                       <span className="text-xs font-semibold text-base-content/60">{t("profile.userSerial")}:</span>
