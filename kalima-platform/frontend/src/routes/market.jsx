@@ -353,6 +353,10 @@ export const purchaseBook = async (purchaseData) => {
     formData.append("numberOnBook", purchaseData.numberOnBook)
     formData.append("seriesName", purchaseData.seriesName)
 
+    if (purchaseData.couponCode) {
+      formData.append("couponCode", purchaseData.couponCode)
+    }
+
     const response = await axios.post(`${API_URL}/ec/book-purchases/`, formData, {
       withCredentials: true,
       headers: {
