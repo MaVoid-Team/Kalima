@@ -848,6 +848,9 @@ const Orders = () => {
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
+                  <p>
+                    <strong>{t("table.finalPrice")}:</strong> {formatPrice(selectedOrder.finalPrice)}
+                  </p>
                   {selectedOrder.notes && (
                     <div>
                       <strong>{t("table.customerNotes")}:</strong>
