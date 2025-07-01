@@ -13,7 +13,7 @@ function isValidPDF(file) {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description, whatsAppNumber } = req.body;
+        const { title, subtitle, serial, section, price, priceAfterDiscount, description, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
         let sample, imageUrl, gallery = [];
         if (req.files && req.files.sample && req.files.sample[0]) {
@@ -31,6 +31,7 @@ exports.createProduct = async (req, res, next) => {
         if (req.files && req.files.gallery) {
             gallery = req.files.gallery.map(file => file.path);
         }
+        // discountPercentage will be auto-calculated in the model, do not include in create
         const product = await ECProduct.create({
             title,
             subtitle,
@@ -40,8 +41,7 @@ exports.createProduct = async (req, res, next) => {
             section,
             serial,
             price,
-            paymentNumber,
-            discountPercentage,
+            priceAfterDiscount,
             description,
             whatsAppNumber,
             createdBy,
@@ -96,14 +96,13 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, paymentNumber, discountPercentage, serial, description, whatsAppNumber } = req.body;
+        const { title, section, price, priceAfterDiscount, serial, description, whatsAppNumber } = req.body;
         const updatedBy = req.user._id;
         let update = {
             title,
             section,
             price,
-            paymentNumber,
-            discountPercentage,
+            priceAfterDiscount,
             serial,
             description,
             updatedBy,
