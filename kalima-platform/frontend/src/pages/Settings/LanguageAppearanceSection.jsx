@@ -53,41 +53,15 @@ function LanguageAppearanceSection() {
             <label className={`label ${isRTL ? 'justify-end' : 'justify-start'}`}>
               <span className="label-text">{t("languageAppearance.options.language")}</span>
             </label>
-            <div className={`flex justify-end`}>
-              <div className={`dropdown ${isLangOpen ? "dropdown-open" : ""}`}>
-                <div 
-                  tabIndex={0}
-                  role="button"
-                  className={`btn m-1 min-w-40 justify-between ${isRTL ? 'flex-row-reverse' : ''}`}
-                  onClick={() => setIsLangOpen(!isLangOpen)}
-                >
-                  <span>{t(`languageAppearance.languages.${i18n.language}`)}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-4 h-4"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </div>
-                <ul className={`menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52 ${isLangOpen ? "block" : "hidden"}`}>
-                  <li>
-                    <button onClick={() => changeLanguage("ar")} className="flex justify-between">
-                      <span>{t("languageAppearance.languages.ar")}</span>
-                      <span>🇸🇦</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button onClick={() => changeLanguage("en")} className="flex justify-between">
-                      <span>{t("languageAppearance.languages.en")}</span>
-                      <span>🇺🇸</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
+            <div className="flex justify-end ">
+              <select
+                className="select select-bordered min-w-40 px-8"
+                value={i18n.language}
+                onChange={e => changeLanguage(e.target.value)}
+              >
+                <option value="ar">{t("languageAppearance.languages.ar")}  🇸🇦</option>
+                <option value="en">{t("languageAppearance.languages.en")}  🇺🇸</option>
+              </select>
             </div>
           </div>
 

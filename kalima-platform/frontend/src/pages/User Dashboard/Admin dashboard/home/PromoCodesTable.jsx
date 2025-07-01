@@ -13,7 +13,6 @@ const PromoCodesTable = () => {
   const dir = isRTL ? "rtl" : "ltr"
   const [filters, setFilters] = useState({
     isRedeemed: "", // 'true' | 'false' | ''
-    redeemedBy: "",
     type: "general", //general | specific | false
   })
   const [state, setState] = useState({
@@ -43,7 +42,6 @@ const PromoCodesTable = () => {
       const promoParams = {
         limit: 1000,
         ...(filters.isRedeemed !== "" && { isRedeemed: filters.isRedeemed }),
-        ...(filters.redeemedBy && { redeemedBy: filters.redeemedBy }),
         ...(filters.type && { type: filters.type }),
       }
 
@@ -246,18 +244,6 @@ const PromoCodesTable = () => {
                 <option value="true">{t("filters.redeemed")}</option>
               </select>
 
-              <select
-                className="select select-bordered"
-                value={filters.redeemedBy}
-                onChange={(e) => setFilters((prev) => ({ ...prev, redeemedBy: e.target.value }))}
-              >
-                <option value="">{t("filters.allStudents")}</option>
-                {students.map((student) => (
-                  <option key={student._id} value={student._id}>
-                    {student.name}
-                  </option>
-                ))}
-              </select>
 
               <select
                 className="select select-bordered"
