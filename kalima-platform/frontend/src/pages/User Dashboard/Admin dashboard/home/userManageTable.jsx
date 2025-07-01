@@ -97,9 +97,7 @@ const UserManagementTable = () => {
         (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
         (!filters.status || getStatus(user) === filters.status) &&
         (filters.successfulInvites === "" ||
-          (filters.successfulInvites === "5" ?
-            (user.successfulInvites || 0) >= 5 :
-            (user.successfulInvites || 0) === parseInt(filters.successfulInvites, 10)))
+          (user.successfulInvites || 0) === parseInt(filters.successfulInvites, 10))
     )
     setFilteredUsers(filtered)
   }
@@ -441,18 +439,15 @@ const UserManagementTable = () => {
             <option value={t("admin.status.valid")}>{t("admin.status.valid")}</option>
             <option value={t("admin.status.missingData")}>{t("admin.status.missingData")}</option>
           </select>
-          <select
-            className="select select-bordered"
+          <input
+            type="number"
+            min="0"
+            placeholder={t("admin.filters.invites")}
+            className="input input-bordered"
             value={filters.successfulInvites}
             onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
-          >
-            <option value="">{t("admin.filters.all")}</option>
-            <option value="1">1 {t("admin.invites.invite")}</option>
-            <option value="2">2 {t("admin.invites.invites")}</option>
-            <option value="3">3 {t("admin.invites.invites")}</option>
-            <option value="4">4 {t("admin.invites.invites")}</option>
-            <option value="5">5+ {t("admin.invites.invites")}</option>
-          </select>
+          />
+
         </div>
 
         <div className="flex gap-4">

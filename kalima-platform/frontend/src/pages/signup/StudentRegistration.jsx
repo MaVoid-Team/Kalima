@@ -52,7 +52,7 @@ export default function StudentRegistration() {
     faction: "Alpha",
     level: "",
     hobbies: [],
-    parentPhoneNumber: "",
+    parentPhoneNumber: null,
     children: [""],
     subject: "",
     teachesAtType: "",
@@ -116,8 +116,10 @@ export default function StudentRegistration() {
         errors.confirmPassword = "passwordsMismatch"
       }
 
-      if (role === "student" && !formData.parentPhoneNumber) {
+      if (role === "student" && (formData.parentPhoneNumber === null || formData.parentPhoneNumber === "")) {
         errors.parentPhoneNumber = "parentPhoneRequired"
+      } else if (role === "student" && !phoneRegex.test(String(formData.parentPhoneNumber))) {
+        errors.parentPhoneNumber = "phoneInvalid"
       }
 
      
@@ -230,7 +232,9 @@ export default function StudentRegistration() {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox"
+      [name]: name === "parentPhoneNumber"
+        ? value === "" ? null : Number(value)
+        : type === "checkbox"
         ? e.target.checked
         : type === "file"
         ? files[0] // File input handling
