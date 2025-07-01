@@ -273,7 +273,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 
     const token = getToken()
 
-    const response = await api.get(`${API_URL}/api/v1/users/me/dashboard`, {
+    const response = await api.get(`${API_URL}/users/me/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -297,7 +297,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         })
           .then((newToken) => {
             return axios
-              .get(`${API_URL}/api/v1/users/me/dashboard`, {
+              .get(`${API_URL}/users/me/dashboard`, {
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${newToken}`,
@@ -323,7 +323,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken)
 
-          const response = await axios.get(`${API_URL}/api/v1/users/me/dashboard`, {
+          const response = await axios.get(`${API_URL}/users/me/dashboard`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
