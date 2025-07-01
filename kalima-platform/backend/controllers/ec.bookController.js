@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // Create ECBook
 exports.createECBook = async (req, res, next) => {
     try {
-        const { title, serial, section, price, paymentNumber, discountPercentage, subject, description, gallery, whatsAppNumber } = req.body;
+        const { title, serial, section, price, paymentNumber, priceAfterDiscount, subject, description, gallery, whatsAppNumber } = req.body;
         const createdBy = req.user._id;
         let sample, thumbnail, galleryArr = [];
         // Handle sample PDF
@@ -42,7 +42,7 @@ exports.createECBook = async (req, res, next) => {
             section,
             price,
             paymentNumber,
-            discountPercentage,
+            priceAfterDiscount,
             subject,
             thumbnail,
             sample,
@@ -96,6 +96,13 @@ exports.updateECBook = async (req, res) => {
         const updateData = { ...req.body };
         if (req.files?.thumbnail?.[0]) updateData.thumbnail = req.files.thumbnail[0].path;
         if (req.files?.sample?.[0]) updateData.sample = req.files.sample[0].path;
+        // Handle gallery update
+        if (req.files?.gallery) {
+            updateData.gallery = req.files.gallery.map(file => file.path);
+        } else if (updateData.gallery) {
+            // If gallery is sent as array or string in body
+            updateData.gallery = Array.isArray(updateData.gallery) ? updateData.gallery : [updateData.gallery];
+        }
         const book = await ECBook.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
         if (!book) return res.status(404).json({ message: "ECBook not found" });
         res.status(201).json({
