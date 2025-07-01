@@ -177,7 +177,7 @@ export const createProduct = async (productData) => {
     formData.append("serial", productData.serial)
     formData.append("section", productData.section)
     formData.append("price", productData.price)
-    formData.append("discountPercentage", productData.discountPercentage || "0")
+    formData.append("priceAfterDiscount", productData.priceAfterDiscount || "0")
     formData.append("paymentNumber", productData.paymentNumber)
 
     // NEW REQUIRED FIELDS
@@ -223,7 +223,7 @@ export const createBook = async (bookData) => {
     formData.append("serial", bookData.serial)
     formData.append("section", bookData.section)
     formData.append("price", bookData.price)
-    formData.append("discountPercentage", bookData.discountPercentage)
+    formData.append("priceAfterDiscount", bookData.priceAfterDiscount || "0")
     formData.append("subject", bookData.subject)
     formData.append("paymentNumber", bookData.paymentNumber)
     formData.append("description", bookData.description)
@@ -311,15 +311,15 @@ export const purchaseProduct = async (purchaseData) => {
     const formData = new FormData()
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
-    
+
     if (purchaseData.paymentScreenShot) {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
-    
+
     if (purchaseData.notes) {
       formData.append("notes", purchaseData.notes)
     }
-    
+
     if (purchaseData.couponCode) {
       formData.append("couponCode", purchaseData.couponCode)
     }
