@@ -594,11 +594,11 @@ const EnhancedAdminForms = ({
                   />
                 </div>
 
-                {/* Discount Percentage Field */}
+                {/* price after discount Field */}
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">
-                      {t("forms.createProduct.fields.discountPercentage") || "Discount Percentage"}
+                      {t("forms.createProduct.fields.priceAfterDiscount") || "Price After Discount"}
                     </span>
                   </label>
                   <input
@@ -607,14 +607,14 @@ const EnhancedAdminForms = ({
                     className="input input-bordered w-full"
                     value={
                       activeTab === "product"
-                        ? productForm?.discountPercentage || ""
-                        : bookForm?.discountPercentage || ""
+                        ? productForm?.priceAfterDiscount || ""
+                        : bookForm?.priceAfterDiscount || ""
                     }
                     onChange={(e) => {
                       if (activeTab === "product") {
-                        setProductForm?.({ ...productForm, discountPercentage: e.target.value })
+                        setProductForm?.({ ...productForm, priceAfterDiscount: e.target.value })
                       } else {
-                        setBookForm?.({ ...bookForm, discountPercentage: e.target.value })
+                        setBookForm?.({ ...bookForm, priceAfterDiscount: e.target.value })
                       }
                     }}
                   />
