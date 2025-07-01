@@ -4,15 +4,32 @@ const productSchema = new mongoose.Schema(
     {
         title: { type: String, required: true },
         serial: { type: String, required: true },
-        thumbnail: { type: String, required: true },
-        sample: { type: String, required: true }, // PDF file path or URL
-        section: { type: mongoose.Schema.Types.ObjectId, ref: "ECSection", required: true },
+        thumbnail: { type: String, required: true }, // Store local file path for product image
+        sample: { type: String }, // Store local file path for sample PDF
+        gallery: [{
+            type: String,
+        }], // Array of local file paths for gallery images
+        section: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ECSection",
+            required: true,
+        },
         price: { type: Number, required: true },
-        //paymentNumber: { type: String, required: true },
+        paymentNumber: { type: String, required: true },
         discountPercentage: { type: Number, default: 0 },
         priceAfterDiscount: { type: Number },
-        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
         updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        description: { type: String, required: [true, "Description is required"], trim: true },
+        whatsAppNumber: {
+            type: String,
+            required: [true, "WhatsApp number is required"],
+            trim: true,
+        },
     },
     {
         timestamps: { createdAt: true, updatedAt: true },
