@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
-import { validateCoupon } from "../../routes/marketCoupons" // Assuming this is the correct path
+import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
 
 // Import components
 import ProductHeader from "./components/ProductHeader"
