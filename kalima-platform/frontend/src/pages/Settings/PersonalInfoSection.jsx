@@ -29,6 +29,9 @@ function PersonalInfoSection() {
     email: ''
   })
 
+  // Email validation state
+  const [emailError, setEmailError] = useState("");
+
   // State for update status
   const [updateStatus, setUpdateStatus] = useState({
     loading: false,
@@ -70,6 +73,15 @@ function PersonalInfoSection() {
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
+    // Email validation
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        setEmailError(t("validation.invalidEmail") || "Invalid email address");
+      } else {
+        setEmailError("");
+      }
+    }
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -350,7 +362,7 @@ function PersonalInfoSection() {
                   <button
                     className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === 'email' ? 'loading' : ''}`}
                     onClick={() => handleSave('email')}
-                    disabled={updateStatus.loading}
+                    disabled={updateStatus.loading || !!emailError}
                   >
                     <Check className="w-4 h-4" />
                   </button>
@@ -376,7 +388,7 @@ function PersonalInfoSection() {
                 value={isEditing.email ? formData.email : userData?.email || ''}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'}`}
+                className={`input input-bordered w-full ${isRTL ? 'text-right' : 'text-left'} ${emailError && isEditing.email ? 'input-error animate-shake' : ''}`}
                 dir={isRTL ? 'rtl' : 'ltr'}
                 readOnly={!isEditing.email}
               />
@@ -386,6 +398,9 @@ function PersonalInfoSection() {
             )}
             {updateStatus.field === 'email' && updateStatus.success && (
               <div className="mt-2 text-success text-sm">{personalInfo.messages?.updateSuccess || "Updated successfully"}</div>
+            )}
+            {emailError && isEditing.email && (
+              <div className="mt-2 text-error text-sm">{emailError}</div>
             )}
           </div>
 
