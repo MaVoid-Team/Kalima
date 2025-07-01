@@ -368,6 +368,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       role: userRole,
       referredBy: req.user.referredBy || null,
       profilePic: req.user.profilePic || null,
+      userSrial: req.user.userSrial || null, // Assuming userSrial is a field in User model
     },
   };
 
