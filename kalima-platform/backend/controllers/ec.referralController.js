@@ -139,3 +139,26 @@ exports.getECReferralStatsByUser = async (req, res, next) => {
         next(err);
     }
 };
+
+// Helper: Recalculate successfulInvites for a single inviter
+exports.recalculateInviterSuccessfulInvites = async (inviterId) => {
+    // Find all users referred by this inviter
+    const referredUsers = await User.find({ referredBy: inviterId }, '_id');
+    let inviteCount = 0;
+    for (const user of referredUsers) {
+        const purchaseCount = await ECPurchase.countDocuments({ createdBy: user._id });
+        if (purchaseCount > 0) inviteCount++;
+    }
+    // Find inviter's role
+    const inviter = await User.findById(inviterId);
+    let Model;
+    switch (inviter.role) {
+        case "Student": Model = Student; break;
+        case "Parent": Model = Parent; break;
+        case "Teacher": Model = Teacher; break;
+        default: Model = null;
+    }
+    if (Model) {
+        await Model.findByIdAndUpdate(inviterId, { successfulInvites: inviteCount });
+    }
+};
