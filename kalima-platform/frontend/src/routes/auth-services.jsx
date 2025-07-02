@@ -1,6 +1,5 @@
 import axios from "axios"
 import { jwtDecode } from "jwt-decode"
-import api from "../services/errorHandling"
 import {
   refreshToken,
   startTokenRefreshCheck,
@@ -11,6 +10,7 @@ import {
 } from "./tokenRefreshServices"
 
 const API_URL = import.meta.env.VITE_API_URL
+
 const TOKEN_KEY = "accessToken"
 
 // --- AUTH HELPERS ---
@@ -375,18 +375,38 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 
 // --- AUTHENTICATED API HELPERS ---
 
-const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
+const handleAuthenticatedRequest = async (method, url, ...args) => {
   try {
     const token = getToken()
-    const fullUrl = `${API_URL}${url}`
+    // Ensure URL doesn't have double slashes
+    const cleanUrl = url.startsWith("/") ? `${API_URL}${url}` : `${API_URL}/${url}`
 
-    const response = await requestFn(fullUrl, ...args, {
+    let response
+    const config = {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       ...(args[args.length - 1] || {}),
-    })
+    }
+
+    // Handle different HTTP methods
+    switch (method.toLowerCase()) {
+      case "get":
+        response = await axios.get(cleanUrl, config)
+        break
+      case "post":
+        response = await axios.post(cleanUrl, args[0] || {}, config)
+        break
+      case "put":
+        response = await axios.put(cleanUrl, args[0] || {}, config)
+        break
+      case "delete":
+        response = await axios.delete(cleanUrl, config)
+        break
+      default:
+        throw new Error(`Unsupported HTTP method: ${method}`)
+    }
 
     return {
       success: true,
@@ -403,13 +423,32 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
           failedQueue.push({ resolve, reject })
         })
           .then((newToken) => {
-            return requestFn(`${API_URL}${url}`, ...args, {
+            const cleanUrl = url.startsWith("/") ? `${API_URL}${url}` : `${API_URL}/${url}`
+            const config = {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${newToken}`,
               },
               ...(args[args.length - 1] || {}),
-            }).then((response) => ({
+            }
+
+            let retryPromise
+            switch (method.toLowerCase()) {
+              case "get":
+                retryPromise = axios.get(cleanUrl, config)
+                break
+              case "post":
+                retryPromise = axios.post(cleanUrl, args[0] || {}, config)
+                break
+              case "put":
+                retryPromise = axios.put(cleanUrl, args[0] || {}, config)
+                break
+              case "delete":
+                retryPromise = axios.delete(cleanUrl, config)
+                break
+            }
+
+            return retryPromise.then((response) => ({
               success: true,
               data: response.data,
               status: response.status,
@@ -428,19 +467,36 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
         if (refreshResult.success && refreshResult.data.accessToken) {
           processQueue(null, refreshResult.data.accessToken)
 
-          const response = await requestFn(`${API_URL}${url}`, ...args, {
+          const cleanUrl = url.startsWith("/") ? `${API_URL}${url}` : `${API_URL}/${url}`
+          const config = {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${refreshResult.data.accessToken}`,
             },
             ...(args[args.length - 1] || {}),
-          })
+          }
+
+          let retryResponse
+          switch (method.toLowerCase()) {
+            case "get":
+              retryResponse = await axios.get(cleanUrl, config)
+              break
+            case "post":
+              retryResponse = await axios.post(cleanUrl, args[0] || {}, config)
+              break
+            case "put":
+              retryResponse = await axios.put(cleanUrl, args[0] || {}, config)
+              break
+            case "delete":
+              retryResponse = await axios.delete(cleanUrl, config)
+              break
+          }
 
           return {
             success: true,
-            data: response.data,
-            status: response.status,
-            headers: response.headers,
+            data: retryResponse.data,
+            status: retryResponse.status,
+            headers: retryResponse.headers,
           }
         } else {
           clearAuthData()
@@ -467,17 +523,17 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
 }
 
 export const getAuthenticatedRequest = async (url, options = {}) => {
-  return handleAuthenticatedRequest(api.get, url, options)
+  return handleAuthenticatedRequest("get", url, options)
 }
 
 export const postAuthenticatedRequest = async (url, data = {}, options = {}) => {
-  return handleAuthenticatedRequest(api.post, url, data, options)
+  return handleAuthenticatedRequest("post", url, data, options)
 }
 
 export const putAuthenticatedRequest = async (url, data = {}, options = {}) => {
-  return handleAuthenticatedRequest(api.put, url, data, options)
+  return handleAuthenticatedRequest("put", url, data, options)
 }
 
 export const deleteAuthenticatedRequest = async (url, options = {}) => {
-  return handleAuthenticatedRequest(api.delete, url, options)
+  return handleAuthenticatedRequest("delete", url, options)
 }
