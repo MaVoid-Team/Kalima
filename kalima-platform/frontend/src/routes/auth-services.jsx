@@ -273,7 +273,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 
     const token = getToken()
 
-    const response = await api.get(`${API_URL}/users/me/dashboard`, {
+    const response = await axios.get(`${API_URL}/users/me/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
