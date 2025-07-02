@@ -50,7 +50,7 @@ export default function StudentRegistration() {
     phoneNumber2: "",
     gender: "",
     faction: "Alpha",
-    level: "",
+    level: [],
     hobbies: [],
     parentPhoneNumber: null,
     children: [""],
@@ -84,7 +84,7 @@ export default function StudentRegistration() {
       if (!formData.fullName?.trim()) errors.fullName = "required"
       if (!formData.gender) errors.gender = "required"
       if (!formData.government) errors.government = "required"
-      if(!formData.administrationZone) errors.administrationZone = "required"
+      if (!formData.administrationZone) errors.administrationZone = "required"
       if (!formData.phoneNumber) {
         errors.phoneNumber = "required"
       } else if (!phoneRegex.test(formData.phoneNumber)) {
@@ -122,7 +122,7 @@ export default function StudentRegistration() {
         errors.parentPhoneNumber = "phoneInvalid"
       }
 
-     
+
 
       if (role === "teacher") {
         if (!formData.subject?.trim()) {
@@ -182,10 +182,10 @@ export default function StudentRegistration() {
         const response = await getAllLevels()
         if (response.success) {
           const levels = response.data.map((level) => ({
-          value: level._id,
-          label: level.name
-        }));
-        setGradeLevels(levels);
+            value: level._id,
+            label: level.name
+          }));
+          setGradeLevels(levels);
         }
       } catch (error) {
         console.error("Error fetching levels:", error)
@@ -227,26 +227,26 @@ export default function StudentRegistration() {
   }
 
   const handleInputChange = (e) => {
-  try {
-    const { name, value, type, files } = e.target;
+    try {
+      const { name, value, type, files } = e.target;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "parentPhoneNumber"
-        ? value === "" ? null : Number(value)
-        : type === "checkbox"
-        ? e.target.checked
-        : type === "file"
-        ? files[0] // File input handling
-        : value,
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "parentPhoneNumber"
+          ? value === "" ? null : Number(value)
+          : type === "checkbox"
+            ? e.target.checked
+            : type === "file"
+              ? files[0] // File input handling
+              : value,
+      }));
 
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
-  } catch (error) {
-    console.error("Error handling input change:", error);
-    setApiError("Failed to process input");
-  }
-};
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    } catch (error) {
+      console.error("Error handling input change:", error);
+      setApiError("Failed to process input");
+    }
+  };
 
 
   const handleChildrenChange = (index, value) => {
@@ -282,7 +282,6 @@ export default function StudentRegistration() {
     data.append("government", formData.government);
     data.append("administrationZone", formData.administrationZone);
 
-    // Add profilePic if selected
     if (formData.profilePic) {
       data.append("profilePic", formData.profilePic);
     }
@@ -290,7 +289,9 @@ export default function StudentRegistration() {
     // Role-specific fields
     switch (formData.role) {
       case "student":
-        data.append("level", formData.level);
+        (formData.level || []).forEach((levelValue, index) => {
+          data.append(`level[${index}]`, levelValue);
+        });
         data.append("faction", formData.faction || "Alpha");
         data.append("parentPhoneNumber", formData.parentPhoneNumber);
 
@@ -313,8 +314,11 @@ export default function StudentRegistration() {
       case "teacher":
         data.append("phoneNumber2", formData.phoneNumber2);
         data.append("subject", formData.subject.trim());
-        data.append("level", formData.level);
         data.append("teachesAtType", formData.teachesAtType);
+
+        (formData.level || []).forEach((levelValue, index) => {
+          data.append(`level[${index}]`, levelValue);
+        });
 
         if (["Center", "Both"].includes(formData.teachesAtType)) {
           formData.centers
@@ -351,38 +355,47 @@ export default function StudentRegistration() {
     navigate("/login", {
       state: { message: "Registration successful" },
     });
+
   } catch (error) {
     let errorMessage = t("errors.unexpectedError");
     const fieldErrors = {};
 
     if (error.response) {
-      const { status, data } = error.response;
+      const { status, data: errorData } = error.response;
 
       switch (status) {
         case 400:
-          errorMessage = data.message || t("errors.invalidData");
-          if (data.message?.includes("phone number")) {
+          errorMessage = errorData.message || t("errors.invalidData");
+
+          if (errorData.message?.includes("phone number")) {
             errorMessage = t("errors.phoneExists");
           }
-          if (data.message?.includes("at least one special character")) {
+
+          if (errorData.message?.includes("at least one special character")) {
             errorMessage = t("errors.PasswordSpecialChar");
           }
-          if (data.message?.includes("at least one uppercase")) {
+
+          if (errorData.message?.includes("at least one uppercase")) {
             errorMessage = t("errors.PasswordCapitalLetter");
           }
-          if (data.field) {
-            fieldErrors[data.field] = data.errorKey || "invalidInput";
+
+          if (errorData.field) {
+            fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
           }
           break;
+
         case 409:
-          errorMessage = data.message || t("errors.emailExists");
-          if (data.field) {
-            fieldErrors[data.field] = data.errorKey || "duplicate";
+          errorMessage = errorData.message || t("errors.emailExists");
+
+          if (errorData.field) {
+            fieldErrors[errorData.field] = errorData.errorKey || "duplicate";
           }
-          if (data.message?.includes("E-Mail")) {
+
+          if (errorData.message?.includes("E-Mail")) {
             errorMessage = t("errors.emailExists");
           }
           break;
+
         case 500:
           errorMessage = t("errors.apiError");
           break;
@@ -391,10 +404,12 @@ export default function StudentRegistration() {
       errorMessage = t("errors.networkError");
     }
 
+    console.error("Full error response:", error.response?.data || error.message);
     setApiError(errorMessage);
     setErrors(fieldErrors);
   }
 };
+
 
 
   const renderStepContent = () => {
@@ -439,7 +454,7 @@ export default function StudentRegistration() {
                   handleChildrenChange={handleChildrenChange}
                   handleInputChange={handleInputChange}
                   t={t}
-                  gradeLevels={gradeLevels} 
+                  gradeLevels={gradeLevels}
                   errors={errors}
                 />
               )

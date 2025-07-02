@@ -96,15 +96,46 @@ exports.createBookPurchase = catchAsync(async (req, res, next) => {
   if (typeof req.body.notes === "undefined") req.body.notes = null;
   if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
 
+  // Coupon logic (optional, for book purchases with coupon support)
+  let coupon;
+  if (req.body.couponCode) {
+    const ECCoupon = require("../models/ec.couponModel");
+    coupon = await ECCoupon.findOne({ couponCode: req.body.couponCode.toString() });
+    if (!coupon) {
+      return next(new AppError("Invalid or expired coupon code", 400));
+    }
+    if (coupon.isActive === false) {
+      return next(new AppError("Coupon code has already been used", 400));
+    }
+  }
+
   // Set the creator
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
   req.body.productName = product.title;
   req.body.price = product.priceAfterDiscount;
   req.body.paymentNumber = product.paymentNumber;
-  req.body.purchaseSerial = `${req.user.userSerial}-${product.section.number}-${product.serial}`;
+  req.body.finalPrice = req.body.price * 1 - (coupon ? coupon.value * 1 : 0);
+
+  // Set coupon ID instead of coupon code string
+  if (coupon) {
+    req.body.couponCode = coupon._id;
+  } else {
+    delete req.body.couponCode;
+  }
+
+  // Robust null-check for section and section.number
+  let sectionNumber = "UNKNOWN";
+  if (product.section && typeof product.section.number !== "undefined" && product.section.number !== null) {
+    sectionNumber = product.section.number;
+  }
+  req.body.purchaseSerial = `${req.user.userSerial}-${sectionNumber}-${product.serial}`;
 
   const purchase = await ECBookPurchase.create(req.body);
+  if (purchase && coupon) {
+    // Mark the coupon as used
+    await coupon.markAsUsed(purchase._id, req.user._id);
+  }
 
   if (!purchase) {
     return next(new AppError("Book purchase creation failed", 400));
@@ -114,6 +145,7 @@ exports.createBookPurchase = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       purchase,
+      coupon: coupon ? coupon._id : null,
     },
   });
 });
