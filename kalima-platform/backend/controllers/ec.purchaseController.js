@@ -487,6 +487,7 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
         _id: "$productId",
         totalPurchases: { $sum: 1 },
         totalValue: { $sum: "$finalPrice" },
+        couponIds: { $push: "$couponCode" }, // collect coupon IDs for later lookup
       },
     },
     {
@@ -498,6 +499,34 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
       }
     },
     { $unwind: "$productInfo" },
+    // Lookup all coupons used for this product's purchases
+    {
+      $lookup: {
+        from: "eccoupons",
+        let: { couponIds: "$couponIds" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $in: ["$_id", "$$couponIds"] },
+                  { $ne: ["$_id", null] }
+                ]
+              }
+            }
+          },
+          { $group: { _id: null, totalCouponValue: { $sum: "$value" } } }
+        ],
+        as: "couponStats"
+      }
+    },
+    {
+      $addFields: {
+        totalCouponValue: {
+          $ifNull: [{ $arrayElemAt: ["$couponStats.totalCouponValue", 0] }, 0]
+        }
+      }
+    },
     {
       $project: {
         _id: 0,
@@ -505,7 +534,8 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
         productName: "$productInfo.title",
         productSection: "$productInfo.section",
         totalPurchases: 1,
-        totalValue: 1
+        totalValue: 1,
+        totalCouponValue: 1
       }
     },
     { $sort: { totalPurchases: -1 } }

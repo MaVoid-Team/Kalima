@@ -92,7 +92,6 @@ const StoreAnalytics = () => {
       const response = await getProductStats()
       if (response.success) {
         const productData = response.data.data || []
-        console.log("Raw product stats from API:", productData) // Debug log
         setProductStats(productData)
       } else {
         throw new Error(response.error)
@@ -523,6 +522,7 @@ const StoreAnalytics = () => {
                 <th className="text-center">{t("table.productName")}</th>
                 <th className="text-center">{t("table.totalPurchases")}</th>
                 <th className="text-center">{t("table.totalValue")}</th>
+                <th className="text-center">{t("table.totalCouponValue")}</th>
                 <th className="text-center">{t("table.avgValue")}</th>
                 <th className="text-center">{t("table.performance")}</th>
               </tr>
@@ -550,13 +550,6 @@ const StoreAnalytics = () => {
                   const maxPurchases = Math.max(...filteredProductStats.map((p) => Number(p.totalPurchases) || 0))
                   const performancePercentage = maxPurchases > 0 ? (totalPurchases / maxPurchases) * 100 : 0
 
-                  // Debug log for each product
-                  console.log(`Product ${product.productName}:`, {
-                    totalValue,
-                    totalPurchases,
-                    avgValue,
-                    rawProduct: product,
-                  })
 
                   return (
                     <tr key={product.productId} className="hover">
@@ -575,7 +568,11 @@ const StoreAnalytics = () => {
                       </td>
                       <td className="text-center font-bold">
                         <span className="text-success">{formatPrice(totalValue)}</span>
-                        <div className="text-xs opacity-50">Raw: {totalValue}</div>
+                      </td>
+                      <td className="text-center">
+                        <span className={`text-base font-bold ${product.totalCouponValue ? "text-success" : "text-gray-500"}`}>
+                          {product.totalCouponValue ? formatPrice(product.totalCouponValue) : "N/A"}
+                        </span>
                       </td>
                       <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
                       <td className="text-center">

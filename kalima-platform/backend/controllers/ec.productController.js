@@ -13,7 +13,7 @@ function isValidPDF(file) {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const { title, subtitle, serial, section, price, paymentNumber, discountPercentage, description, whatsAppNumber } = req.body;
+        const { title, serial, section, price, priceAfterDiscount, description, whatsAppNumber, paymentNumber } = req.body;
         const createdBy = req.user._id;
         let sample, imageUrl, gallery = [];
         if (req.files && req.files.sample && req.files.sample[0]) {
@@ -31,19 +31,19 @@ exports.createProduct = async (req, res, next) => {
         if (req.files && req.files.gallery) {
             gallery = req.files.gallery.map(file => file.path);
         }
+        // discountPercentage will be auto-calculated in the model, do not include in create
         const product = await ECProduct.create({
             title,
-            subtitle,
             thumbnail: imageUrl,
             sample,
             gallery,
             section,
             serial,
             price,
-            paymentNumber,
-            discountPercentage,
+            priceAfterDiscount,
             description,
             whatsAppNumber,
+            paymentNumber,
             createdBy,
         });
 
@@ -64,11 +64,22 @@ exports.getAllProducts = async (req, res) => {
             path: "section",
             select: "number"
         });
+        // Ensure all fields are present in the response
+        const productsWithAllFields = products.map(product => {
+            const obj = product.toObject();
+            return {
+                ...obj,
+                description: obj.description,
+                whatsAppNumber: obj.whatsAppNumber,
+                paymentNumber: obj.paymentNumber,
+                gallery: obj.gallery
+            };
+        });
         res.status(200).json({
             status: "success",
-            results: products.length,
+            results: productsWithAllFields.length,
             data: {
-                products,
+                products: productsWithAllFields,
             },
         });
     } catch (err) {
@@ -83,10 +94,17 @@ exports.getProductById = async (req, res) => {
             select: "number"
         });
         if (!product) return res.status(404).json({ message: "Product not found" });
+        const obj = product.toObject();
         res.status(200).json({
             status: "success",
             data: {
-                product,
+                product: {
+                    ...obj,
+                    description: obj.description,
+                    whatsAppNumber: obj.whatsAppNumber,
+                    paymentNumber: obj.paymentNumber,
+                    gallery: obj.gallery
+                },
             },
         });
     } catch (err) {
@@ -96,18 +114,18 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, paymentNumber, discountPercentage, serial, description, whatsAppNumber } = req.body;
+        const { title, section, price, priceAfterDiscount, serial, description, whatsAppNumber, paymentNumber } = req.body;
         const updatedBy = req.user._id;
         let update = {
             title,
             section,
             price,
-            paymentNumber,
-            discountPercentage,
+            priceAfterDiscount,
             serial,
             description,
             updatedBy,
             whatsAppNumber,
+            paymentNumber,
             updatedAt: new Date(),
         };
         // Handle PDF sample update
@@ -122,16 +140,30 @@ exports.updateProduct = async (req, res) => {
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
             update.thumbnail = req.files.thumbnail[0].path;
         }
+        // Handle gallery update
+        if (req.files && req.files.gallery) {
+            update.gallery = req.files.gallery.map(file => file.path);
+        }
         const product = await ECProduct.findByIdAndUpdate(
             req.params.id,
             update,
             { new: true }
         ).populate({ path: "section", select: "number" });
         if (!product) return res.status(404).json({ message: "Product not found" });
+        const obj = product.toObject();
         res.status(200).json({
             status: "success",
             data: {
-                product,
+                product: {
+                    ...obj,
+                    description: obj.description,
+                    whatsAppNumber: obj.whatsAppNumber,
+                    paymentNumber: obj.paymentNumber,
+                    gallery: obj.gallery,
+                    sample: obj.sample,
+                    thumbnail: obj.thumbnail,
+                    subtitle: obj.subtitle
+                },
             },
         });
     } catch (err) {

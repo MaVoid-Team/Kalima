@@ -1001,7 +1001,7 @@ const PromoCodes = () => {
                       }
                     >
                       <span className="text-xs font-semibold text-base-content/60">{t("profile.userSerial")}:</span>
-                      <p className="text-sm opacity-70 truncate">{userInfo?.userSerial || ""}</p>
+                      <p className="text-base opacity-70 font-bold truncate">{userInfo?.userSerial || ""}</p>
                       <Info className="w-3 h-3 text-primary flex-shrink-0" />
                     </div>
                     <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
