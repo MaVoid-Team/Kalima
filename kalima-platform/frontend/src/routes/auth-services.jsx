@@ -126,7 +126,7 @@ initializeTokenHelpers({
 
 export const registerUser = async (userData) => {
   try {
-    const response = await api.post(`${API_URL}/register`, userData, {
+    const response = await api.post(`/register`, userData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -145,7 +145,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post(`${API_URL}/auth`, credentials, {
+    const response = await api.post(`/auth`, credentials, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -235,7 +235,7 @@ export const logoutUser = async () => {
 
     if (token) {
       await api.post(
-        `${API_URL}/auth/logout`,
+        `/auth/logout`,
         {},
         {
           headers: {
@@ -275,7 +275,7 @@ export const getUserDashboard = async ({ params = {} } = {}) => {
 
     const token = getToken()
 
-    const response = await api.get(`${API_URL}/users/me/dashboard`, {
+    const response = await api.get(`/users/me/dashboard`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
