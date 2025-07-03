@@ -29,12 +29,26 @@ const AuditLog = () => {
   const dir = isRTL ? "rtl" : "ltr"
 
   // Fetch audit logs on component mount and when filters change
+  // Cleaned single useEffect for fetching logs
   useEffect(() => {
     const fetchAuditLogs = async () => {
       setLoading(true)
       try {
-        const params = { page, limit, ...Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")) }
+        // Transform filters so "role" becomes "user.role"
+        const transformedFilters = { ...filters }
+        if (transformedFilters.role) {
+          transformedFilters["user.role"] = transformedFilters.role
+          delete transformedFilters.role
+        }
+
+        const params = {
+          page,
+          limit,
+          ...Object.fromEntries(Object.entries(transformedFilters).filter(([, v]) => v !== "" && v !== undefined)),
+        }
+
         const response = await getAuditLogs(params.page, params.limit, params)
+
         if (response.status === "success") {
           setLogs(response.data.logs || [])
           setError(null)
@@ -48,8 +62,10 @@ const AuditLog = () => {
         setLoading(false)
       }
     }
+
     fetchAuditLogs()
   }, [page, limit, filters])
+
 
   // Fetch all logs for export (without pagination)
   const fetchAllLogs = async () => {
@@ -81,7 +97,10 @@ const AuditLog = () => {
     fetch()
   }, [page, filters, limit])
 
-  const handleFilterChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }))
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }))
+    setPage(1)
+  }
   const applyFilters = () => setPage(1)
 
   // Export functionality
@@ -419,7 +438,7 @@ const AuditLog = () => {
       <div className="flex flex-wrap gap-3 mb-6 justify-start bg-base-100">
 
         {/* Role Filter */}
-        <div className="dropdown dropdown-end bg-base-100">
+        {/* <div className="dropdown dropdown-end bg-base-100">
           <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.role || t("admin.auditlog.filters.role")}</span>
@@ -434,7 +453,7 @@ const AuditLog = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         {/* Action Filter */}
         <div className="dropdown dropdown-end bg-base-100">
@@ -456,7 +475,7 @@ const AuditLog = () => {
       </div>
 
       {/* Date Filters */}
-      <div className="flex items-center gap-2 mb-6">
+      {/* <div className="flex items-center gap-2 mb-6">
         <input
           type="date"
           className="input input-bordered"
@@ -469,7 +488,7 @@ const AuditLog = () => {
           className="input input-bordered"
           onChange={(e) => handleFilterChange("endDate", e.target.value)}
         />
-      </div>
+      </div> */}
 
       {/* Loading & Error States */}
       {loading && (
@@ -515,9 +534,9 @@ const AuditLog = () => {
                       <p className="text-sm opacity-70 max-w-md">
                         {Object.values(filters).some((v) => v !== "")
                           ? t("admin.auditlog.noRecordsFiltered") ||
-                            "No audit logs match your current filters. Try adjusting your search criteria."
+                          "No audit logs match your current filters. Try adjusting your search criteria."
                           : t("admin.auditlog.noRecordsYet") ||
-                            "No audit logs have been recorded yet. Activity will appear here once users start interacting with the system."}
+                          "No audit logs have been recorded yet. Activity will appear here once users start interacting with the system."}
                       </p>
                     </div>
                   </td>

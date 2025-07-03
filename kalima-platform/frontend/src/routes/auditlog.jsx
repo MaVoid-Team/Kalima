@@ -10,26 +10,24 @@ export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
       throw new Error("User not authenticated");
     }
 
-    // Corrected params with proper syntax
+    // Flatten and transform filters for query params
     const transformedFilters = {
-      user: filters.user,
-      role: filters.role,
-      action: filters.action,
-      resource_type: filters.resource_type,
-      status: filters.status,
-      startDate: filters.startDate,
-      endDate: filters.endDate
+      ...filters,
     };
+
+    if (filters.role) {
+      transformedFilters["user.role"] = filters.role; // 👈 correct param name
+      delete transformedFilters.role;
+    }
 
     const params = {
       page,
       limit,
-      ...Object.fromEntries(
-        Object.entries(transformedFilters).filter(([_, v]) => v !== "")
-      )
+      ...Object.fromEntries(Object.entries(transformedFilters).filter(([_, v]) => v !== "" && v !== undefined)),
     };
 
     const token = getToken();
+
     const response = await axios.get(`${API_URL}/api/v1/audit-logs`, {
       params,
       withCredentials: true,
@@ -41,12 +39,16 @@ export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
 
     return {
       status: "success",
-      data: response.data.data
+      data: response.data.data,
     };
   } catch (error) {
-    return `error: ${error.message}`
+    return {
+      status: "error",
+      error: error?.response?.data?.message || error.message || "Unknown error",
+    };
   }
 };
+
 export const getAuditLogById = async (logId) => {
   try {
     if (!isLoggedIn()) {
