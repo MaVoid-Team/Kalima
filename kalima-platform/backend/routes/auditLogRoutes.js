@@ -14,8 +14,8 @@ router.get("/", auditLogController.getAllAuditLogs);
 // Get logs for specific resource type
 router.get("/resource/:resourceType", auditLogController.getResourceAuditLogs);
 
-// Get logs for specific user
-router.get("/user/:userId", auditLogController.getUserAuditLogs);
+// Get logs for specific user by email
+router.get("/user/email/:email", auditLogController.getUserAuditLogsByEmail);
 
 // Get logs for specific resource instance
 router.get("/resource/:resourceType/:resourceId", auditLogController.getResourceInstanceAuditLogs);
