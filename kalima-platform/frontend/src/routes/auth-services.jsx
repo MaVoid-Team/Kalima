@@ -150,6 +150,8 @@ export const loginUser = async (credentials) => {
         "Content-Type": "application/json",
       },
     })
+    console.log("Login response:", response)
+    console.log("BASE URL:", API_URL)
 
     if (response.data.accessToken) {
       setToken(response.data.accessToken)
@@ -387,6 +389,8 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
       },
       ...(args[args.length - 1] || {}),
     })
+    console.log("Response from authenticated request:", response)
+    console.log("URL:", fullUrl)
 
     return {
       success: true,
@@ -435,6 +439,8 @@ const handleAuthenticatedRequest = async (requestFn, url, ...args) => {
             },
             ...(args[args.length - 1] || {}),
           })
+          console.log("Response after token refresh:", response)
+          console.log("URL:", `${API_URL}${url}`)
 
           return {
             success: true,
