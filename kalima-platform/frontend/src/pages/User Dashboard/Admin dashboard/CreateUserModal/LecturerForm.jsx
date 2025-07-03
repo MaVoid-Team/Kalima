@@ -43,9 +43,6 @@ const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
                 </option>
               ))}
             </select>
-            <button type="button" className="btn btn-secondary">
-              {t("buttons.add")}
-            </button>
           </div>
         </div>
 

@@ -455,6 +455,7 @@ const Orders = () => {
                 <th className="text-center">{t("table.customer")}</th>
                 <th className="text-center">{t("table.type")}</th>
                 <th className="text-center">{t("table.price")}</th>
+                <th className="text-center">{t("table.couponCode")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
                 <th className="text-center">{t("table.notes")}</th>
@@ -516,6 +517,7 @@ const Orders = () => {
                       </div>
                     </td>
                     <td className="text-center font-bold">{order.formattedPrice}</td>
+                    <td className="text-center font-bold">{order.couponCode != null ? <span className="text-green-500">{order.couponCode.value}</span> : "NA"}</td>
                     <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
                     <td className="text-center">
                       {order.confirmed ? (
@@ -818,6 +820,10 @@ const Orders = () => {
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
+
+                  <p>
+                    <strong>{t("table.couponCode")}:</strong> {formatPrice(selectedOrder.couponCode?.value || "NA")}
+                  </p>
                   {selectedOrder.notes && (
                     <p>
                       <strong>{t("table.customerNotes")}:</strong> {selectedOrder.notes}
@@ -875,10 +881,6 @@ const Orders = () => {
                     <MessageSquare className="w-4 h-4" />
                     {t("table.adminNotes")}
                   </span>
-                  <button className="btn btn-xs btn-primary" onClick={() => openNotesModal(selectedOrder)}>
-                    <Edit3 className="w-3 h-3" />
-                    {t("table.edit")}
-                  </button>
                 </label>
                 <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (

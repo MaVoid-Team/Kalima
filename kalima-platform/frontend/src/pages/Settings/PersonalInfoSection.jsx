@@ -26,7 +26,8 @@ function PersonalInfoSection() {
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    email: ''
+    email: '',
+    profilePic: null
   })
 
   // Email validation state
@@ -40,6 +41,12 @@ function PersonalInfoSection() {
     field: null
   })
 
+  const handleProfilePicChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    setFormData((prev) => ({ ...prev, profilePic: file }))
+  }
+}
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {

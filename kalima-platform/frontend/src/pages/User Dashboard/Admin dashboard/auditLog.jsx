@@ -415,33 +415,8 @@ const AuditLog = () => {
         </div>
       )}
 
-      {/* Search and Filters */}
-      <div className="mb-6">
-        <div className="relative">
-          <input type="text" placeholder={t("admin.auditlog.search")} className="input input-bordered w-full pr-10" />
-          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
       {/* Filter Controls */}
       <div className="flex flex-wrap gap-3 mb-6 justify-start bg-base-100">
-        {/* User Filter */}
-        <div className="dropdown dropdown-end">
-          <label tabIndex={0} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
-            <FiChevronDown className="h-5 w-5" />
-            <span>{filters.user || t("admin.auditlog.filters.user")}</span>
-          </label>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li>
-              <button onClick={() => handleFilterChange("user", "")}>{t("admin.auditlog.filters.all")}</button>
-            </li>
-            {[...new Set(logs.map((l) => l.user?.name))].map((name, i) => (
-              <li key={i}>
-                <button onClick={() => handleFilterChange("user", name)}>{name}</button>
-              </li>
-            ))}
-          </ul>
-        </div>
 
         {/* Role Filter */}
         <div className="dropdown dropdown-end bg-base-100">
@@ -453,7 +428,7 @@ const AuditLog = () => {
             <li>
               <button onClick={() => handleFilterChange("role", "")}>{t("admin.auditlog.filters.all")}</button>
             </li>
-            {["admin", "lecturer", "student"].map((role) => (
+            {["admin", "lecturer", "student", "Teacher", "moderator", "subAdmin"].map((role) => (
               <li key={role}>
                 <button onClick={() => handleFilterChange("role", role)}>{translateRole(role)}</button>
               </li>
@@ -478,12 +453,6 @@ const AuditLog = () => {
             ))}
           </ul>
         </div>
-
-        {/* Apply Button */}
-        <button className="btn btn-info text-white rounded-full gap-2" onClick={applyFilters}>
-          <FiRotateCw className="h-5 w-5" />
-          <span>{t("admin.auditlog.filters.apply")}</span>
-        </button>
       </div>
 
       {/* Date Filters */}
