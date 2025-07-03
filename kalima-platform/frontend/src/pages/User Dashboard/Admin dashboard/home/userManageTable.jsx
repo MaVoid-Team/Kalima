@@ -424,7 +424,7 @@ const UserManagementTable = () => {
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
           >
             <option value="">{t("admin.filters.allTypes")}</option>
-            {["student", "parent", "lecturer"].map((role) => (
+            {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
               <option key={role} value={role}>
                 {t(`admin.roles.${role}`)}
               </option>
