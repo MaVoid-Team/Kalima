@@ -21,6 +21,8 @@ const bcrypt = require("bcrypt");
 const handleCSV = require("../utils/upload files/handleCSV.js");
 const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
+const fs = require("fs");
+const path = require("path");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -1063,13 +1065,33 @@ const updateMe = catchAsync(async (req, res, next) => {
     }
   });
 
+  // Handle profile picture upload (if file is present)
+  if (req.file && req.file.fieldname === "profilePic") {
+    // Delete old profile picture if it exists
+    const currentUser = await User.findById(userId).select('profilePic referredBy userSerial');
+    if (currentUser && currentUser.profilePic && fs.existsSync(currentUser.profilePic)) {
+      try {
+        fs.unlinkSync(currentUser.profilePic);
+      } catch (err) {
+        // Log error but don't block the update
+        console.error("Failed to delete old profile picture:", err);
+      }
+    }
+    filteredBody.profilePic = req.file.path;
+  } else {
+    // If not uploading a new profilePic, still need currentUser for referral logic
+    var currentUser = await User.findById(userId).select('referredBy userSerial');
+  }
+
   // Handle referralSerial update: allow user to set referredBy if not already set
   if (req.body.referralSerial) {
-    // Only allow setting referredBy if not already set
-    const currentUser = await User.findById(userId).select('referredBy');
     if (!currentUser.referredBy) {
       const inviter = await User.findOne({ userSerial: req.body.referralSerial });
       if (inviter && inviter._id.toString() !== userId.toString()) {
+        // Prevent self-referral by serial
+        if (inviter.userSerial === currentUser.userSerial) {
+          return next(new AppError("You cannot refer yourself.", 400));
+        }
         filteredBody.referredBy = inviter._id;
       } else if (inviter && inviter._id.toString() === userId.toString()) {
         return next(new AppError("You cannot refer yourself.", 400));
