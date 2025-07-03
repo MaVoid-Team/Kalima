@@ -46,6 +46,7 @@ const AdminPanel = () => {
     description: "",
     number: "",
     thumbnail: "logo",
+    allowedFor: [],
   })
 
   const [productForm, setProductForm] = useState({
@@ -416,6 +417,7 @@ const AdminPanel = () => {
         description: sectionForm.description,
         number: Number.parseInt(sectionForm.number),
         thumbnail: sectionForm.thumbnail,
+        allowedFor: sectionForm.allowedFor || [],
       })
 
       if (response?.status === "success") {
@@ -424,6 +426,7 @@ const AdminPanel = () => {
           description: "",
           number: "",
           thumbnail: "logo",
+          allowedFor: [],
         })
         alert(t("alerts.sectionCreatedSuccess"))
         await refetch()
@@ -566,7 +569,6 @@ const AdminPanel = () => {
       </div>
     )
   }
-
   return (
     <ErrorBoundary>
       <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>

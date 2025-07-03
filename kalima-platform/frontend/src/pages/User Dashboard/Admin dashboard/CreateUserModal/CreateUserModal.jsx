@@ -1,66 +1,122 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
 import { useTranslation } from "react-i18next"
+
 import { getAllLecturers } from "../../../../routes/fetch-users"
+
 import { getAllLevels } from "../../../../routes/levels"
+
 import { getAllSubjects } from "../../../../routes/courses"
+
 import StudentForm from "./StudentForm"
+
 import ParentForm from "./ParentForm"
+
 import LecturerForm from "./LecturerForm"
+
 import AssistantForm from "./AssistantForm"
+
 import BulkCreateUsers from "./BulkCreateUsers"
+
+import TeacherForm from "./TeacherForm"
+
 import { governments, getAdministrationZonesForGovernment } from "../../../../constants/locations"
+
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
+
   const isRTL = i18n.language === "ar"
 
   const initialUserState = {
     role: "student",
+
     name: "",
+
     email: "",
+
     password: "",
+
     confirmPassword: "",
+
     gender: "male",
+
     level: "",
+
     phoneNumber: "",
+
     parentPhoneNumber: "",
+
     hobbies: [],
+
     faction: "",
+
     school: "",
+
     parent: "",
+
     subject: [],
+
     bio: "",
+
     expertise: "",
+
     assignedLecturer: "",
+
     sequencedId: "",
+
     government: "",
+
     administrationZone: "",
+
+    // Teacher-specific fields
+
+    phoneNumber2: "",
+
+    teachesAtType: "",
+
+    centers: [],
+
+    socialMedia: [],
   }
 
   const [userData, setUserData] = useState(initialUserState)
+
   const [formError, setFormError] = useState("")
+
   const [isBulkMode, setIsBulkMode] = useState(false)
+
   const [levels, setLevels] = useState([])
+
   const [subjects, setSubjects] = useState([])
+
   const [lecturers, setLecturers] = useState([])
+
   const [loadingDropdowns, setLoadingDropdowns] = useState(false)
 
   // Reset form when modal opens/closes
+
   useEffect(() => {
     if (isOpen) {
       setUserData(initialUserState)
+
       setFormError("")
+
       setIsBulkMode(false)
+
       fetchDropdownData()
     }
   }, [isOpen])
 
   // Fetch data for dropdowns
+
   const fetchDropdownData = async () => {
     setLoadingDropdowns(true)
+
     try {
       const levelsResult = await getAllLevels()
+
       if (levelsResult.success) {
         setLevels(levelsResult.data || [])
       } else {
@@ -68,6 +124,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
 
       const subjectsResult = await getAllSubjects()
+
       if (subjectsResult.success) {
         setSubjects(subjectsResult.data || [])
       } else {
@@ -75,6 +132,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
 
       const lecturersResult = await getAllLecturers()
+
       if (lecturersResult.success) {
         setLecturers(lecturersResult.data || [])
       } else {
@@ -82,6 +140,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     } catch (error) {
       setFormError(t("errors.failedToLoadDropdowns"))
+
       console.error("Error fetching dropdown data:", error)
     } finally {
       setLoadingDropdowns(false)
@@ -89,6 +148,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   }
 
   // Display error from parent component
+
   useEffect(() => {
     if (error) {
       setFormError(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
@@ -97,29 +157,36 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
+
     setUserData((prev) => ({ ...prev, [name]: value }))
   }
 
   const validateForm = () => {
     // Email format
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
     if (!emailRegex.test(userData.email)) {
       return t("validation.invalidEmail")
     }
 
     // Password match and length
+
     if (userData.password !== userData.confirmPassword) {
       return t("validation.passwordsDoNotMatch")
     }
+
     if (userData.password.length < 6) {
       return t("validation.passwordTooShort")
     }
 
     // Role-specific validations
+
     if (userData.role === "student") {
       if (!userData.level) {
         return t("validation.levelRequired")
       }
+
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
         return t("validation.invalidPhoneNumber")
       }
@@ -143,30 +210,76 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     }
 
+    if (userData.role === "Teacher") {
+      if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
+        return t("validation.invalidPhoneNumber")
+      }
+
+      if (!userData.subject) {
+        return t("validation.subjectRequired")
+      }
+
+      if (!userData.level || userData.level.length === 0) {
+        return t("validation.levelRequired")
+      }
+
+      if (!userData.teachesAtType) {
+        return t("validation.teachesAtTypeRequired")
+      }
+
+      if (
+        (userData.teachesAtType === "Both" || userData.teachesAtType === "Center") &&
+        (!userData.centers || userData.centers.length === 0)
+      ) {
+        return t("validation.centersRequired")
+      }
+
+      if ((userData.teachesAtType === "Both" || userData.teachesAtType === "School") && !userData.school) {
+        return t("validation.schoolRequired")
+      }
+
+      if (!userData.government) {
+        return t("validation.governmentRequired")
+      }
+
+      if (!userData.administrationZone) {
+        return t("validation.administrationZoneRequired")
+      }
+    }
+
     return ""
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+
     setFormError("")
 
     const validationError = validateForm()
+
     if (validationError) {
       setFormError(validationError)
+
       return
     }
 
-    const filteredData = filterDataByRole(userData)// Log data for debugging
+    const filteredData = filterDataByRole(userData) // Log data for debugging
+
     onCreateUser(filteredData)
   }
 
   const filterDataByRole = (data) => {
     const commonFields = {
       role: data.role,
+
       name: data.name,
+
       email: data.email,
+
       password: data.password,
+
       confirmPassword: data.confirmPassword,
+
       gender: data.gender,
     }
 
@@ -174,43 +287,88 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       case "student":
         return {
           ...commonFields,
+
           level: data.level || undefined,
+
           phoneNumber: data.phoneNumber || undefined,
+
           sequencedId: data.sequencedId || undefined,
+
           parentPhoneNumber: data.parentPhoneNumber || undefined,
+
           hobbies: data.hobbies && data.hobbies.length > 0 ? data.hobbies : undefined,
+
           faction: data.faction || undefined,
+
           school: data.school || undefined,
+
           parent: data.parent || undefined,
+
           government: data.government || undefined,
+
           administrationZone: data.administrationZone || undefined,
         }
 
       case "parent":
         return {
           ...commonFields,
+
           phoneNumber: data.phoneNumber || undefined,
+
           government: data.government || undefined,
+
           administrationZone: data.administrationZone || undefined,
         }
 
       case "lecturer":
         return {
           ...commonFields,
+
           subject: data.subject || [],
+
           bio: data.bio || undefined,
+
           expertise: data.expertise || undefined,
+
           government: data.government || undefined,
+
           administrationZone: data.administrationZone || undefined,
         }
 
       case "assistant":
         return {
           ...commonFields,
+
           assignedLecturer: data.assignedLecturer || undefined,
         }
 
+      case "Teacher":
+        return {
+          ...commonFields,
+
+          phoneNumber: data.phoneNumber || undefined,
+
+          phoneNumber2: data.phoneNumber2 || undefined,
+
+          subject: data.subject || undefined,
+
+          level: data.level || [],
+
+          teachesAtType: data.teachesAtType || undefined,
+
+          centers: data.centers || [],
+
+          school: data.school || undefined,
+
+          government: data.government || undefined,
+
+          administrationZone: data.administrationZone || undefined,
+
+          socialMedia: data.socialMedia || [],
+        }
+
       case "subadmin":
+
       case "moderator":
         return commonFields
 
@@ -230,6 +388,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           <button className={`tab ${!isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(false)}>
             {t("tabs.createSingleUser")}
           </button>
+
           <button className={`tab ${isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(true)}>
             {t("tabs.bulkCreate")}
           </button>
@@ -255,6 +414,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.accountType")}</span>
                   </label>
+
                   <select
                     name="role"
                     className="select select-bordered"
@@ -265,12 +425,20 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     <option value="" disabled>
                       {t("placeholders.selectAccountType")}
                     </option>
+
                     <option value="subadmin">{t("roles.subadmin")}</option>
+
                     <option value="moderator">{t("roles.moderator")}</option>
+
                     <option value="assistant">{t("roles.assistant")}</option>
+
                     <option value="student">{t("roles.student")}</option>
+
                     <option value="parent">{t("roles.parent")}</option>
+
                     <option value="lecturer">{t("roles.lecturer")}</option>
+
+                    <option value="Teacher">{t("roles.teacher")}</option>
                   </select>
                 </div>
               </div>
@@ -280,6 +448,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.gender")}</span>
                   </label>
+
                   <select
                     name="gender"
                     className="select select-bordered"
@@ -288,6 +457,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     required
                   >
                     <option value="male">{t("gender.male")}</option>
+
                     <option value="female">{t("gender.female")}</option>
                   </select>
                 </div>
@@ -299,6 +469,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 <label className="label">
                   <span className="label-text">{t("fields.name")}</span>
                 </label>
+
                 <input
                   type="text"
                   name="name"
@@ -315,6 +486,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 <label className="label">
                   <span className="label-text">{t("fields.email")}</span>
                 </label>
+
                 <input
                   type="email"
                   name="email"
@@ -332,6 +504,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.password")}</span>
                   </label>
+
                   <input
                     type="password"
                     name="password"
@@ -348,6 +521,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   <label className="label">
                     <span className="label-text">{t("fields.confirmPassword")}</span>
                   </label>
+
                   <input
                     type="password"
                     name="confirmPassword"
@@ -361,14 +535,40 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
             </div>
 
             {userData.role === "student" && (
-              <StudentForm userData={userData} handleChange={handleChange} levels={levels} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
+              <StudentForm
+                userData={userData}
+                handleChange={handleChange}
+                levels={levels}
+                t={t}
+                isRTL={isRTL}
+                governments={governments}
+                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
+              />
             )}
+
             {userData.role === "parent" && (
-              <ParentForm userData={userData} handleChange={handleChange} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
+              <ParentForm
+                userData={userData}
+                handleChange={handleChange}
+                t={t}
+                isRTL={isRTL}
+                governments={governments}
+                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
+              />
             )}
+
             {userData.role === "lecturer" && (
-              <LecturerForm userData={userData} handleChange={handleChange} subjects={subjects} t={t} isRTL={isRTL} governments={governments} getAdministrationZonesForGovernment={getAdministrationZonesForGovernment} />
+              <LecturerForm
+                userData={userData}
+                handleChange={handleChange}
+                subjects={subjects}
+                t={t}
+                isRTL={isRTL}
+                governments={governments}
+                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
+              />
             )}
+
             {userData.role === "assistant" && (
               <AssistantForm
                 userData={userData}
@@ -379,10 +579,24 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               />
             )}
 
+            {userData.role === "Teacher" && (
+              <TeacherForm
+                userData={userData}
+                handleChange={handleChange}
+                subjects={subjects}
+                levels={levels}
+                t={t}
+                isRTL={isRTL}
+                governments={governments}
+                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
+              />
+            )}
+
             <div className="modal-action">
               <button type="button" className="btn" onClick={onClose}>
                 {t("buttons.cancel")}
               </button>
+
               <button type="submit" className="btn btn-primary" disabled={loadingDropdowns}>
                 {t("buttons.create")}
               </button>

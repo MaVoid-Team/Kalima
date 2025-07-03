@@ -544,7 +544,7 @@ const CreateCoupons = () => {
                       {coupon.usedBy ? (
                         <div className="flex items-center justify-center gap-1">
                           <User className="w-4 h-4 text-orange-600" />
-                          <span className="text-sm">Used by <span className="font-bold">{coupon.appliedToPurchase.userName}</span></span>
+                          <span className="text-sm">Used by <span className="font-bold">{coupon.usedBy.name}</span></span>
                         </div>
                       ) : (
                         <span className="text-gray-400">-</span>

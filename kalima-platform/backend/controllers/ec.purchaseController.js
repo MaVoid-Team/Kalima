@@ -198,31 +198,8 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   if (req.user.referredBy) {
     const purchaseCount = await ECPurchase.countDocuments({ createdBy: req.user._id });
     if (purchaseCount === 1) {
-      // Find the inviter's role (Student, Parent, Teacher)
-      const User = require("../models/userModel");
-      const Student = require("../models/studentModel");
-      const Parent = require("../models/parentModel");
-      const Teacher = require("../models/teacherModel");
-      const inviter = await User.findById(req.user.referredBy);
-      if (inviter) {
-        let Model;
-        switch (inviter.role) {
-          case "Student":
-            Model = Student;
-            break;
-          case "Parent":
-            Model = Parent;
-            break;
-          case "Teacher":
-            Model = Teacher;
-            break;
-          default:
-            Model = null;
-        }
-        if (Model) {
-          await Model.findByIdAndUpdate(inviter._id, { $inc: { successfulInvites: 1 } });
-        }
-      }
+      const { recalculateInviterSuccessfulInvites } = require("./ec.referralController");
+      await recalculateInviterSuccessfulInvites(req.user.referredBy);
     }
   }
   // --- End referral logic ---
