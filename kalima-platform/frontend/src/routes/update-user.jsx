@@ -7,31 +7,33 @@ const API_URL = import.meta.env.VITE_API_URL
 
 export const updateCurrentUser = async (updateData) => {
   try {
+    const isFormData = updateData instanceof FormData
+
     const response = await axios.patch(
       `${API_URL}/users/me/update`,
       updateData,
       {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": isFormData ? "multipart/form-data" : "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
       }
-    );
+    )
 
-    return { 
-      success: true, 
-      data: response.data 
-    };
+    return {
+      success: true,
+      data: response.data,
+    }
 
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || 
-            error.message || 
-            "Failed to update user data"
-    };
+      error: error.response?.data?.message ||
+             error.message ||
+             "Failed to update user data",
+    }
   }
-};
+}
 
 /**
  * Updates the user's password

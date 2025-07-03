@@ -36,6 +36,7 @@ exports.createCoupon = catchAsync(async (req, res, next) => {
 exports.getAllCoupons = catchAsync(async (req, res, next) => {
   const coupons = await ECCoupon.find()
     .populate("createdBy", "name email")
+    .populate("usedBy", "name email")
     .sort("-createdAt");
 
   res.status(200).json({
@@ -76,7 +77,8 @@ exports.getUsedCoupons = catchAsync(async (req, res, next) => {
 exports.getCouponById = catchAsync(async (req, res, next) => {
   const coupon = await ECCoupon.findById(req.params.id)
     .populate("createdBy", "name email")
-    .populate("appliedToPurchase");
+    .populate("appliedToPurchase")
+    .populate("usedBy", "name email");
 
   if (!coupon) {
     return next(new AppError("No coupon found with that ID", 404));
@@ -111,14 +113,11 @@ exports.useCoupon = catchAsync(async (req, res, next) => {
     return next(new AppError("This coupon has expired", 400));
   }
 
-  // Check if coupon is for the current user
-  // const currentUser = await User.findById(req.user._id);
-  // if (coupon.createdFor !== currentUser.userSerial) {
-  //   return next(new AppError("This coupon is not valid for your account", 403));
-  // }
-
   // Pass userId to markAsUsed
   const updatedCoupon = await coupon.markAsUsed(purchaseId, req.user._id);
+
+  // Populate usedBy with name and email
+  await updatedCoupon.populate("usedBy", "name email");
 
   res.status(200).json({
     status: "success",

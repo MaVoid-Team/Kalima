@@ -3,8 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const verifyJWT = require("../middleware/verifyJWT");
-const uploadFileMiddleware =
-  require("../utils/upload files/uploadFiles").uploadFileToDisk;
+const { uploadFileToDisk, uploadProfilePicToDisk } = require("../utils/upload files/uploadFiles");
 const authController = require("../controllers/authController");
 // Routes that don't require authentication
 router
@@ -34,7 +33,7 @@ router
   .patch(verifyJWT, userController.changePassword);
 router
   .route("/accounts/bulk-create")
-  .post(uploadFileMiddleware, userController.uploadFileForBulkCreation);
+  .post(uploadFileToDisk, userController.uploadFileForBulkCreation);
 // Routes that require authentication
 router.use(verifyJWT);
 
@@ -45,7 +44,7 @@ router.get("/me/dashboard", userController.getMyData);
 router.get("/me/children", userController.getParentChildrenData);
 
 // Update current user profile information
-router.patch("/me/update", userController.updateMe);
+router.patch("/me/update", uploadProfilePicToDisk, userController.updateMe);
 
 router.route("/update/password").patch(userController.changePassword);
 

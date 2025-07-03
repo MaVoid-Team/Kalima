@@ -453,15 +453,16 @@ const Orders = () => {
           <table className="table w-full table-fixed overflow-hidden">
             <thead>
               <tr>
-                <th className="text-center w-48">{t("table.product")}</th>
-                <th className="text-center w-40">{t("table.customer")}</th>
-                <th className="text-center w-20">{t("table.type")}</th>
-                <th className="text-center w-24">{t("table.price")}</th>
-                <th className="text-center w-32">{t("table.transferFrom")}</th>
-                <th className="text-center w-28">{t("table.status")}</th>
-                <th className="text-center w-32">{t("table.notes")}</th>
-                <th className="text-center w-28">{t("table.date")}</th>
-                <th className="text-center w-40">{t("table.actions")}</th>
+                <th className="text-center">{t("table.product")}</th>
+                <th className="text-center">{t("table.customer")}</th>
+                <th className="text-center">{t("table.type")}</th>
+                <th className="text-center">{t("table.price")}</th>
+                <th className="text-center">{t("table.couponCode")}</th>
+                <th className="text-center">{t("table.transferFrom")}</th>
+                <th className="text-center">{t("table.status")}</th>
+                <th className="text-center">{t("table.notes")}</th>
+                <th className="text-center">{t("table.date")}</th>
+                <th className="text-center">{t("table.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -487,20 +488,9 @@ const Orders = () => {
                   <tr key={order._id}>
                     <td className="text-center truncate">
                       <div className="flex items-center gap-3 justify-center">
-                        <div className="text-left min-w-0">
-                          <div className="font-bold text-sm truncate" title={order.productName}>
-                            {order.productName}
-                          </div>
-                          <div className="text-xs opacity-50 font-mono truncate" title={order.purchaseSerial}>
-                            {order.purchaseSerial}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-center truncate">
-                      <div className="min-w-0">
-                        <div className="font-medium truncate" title={order.userName}>
-                          {order.userName}
+                        <div className="text-left">
+                          <div className="font-bold text-sm">{order.productName}</div>
+                          <div className="text-xs opacity-50">{order.purchaseSerial}</div>
                         </div>
                         <div className="text-xs opacity-50 truncate" title={order.createdBy?.email}>
                           {order.createdBy?.email}
@@ -515,10 +505,9 @@ const Orders = () => {
                         {t(order.orderType === "Book" ? "table.book" : "table.productType")}
                       </div>
                     </td>
-                    <td className="text-center font-bold text-sm">{order.formattedPrice}</td>
-                    <td className="text-center font-mono text-xs truncate" title={order.numberTransferredFrom}>
-                      {order.numberTransferredFrom}
-                    </td>
+                    <td className="text-center font-bold">{order.formattedPrice}</td>
+                    <td className="text-center font-bold">{order.couponCode != null ? <span className="text-green-500">{order.couponCode.value}</span> : "NA"}</td>
+                    <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
                     <td className="text-center">
                       {order.confirmed ? (
                         <div className="flex flex-col items-center gap-1">
@@ -848,8 +837,9 @@ const Orders = () => {
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
+
                   <p>
-                    <strong>{t("table.finalPrice")}:</strong> {formatPrice(selectedOrder.finalPrice)}
+                    <strong>{t("table.couponCode")}:</strong> {formatPrice(selectedOrder.couponCode?.value || "NA")}
                   </p>
                   {selectedOrder.notes && (
                     <div>
@@ -911,10 +901,6 @@ const Orders = () => {
                     <FileText className="w-4 h-4" />
                     {t("table.adminNotes")}
                   </span>
-                  <button className="btn btn-xs btn-primary" onClick={() => openNotesModal(selectedOrder)}>
-                    <Edit3 className="w-3 h-3" />
-                    {selectedOrder.adminNotes ? t("table.edit") : t("table.add")}
-                  </button>
                 </label>
                 <div className="bg-base-200 p-4 rounded min-h-24">
                   {selectedOrder.adminNotes ? (
