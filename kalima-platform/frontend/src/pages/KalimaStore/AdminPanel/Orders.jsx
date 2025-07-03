@@ -486,18 +486,6 @@ const Orders = () => {
                   <tr key={order._id}>
                     <td className="text-center">
                       <div className="flex items-center gap-3 justify-center">
-                        <div className="avatar">
-                          <div className="w-12 h-12 rounded">
-                            <img
-                              src={order.productId?.thumbnail || "/placeholder.svg?height=48&width=48"}
-                              alt={order.productName}
-                              onError={(e) => {
-                                e.target.onerror = null
-                                e.target.src = "/placeholder.svg?height=48&width=48"
-                              }}
-                            />
-                          </div>
-                        </div>
                         <div className="text-left">
                           <div className="font-bold text-sm">{order.productName}</div>
                           <div className="text-xs opacity-50">{order.purchaseSerial}</div>
