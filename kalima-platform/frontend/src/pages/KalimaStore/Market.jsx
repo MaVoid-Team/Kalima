@@ -95,7 +95,7 @@ const Market = () => {
     { id: "all", name: t("categories.allSections"), icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
-      name: t(`sections.${section.name}`),
+      name: section.name,
       icon: "📚",
     })),
   ]
