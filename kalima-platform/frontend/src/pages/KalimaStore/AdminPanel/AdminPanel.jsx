@@ -587,7 +587,6 @@ const AdminPanel = () => {
         <div className="px-4 py-8">
           <ProductsManagement
             products={products}
-            books={books}
             sections={sections}
             subjects={subjects}
             onEditProduct={handleEditProduct}
@@ -638,10 +637,10 @@ const AdminPanel = () => {
           {/* Bottom decorative elements */}
           <div className="relative">
             <div className={`absolute bottom-16 ${isRTL ? "right-10" : "left-10"}`}>
-              <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-up-dottedball" />
+              <img src="/rDots.png" alt={t("decorativeDots")} className="w-16 h-full animate-float-up-dottedball" />
             </div>
             <div className={`absolute bottom-8 ${isRTL ? "left-10" : "right-10"}`}>
-              <img src="/ring.png" alt="Decorative circle" className="w-16 h-full animate-float-down-dottedball" />
+              <img src="/ring.png" alt={t("decorativeCircle")} className="w-16 h-full animate-float-down-dottedball" />
             </div>
           </div>
         </div>

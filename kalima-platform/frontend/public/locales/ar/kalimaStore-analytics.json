@@ -41,6 +41,7 @@
     "revenue": "الإيرادات",
     "confirmedRevenue": "الإيرادات المؤكدة",
     "noData": "لا توجد بيانات",
-    "tryAdjustingFilters": "جرب تعديل المرشحات"
+    "tryAdjustingFilters": "جرب تعديل المرشحات",
+    "totalCouponValue": "قيمة الكوبون الإجمالية"
   }
 } 

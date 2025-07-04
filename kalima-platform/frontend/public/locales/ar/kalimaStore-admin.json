@@ -47,6 +47,7 @@
         "section": "القسم",
         "price": "السعر",
         "discountPercentage": "نسبة الخصم",
+        "priceAfterDiscount": "السعر بعد الخصم",
         "paymentNumber": "رقم الدفع",
         "whatsAppNumber": "رقم الواتساب",
         "thumbnail": "صورة المنتج المصغرة",
@@ -109,7 +110,8 @@
         "name": "اسم القسم",
         "number": "رقم القسم",
         "description": "الوصف",
-        "thumbnail": "الصورة المصغرة"
+        "thumbnail": "الصورة المصغرة",
+        "allowedRoles": "الأدوار المسموحة"
       },
       "placeholders": {
         "name": "أدخل اسم القسم",
@@ -242,7 +244,9 @@
     "totalItems": "إجمالي العناصر",
     "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
     "export": "تصدير البيانات",
-    "exporting": "جاري التصدير..."
+    "exporting": "جاري التصدير...",
+    "csvFormat": "تنسيق CSV",
+    "jsonFormat": "تنسيق JSON"
   },
   "products": {
     "unknownSection": "قسم غير معروف"
@@ -262,5 +266,26 @@
     "page": "الصفحة",
     "goToPage": "اذهب إلى الصفحة",
     "itemsPerPage": "{{count}} في الصفحة"
+  },
+  "subject": "المادة",
+  "unknownSubject": "مادة غير معروفة",
+  "nA": "غير متوفر",
+  "dash": "-",
+  "zeroPercent": "٠٪",
+  "decorativeDots": "نقاط زخرفية",
+  "decorativeCircle": "دائرة زخرفية",
+  "decorativeZigzag": "خط متعرج زخرفي",
+  "galleryImages": "صور المعرض",
+  "unknown": "غير معروف",
+  "roles": {
+    "Student": "طالب",
+    "Parent": "ولي أمر",
+    "Teacher": "معلم"
+  },
+  "fileSize": {
+    "bytes": "بايت",
+    "kb": "ك.ب",
+    "mb": "م.ب",
+    "gb": "ج.ب"
   }
 }
