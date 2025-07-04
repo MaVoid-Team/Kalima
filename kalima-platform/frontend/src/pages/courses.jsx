@@ -136,62 +136,28 @@ export default function CoursesPage() {
     containersData.map((container, index) => {
       const levelName = container.level?.name || ""
 
-      let stage = "المرحلة الثانوية"
-      switch (levelName) {
-        case "Primary":
-          stage = "المرحلة الابتدائية"
-          break
-        case "Middle":
-          stage = "المرحلة الإعدادية"
-          break
-        case "Upper Primary":
-          stage = "المرحلة الابتدائية العليا"
-          break
-        case "Higher Secondary":
-          stage = "المرحلة الثانوية"
-          break
-        case "Fourth Elementary":
-          stage = "الصف الرابع الابتدائي"
-          break
-        case "First Primary":
-          stage = "الصف الأول الابتدائي"
-          break
-        case "Second Primary":
-          stage = "الصف الثاني الابتدائي"
-          break
-        case "Third Primary":
-          stage = "الصف الثالث الابتدائي"
-          break
-        case "First Secondary":
-          stage = "الصف الأول الثانوي"
-          break
-        case "Second Secondary":
-          stage = "الصف الثاني الثانوي"
-          break
-        case "Third Secondary":
-          stage = "الصف الثالث الثانوي"
-          break
-      }
+      // Use the level name directly from the API and translate it
+      const stage = t(`levels.${levelName}`, { defaultValue: levelName })
 
       const isFree = container.price === 0
-      const status = isFree ? "مجاني" : "مدفوع"
+      const status = isFree ? t("status.free") : t("status.paid")
 
-      let type = "شرح"
+      let type = t("types.course")
       switch (container.type) {
         case "course":
-          type = "شرح"
+          type = t("types.course")
           break
         case "year":
-          type = "سنة كاملة"
+          type = t("types.year")
           break
         case "term":
-          type = "فصل دراسي"
+          type = t("types.term")
           break
         case "month":
-          type = "شهر"
+          type = t("types.month")
           break
         default:
-          type = container.type || "شرح"
+          type = container.type || t("types.course")
       }
 
       const teacherId = container.createdBy?._id || container.createdBy
@@ -206,8 +172,8 @@ export default function CoursesPage() {
         containerImage: containerImageUrl, // Pass the actual container image URL
         title: container.name,
         subject: container.subject?.name || "",
-        teacher: matchedLecturer?.name || "مدرس غير محدد",
-        teacherRole: matchedLecturer?.role || "محاضر",
+        teacher: matchedLecturer?.name || t("unknownTeacher"),
+        teacherRole: matchedLecturer?.role || t("lecturer"),
         grade: levelName,
         rating: 4 + (index % 2) * 0.5,
         stage,
@@ -227,29 +193,8 @@ export default function CoursesPage() {
     if (selectedStage) {
       filtered = filtered.filter((container) => {
         const levelName = container.level?.name || ""
-        let stage
-        switch (levelName) {
-          case "Primary":
-          case "Fourth Elementary":
-          case "First Primary":
-          case "Second Primary":
-          case "Third Primary":
-            stage = "المرحلة الابتدائية"
-            break
-          case "Middle":
-          case "Upper Primary":
-            stage = "المرحلة الإعدادية"
-            break
-          case "Higher Secondary":
-          case "First Secondary":
-          case "Second Secondary":
-          case "Third Secondary":
-            stage = "المرحلة الثانوية"
-            break
-          default:
-            stage = ""
-        }
-        return stage === selectedStage
+        const translatedStage = t(`levels.${levelName}`, { defaultValue: levelName })
+        return translatedStage === selectedStage
       })
     }
 
@@ -261,20 +206,8 @@ export default function CoursesPage() {
     // Apply grade filter
     if (selectedGrade) {
       const levelId = levels.find((level) => {
-        const displayName =
-          {
-            Primary: "المرحلة الابتدائية",
-            Middle: "المرحلة الإعدادية",
-            "Upper Primary": "المرحلة الابتدائية العليا",
-            "Higher Secondary": "المرحلة الثانوية",
-            "Fourth Elementary": "الصف الرابع الابتدائي",
-            "First Primary": "الصف الأول الابتدائي",
-            "Second Primary": "الصف الثاني الابتدائي",
-            "Third Primary": "الصف الثالث الابتدائي",
-            "First Secondary": "الصف الأول الثانوي",
-            "Second Secondary": "الصف الثاني الثانوي",
-            "Third Secondary": "الصف الثالث الثانوي",
-          }[level.name] === selectedGrade
+        const translatedLevelName = t(`levels.${level.name}`, { defaultValue: level.name })
+        return translatedLevelName === selectedGrade
       })?._id
 
       if (levelId) {
@@ -286,16 +219,16 @@ export default function CoursesPage() {
     if (selectedCourseType) {
       let apiType = "course"
       switch (selectedCourseType) {
-        case "شرح":
+        case t("types.course"):
           apiType = "course"
           break
-        case "سنة كاملة":
+        case t("types.year"):
           apiType = "year"
           break
-        case "فصل دراسي":
+        case t("types.term"):
           apiType = "term"
           break
-        case "شهر":
+        case t("types.month"):
           apiType = "month"
           break
         default:
@@ -308,7 +241,7 @@ export default function CoursesPage() {
     if (selectedCourseStatus) {
       filtered = filtered.filter((c) => {
         const price = c.price || 0
-        return selectedCourseStatus === "مجاني" ? price === 0 : price > 0
+        return selectedCourseStatus === t("status.free") ? price === 0 : price > 0
       })
     }
 
@@ -405,21 +338,8 @@ export default function CoursesPage() {
   // Create level options from fetched levels
   const levelOptions = useMemo(() => {
     return levels.map((level) => {
-      // Map raw API values to display names
-      const displayName =
-        {
-          Primary: "المرحلة الابتدائية",
-          Middle: "المرحلة الإعدادية",
-          "Upper Primary": "المرحلة الابتدائية العليا",
-          "Higher Secondary": "المرحلة الثانوية",
-          "Fourth Elementary": "الصف الرابع الابتدائي",
-          "First Primary": "الصف الأول الابتدائي",
-          "Second Primary": "الصف الثاني الابتدائي",
-          "Third Primary": "الصف الثالث الابتدائي",
-          "First Secondary": "الصف الأول الثانوي",
-          "Second Secondary": "الصف الثاني الثانوي",
-          "Third Secondary": "الصف الثالث الثانوي",
-        }[level.name] || level.name
+      // Use translation for the level name
+      const displayName = t(`levels.${level.name}`, { defaultValue: level.name })
 
       return {
         label: displayName,
@@ -427,20 +347,20 @@ export default function CoursesPage() {
         id: level._id,
       }
     })
-  }, [levels])
+  }, [levels, t])
 
   const priceOptions = [
-    { label: "مجاني", value: "0-0" },
-    { label: "أقل من 500 جنيه", value: "1-500" },
-    { label: "500-1000 جنيه", value: "500-1000" },
-    { label: "أكثر من 1000 جنيه", value: "1000-10000" },
+    { label: t("priceRanges.free"), value: "0-0" },
+    { label: t("priceRanges.under500"), value: "1-500" },
+    { label: t("priceRanges.500to1000"), value: "500-1000" },
+    { label: t("priceRanges.over1000"), value: "1000-10000" },
   ]
 
   const typeOptions = [
-    { label: "شرح", value: "شرح" },
-    { label: "سنة كاملة", value: "سنة كاملة" },
-    { label: "فصل دراسي", value: "فصل دراسي" },
-    { label: "شهر", value: "شهر" },
+    { label: t("types.course"), value: t("types.course") },
+    { label: t("types.year"), value: t("types.year") },
+    { label: t("types.term"), value: t("types.term") },
+    { label: t("types.month"), value: t("types.month") },
   ]
 
   const filterOptions = [
@@ -449,9 +369,9 @@ export default function CoursesPage() {
       value: selectedStage,
       options: [
         { label: t("filters.all"), value: "" },
-        { label: "المرحلة الابتدائية", value: "المرحلة الابتدائية" },
-        { label: "المرحلة الإعدادية", value: "المرحلة الإعدادية" },
-        { label: "المرحلة الثانوية", value: "المرحلة الثانوية" },
+        { label: t("stages.primary"), value: t("stages.primary") },
+        { label: t("stages.middle"), value: t("stages.middle") },
+        { label: t("stages.secondary"), value: t("stages.secondary") },
       ],
       onSelect: setSelectedStage,
     },
@@ -478,8 +398,8 @@ export default function CoursesPage() {
       value: selectedCourseStatus,
       options: [
         { label: t("filters.all"), value: "" },
-        { label: "مجاني", value: "مجاني" },
-        { label: "مدفوع", value: "مدفوع" },
+        { label: t("status.free"), value: t("status.free") },
+        { label: t("status.paid"), value: t("status.paid") },
       ],
       onSelect: setSelectedCourseStatus,
     },
@@ -603,7 +523,7 @@ export default function CoursesPage() {
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
-                      {isRTL ? "التالي" : "السابق"}
+                      {isRTL ? t("pagination.next") : t("pagination.previous")}
                     </button>
 
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -638,7 +558,7 @@ export default function CoursesPage() {
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      {isRTL ? "السابق" : "التالي"}
+                      {isRTL ? t("pagination.previous") : t("pagination.next")}
                     </button>
                   </div>
                 </div>

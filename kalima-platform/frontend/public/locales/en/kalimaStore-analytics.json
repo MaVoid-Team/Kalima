@@ -41,6 +41,7 @@
     "revenue": "Revenue",
     "confirmedRevenue": "Confirmed Revenue",
     "noData": "No Data Found",
-    "tryAdjustingFilters": "Try adjusting your filters"
+    "tryAdjustingFilters": "Try adjusting your filters",
+    "totalCouponValue": "Total Coupon Value"
   }
 } 

@@ -83,7 +83,9 @@
     "selectGovernment": "Select Government",
     "administrationZone": "Administration Zone",
     "selectAdministrationZone": "Select Administration Zone",
-    "yourCustomHobbies": "Your Custom Hobbies"
+    "yourCustomHobbies": "Your Custom Hobbies",
+    "referralSerial": "Referral Serial",
+    "profilePic": "Profile Picture"
   },
   "gender": {
     "male": "Male",
