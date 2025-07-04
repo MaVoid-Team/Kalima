@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer } from "../routes/lectures"
 import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
@@ -138,6 +139,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 export default function CourseDetails() {
   const { courseId } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation("courseDetails")
   const [courseData, setCourseData] = useState(null)
   const [purchaseHistory, setPurchaseHistory] = useState([])
   const [loading, setLoading] = useState(true)

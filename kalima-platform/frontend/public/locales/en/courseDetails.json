@@ -54,6 +54,44 @@
     "errors": {
       "fetchError": "Failed to fetch course details",
       "unexpected": "An unexpected error occurred"
+    },
+    "containerTypes": {
+      "course": "Course",
+      "year": "Year",
+      "term": "Term",
+      "month": "Month",
+      "lecture": "Lecture"
+    },
+    "pricing": {
+      "points": "points",
+      "free": "Free"
+    },
+    "purchase": {
+      "purchased": "Purchased",
+      "availableInCourse": "Available in Course",
+      "buy": "Buy",
+      "getFree": "Get Free",
+      "purchaseStatus": "Purchase Status",
+      "notPurchased": "Not Purchased",
+      "notDetermined": "Not Determined",
+      "purchaseSuccess": "Purchase Successful!",
+      "purchaseError": "Purchase failed. Please try again.",
+      "purchaseInProgress": "Purchasing...",
+      "getCourseFree": "Get Course for Free",
+      "buyCourse": "Buy Course"
+    },
+    "courseInfo": {
+      "price": "Price",
+      "level": "Level",
+      "subject": "Subject",
+      "courseObjectives": "Course Objectives",
+      "courseContents": "Course Contents"
+    },
+    "errors": {
+      "fetchError": "Failed to fetch course data",
+      "unexpected": "An unexpected error occurred",
+      "purchaseError": "Purchase failed. Please try again.",
+      "purchaseProcessError": "An error occurred during purchase",
+      "courseNotFound": "Course not found"
     }
-    
   }
