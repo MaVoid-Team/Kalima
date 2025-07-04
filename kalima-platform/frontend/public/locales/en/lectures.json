@@ -12,6 +12,7 @@
   "purchased": "Purchased",
   "purchase": "Purchase",
   "available : ": " Available",
+  "noPointsBalances": "No points available",
   "filters": {
     "reset": "Reset Filters",
     "stage": "Instructor Role",
