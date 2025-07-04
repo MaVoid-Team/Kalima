@@ -587,7 +587,6 @@ const AdminPanel = () => {
         <div className="px-4 py-8">
           <ProductsManagement
             products={products}
-            books={books}
             sections={sections}
             subjects={subjects}
             onEditProduct={handleEditProduct}
