@@ -33,11 +33,11 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
       {/* Header */}
       <div className="flex items-center justify-center relative mb-8">
         <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
-          <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
+          <img src="/waves.png" alt={t("decorativeZigzag")} className="w-20 h-full animate-float-zigzag" />
         </div>
         <h2 className="text-3xl font-bold text-center">{t("sectionsManagement.title")}</h2>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
-          <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
+          <img src="/ring.png" alt={t("decorativeCircle")} className="w-20 h-full animate-float-up-dottedball" />
         </div>
       </div>
 
@@ -77,8 +77,8 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
             <tbody>
               {sectionsWithCounts.map((section) => (
                 <tr key={section._id}>
-                  <td className="text-center font-medium">{section.name || "N/A"}</td>
-                  <td className="text-center">{section.number || "N/A"}</td>
+                  <td className="text-center font-medium">{section.name || t("nA")}</td>
+                  <td className="text-center">{section.number || t("nA")}</td>
                   <td className="text-center">{section.productCount || 0}</td>
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
@@ -120,7 +120,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
 
         {/* Decorative dots */}
         <div className="absolute bottom-4 right-4">
-          <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-down-dottedball" />
+          <img src="/rDots.png" alt={t("decorativeDots")} className="w-16 h-full animate-float-down-dottedball" />
         </div>
       </div>
     </div>

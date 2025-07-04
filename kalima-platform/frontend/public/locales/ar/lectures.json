@@ -12,6 +12,7 @@
   "purchased": "مشترك",
   "purchase": "شراء",
   "available : ": " المتاحة",
+  "noPointsBalances": "لا يوجد نقاط متاحة",
   "filters": {
     "reset": "إعادة تعيين الفلاتر",
     "stage": "دور المحاضر",
