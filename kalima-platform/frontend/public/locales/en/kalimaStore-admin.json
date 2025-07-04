@@ -47,6 +47,7 @@
         "section": "Section",
         "price": "Price",
         "discountPercentage": "Discount Percentage",
+        "priceAfterDiscount": "Price After Discount",
         "paymentNumber": "Payment Number",
         "whatsAppNumber": "WhatsApp Number",
         "thumbnail": "Product Thumbnail",
@@ -109,7 +110,8 @@
         "name": "Section Name",
         "number": "Section Number",
         "description": "Description",
-        "thumbnail": "Thumbnail"
+        "thumbnail": "Thumbnail",
+        "allowedRoles": "Allowed Roles"
       },
       "placeholders": {
         "name": "Enter section name",
@@ -242,7 +244,9 @@
     "totalItems": "Total Items",
     "successMessage": "Successfully exported {{count}} {{type}}",
     "export": "Export Data",
-    "exporting": "Exporting..."
+    "exporting": "Exporting...",
+    "csvFormat": "CSV Format",
+    "jsonFormat": "JSON Format"
   },
   "products": {
     "unknownSection": "Unknown Section"
@@ -262,5 +266,26 @@
     "page": "Page",
     "goToPage": "Go to page",
     "itemsPerPage": "{{count}} per page"
+  },
+  "subject": "Subject",
+  "unknownSubject": "Unknown Subject",
+  "nA": "N/A",
+  "dash": "-",
+  "zeroPercent": "0%",
+  "decorativeDots": "Decorative dots",
+  "decorativeCircle": "Decorative circle",
+  "decorativeZigzag": "Decorative zigzag",
+  "galleryImages": "Gallery Images",
+  "unknown": "Unknown",
+  "roles": {
+    "Student": "Student",
+    "Parent": "Parent",
+    "Teacher": "Teacher"
+  },
+  "fileSize": {
+    "bytes": "Bytes",
+    "kb": "KB",
+    "mb": "MB",
+    "gb": "GB"
   }
 }

@@ -128,8 +128,11 @@
     "applyCoupon": "Apply",
     "priceSummary": "Price Summary",
     "originalPrice": "Original Price",
+    "discountedPrice": "Discounted Price",
     "discount": "Discount",
-    "total": "Total"
+    "total": "Total",
+    "notes": "Notes",
+    "notesPlaceholder": "Enter notes"
   },
   "sample": {
     "noSample": "No Sample Available",

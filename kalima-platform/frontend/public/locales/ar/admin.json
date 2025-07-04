@@ -1,5 +1,5 @@
 {
-    "admin": {
+    "admin": { 
       "pageTitle": "صفحة الأدمن",
       "students": "الطلاب",
       "teachers": "المعلمين",
@@ -22,7 +22,13 @@
         "save": "حفظ",
         "cancel": "الغاء"
       },
-     
+      "export": {
+        "export": "تصدير",
+        "exporting": "جاري التصدير...",
+        "csvFormat": "تنسيق CSV",
+        "jsonFormat": "تنسيق JSON",
+        "exportFiltered": "تصدير المفلتر"
+      },
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
         "pointsError": "يجب أن تكون قيمة النقاط أكبر من صفر",
@@ -88,16 +94,20 @@
       "name": "الاسم",
       "phone": "رقم الهاتف",
       "allTypes": "كل الأنواع",
-      "allStatus": "كل الحالات"
+      "allStatus": "كل الحالات",
+      "invites": "دعوات"
     },
     "roles": {
       "student": "طالب",
       "parent": "ولي أمر",
       "lecturers": "معلم",
       "lecturer": "معلم",
-      "teacher": "معلم",
+      "teacher": "مدرس",
       "assistant": "مساعد",
-      "admin": "أدمن"
+      "admin": "أدمن",
+      "subAdmin": "مسؤول فرعي",
+      "Teacher": "مدرس",
+      "moderator": "مشرف"
     },
     "status": {
       "valid": "صالح",
@@ -108,7 +118,8 @@
       "status": "الحالة",
       "accountType": "نوع الحساب",
       "phone": "رقم الهاتف",
-      "name": "الاسم"
+      "name": "الاسم",
+      "successfulInvites": "الدعوات الناجحة"
     },
     "actions": {
       "delete": "حذف",

@@ -128,8 +128,11 @@
     "applyCoupon": "تطبيق",
     "priceSummary": "ملخص السعر",
     "originalPrice": "السعر الأصلي",
+    "discountedPrice": "السعر بعد الخصم",
     "discount": "الخصم",
-    "total": "المجموع"
+    "total": "المجموع",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أدخل الملاحظات"
   },
   "sample": {
     "noSample": "لا يوجد ملف عينة",

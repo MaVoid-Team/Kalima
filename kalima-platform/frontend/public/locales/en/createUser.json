@@ -32,7 +32,14 @@
     "government": "Government",
     "administrationZone": "Administration Zone",
     "selectGovernment": "Select Government",
-    "selectAdministrationZone": "Select Administration Zone"
+    "selectAdministrationZone": "Select Administration Zone",
+    "profilePic": "Profile Picture",
+    "referralSerial": "Referral Serial",
+    "phoneNumber2": "Phone Number (Optional)",
+    "subject": "Subject",
+    "levels": "Levels",
+    "teachesAtType": "Where do you teach?",
+    "socialMedia": "Social Media"
   },
   "placeholders": {
     "selectAccountType": "Select Account Type",
@@ -45,7 +52,15 @@
     "bio": "Enter bio",
     "selectLecturer": "Select Lecturer",
     "addHobby": "Add a hobby",
-    "selectSubject": "Select subject"
+    "selectSubject": "Select subject",
+    "selectTeachesAt": "Select teaches at",
+    "selectPlatform": "Select platform",
+    "accountName": "Account name/handle",
+    "socialLink": "Social Link",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram",
+    "phoneNumber2": "Phone Number (Optional)"
   },
   "roles": {
     "subadmin": "Sub Admin",

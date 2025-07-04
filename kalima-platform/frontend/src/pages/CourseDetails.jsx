@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { getContainerById, purchaseContainer } from "../routes/lectures"
 import { getUserDashboard } from "../routes/auth-services"
 import { LoadingSpinner } from "../components/LoadingSpinner"
@@ -18,7 +19,7 @@ const DetailItem = ({ label, value, icon }) => (
   </div>
 )
 
-const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress, parentPurchased = false }) => {
+const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress, parentPurchased = false, t }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [childContainers, setChildContainers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -49,11 +50,11 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
   const containerIsPurchased = parentPurchased || isPurchased(container._id)
   const containerTypeLabel =
     {
-      course: "دورة",
-      year: "سنة",
-      term: "فصل دراسي",
-      month: "شهر",
-      lecture: "محاضرة",
+      course: t("containerTypes.course"),
+      year: t("containerTypes.year"),
+      term: t("containerTypes.term"),
+      month: t("containerTypes.month"),
+      lecture: t("containerTypes.lecture"),
     }[container.type] || container.type
 
   return (
@@ -71,9 +72,9 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
               <div className="flex gap-2 mt-1">
                 <span className="badge badge-accent">{containerTypeLabel}</span>
                 {container.price > 0 ? (
-                  <span className="badge badge-neutral">{container.price} نقطة</span>
+                  <span className="badge badge-neutral">{container.price} {t("pricing.points")}</span>
                 ) : (
-                  <span className="badge badge-success">مجاني</span>
+                  <span className="badge badge-success">{t("pricing.free")}</span>
                 )}
               </div>
             </div>
@@ -83,7 +84,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
             {containerIsPurchased ? (
               <span className="badge badge-success gap-1">
                 <FaUnlock size={12} />
-                {parentPurchased ? "متاح ضمن الدورة" : "تم الشراء"}
+                {parentPurchased ? t("purchase.availableInCourse") : t("purchase.purchased")}
               </span>
             ) : (
               <button
@@ -91,7 +92,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
                 onClick={() => onPurchase(container._id)}
                 disabled={purchaseInProgress !== null}
               >
-                {container.price > 0 ? "شراء" : "الحصول مجاناً"}
+                {container.price > 0 ? t("purchase.buy") : t("purchase.getFree")}
               </button>
             )}
 
@@ -126,6 +127,7 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
                 onPurchase={onPurchase}
                 purchaseInProgress={purchaseInProgress}
                 parentPurchased={containerIsPurchased} // Pass down purchase status
+                t={t}
               />
             ))}
           </div>
@@ -138,6 +140,8 @@ const ContainerItem = ({ container, isPurchased, onPurchase, purchaseInProgress,
 export default function CourseDetails() {
   const { courseId } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation("courseDetails")
+  const { t: tCommon } = useTranslation("common")
   const [courseData, setCourseData] = useState(null)
   const [purchaseHistory, setPurchaseHistory] = useState([])
   const [loading, setLoading] = useState(true)
@@ -166,7 +170,7 @@ export default function CourseDetails() {
         if (courseResult?.status === "success" && courseResult.data) {
           setCourseData(courseResult.data)
         } else {
-          setError("فشل في جلب بيانات الدورة")
+          setError(t("errors.fetchError"))
         }
 
         if (dashboardResult?.success) {
@@ -179,7 +183,7 @@ export default function CourseDetails() {
         }
       } catch (err) {
         console.error("Error fetching data:", err)
-        setError("حدث خطأ غير متوقع")
+        setError(t("errors.unexpected"))
       } finally {
         setLoading(false)
       }
@@ -279,11 +283,11 @@ export default function CourseDetails() {
           refreshPurchaseHistory()
         }
       } else {
-        setPurchaseError("فشل في عملية الشراء. يرجى المحاولة مرة أخرى.")
+        setPurchaseError(t("purchase.purchaseError"))
       }
     } catch (err) {
       console.error("Purchase error:", err)
-      setPurchaseError(err.response?.data?.message || "حدث خطأ أثناء الشراء")
+      setPurchaseError(err.response?.data?.message || t("errors.purchaseProcessError"))
     } finally {
       setPurchaseInProgress(null)
     }
@@ -313,7 +317,7 @@ export default function CourseDetails() {
 
   if (loading) return <LoadingSpinner />
   if (error) return <ErrorAlert message={error} />
-  if (!courseData) return <ErrorAlert message="لم يتم العثور على الدورة" />
+  if (!courseData) return <ErrorAlert message={t("errors.courseNotFound")} />
 
   return (
     <div className="min-h-screen bg-base-100">
@@ -323,34 +327,34 @@ export default function CourseDetails() {
           <div className="lg:w-1/3 order-1 lg:order-none">
             <div className="card bg-base-100 shadow-xl sticky top-6">
               <div className="card-body">
-                <h2 className="card-title justify-center text-2xl mb-4">تفاصيل الدورة</h2>
+                <h2 className="card-title justify-center text-2xl mb-4">{t("details.title")}</h2>
                 <div className="space-y-2">
                   <DetailItem
                     icon={<FaMoneyBillWave className="text-accent" />}
-                    label="السعر"
-                    value={courseData?.price > 0 ? `${courseData.price} نقطة` : "مجاني"}
+                    label={t("courseInfo.price")}
+                    value={courseData?.price > 0 ? `${courseData.price} ${t("pricing.points")}` : t("pricing.free")}
                   />
                   <DetailItem
                     icon={<FaGraduationCap className="text-primary" />}
-                    label="المستوى"
-                    value={courseData?.level?.name || "غير محدد"}
+                    label={t("courseInfo.level")}
+                    value={courseData?.level?.name ? tCommon(`gradeLevels.${courseData.level.name}`) : t("purchase.notDetermined")}
                   />
                   <DetailItem
                     icon={<FaBook className="text-secondary" />}
-                    label="المادة"
-                    value={courseData?.subject?.name || "غير محدد"}
+                    label={t("courseInfo.subject")}
+                    value={courseData?.subject?.name || t("purchase.notDetermined")}
                   />
                   <DetailItem
                     icon={<FaChalkboardTeacher className="text-accent" />}
-                    label="حالة الشراء"
-                    value={isContainerPurchased(courseId) ? "مشتراة" : "غير مشتراة"}
+                    label={t("purchase.purchaseStatus")}
+                    value={isContainerPurchased(courseId) ? t("purchase.purchased") : t("purchase.notPurchased")}
                   />
                 </div>
 
                 <div className="card-actions mt-6">
                   {isContainerPurchased(courseId) ? (
                     <button className="btn btn-success w-full" disabled>
-                      ✓ تم الشراء
+                      ✓ {t("purchase.purchased")}
                     </button>
                   ) : (
                     <>
@@ -361,7 +365,7 @@ export default function CourseDetails() {
                       )}
                       {purchaseSuccess && (
                         <div className="alert alert-success w-full mb-2">
-                          <span>تم الشراء بنجاح!</span>
+                          <span>{t("purchase.purchaseSuccess")}</span>
                         </div>
                       )}
                       <button
@@ -370,10 +374,10 @@ export default function CourseDetails() {
                         disabled={purchaseInProgress !== null}
                       >
                         {courseData?.price === 0
-                          ? "الحصول على الدورة مجانًا"
+                          ? t("purchase.getCourseFree")
                           : purchaseInProgress === courseId
-                            ? "جاري الشراء..."
-                            : "شراء الدورة"}
+                            ? t("purchase.purchaseInProgress")
+                            : t("purchase.buyCourse")}
                       </button>
                     </>
                   )}
@@ -389,7 +393,7 @@ export default function CourseDetails() {
               <div className="card-body">
                 <div className="flex justify-between items-start">
                   <h1 className="card-title text-2xl md:text-3xl mb-4">{courseData?.name}</h1>
-                  {isContainerPurchased(courseId) && <span className="badge badge-success badge-lg">مشتراة</span>}
+                  {isContainerPurchased(courseId) && <span className="badge badge-success badge-lg">{t("purchase.purchased")}</span>}
                 </div>
                 {courseData?.description && <p className="text-base-content/80">{courseData.description}</p>}
               </div>
@@ -399,7 +403,7 @@ export default function CourseDetails() {
             {courseData?.goal?.length > 0 && (
               <div className="card bg-base-100 shadow-lg">
                 <div className="card-body">
-                  <h2 className="card-title text-xl mb-4">أهداف الدورة</h2>
+                  <h2 className="card-title text-xl mb-4">{t("courseInfo.courseObjectives")}</h2>
                   <ul className="space-y-3">
                     {courseData.goal.map((obj, i) => (
                       <li key={i} className="flex gap-3">
@@ -415,7 +419,7 @@ export default function CourseDetails() {
             {/* Course Content Section */}
             <div className="card bg-base-100 shadow-lg">
               <div className="card-body">
-                <h2 className="card-title text-xl mb-4">محتويات الدورة</h2>
+                <h2 className="card-title text-xl mb-4">{t("courseInfo.courseContents")}</h2>
 
                 {/* Main container */}
                 <ContainerItem
@@ -423,6 +427,7 @@ export default function CourseDetails() {
                   isPurchased={isContainerPurchased}
                   onPurchase={handlePurchase}
                   purchaseInProgress={purchaseInProgress}
+                  t={t}
                 />
               </div>
             </div>

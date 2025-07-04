@@ -269,11 +269,11 @@ const AdminModals = ({
                 {/* WhatsApp Number field */}
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">WhatsApp Number *</span>
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.whatsAppNumber") || "WhatsApp Number"} *</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Enter WhatsApp number"
+                    placeholder={t("forms.createProduct.placeholders.whatsAppNumber") || "Enter WhatsApp number"}
                     className="input input-bordered w-full"
                     value={productForm?.whatsAppNumber || ""}
                     onChange={(e) => setProductForm?.({ ...productForm, whatsAppNumber: e.target.value })}
@@ -284,10 +284,10 @@ const AdminModals = ({
                 {/* Description field */}
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Description *</span>
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.description") || "Description"} *</span>
                   </label>
                   <textarea
-                    placeholder="Enter product description..."
+                    placeholder={t("forms.createProduct.placeholders.description") || "Enter product description..."}
                     className="textarea textarea-bordered w-full h-24"
                     value={productForm?.description || ""}
                     onChange={(e) => setProductForm?.({ ...productForm, description: e.target.value })}
@@ -333,7 +333,7 @@ const AdminModals = ({
                 {/* Gallery field */}
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Gallery Images</span>
+                    <span className="label-text font-medium">{t("galleryImages")}</span>
                   </label>
                   <input
                     type="file"
@@ -380,8 +380,8 @@ const AdminModals = ({
           <div className="modal-box">
             <h3 className="font-bold text-lg">{t("modals.deleteSection.title") || "Confirm Delete"}</h3>
             <p className="py-4">
-              {t("modals.deleteSection.message", { sectionName: sectionToDelete?.name }) ||
-                `Are you sure you want to delete the section "${sectionToDelete?.name || "Unknown"}"? This action cannot be undone.`}
+              {t("modals.deleteSection.message", { sectionName: sectionToDelete?.name || t("unknown") }) ||
+                `Are you sure you want to delete the section "${sectionToDelete?.name || t("unknown")}"? This action cannot be undone.`}
             </p>
             <div className="modal-action">
               <button
@@ -411,8 +411,8 @@ const AdminModals = ({
           <div className="modal-box">
             <h3 className="font-bold text-lg">{t("modals.deleteProduct.title") || "Confirm Delete"}</h3>
             <p className="py-4">
-              {t("modals.deleteProduct.message", { productName: productToDelete?.title }) ||
-                `Are you sure you want to delete the product "${productToDelete?.title || "Unknown"}"? This action cannot be undone.`}
+              {t("modals.deleteProduct.message", { productName: productToDelete?.title || t("unknown") }) ||
+                `Are you sure you want to delete the product "${productToDelete?.title || t("unknown")}"? This action cannot be undone.`}
             </p>
             <div className="modal-action">
               <button
