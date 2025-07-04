@@ -12,6 +12,7 @@
   "purchased": "Purchased",
   "purchase": "Purchase",
   "available : ": " Available",
+  "noPointsBalances": "No points available",
   "filters": {
     "reset": "Reset Filters",
     "stage": "Instructor Role",
@@ -41,7 +42,21 @@
   "Third Primary": "Third Primary",
   "First Secondary": "First Secondary",
   "Second Secondary": "Second Secondary",
-  "Third Secondary": "Third Secondary"
+  "Third Secondary": "Third Secondary",
+  "2nd Primary": "2nd Primary",
+  "2nd Secondary": "2nd Secondary",
+  "3rd Primary": "3rd Primary",
+  "3rd Secondary": "3rd Secondary",
+  "4th Primary": "4th Primary",
+  "4th Secondary": "4th Secondary",
+  "5th Primary": "5th Primary",
+  "1st Preparatory": "1st Preparatory",
+  "2nd Preparatory": "2nd Preparatory",
+  "3rd Preparatory": "3rd Preparatory",
+  "4th Preparatory": "4th Preparatory",
+  "5th Preparatory": "5th Preparatory",
+  "6th Preparatory": "6th Preparatory",
+  "7th Preparatory": "7th Preparatory"
 },
  "common": {
     "loading": "Loading..."
