@@ -63,10 +63,10 @@ const ProductsManagement = memo(({
   }, [sections, t])
 
   const getSubjectName = useCallback((subjectId) => {
-    if (!subjectId) return "Unknown Subject"
+    if (!subjectId) return t("unknownSubject")
     const subject = subjects.find(s => s?._id === subjectId || (typeof subjectId === "object" && s?._id === subjectId?._id))
-    return subject?.name || "Unknown Subject"
-  }, [subjects])
+    return subject?.name || t("unknownSubject")
+  }, [subjects, t])
 
   const formatPrice = useCallback((price, discountPercentage) => {
     if (!price || !discountPercentage || discountPercentage <= 0) {
@@ -138,11 +138,11 @@ const ProductsManagement = memo(({
       <div className="flex items-center justify-center relative mb-8">
         {/* Decorative elements */}
         <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
-          <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
+          <img src="/waves.png" alt={t("decorativeZigzag")} className="w-20 h-full animate-float-zigzag" />
         </div>
         <h2 className="text-3xl font-bold text-center">{t("productsManagement.title") || "Products Management"}</h2>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
-          <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
+          <img src="/ring.png" alt={t("decorativeCircle")} className="w-20 h-full animate-float-up-dottedball" />
         </div>
       </div>
 
@@ -173,7 +173,7 @@ const ProductsManagement = memo(({
                 <th className="text-center">{t("productsManagement.table.title") || "Title"}</th>
                 <th className="text-center">{t("productsManagement.table.serial") || "Serial"}</th>
                 <th className="text-center">{t("productsManagement.table.section") || "Section"}</th>
-                <th className="text-center">Subject</th>
+                <th className="text-center">{t("subject")}</th>
                 <th className="text-center">{t("productsManagement.table.price") || "Price"}</th>
                 <th className="text-center">{t("productsManagement.table.discount") || "Discount"}</th>
                 <th className="text-center">{t("productsManagement.table.finalPrice") || "Final Price"}</th>
@@ -202,15 +202,15 @@ const ProductsManagement = memo(({
                         </div>
                       </div>
                     </td>
-                    <td className="text-center font-medium">{product.title || "N/A"}</td>
-                    <td className="text-center font-mono text-sm">{product.serial || "N/A"}</td>
+                    <td className="text-center font-medium">{product.title || t("nA")}</td>
+                    <td className="text-center font-mono text-sm">{product.serial || t("nA")}</td>
                     <td className="text-center">{getSectionName(product.section)}</td>
                     <td className="text-center">
-                      {product.type === "book" ? getSubjectName(product.subject) : "-"}
+                      {product.type === "book" ? getSubjectName(product.subject) : t("dash")}
                     </td>
                     <td className="text-center font-bold">{product.price || 0}</td>
                     <td className="text-center">
-                      {product.discountPercentage > 0 ? `${product.discountPercentage}%` : "0%"}
+                      {product.discountPercentage > 0 ? `${product.discountPercentage}%` : t("zeroPercent")}
                     </td>
                     <td className="text-center font-bold text-primary">{finalPrice}</td>
                     <td className="text-center">
@@ -265,7 +265,7 @@ const ProductsManagement = memo(({
 
         {/* Decorative dots */}
         <div className={`absolute bottom-4 ${isRTL ? "left-4" : "right-4"}`}>
-          <img src="/rDots.png" alt="Decorative dots" className="w-16 h-full animate-float-down-dottedball" />
+          <img src="/rDots.png" alt={t("decorativeDots")} className="w-16 h-full animate-float-down-dottedball" />
         </div>
       </div>
     </div>
