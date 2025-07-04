@@ -231,14 +231,14 @@ const EnhancedAdminForms = ({
     const fileInput = document.getElementById(`${activeTab}-${fieldName}`)
     if (fileInput) fileInput.value = ""
   }
-  const roleOptions = ["Student", "Parent", "Teacher"]
+  const roleOptions = [t("roles.Student"), t("roles.Parent"), t("roles.Teacher")]
 
 
   // Format file size
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes"
     const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
+    const sizes = [t("fileSize.bytes"), t("fileSize.kb"), t("fileSize.mb"), t("fileSize.gb")]
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   }
@@ -811,7 +811,7 @@ const EnhancedAdminForms = ({
                             }))
                           }}
                         />
-                        <span>{t(`roles.${role}`, { defaultValue: role })}</span>
+                        <span>{role}</span>
                       </label>
                     ))}
                   </div>
