@@ -129,7 +129,9 @@
     "priceSummary": "Price Summary",
     "originalPrice": "Original Price",
     "discount": "Discount",
-    "total": "Total"
+    "total": "Total",
+    "notes": "Notes",
+    "notesPlaceholder": "Enter notes"
   },
   "sample": {
     "noSample": "No Sample Available",

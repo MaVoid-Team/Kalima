@@ -129,7 +129,9 @@
     "priceSummary": "ملخص السعر",
     "originalPrice": "السعر الأصلي",
     "discount": "الخصم",
-    "total": "المجموع"
+    "total": "المجموع",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "أدخل الملاحظات"
   },
   "sample": {
     "noSample": "لا يوجد ملف عينة",

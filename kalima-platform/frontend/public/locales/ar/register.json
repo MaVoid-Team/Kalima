@@ -83,7 +83,9 @@
     "selectGovernment": "اختر المحافظة",
     "administrationZone": "المنطقة الإدارية",
     "selectAdministrationZone": "اختر المنطقة الإدارية",
-    "yourCustomHobbies": "هواياتك الخاصة"
+    "yourCustomHobbies": "هواياتك الخاصة",
+    "referralSerial": "رقم التسلسل المرجعي",
+    "profilePic": "صورة الملف الشخصي"
 
     },
     "gender": {
