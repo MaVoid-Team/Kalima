@@ -5,7 +5,6 @@ import { FaPencilAlt, FaTrash } from "react-icons/fa"
 
 const ProductsManagement = memo(({
   products = [],
-  books = [],
   sections = [],
   subjects = [],
   onEditProduct,
@@ -18,29 +17,29 @@ const ProductsManagement = memo(({
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
-  // Combine products and books
   const allItems = useMemo(() => {
-    const productsWithType = products.map(product => ({ ...product, type: 'product' }))
-    const booksWithType = books.map(book => ({ ...book, type: 'book' }))
-    return [...productsWithType, ...booksWithType]
-  }, [products, books])
+    return products.map((item) => ({
+      ...item,
+      type: item.subject ? 'book' : 'product', // auto-detect based on presence of 'subject'
+    }))
+  }, [products])
 
   // Filter items based on search
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim()) {
       return allItems
     }
-    
+
     const searchLower = searchTerm.toLowerCase().trim()
     const filtered = allItems.filter(item => {
       // Check if any of the searchable fields contain the search term
       const titleMatch = item.title?.toLowerCase().includes(searchLower)
       const serialMatch = item.serial?.toLowerCase().includes(searchLower)
       const descriptionMatch = item.description?.toLowerCase().includes(searchLower)
-      
+
       return titleMatch || serialMatch || descriptionMatch
     })
-    
+
     return filtered
   }, [allItems, searchTerm])
 
@@ -169,7 +168,6 @@ const ProductsManagement = memo(({
           <table className="table w-full">
             <thead>
               <tr>
-                <th className="text-center">{t("productsManagement.table.thumbnail") || "Thumbnail"}</th>
                 <th className="text-center">{t("productsManagement.table.title") || "Title"}</th>
                 <th className="text-center">{t("productsManagement.table.serial") || "Serial"}</th>
                 <th className="text-center">{t("productsManagement.table.section") || "Section"}</th>
@@ -188,20 +186,6 @@ const ProductsManagement = memo(({
 
                 return (
                   <tr key={product._id}>
-                    <td className="text-center">
-                      <div className="avatar">
-                        <div className="w-12 h-12 rounded">
-                          <img
-                            src={product.thumbnail || "/placeholder.svg?height=48&width=48"}
-                            alt={product.title}
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = "/placeholder.svg?height=48&width=48"
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </td>
                     <td className="text-center font-medium">{product.title || t("nA")}</td>
                     <td className="text-center font-mono text-sm">{product.serial || t("nA")}</td>
                     <td className="text-center">{getSectionName(product.section)}</td>
