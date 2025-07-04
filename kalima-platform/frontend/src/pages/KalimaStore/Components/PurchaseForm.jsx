@@ -248,7 +248,7 @@ const PurchaseForm = ({
                   <span className="line-through text-gray-500">{productPrice?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg">
-                  <span>{t("purchaseForm.discountedPrice", "Discounted Price")}</span>
+                  <span>{t("purchaseForm.discountedPrice")}</span>
                   <span>{displayPrice?.toFixed(2)}</span>
                 </div>
               </>
