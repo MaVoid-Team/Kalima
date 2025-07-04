@@ -22,6 +22,13 @@
         "save": "Save",
         "cancel": "Cancel"
       },
+      "export": {
+        "export": "Export",
+        "exporting": "Exporting...",
+        "csvFormat": "CSV Format",
+        "jsonFormat": "JSON Format",
+        "exportFiltered": "Export Filtered"
+      },
       "errors": {
         "fetchLecturers": "Failed to fetch lecturers",
         "pointsError": "Points amount must be greater than zero",
@@ -86,7 +93,8 @@
       "name": "Name",
       "phone": "Phone Number",
       "allTypes": "All Types",
-      "allStatus": "All Statuses"
+      "allStatus": "All Statuses",
+      "invites": "Invites"
     },
     "roles": {
       "student": "Student",
@@ -95,7 +103,10 @@
       "lecturer": "Lecturer",
       "teacher": "Teacher",
       "assistant": "Assistant",
-      "admin": "Admin"
+      "admin": "Admin",
+      "subAdmin": "Sub Admin",
+      "Teacher": "Teacher",
+      "moderator": "Moderator"
     },
     "status": {
       "valid": "Valid",
@@ -106,7 +117,8 @@
       "status": "Status",
       "accountType": "Account Type",
       "phone": "Phone",
-      "name": "Name"
+      "name": "Name",
+      "successfulInvites": "Successful Invites" 
     },
     "actions": {
       "delete": "Delete",
