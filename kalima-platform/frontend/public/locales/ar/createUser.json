@@ -32,7 +32,14 @@
     "government" : "المحافظه",
     "administrationZone" : "المناطق الادارية",
     "selectGovernment" :"اختر المحافظه",
-    "selectAdministrationZone" :"اختر المناطق الادارية"
+    "selectAdministrationZone" :"اختر المناطق الادارية",
+    "profilePic": "صورة الملف الشخصي",
+    "referralSerial": "رقم التسلسل المرجعي",
+    "phoneNumber2": "رقم الهاتف (اختياري)",
+    "subject": "المادة",
+    "levels": "المستويات",
+    "teachesAtType": "أين تدرس؟",
+    "socialMedia": "وسائل التواصل الاجتماعي"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
@@ -46,7 +53,15 @@
     "selectLecturer": "اختر المعلم",
     "selectSubject": "اختر المواد الدراسية",
     "selectHobbies": "اختر الاهتمامات",
-    "addHobby": "اضافة اهتمام"
+    "addHobby": "اضافة اهتمام",
+    "selectTeachesAt": "اختر مكان التدريس",
+    "selectPlatform": "اختر المنصة",
+    "accountName": "لينك الحساب",
+    "socialLink": "لينك الحساب",
+    "facebook": "فيسبوك",
+    "twitter": "تويتر",
+    "instagram": "إنستاغرام",
+    "phoneNumber2": "رقم الهاتف (اختياري)"
   },
   "roles": {
     "subadmin": "مدير فرعي",
