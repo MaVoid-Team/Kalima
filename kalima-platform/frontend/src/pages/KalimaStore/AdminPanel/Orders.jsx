@@ -485,12 +485,8 @@ const Orders = () => {
                 memoizedOrders.map((order) => (
                   <tr key={order._id}>
                     <td className="text-center">
-                      <div className="flex items-center gap-3 justify-center">
-                        <div className="text-left">
                           <div className="font-bold text-sm">{order.productName}</div>
                           <div className="text-xs opacity-50">{order.purchaseSerial}</div>
-                        </div>
-                      </div>
                     </td>
                     <td className="text-center">
                       <div>
