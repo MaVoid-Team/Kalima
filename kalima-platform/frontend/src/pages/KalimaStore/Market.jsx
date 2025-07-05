@@ -92,7 +92,7 @@ const Market = () => {
 
   // Create categories array with "All" option and fetched sections
   const categories = [
-    { id: "all", name: t("categories.allSections"), icon: "☰" },
+    { id: "all", icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
       name: section.name,
