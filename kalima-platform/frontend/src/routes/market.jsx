@@ -349,6 +349,9 @@ export const purchaseBook = async (purchaseData) => {
     if (purchaseData.paymentScreenShot) {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
     }
+    if(purchaseData.notes){
+      formData.append("notes", purchaseData.notes)
+    }
     formData.append("nameOnBook", purchaseData.nameOnBook)
     formData.append("numberOnBook", purchaseData.numberOnBook)
     formData.append("seriesName", purchaseData.seriesName)
