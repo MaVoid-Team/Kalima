@@ -5,6 +5,7 @@ import { FiX, FiFileText, FiChevronDown, FiEdit, FiRotateCw, FiSearch } from "re
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle, FaDownload, FaFileExport } from "react-icons/fa"
 import { getAuditLogs } from "../../../routes/auditlog"
 import { useTranslation } from "react-i18next"
+import { getAuditLogsByEmail } from "../../../routes/auditlog"
 
 const AuditLog = () => {
   const { t, i18n } = useTranslation("admin")
@@ -31,6 +32,7 @@ const AuditLog = () => {
   // Fetch audit logs on component mount and when filters change
   // Cleaned single useEffect for fetching logs
   useEffect(() => {
+    if (filters.email) return
     const fetchAuditLogs = async () => {
       setLoading(true)
       try {
@@ -65,6 +67,30 @@ const AuditLog = () => {
 
     fetchAuditLogs()
   }, [page, limit, filters])
+
+  const handleSearchByEmail = async () => {
+    if (!filters.email || filters.email.trim() === "") return
+
+    setLoading(true)
+    try {
+      const response = await getAuditLogsByEmail(filters.email.trim())
+
+      if (response.status === "success") {
+        setLogs(response.data.logs || [])
+        setPage(1)
+        setError(null)
+      } else {
+        setLogs([])
+        setError(response.error)
+      }
+    } catch (e) {
+      setLogs([])
+      setError("Error searching by email")
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
 
   // Fetch all logs for export (without pagination)
@@ -436,6 +462,20 @@ const AuditLog = () => {
 
       {/* Filter Controls */}
       <div className="flex flex-wrap gap-3 mb-6 justify-start bg-base-100">
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            placeholder={t("admin.auditlog.filters.email")}
+            className="input input-bordered w-full max-w-xs"
+            value={filters.email || ""}
+            onChange={(e) => setFilters((prev) => ({ ...prev, email: e.target.value }))}
+          />
+          <button className="btn btn-primary" onClick={() => handleSearchByEmail()}>
+            <FiSearch className="mr-2" />
+            {t("admin.auditlog.filters.search")}
+          </button>
+        </div>
+
 
         {/* Role Filter */}
         {/* <div className="dropdown dropdown-end bg-base-100">
@@ -510,7 +550,7 @@ const AuditLog = () => {
           <table className="table w-full">
             <thead>
               <tr>
-                {["user", "action", "datetime"].map((header) => (
+                {["user", "email", "action", "datetime"].map((header) => (
                   <th key={header} className={`${isRTL ? "text-right" : "text-left"} text-sm`}>
                     {t(`admin.auditlog.columns.${header}`)}
                   </th>
@@ -545,6 +585,7 @@ const AuditLog = () => {
                 logs.map((log) => (
                   <tr key={log._id} className="hover">
                     <td className="text-sm py-2">{log.user?.name || t("admin.auditlog.status.unknown")}</td>
+                    <td className="text-sm py-2">{log.user?.email || t("admin.auditlog.status.unknown")} </td>
                     <td className="text-sm py-2">
                       <div className="flex items-center gap-2">
                         {getActionIcon(log.action)}

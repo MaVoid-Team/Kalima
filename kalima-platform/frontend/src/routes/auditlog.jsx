@@ -71,3 +71,27 @@ export const getAuditLogById = async (logId) => {
     return `Error fetching audit log ${logId}: ${error.message}`
   }
 };
+
+export const getAuditLogsByEmail = async (email) => {
+  try {
+    if (!isLoggedIn()) throw new Error("User not authenticated");
+
+    const response = await axios.get(`${API_URL}/api/v1/audit-logs/user/email/${email}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return {
+      status: "success",
+      data: response.data.data,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      error: error?.response?.data?.message || error.message || "Unknown error",
+    };
+  }
+};
