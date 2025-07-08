@@ -92,10 +92,10 @@ const Market = () => {
 
   // Create categories array with "All" option and fetched sections
   const categories = [
-    { id: "all", name: t("categories.allSections"), icon: "☰" },
+    { id: "all", icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
-      name: t(`sections.${section.name}`),
+      name: section.name,
       icon: "📚",
     })),
   ]
@@ -234,20 +234,6 @@ const Market = () => {
                   </div>
                 </div>
               )}
-
-              {/* Type Badge - Show if it's actually a book (has __t: "ECBook") */}
-              {item.__t === "ECBook" && item.subject && (
-                <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} z-10`}>
-                  <div
-                    className={`bg-secondary px-2 py-1 ${
-                      isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
-                    } text-xs font-medium`}
-                  >
-                    📚 {item.subject.name || item.subject}
-                  </div>
-                </div>
-              )}
-
               <figure className="px-4 pt-4">
                 <img
                   src={

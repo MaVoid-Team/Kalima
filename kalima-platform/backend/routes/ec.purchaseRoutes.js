@@ -12,7 +12,7 @@ router.use(verifyJWT);
 // Public routes (all authenticated users can access)
 router
   .route("/")
-  .get(ecPurchaseController.getAllPurchases)
+  .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), ecPurchaseController.getAllPurchases)
   .post(
     authController.verifyRoles("Parent", "Student", "Teacher"),
     uploadPaymentScreenshotToDisk,
