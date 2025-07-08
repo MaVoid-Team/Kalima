@@ -91,7 +91,7 @@ export default function StudentRegistration() {
         errors.phoneNumber = "phoneInvalid"
       }
 
-      if (role === "student" && !formData.level) {
+      if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
         errors.level = "required"
       }
     }
@@ -129,7 +129,7 @@ export default function StudentRegistration() {
           errors.subject = "subjectRequired"
         }
 
-        if (!formData.level || formData.level.length === 0) {
+        if (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0)) {
           errors.level = "required"
         }
 
@@ -289,9 +289,16 @@ export default function StudentRegistration() {
     // Role-specific fields
     switch (formData.role) {
       case "student":
-        (formData.level || []).forEach((levelValue, index) => {
-          data.append(`level[${index}]`, levelValue);
-        });
+        // Handle level as single value for students
+        if (formData.level) {
+          if (Array.isArray(formData.level)) {
+            formData.level.forEach((levelValue, index) => {
+              data.append(`level[${index}]`, levelValue);
+            });
+          } else {
+            data.append("level", formData.level);
+          }
+        }
         data.append("faction", formData.faction || "Alpha");
         data.append("parentPhoneNumber", formData.parentPhoneNumber);
 
@@ -316,9 +323,12 @@ export default function StudentRegistration() {
         data.append("subject", formData.subject.trim());
         data.append("teachesAtType", formData.teachesAtType);
 
-        (formData.level || []).forEach((levelValue, index) => {
-          data.append(`level[${index}]`, levelValue);
-        });
+        // Handle level as array for teachers
+        if (formData.level && Array.isArray(formData.level)) {
+          formData.level.forEach((levelValue, index) => {
+            data.append(`level[${index}]`, levelValue);
+          });
+        }
 
         if (["Center", "Both"].includes(formData.teachesAtType)) {
           formData.centers

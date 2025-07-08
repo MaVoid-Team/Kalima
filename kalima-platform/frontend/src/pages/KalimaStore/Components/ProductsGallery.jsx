@@ -86,10 +86,6 @@ const ProductGallery = ({ gallery = [], title }) => {
                       src={image.url || "/placeholder.svg"}
                       alt={image.alt}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg?height=80&width=80"
-                      }}
                     />
                   </button>
                 ))}
