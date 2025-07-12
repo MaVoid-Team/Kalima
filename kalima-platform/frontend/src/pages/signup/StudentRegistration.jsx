@@ -61,7 +61,7 @@ export default function StudentRegistration() {
     socialMedia: [{ platform: "", account: "" }],
     government: "",
     administrationZone: "",
-    referralSerial: "",
+    referralSerial: null,
     profilePic: null,
   })
   const [errors, setErrors] = useState({})
@@ -272,6 +272,9 @@ export default function StudentRegistration() {
       data.append("role", formData.role);
       data.append("name", formData.fullName.trim());
       data.append("email", formData.email.toLowerCase().trim());
+      if (formData.referralSerial) {
+        data.append("referralSerial", formData.referralSerial)
+      }
       data.append("password", formData.password);
       data.append("confirmPassword", formData.confirmPassword);
       data.append("gender", formData.gender);
