@@ -79,11 +79,6 @@ const ReferralSection = ({ userInfo, onUserUpdate }) => {
                 {t("referral.alreadyApplied")}
               </span>
             </div>
-            {userInfo?.referredBy && (
-              <p className="text-sm text-base-content/70 mt-2">
-                {t("referral.referredBy")} {userInfo.referredBy}
-              </p>
-            )}
           </div>
         </div>
       </div>
