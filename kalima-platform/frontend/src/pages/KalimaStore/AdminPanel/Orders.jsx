@@ -161,8 +161,13 @@ const Orders = () => {
     setShowDetailsModal(true)
   }
 
-  const handleViewPaymentScreenshot = (screenshotUrl) => {
-    window.open(screenshotUrl, "_blank")
+  const handleViewPaymentScreenshot = (screenshotPath) => {
+    if (!screenshotPath) return
+    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || ""
+    const normalizedPath = screenshotPath.startsWith("uploads/")
+      ? `${baseURL}/${screenshotPath}`
+      : `${baseURL}/${screenshotPath}`
+    window.open(normalizedPath, "_blank")
   }
 
   const handleWhatsAppContact = (order) => {
