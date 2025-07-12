@@ -1,4 +1,5 @@
 const ECSection = require("../models/ec.sectionModel");
+const ECProduct = require("../models/ec.productModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -83,6 +84,8 @@ exports.deleteSection = catchAsync(async (req, res, next) => {
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
+  // Delete all products related to this section
+  await ECProduct.deleteMany({ section: section._id });
   res.status(203).json({
     message: "Section deleted successfully",
     status: "success",
