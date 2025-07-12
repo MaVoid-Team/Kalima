@@ -156,7 +156,7 @@ const Orders = () => {
     const baseURL = import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || ""
     const normalizedPath = screenshotPath.startsWith("uploads/")
       ? `${baseURL}/${screenshotPath}`
-      : `${baseURL}/uploads/payment_screenshots/${screenshotPath}`
+      : `${baseURL}/${screenshotPath}`
     window.open(normalizedPath, "_blank")
   }
 
