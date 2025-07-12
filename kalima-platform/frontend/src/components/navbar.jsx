@@ -107,6 +107,8 @@ const NavBar = () => {
         return "/dashboard/admin-dashboard";
       case "Assistant":
         return "/dashboard/assistant-dashboard";
+      case "Parent" :
+        return "/dashboard/student-dashboard/promo-codes";
       default:
         return "/";
     }

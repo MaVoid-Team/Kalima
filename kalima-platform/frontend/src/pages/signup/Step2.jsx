@@ -17,7 +17,7 @@ export default function Step2({ formData, handleInputChange, t, errors }) {
             <span className="label-text">{t('form.parentPhone')}</span>
           </label>
           <input
-            type="number"
+            type="text"
             name="parentPhoneNumber"
             className={`input input-bordered ${errors.parentPhoneNumber ? 'input-error animate-shake' : ''}`}
             value={formData.parentPhoneNumber || ''}
