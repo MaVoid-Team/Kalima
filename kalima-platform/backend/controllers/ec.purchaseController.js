@@ -5,6 +5,7 @@ const AppError = require("../utils/appError");
 const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
+const { sendEmail } = require("../utils/emailVerification/emailService");
 
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
@@ -203,6 +204,26 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     }
   }
   // --- End referral logic ---
+
+  // Send email to user after successful purchase
+  try {
+    await sendEmail(
+      req.user.email,
+      "Your Purchase Confirmation",
+      `<div style='font-family: Arial, sans-serif;'>
+        <h2>Thank you for your purchase!</h2>
+        <p>Dear ${req.user.name},</p>
+        <p>Your purchase (<b>${purchase.purchaseSerial}</b>) was successful.</p>
+        <p>Product: <b>${purchase.productName}</b></p>
+        <p>Amount Paid: <b>${purchase.finalPrice}</b></p>
+        <p>your order is being processed by kalima team  .</p>
+        <p>If you have any questions, please contact support.</p>
+        <br><p>Best regards,<br>Kalima Team</p>
+      </div>`
+    );
+  } catch (err) {
+    console.error("Failed to send purchase confirmation email:", err);
+  }
 
   res.status(201).json({
     status: "success",
