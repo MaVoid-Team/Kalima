@@ -75,7 +75,7 @@ export const getAuditLogsByEmail = async (email) => {
   try {
     if (!isLoggedIn()) throw new Error("User not authenticated");
 
-    const response = await axios.get(`${API_URL}/api/v1/audit-logs/user/email/${email}`, {
+    const response = await axios.get(`${API_URL}/audit-logs/user/email/${email}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
