@@ -52,7 +52,7 @@ export default function StudentRegistration() {
     faction: "Alpha",
     level: [],
     hobbies: [],
-    parentPhoneNumber: null,
+    parentPhoneNumber: "",
     children: [""],
     subject: "",
     teachesAtType: "",
@@ -232,13 +232,10 @@ export default function StudentRegistration() {
 
       setFormData((prev) => ({
         ...prev,
-        [name]: name === "parentPhoneNumber"
-          ? value === "" ? null : Number(value)
-          : type === "checkbox"
-            ? e.target.checked
-            : type === "file"
-              ? files[0] // File input handling
-              : value,
+        [name]:
+          type === "file"
+            ? files[0]
+            : value, // ✅ Always keep as string, especially for phone numbers
       }));
 
       setErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -265,160 +262,159 @@ export default function StudentRegistration() {
   }
 
   const handleSubmit = async () => {
-  try {
-    setApiError(null);
-    setErrors({});
+    try {
+      setApiError(null);
+      setErrors({});
 
-    const data = new FormData();
+      const data = new FormData();
 
-    // Common fields across all roles
-    data.append("role", formData.role);
-    data.append("name", formData.fullName.trim());
-    data.append("email", formData.email.toLowerCase().trim());
-    data.append("password", formData.password);
-    data.append("confirmPassword", formData.confirmPassword);
-    data.append("gender", formData.gender);
-    data.append("phoneNumber", formData.phoneNumber);
-    data.append("government", formData.government);
-    data.append("administrationZone", formData.administrationZone);
+      // Common fields across all roles
+      data.append("role", formData.role);
+      data.append("name", formData.fullName.trim());
+      data.append("email", formData.email.toLowerCase().trim());
+      data.append("password", formData.password);
+      data.append("confirmPassword", formData.confirmPassword);
+      data.append("gender", formData.gender);
+      data.append("phoneNumber", formData.phoneNumber);
+      data.append("government", formData.government);
+      data.append("administrationZone", formData.administrationZone);
 
-    if (formData.profilePic) {
-      data.append("profilePic", formData.profilePic);
-    }
+      if (formData.profilePic) {
+        data.append("profilePic", formData.profilePic);
+      }
 
-    // Role-specific fields
-    switch (formData.role) {
-      case "student":
-        // Handle level as single value for students
-        if (formData.level) {
-          if (Array.isArray(formData.level)) {
+      // Role-specific fields
+      switch (formData.role) {
+        case "student":
+          // Handle level as single value for students
+          if (formData.level) {
+            if (Array.isArray(formData.level)) {
+              formData.level.forEach((levelValue, index) => {
+                data.append(`level[${index}]`, levelValue);
+              });
+            } else {
+              data.append("level", formData.level);
+            }
+          }
+          data.append("faction", formData.faction || "Alpha");
+          data.append("parentPhoneNumber", formData.parentPhoneNumber);
+
+          formData.hobbies
+            .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name)
+            .filter(Boolean)
+            .forEach((hobby, index) => {
+              data.append(`hobbies[${index}]`, hobby);
+            });
+          break;
+
+        case "parent":
+          formData.children
+            .filter((c) => c.trim() !== "")
+            .forEach((child, index) => {
+              data.append(`children[${index}]`, child.trim());
+            });
+          break;
+
+        case "teacher":
+          data.append("phoneNumber2", formData.phoneNumber2);
+          data.append("subject", formData.subject.trim());
+          data.append("teachesAtType", formData.teachesAtType);
+
+          // Handle level as array for teachers
+          if (formData.level && Array.isArray(formData.level)) {
             formData.level.forEach((levelValue, index) => {
               data.append(`level[${index}]`, levelValue);
             });
-          } else {
-            data.append("level", formData.level);
           }
-        }
-        data.append("faction", formData.faction || "Alpha");
-        data.append("parentPhoneNumber", formData.parentPhoneNumber);
 
-        formData.hobbies
-          .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name)
-          .filter(Boolean)
-          .forEach((hobby, index) => {
-            data.append(`hobbies[${index}]`, hobby);
-          });
-        break;
+          if (["Center", "Both"].includes(formData.teachesAtType)) {
+            formData.centers
+              .filter((c) => c.trim() !== "")
+              .forEach((center, index) => {
+                data.append(`centers[${index}]`, center.trim());
+              });
+          }
 
-      case "parent":
-        formData.children
-          .filter((c) => c.trim() !== "")
-          .forEach((child, index) => {
-            data.append(`children[${index}]`, child.trim());
-          });
-        break;
+          if (["School", "Both"].includes(formData.teachesAtType)) {
+            data.append("school", formData.school.trim());
+          }
 
-      case "teacher":
-        data.append("phoneNumber2", formData.phoneNumber2);
-        data.append("subject", formData.subject.trim());
-        data.append("teachesAtType", formData.teachesAtType);
-
-        // Handle level as array for teachers
-        if (formData.level && Array.isArray(formData.level)) {
-          formData.level.forEach((levelValue, index) => {
-            data.append(`level[${index}]`, levelValue);
-          });
-        }
-
-        if (["Center", "Both"].includes(formData.teachesAtType)) {
-          formData.centers
-            .filter((c) => c.trim() !== "")
-            .forEach((center, index) => {
-              data.append(`centers[${index}]`, center.trim());
+          formData.socialMedia
+            .filter((s) => s.platform && s.account)
+            .forEach((social, index) => {
+              data.append(`socialMedia[${index}][platform]`, social.platform);
+              data.append(`socialMedia[${index}][account]`, social.account.trim());
             });
-        }
-
-        if (["School", "Both"].includes(formData.teachesAtType)) {
-          data.append("school", formData.school.trim());
-        }
-
-        formData.socialMedia
-          .filter((s) => s.platform && s.account)
-          .forEach((social, index) => {
-            data.append(`socialMedia[${index}][platform]`, social.platform);
-            data.append(`socialMedia[${index}][account]`, social.account.trim());
-          });
-        break;
-
-      default:
-        throw new Error("Invalid role selected");
-    }
-
-    const url = `${apiUrl}/register`;
-
-    const response = await axios.post(url, data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    navigate("/login", {
-      state: { message: "Registration successful" },
-    });
-
-  } catch (error) {
-    let errorMessage = t("errors.unexpectedError");
-    const fieldErrors = {};
-
-    if (error.response) {
-      const { status, data: errorData } = error.response;
-
-      switch (status) {
-        case 400:
-          errorMessage = errorData.message || t("errors.invalidData");
-
-          if (errorData.message?.includes("phone number")) {
-            errorMessage = t("errors.phoneExists");
-          }
-
-          if (errorData.message?.includes("at least one special character")) {
-            errorMessage = t("errors.PasswordSpecialChar");
-          }
-
-          if (errorData.message?.includes("at least one uppercase")) {
-            errorMessage = t("errors.PasswordCapitalLetter");
-          }
-
-          if (errorData.field) {
-            fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
-          }
           break;
 
-        case 409:
-          errorMessage = errorData.message || t("errors.emailExists");
-
-          if (errorData.field) {
-            fieldErrors[errorData.field] = errorData.errorKey || "duplicate";
-          }
-
-          if (errorData.message?.includes("E-Mail")) {
-            errorMessage = t("errors.emailExists");
-          }
-          break;
-
-        case 500:
-          errorMessage = t("errors.apiError");
-          break;
+        default:
+          throw new Error("Invalid role selected");
       }
-    } else if (error.request) {
-      errorMessage = t("errors.networkError");
-    }
 
-    console.error("Full error response:", error.response?.data || error.message);
-    setApiError(errorMessage);
-    setErrors(fieldErrors);
-  }
-};
+      const url = `${apiUrl}/api/v1/register`;
+      const response = await axios.post(url, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      navigate("/login", {
+        state: { message: "Registration successful" },
+      });
+
+    } catch (error) {
+      let errorMessage = t("errors.unexpectedError");
+      const fieldErrors = {};
+
+      if (error.response) {
+        const { status, data: errorData } = error.response;
+
+        switch (status) {
+          case 400:
+            errorMessage = errorData.message || t("errors.invalidData");
+
+            if (errorData.message?.includes("phone number")) {
+              errorMessage = t("errors.phoneExists");
+            }
+
+            if (errorData.message?.includes("at least one special character")) {
+              errorMessage = t("errors.PasswordSpecialChar");
+            }
+
+            if (errorData.message?.includes("at least one uppercase")) {
+              errorMessage = t("errors.PasswordCapitalLetter");
+            }
+
+            if (errorData.field) {
+              fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
+            }
+            break;
+
+          case 409:
+            errorMessage = errorData.message || t("errors.emailExists");
+
+            if (errorData.field) {
+              fieldErrors[errorData.field] = errorData.errorKey || "duplicate";
+            }
+
+            if (errorData.message?.includes("E-Mail")) {
+              errorMessage = t("errors.emailExists");
+            }
+            break;
+
+          case 500:
+            errorMessage = t("errors.apiError");
+            break;
+        }
+      } else if (error.request) {
+        errorMessage = t("errors.networkError");
+      }
+
+      console.error("Full error response:", error.response?.data || error.message);
+      setApiError(errorMessage);
+      setErrors(fieldErrors);
+    }
+  };
 
 
 

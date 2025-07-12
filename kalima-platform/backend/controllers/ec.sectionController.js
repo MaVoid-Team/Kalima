@@ -83,7 +83,7 @@ exports.deleteSection = catchAsync(async (req, res, next) => {
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
-  res.status(204).json({
+  res.status(203).json({
     message: "Section deleted successfully",
     status: "success",
     data: null,
