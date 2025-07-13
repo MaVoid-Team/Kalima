@@ -27,6 +27,7 @@
     "customer": "العميل",
     "type": "النوع",
     "price": "السعر",
+    "couponCode" : "كود الخصم",
     "transferFrom": "تم التحويل من",
     "status": "الحالة",
     "notes": "الملاحظات",
