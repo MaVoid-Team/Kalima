@@ -784,39 +784,6 @@ const EnhancedAdminForms = ({
                     required
                   ></textarea>
                 </div>
-
-                {/* Allowed Roles */}
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      {t("forms.createSection.fields.allowedRoles") || "Allowed Roles"}
-                    </span>
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {roleOptions.map((role) => (
-                      <label key={role} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          className="checkbox checkbox-primary"
-                          checked={sectionForm?.allowedFor?.includes(role)}
-                          onChange={(e) => {
-                            const checked = e.target.checked
-                            const updatedRoles = checked
-                              ? [...(sectionForm?.allowedFor || []), role]
-                              : sectionForm?.allowedFor?.filter((r) => r !== role)
-
-                            setSectionForm?.((prev) => ({
-                              ...prev,
-                              allowedFor: updatedRoles,
-                            }))
-                          }}
-                        />
-                        <span>{role}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
               </div>
 
               {/* Arrow decoration */}
