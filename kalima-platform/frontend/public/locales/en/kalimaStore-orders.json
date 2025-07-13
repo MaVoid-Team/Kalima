@@ -27,6 +27,7 @@
     "customer": "Customer",
     "type": "Type",
     "price": "Price",
+    "couponCode" : "Coupon Code",
     "transferFrom": "Transfer From",
     "status": "Status",
     "notes": "Notes",
