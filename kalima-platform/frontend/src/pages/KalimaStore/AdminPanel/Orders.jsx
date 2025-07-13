@@ -9,7 +9,7 @@ import {
   updatePurchase,
 } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
-import { Check, Eye, ImageIcon, Notebook, Edit3, Save, X, FileText, Plus } from "lucide-react"
+import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X } from "lucide-react"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -53,6 +53,7 @@ const Orders = () => {
         setCurrentPage(1)
       }
     }, 500)
+
     return () => clearTimeout(timer)
   }, [searchQuery, debouncedSearchQuery, currentPage])
 
@@ -60,19 +61,24 @@ const Orders = () => {
     try {
       setLoading(true)
       setError(null)
+
       const queryParams = {
         page: currentPage,
       }
+
       if (debouncedSearchQuery.trim()) {
         queryParams.search = debouncedSearchQuery.trim()
       }
+
       if (statusFilter !== "all") {
         queryParams.confirmed = statusFilter === "confirmed"
       }
 
       const response = await getAllProductPurchases(queryParams)
+
       if (response.success) {
         let purchases = response.data.data.purchases
+
         if (typeFilter !== "all") {
           if (typeFilter === "book") {
             purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
@@ -120,7 +126,9 @@ const Orders = () => {
   const handleConfirmOrder = async (order) => {
     try {
       setConfirmLoading({ ...confirmLoading, [order._id]: true })
+
       let response
+
       if (order.__t === "ECBookPurchase") {
         response = await confirmBookPurchase(order._id)
       } else {
@@ -129,11 +137,13 @@ const Orders = () => {
 
       if (response.success) {
         setOrders((prevOrders) => prevOrders.map((o) => (o._id === order._id ? { ...o, confirmed: true } : o)))
+
         setStats((prevStats) => ({
           ...prevStats,
           confirmed: prevStats.confirmed + 1,
           pending: prevStats.pending - 1,
         }))
+
         alert(t("alerts.orderConfirmed"))
       } else {
         throw new Error(response.error)
@@ -212,6 +222,7 @@ const Orders = () => {
 
     try {
       setNotesModal((prev) => ({ ...prev, loading: true }))
+
       const response = await updatePurchase(notesModal.orderId, {
         adminNotes: notesModal.notes,
       })
@@ -223,12 +234,15 @@ const Orders = () => {
             order._id === notesModal.orderId ? { ...order, adminNotes: notesModal.notes } : order,
           ),
         )
+
         // Update selected order if it's the same one
         if (selectedOrder && selectedOrder._id === notesModal.orderId) {
           setSelectedOrder((prev) => ({ ...prev, adminNotes: notesModal.notes }))
         }
+
         // Close modal
         setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+
         alert(t("alerts.notesSaved"))
       } else {
         throw new Error(response.error)
@@ -251,19 +265,10 @@ const Orders = () => {
     }
   }
 
-  // Get notes preview for table display - improved
+  // Get notes preview for table display
   const getNotesPreview = (notes) => {
     if (!notes) return ""
-    return notes.length > 30 ? notes.substring(0, 30) + "..." : notes
-  }
-
-  // Get notes word count
-  const getNotesWordCount = (notes) => {
-    if (!notes) return 0
-    return notes
-      .trim()
-      .split(/\s+/)
-      .filter((word) => word.length > 0).length
+    return notes.length > 50 ? notes.substring(0, 50) + "..." : notes
   }
 
   // Memoize order items to prevent unnecessary re-renders
@@ -271,10 +276,8 @@ const Orders = () => {
     return orders.map((order) => ({
       ...order,
       orderType: getOrderType(order),
-      formattedPrice: formatPrice(order.finalPrice),
+      formattedPrice: formatPrice(order.price),
       notesPreview: getNotesPreview(order.adminNotes),
-      hasNotes: !!(order.adminNotes && order.adminNotes.trim()),
-      notesWordCount: getNotesWordCount(order.adminNotes),
     }))
   }, [orders])
 
@@ -450,7 +453,7 @@ const Orders = () => {
       {/* Orders Table */}
       <div className="card shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="table w-full table-fixed overflow-hidden">
+          <table className="table w-full">
             <thead>
               <tr>
                 <th className="text-center">{t("table.product")}</th>
@@ -491,9 +494,14 @@ const Orders = () => {
                           <div className="text-xs opacity-50">{order.purchaseSerial}</div>
                     </td>
                     <td className="text-center">
-                      <div
-                        className={`badge badge-sm ${order.orderType === "Book" ? "badge-primary" : "badge-secondary"}`}
-                      >
+                      <div>
+                        <div className="font-medium">{order.userName}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.email}</div>
+                        <div className="text-xs opacity-50">{order.createdBy?.role}</div>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <div className={`badge ${order.orderType === "Book" ? "badge-primary" : "badge-secondary"}`}>
                         {t(order.orderType === "Book" ? "table.book" : "table.productType")}
                       </div>
                     </td>
@@ -503,92 +511,80 @@ const Orders = () => {
                     <td className="text-center">
                       {order.confirmed ? (
                         <div className="flex flex-col items-center gap-1">
-                          <div className="badge badge-success badge-sm">{t("table.confirmed")}</div>
+                          <div className="badge badge-success">{t("table.confirmed")}</div>
                           {order.confirmedBy && (
-                            <div className="text-xs opacity-50 truncate" title={order.confirmedBy.name}>
+                            <div className="text-xs opacity-50">
                               {t("table.by")} {order.confirmedBy.name}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div className="badge badge-warning badge-sm">{t("table.pending")}</div>
+                        <div className="badge badge-warning">{t("table.pending")}</div>
                       )}
                     </td>
-                    <td className="text-center">
-                      <div className="flex items-center justify-center min-w-0">
-                        {order.hasNotes ? (
-                          <div
-                            className="tooltip tooltip-left cursor-pointer"
-                            data-tip={order.adminNotes}
-                            onClick={() => openNotesModal(order)}
-                          >
-                            <div className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors">
-                              <FileText className="w-4 h-4 flex-shrink-0" />
-                              <div className="flex flex-col items-start min-w-0">
-                                <span className="text-xs truncate max-w-20" title={order.notesPreview}>
-                                  {order.notesPreview}
-                                </span>
-                                <span className="text-xs opacity-60">
-                                  {order.notesWordCount} {order.notesWordCount === 1 ? "word" : "words"}
-                                </span>
-                              </div>
-                            </div>
+                    <td className="text-center max-w-32">
+                      {order.adminNotes ? (
+                        <div className="tooltip tooltip-left" data-tip={order.adminNotes}>
+                          <div className="flex items-center gap-1 text-blue-600 cursor-help">
+                            <MessageSquare className="w-4 h-4" />
+                            <span className="text-xs truncate">{order.notesPreview}</span>
                           </div>
-                        ) : (
-                          <button
-                            className="flex items-center gap-1 text-gray-400 hover:text-blue-600 transition-colors"
-                            onClick={() => openNotesModal(order)}
-                            title={t("table.addNotes")}
-                          >
-                            <Plus className="w-4 h-4" />
-                            <span className="text-xs">{t("table.addNote")}</span>
-                          </button>
-                        )}
-                      </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
+                      )}
                     </td>
-                    <td className="text-center text-xs truncate" title={order.formattedCreatedAt}>
-                      {order.formattedCreatedAt}
-                    </td>
+                    <td className="text-center text-sm">{order.formattedCreatedAt}</td>
                     <td className="text-center">
-                      <div className="flex justify-center gap-1 flex-wrap">
+                      <div className="flex justify-center gap-2">
                         <button
-                          className="btn btn-ghost btn-xs"
+                          className="btn btn-ghost btn-sm"
                           onClick={() => handleViewDetails(order)}
                           title={t("table.viewDetails")}
                         >
-                          <Eye className="w-3 h-3" />
+                          <Eye className="w-4 h-4" />
                         </button>
+
                         <button
-                          className={`btn btn-ghost btn-xs ${order.hasNotes ? "text-blue-600" : "text-gray-400"}`}
+                          className={`btn btn-ghost btn-sm relative ${
+                            order.adminNotes ? "text-blue-600" : "text-gray-400"
+                          }`}
                           onClick={() => openNotesModal(order)}
-                          title={order.hasNotes ? t("table.viewEditNotes") : t("table.addNotes")}
+                          title={
+                            order.adminNotes
+                              ? t("table.viewEditNotes")
+                              : t("table.addNotes")
+                          }
                         >
-                          <Notebook className="w-3 h-3" />
-                          {order.hasNotes && (
-                            <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                          <Notebook className="w-4 h-4" />
+                          {order.adminNotes && (
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
                           )}
                         </button>
+
                         {order.paymentScreenShot && (
                           <button
-                            className="btn btn-ghost btn-xs"
+                            className="btn btn-ghost btn-sm"
                             onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
                             title={t("table.viewPaymentScreenshot")}
                           >
                             <ImageIcon className="w-3 h-3" />
                           </button>
                         )}
+
                         {order.numberTransferredFrom && (
                           <button
-                            className="btn btn-ghost btn-xs text-green-600 hover:bg-green-50"
+                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
                             onClick={() => handleWhatsAppContact(order)}
                             title={t("table.contactWhatsApp")}
                           >
-                            <FaWhatsapp className="w-3 h-3" />
+                            <FaWhatsapp />
                           </button>
                         )}
+
                         {!order.confirmed && (
                           <button
-                            className="btn btn-success btn-xs"
+                            className="btn btn-success btn-sm"
                             onClick={() => handleConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
                             title={t("table.confirmOrder")}
@@ -596,7 +592,7 @@ const Orders = () => {
                             {confirmLoading[order._id] ? (
                               <span className="loading loading-spinner loading-xs"></span>
                             ) : (
-                              <Check className="w-3 h-3" />
+                              <Check className="w-4 h-4" />
                             )}
                           </button>
                         )}
@@ -632,8 +628,10 @@ const Orders = () => {
               </svg>
               {t("table.previous")}
             </button>
+
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageToShow
+
               if (totalPages <= 5) {
                 pageToShow = i + 1
               } else if (currentPage <= 3) {
@@ -655,6 +653,7 @@ const Orders = () => {
                 </button>
               )
             })}
+
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -666,6 +665,7 @@ const Orders = () => {
               </svg>
             </button>
           </div>
+
           <div className="text-sm text-gray-600">
             {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
           </div>
@@ -675,18 +675,11 @@ const Orders = () => {
       {/* Enhanced Admin Notes Modal */}
       {notesModal.isOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-xl flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <div>{t("table.adminNotes")}</div>
-                  <div className="text-sm font-normal opacity-70">
-                    Order: {orders.find((o) => o._id === notesModal.orderId)?.purchaseSerial}
-                  </div>
-                </div>
+          <div className="modal-box max-w-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-primary" />
+                {t("table.adminNotes")}
               </h3>
               <button
                 className="btn btn-sm btn-circle btn-ghost"
@@ -697,36 +690,22 @@ const Orders = () => {
               </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="form-control">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="label-text font-medium text-base">{t("table.notesLabel")}</label>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="opacity-70">
-                      {getNotesWordCount(notesModal.notes)}{" "}
-                      {getNotesWordCount(notesModal.notes) === 1 ? "word" : "words"}
-                    </span>
-                    <span className="opacity-70">
-                      {notesModal.notes.length}/1000 {t("table.characters")}
-                    </span>
-                  </div>
-                </div>
+                <label className="label">
+                  <span className="label-text font-medium">{t("table.notesLabel")}</span>
+                  <span className="label-text-alt">
+                    {notesModal.notes.length}/500 {t("table.characters")}
+                  </span>
+                </label>
                 <textarea
-                  className="textarea textarea-bordered w-full h-40 resize-none text-base leading-relaxed"
+                  className="textarea textarea-bordered w-full h-32 resize-none"
                   placeholder={t("table.notesPlaceholder")}
                   value={notesModal.notes}
                   onChange={(e) => handleNotesChange(e.target.value)}
-                  maxLength={1000}
+                  maxLength={500}
                   disabled={notesModal.loading}
                 />
-                <div className="label">
-                  <span className="label-text-alt opacity-60">
-                    {t(
-                      "table.notesHint",
-                      "Use this space to add internal notes about this order. These notes are only visible to administrators.",
-                    )}
-                  </span>
-                </div>
               </div>
 
               {notesModal.hasChanges && (
@@ -750,7 +729,7 @@ const Orders = () => {
             </div>
 
             <div className="modal-action">
-              <button className="btn btn-ghost" onClick={closeNotesModal} disabled={notesModal.loading}>
+              <button className="btn" onClick={closeNotesModal} disabled={notesModal.loading}>
                 {t("table.cancel")}
               </button>
               <button
@@ -778,22 +757,23 @@ const Orders = () => {
       {/* Order Details Modal */}
       {showDetailsModal && selectedOrder && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">{t("table.orderID")}</span>
                   </label>
-                  <p className="font-mono text-sm bg-base-200 p-2 rounded break-all">{selectedOrder._id}</p>
+                  <p className="font-mono text-sm">{selectedOrder._id}</p>
                 </div>
+
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">{t("table.purchaseSerial")}</span>
                   </label>
-                  <p className="font-mono text-sm bg-base-200 p-2 rounded">{selectedOrder.purchaseSerial}</p>
+                  <p className="font-mono text-sm">{selectedOrder.purchaseSerial}</p>
                 </div>
               </div>
 
@@ -801,7 +781,7 @@ const Orders = () => {
                 <label className="label">
                   <span className="label-text font-medium">{t("table.customerInfo")}</span>
                 </label>
-                <div className="bg-base-200 p-4 rounded space-y-2">
+                <div className="bg-base-200 p-3 rounded">
                   <p>
                     <strong>{t("table.name")}:</strong> {selectedOrder.userName}
                   </p>
@@ -818,7 +798,7 @@ const Orders = () => {
                 <label className="label">
                   <span className="label-text font-medium">{t("table.productInfo")}</span>
                 </label>
-                <div className="bg-base-200 p-4 rounded space-y-2">
+                <div className="bg-base-200 p-3 rounded">
                   <p>
                     <strong>{t("table.name")}:</strong> {selectedOrder.productName}
                   </p>
@@ -834,12 +814,9 @@ const Orders = () => {
                     <strong>{t("table.couponCode")}:</strong> {formatPrice(selectedOrder.couponCode?.value || "NA")}
                   </p>
                   {selectedOrder.notes && (
-                    <div>
-                      <strong>{t("table.customerNotes")}:</strong>
-                      <div className="mt-1 p-2 bg-base-100 rounded text-sm whitespace-pre-wrap">
-                        {selectedOrder.notes}
-                      </div>
-                    </div>
+                    <p>
+                      <strong>{t("table.customerNotes")}:</strong> {selectedOrder.notes}
+                    </p>
                   )}
                 </div>
               </div>
@@ -848,7 +825,7 @@ const Orders = () => {
                 <label className="label">
                   <span className="label-text font-medium">{t("table.paymentInfo")}</span>
                 </label>
-                <div className="bg-base-200 p-4 rounded space-y-2">
+                <div className="bg-base-200 p-3 rounded">
                   <p>
                     <strong>{t("table.paymentNumber")}:</strong> {selectedOrder.paymentNumber}
                   </p>
@@ -873,7 +850,7 @@ const Orders = () => {
                   <label className="label">
                     <span className="label-text font-medium">{t("table.bookInfo")}</span>
                   </label>
-                  <div className="bg-base-200 p-4 rounded space-y-2">
+                  <div className="bg-base-200 p-3 rounded">
                     <p>
                       <strong>{t("table.nameOnBook")}:</strong> {selectedOrder.nameOnBook}
                     </p>
@@ -890,30 +867,15 @@ const Orders = () => {
               <div>
                 <label className="label">
                   <span className="label-text font-medium flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
+                    <MessageSquare className="w-4 h-4" />
                     {t("table.adminNotes")}
                   </span>
                 </label>
-                <div className="bg-base-200 p-4 rounded min-h-24">
+                <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (
-                    <div>
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">{selectedOrder.adminNotes}</div>
-                      <div className="mt-2 text-xs opacity-60">
-                        {getNotesWordCount(selectedOrder.adminNotes)}{" "}
-                        {getNotesWordCount(selectedOrder.adminNotes) === 1 ? "word" : "words"} •
-                        {selectedOrder.adminNotes.length} characters
-                      </div>
-                    </div>
+                    <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
                   ) : (
-                    <div className="flex items-center justify-center h-16">
-                      <div className="text-center">
-                        <p className="text-gray-500 italic text-sm">{t("table.noAdminNotes")}</p>
-                        <button className="btn btn-sm btn-ghost mt-2" onClick={() => openNotesModal(selectedOrder)}>
-                          <Plus className="w-4 h-4" />
-                          {t("table.addFirstNote")}
-                        </button>
-                      </div>
-                    </div>
+                    <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
                   )}
                 </div>
               </div>
