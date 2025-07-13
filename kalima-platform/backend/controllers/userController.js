@@ -69,11 +69,13 @@ const updateUser = catchAsync(async (req, res, next) => {
   */
   const userId = req.params.userId;
 
-  /*
-  BUG -->> status code here should be 400 (or 403)
-  */
+  // If password is provided, hash it and allow update
+  let hashedPassword = null;
   if (password) {
-    return next(new AppError("Can't update password on this route.", 404));
+    if (password.length < 8) {
+      return next(new AppError("Password must be at least 8 characters.", 400));
+    }
+    hashedPassword = await bcrypt.hash(password, 12);
   }
 
   const selectedFields = "-password -passwordChangedAt";
@@ -133,6 +135,9 @@ const updateUser = catchAsync(async (req, res, next) => {
     role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
+  if (hashedPassword) {
+    updatedUser.password = hashedPassword;
+  }
 
   if (
     foundUser.role.toLowerCase() === "student" &&
@@ -208,7 +213,13 @@ const updateUser = catchAsync(async (req, res, next) => {
       break;
 
     default:
-      return next(new AppError("Invalid role", 400));
+      // For base User model, if password is being updated, ensure select includes password
+      user = await User.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
   }
 
   res.json(user);
