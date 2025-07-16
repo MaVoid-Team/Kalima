@@ -64,6 +64,38 @@ exports.getBookPurchaseById = catchAsync(async (req, res, next) => {
 
 // Create new book purchase
 exports.createBookPurchase = catchAsync(async (req, res, next) => {
+  // --- Referral successful invite logic ---
+  // Only increment inviter's successfulInvites if this is the first book purchase for the referred user
+  if (req.user.referredBy) {
+    const ECBookPurchase = require("../models/ec.bookpurchaseModel");
+    const purchaseCount = await ECBookPurchase.countDocuments({ createdBy: req.user._id });
+    if (purchaseCount === 1) {
+      const { recalculateInviterSuccessfulInvites } = require("./ec.referralController");
+      await recalculateInviterSuccessfulInvites(req.user.referredBy);
+    }
+  }
+  // --- End referral logic ---
+
+  // Send email to user after successful book purchase
+  try {
+    const { sendEmail } = require("../utils/emailVerification/emailService");
+    await sendEmail(
+      req.user.email,
+      "Your Book Purchase Confirmation",
+      `<div style='font-family: Arial, sans-serif;'>
+        <h2>Thank you for your book purchase!</h2>
+        <p>Dear ${req.user.name},</p>
+        <p>Your book purchase (<b>${purchase.purchaseSerial}</b>) was successful.</p>
+        <p>Book: <b>${purchase.productName}</b></p>
+        <p>Amount Paid: <b>${purchase.finalPrice}</b></p>
+        <p>Your order is being processed by the Kalima team.</p>
+        <p>If you have any questions, please contact support.</p>
+        <br><p>Best regards,<br>Kalima Team</p>
+      </div>`
+    );
+  } catch (err) {
+    console.error("Failed to send book purchase confirmation email:", err);
+  }
   // Handle payment screenshot upload
   let paymentScreenShotPath = null;
   if (req.file && req.file.fieldname === "paymentScreenShot") {
