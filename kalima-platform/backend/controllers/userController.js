@@ -23,6 +23,7 @@ const handleExcel = require("../utils/upload files/handleEXCEL.js");
 const QueryFeatures = require("../utils/queryFeatures");
 const fs = require("fs");
 const path = require("path");
+const { ref } = require("joi");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find().select("-password").lean();
@@ -68,11 +69,13 @@ const updateUser = catchAsync(async (req, res, next) => {
   */
   const userId = req.params.userId;
 
-  /*
-  BUG -->> status code here should be 400 (or 403)
-  */
+  // If password is provided, hash it and allow update
+  let hashedPassword = null;
   if (password) {
-    return next(new AppError("Can't update password on this route.", 404));
+    if (password.length < 8) {
+      return next(new AppError("Password must be at least 8 characters.", 400));
+    }
+    hashedPassword = await bcrypt.hash(password, 12);
   }
 
   const selectedFields = "-password -passwordChangedAt";
@@ -132,6 +135,9 @@ const updateUser = catchAsync(async (req, res, next) => {
     role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
+  if (hashedPassword) {
+    updatedUser.password = hashedPassword;
+  }
 
   if (
     foundUser.role.toLowerCase() === "student" &&
@@ -207,7 +213,13 @@ const updateUser = catchAsync(async (req, res, next) => {
       break;
 
     default:
-      return next(new AppError("Invalid role", 400));
+      // For base User model, if password is being updated, ensure select includes password
+      user = await User.findByIdAndUpdate(userId, updatedUser, {
+        new: true,
+        runValidators: true,
+      })
+        .select(selectedFields)
+        .lean();
   }
 
   res.json(user);
@@ -358,15 +370,6 @@ const getMyData = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const userRole = req.user.role;
 
-  // Fetch inviter info if referredBy exists
-  let inviterInfo = null;
-  if (req.user.referredBy) {
-    const inviter = await User.findById(req.user.referredBy).select("_id name email").lean();
-    if (inviter) {
-      inviterInfo = { id: inviter._id, name: inviter.name, email: inviter.email };
-    }
-  }
-
   // Parse field selection (if provided)
   const fields = req.query.fields ? req.query.fields.split(",") : null;
 
@@ -377,7 +380,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       name: req.user.name,
       email: req.user.email,
       role: userRole,
-      referredBy: inviterInfo, // Now contains inviter's info or null
+      referredBy: req.user.referredBy || null,
       profilePic: req.user.profilePic || null,
       userSerial: req.user.userSerial || null, // Assuming userSrial is a field in User model
     },
