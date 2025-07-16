@@ -151,7 +151,9 @@
         "status": "Status",
         "date": "Date",
         "to": "to",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "search": "Search audit logs...",
+        "email" : "Email"
       },
       
       "columns": {
@@ -160,7 +162,8 @@
         "action": "Action",
         "resource": "Resource",
         "datetime": "Date/Time",
-        "status": "Status"
+        "status": "Status",
+        "email" :"Email"
       },
       
       "roles": {
