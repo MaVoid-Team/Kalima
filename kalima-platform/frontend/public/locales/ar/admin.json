@@ -248,7 +248,10 @@
         "assistant": "مساعد",
         "parent": "ولي أمر",
         "package": "باقات",
-        "lesson": "درس"
+        "lesson": "درس",
+        "ec": {
+          "purchase": "شراء"
+        }
       },
       "idDisplay": "ID: {{id}}",
       

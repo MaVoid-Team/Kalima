@@ -245,7 +245,10 @@
         "assistant": "Assistant",
         "parent": "Parent",
         "package": "Packages",
-        "lesson": "Lesson"
+        "lesson": "Lesson",
+                "ec": {
+          "purchase": "Purchase"
+        }
       },
       "idDisplay": "ID: {{id}}",
       "status": {
