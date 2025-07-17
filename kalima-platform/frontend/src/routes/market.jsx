@@ -377,7 +377,7 @@ export const purchaseBook = async (purchaseData) => {
 export const RecalculateInvites = async () => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/referrals/recalculate`,
+      `${API_URL}/ec/referrals/recalculate`,
       {},
       {
         withCredentials: true,
