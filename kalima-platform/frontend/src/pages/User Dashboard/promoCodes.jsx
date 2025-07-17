@@ -1,36 +1,8 @@
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { Html5Qrcode } from "html5-qrcode"
-import {
-  Wallet,
-  Info,
-  Ticket,
-  QrCode,
-  Gift,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Check,
-  X,
-  Search,
-  Camera,
-  RefreshCw,
-  Users,
-  Clock,
-  BookOpen,
-  BarChart3,
-  User,
-  GraduationCap,
-  School,
-  UserCircle2,
-  Award,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Calendar,
-} from "lucide-react"
+import { Wallet, Info, Ticket, QrCode, Gift, ChevronLeft, ChevronRight, Copy, Check, X, Search, Camera, RefreshCw, Users, Clock, BookOpen, BarChart3, User, GraduationCap, School, UserCircle2, Award, FileText, CheckCircle, XCircle, Calendar } from 'lucide-react'
 import { getUserDashboard } from "../../routes/auth-services"
 import { getChildrenData } from "../../routes/parents"
 import { redeemPromoCode } from "../../routes/codes"
@@ -96,6 +68,7 @@ const PromoCodes = () => {
           setUserInfo(userInfo)
           setBalance(userInfo?.totalPoints || 0)
           setIsParent(userInfo?.role === "Parent")
+
           if (!selectedChild) {
             const mappedRedeemedCodes = (redeemedCodes || []).map((code, index) => ({
               id: `code-${index + 1}`,
@@ -115,6 +88,7 @@ const PromoCodes = () => {
               }),
               isRedemption: true,
             }))
+
             const mappedPurchaseHistory = (purchaseHistory || []).map((purchase, index) => ({
               id: `purchase-${index + 1}`,
               type: t("transactions.types.coursePurchase"),
@@ -131,12 +105,15 @@ const PromoCodes = () => {
               }),
               isRedemption: false,
             }))
+
             const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
               (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
             )
+
             setTransactions(combinedTransactions)
             setPointsBalances(pointsBalances || [])
             setLectureAccess(lectureAccess || [])
+
             if (paginationInfo) {
               const purchaseTotalPages = paginationInfo.purchaseHistory?.totalPages || 1
               const redeemedTotalPages = paginationInfo.redeemedCodes?.totalPages || 1
@@ -153,6 +130,7 @@ const PromoCodes = () => {
         setLoading(false)
       }
     }
+
     fetchDashboardData()
   }, [transactionsPage, lecturesPage, activeTab, limit, redeemSuccess, t, i18n.language, selectedChild])
 
@@ -174,6 +152,7 @@ const PromoCodes = () => {
         }
       }
     }
+
     if (isParent) {
       fetchChildrenData()
     }
@@ -184,6 +163,7 @@ const PromoCodes = () => {
       const childData = children.find((child) => child._id === selectedChild)
       if (childData) {
         setBalance(childData.totalPoints || 0)
+
         const mappedRedeemedCodes = (childData.redeemedCodes || []).map((code, index) => ({
           id: `code-${index + 1}`,
           type: t("transactions.types.codeRedemption"),
@@ -200,6 +180,7 @@ const PromoCodes = () => {
           }),
           isRedemption: true,
         }))
+
         const mappedPurchaseHistory = (childData.purchaseHistory || []).map((purchase, index) => ({
           id: `purchase-${index + 1}`,
           type: t("transactions.types.coursePurchase"),
@@ -216,9 +197,11 @@ const PromoCodes = () => {
           }),
           isRedemption: false,
         }))
+
         const combinedTransactions = [...mappedRedeemedCodes, ...mappedPurchaseHistory].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
         )
+
         setTransactions(combinedTransactions)
         setLectureAccess(childData.lectureAccess || [])
         setExamScores(childData.examScores || [])
@@ -236,9 +219,11 @@ const PromoCodes = () => {
     const handleModalClose = () => {
       stopScanner()
     }
+
     if (scannerModal) {
       scannerModal.addEventListener("close", handleModalClose)
     }
+
     return () => {
       stopScanner()
       if (scannerModal) {
@@ -262,15 +247,18 @@ const PromoCodes = () => {
     setScannerLoading(true)
     document.getElementById("redeem_modal").close()
     document.getElementById("scanner_modal").showModal()
+
     setTimeout(() => {
       try {
         const scanner = new Html5Qrcode("qr-reader")
         scannerRef.current = scanner
+
         const config = {
           fps: 10,
           qrbox: { width: 250, height: 250 },
           aspectRatio: 1.0,
         }
+
         scanner
           .start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
           .then(() => {
@@ -336,6 +324,7 @@ const PromoCodes = () => {
       setScannerActive(false)
       setScannerLoading(false)
     }
+
     try {
       let codeToRedeem = decodedText
       try {
@@ -346,9 +335,11 @@ const PromoCodes = () => {
       } catch (e) {
         console.log("QR code is not in JSON format, using raw text")
       }
+
       if (navigator.vibrate) {
         navigator.vibrate(200)
       }
+
       document.getElementById("scanner_modal").close()
       setRedeemCode(codeToRedeem)
       setRedeemError(null)
@@ -369,9 +360,11 @@ const PromoCodes = () => {
       setRedeemError(t("redeem.errors.emptyCode"))
       return
     }
+
     setRedeemLoading(true)
     setRedeemError(null)
     setRedeemSuccess(null)
+
     try {
       if (selectedChild) {
         setRedeemError(
@@ -380,6 +373,7 @@ const PromoCodes = () => {
         setRedeemLoading(false)
         return
       }
+
       const result = await redeemPromoCode(redeemCode)
       if (result.success) {
         setRedeemSuccess(t("redeem.success"))
@@ -401,13 +395,16 @@ const PromoCodes = () => {
       setAddChildError(t("addChild.errors.emptyId"))
       return
     }
+
     setAddChildLoading(true)
     setAddChildError(null)
     setAddChildSuccess(null)
+
     try {
       const updateData = {
         children: [sequencedId],
       }
+
       const result = await updateCurrentUser(updateData)
       if (result.success) {
         setAddChildSuccess(t("addChild.success"))
@@ -602,6 +599,7 @@ const PromoCodes = () => {
               } else {
                 pageNum = transactionsPage - 2 + i
               }
+
               return (
                 <button
                   key={pageNum}
@@ -692,6 +690,7 @@ const PromoCodes = () => {
               } else {
                 pageNum = lecturesPage - 2 + i
               }
+
               return (
                 <button
                   key={pageNum}
@@ -733,11 +732,9 @@ const PromoCodes = () => {
                       {exam.passed ? t("exams.passed") || "Passed" : t("exams.failed") || "Failed"}
                     </div>
                   </div>
-
                   <p className="text-sm opacity-70 line-clamp-2 mb-3">
                     {exam.lecture.description || t("noDescription")}
                   </p>
-
                   <div className="bg-base-200/50 rounded-lg p-3">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium">{t("exams.score") || "Score"}:</span>
@@ -745,19 +742,16 @@ const PromoCodes = () => {
                         {exam.score} / {exam.maxScore}
                       </span>
                     </div>
-
                     <div className="w-full bg-base-300 rounded-full h-2.5">
                       <div
                         className={`h-2.5 rounded-full ${exam.passed ? "bg-success" : "bg-error"}`}
                         style={{ width: `${(exam.score / exam.maxScore) * 100}%` }}
                       ></div>
                     </div>
-
                     <div className="text-xs mt-2 opacity-70">
                       {t("exams.passingThreshold") || "Passing threshold"}: {exam.passingThreshold} / {exam.maxScore}
                     </div>
                   </div>
-
                   <div className="flex flex-wrap justify-between items-center mt-3 text-xs opacity-70 gap-2">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3 flex-shrink-0" />
@@ -810,6 +804,7 @@ const PromoCodes = () => {
 
   const renderChildrenSelector = () => {
     if (!isParent) return null
+
     return (
       <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
         <div className="card-body">
@@ -911,6 +906,7 @@ const PromoCodes = () => {
           <p className="text-center text-base-content/70">{t("subtitle")}</p>
         </div>
       </div>
+
       <div className="mx-auto px-4 -mt-8">
         {fetchError && (
           <div className="alert alert-error max-w-md mx-auto mb-6">
@@ -918,10 +914,54 @@ const PromoCodes = () => {
             <span>{fetchError}</span>
           </div>
         )}
+
         {userInfo && <ReferralSection userInfo={userInfo} onUserUpdate={updateCurrentUser} />}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-          {userInfo?.role === "Parent" ? (
-            <div className="lg:col-span-3 card bg-base-100 shadow-sm border border-base-200">
+          {/* User Profile Card - Always show */}
+          <div className="card bg-base-100 shadow-sm border border-base-200">
+            <div className="card-body p-4 md:p-6">
+              <div className="flex items-center gap-4">
+                <div className="avatar avatar-placeholder">
+                  <div className="bg-primary/10 text-primary rounded-full w-12 md:w-16">
+                    <span className="text-xl">{userInfo?.name?.charAt(0) || "U"}</span>
+                  </div>
+                </div>
+                <div className="overflow-hidden">
+                  <h2 className="card-title text-base md:text-lg truncate">{userInfo?.name || t("user")}</h2>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-semibold text-base-content/60">{t("profile.email")}:</span>
+                    <p className="text-sm opacity-70 truncate">{userInfo?.email || ""}</p>
+                  </div>
+                  <div
+                    className="flex items-center gap-1 tooltip"
+                    data-tip={
+                      t("profile.sequenceIdTooltip") || "Parents should use this ID when signing up to link accounts"
+                    }
+                  >
+                    <span className="text-xs font-semibold text-base-content/60">{t("profile.sequenceId")}:</span>
+                    <p className="text-sm opacity-70 truncate">{userInfo?.sequencedId || ""}</p>
+                    <Info className="w-3 h-3 text-primary flex-shrink-0" />
+                  </div>
+                  <div
+                    className="flex items-center gap-1 tooltip"
+                    data-tip={
+                      t("profile.userSerial") || "Send this to your friends to invite them to the platform and win rewards"
+                    }
+                  >
+                    <span className="text-xs font-semibold text-base-content/60">{t("profile.userSerial")}:</span>
+                    <p className="text-base opacity-70 font-bold truncate">{userInfo?.userSerial || ""}</p>
+                    <Info className="w-3 h-3 text-primary flex-shrink-0" />
+                  </div>
+                  <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Add Child section for parents */}
+          {userInfo?.role === "Parent" && (
+            <div className="lg:col-span-2 card bg-base-100 shadow-sm border border-base-200">
               <div className="card-body p-6">
                 <h2 className="card-title text-lg font-semibold mb-4">{t("addChild.title") || "Add Child"}</h2>
                 <div className="space-y-4">
@@ -952,14 +992,12 @@ const PromoCodes = () => {
                       </button>
                     </div>
                   </div>
-
                   {addChildError && (
                     <div className="alert alert-error shadow-lg">
                       <X className="w-5 h-5 shrink-0" />
                       <span>{addChildError}</span>
                     </div>
                   )}
-
                   {addChildSuccess && (
                     <div className="alert alert-success shadow-lg">
                       <Check className="w-5 h-5 shrink-0" />
@@ -969,47 +1007,8 @@ const PromoCodes = () => {
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="card bg-base-100 shadow-sm border border-base-200">
-              <div className="card-body p-4 md:p-6">
-                <div className="flex items-center gap-4">
-                  <div className="avatar avatar-placeholder">
-                    <div className="bg-primary/10 text-primary rounded-full w-12 md:w-16">
-                      <span className="text-xl">{userInfo?.name?.charAt(0) || "U"}</span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden">
-                    <h2 className="card-title text-base md:text-lg truncate">{userInfo?.name || t("user")}</h2>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-semibold text-base-content/60">{t("profile.email")}:</span>
-                      <p className="text-sm opacity-70 truncate">{userInfo?.email || ""}</p>
-                    </div>
-                    <div
-                      className="flex items-center gap-1 tooltip"
-                      data-tip={
-                        t("profile.sequenceIdTooltip") || "Parents should use this ID when signing up to link accounts"
-                      }
-                    >
-                      <span className="text-xs font-semibold text-base-content/60">{t("profile.sequenceId")}:</span>
-                      <p className="text-sm opacity-70 truncate">{userInfo?.sequencedId || ""}</p>
-                      <Info className="w-3 h-3 text-primary flex-shrink-0" />
-                    </div>
-                    <div
-                      className="flex items-center gap-1 tooltip"
-                      data-tip={
-                        t("profile.userSerial") || "Send this to your friends to invite them to the platform and win rewards"
-                      }
-                    >
-                      <span className="text-xs font-semibold text-base-content/60">{t("profile.userSerial")}:</span>
-                      <p className="text-base opacity-70 font-bold truncate">{userInfo?.userSerial || ""}</p>
-                      <Info className="w-3 h-3 text-primary flex-shrink-0" />
-                    </div>
-                    <div className="badge badge-outline mt-1">{userInfo?.role || t("student")}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
           )}
+
           {userInfo?.role === "Student" && userInfo?.sequencedId && (
             <div className="lg:col-span-3 alert alert-info text-info-content">
               <Info className="w-5 h-5" />
@@ -1030,26 +1029,7 @@ const PromoCodes = () => {
               </div>
             </div>
           )}
-          <div className="card bg-primary text-primary-content shadow-md">
-            <div className="card-body">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="card-title">
-                  {selectedChild
-                    ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("balance.title").toLowerCase()}`
-                    : t("balance.title")}
-                </h2>
-                <Wallet className="w-6 h-6" />
-              </div>
-              <div className="stat-value text-3xl">
-                {loading ? (
-                  <span className="loading loading-dots loading-md"></span>
-                ) : (
-                  `${balance} ${t("balance.currency")}`
-                )}
-              </div>
-              <p className="text-sm opacity-80 mt-2">{t("balance.description")}</p>
-            </div>
-          </div>
+
           {userInfo?.role === "Student" && (
             <div className="card bg-base-100 shadow-sm border border-base-200">
               <div className="card-body">
@@ -1085,7 +1065,9 @@ const PromoCodes = () => {
             </div>
           )}
         </div>
+
         {renderChildrenSelector()}
+
         {!selectedChild && (
           <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
             <div className="card-body">
@@ -1134,6 +1116,7 @@ const PromoCodes = () => {
             </div>
           </div>
         )}
+
         <div className="card bg-base-100 shadow-sm border border-base-200 mb-8">
           <div className="card-body p-0">
             <div className="tabs tabs-bordered">
@@ -1155,7 +1138,6 @@ const PromoCodes = () => {
                   ? `${children.find((c) => c._id === selectedChild)?.name}'s ${t("lectures.title").toLowerCase()}`
                   : t("lectures.title")}
               </button>
-
               {/* Only show the exams tab when a child is selected */}
               {selectedChild && (
                 <button
@@ -1177,6 +1159,7 @@ const PromoCodes = () => {
           </div>
         </div>
       </div>
+
       <dialog id="scanner_modal" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box bg-base-100 relative max-w-md p-6">
           <form method="dialog">
@@ -1241,6 +1224,7 @@ const PromoCodes = () => {
           <button onClick={stopScanner}>close</button>
         </form>
       </dialog>
+
       <dialog id="redeem_modal" className="modal modal-bottom sm:modal-middle">
         <div className="modal-box bg-base-100 relative max-w-md p-6">
           <form method="dialog">
