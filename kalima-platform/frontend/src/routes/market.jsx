@@ -373,3 +373,24 @@ export const purchaseBook = async (purchaseData) => {
     throw error
   }
 }
+
+export const RecalculateInvites = async () => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/v1/ec/referrals/recalculate`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error Calculating Invites: ${error.message}`)
+    throw error
+  }
+}
+
