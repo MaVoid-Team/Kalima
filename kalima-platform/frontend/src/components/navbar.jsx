@@ -98,6 +98,8 @@ const NavBar = () => {
   const getDashboardPath = (role) => {
     switch (role) {
       case "Student":
+      case "Parent" :
+      case "Teacher" :
         return "/dashboard/student-dashboard/promo-codes";
       case "Lecturer":
         return "/dashboard/lecturer-dashboard";
@@ -107,8 +109,6 @@ const NavBar = () => {
         return "/dashboard/admin-dashboard";
       case "Assistant":
         return "/dashboard/assistant-dashboard";
-      case "Parent" :
-        return "/dashboard/student-dashboard/promo-codes";
       default:
         return "/";
     }
