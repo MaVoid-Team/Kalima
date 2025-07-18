@@ -60,7 +60,7 @@ const teacherValidation = userValidation.concat(
       .optional(),
     government: Joi.string().required(),
     administrationZone: Joi.string().required(),
-    referralSerial: Joi.string().optional(), // Allow referralSerial
+    referralSerial: Joi.string().allow("").optional(), // Allow referralSerial to be empty
   })
 );
 
