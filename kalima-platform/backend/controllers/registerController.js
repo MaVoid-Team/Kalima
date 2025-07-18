@@ -206,8 +206,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     newUser.profilePic = profilePicPath;
   }
 
-  // Referral logic: look up inviter by serial and set referredBy
-  if (req.body.referralSerial) {
+  // Referral logic: look up inviter by serial and set referredBy (ignore empty string)
+  if (req.body.referralSerial !== undefined && req.body.referralSerial !== "") {
     const inviter = await User.findOne({ userSerial: req.body.referralSerial });
     if (inviter) {
       newUser.referredBy = inviter._id;
@@ -219,9 +219,11 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   switch (role.toLowerCase()) {
     case "teacher": {
-      // check phoneNumber2 (optional)
-      if (userData.phoneNumber2 !== undefined) {
+      // check phoneNumber2 (optional, do not save empty string)
+      if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "") {
         newUser.phoneNumber2 = userData.phoneNumber2;
+      } else {
+        delete newUser.phoneNumber2;
       }
       // Validate level (must be an array of allowed values)
       if (
