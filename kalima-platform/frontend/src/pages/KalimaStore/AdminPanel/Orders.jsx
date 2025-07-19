@@ -171,7 +171,7 @@ const Orders = () => {
   }
 
   const handleWhatsAppContact = (order) => {
-    const phoneNumber = order.numberTransferredFrom
+    const phoneNumber = order.createdBy?.phoneNumber
     const message = encodeURIComponent(
       `Hello! This is regarding your order for ${order.productName} (Order ID: ${order.purchaseSerial}). How can we assist you?`,
     )
