@@ -59,7 +59,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
   // Apply population and execute query
   const purchases = await features.query.populate([
-    { path: "createdBy", select: "name email role" },
+    { path: "createdBy", select: "name email role phoneNumber" },
     { path: "confirmedBy", select: "name email role" },
     { path: "couponCode", select: "couponCode value expirationDate" },
     {
