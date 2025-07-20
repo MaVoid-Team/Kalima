@@ -192,7 +192,7 @@ const governmentsData = [
             "Kafr Shukr Educational Administration",
             "Obour Educational Administration",
             "Khosous Educational Administration"
-        ]
+        ] // Add zones if available
     },
     {
         name: "Qena",
