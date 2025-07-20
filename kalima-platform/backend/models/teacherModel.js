@@ -1,3 +1,19 @@
+// Helper to convert Arabic numerals to English numerals
+function toEnglishDigits(str) {
+  if (!str) return str;
+  return str.replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)])
+    .replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]);
+}
+// Helper to format Egyptian phone numbers to international format
+function formatEgyptianPhoneNumber(number) {
+  if (!number) return number;
+  let num = toEnglishDigits(number).replace(/[-\s]/g, '');
+  if (num.startsWith('+20')) return num;
+  if (num.startsWith('0')) return '+20' + num.slice(1);
+  if (num.startsWith('20')) return '+' + num;
+  return num;
+}
+
 const mongoose = require("mongoose");
 const User = require("./userModel");
 const { uniqueId } = require("lodash");
@@ -96,6 +112,13 @@ const teacherSchema = new mongoose.Schema(
 
 
 teacherSchema.pre("save", async function (next) {
+  // Auto-format phone numbers to international format for Egypt
+  if (this.phoneNumber) {
+    this.phoneNumber = formatEgyptianPhoneNumber(this.phoneNumber);
+  }
+  if (this.phoneNumber2) {
+    this.phoneNumber2 = formatEgyptianPhoneNumber(this.phoneNumber2);
+  }
   if (this.isNew && !this.userSerial) {
     try {
       let subjectPrefix = "";
