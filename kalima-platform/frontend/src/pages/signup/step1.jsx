@@ -8,6 +8,15 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   const [administrationZones, setAdministrationZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(false);
 
+  const toEnglishDigits = (str) =>
+    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+
+  const handleNumberOnlyChange = (e) => {
+    const { name, value } = e.target;
+    const cleaned = toEnglishDigits(value);
+    handleInputChange({ target: { name, value: cleaned } });
+  };
+
   // Fetch governments on component mount
   useEffect(() => {
     const loadGovernments = async () => {
@@ -176,11 +185,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
             <span className="label-text">{t('form.phoneNumber')}</span>
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             name="phoneNumber"
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
             value={formData.phoneNumber}
-            onChange={handleInputChange}
+            onChange={handleNumberOnlyChange}
+            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
             required
           />
           {errors.phoneNumber && (
@@ -220,11 +230,12 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
                 <span className="label-text">{t('form.phoneNumber2')}</span>
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 name="phoneNumber2"
-                className={`input input-bordered w-2/3 lg:w-1/2 `}
                 value={formData.phoneNumber2}
-                onChange={handleInputChange}
+                onChange={handleNumberOnlyChange}
+                className="input input-bordered w-2/3 lg:w-1/2"
                 required
               />
               <label className="label">
