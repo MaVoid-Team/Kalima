@@ -1,12 +1,20 @@
 
-// Helper to format Egyptian phone numbers to international format
+// Helper to format Egyptian phone numbers to international format robustly
 function formatEgyptianPhoneNumber(number) {
   if (!number) return number;
-  let num = number;
+  // Remove all non-digit characters except leading +
+  let num = number.trim().replace(/[^\d+]/g, '');
+  // Remove leading zeros (except if it's just '0')
+  if (num.startsWith('00')) num = '+' + num.slice(2);
+  if (num.startsWith('0') && num.length > 1) num = num.slice(1);
+  // Add +20 if missing
   if (num.startsWith('+20')) return num;
-  if (num.startsWith('0')) return '+20' + num.slice(1);
   if (num.startsWith('20')) return '+' + num;
-  return num;
+  if (num.startsWith('+')) return num; // fallback for other country codes
+  // If only 10 or 11 digits, assume it's a local Egyptian number
+  if (num.length === 10) return '+20' + num;
+  if (num.length === 11 && num[0] === '1') return '+20' + num;
+  return '+20' + num;
 }
 
 const mongoose = require('mongoose');
