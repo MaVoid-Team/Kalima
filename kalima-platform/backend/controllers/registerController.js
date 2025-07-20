@@ -23,6 +23,16 @@ const validatePassword = (password) => {
     );
   }
 };
+// Helper to format Egyptian phone numbers to international format
+function formatEgyptianPhoneNumber(number) {
+  if (!number) return number;
+  let num = number;
+  if (num.startsWith('+20')) return num;
+  if (num.startsWith('0')) return '+20' + num.slice(1);
+  if (num.startsWith('20')) return '+' + num;
+  return num;
+}
+
 const registerNewUser = catchAsync(async (req, res, next) => {
   const {
     role,
@@ -198,8 +208,13 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     newUser.administrationZone = administrationZone;
   }
 
+
+  // Normalize phone numbers before saving
   if (phoneNumber) {
-    newUser.phoneNumber = phoneNumber;
+    newUser.phoneNumber = formatEgyptianPhoneNumber(phoneNumber);
+  }
+  if (userData.phoneNumber2 !== undefined && userData.phoneNumber2 !== "") {
+    newUser.phoneNumber2 = formatEgyptianPhoneNumber(userData.phoneNumber2);
   }
 
   if (profilePicPath !== undefined) {

@@ -1,6 +1,15 @@
 "use client"
 
 const ParentForm = ({ userData, handleChange, t, governments, getAdministrationZonesForGovernment, isRTL }) => {
+
+    const toEnglishDigits = (str) =>
+    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+
+  const handlePhoneInputChange = (e) => {
+    const { name, value } = e.target;
+    const cleanedValue = toEnglishDigits(value);
+    handleChange({ target: { name, value: cleanedValue } });
+  };
   return (
     <div className="space-y-4">
       {/* Phone Number Field */}
@@ -9,15 +18,15 @@ const ParentForm = ({ userData, handleChange, t, governments, getAdministrationZ
           <label className="label">
             <span className="label-text">{t("fields.phoneNumber")}</span>
           </label>
-          <input
-            type="tel"
-            name="phoneNumber"
-            className="input input-bordered"
-            value={userData.phoneNumber || ""}
-            onChange={handleChange}
-            placeholder={t("placeholders.phoneNumber")}
-            required
-          />
+           <input
+              type="text"
+              inputMode="numeric"
+              name="phoneNumber"
+              className="input input-bordered"
+              value={userData.phoneNumber || ""}
+              onChange={handlePhoneInputChange}
+              placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
+            />
         </div>
       </div>
 
