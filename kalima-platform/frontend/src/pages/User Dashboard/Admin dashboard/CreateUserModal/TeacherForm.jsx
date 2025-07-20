@@ -82,13 +82,23 @@ const TeacherForm = ({
   }
 
   const toEnglishDigits = (str) =>
-    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+  str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
 
-  const handlePhoneInputChange = (e) => {
-    const { name, value } = e.target;
-    const cleanedValue = toEnglishDigits(value);
-    handleChange({ target: { name, value: cleanedValue } });
-  };
+const handlePhoneInputChange = (e) => {
+  const { name, value } = e.target;
+
+  if (value.startsWith("+")) {
+    handleChange({ target: { name, value } });
+    return;
+  }
+
+  const digitsOnly = toEnglishDigits(value);
+  const finalValue = digitsOnly.startsWith("0")
+    ? `+2${digitsOnly}`
+    : `+20${digitsOnly}`;
+
+  handleChange({ target: { name, value: finalValue } });
+};
 
 
   // Handle social media
