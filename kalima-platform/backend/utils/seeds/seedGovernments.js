@@ -181,7 +181,18 @@ const governmentsData = [
     },
     {
         name: "Qualyubia",
-        administrationZone: [] // Add zones if available
+        administrationZone: [
+            "East Shubra El-Kheima Educational Administration",
+            "West Shubra El-Kheima Educational Administration",
+            "Banha Educational Administration",
+            "Khanka Educational Administration",
+            "Tukh Educational Administration",
+            "Qalyub Educational Administration",
+            "Shebin El-Qanater Educational Administration",
+            "Kafr Shukr Educational Administration",
+            "Obour Educational Administration",
+            "Khosous Educational Administration"
+        ]
     },
     {
         name: "Qena",
