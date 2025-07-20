@@ -8,6 +8,7 @@ import LanguageCourseCard from "./LanguageCourseCard"
 
 const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
   const { i18n } = useTranslation()
+
   const content = useMemo(
     () => ({
       en: {
@@ -27,6 +28,7 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
   )
 
   const langContent = content[i18n.language] || content.en
+
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   const [expandedBookId, setExpandedBookId] = useState(null)
@@ -41,7 +43,6 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
       setIsMobile(window.innerWidth < 768)
       setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024)
     }
-
     handleResize()
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
@@ -55,10 +56,15 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
     }
   }
 
+  // Get the expanded book data
+  const getExpandedBookData = (bookId) => {
+    return books.find((book) => book.id === bookId)
+  }
+
   // Create a modified books array that includes the expanded card and featured card (desktop only)
   const renderBooks = useMemo(() => {
     const result = []
-    
+
     // Insert books and expanded cards
     for (let i = 0; i < books.length; i++) {
       // Insert featured card at random position if on desktop and no book is expanded
@@ -74,10 +80,11 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
 
       // Insert expanded card if this book is expanded
       if (books[i].id === expandedBookId) {
+        const expandedBook = getExpandedBookData(expandedBookId)
         result.push({
           id: `expanded-${books[i].id}`,
           isExpanded: true,
-          originalBook: books[i],
+          originalBook: expandedBook,
         })
       }
     }
@@ -107,7 +114,7 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
           <div className="relative">
             <div className="flex flex-wrap gap-3 sm:gap-4 pb-2">
               {renderBooks
-                .filter(item => !item.isFeatured) // Filter out featured card on mobile/tablet
+                .filter((item) => !item.isFeatured) // Filter out featured card on mobile/tablet
                 .slice(0, expandedBookId ? getVisibleBooksCount() + 1 : getVisibleBooksCount())
                 .map((item) => {
                   if (item.isExpanded) {
@@ -123,7 +130,7 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
                         <LanguageCourseCard
                           isRTL={isRTL}
                           title={item.originalBook.title}
-                          subtitle={langContent.subtitle}
+                          subtitle={`${langContent.subtitle} - ${item.originalBook.title}`}
                           rating={4}
                           imageUrl={item.originalBook.image}
                           buttonText={langContent.buttonText}
@@ -131,7 +138,6 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
                       </motion.div>
                     )
                   }
-
                   return (
                     <motion.div
                       key={item.id}
@@ -199,7 +205,7 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
                     <LanguageCourseCard
                       isRTL={isRTL}
                       title={item.originalBook.title}
-                      subtitle={langContent.subtitle}
+                      subtitle={`${langContent.subtitle} - ${item.originalBook.title}`}
                       rating={4}
                       imageUrl={item.originalBook.image}
                       buttonText={langContent.buttonText}
@@ -207,7 +213,6 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
                   </motion.div>
                 )
               }
-
               if (item.isFeatured) {
                 return (
                   <motion.div
@@ -228,7 +233,6 @@ const LanguageBooks = React.memo(({ books = [], isRTL = false }) => {
                   </motion.div>
                 )
               }
-
               return (
                 <motion.div
                   key={item.id}
