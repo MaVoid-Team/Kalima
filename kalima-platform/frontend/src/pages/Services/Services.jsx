@@ -34,39 +34,35 @@ const Services = () => {
 
   const books = useMemo(
     () => [
-      { id: 1, title: "العلم جميع اللغات", image: "/Book.png" },
-      { id: 2, title: "اللغة العربية", image: "/Book-1.png" },
-      { id: 3, title: "اللغة الإنجليزية", image: "/Book-2.png" },
-      { id: 4, title: "اللغة الفرنسية", image: "/Book-3.png" },
-      { id: 5, title: "اللغة الألمانية", image: "/Book-4.png" },
-      { id: 6, title: "اللغة الإسبانية", image: "/Book-5.png" },
-      { id: 7, title: "اللغة الصينية", image: "/Book-2.png" },
+      { id: 2, title: "اللغة العربية", image: "/Book-12.png" },
+      { id: 3, title: "اللغة الإنجليزية", image: "/Book-11.png" },
+      { id: 4, title: "اللغة الفرنسية", image: "/Book-10.png" },
+      { id: 5, title: "اللغة الألمانية", image: "/Book-6.png" },
+      { id: 6, title: "اللغة الإسبانية", image: "/Book-9.png" },
+      { id: 7, title: "اللغة الروسيه", image: "/Book-8.png" },
     ],
     []
   );
 
   const books1 = useMemo(
     () => [
-      { id: 1, title: "العلم جميع اللغات", image: "/Book-6.png" },
-      { id: 2, title: "اللغة العربية", image: "/Book-7.png" },
-      { id: 3, title: "اللغة الإنجليزية", image: "/Book-8.png" },
-      { id: 4, title: "اللغة الفرنسية", image: "/Book-9.png" },
-      { id: 5, title: "اللغة الألمانية", image: "/Book-10.png" },
-      { id: 6, title: "اللغة الإسبانية", image: "/Book-11.png" },
-      { id: 7, title: "اللغة الصينية", image: "/Book-12.png" },
+      { id: 1, title: "التاريخ", image: "/Book.png" },
+      { id: 2, title: "الفلسفه", image: "/Book-5.png" },
+      { id: 3, title: "علم النفس", image: "/Book-4.png" },
+      { id: 4, title: "المنطق", image: "/Book-3.png" },
+      { id: 5, title: "الجغرافيا", image: "/Book-1.png" },
     ],
     []
   );
 
   const books2 = useMemo(
     () => [
-      { id: 1, title: "العلم جميع اللغات", image: "/Book-13.png" },
-      { id: 2, title: "اللغة العربية", image: "/Book-14.png" },
-      { id: 3, title: "اللغة الإنجليزية", image: "/Book-15.png" },
-      { id: 4, title: "اللغة الفرنسية", image: "/Book-16.png" },
-      { id: 5, title: "اللغة الألمانية", image: "/Book-17.png" },
-      { id: 6, title: "اللغة الإسبانية", image: "/Book-18.png" },
-      { id: 7, title: "اللغة الصينية", image: "/Book-19.png" },
+      { id: 2, title: "الجيولوجيا", image: "/Book-14.png" },
+      { id: 3, title: "الكيمياء", image: "/Book-15.png" },
+      { id: 4, title: "الفيزياء", image: "/Book-16.png" },
+      { id: 5, title: "الاحصاء", image: "/Book-17.png" },
+      { id: 6, title: "الجبر", image: "/Book-18.png" },
+      { id: 7, title: "الهندسه", image: "/Book-19.png" },
     ],
     []
   );

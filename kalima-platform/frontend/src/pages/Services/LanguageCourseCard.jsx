@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 const LanguageCourseCard = React.memo(
   ({
@@ -6,12 +6,12 @@ const LanguageCourseCard = React.memo(
     title,
     subtitle,
     rating = 0,
-    imageUrl = "/languagedetails.png"
+    imageUrl = "/languagedetails.png",
     // buttonText = "View Details",
   }) => {
     const stars = Array(5)
       .fill(0)
-      .map((_, i) => i < rating);
+      .map((_, i) => i < rating)
 
     return (
       <div
@@ -20,30 +20,19 @@ const LanguageCourseCard = React.memo(
         }`}
       >
         <figure className="w-1/3 sm:w-2/5 relative">
-          <img
-            src={imageUrl}
-            alt="Language Course"
-            className="w-full h-full object-cover"
-          />
+          <img src={imageUrl || "/placeholder.svg"} alt="Language Course" className="w-full h-full object-cover" />
         </figure>
-
         <div className="card-body w-2/3 sm:w-3/5 p-4 sm:p-6">
           <div className={isRTL ? "text-right" : "text-left"}>
-            <h2 className="card-title text-lg sm:text-xl font-bold text-primary">
-              {title}
-            </h2>
-            <p className="text-sm sm:text-base text-base-content/80 mt-1">
-              {subtitle}
-            </p>
+            <h2 className="card-title text-lg sm:text-xl font-bold text-primary">{title}</h2>
+            <p className="text-sm sm:text-base text-base-content/80 mt-1">{subtitle}</p>
             <div className="rating rating-xs sm:rating-sm mt-2">
               {stars.map((filled, index) => (
                 <input
                   key={index}
                   type="radio"
                   name="rating"
-                  className={`mask mask-star-2 ${
-                    filled ? "bg-yellow-400" : "bg-gray-300"
-                  }`}
+                  className={`mask mask-star-2 ${filled ? "bg-yellow-400" : "bg-gray-300"}`}
                   checked={filled}
                   readOnly
                 />
@@ -81,7 +70,8 @@ const LanguageCourseCard = React.memo(
           </div>
         </div>
       </div>
-    );
-  }
+    )
+  },
 )
-export default LanguageCourseCard;
+
+export default LanguageCourseCard
