@@ -13,6 +13,7 @@ export const getAllStudents = async () => {
     const response = await axios.get(`${API_URL}/users/role/student`, {
       headers: getAuthHeader(),
     });
+    console.log("Fetched students:", response);
 
     return {
       success: true,
@@ -29,6 +30,7 @@ export const getAllParents = async () => {
     const response = await axios.get(`${API_URL}/users/role/parent`, {
       headers: getAuthHeader(),
     });
+    console.log("Fetched parents:", response);
 
     return {
       success: true,
@@ -45,6 +47,7 @@ export const getAllAssistants = async () => {
     const response = await axios.get(`${API_URL}/users/role/assistant`, {
       headers: getAuthHeader(),
     });
+    console.log("Fetched assistants:", response);
 
     return {
       success: true,
@@ -61,7 +64,7 @@ export const getAllLecturers = async () => {
     const response = await axios.get(`${API_URL}/lecturers`, {
       headers: getAuthHeader(),
     });
-
+    console.log("Fetched lecturers:", response);
     return {
       success: true,
       data: response.data.data
