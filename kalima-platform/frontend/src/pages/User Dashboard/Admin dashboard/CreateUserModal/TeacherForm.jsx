@@ -81,6 +81,16 @@ const TeacherForm = ({
     handleChange(syntheticEvent)
   }
 
+  const toEnglishDigits = (str) =>
+    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+
+  const handlePhoneInputChange = (e) => {
+    const { name, value } = e.target;
+    const cleanedValue = toEnglishDigits(value);
+    handleChange({ target: { name, value: cleanedValue } });
+  };
+
+
   // Handle social media
   const addSocialMedia = () => {
     const platformInput = document.getElementById("socialPlatform")
@@ -154,11 +164,12 @@ const TeacherForm = ({
               <span className="label-text">{t("fields.phoneNumber") || "Phone Number"}</span>
             </label>
             <input
-              type="tel"
+              type="text"
+              inputMode="numeric"
               name="phoneNumber"
               className="input input-bordered"
               value={userData.phoneNumber || ""}
-              onChange={handleChange}
+              onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
               required
             />
@@ -171,11 +182,12 @@ const TeacherForm = ({
               <span className="label-text">{t("fields.phoneNumber2") || "Phone Number 2 (Optional)"}</span>
             </label>
             <input
-              type="tel"
+              type="text"
+              inputMode="numeric"
               name="phoneNumber2"
               className="input input-bordered"
               value={userData.phoneNumber2 || ""}
-              onChange={handleChange}
+              onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber2") || "Enter second phone number"}
             />
           </div>
