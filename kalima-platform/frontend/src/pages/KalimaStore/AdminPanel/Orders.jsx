@@ -173,7 +173,17 @@ const Orders = () => {
   const handleWhatsAppContact = (order) => {
     const phoneNumber = order.createdBy?.phoneNumber
     const message = encodeURIComponent(
-      `Hello! This is regarding your order for ${order.productName} (Order ID: ${order.purchaseSerial}). How can we assist you?`,
+      `أهلاً بك أ/ ${order.userName} 👋 
+
+تم استلام طلبك ${order.productName} بنجاح، وجارٍ تجهيزه الآن.
+
+لو عندك أي استفسار بخصوص الطلب ، تقدر تتواصل معانا في أي وقت على نفس الرقم.
+
+نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙
+
+مع تحيات فريق عمل
+منصة كلمة
+`,
     )
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, "_blank")
@@ -490,8 +500,8 @@ const Orders = () => {
                 memoizedOrders.map((order) => (
                   <tr key={order._id}>
                     <td className="text-center">
-                          <div className="font-bold text-sm">{order.productName}</div>
-                          <div className="text-xs opacity-50">{order.purchaseSerial}</div>
+                      <div className="font-bold text-sm">{order.productName}</div>
+                      <div className="text-xs opacity-50">{order.purchaseSerial}</div>
                     </td>
                     <td className="text-center">
                       <div>
@@ -546,9 +556,8 @@ const Orders = () => {
                         </button>
 
                         <button
-                          className={`btn btn-ghost btn-sm relative ${
-                            order.adminNotes ? "text-blue-600" : "text-gray-400"
-                          }`}
+                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-blue-600" : "text-gray-400"
+                            }`}
                           onClick={() => openNotesModal(order)}
                           title={
                             order.adminNotes
