@@ -9,13 +9,23 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   const [zonesLoading, setZonesLoading] = useState(false);
 
   const toEnglishDigits = (str) =>
-    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+  str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
 
-  const handleNumberOnlyChange = (e) => {
-    const { name, value } = e.target;
-    const cleaned = toEnglishDigits(value);
-    handleInputChange({ target: { name, value: cleaned } });
-  };
+const handlePhoneInputChange = (e) => {
+  const { name, value } = e.target;
+
+  if (value.startsWith("+")) {
+    handleChange({ target: { name, value } });
+    return;
+  }
+
+  const digitsOnly = toEnglishDigits(value);
+  const finalValue = digitsOnly.startsWith("0")
+    ? `+2${digitsOnly}`
+    : `+20${digitsOnly}`;
+
+  handleChange({ target: { name, value: finalValue } });
+};
 
   // Fetch governments on component mount
   useEffect(() => {
@@ -189,7 +199,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
             inputMode="numeric"
             name="phoneNumber"
             value={formData.phoneNumber}
-            onChange={handleNumberOnlyChange}
+            onChange={handlePhoneInputChange}
             className={`input input-bordered w-2/3 lg:w-1/2 ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
             required
           />
@@ -234,7 +244,7 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
                 inputMode="numeric"
                 name="phoneNumber2"
                 value={formData.phoneNumber2}
-                onChange={handleNumberOnlyChange}
+                onChange={handlePhoneInputChange}
                 className="input input-bordered w-2/3 lg:w-1/2"
                 required
               />
