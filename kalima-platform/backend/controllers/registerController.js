@@ -23,16 +23,10 @@ const validatePassword = (password) => {
     );
   }
 };
-// Helper to convert Arabic numerals to English numerals
-function toEnglishDigits(str) {
-  if (!str) return str;
-  return str.replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)])
-    .replace(/[۰-۹]/g, d => '0123456789'['۰۱۲۳۴۵۶۷۸۹'.indexOf(d)]);
-}
 // Helper to format Egyptian phone numbers to international format
 function formatEgyptianPhoneNumber(number) {
   if (!number) return number;
-  let num = toEnglishDigits(number).replace(/[-\s]/g, '');
+  let num = number;
   if (num.startsWith('+20')) return num;
   if (num.startsWith('0')) return '+20' + num.slice(1);
   if (num.startsWith('20')) return '+' + num;
