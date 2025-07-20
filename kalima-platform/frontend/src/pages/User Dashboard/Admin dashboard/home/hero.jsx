@@ -14,45 +14,47 @@ const Hero = () => {
   const dir = isRTL ? 'rtl' : 'ltr';
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Fetch all data in parallel
-        const [
-          lecturerResponse,
-          assistantResponse,
-          parentResponse,
-          studentResponse
-        ] = await Promise.all([
-          getAllLecturers(),
-          getAllAssistants(),
-          getAllParents(),
-          getAllStudents()
-        ]);
-
-        // Check for errors in responses
-        if (!lecturerResponse.success || !assistantResponse.success || 
-            !parentResponse.success || !studentResponse.success) {
-          throw new Error('Failed to fetch some user data');
-        }
-
-        // Set state with fetched data
-        setLecturers(lecturerResponse.data);
-        setAssistants(assistantResponse.data);
-        setParents(parentResponse.data);
-        setStudents(studentResponse.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        setError(error.message || 'Failed to fetch data');
-      } finally {
-        setLoading(false);
+      // Fetch data one at a time (sequentially)
+      const lecturerResponse = await getAllLecturers();
+      if (!lecturerResponse.success) {
+        throw new Error("Failed to fetch lecturers");
       }
-    };
+      setLecturers(lecturerResponse.data);
 
-    fetchData();
-  }, []); // Empty dependency array means this runs once on mount
+      const assistantResponse = await getAllAssistants();
+      if (!assistantResponse.success) {
+        throw new Error("Failed to fetch assistants");
+      }
+      setAssistants(assistantResponse.data);
+
+      const parentResponse = await getAllParents();
+      if (!parentResponse.success) {
+        throw new Error("Failed to fetch parents");
+      }
+      setParents(parentResponse.data);
+
+      const studentResponse = await getAllStudents();
+      if (!studentResponse.success) {
+        throw new Error("Failed to fetch students");
+      }
+      setStudents(studentResponse.data);
+      
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError(error.message || "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+ // Empty dependency array means this runs once on mount
 
   return (
     <div className="mx-auto p-6 w-full font-[Cairo]">
