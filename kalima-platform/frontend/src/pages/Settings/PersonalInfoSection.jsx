@@ -341,8 +341,8 @@ function PersonalInfoSection() {
 
   const hasProfilePic = userData?.profilePic
   const currentProfilePicUrl = hasProfilePic
-    ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\\/g, "/")}`
-    : "/default-avatar.png"
+  ? convertPathToUrl(userData.profilePic)
+  : "/default-avatar.png"
 
   return (
     <div className="mb-8">
