@@ -81,8 +81,8 @@
       "whatsApp": "واتساب",
       "government": "المحافظة",
     "selectGovernment": "اختر المحافظة",
-    "administrationZone": "المنطقة الإدارية",
-    "selectAdministrationZone": "اختر المنطقة الإدارية",
+    "administrationZone": "الاداره التعليميه",
+    "selectAdministrationZone": "اختر الاداره التعليميه",
     "yourCustomHobbies": "هواياتك الخاصة",
     "referralSerial": "كود الدعوه",
     "profilePic": "صورة الملف الشخصي"
@@ -177,7 +177,7 @@
         "socialMediaPlatform": "المنصة مطلوبة",
         "socialMediaAccount": "اسم الحساب مطلوب",
         "governmentRequired": "المحافظة مطلوبة",
-    "administrationZoneRequired": "المنطقة الإدارية مطلوبة"
+    "administrationZoneRequired": "الاداره التعليميه مطلوبة"
         },
         "errors": {
           "apiError": "خطأ في الخادم",
