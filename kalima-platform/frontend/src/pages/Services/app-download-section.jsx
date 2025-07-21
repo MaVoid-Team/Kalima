@@ -61,7 +61,7 @@ export function AppDownloadSection() {
               </h2>
 
               <p className={`text-lg md:text-xl mb-6 ${isRTL ? "text-right" : "text-left"}`}>
-                {t("appDownload.content1") || "Best free educational app. Download our app"}{" "}
+                {t("appDownload.content1") || "Download our app"}{" "}
                 <span className="text-primary">{t("appDownload.now") || "now"}</span>{" "}
                 {t("appDownload.content2") || "on your mobile to learn"}{" "}
                 <span className="text-primary">{t("appDownload.everywhere") || "everywhere"}</span>
