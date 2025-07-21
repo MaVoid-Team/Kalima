@@ -2,264 +2,215 @@ require('dotenv').config();
 const mongoose = require("mongoose");
 const government = require("../../models/governmentModel");
 
-const governmentsData = [
-    {
-        name: "Alexandria",
-        administrationZone: [
-            "East Educational Administration", "West Educational Administration",
-            "Central Educational Administration", "El-Gomrok Educational Administration",
-            "Montaza Educational Administration", "Agamy Educational Administration",
-            "Amreya Educational Administration"
-        ]
-    },
-    {
-        name: "Aswan",
-        administrationZone: [
-            "Aswan Educational Administration", "Edfu Educational Administration",
-            "Kom Ombo Educational Administration", "Nasr El-Nuba Educational Administration",
-            "Daraw Educational Administration", "El-Radisiya Educational Administration"
-        ]
-    },
-    {
-        name: "Assiut",
-        administrationZone: [
-            "Assiut Educational Administration", "Dairut Educational Administration",
-            "El-Qusiya Educational Administration", "Abnoub Educational Administration",
-            "El-Fateh Educational Administration", "Sahel Selim Educational Administration",
-            "El-Badari Educational Administration", "Sodfa Educational Administration",
-            "El-Ghanayem Educational Administration", "Abu Tig Educational Administration",
-            "Manfalut Educational Administration"
-        ]
-    },
-    {
-        name: "Beheira",
-        administrationZone: [
-            "Damanhour Educational Administration", "Kafr El-Dawar Educational Administration",
-            "Abu Hummus Educational Administration", "Edko Educational Administration",
-            "El-Mahmoudia Educational Administration", "El-Rahmaniya Educational Administration",
-            "Kom Hamada Educational Administration", "Itay El-Baroud Educational Administration",
-            "Hosh Essa Educational Administration", "Shubrakhit Educational Administration",
-            "El-Delengat Educational Administration", "Wadi El-Natrun Educational Administration"
-        ]
-    },
-    {
-        name: "Beni Suef",
-        administrationZone: [
-            "Beni Suef Educational Administration", "El-Wasta Educational Administration",
-            "Nasser Educational Administration", "Ihnasia Educational Administration",
-            "Beba Educational Administration", "Fashn Educational Administration",
-            "Samasta Educational Administration"
-        ]
-    },
-    {
-        name: "Cairo",
-        administrationZone: [
-            "East Cairo Educational Administration", "West Cairo Educational Administration",
-            "North Cairo Educational Administration", "South Cairo Educational Administration",
-            "Central Cairo Educational Administration", "El-Waili Educational Administration",
-            "El-Zeitoun Educational Administration", "Heliopolis Educational Administration",
-            "Nasr City Educational Administration", "El-Salam Educational Administration",
-            "El-Matariya Educational Administration", "Ain Shams Educational Administration",
-            "El-Marg Educational Administration", "El-Shorouk Educational Administration"
-        ]
-    },
-    {
-        name: "Dakahlia",
-        administrationZone: [
-            "Mansoura Educational Administration", "Talkha Educational Administration",
-            "Mit Ghamr Educational Administration", "Aga Educational Administration",
-            "Sinbillawin Educational Administration", "El-Manzala Educational Administration",
-            "Belqas Educational Administration", "Sherbin Educational Administration",
-            "Dikirnis Educational Administration", "El-Gammaliya Educational Administration",
-            "Mit Salsil Educational Administration", "Nabaroh Educational Administration"
-        ]
-    },
-    {
-        name: "Damietta",
-        administrationZone: [
-            "Damietta Educational Administration", "Faraskour Educational Administration",
-            "Kafr Saad Educational Administration", "El-Zarqa Educational Administration",
-            "Kafr El-Batikh Educational Administration"
-        ]
-    },
-    {
-        name: "Fayoum",
-        administrationZone: [
-            "Fayoum Educational Administration", "Tamiya Educational Administration",
-            "Sinnuris Educational Administration", "Ibshaway Educational Administration",
-            "Itsa Educational Administration", "Youssef El Seddik Educational Administration"
-        ]
-    },
-    {
-        name: "Gharbia",
-        administrationZone: [
-            "Tanta Educational Administration", "El-Mahalla El-Kubra Educational Administration",
-            "Kafr El-Zayat Educational Administration", "Zefta Educational Administration",
-            "El-Santa Educational Administration", "Samannoud Educational Administration",
-            "Bassioun Educational Administration", "Qutour Educational Administration"
-        ]
-    },
-    {
-        name: "Giza",
-        administrationZone: [
-            "North Giza Educational Administration", "South Giza Educational Administration",
-            "East Giza Educational Administration", "West Giza Educational Administration",
-            "6th of October Educational Administration", "El-Haram Educational Administration",
-            "El-Dokki Educational Administration", "El-Agouza Educational Administration",
-            "El-Wahat Educational Administration", "Atfih Educational Administration"
-        ]
-    },
-    {
-        name: "Ismailia",
-        administrationZone: [
-            "Ismailia Educational Administration", "El-Tal El-Kebir Educational Administration",
-            "Fayed Educational Administration", "El-Qantara Educational Administration",
-            "Abu Swair Educational Administration", "El-Qassassin Educational Administration"
-        ]
-    },
-    {
-        name: "Kafr el-Sheikh",
-        administrationZone: [
-            "Kafr El-Sheikh Educational Administration", "Desouk Educational Administration",
-            "Fuwwah Educational Administration", "Motobas Educational Administration",
-            "Baltim Educational Administration", "Sidi Salem Educational Administration",
-            "Qalin Educational Administration", "El-Hamoul Educational Administration",
-            "El-Riyad Educational Administration", "Bella Educational Administration"
-        ]
-    },
-    {
-        name: "Matrouh",
-        administrationZone: [
-            "Marsa Matrouh Educational Administration", "El-Hamam Educational Administration",
-            "El-Alamein Educational Administration", "El-Dabaa Educational Administration",
-            "El-Salloum Educational Administration", "Siwa Educational Administration"
-        ]
-    },
-    {
-        name: "Minya",
-        administrationZone: [
-            "Minya Educational Administration", "Abu Qurqas Educational Administration",
-            "El-Adwa Educational Administration", "Maghagha Educational Administration",
-            "Beni Mazar Educational Administration", "Matai Educational Administration",
-            "Samalut Educational Administration", "Mallawi Educational Administration",
-            "Dir Mawas Educational Administration"
-        ]
-    },
-    {
-        name: "Menofia",
-        administrationZone: [
-            "Shebin El-Kom Educational Administration", "Menouf Educational Administration",
-            "Ashmoun Educational Administration", "Quesna Educational Administration",
-            "El-Bagour Educational Administration", "El-Shohada Educational Administration",
-            "Berket El-Sab Educational Administration", "Tala Educational Administration",
-            "Sers El-Lyan Educational Administration"
-        ]
-    },
-    {
-        name: "New Valley",
-        administrationZone: [
-            "Kharga Educational Administration", "Dakhla Educational Administration",
-            "Farafra Educational Administration", "Baris Educational Administration",
-            "Balat Educational Administration"
-        ]
-    },
-    {
-        name: "North Sinai",
-        administrationZone: [
-            "El-Arish Educational Administration", "Sheikh Zuweid Educational Administration",
-            "Rafah Educational Administration", "Bir al-Abd Educational Administration",
-            "El-Hasana Educational Administration", "Nakhl Educational Administration"
-        ]
-    },
-    {
-        name: "Port Said",
-        administrationZone: [
-            "Port Said North Educational Administration", "Port Said South Educational Administration",
-            "Port Fouad Educational Administration", "El-Zohor Educational Administration",
-            "El-Arab District Educational Administration", "El-Dawahy Educational Administration"
-        ]
-    },
-    {
-        name: "Qualyubia",
-        administrationZone: [
-            "East Shubra El-Kheima Educational Administration",
-            "West Shubra El-Kheima Educational Administration",
-            "Banha Educational Administration",
-            "Khanka Educational Administration",
-            "Tukh Educational Administration",
-            "Qalyub Educational Administration",
-            "Shebin El-Qanater Educational Administration",
-            "Kafr Shukr Educational Administration",
-            "Obour Educational Administration",
-            "Khosous Educational Administration"
-        ] // Add zones if available
-    },
-    {
-        name: "Qena",
-        administrationZone: [
-            "Qena Educational Administration", "Abu Tesht Educational Administration",
-            "Nag Hammadi Educational Administration", "Deshna Educational Administration",
-            "Farshout Educational Administration", "Qift Educational Administration",
-            "Qus Educational Administration", "Naqada Educational Administration"
-        ]
-    },
-    {
-        name: "Red Sea",
-        administrationZone: [
-            "Hurghada Educational Administration", "Ras Gharib Educational Administration",
-            "Safaga Educational Administration", "El-Qusair Educational Administration",
-            "Marsa Alam Educational Administration", "Shalatin Educational Administration",
-            "Halayeb Educational Administration"
-        ]
-    },
-    {
-        name: "Al-Sharqia",
-        administrationZone: [
-            "Zagazig Educational Administration", "Fakous Educational Administration",
-            "Hehia Educational Administration", "Abu Hammad Educational Administration",
-            "Abu Kebir Educational Administration", "El-Ibrahimia Educational Administration",
-            "Belbeis Educational Administration", "Menia El-Kamh Educational Administration",
-            "Diarb Negm Educational Administration", "Kafr Saqr Educational Administration",
-            "Mashtool El-Souk Educational Administration"
-        ]
-    },
-    {
-        name: "Sohag",
-        administrationZone: [
-            "Sohag Educational Administration", "Akhmim Educational Administration",
-            "El-Balyana Educational Administration", "El-Maragha Educational Administration",
-            "Dar El-Salam Educational Administration", "Gerga Educational Administration",
-            "Juhayna Educational Administration", "Sakulta Educational Administration",
-            "Tama Educational Administration", "Tahta Educational Administration",
-            "El-Munsha Educational Administration"
-        ]
-    },
-    {
-        name: "South Sinai",
-        administrationZone: [
-            "El-Tor Educational Administration", "Sharm El-Sheikh Educational Administration",
-            "Dahab Educational Administration", "Nuweiba Educational Administration",
-            "Saint Catherine Educational Administration", "Abu Rudeis Educational Administration",
-            "Ras Sidr Educational Administration"
-        ]
-    },
-    {
-        name: "Suez",
-        administrationZone: [
-            "Suez Educational Administration", "El-Arbaeen Educational Administration",
-            "Ataqah Educational Administration", "El-Ganayen Educational Administration",
-            "Faisal Educational Administration"
-        ]
-    },
-    {
-        name: "Luxor",
-        administrationZone: [
-            "Luxor Educational Administration", "Armant Educational Administration",
-            "Esna Educational Administration", "El-Tod Educational Administration",
-            "El-Qurna Educational Administration"
-        ]
-    }
-];
+const governmentsData =
+    [
+        {
+            name: "محافظة الإسكندرية",
+            administrationZone: [
+                "إدارة الجمرك", "إدارة برج العرب", "إدارة وسط", "إدارة غرب", "إدارة المنتزة أول",
+                "إدارة المنتزة ثانٍ", "إدارة العامرية", "إدارة العجمي", "إدارة شرق"
+            ]
+        },
+        {
+            name: "محافظة البحيرة",
+            administrationZone: [
+                "إدارة مركز دمنهور", "إدارة المحمودية", "إدارة شبراخيت", "إدارة الرحمانية", "إدارة حوش عيسى",
+                "إدارة إدكو", "إدارة رشيد", "إدارة أبو المطامير", "إدارة وادي النطرون", "إدارة التحرير",
+                "إدارة النوبارية", "إدارة بندر دمنهور", "إدارة بندر كفر الدوار", "إدارة مركز كفر الدوار",
+                "إدارة كوم حمادة", "إدارة أبو حمص", "إدارة الدلنجات", "إدارة ايتاي البارود"
+            ]
+        },
+        {
+            name: "محافظة الشرقية",
+            administrationZone: [
+                "إدارة شرق", "إدارة غرب", "إدارة القنايات", "إدارة بلبيس", "إدارة العاشر", "إدارة مشتول",
+                "إدارة منيا القمح", "إدارة أبو حماد", "إدارة القرين", "إدارة دير نجم", "إدارة ههيا",
+                "إدارة الإبراهيمية", "إدارة أبو كبير", "إدارة كفر صقر", "إدارة أولاد صقر", "إدارة فاقوس",
+                "إدارة الحسينية", "إدارة صان الحجر", "إدارة منشأة أبو عمر", "إدارة الصالحية"
+            ]
+        },
+        {
+            name: "محافظة بني سويف",
+            administrationZone: [
+                "إدارة الواسطى", "إدارة بني سويف", "إدارة الفشن", "إدارة ناصر", "إدارة اهناسيا",
+                "إدارة ببا", "إدارة سمسطا"
+            ]
+        },
+        {
+            name: "محافظة الدقهلية",
+            administrationZone: [
+                "إدارة غرب المنصورة", "إدارة طلخا", "إدارة بلقاس", "إدارة شربين", "إدارة السنبلاوين",
+                "إدارة ميت غمر", "إدارة دكرنس", "إدارة تمي الأمديد", "إدارة بني عبيد", "إدارة منية النصر",
+                "إدارة ميت سلسيل", "إدارة المنزلة", "إدارة شرق المنصورة", "إدارة نبروه", "إدارة أجا",
+                "إدارة الجمالية", "إدارة المطرية", "إدارة مدارس اللغات"
+            ]
+        },
+        {
+            name: "محافظة مطروح",
+            administrationZone: [
+                "إدارة قطاع البنجر", "إدارة الحمام", "إدارة مطروح", "إدارة العلمين", "إدارة الضبعة",
+                "إدارة براني", "إدارة نجيله", "إدارة السلوم", "إدارة سيوة"
+            ]
+        },
+        {
+            name: "محافظة القليوبية",
+            administrationZone: [
+                "إدارة بنها", "إدارة طوخ", "إدارة قها", "إدارة قليوب", "إدارة القناطر الخيرية",
+                "إدارة غرب شبرا", "إدارة شرق شبرا", "إدارة شبين القناطر", "إدارة الخانكة",
+                "إدارة الخصوص", "إدارة العبور", "إدارة كفر شكر"
+            ]
+        },
+        {
+            name: "محافظة سوهاج",
+            administrationZone: [
+                "إدارة البلينا", "إدارة طما", "إدارة طهطا", "إدارة جهينة", "إدارة أسيوط",
+                "إدارة مراغة", "إدارة سوهاج", "إدارة أخميم", "إدارة ساقلتة", "إدارة دار السلام",
+                "إدارة المنشأة", "إدارة جرجا"
+            ]
+        },
+        {
+            name: "محافظة السويس",
+            administrationZone: [
+                "إدارة جنوب السويس", "إدارة شمال السويس", "إدارة الجناين"
+            ]
+        },
+        {
+            name: "محافظة الجيزة",
+            administrationZone: [
+                "إدارة الهرم", "إدارة حدائق أكتوبر", "إدارة العمرانية", "إدارة أوسيم", "إدارة بولاق",
+                "إدارة كرداسة", "إدارة منشأة القناطر", "إدارة البدرشين", "إدارة العياط", "إدارة 6 أكتوبر",
+                "إدارة شمال الجيزة", "إدارة أبو النمرس", "إدارة الصف", "إدارة أطفيح", "إدارة الوراق",
+                "إدارة جنوب الجيزة", "إدارة العجوزة", "إدارة الدقي", "إدارة الحوامدية", "إدارة الشيخ زايد",
+                "إدارة الواحات البحرية"
+            ]
+        },
+        {
+            name: "محافظة الإسماعيلية",
+            administrationZone: [
+                "إدارة شمال الإسماعيلية", "إدارة جنوب الإسماعيلية", "إدارة أبو صوير", "إدارة القصاصين",
+                "إدارة التل الكبير", "إدارة فايد", "إدارة غرب القنطرة", "إدارة شرق القنطرة"
+            ]
+        },
+        {
+            name: "محافظة الأقصر",
+            administrationZone: [
+                "إدارة الأقصر", "إدارة البياضية", "إدارة طود", "إدارة الزينية", "إدارة القرنة",
+                "إدارة أرمنت", "إدارة إسنا"
+            ]
+        },
+        {
+            name: "محافظة المنوفية",
+            administrationZone: [
+                "إدارة شبين الكوم", "إدارة السادات", "إدارة أشمون", "إدارة منوف", "إدارة تلا",
+                "إدارة قويسنا", "إدارة الباجور", "إدارة الشهداء", "إدارة بركة السبع", "إدارة سرس الليان"
+            ]
+        },
+        {
+            name: "محافظة القاهرة",
+            administrationZone: [
+                "إدارة روض الفرج", "إدارة الساحل", "إدارة شبرا", "إدارة الشرابية", "إدارة الزاوية",
+                "إدارة حدائق القبة", "إدارة الزيتون", "إدارة مصر الجديدة", "إدارة النزهة",
+                "إدارة شرق مدينة نصر", "إدارة غرب مدينة نصر", "إدارة القاهرة الجديدة", "إدارة الشروق",
+                "إدارة بدر", "إدارة السلام", "إدارة المرج", "إدارة المطرية", "إدارة عين شمس",
+                "إدارة غرب القاهرة", "إدارة عابدين", "إدارة وسط القاهرة", "إدارة باب الشعرية",
+                "إدارة الوايلي", "إدارة منشية ناصر", "إدارة السيدة زينب", "إدارة الخليفة", "إدارة المقطم",
+                "إدارة مصر القديمة", "إدارة البساتين", "إدارة دار السلام", "إدارة المعادي",
+                "إدارة المعصرة", "إدارة حلوان", "إدارة التبين", "إدارة المستقبل"
+            ]
+        },
+        {
+            name: "محافظة الوادي الجديد",
+            administrationZone: [
+                "إدارة الخارجة", "إدارة باريس", "إدارة بلاط", "إدارة الداخلة", "إدارة الفرافرة"
+            ]
+        },
+        {
+            name: "محافظة كفر الشيخ",
+            administrationZone: [
+                "إدارة شرق كفر الشيخ", "إدارة غرب كفر الشيخ", "إدارة الرياض", "إدارة سيدي سالم",
+                "إدارة دسوق", "إدارة قلين", "إدارة فوة", "إدارة مطوبس", "إدارة بيلا", "إدارة الحامول",
+                "إدارة بلطيم", "إدارة برج البرلس", "إدارة سيدي غازي"
+            ]
+        },
+        {
+            name: "محافظة أسيوط",
+            administrationZone: [
+                "إدارة أسيوط", "إدارة ديروط", "إدارة القوصية", "إدارة منفلوط", "إدارة ابنوب",
+                "إدارة البدارى", "إدارة أبو تيج", "إدارة الفتح", "إدارة صدفا", "إدارة الغنايم",
+                "إدارة ساحل سليم"
+            ]
+        },
+        {
+            name: "محافظة البحر الأحمر",
+            administrationZone: [
+                "إدارة رأس غارب", "إدارة الغردقة", "إدارة سفاجا", "إدارة القصير", "إدارة مرسى علم",
+                "إدارة شلاتين", "إدارة حلايب"
+            ]
+        },
+        {
+            name: "محافظة بور سعيد",
+            administrationZone: [
+                "إدارة بور فؤاد", "إدارة شرق", "إدارة جنوب", "إدارة شمال", "إدارة الزهور",
+                "إدارة بحر البقر", "إدارة الإسماعيلية"
+            ]
+        },
+        {
+            name: "محافظة الغربية",
+            administrationZone: [
+                "إدارة شرق طنطا", "إدارة غرب طنطا", "إدارة شرق المحلة", "إدارة زفتى", "إدارة غرب المحلة",
+                "إدارة سمنود", "إدارة السنطة", "إدارة قطور", "إدارة كفر الزيات", "إدارة بسيون"
+            ]
+        },
+        {
+            name: "محافظة أسوان",
+            administrationZone: [
+                "إدارة أسوان", "إدارة دراو", "إدارة نصر", "إدارة كوم امبو", "إدارة أدفو"
+            ]
+        },
+        {
+            name: "محافظة المنيا",
+            administrationZone: [
+                "إدارة العدوة", "إدارة مغاغة", "إدارة بني مزار", "إدارة مطاي", "إدارة سمالوط",
+                "إدارة المنيا", "إدارة أبو قرقاص", "إدارة ملوي", "إدارة دير مواس"
+            ]
+        },
+        {
+            name: "محافظة دمياط",
+            administrationZone: [
+                "إدارة عزبة البرج", "إدارة دمياط", "إدارة الروضة", "إدارة فارسكور", "إدارة الزرقا",
+                "إدارة دمياط الجديدة", "إدارة كفر البطيخ", "إدارة ميت أبو غالب", "إدارة السرو",
+                "إدارة كفر سعد"
+            ]
+        },
+        {
+            name: "محافظة قنا",
+            administrationZone: [
+                "إدارة أبو تشت", "إدارة فرشوط", "إدارة نجع حمادي", "إدارة دشنا", "إدارة الوقف",
+                "إدارة قنا", "إدارة قفط", "إدارة قوص", "إدارة نقادة"
+            ]
+        },
+        {
+            name: "محافظة شمال سيناء",
+            administrationZone: [
+                "إدارة بئر العبد", "إدارة نخلة", "إدارة الحسنة", "إدارة العريش", "إدارة الشيخ زويد",
+                "إدارة رفح"
+            ]
+        },
+        {
+            name: "محافظة الفيوم",
+            administrationZone: [
+                "إدارة غرب الفيوم", "إدارة شرق الفيوم", "إدارة أطسا", "إدارة سنورس", "إدارة طامية",
+                "إدارة أبشواي", "إدارة يوسف الصديق"
+            ]
+        },
+        {
+            name: "محافظة جنوب سيناء",
+            administrationZone: [
+                "إدارة الطور", "إدارة دهب", "إدارة أبو رديس", "إدارة رأس سدر", "إدارة نخل",
+                "إدارة نويبع", "إدارة سانت كاترين", "إدارة شرم الشيخ"
+            ]
+        }
+    ]
 
 async function seedGovernments() {
     try {
