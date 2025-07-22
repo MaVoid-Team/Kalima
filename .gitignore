@@ -49,6 +49,7 @@ frontend/.cache/
 .fusebox/
 .dynamodb/
 
+uploads/
 # Config files
 .env
 .env.*
