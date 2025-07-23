@@ -256,9 +256,9 @@ const ProductsManagement = memo(({
         )}
 
         {/* Decorative dots */}
-        <div className={`absolute bottom-4 ${isRTL ? "left-4" : "right-4"}`}>
+        {/* <div className={`absolute bottom-4 ${isRTL ? "left-4" : "right-4"}`}>
           <img src="/rDots.png" alt={t("decorativeDots")} className="w-16 h-full animate-float-down-dottedball" />
-        </div>
+        </div> */}
       </div>
     </div>
   )
