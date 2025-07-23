@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema(
 // Middleware to calculate discountPercentage from price and priceAfterDiscount
 productSchema.pre("save", function (next) {
     if (this.price && this.priceAfterDiscount !== undefined && this.price !== 0) {
-        this.discountPercentage = Math.ceil(((this.price - this.priceAfterDiscount) / this.price) * 100);
+        this.discountPercentage = Math.round(((this.price - this.priceAfterDiscount) / this.price) * 100);
     } else {
         this.discountPercentage = 0;
     }
@@ -59,7 +59,8 @@ productSchema.pre("findOneAndUpdate", function (next) {
         const finalPriceAfterDiscount = typeof priceAfterDiscount === "number" ? priceAfterDiscount : doc ? doc.priceAfterDiscount : finalPrice;
         let discount = 0;
         if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
-            discount = Math.ceil(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+            discount = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+            ;
         }
         if (update.$set) update.$set.discountPercentage = discount;
         else update.discountPercentage = discount;
