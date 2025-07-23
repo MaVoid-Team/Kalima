@@ -117,8 +117,7 @@ const ProductsManagement = memo(({
         >
           <option value={5}>5</option>
           <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
+          <option value={15}>15</option>
         </select>
         <span className="text-sm text-gray-600">{t("pagination.perPage") || "per page"}</span>
       </div>
