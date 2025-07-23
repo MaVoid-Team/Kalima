@@ -71,8 +71,6 @@ const ProductsManagement = memo(({
     if (!price || !discountPercentage || discountPercentage <= 0) {
       return price || 0
     }
-    const discountAmount = (price * discountPercentage) / 100
-    return (price - discountAmount).toFixed(2)
   }, [])
 
   // Pagination handlers
@@ -195,8 +193,6 @@ const ProductsManagement = memo(({
               {paginatedItems.map((product) => {
                 if (!product?._id) return null
 
-                const finalPrice = formatPrice(product.price, product.discountPercentage)
-
                 return (
                   <tr key={product._id}>
                     <td className="text-center font-medium">{product.title || t("nA")}</td>
@@ -209,7 +205,7 @@ const ProductsManagement = memo(({
                     <td className="text-center">
                       {product.discountPercentage > 0 ? `${product.discountPercentage}%` : t("zeroPercent")}
                     </td>
-                    <td className="text-center font-bold text-primary">{finalPrice}</td>
+                    <td className="text-center font-bold text-primary">{product.priceAfterDiscount ? product.priceAfterDiscount : product.price}</td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button
