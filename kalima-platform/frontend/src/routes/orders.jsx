@@ -14,7 +14,6 @@ export const getAllProductPurchases = async (queryParams = {}) => {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
-
     const response = await axios.get(`${API_URL}/api/v1/ec/purchases/`, {
       params: {
         limit: 6, // Fixed limit as requested
@@ -25,7 +24,6 @@ export const getAllProductPurchases = async (queryParams = {}) => {
         Authorization: `Bearer ${getToken()}`,
       },
     })
-
     return {
       success: true,
       data: response.data,
