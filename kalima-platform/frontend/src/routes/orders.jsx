@@ -127,13 +127,20 @@ export const getAllStats = async () => {
   }
 }
 
-export const getProductStats = async () => {
+export const getProductStats = async (date = null) => {
   try {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/ec/purchases/product-purchase-stats`, {
+    let url = `${API_URL}/ec/purchases/product-purchase-stats`
+
+    // If date is provided, use the stats endpoint with date parameter
+    if (date) {
+      url = `${API_URL}/ec/purchases/stats?date=${date}`
+    }
+
+    const response = await axios.get(url, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

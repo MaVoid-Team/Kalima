@@ -169,7 +169,7 @@ const AboutSection = React.memo(({ isRTL }) => {
             >
               <div className="relative w-full h-full max-w-[500px]">
                 <img
-                  src="/education-image-services.png"
+                  src="/man-working.jpg"
                   alt={isRTL ? "طلاب يدرسون" : "Students learning"}
                   className="w-full h-full object-contain rounded-xl"
                   loading="lazy"
