@@ -36,6 +36,17 @@ const StoreAnalytics = () => {
     confirmedRevenue: 0,
     averagePrice: 0,
   })
+
+  // Store original overview stats to restore when clearing filters
+  const [originalOverviewStats, setOriginalOverviewStats] = useState({
+    totalPurchases: 0,
+    confirmedPurchases: 0,
+    pendingPurchases: 0,
+    totalRevenue: 0,
+    confirmedRevenue: 0,
+    averagePrice: 0,
+  })
+
   const [monthlyStats, setMonthlyStats] = useState([])
   const [productStats, setProductStats] = useState([])
   const [filteredProductStats, setFilteredProductStats] = useState([])
@@ -84,6 +95,7 @@ const StoreAnalytics = () => {
       if (response.success) {
         const { overview, monthlyStats } = response.data.data
         setOverviewStats(overview)
+        setOriginalOverviewStats(overview) // Store original stats
         setMonthlyStats(monthlyStats || [])
       } else {
         throw new Error(response.error)
@@ -175,9 +187,8 @@ const StoreAnalytics = () => {
   const handleMonthFilterChange = (monthValue) => {
     setSelectedMonth(monthValue)
     if (monthValue === "all") {
-      // Use overall stats
-      const overview = overviewStats
-      setOverviewStats(overview)
+      // Restore original overview stats
+      setOverviewStats(originalOverviewStats)
     } else {
       // Find specific month stats
       const monthData = monthlyStats.find((stat) => `${stat._id.year}-${stat._id.month}` === monthValue)
@@ -201,18 +212,26 @@ const StoreAnalytics = () => {
       fetchProductStats(date)
     } else {
       fetchProductStats()
+      // Restore original overview stats when clearing date
+      if (selectedMonth === "all") {
+        setOverviewStats(originalOverviewStats)
+      }
     }
   }
 
-  // Update the clearFilters function to include date
+  // Update the clearFilters function to properly reset everything
   const clearFilters = () => {
     setSelectedMonth("all")
     setRevenueFilter("all")
     setConfirmationFilter("all")
     setSearchQuery("")
     setSelectedDate("")
-    handleMonthFilterChange("all")
-    fetchProductStats() // Fetch regular product stats
+
+    // Restore original overview stats
+    setOverviewStats(originalOverviewStats)
+
+    // Refetch regular product stats
+    fetchProductStats()
   }
 
   // Update hasActiveFilters to include selectedDate
@@ -639,14 +658,6 @@ const StoreAnalytics = () => {
                     const maxPurchases = Math.max(...filteredProductStats.map((p) => Number(p.totalPurchases) || 0))
                     const performancePercentage = maxPurchases > 0 ? (totalPurchases / maxPurchases) * 100 : 0
 
-                    // Debug log for each product
-                    console.log(`Product ${product.productName}:`, {
-                      totalValue,
-                      totalPurchases,
-                      avgValue,
-                      rawProduct: product,
-                    })
-
                     return (
                       <tr key={product.productId} className="hover">
                         <td className="text-center">
@@ -664,7 +675,6 @@ const StoreAnalytics = () => {
                         </td>
                         <td className="text-center font-bold">
                           <span className="text-success">{formatPrice(totalValue)}</span>
-                          <div className="text-xs opacity-50">Raw: {totalValue}</div>
                         </td>
                         <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
                         <td className="text-center">
@@ -733,7 +743,7 @@ const StoreAnalytics = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div>{" "}
         </div>
       )}
     </div>
