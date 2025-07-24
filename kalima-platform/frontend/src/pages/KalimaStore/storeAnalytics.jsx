@@ -201,6 +201,7 @@ const StoreAnalytics = () => {
       fetchProductStats(date)
     } else {
       fetchProductStats()
+      setSelectedDate("")
     }
   }
 
