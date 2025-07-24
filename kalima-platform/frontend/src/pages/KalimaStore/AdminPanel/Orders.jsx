@@ -9,7 +9,7 @@ import {
   updatePurchase,
 } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
-import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X } from "lucide-react"
+import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X, Calendar, Filter } from "lucide-react"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -22,6 +22,7 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
+  const [selectedDate, setSelectedDate] = useState("") // Add date filter state
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalPurchases, setTotalPurchases] = useState(0)
@@ -53,7 +54,6 @@ const Orders = () => {
         setCurrentPage(1)
       }
     }, 500)
-
     return () => clearTimeout(timer)
   }, [searchQuery, debouncedSearchQuery, currentPage])
 
@@ -61,24 +61,23 @@ const Orders = () => {
     try {
       setLoading(true)
       setError(null)
-
       const queryParams = {
         page: currentPage,
       }
-
       if (debouncedSearchQuery.trim()) {
         queryParams.search = debouncedSearchQuery.trim()
       }
-
       if (statusFilter !== "all") {
         queryParams.confirmed = statusFilter === "confirmed"
       }
+      // Add date filter to query params
+      if (selectedDate) {
+        queryParams.date = selectedDate
+      }
 
       const response = await getAllProductPurchases(queryParams)
-
       if (response.success) {
         let purchases = response.data.data.purchases
-
         if (typeFilter !== "all") {
           if (typeFilter === "book") {
             purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
@@ -113,7 +112,7 @@ const Orders = () => {
     } finally {
       setLoading(false)
     }
-  }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery])
+  }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery, selectedDate])
 
   const handleRefresh = useCallback(() => {
     fetchOrders()
@@ -123,12 +122,31 @@ const Orders = () => {
     fetchOrders()
   }, [fetchOrders])
 
+  // Add date change handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date)
+    if (currentPage !== 1) {
+      setCurrentPage(1) // Reset to first page when date changes
+    }
+  }
+
+  // Add clear filters function
+  const clearFilters = () => {
+    setSearchQuery("")
+    setStatusFilter("all")
+    setTypeFilter("all")
+    setSelectedDate("")
+    setCurrentPage(1)
+  }
+
+  // Check if any filters are active
+  const hasActiveFilters =
+    searchQuery.trim() !== "" || statusFilter !== "all" || typeFilter !== "all" || selectedDate !== ""
+
   const handleConfirmOrder = async (order) => {
     try {
       setConfirmLoading({ ...confirmLoading, [order._id]: true })
-
       let response
-
       if (order.__t === "ECBookPurchase") {
         response = await confirmBookPurchase(order._id)
       } else {
@@ -137,13 +155,11 @@ const Orders = () => {
 
       if (response.success) {
         setOrders((prevOrders) => prevOrders.map((o) => (o._id === order._id ? { ...o, confirmed: true } : o)))
-
         setStats((prevStats) => ({
           ...prevStats,
           confirmed: prevStats.confirmed + 1,
           pending: prevStats.pending - 1,
         }))
-
         alert(t("alerts.orderConfirmed"))
       } else {
         throw new Error(response.error)
@@ -173,16 +189,7 @@ const Orders = () => {
   const handleWhatsAppContact = (order) => {
     const phoneNumber = order.createdBy?.phoneNumber
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${order.userName}
-تم استلام طلبك ${order.productName} بنجاح، وجارٍ تجهيزه الآن.
-
-لو عندك أي استفسار بخصوص الطلب ، تقدر تتواصل معانا في أي وقت على نفس الرقم.
-
-نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا!
-
-مع تحيات فريق عمل
-منصة كلمة
-`,
+      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك ${order.productName} بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب ، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`,
     )
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, "_blank")
@@ -237,7 +244,6 @@ const Orders = () => {
 
     try {
       setNotesModal((prev) => ({ ...prev, loading: true }))
-
       const response = await updatePurchase(notesModal.orderId, {
         adminNotes: notesModal.notes,
       })
@@ -249,15 +255,12 @@ const Orders = () => {
             order._id === notesModal.orderId ? { ...order, adminNotes: notesModal.notes } : order,
           ),
         )
-
         // Update selected order if it's the same one
         if (selectedOrder && selectedOrder._id === notesModal.orderId) {
           setSelectedOrder((prev) => ({ ...prev, adminNotes: notesModal.notes }))
         }
-
         // Close modal
         setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
-
         alert(t("alerts.notesSaved"))
       } else {
         throw new Error(response.error)
@@ -435,6 +438,19 @@ const Orders = () => {
                 </button>
               )}
             </div>
+
+            {/* Date Filter */}
+            <div className="flex items-center gap-2 min-w-40">
+              <Calendar className="w-4 h-4" />
+              <input
+                type="date"
+                className="input input-bordered w-full"
+                value={selectedDate}
+                onChange={(e) => handleDateChange(e.target.value)}
+                title={t("filters.selectDate")}
+              />
+            </div>
+
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -446,6 +462,7 @@ const Orders = () => {
                 <option value="pending">{t("filters.pending")}</option>
               </select>
             </div>
+
             <div className="min-w-40">
               <select
                 className="select select-bordered w-full"
@@ -457,13 +474,67 @@ const Orders = () => {
                 <option value="product">{t("filters.products")}</option>
               </select>
             </div>
+
             <button onClick={handleRefresh} className="btn btn-primary" disabled={loading}>
               {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
               {t("refresh")}
             </button>
+
+            {hasActiveFilters && (
+              <button className="btn btn-ghost" onClick={clearFilters}>
+                <X className="w-4 h-4" />
+                {t("clearFilters")}
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Active Filters Indicator */}
+      {hasActiveFilters && (
+        <div className="card shadow-lg mb-6">
+          <div className="card-body p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Filter className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">{t("activeFilters")}:</span>
+              {selectedDate && (
+                <div className="badge badge-info gap-2">
+                  Date: {selectedDate}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => handleDateChange("")} />
+                </div>
+              )}
+              {statusFilter !== "all" && (
+                <div className="badge badge-primary gap-2">
+                  {t(`filters.${statusFilter}`)}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setStatusFilter("all")} />
+                </div>
+              )}
+              {typeFilter !== "all" && (
+                <div className="badge badge-secondary gap-2">
+                  {t(`filters.${typeFilter === "book" ? "books" : "products"}`)}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setTypeFilter("all")} />
+                </div>
+              )}
+              {searchQuery.trim() && (
+                <div className="badge badge-accent gap-2">
+                  Search: "{searchQuery}"
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => setSearchQuery("")} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Filter Alert */}
+      {selectedDate && (
+        <div className="alert alert-info mb-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            <span>Showing orders for {selectedDate}</span>
+          </div>
+        </div>
+      )}
 
       {/* Orders Table */}
       <div className="card shadow-lg overflow-hidden">
@@ -486,16 +557,16 @@ const Orders = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="9" className="text-center py-8">
+                  <td colSpan="10" className="text-center py-8">
                     <div className="loading loading-spinner loading-lg"></div>
                     <p className="mt-2 text-gray-500">{t("loading")}</p>
                   </td>
                 </tr>
               ) : memoizedOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="text-center py-8">
+                  <td colSpan="10" className="text-center py-8">
                     <p className="text-gray-500">
-                      {searchQuery || statusFilter !== "all" || typeFilter !== "all"
+                      {searchQuery || statusFilter !== "all" || typeFilter !== "all" || selectedDate
                         ? t("noOrdersFound")
                         : t("noOrdersAvailable")}
                     </p>
@@ -521,7 +592,13 @@ const Orders = () => {
                       </div>
                     </td>
                     <td className="text-center font-bold">{order.finalPrice}</td>
-                    <td className="text-center font-bold">{order.couponCode != null ? <span className="text-green-500">{order.couponCode.value}</span> : "NA"}</td>
+                    <td className="text-center font-bold">
+                      {order.couponCode != null ? (
+                        <span className="text-green-500">{order.couponCode.value}</span>
+                      ) : (
+                        "NA"
+                      )}
+                    </td>
                     <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
                     <td className="text-center">
                       {order.confirmed ? (
@@ -549,7 +626,9 @@ const Orders = () => {
                         <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
                       )}
                     </td>
-                    <td className="text-center text-sm">{order.formattedCreatedAt} - {formatTime(order.createdAt)}</td>
+                    <td className="text-center text-sm">
+                      {order.formattedCreatedAt} - {formatTime(order.createdAt)}
+                    </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button
@@ -559,23 +638,18 @@ const Orders = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-
                         <button
-                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-blue-600" : "text-gray-400"
-                            }`}
+                          className={`btn btn-ghost btn-sm relative ${
+                            order.adminNotes ? "text-blue-600" : "text-gray-400"
+                          }`}
                           onClick={() => openNotesModal(order)}
-                          title={
-                            order.adminNotes
-                              ? t("table.viewEditNotes")
-                              : t("table.addNotes")
-                          }
+                          title={order.adminNotes ? t("table.viewEditNotes") : t("table.addNotes")}
                         >
                           <Notebook className="w-4 h-4" />
                           {order.adminNotes && (
                             <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
                           )}
                         </button>
-
                         {order.paymentScreenShot && (
                           <button
                             className="btn btn-ghost btn-sm"
@@ -585,7 +659,6 @@ const Orders = () => {
                             <ImageIcon className="w-3 h-3" />
                           </button>
                         )}
-
                         {order.numberTransferredFrom && (
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
@@ -595,7 +668,6 @@ const Orders = () => {
                             <FaWhatsapp />
                           </button>
                         )}
-
                         {!order.confirmed && (
                           <button
                             className="btn btn-success btn-sm"
@@ -642,10 +714,8 @@ const Orders = () => {
               </svg>
               {t("table.previous")}
             </button>
-
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
               let pageToShow
-
               if (totalPages <= 5) {
                 pageToShow = i + 1
               } else if (currentPage <= 3) {
@@ -667,7 +737,6 @@ const Orders = () => {
                 </button>
               )
             })}
-
             <button
               className="join-item btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -679,7 +748,6 @@ const Orders = () => {
               </svg>
             </button>
           </div>
-
           <div className="text-sm text-gray-600">
             {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
           </div>
@@ -703,7 +771,6 @@ const Orders = () => {
                 <X className="w-4 h-4" />
               </button>
             </div>
-
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label">
@@ -721,7 +788,6 @@ const Orders = () => {
                   disabled={notesModal.loading}
                 />
               </div>
-
               {notesModal.hasChanges && (
                 <div className="alert alert-info">
                   <svg
@@ -741,7 +807,6 @@ const Orders = () => {
                 </div>
               )}
             </div>
-
             <div className="modal-action">
               <button className="btn" onClick={closeNotesModal} disabled={notesModal.loading}>
                 {t("table.cancel")}
@@ -773,7 +838,6 @@ const Orders = () => {
         <div className="modal modal-open">
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
-
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -782,7 +846,6 @@ const Orders = () => {
                   </label>
                   <p className="font-mono text-sm">{selectedOrder._id}</p>
                 </div>
-
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">{t("table.purchaseSerial")}</span>
@@ -823,7 +886,6 @@ const Orders = () => {
                   <p>
                     <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
                   </p>
-
                   <p>
                     <strong>{t("table.couponCode")}:</strong> {formatPrice(selectedOrder.couponCode?.value || "NA")}
                   </p>
