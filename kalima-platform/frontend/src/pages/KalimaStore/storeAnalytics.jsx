@@ -36,6 +36,17 @@ const StoreAnalytics = () => {
     confirmedRevenue: 0,
     averagePrice: 0,
   })
+
+  // Store original overview stats to restore when clearing filters
+  const [originalOverviewStats, setOriginalOverviewStats] = useState({
+    totalPurchases: 0,
+    confirmedPurchases: 0,
+    pendingPurchases: 0,
+    totalRevenue: 0,
+    confirmedRevenue: 0,
+    averagePrice: 0,
+  })
+
   const [monthlyStats, setMonthlyStats] = useState([])
   const [productStats, setProductStats] = useState([])
   const [filteredProductStats, setFilteredProductStats] = useState([])
@@ -44,6 +55,17 @@ const StoreAnalytics = () => {
   const [selectedMonth, setSelectedMonth] = useState("all")
   const [revenueFilter, setRevenueFilter] = useState("all") // all, high, medium, low
   const [confirmationFilter, setConfirmationFilter] = useState("all") // all, confirmed, pending
+
+  // Add new state for date selection
+  const [selectedDate, setSelectedDate] = useState("")
+  const [dailyStats, setDailyStats] = useState({
+    totalPurchases: 0,
+    confirmedPurchases: 0,
+    pendingPurchases: 0,
+    totalRevenue: 0,
+    confirmedRevenue: 0,
+    averagePrice: 0,
+  })
   const [searchQuery, setSearchQuery] = useState("")
 
   // Generate month options from monthly stats
@@ -73,6 +95,7 @@ const StoreAnalytics = () => {
       if (response.success) {
         const { overview, monthlyStats } = response.data.data
         setOverviewStats(overview)
+        setOriginalOverviewStats(overview) // Store original stats
         setMonthlyStats(monthlyStats || [])
       } else {
         throw new Error(response.error)
@@ -85,14 +108,23 @@ const StoreAnalytics = () => {
     }
   }, [])
 
-  // Fetch product stats
-  const fetchProductStats = useCallback(async () => {
+  // Update the fetchProductStats function to handle date parameter
+  const fetchProductStats = useCallback(async (date = null) => {
     try {
       setProductStatsLoading(true)
-      const response = await getProductStats()
+      const response = await getProductStats(date)
       if (response.success) {
-        const productData = response.data.data || []
-        setProductStats(productData)
+        if (date) {
+          // Handle date-specific stats response
+          const { overview, dailyStats } = response.data.data
+          setOverviewStats(overview)
+          setDailyStats(dailyStats)
+          setProductStats([]) // Clear product stats when viewing daily stats
+        } else {
+          // Handle regular product stats response
+          const productData = response.data.data || []
+          setProductStats(productData)
+        }
       } else {
         throw new Error(response.error)
       }
@@ -155,9 +187,8 @@ const StoreAnalytics = () => {
   const handleMonthFilterChange = (monthValue) => {
     setSelectedMonth(monthValue)
     if (monthValue === "all") {
-      // Use overall stats
-      const overview = overviewStats
-      setOverviewStats(overview)
+      // Restore original overview stats
+      setOverviewStats(originalOverviewStats)
     } else {
       // Find specific month stats
       const monthData = monthlyStats.find((stat) => `${stat._id.year}-${stat._id.month}` === monthValue)
@@ -174,18 +205,42 @@ const StoreAnalytics = () => {
     }
   }
 
-  // Clear all filters
+  // Add date change handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date)
+    if (date) {
+      fetchProductStats(date)
+    } else {
+      fetchProductStats()
+      // Restore original overview stats when clearing date
+      if (selectedMonth === "all") {
+        setOverviewStats(originalOverviewStats)
+      }
+    }
+  }
+
+  // Update the clearFilters function to properly reset everything
   const clearFilters = () => {
     setSelectedMonth("all")
     setRevenueFilter("all")
     setConfirmationFilter("all")
     setSearchQuery("")
-    handleMonthFilterChange("all")
+    setSelectedDate("")
+
+    // Restore original overview stats
+    setOverviewStats(originalOverviewStats)
+
+    // Refetch regular product stats
+    fetchProductStats()
   }
 
-  // Check if any filters are active
+  // Update hasActiveFilters to include selectedDate
   const hasActiveFilters =
-    selectedMonth !== "all" || revenueFilter !== "all" || confirmationFilter !== "all" || searchQuery.trim() !== ""
+    selectedMonth !== "all" ||
+    revenueFilter !== "all" ||
+    confirmationFilter !== "all" ||
+    searchQuery.trim() !== "" ||
+    selectedDate !== ""
 
   // Format currency
   const formatPrice = (price) => {
@@ -291,6 +346,16 @@ const StoreAnalytics = () => {
                   ))}
                 </select>
               </div>
+              {/* Date Filter */}
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <input
+                  type="date"
+                  className="input input-bordered input-sm"
+                  value={selectedDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                />
+              </div>
               {/* Revenue Filter */}
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
@@ -349,7 +414,22 @@ const StoreAnalytics = () => {
                   <X className="w-3 h-3 cursor-pointer" onClick={() => setSearchQuery("")} />
                 </div>
               )}
+              {selectedDate && (
+                <div className="badge badge-info gap-2">
+                  Date: {selectedDate}
+                  <X className="w-3 h-3 cursor-pointer" onClick={() => handleDateChange("")} />
+                </div>
+              )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {selectedDate && (
+        <div className="alert alert-info mb-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5" />
+            <span>Showing daily statistics for {selectedDate}</span>
           </div>
         </div>
       )}
@@ -506,94 +586,117 @@ const StoreAnalytics = () => {
         </div>
       </div>
 
-      {/* Product Performance Table */}
-      <div className="card shadow-lg overflow-hidden">
-        <div className="card-header p-4 border-b border-base-200">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            {t("productPerformance")}
-          </h2>
+      {selectedDate ? (
+        <div className="card shadow-lg overflow-hidden">
+          <div className="card-header p-4 border-b border-base-200">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              {t("dailyStats")} - {selectedDate}
+            </h2>
+          </div>
+          <div className="card-body p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="stat">
+                <div className="stat-title">Daily Purchases</div>
+                <div className="stat-value">{dailyStats.totalPurchases}</div>
+                <div className="stat-desc">Total orders today</div>
+              </div>
+              <div className="stat">
+                <div className="stat-title">Daily Revenue</div>
+                <div className="stat-value">{formatPrice(dailyStats.totalRevenue)}</div>
+                <div className="stat-desc">Revenue generated today</div>
+              </div>
+              <div className="stat">
+                <div className="stat-title">Confirmed Revenue</div>
+                <div className="stat-value text-success">{formatPrice(dailyStats.confirmedRevenue)}</div>
+                <div className="stat-desc">Confirmed orders today</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th className="text-center">{t("table.rank")}</th>
-                <th className="text-center">{t("table.productName")}</th>
-                <th className="text-center">{t("table.totalPurchases")}</th>
-                <th className="text-center">{t("table.totalValue")}</th>
-                <th className="text-center">{t("table.totalCouponValue")}</th>
-                <th className="text-center">{t("table.avgValue")}</th>
-                <th className="text-center">{t("table.performance")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productStatsLoading ? (
+      ) : (
+        // Keep the existing Product Performance Table here
+        <div className="card shadow-lg overflow-hidden">
+          <div className="card-header p-4 border-b border-base-200">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              {t("productPerformance")}
+            </h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="table w-full">
+              <thead>
                 <tr>
-                  <td colSpan="6" className="text-center py-8">
-                    <div className="loading loading-spinner loading-lg"></div>
-                  </td>
+                  <th className="text-center">{t("table.rank")}</th>
+                  <th className="text-center">{t("table.productName")}</th>
+                  <th className="text-center">{t("table.totalPurchases")}</th>
+                  <th className="text-center">{t("table.totalValue")}</th>
+                  <th className="text-center">{t("table.avgValue")}</th>
+                  <th className="text-center">{t("table.performance")}</th>
                 </tr>
-              ) : filteredProductStats.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-8">
-                    <div className="text-6xl mb-4">📊</div>
-                    <h3 className="text-xl font-semibold mb-2">{t("table.noData")}</h3>
-                    <p className="text-gray-500">{t("table.tryAdjustingFilters")}</p>
-                  </td>
-                </tr>
-              ) : (
-                filteredProductStats.map((product, index) => {
-                  const totalValue = Number(product.totalValue) || 0
-                  const totalPurchases = Number(product.totalPurchases) || 0
-                  const avgValue = totalPurchases > 0 ? totalValue / totalPurchases : 0
-                  const maxPurchases = Math.max(...filteredProductStats.map((p) => Number(p.totalPurchases) || 0))
-                  const performancePercentage = maxPurchases > 0 ? (totalPurchases / maxPurchases) * 100 : 0
+              </thead>
+              <tbody>
+                {productStatsLoading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-8">
+                      <div className="loading loading-spinner loading-lg"></div>
+                    </td>
+                  </tr>
+                ) : filteredProductStats.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="text-center py-8">
+                      <div className="text-6xl mb-4">📊</div>
+                      <h3 className="text-xl font-semibold mb-2">{t("table.noData")}</h3>
+                      <p className="text-gray-500">{t("table.tryAdjustingFilters")}</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredProductStats.map((product, index) => {
+                    const totalValue = Number(product.totalValue) || 0
+                    const totalPurchases = Number(product.totalPurchases) || 0
+                    const avgValue = totalPurchases > 0 ? totalValue / totalPurchases : 0
+                    const maxPurchases = Math.max(...filteredProductStats.map((p) => Number(p.totalPurchases) || 0))
+                    const performancePercentage = maxPurchases > 0 ? (totalPurchases / maxPurchases) * 100 : 0
 
-
-                  return (
-                    <tr key={product.productId} className="hover">
-                      <td className="text-center">
-                        <div className="flex items-center justify-center">
-                          {index === 0 && <Award className="w-4 h-4 text-yellow-500 mr-1" />}
-                          <span className="font-bold">{index + 1}</span>
-                        </div>
-                      </td>
-                      <td className="text-center">
-                        <div className="font-medium">{product.productName}</div>
-                        <div className="text-xs opacity-50 font-mono">{product.productId}</div>
-                      </td>
-                      <td className="text-center">
-                        <div className="badge badge-primary">{totalPurchases}</div>
-                      </td>
-                      <td className="text-center font-bold">
-                        <span className="text-success">{formatPrice(totalValue)}</span>
-                      </td>
-                      <td className="text-center">
-                        <span className={`text-base font-bold ${product.totalCouponValue ? "text-success" : "text-gray-500"}`}>
-                          {product.totalCouponValue ? formatPrice(product.totalCouponValue) : "N/A"}
-                        </span>
-                      </td>
-                      <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
-                      <td className="text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-20 bg-base-200 rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full transition-all"
-                              style={{ width: `${performancePercentage}%` }}
-                            ></div>
+                    return (
+                      <tr key={product.productId} className="hover">
+                        <td className="text-center">
+                          <div className="flex items-center justify-center">
+                            {index === 0 && <Award className="w-4 h-4 text-yellow-500 mr-1" />}
+                            <span className="font-bold">{index + 1}</span>
                           </div>
-                          <span className="text-xs font-medium">{Math.round(performancePercentage)}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="text-center">
+                          <div className="font-medium">{product.productName}</div>
+                          <div className="text-xs opacity-50 font-mono">{product.productId}</div>
+                        </td>
+                        <td className="text-center">
+                          <div className="badge badge-primary">{totalPurchases}</div>
+                        </td>
+                        <td className="text-center font-bold">
+                          <span className="text-success">{formatPrice(totalValue)}</span>
+                        </td>
+                        <td className="text-center">{formatPrice(Math.round(avgValue))}</td>
+                        <td className="text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-20 bg-base-200 rounded-full h-2">
+                              <div
+                                className="bg-primary h-2 rounded-full transition-all"
+                                style={{ width: `${performancePercentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs font-medium">{Math.round(performancePercentage)}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Monthly Trends Section */}
       {monthlyStats.length > 1 && (
@@ -640,7 +743,7 @@ const StoreAnalytics = () => {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div>{" "}
         </div>
       )}
     </div>
