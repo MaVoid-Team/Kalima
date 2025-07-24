@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema(
         },
         price: { type: Number, required: true },
         paymentNumber: { type: String, required: true },
-        discountPercentage: { type: Number, default: 0 },
+        discountPercentage: { type: Number },
         priceAfterDiscount: { type: Number },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
