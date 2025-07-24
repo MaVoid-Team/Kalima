@@ -178,6 +178,7 @@ const StoreAnalytics = () => {
       // Use overall stats
       const overview = overviewStats
       setOverviewStats(overview)
+      setSelectedMonth("all")
     } else {
       // Find specific month stats
       const monthData = monthlyStats.find((stat) => `${stat._id.year}-${stat._id.month}` === monthValue)
