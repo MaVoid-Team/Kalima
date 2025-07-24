@@ -202,6 +202,12 @@ const Orders = () => {
     return `${price} ج`
   }
 
+  const formatTime = (dateString) =>
+    new Date(dateString).toLocaleTimeString(i18n.language, {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
   // Enhanced notes functionality
   const openNotesModal = (order) => {
     const currentNotes = order.adminNotes || ""
@@ -514,7 +520,7 @@ const Orders = () => {
                         {t(order.orderType === "Book" ? "table.book" : "table.productType")}
                       </div>
                     </td>
-                    <td className="text-center font-bold">{order.formattedPrice}</td>
+                    <td className="text-center font-bold">{order.finalPrice}</td>
                     <td className="text-center font-bold">{order.couponCode != null ? <span className="text-green-500">{order.couponCode.value}</span> : "NA"}</td>
                     <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
                     <td className="text-center">
@@ -543,7 +549,7 @@ const Orders = () => {
                         <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
                       )}
                     </td>
-                    <td className="text-center text-sm">{order.formattedCreatedAt}</td>
+                    <td className="text-center text-sm">{order.formattedCreatedAt} - {formatTime(order.createdAt)}</td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button

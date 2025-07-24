@@ -224,7 +224,7 @@ const ExamPreparationSection = React.memo(({ isRTL }) => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.7 }}
-                  src="/education-card2.png"
+                  src="/courses-photo.jpg"
                   alt={isRTL ? "مجموعة دراسة" : "Study group"}
                   className="absolute inset-0 w-full h-full object-cover object-center"
                 />
