@@ -180,7 +180,7 @@ const PurchaseForm = ({
                       type="file"
                       id="file-upload"
                       className="hidden"
-                      accept="image/*,.pdf"
+                      accept="image/*"
                       onChange={handleFileChange}
                     />
                     <label htmlFor="file-upload" className="btn btn-outline cursor-pointer">
