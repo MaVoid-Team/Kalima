@@ -325,6 +325,7 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
 
 // Get purchase statistics
 exports.getPurchaseStats = catchAsync(async (req, res, next) => {
+  // 1) إحصائيات عامة
   const stats = await ECPurchase.aggregate([
     {
       $group: {
@@ -340,7 +341,7 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
         confirmedRevenue: {
           $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0] },
         },
-        averagePrice: { $avg: "$finalPrice" }
+        averagePrice: { $avg: "$finalPrice" },
       },
     },
     {
@@ -350,11 +351,12 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
         pendingPurchases: 1,
         totalRevenue: 1,
         confirmedRevenue: 1,
-        averagePrice: { $round: ["$averagePrice", 2] }
-      }
-    }
+        averagePrice: { $round: ["$averagePrice", 2] },
+      },
+    },
   ]);
 
+  // 2) إحصائيات شهرية (آخر 12 شهر)
   const monthlyStats = await ECPurchase.aggregate([
     {
       $group: {
@@ -372,14 +374,64 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
         },
       },
     },
-    {
-      $sort: { "_id.year": -1, "_id.month": -1 },
-    },
-    {
-      $limit: 12,
-    },
+    { $sort: { "_id.year": -1, "_id.month": -1 } },
   ]);
 
+  // 3) إحصائيات اليوم المحدد (إن وُجد date)
+  let dailyStats = null;
+  if (req.query.date) {
+    const targetDate = new Date(req.query.date);
+    if (!isNaN(targetDate)) {
+      const startOfDay = new Date(targetDate).setHours(0, 0, 0, 0);
+      const endOfDay = new Date(targetDate).setHours(23, 59, 59, 999);
+
+      const [day] = await ECPurchase.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: new Date(startOfDay), $lte: new Date(endOfDay) },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalPurchases: { $sum: 1 },
+            confirmedPurchases: {
+              $sum: { $cond: [{ $eq: ["$confirmed", true] }, 1, 0] },
+            },
+            pendingPurchases: {
+              $sum: { $cond: [{ $eq: ["$confirmed", false] }, 1, 0] },
+            },
+            totalRevenue: { $sum: "$finalPrice" },
+            confirmedRevenue: {
+              $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0] },
+            },
+            averagePrice: { $avg: "$finalPrice" },
+          },
+        },
+        {
+          $project: {
+            totalPurchases: 1,
+            confirmedPurchases: 1,
+            pendingPurchases: 1,
+            totalRevenue: 1,
+            confirmedRevenue: 1,
+            averagePrice: { $round: ["$averagePrice", 2] },
+          },
+        },
+      ]);
+
+      dailyStats = day || {
+        totalPurchases: 0,
+        confirmedPurchases: 0,
+        pendingPurchases: 0,
+        totalRevenue: 0,
+        confirmedRevenue: 0,
+        averagePrice: 0,
+      };
+    }
+  }
+
+  // 4) الردّ
   res.status(200).json({
     status: "success",
     data: {
@@ -392,6 +444,8 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
         averagePrice: 0,
       },
       monthlyStats,
+      // ستُرجع إما كائن stats لليوم المحدد أو null إذا لم يُرسل date
+      dailyStats,
     },
   });
 });
