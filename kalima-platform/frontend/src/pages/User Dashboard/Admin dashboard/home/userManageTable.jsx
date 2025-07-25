@@ -140,7 +140,7 @@ const UserManagementTable = () => {
     setFilteredUsers(filtered)
   }
 
-  const getRoleLabel = (role) => t(`admin.roles.${role}`)
+  const getRoleLabel = (role) => t(`admin.roles.${role.toLowerCase()}`)
 
   const getStatus = (user) => {
     if (!user.phoneNumber) return t("admin.status.missingData")
