@@ -5,12 +5,14 @@ import { useState } from "react"
 const TeacherForm = ({
   userData,
   handleChange,
+  handleGovernmentChange,
   subjects,
   levels,
+  governments,
+  administrationZones,
+  loadingZones,
   t,
   isRTL,
-  governments,
-  getAdministrationZonesForGovernment,
 }) => {
   const [selectedLevels, setSelectedLevels] = useState(userData.level || [])
   const [selectedCenters, setSelectedCenters] = useState(userData.centers || [])
@@ -81,15 +83,13 @@ const TeacherForm = ({
     handleChange(syntheticEvent)
   }
 
-  const toEnglishDigits = (str) =>
-    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+  const toEnglishDigits = (str) => str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
 
   const handlePhoneInputChange = (e) => {
-    const { name, value } = e.target;
-    const cleanedValue = toEnglishDigits(value);
-    handleChange({ target: { name, value: cleanedValue } });
-  };
-
+    const { name, value } = e.target
+    const cleanedValue = toEnglishDigits(value)
+    handleChange({ target: { name, value: cleanedValue } })
+  }
 
   // Handle social media
   const addSocialMedia = () => {
@@ -142,6 +142,11 @@ const TeacherForm = ({
     }
     // If levels is an array of strings or simple values
     return levelValue
+  }
+
+  const handleGovernmentSelect = (e) => {
+    const governmentName = e.target.value
+    handleGovernmentChange(governmentName)
   }
 
   const shouldShowCenters = userData.teachesAtType === "Both" || userData.teachesAtType === "Center"
@@ -334,13 +339,13 @@ const TeacherForm = ({
             name="government"
             className="select select-bordered w-2/3 lg:w-1/2"
             value={userData.government || ""}
-            onChange={handleChange}
+            onChange={handleGovernmentSelect}
             required
           >
             <option value="">{t("fields.selectGovernment") || "Select Government"}</option>
             {governments.map((government) => (
-              <option key={government} value={government}>
-                {government}
+              <option key={government._id} value={government.name}>
+                {government.name}
               </option>
             ))}
           </select>
@@ -354,20 +359,32 @@ const TeacherForm = ({
             <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
-            disabled={!userData.government}
+            disabled={!userData.government || loadingZones}
             name="administrationZone"
             className="select select-bordered w-2/3 lg:w-1/2"
             value={userData.administrationZone || ""}
             onChange={handleChange}
             required
           >
-            <option value="">{t("fields.selectAdministrationZone") || "Select Administration Zone"}</option>
-            {getAdministrationZonesForGovernment(userData.government).map((zone) => (
-              <option key={zone} value={zone}>
+            <option value="">
+              {loadingZones
+                ? t("fields.loadingZones") || "Loading zones..."
+                : t("fields.selectAdministrationZone") || "Select Administration Zone"}
+            </option>
+            {administrationZones.map((zone, index) => (
+              <option key={index} value={zone}>
                 {zone}
               </option>
             ))}
           </select>
+          {loadingZones && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="loading loading-spinner loading-xs"></span>
+              <span className="text-xs text-gray-500">
+                {t("fields.loadingZones") || "Loading administration zones..."}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
