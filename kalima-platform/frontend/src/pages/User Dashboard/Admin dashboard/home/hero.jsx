@@ -15,38 +15,49 @@ const Hero = () => {
 
   useEffect(() => {
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-
-      // Fetch data one at a time (sequentially)
-      const lecturerResponse = await getAllLecturers();
-      if (!lecturerResponse.success) {
-        throw new Error("Failed to fetch lecturers");
+      // Fetch lecturers
+      try {
+        const lecturerResponse = await getAllLecturers();
+        if (!lecturerResponse.success) throw new Error("Failed to fetch lecturers");
+        setLecturers(lecturerResponse.data);
+      } catch (err) {
+        console.error("Lecturer fetch error:", err);
       }
-      setLecturers(lecturerResponse.data);
 
-      const assistantResponse = await getAllAssistants();
-      if (!assistantResponse.success) {
-        throw new Error("Failed to fetch assistants");
+      // Fetch assistants
+      try {
+        const assistantResponse = await getAllAssistants();
+        if (!assistantResponse.success) throw new Error("Failed to fetch assistants");
+        setAssistants(assistantResponse.data);
+      } catch (err) {
+        console.error("Assistant fetch error:", err);
       }
-      setAssistants(assistantResponse.data);
 
-      const parentResponse = await getAllParents();
-      if (!parentResponse.success) {
-        throw new Error("Failed to fetch parents");
+      // Fetch parents
+      try {
+        const parentResponse = await getAllParents();
+        if (!parentResponse.success) throw new Error("Failed to fetch parents");
+        setParents(parentResponse.data);
+      } catch (err) {
+        console.error("Parent fetch error:", err);
       }
-      setParents(parentResponse.data);
 
-      const studentResponse = await getAllStudents();
-      if (!studentResponse.success) {
-        throw new Error("Failed to fetch students");
+      // Fetch students
+      try {
+        const studentResponse = await getAllStudents();
+        if (!studentResponse.success) throw new Error("Failed to fetch students");
+        setStudents(studentResponse.data);
+      } catch (err) {
+        console.error("Student fetch error:", err);
       }
-      setStudents(studentResponse.data);
-      
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setError(error.message || "Failed to fetch data");
+
+    } catch (overallError) {
+      console.error("Unexpected error in fetchData:", overallError);
+      setError("Some data failed to load. Check console for details.");
     } finally {
       setLoading(false);
     }
@@ -54,6 +65,7 @@ const Hero = () => {
 
   fetchData();
 }, []);
+
  // Empty dependency array means this runs once on mount
 
   return (
