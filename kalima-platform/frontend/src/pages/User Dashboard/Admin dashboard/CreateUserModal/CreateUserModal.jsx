@@ -22,7 +22,7 @@ import BulkCreateUsers from "./BulkCreateUsers"
 
 import TeacherForm from "./TeacherForm"
 
-import { governments, getAdministrationZonesForGovernment } from "../../../../constants/locations"
+import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
   const { t, i18n } = useTranslation("createUser")
@@ -95,6 +95,10 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   const [loadingDropdowns, setLoadingDropdowns] = useState(false)
 
+  const [governments, setGovernments] = useState([])
+  const [administrationZones, setAdministrationZones] = useState([])
+  const [loadingZones, setLoadingZones] = useState(false)
+
   // Reset form when modal opens/closes
 
   useEffect(() => {
@@ -113,10 +117,16 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
   const fetchDropdownData = async () => {
     setLoadingDropdowns(true)
-
     try {
-      const levelsResult = await getAllLevels()
+      // Fetch governments
+      const governmentsResult = await getAllGovernments()
+      if (governmentsResult.success) {
+        setGovernments(governmentsResult.data || [])
+      } else {
+        console.error("Failed to fetch governments:", governmentsResult.error)
+      }
 
+      const levelsResult = await getAllLevels()
       if (levelsResult.success) {
         setLevels(levelsResult.data || [])
       } else {
@@ -124,7 +134,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
 
       const subjectsResult = await getAllSubjects()
-
       if (subjectsResult.success) {
         setSubjects(subjectsResult.data || [])
       } else {
@@ -132,7 +141,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
 
       const lecturersResult = await getAllLecturers()
-
       if (lecturersResult.success) {
         setLecturers(lecturersResult.data || [])
       } else {
@@ -140,7 +148,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     } catch (error) {
       setFormError(t("errors.failedToLoadDropdowns"))
-
       console.error("Error fetching dropdown data:", error)
     } finally {
       setLoadingDropdowns(false)
@@ -377,6 +384,34 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     }
   }
 
+  const handleGovernmentChange = async (governmentName) => {
+    setUserData((prev) => ({
+      ...prev,
+      government: governmentName,
+      administrationZone: "", // Reset zone when government changes
+    }))
+
+    if (governmentName) {
+      setLoadingZones(true)
+      try {
+        const zonesResult = await getGovernmentZones(governmentName)
+        if (zonesResult.success) {
+          setAdministrationZones(zonesResult.data || [])
+        } else {
+          console.error("Failed to fetch zones:", zonesResult.error)
+          setAdministrationZones([])
+        }
+      } catch (error) {
+        console.error("Error fetching zones:", error)
+        setAdministrationZones([])
+      } finally {
+        setLoadingZones(false)
+      }
+    } else {
+      setAdministrationZones([])
+    }
+  }
+
   if (!isOpen) return null
 
   return (
@@ -538,11 +573,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <StudentForm
                 userData={userData}
                 handleChange={handleChange}
+                handleGovernmentChange={handleGovernmentChange}
                 levels={levels}
+                governments={governments}
+                administrationZones={administrationZones}
+                loadingZones={loadingZones}
                 t={t}
                 isRTL={isRTL}
-                governments={governments}
-                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
               />
             )}
 
@@ -550,10 +587,12 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <ParentForm
                 userData={userData}
                 handleChange={handleChange}
+                handleGovernmentChange={handleGovernmentChange}
+                governments={governments}
+                administrationZones={administrationZones}
+                loadingZones={loadingZones}
                 t={t}
                 isRTL={isRTL}
-                governments={governments}
-                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
               />
             )}
 
@@ -561,11 +600,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <LecturerForm
                 userData={userData}
                 handleChange={handleChange}
+                handleGovernmentChange={handleGovernmentChange}
                 subjects={subjects}
+                governments={governments}
+                administrationZones={administrationZones}
+                loadingZones={loadingZones}
                 t={t}
                 isRTL={isRTL}
-                governments={governments}
-                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
               />
             )}
 
@@ -583,12 +624,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <TeacherForm
                 userData={userData}
                 handleChange={handleChange}
+                handleGovernmentChange={handleGovernmentChange}
                 subjects={subjects}
                 levels={levels}
+                governments={governments}
+                administrationZones={administrationZones}
+                loadingZones={loadingZones}
                 t={t}
                 isRTL={isRTL}
-                governments={governments}
-                getAdministrationZonesForGovernment={getAdministrationZonesForGovernment}
               />
             )}
 

@@ -2,7 +2,17 @@
 
 import { useState } from "react"
 
-const StudentForm = ({ userData, handleChange, levels, t, governments, getAdministrationZonesForGovernment, isRTL }) => {
+const StudentForm = ({
+  userData,
+  handleChange,
+  handleGovernmentChange,
+  levels,
+  governments,
+  administrationZones,
+  loadingZones,
+  t,
+  isRTL,
+}) => {
   const [hobby, setHobby] = useState("")
 
   const addHobby = () => {
@@ -16,14 +26,18 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
     userData.hobbies = userData.hobbies.filter((_, i) => i !== index)
   }
 
-   const toEnglishDigits = (str) =>
-    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+  const toEnglishDigits = (str) => str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "")
 
   const handlePhoneInputChange = (e) => {
-    const { name, value } = e.target;
-    const cleanedValue = toEnglishDigits(value);
-    handleChange({ target: { name, value: cleanedValue } });
-  };
+    const { name, value } = e.target
+    const cleanedValue = toEnglishDigits(value)
+    handleChange({ target: { name, value: cleanedValue } })
+  }
+
+  const handleGovernmentSelect = (e) => {
+    const governmentName = e.target.value
+    handleGovernmentChange(governmentName)
+  }
 
   return (
     <>
@@ -49,7 +63,6 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
             </select>
           </div>
         </div>
-
         <div className="form-control">
           <div className="flex flex-col gap-4">
             <label className="label">
@@ -63,6 +76,7 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
               value={userData.phoneNumber || ""}
               onChange={handlePhoneInputChange}
               placeholder={t("placeholders.phoneNumber") || "Enter phone number"}
+              required
             />
           </div>
         </div>
@@ -84,7 +98,6 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
             />
           </div>
         </div>
-
         <div className="form-control">
           <div className="flex flex-col gap-4">
             <label className="label">
@@ -101,6 +114,7 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
           </div>
         </div>
       </div>
+
       {/* Government Selection */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
@@ -109,14 +123,14 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
           </label>
           <select
             name="government"
-            className={`select select-bordered w-2/3 lg:w-1/2 `}
+            className="select select-bordered w-2/3 lg:w-1/2"
             value={userData.government || ""}
-            onChange={handleChange}
+            onChange={handleGovernmentSelect}
           >
             <option value="">{t("fields.selectGovernment") || "Select Government"}</option>
             {governments.map((government) => (
-              <option key={government} value={government}>
-                {government}
+              <option key={government._id} value={government.name}>
+                {government.name}
               </option>
             ))}
           </select>
@@ -124,28 +138,40 @@ const StudentForm = ({ userData, handleChange, levels, t, governments, getAdmini
       </div>
 
       {/* Administration Zone Selection - Only show if government is selected */}
-
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
             <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
           </label>
           <select
-            disabled={!userData.government}
+            disabled={!userData.government || loadingZones}
             name="administrationZone"
-            className={`select select-bordered  w-2/3 lg:w-1/2`}
+            className="select select-bordered w-2/3 lg:w-1/2"
             value={userData.administrationZone || ""}
             onChange={handleChange}
           >
-            <option value="">{t("fields.selectAdministrationZone") || "Select Administration Zone"}</option>
-            {getAdministrationZonesForGovernment(userData.government).map((zone) => (
-              <option key={zone} value={zone}>
+            <option value="">
+              {loadingZones
+                ? t("fields.loadingZones") || "Loading zones..."
+                : t("fields.selectAdministrationZone") || "Select Administration Zone"}
+            </option>
+            {administrationZones.map((zone, index) => (
+              <option key={index} value={zone}>
                 {zone}
               </option>
             ))}
           </select>
+          {loadingZones && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="loading loading-spinner loading-xs"></span>
+              <span className="text-xs text-gray-500">
+                {t("fields.loadingZones") || "Loading administration zones..."}
+              </span>
+            </div>
+          )}
         </div>
       </div>
+
       <div className="form-control">
         <label className="label">
           <span className="label-text">{t("fields.hobbiesOptional")}</span>
