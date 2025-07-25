@@ -169,6 +169,7 @@ const UserManagementTable = () => {
       if (result.success) {
         setUsers((prev) => [...prev, result.data])
         setShowCreateModal(false)
+        fetchUsers() // Refresh users after creation
       } else {
         throw new Error(result.error)
       }
