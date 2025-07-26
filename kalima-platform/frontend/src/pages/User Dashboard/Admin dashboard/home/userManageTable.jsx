@@ -376,6 +376,10 @@ const UserManagementTable = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.joinedDate")}</label>
             <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{formatDate(user.createdAt)}</p>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.userSerial")}</label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.userSerial || t("admin.NA")}</p>
+          </div>
           {user.government && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
