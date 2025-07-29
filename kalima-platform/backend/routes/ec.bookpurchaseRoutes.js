@@ -22,15 +22,13 @@ router
 router
   .route("/stats")
   .get(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin"),
     ecBookPurchaseController.getBookPurchaseStats
   );
 
 // Get current user's book purchases
 router.get("/myPurchases", ecBookPurchaseController.getBookPurchaseByUser);
-// Search by serial number
-// router.get("/search/serial/:serial", ecBookPurchaseController.searchBookPurchaseBySerial);
-// Get book purchases by user ID (admin/moderator)
+//
 router.get("/:userId", ecBookPurchaseController.getBookPurchaseByUser);
 
 // Confirmation route

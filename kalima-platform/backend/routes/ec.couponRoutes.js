@@ -11,35 +11,35 @@ router.use(verifyJWT);
 // Admin and subadmin can create coupons
 router.post(
   "/",
-  authController.verifyRoles("admin", "subadmin"),
+  authController.verifyRoles("Admin", "SubAdmin"),
   couponController.createCoupon
 );
 
-// Get all coupons (admin only)
+
 router.get(
   "/",
-  authController.verifyRoles("admin", "subadmin"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   couponController.getAllCoupons
 );
 
 // Get active coupons
 router.get(
   "/active",
-  authController.verifyRoles("admin", "subadmin", "moderator"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   couponController.getActiveCoupons
 );
 
 // Get used coupons
 router.get(
   "/used",
-  authController.verifyRoles("admin", "subadmin", "moderator"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   couponController.getUsedCoupons
 );
 
 // Use a coupon
 router.post(
   "/use",
-  authController.verifyRoles("student", "parent", "teacher"),
+  authController.verifyRoles("Parent", "Student", "Teacher"),
   couponController.useCoupon
 );
 
@@ -54,14 +54,14 @@ router.post(
 // Delete coupon (admin and subadmin only)
 router.delete(
   "/:id",
-  authController.verifyRoles("admin", "subadmin"),
+  authController.verifyRoles("Admin", "SubAdmin"),
   couponController.deleteCoupon
 );
 
 // Get coupon by ID
 router.get(
   "/:id",
-  authController.verifyRoles("admin", "subadmin", "moderator"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   couponController.getCouponById
 );
 
