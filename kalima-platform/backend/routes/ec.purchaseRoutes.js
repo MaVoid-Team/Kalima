@@ -23,13 +23,13 @@ router
 router
   .route("/stats")
   .get(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin"),
     ecPurchaseController.getPurchaseStats
   );
 
 // Product purchase stats route
 router.route("/product-purchase-stats").get(
-  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+  authController.verifyRoles("Admin"),
   ecPurchaseController.getProductPurchaseStats
 );
 
@@ -43,7 +43,7 @@ router.route("/user/:userId").get(ecPurchaseController.getPurchasesByUser);
 router
   .route("/:id/confirm")
   .patch(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     ecPurchaseController.confirmPurchase
   );
 
@@ -59,7 +59,7 @@ router
   .route("/:id")
   .get(ecPurchaseController.getPurchaseById)
   .patch(
-    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    authController.verifyRoles("Admin", "SubAdmin"),
     uploadPaymentScreenshotToDisk,
     ecPurchaseController.updatePurchase
   )
