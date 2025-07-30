@@ -17,10 +17,6 @@ exports.createECBook = async (req, res, next) => {
             }
             // Use local file path from multer
             sample = file.path;
-        } else {
-            // Debug: log files object
-            console.log('req.files:', req.files);
-            return res.status(400).json({ message: "Sample PDF is required" });
         }
         // Handle thumbnail image
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
