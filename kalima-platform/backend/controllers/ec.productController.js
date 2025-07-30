@@ -22,8 +22,6 @@ exports.createProduct = async (req, res, next) => {
                 return res.status(400).json({ message: "Sample must be a PDF and <= 75MB" });
             }
             sample = file.path;
-        } else {
-            return res.status(400).json({ message: "Sample PDF is required" });
         }
         if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
             imageUrl = req.files.thumbnail[0].path;
