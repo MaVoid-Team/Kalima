@@ -41,7 +41,7 @@ const SignedLecturers = () => {
           const role = result.data.data.userInfo.role
           setUserRole(role)
 
-          if (role !== "Admin" && role !== "moderator") {
+          if (role !== "Admin" && role !== "moderator" && role !== "SubAdmin") {
             navigate("/")
             return
           }

@@ -105,7 +105,7 @@ const NavBar = () => {
         return "/dashboard/lecturer-dashboard";
       case "Admin":
       case "Moderator":
-      case "Subadmin":
+      case "SubAdmin":
         return "/dashboard/admin-dashboard";
       case "Assistant":
         return "/dashboard/assistant-dashboard";
