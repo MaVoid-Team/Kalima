@@ -666,7 +666,12 @@ const EnhancedAdminForms = ({
                 </div>
 
                 {/* Sample File Upload */}
-                {renderFileUpload()}
+                {renderFileUpload(
+                  "sample",
+                  t("forms.createProduct.fields.sampleFile") || "Sample File",
+                  ".pdf",
+                  t("forms.createProduct.hints.sampleFile") || "Upload sample file (PDF)",
+                )}
 
                 {/* Description Field */}
                 <div>
