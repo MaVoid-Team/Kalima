@@ -20,16 +20,16 @@ const Market = () => {
   const [itemsPerPage] = useState(6)
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
-  if (!filePath) return null
-  if (filePath.startsWith("http")) return filePath
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
 
-  const normalizedPath = filePath.replace(/\\/g, "/")
-  const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1
+    const normalizedPath = filePath.replace(/\\/g, "/")
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1
 
-  const filename = normalizedPath.split("/").pop()
-  return `${baseUrl}/uploads/${folder}/${filename}`
-}
+    const filename = normalizedPath.split("/").pop()
+    return `${baseUrl}/uploads/${folder}/${filename}`
+  }
 
   // Filter products based on active tab
   const filteredBySection = useMemo(() => {
@@ -155,9 +155,8 @@ const Market = () => {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${
-                  isRTL ? "border-l-2" : "border-r-2"
-                } border-secondary ${activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"}`}
+                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${isRTL ? "border-l-2" : "border-r-2"
+                  } border-secondary ${activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"}`}
               >
                 <span className={`${isRTL ? "ml-2" : "mr-2"}`}>{category.icon}</span>
                 {category.name}
@@ -177,9 +176,8 @@ const Market = () => {
                 placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`input input-bordered w-full ${
-                  isRTL ? "pr-12" : "pl-12"
-                } focus:border-primary focus:ring-primary`}
+                className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"
+                  } focus:border-primary focus:ring-primary`}
               />
               <div className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 transform -translate-y-1/2`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,19 +219,21 @@ const Market = () => {
               className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
             >
               {/* Discount Badge */}
-              {item.discountPercentage && item.discountPercentage > 0 && (
-                <div className={`absolute top-4 ${isRTL ? "right-4" : "left-4"} z-10`}>
-                  <div
-                    className={`bg-primary px-3 py-1 ${
-                      isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
+              <div
+                className={`absolute top-4 ${isRTL ? "right-4" : "left-4"} z-10 ${item.discountPercentage && item.discountPercentage > 0 ? "opacity-100 visible" : "opacity-0 invisible"
+                  } transition-opacity duration-300`}
+              >
+                <div
+                  className={`bg-primary px-3 py-1 ${isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
                     } text-sm font-medium`}
-                  >
-                    {t("product.discounts")}
-                    <br />
-                    <span className="text-lg font-bold">{item.discountPercentage ? item.discountPercentage + "%" : ""}</span>
-                  </div>
+                >
+                  {t("product.discounts")}
+                  <br />
+                  <span className="text-lg font-bold">
+                    {item.discountPercentage ? item.discountPercentage + "%" : ""}
+                  </span>
                 </div>
-              )}
+              </div>
               <figure className="px-4 pt-4">
                 <img
                   src={
