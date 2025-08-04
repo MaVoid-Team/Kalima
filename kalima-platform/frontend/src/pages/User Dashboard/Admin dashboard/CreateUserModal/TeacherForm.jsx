@@ -26,7 +26,6 @@ const TeacherForm = ({
     if (!selectedLevels.includes(levelValue)) {
       const newLevels = [...selectedLevels, levelValue]
       setSelectedLevels(newLevels)
-
       const syntheticEvent = {
         target: {
           name: "level",
@@ -40,7 +39,6 @@ const TeacherForm = ({
   const removeLevel = (levelValue) => {
     const newLevels = selectedLevels.filter((level) => level !== levelValue)
     setSelectedLevels(newLevels)
-
     const syntheticEvent = {
       target: {
         name: "level",
@@ -54,12 +52,10 @@ const TeacherForm = ({
   const addCenter = () => {
     const centerInput = document.getElementById("centerInput")
     const centerName = centerInput.value.trim()
-
     if (centerName && !selectedCenters.includes(centerName)) {
       const newCenters = [...selectedCenters, centerName]
       setSelectedCenters(newCenters)
       centerInput.value = ""
-
       const syntheticEvent = {
         target: {
           name: "centers",
@@ -73,7 +69,6 @@ const TeacherForm = ({
   const removeCenter = (centerName) => {
     const newCenters = selectedCenters.filter((center) => center !== centerName)
     setSelectedCenters(newCenters)
-
     const syntheticEvent = {
       target: {
         name: "centers",
@@ -91,19 +86,18 @@ const TeacherForm = ({
     handleChange({ target: { name, value: cleanedValue } })
   }
 
-  // Handle social media
+  // Handle social media - Fixed to use 'account' instead of 'link'
   const addSocialMedia = () => {
     const platformInput = document.getElementById("socialPlatform")
-    const linkInput = document.getElementById("socialLink")
+    const accountInput = document.getElementById("socialAccount")
     const platform = platformInput.value
-    const link = linkInput.value.trim()
+    const account = accountInput.value.trim()
 
-    if (platform && link) {
-      const newSocialMedia = [...socialMediaLinks, { platform, link }]
+    if (platform && account) {
+      const newSocialMedia = [...socialMediaLinks, { platform, account }]
       setSocialMediaLinks(newSocialMedia)
       platformInput.value = ""
-      linkInput.value = ""
-
+      accountInput.value = ""
       const syntheticEvent = {
         target: {
           name: "socialMedia",
@@ -117,7 +111,6 @@ const TeacherForm = ({
   const removeSocialMedia = (index) => {
     const newSocialMedia = socialMediaLinks.filter((_, i) => i !== index)
     setSocialMediaLinks(newSocialMedia)
-
     const syntheticEvent = {
       target: {
         name: "socialMedia",
@@ -180,7 +173,6 @@ const TeacherForm = ({
             />
           </div>
         </div>
-
         <div className="form-control">
           <div className="flex flex-col gap-2">
             <label className="label">
@@ -236,7 +228,6 @@ const TeacherForm = ({
               </option>
             ))}
           </select>
-
           {selectedLevels.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {selectedLevels.map((levelValue) => (
@@ -292,7 +283,6 @@ const TeacherForm = ({
                 {t("buttons.add") || "Add"}
               </button>
             </div>
-
             {selectedCenters.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {selectedCenters.map((center, index) => (
@@ -388,7 +378,7 @@ const TeacherForm = ({
         </div>
       </div>
 
-      {/* Social Media (Optional) */}
+      {/* Social Media (Optional) - Updated to use 'account' */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label">
@@ -405,30 +395,22 @@ const TeacherForm = ({
               <option value="TikTok">TikTok</option>
             </select>
             <input
-              type="url"
-              id="socialLink"
+              type="text"
+              id="socialAccount"
               className="input input-bordered"
-              placeholder={t("placeholders.socialLink") || "Enter profile URL"}
+              placeholder={t("placeholders.socialAccount") || "Enter account/username"}
             />
             <button type="button" className="btn btn-secondary" onClick={addSocialMedia}>
               {t("buttons.add") || "Add"}
             </button>
           </div>
-
           {socialMediaLinks.length > 0 && (
             <div className="space-y-2 mt-2">
               {socialMediaLinks.map((social, index) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-base-200 rounded">
                   <div className="flex items-center gap-2">
                     <span className="badge badge-outline">{social.platform}</span>
-                    <a
-                      href={social.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline truncate"
-                    >
-                      {social.link}
-                    </a>
+                    <span className="text-sm truncate">{social.account}</span>
                   </div>
                   <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeSocialMedia(index)}>
                     ×
