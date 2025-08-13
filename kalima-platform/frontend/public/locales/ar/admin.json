@@ -156,8 +156,8 @@
     "roles": {
       "student": "طالب",
       "parent": "ولي أمر",
-      "lecturers": "معلم",
-      "lecturer": "معلم",
+      "lecturers": "محاضرين",
+      "lecturer": "محاضر",
       "teacher": "مدرس",
       "assistant": "مساعد",
       "admin": "أدمن",
