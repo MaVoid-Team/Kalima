@@ -61,7 +61,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await ECProduct.find().populate({
             path: "section",
             select: "number"
-        });
+        }).sort({ createdAt: -1 });
         // Ensure all fields are present in the response
         const productsWithAllFields = products.map(product => {
             const obj = product.toObject();
