@@ -17,7 +17,7 @@ const PaymentSection = ({ paymentNumber, isRTL, whatsAppNumber }) => {
       console.error(t("errors.copyFailed"), err)
     }
   }
-
+// dummy comment to re-commit
   return (
     <div className="text-center space-y-8">
       {/* Section Header */}

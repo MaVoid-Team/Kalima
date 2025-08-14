@@ -251,7 +251,7 @@ const ProductDetails = () => {
           notes: "",
         })
         handleRemoveCoupon() // Also reset coupon state
-
+// dummy comment to re-commit
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
       } else {
