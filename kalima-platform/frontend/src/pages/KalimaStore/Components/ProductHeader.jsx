@@ -28,5 +28,5 @@ const ProductHeader = ({ onBack, isRTL }) => {
     </div>
   )
 }
-
+// dummy comment to re-commit
 export default ProductHeader

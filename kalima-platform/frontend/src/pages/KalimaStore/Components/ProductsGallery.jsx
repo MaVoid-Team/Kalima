@@ -22,7 +22,7 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
 
   return `${baseUrl}/${normalizedPath}`
 }
-
+  // dummy comment to re-commit
   const galleryImages = (gallery || [])
     .map((img, index) => ({
       url: convertPathToUrl(img),

@@ -91,7 +91,7 @@ const Market = () => {
         setLoading(false)
       }
     }
-
+// dummy comment to re-commit
     fetchInitialData()
   }, [t])
 
