@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { FaWhatsapp } from "react-icons/fa"
 
-const PaymentSection = ({ paymentNumber, isRTL }) => {
+const PaymentSection = ({ paymentNumber, isRTL, whatsAppNumber }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
   const [copySuccess, setCopySuccess] = useState(false)
 
@@ -31,9 +32,8 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
           <p className="text-sm opacity-90 mb-2">{t("paymentSection.paymentNumber")}</p>
           <button
             onClick={handleCopyNumber}
-            className={`btn btn-lg font-mono text-2xl ${
-              copySuccess ? "btn-success" : "btn-ghost bg-base-100 text-base-content hover:bg-base-200"
-            }`}
+            className={`btn btn-lg font-mono text-2xl ${copySuccess ? "btn-success" : "btn-ghost bg-base-100 text-base-content hover:bg-base-200"
+              }`}
           >
             {paymentNumber}
             <svg className="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,6 +74,16 @@ const PaymentSection = ({ paymentNumber, isRTL }) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="card bg-base-200">
+        <div className="card-body p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <FaWhatsapp className="w-5 h-5 text-green-500" />
+            <span className="font-semibold">{t("product.whatsapp")}</span>
+          </div>
+          <p className="font-mono text-lg">{whatsAppNumber}</p>
         </div>
       </div>
 
