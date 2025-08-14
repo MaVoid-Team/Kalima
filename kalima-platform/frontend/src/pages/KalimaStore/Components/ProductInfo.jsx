@@ -15,7 +15,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
   }
 
   const actualType = getActualType()
-
+// dummy comment to re-commit
   const getItemCategory = () => {
     if (actualType === "book" && product.subject) {
       return product.subject.name || product.subject

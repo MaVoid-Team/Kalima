@@ -19,7 +19,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
   const filename = normalizedPath.split("/").pop()
   return `${baseUrl}/uploads/docs/${filename}`
 }
-
+// dummy comment to re-commit
   const fileUrl = convertPathToUrl(sample)
 
   const handleDownloadSample = async () => {

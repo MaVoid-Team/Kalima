@@ -24,7 +24,7 @@ const PurchaseForm = ({
 }) => {
   const [dragActive, setDragActive] = useState(false)
   const { t } = useTranslation("kalimaStore-ProductDetails")
-
+// dummy comment to re-commit
   const handleDrag = (e) => {
     e.preventDefault()
     e.stopPropagation()
