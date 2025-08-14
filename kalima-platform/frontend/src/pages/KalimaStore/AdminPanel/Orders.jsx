@@ -949,7 +949,13 @@ const Orders = () => {
                 </label>
                 <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (
+                    <div>
                     <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
+                    <div className="flex flex-col">
+                    <p>Created By : </p>
+                    <p><strong>{selectedOrder.adminNoteBy.name}</strong></p>
+                    </div>
+                    </div>
                   ) : (
                     <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
                   )}
