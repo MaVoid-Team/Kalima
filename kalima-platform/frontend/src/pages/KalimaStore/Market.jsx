@@ -72,7 +72,17 @@ const Market = () => {
         const productsResponse = await getAllProducts()
 
         if (productsResponse.status === "success") {
-          setAllProducts(productsResponse.data.products)
+          const now = new Date()
+          const productsWithNewFlag = productsResponse.data.products.map(product => {
+            const createdDate = new Date(product.createdAt)
+            const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24) // ms → days
+
+            return {
+              ...product,
+              isNew: diffInDays <= 3 // mark as new if within 3 days
+            }
+          })
+          setAllProducts(productsWithNewFlag)
         }
       } catch (err) {
         setError(err.message)
@@ -155,9 +165,8 @@ const Market = () => {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${
-                  isRTL ? "border-l-2" : "border-r-2"
-                } border-secondary ${activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"}`}
+                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${isRTL ? "border-l-2" : "border-r-2"
+                  } border-secondary ${activeTab === category.id ? "bg-secondary/55 rounded-t-lg" : "hover:bg-primary"}`}
               >
                 <span className={`${isRTL ? "ml-2" : "mr-2"}`}>{category.icon}</span>
                 {category.name}
@@ -177,9 +186,8 @@ const Market = () => {
                 placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`input input-bordered w-full ${
-                  isRTL ? "pr-12" : "pl-12"
-                } focus:border-primary focus:ring-primary`}
+                className={`input input-bordered w-full ${isRTL ? "pr-12" : "pl-12"
+                  } focus:border-primary focus:ring-primary`}
               />
               <div className={`absolute ${isRTL ? "right-4" : "left-4"} top-1/2 transform -translate-y-1/2`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,13 +232,22 @@ const Market = () => {
               {item.discountPercentage && item.discountPercentage > 0 && (
                 <div className={`absolute top-4 ${isRTL ? "right-4" : "left-4"} z-10`}>
                   <div
-                    className={`bg-primary px-3 py-1 ${
-                      isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
-                    } text-sm font-medium`}
+                    className={`bg-primary px-3 py-1 ${isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
+                      } text-sm font-medium`}
                   >
                     {t("product.discounts")}
                     <br />
                     <span className="text-lg font-bold">{item.discountPercentage}%</span>
+                  </div>
+                </div>
+              )}
+              {item.isNew && (
+                <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} z-10`}>
+                  <div
+                    className={`bg-secondary px-3 py-1 ${isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium`}
+                  >
+                    {t("product.new") || "NEW"}
                   </div>
                 </div>
               )}

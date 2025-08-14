@@ -45,6 +45,7 @@ const UserManagementTable = () => {
   })
 
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isSubAdmin, setIsSubAdmin] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
 
   // Pagination state
@@ -60,10 +61,12 @@ const UserManagementTable = () => {
           // Case-insensitive comparison for "admin" role
           const userRole = result.data.data.userInfo.role
           setIsAdmin(userRole.toLowerCase() === "admin")
+          setIsSubAdmin(userRole.toLowerCase() === "subadmin")
         }
       } catch (error) {
         console.error("Error checking admin status:", error)
         setIsAdmin(false)
+        setIsSubAdmin(false)
       }
     }
     checkAdminStatus()
@@ -853,7 +856,7 @@ const UserManagementTable = () => {
                     >
                       <FaEye />
                     </button>
-                    {isAdmin && (
+                    {isAdmin || isSubAdmin && (
                       <button
                         className="btn btn-info btn-xs"
                         onClick={() => openEditModal(user)}

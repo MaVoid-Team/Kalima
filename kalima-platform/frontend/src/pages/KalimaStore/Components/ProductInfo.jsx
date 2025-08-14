@@ -52,15 +52,6 @@ const ProductInfo = ({ product, type, isRTL }) => {
 
       {/* Product Details */}
       <div className="space-y-4">
-        <div className="card bg-base-200">
-          <div className="card-body p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <FaWhatsapp className="w-5 h-5 text-green-500" />
-              <span className="font-semibold">{t("product.whatsapp")}</span>
-            </div>
-            <p className="font-mono text-lg">{product.whatsAppNumber}</p>
-          </div>
-        </div>
 
         {product.description && (
           <div className="card bg-base-200">
