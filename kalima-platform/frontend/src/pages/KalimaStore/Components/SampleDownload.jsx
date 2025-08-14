@@ -19,7 +19,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
 
     return `${baseUrl}/uploads/docs/${filename}`
   }
-
+// dummy comment to re-commit
   const fileUrl = convertPathToUrl(sample)
 
   const handleDownloadSample = async () => {
