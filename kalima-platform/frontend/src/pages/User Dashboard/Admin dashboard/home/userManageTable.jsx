@@ -61,7 +61,7 @@ const UserManagementTable = () => {
           // Case-insensitive comparison for "admin" role
           const userRole = result.data.data.userInfo.role
           setIsAdmin(userRole.toLowerCase() === "admin")
-          setIsSubAdmin(userRole.toLowerCase() == "subAdmin")
+          setIsSubAdmin(userRole.toLowerCase() === "subadmin")
         }
       } catch (error) {
         console.error("Error checking admin status:", error)

@@ -70,6 +70,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   const purchases = await features.query.populate([
     { path: "createdBy", select: "name email role phoneNumber" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "adminNoteBy", select: "name" },
     { path: "couponCode", select: "couponCode value expirationDate" },
     {
       path: "productId",
@@ -97,6 +98,7 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
   const purchase = await ECPurchase.findById(req.params.id).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "adminNoteBy", select: "name" }, // populate the new field
     { path: "couponCode", select: "couponCode value expirationDate" },
 
     {
@@ -192,6 +194,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   // Support notes and adminNotes fields
   if (typeof req.body.notes === "undefined") req.body.notes = null;
   if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
+  if (typeof req.body.adminNoteBy === "undefined") req.body.adminNoteBy = null;
 
   const purchase = await ECPurchase.create(req.body); // Populate the created purchase
   if (!purchase) {
@@ -244,45 +247,41 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
 
 // Update purchase
 exports.updatePurchase = catchAsync(async (req, res, next) => {
-  // Handle payment screenshot update
-  if (req.file && req.file.fieldname === "paymentScreenShot") {
-    req.body.paymentScreenShot = req.file.path;
-  } else if (typeof req.body.paymentScreenShot === "undefined") {
-    req.body.paymentScreenShot = null;
-  }
-  // Remove fields that shouldn't be updated directly
-  delete req.body.createdBy;
-  delete req.body.createdAt;
-  delete req.body.purchaseSerial; // Prevent manual serial modification
-  delete req.body.finalPrice;
-  delete req.body.couponCode;
-  delete req.body.paymentScreenShot;
-  // Allow updating notes and adminNotes
-  // (no extra logic needed, just don't delete them)
+  // Get the current purchase to compare changes
+  const oldPurchase = await ECPurchase.findById(req.params.id);
 
+  if (!oldPurchase) {
+    return next(new AppError("No purchase found with that ID", 404));
+  }
+
+  // Detect if adminNote is being added or changed
+  const isAdminNoteChanged =
+    req.body.adminNotes && req.body.adminNotes !== oldPurchase.adminNotes;
+
+  if (isAdminNoteChanged) {
+    req.body.adminNoteBy = req.user._id; // whoever is logged in
+  }
+
+  // Your existing update logic
   const purchase = await ECPurchase.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   }).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
+    { path: "adminNoteBy", select: "name" }, // populate the new field
     {
       path: "productId",
       select: "title serial priceAfterDiscount section thumbnail",
     },
   ]);
 
-  if (!purchase) {
-    return next(new AppError("No purchase found with that ID", 404));
-  }
-
   res.status(200).json({
     status: "success",
-    data: {
-      purchase,
-    },
+    data: { purchase },
   });
 });
+
 
 // Confirm purchase
 exports.confirmPurchase = catchAsync(async (req, res, next) => {

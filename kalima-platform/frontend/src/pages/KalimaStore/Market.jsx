@@ -72,7 +72,17 @@ const Market = () => {
         const productsResponse = await getAllProducts()
 
         if (productsResponse.status === "success") {
-          setAllProducts(productsResponse.data.products)
+          const now = new Date()
+          const productsWithNewFlag = productsResponse.data.products.map(product => {
+            const createdDate = new Date(product.createdAt)
+            const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24) // ms → days
+
+            return {
+              ...product,
+              isNew: diffInDays <= 3 // mark as new if within 3 days
+            }
+          })
+          setAllProducts(productsWithNewFlag)
         }
       } catch (err) {
         setError(err.message)
@@ -234,6 +244,16 @@ const Market = () => {
                   </span>
                 </div>
               </div>
+              {item.isNew && (
+                <div className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} z-10`}>
+                  <div
+                    className={`bg-secondary px-3 py-1 ${isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium`}
+                  >
+                    {t("product.new") || "NEW"}
+                  </div>
+                </div>
+              )}
               <figure className="px-4 pt-4">
                 <img
                   src={

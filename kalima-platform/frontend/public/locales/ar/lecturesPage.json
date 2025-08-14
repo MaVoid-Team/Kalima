@@ -85,7 +85,7 @@
     "labels": {
       "course": "دورة",
       "price": "السعر: {{price}} نقطة",
-      "lecturer": "المدرس",
+      "lecturer": "المحاضر",
       "purchaseDate": "تاريخ الشراء",
       "unknown": "غير معروف"
     },
