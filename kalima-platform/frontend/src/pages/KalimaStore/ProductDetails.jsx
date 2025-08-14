@@ -317,7 +317,7 @@ const ProductDetails = () => {
         </div>
         <div className="card bg-base-100 shadow-xl mb-8">
           <div className="card-body">
-                        <PurchaseForm
+            <PurchaseForm
               type={displayType}
               purchaseForm={purchaseForm}
               setPurchaseForm={setPurchaseForm}
@@ -335,13 +335,19 @@ const ProductDetails = () => {
               onRemoveCoupon={handleRemoveCoupon}
               couponValidation={couponValidation}
             />
-            </div>
-        </div>
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <PaymentSection paymentNumber={product.paymentNumber} isRTL={isRTL} />
           </div>
         </div>
+        {product && (
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <PaymentSection
+                paymentNumber={product.paymentNumber}
+                isRTL={isRTL}
+                whatsAppNumber={product?.whatsAppNumber || ""}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
