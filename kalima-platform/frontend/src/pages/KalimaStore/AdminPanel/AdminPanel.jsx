@@ -335,14 +335,16 @@ const AdminPanel = () => {
         serial: productForm.serial,
         section: productForm.section,
         price: productForm.price,
-        discountPercentage: productForm.discountPercentage,
+        priceAfterDiscount: productForm.priceAfterDiscount,
         paymentNumber: productForm.paymentNumber,
         thumbnail: productForm.thumbnail,
         sample: productForm.sample,
         gallery: productForm.gallery,
         whatsAppNumber: productForm.whatsAppNumber,
         description: productForm.description,
-      })
+        ...(editingProduct.__t === "ECBook" && { subject: productForm.subject })
+      }
+    )
 
       if (response?.status === "success") {
         setShowEditProductModal(false)
@@ -661,6 +663,7 @@ const AdminPanel = () => {
           setProductForm={setProductForm}
           onUpdateProduct={handleUpdateProduct}
           sections={sections}
+          subjects={subjects}
           onFileChange={handleFileChange}
           showDeleteModal={showDeleteModal}
           setShowDeleteModal={setShowDeleteModal}
