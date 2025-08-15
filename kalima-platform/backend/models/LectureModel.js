@@ -3,21 +3,22 @@ const Container = require("./containerModel");
 
 const lectureSchema = new mongoose.Schema({
   videoLink: { type: String, required: true },
+  thumbnail: { type: String, required: true }, // Store local file path for thumbnail
   description: { type: String },
   numberOfViews: { type: Number, default: 3 },
   teacherAllowed: { type: Boolean, required: true },
-  lecture_type: { 
+  lecture_type: {
     type: String,
     enum: ['Free', 'Paid', 'Revision', 'Teachers Only'],
     required: [true, 'A lecture must have a type'],
-  },  requiresExam: {
+  }, requiresExam: {
     type: Boolean,
     default: false
   },
   examConfig: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "LecturerExamConfig"
-  },  
+  },
   passingThreshold: {
     type: Number,
     min: 0,
