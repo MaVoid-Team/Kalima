@@ -12,7 +12,8 @@
   "product": {
     "discounts": "خصم",
     "currency": "ج",
-    "viewDetails": "عرض التفاصيل"
+    "viewDetails": "عرض التفاصيل",
+    "new": "اضيف حديثا"
   },
   "sections": {
     "Designs": "تصاميم",
