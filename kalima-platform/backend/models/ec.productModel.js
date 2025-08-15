@@ -18,6 +18,7 @@ const productSchema = new mongoose.Schema(
         paymentNumber: { type: String, required: true },
         discountPercentage: { type: Number },
         priceAfterDiscount: { type: Number },
+        subject: { type: mongoose.Schema.Types.ObjectId, ref: "Subject" },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
