@@ -268,6 +268,8 @@ mongoose.connection.once("open", () => {
   // Make io accessible in routes
   app.set("io", io);
 
+  require("./utils/cleanup/paymentScreenshotCleanup").start();
+
   httpServer.listen(PORT, () => {
     console.log(`Server active and listening on port ${PORT}.`);
   });
