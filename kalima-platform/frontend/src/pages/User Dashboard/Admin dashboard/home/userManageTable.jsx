@@ -860,7 +860,7 @@ const UserManagementTable = () => {
                     >
                       <FaEye />
                     </button>
-                    {isAdmin || isSubAdmin && (
+                    {isAdmin | isSubAdmin && (
                       <button
                         className="btn btn-info btn-xs"
                         onClick={() => openEditModal(user)}
