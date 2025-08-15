@@ -32,6 +32,7 @@ services:
       - CLOUDINARY_SECRET=${CLOUDINARY_SECRET}
       - RESEND_API_KEY=${RESEND_API_KEY}
       - EMAIL_FROM=${EMAIL_FROM}
+      - PAYMENT_SS_RETENTION_DAYS=90
     networks:
       - app-network
     volumes:
