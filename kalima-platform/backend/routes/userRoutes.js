@@ -9,7 +9,8 @@ const authController = require("../controllers/authController");
 router
   .route("/")
   .get(userController.getAllUsers)
-  .post(validateUser, userController.createUser);
+  .post(uploadProfilePicToDisk,
+    validateUser, userController.createUser);
 
 router
   .route("/:userId")
