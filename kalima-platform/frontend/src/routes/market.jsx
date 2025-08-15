@@ -261,12 +261,15 @@ export const updateProduct = async (productId, productData) => {
     const formData = new FormData()
 
     // Append all the form fields that are provided
-    if (productData.title) formData.append("title", productData.title)
-    if (productData.serial) formData.append("serial", productData.serial)
-    if (productData.section) formData.append("section", productData.section)
-    if (productData.price) formData.append("price", productData.price)
-    if (productData.discountPercentage) formData.append("discountPercentage", productData.discountPercentage)
-    if (productData.paymentNumber) formData.append("paymentNumber", productData.paymentNumber)
+    if (productData.title !== undefined) formData.append("title", productData.title)
+    if (productData.serial !== undefined) formData.append("serial", productData.serial)
+    if (productData.section !== undefined) formData.append("section", productData.section)
+    if (productData.price !== undefined) formData.append("price", productData.price)
+    if (productData.priceAfterDiscount !== undefined) formData.append("priceAfterDiscount", productData.priceAfterDiscount)
+    if (productData.paymentNumber !== undefined) formData.append("paymentNumber", productData.paymentNumber)
+    if (productData.whatsAppNumber !== undefined) formData.append("whatsAppNumber", productData.whatsAppNumber)
+    if (productData.subject !== undefined) formData.append("subject", productData.subject)
+    if (productData.description !== undefined) formData.append("description", productData.description)
 
     // Append files if they exist
     if (productData.thumbnail) {
@@ -276,13 +279,17 @@ export const updateProduct = async (productId, productData) => {
       formData.append("sample", productData.sample)
     }
 
-    const response = await axios.patch(`${API_URL}/api/v1/ec/products/${productId}`, formData, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        "Content-Type": "multipart/form-data",
-      },
-    })
+    const response = await axios.patch(
+      `${API_URL}/api/v1/ec/products/${productId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    )
     return response.data
   } catch (error) {
     console.error(`Error updating product: ${error.message}`)
