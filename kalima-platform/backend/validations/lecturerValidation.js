@@ -10,6 +10,7 @@ const lecturerValidation = userValidation.concat(
     }),
     bio: Joi.string().required(),
     expertise: Joi.string().required(),
+    profilePic: Joi.string().trim().allow("").optional()
   })
 );
 
