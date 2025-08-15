@@ -121,6 +121,10 @@
       }
     }
   },
+  "common": {
+    "cancel" : "الغاء",
+    "update": "نحديث"
+  },
   "fileUpload": {
     "uploaded": "تم الرفع",
     "upload": "رفع",
