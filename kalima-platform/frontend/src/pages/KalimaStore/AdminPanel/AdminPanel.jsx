@@ -661,6 +661,7 @@ const AdminPanel = () => {
           setProductForm={setProductForm}
           onUpdateProduct={handleUpdateProduct}
           sections={sections}
+          subjects={subjects}
           onFileChange={handleFileChange}
           showDeleteModal={showDeleteModal}
           setShowDeleteModal={setShowDeleteModal}
