@@ -112,15 +112,16 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, priceAfterDiscount, serial, description, whatsAppNumber, paymentNumber } = req.body
-        const updatedBy = req.user._id
+        const { title, section, price, priceAfterDiscount, serial, description, whatsAppNumber, paymentNumber, subject } = req.body;
+        const updatedBy = req.user._id;
 
-        // Get the existing product to access old file paths
-        const existingProduct = await ECProduct.findById(req.params.id)
+        // 1️⃣ Get the existing product first
+        const existingProduct = await ECProduct.findById(req.params.id);
         if (!existingProduct) {
-            return res.status(404).json({ message: "Product not found" })
+            return res.status(404).json({ message: "Product not found" });
         }
 
+        // 2️⃣ Start building the update object after we have existingProduct
         const update = {
             title,
             section,
@@ -131,133 +132,94 @@ exports.updateProduct = async (req, res) => {
             updatedBy,
             whatsAppNumber,
             paymentNumber,
+            subject: subject || existingProduct.subject,
+            thumbnail: existingProduct.thumbnail,
+            sample: existingProduct.sample,
+            gallery: existingProduct.gallery,
             updatedAt: new Date(),
-        }
+        };
 
         // Handle PDF sample update
-        if (req.files && req.files.sample && req.files.sample[0]) {
-            const file = req.files.sample[0]
+        if (req.files?.sample?.[0]) {
+            const file = req.files.sample[0];
 
-            // Validate PDF file
             if (file.mimetype !== "application/pdf") {
-                return res.status(400).json({ message: "Sample must be a PDF file" })
+                return res.status(400).json({ message: "Sample must be a PDF file" });
             }
-
             if (file.size > 75 * 1024 * 1024) {
-                return res.status(400).json({ message: "Sample file size must be <= 75MB" })
+                return res.status(400).json({ message: "Sample file size must be <= 75MB" });
             }
 
-            // Delete old sample file if it exists
             if (existingProduct.sample && fs.existsSync(existingProduct.sample)) {
-                try {
-                    fs.unlinkSync(existingProduct.sample)
-                } catch (err) {
-                    console.error("Failed to delete old sample file:", err)
-                }
+                fs.unlinkSync(existingProduct.sample);
             }
 
-            update.sample = file.path
+            update.sample = file.path;
         }
 
-        // Handle image thumbnail update with validation
-        if (req.files && req.files.thumbnail && req.files.thumbnail[0]) {
-            const file = req.files.thumbnail[0]
+        // Handle thumbnail update
+        if (req.files?.thumbnail?.[0]) {
+            const file = req.files.thumbnail[0];
+            const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
-            // Validate image file type
-            const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
             if (!allowedImageTypes.includes(file.mimetype)) {
-                return res.status(400).json({
-                    message: "Thumbnail must be an image file (JPEG, PNG, or WebP)",
-                })
+                return res.status(400).json({ message: "Thumbnail must be JPEG, PNG, or WebP" });
             }
-
-            // Validate image file size (e.g., 5MB limit)
             if (file.size > 5 * 1024 * 1024) {
-                return res.status(400).json({ message: "Thumbnail file size must be <= 5MB" })
+                return res.status(400).json({ message: "Thumbnail file size must be <= 5MB" });
             }
 
-            // Delete old thumbnail file if it exists
             if (existingProduct.thumbnail && fs.existsSync(existingProduct.thumbnail)) {
-                try {
-                    fs.unlinkSync(existingProduct.thumbnail)
-                } catch (err) {
-                    console.error("Failed to delete old thumbnail file:", err)
-                }
+                fs.unlinkSync(existingProduct.thumbnail);
             }
 
-            update.thumbnail = file.path
+            update.thumbnail = file.path;
         }
 
-        // Handle gallery update with validation
-        if (req.files && req.files.gallery && req.files.gallery.length > 0) {
-            // Validate each gallery image
-            for (const file of req.files.gallery) {
-                const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"]
-                if (!allowedImageTypes.includes(file.mimetype)) {
-                    return res.status(400).json({
-                        message: "All gallery images must be image files (JPEG, PNG, or WebP)",
-                    })
-                }
+        // Handle gallery update
+        if (req.files?.gallery?.length > 0) {
+            const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+            for (const file of req.files.gallery) {
+                if (!allowedImageTypes.includes(file.mimetype)) {
+                    return res.status(400).json({ message: "All gallery images must be JPEG, PNG, or WebP" });
+                }
                 if (file.size > 5 * 1024 * 1024) {
-                    return res.status(400).json({
-                        message: "Each gallery image must be <= 5MB",
-                    })
+                    return res.status(400).json({ message: "Each gallery image must be <= 5MB" });
                 }
             }
 
-            // Delete old gallery files if they exist
-            if (existingProduct.gallery && existingProduct.gallery.length > 0) {
+            if (existingProduct.gallery?.length > 0) {
                 existingProduct.gallery.forEach((imagePath) => {
                     if (fs.existsSync(imagePath)) {
-                        try {
-                            fs.unlinkSync(imagePath)
-                        } catch (err) {
-                            console.error("Failed to delete old gallery image:", err)
-                        }
+                        fs.unlinkSync(imagePath);
                     }
-                })
+                });
             }
 
-            update.gallery = req.files.gallery.map((file) => file.path)
+            update.gallery = req.files.gallery.map((file) => file.path);
         }
 
-        // Update the product
+        // 3️⃣ Save the updated product
         const product = await ECProduct.findByIdAndUpdate(req.params.id, update, {
             new: true,
             runValidators: true,
-        }).populate({ path: "section", select: "number" })
-
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" })
-        }
-
-        const obj = product.toObject()
+        }).populate({ path: "section", select: "number" });
 
         res.status(200).json({
             status: "success",
-            data: {
-                product: {
-                    ...obj,
-                    description: obj.description,
-                    whatsAppNumber: obj.whatsAppNumber,
-                    paymentNumber: obj.paymentNumber,
-                    gallery: obj.gallery,
-                    sample: obj.sample,
-                    thumbnail: obj.thumbnail,
-                    subtitle: obj.subtitle,
-                },
-            },
-        })
+            data: { product },
+        });
     } catch (err) {
-        console.error("Error updating product:", err)
+        console.error("Error updating product:", err);
         res.status(500).json({
             status: "error",
             message: "Internal server error",
             error: process.env.NODE_ENV === "development" ? err.message : undefined,
-        })
+        });
     }
-}
+};
+
 
 exports.deleteProduct = async (req, res) => {
     try {
