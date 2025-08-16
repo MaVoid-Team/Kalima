@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 const User = require('./userModel');
+const { trim } = require('lodash');
 
 const lecturerSchema = new mongoose.Schema({
   bio: { type: String, required: true },
   expertise: { type: String, required: true },
-  profilePicture: {
-    url: String,
-    publicId: String,
+  profilePic: {
+    type: String,
+    trim: true,
   },
 }, {
   timestamps: true
