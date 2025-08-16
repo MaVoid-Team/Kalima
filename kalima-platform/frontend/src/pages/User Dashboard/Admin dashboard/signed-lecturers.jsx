@@ -28,8 +28,6 @@ const SignedLecturers = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filters, setFilters] = useState({
     expertise: "",
-    government: "",
-    status: "", // active, inactive, all
   })
 
   // Check user role and fetch data
@@ -114,18 +112,6 @@ const SignedLecturers = () => {
     // Apply expertise filter
     if (filters.expertise) {
       filtered = filtered.filter((lecturer) => lecturer.expertise?.toLowerCase() === filters.expertise.toLowerCase())
-    }
-
-    // Apply government filter
-    if (filters.government) {
-      filtered = filtered.filter((lecturer) => lecturer.government?.toLowerCase() === filters.government.toLowerCase())
-    }
-
-    // Apply status filter (assuming we have an isActive field or similar)
-    if (filters.status === "active") {
-      filtered = filtered.filter((lecturer) => lecturer.isActive !== false)
-    } else if (filters.status === "inactive") {
-      filtered = filtered.filter((lecturer) => lecturer.isActive === false)
     }
 
     const totalPages = Math.ceil(filtered.length / state.itemsPerPage)
@@ -285,29 +271,6 @@ const SignedLecturers = () => {
                 ))}
               </select>
 
-              <select
-                className="select select-bordered select-sm"
-                value={filters.government}
-                onChange={(e) => setFilters((prev) => ({ ...prev, government: e.target.value }))}
-              >
-                <option value="">{t("filters.allGovernments") || "All Governments"}</option>
-                {uniqueGovernments.map((government) => (
-                  <option key={government} value={government}>
-                    {government}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                className="select select-bordered select-sm"
-                value={filters.status}
-                onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
-              >
-                <option value="">{t("filters.allStatuses") || "All Status"}</option>
-                <option value="active">{t("filters.active") || "Active"}</option>
-                <option value="inactive">{t("filters.inactive") || "Inactive"}</option>
-              </select>
-
               <button className="btn btn-outline btn-sm" onClick={clearFilters}>
                 {t("filters.clear") || "Clear"}
               </button>
@@ -364,9 +327,6 @@ const SignedLecturers = () => {
                       <th data-tip={t("lecturers.contactTooltip") || "Contact information"}>
                         {t("lecturers.contact") || "Contact"}
                       </th>
-                      <th data-tip={t("lecturers.locationTooltip") || "Government and location"}>
-                        {t("lecturers.location") || "Location"}
-                      </th>
                       <th data-tip={t("lecturers.joinedTooltip") || "Registration date"}>
                         {t("lecturers.joined") || "Joined"}
                       </th>
@@ -407,12 +367,6 @@ const SignedLecturers = () => {
                               <FaPhone className="w-3 h-3 opacity-60" />
                               <span>{lecturer.phoneNumber || "N/A"}</span>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="text-sm">
-                            <div className="font-medium">{lecturer.government || "N/A"}</div>
-                            <div className="opacity-70">{lecturer.administrationZone || ""}</div>
                           </div>
                         </td>
                         <td>

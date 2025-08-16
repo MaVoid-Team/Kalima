@@ -2,26 +2,30 @@
 
 import { useState } from "react"
 
-const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
+const LecturerForm = ({ userData, handleChange, subjects, t }) => {
   const [selectedSubjects, setSelectedSubjects] = useState(userData.subject || [])
 
   const handleSubjectSelect = (e) => {
     const subjectId = e.target.value
     if (!subjectId) return
 
-    // Check if subject is already selected
     if (!selectedSubjects.includes(subjectId)) {
-      setSelectedSubjects((prev) => [...prev, subjectId])
-      userData.subject = [...(userData.subject || []), subjectId]
+      const newSubjects = [...selectedSubjects, subjectId]
+      setSelectedSubjects(newSubjects)
+
+      // Always update as array
+      handleChange({ target: { name: "subject", value: newSubjects } })
     }
   }
 
   const removeSubject = (subjectId) => {
-    setSelectedSubjects((prev) => prev.filter((id) => id !== subjectId))
-    userData.subject = (userData.subject || []).filter((id) => id !== subjectId)
+    const newSubjects = selectedSubjects.filter((id) => id !== subjectId)
+    setSelectedSubjects(newSubjects)
+
+    // Always update as array
+    handleChange({ target: { name: "subject", value: newSubjects } })
   }
 
-  // Find subject name by ID
   const getSubjectNameById = (id) => {
     const subject = subjects.find((s) => s._id === id)
     return subject ? subject.name : id
@@ -29,16 +33,25 @@ const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
 
   return (
     <>
+      {/* Subjects Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-4">
           <label className="label">
             <span className="label-text">{t("fields.subjects")}</span>
           </label>
           <div className="flex gap-2">
-            <select className="select select-bordered flex-1" onChange={handleSubjectSelect} value="">
+            <select
+              className="select select-bordered flex-1"
+              onChange={handleSubjectSelect}
+              value=""
+            >
               <option value="">{t("placeholders.selectSubject")}</option>
               {subjects.map((subject) => (
-                <option key={subject._id} value={subject._id} disabled={selectedSubjects.includes(subject._id)}>
+                <option
+                  key={subject._id}
+                  value={subject._id}
+                  disabled={selectedSubjects.includes(subject._id)}
+                >
                   {subject.name}
                 </option>
               ))}
@@ -51,7 +64,11 @@ const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
             {selectedSubjects.map((subjectId) => (
               <div key={subjectId} className="badge badge-secondary gap-1">
                 {getSubjectNameById(subjectId)}
-                <button type="button" className="btn btn-ghost btn-xs" onClick={() => removeSubject(subjectId)}>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-xs"
+                  onClick={() => removeSubject(subjectId)}
+                >
                   ×
                 </button>
               </div>
@@ -60,6 +77,37 @@ const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
         )}
       </div>
 
+      {/* Profile Picture Upload */}
+      <div className="form-control">
+        <div className="flex flex-col gap-4">
+          <label className="label">
+            <span className="label-text">{t("fields.profilePicture")}</span>
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            className="file-input file-input-bordered"
+            onChange={(e) => {
+              const file = e.target.files[0]
+              if (file) {
+                handleChange({ target: { name: "profilePic", value: file } })
+              }
+            }}
+          />
+        </div>
+
+        {userData.profilePic && (
+          <div className="mt-2">
+            <img
+              src={URL.createObjectURL(userData.profilePic) || "/placeholder.svg"}
+              alt="Profile Preview"
+              className="w-24 h-24 object-cover rounded-full border"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Bio */}
       <div className="form-control">
         <div className="flex flex-col gap-4">
           <label className="label">
@@ -76,6 +124,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t, isRTL}) => {
         </div>
       </div>
 
+      {/* Expertise */}
       <div className="form-control">
         <div className="flex flex-col gap-4">
           <label className="label">
