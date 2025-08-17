@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
@@ -11,8 +11,8 @@ import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 
 const MyLecturesPage = () => {
-  const { t, i18n } = useTranslation('lecturesPage');
-  const isRTL = i18n.language === "ar";
+  const { t, i18n } = useTranslation("lecturesPage")
+  const isRTL = i18n.language === "ar"
   const [lectures, setLectures] = useState([])
   const [allLectures, setAllLectures] = useState([]) // Store all lectures before pagination
   const [subjects, setSubjects] = useState([])
@@ -24,25 +24,34 @@ const MyLecturesPage = () => {
   const [userId, setUserId] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [creationLoading, setCreationLoading] = useState(false)
-
+  const [successMessage, setSuccessMessage] = useState("")
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState("")
   const [selectedLevelFilter, setSelectedLevelFilter] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [totalPages, setTotalPages] = useState(0)
 
-  // Fetch initial data
+  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
+
+    const normalizedPath = filePath.replace(/\\/g, "/")
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+    const baseUrl = API_URL.replace(/\/$/, "")
+    const filename = normalizedPath.split("/").pop()
+
+    return `${baseUrl}/uploads/${folder}/${filename}`
+  }
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         setLoading(true)
         setError(null)
 
-        // Fetch subjects and levels first (needed for all roles for the modal/filters)
         const subjectsRes = await getAllSubjects()
         const levelsRes = await getAllLevels()
 
-        // Handle subjects fetch result
         if (subjectsRes.success) {
           setSubjects(subjectsRes.data || [])
         } else {
@@ -51,7 +60,6 @@ const MyLecturesPage = () => {
           setError("فشل في تحميل المواد، لكن يمكنك المتابعة.")
         }
 
-        // Handle levels fetch result
         if (levelsRes.success) {
           setLevels(levelsRes.data || [])
         } else {
@@ -60,9 +68,8 @@ const MyLecturesPage = () => {
           setError((prev) => (prev ? `${prev}` : "فشل في تحميل المستويات، لكن يمكنك المتابعة."))
         }
 
-        // Fetch dashboard data to get user role
         const result = await getUserDashboard({
-          params: { fields: "userInfo,containers,purchaseHistory", limit: 200 },
+          params: { fields: "userInfo,containers,purchaseHistory", limit: 500 },
         })
 
         if (result.success) {
@@ -70,9 +77,7 @@ const MyLecturesPage = () => {
           setUserRole(userInfo.role)
           setUserId(userInfo.id)
 
-          // Different data fetching based on user role
           if (["Admin", "Subadmin", "Moderator"].includes(userInfo.role)) {
-            // For admin roles, fetch all lectures
             const allLecturesResult = await getAllLectures({
               limit: 200,
             })
@@ -89,6 +94,7 @@ const MyLecturesPage = () => {
                 requiresExam: lecture.requiresExam,
                 examConfig: lecture.examConfig,
                 lecturer: lecture.createdBy,
+                thumbnail: lecture.thumbnail,
               }))
 
               setAllLectures(lecturesData)
@@ -97,7 +103,6 @@ const MyLecturesPage = () => {
               setError("فشل في تحميل جميع المحاضرات")
             }
           } else if (userInfo.role === "Lecturer") {
-            // For lecturers, use the containers from dashboard
             const lecturesData =
               result.data.data.containers
                 ?.filter((c) => c.type === "lecture")
@@ -112,11 +117,11 @@ const MyLecturesPage = () => {
                   requiresExam: lecture.requiresExam,
                   examConfig: lecture.examConfig,
                   lecturer: userInfo,
+                  thumbnail: lecture.thumbnail,
                 })) || []
 
             setAllLectures(lecturesData)
           } else if (userInfo.role === "Student") {
-            // For students, use the purchase history
             const lecturesData =
               result.data.data.purchaseHistory
                 ?.filter((p) => p.container?.type === "lecture")
@@ -137,6 +142,7 @@ const MyLecturesPage = () => {
                   lecturer: p.lecturer,
                   subject: p.container?.subject,
                   level: p.container?.level,
+                  thumbnail: p.container?.thumbnail,
                 })) || []
 
             setAllLectures(lecturesData)
@@ -155,13 +161,10 @@ const MyLecturesPage = () => {
     fetchInitialData()
   }, [])
 
-  // Apply filters and pagination whenever filters, page, or allLectures changes
   useEffect(() => {
     if (allLectures.length > 0) {
-      // Apply filters - but only for non-admin roles
       let filteredLectures = [...allLectures]
 
-      // Skip filtering for admin roles to avoid duplicates
       if (!["Admin", "Subadmin", "Moderator"].includes(userRole)) {
         if (selectedSubjectFilter) {
           filteredLectures = filteredLectures.filter((l) => l.subject?._id === selectedSubjectFilter)
@@ -172,7 +175,6 @@ const MyLecturesPage = () => {
         }
       }
 
-      // Apply pagination
       const startIndex = (currentPage - 1) * itemsPerPage
       const paginatedLectures = filteredLectures.slice(startIndex, startIndex + itemsPerPage)
 
@@ -190,18 +192,32 @@ const MyLecturesPage = () => {
     setCurrentPage(1)
   }
 
-  const handleCreateLecture = async (lectureData, attachmentFile, attachmentType) => {
+  const handleCreateLecture = async (lectureData, attachmentFile, attachmentType, thumbnailFile) => {
     setCreationLoading(true)
     setError(null)
+    setSuccessMessage("")
 
     try {
-      const response = await createLecture(lectureData)
+      let response
+      if (thumbnailFile) {
+        const formData = new FormData()
+
+        Object.keys(lectureData).forEach((key) => {
+          if (lectureData[key] !== null && lectureData[key] !== undefined) {
+            formData.append(key, lectureData[key])
+          }
+        })
+
+        formData.append("thumbnail", thumbnailFile)
+        response = await createLecture(formData)
+      } else {
+        response = await createLecture(lectureData)
+      }
 
       if (response.status !== "success" && response.success !== true) {
         throw new Error(response.message || "فشل في إنشاء المحاضرة")
       }
 
-      // Extract the lecture ID from the response
       let lectureId = null
       if (response.data && response.data.lecture && response.data.lecture._id) {
         lectureId = response.data.lecture._id
@@ -213,7 +229,6 @@ const MyLecturesPage = () => {
         lectureId = response.data.id
       }
 
-      // Handle attachment after successful lecture creation
       if (attachmentFile && lectureId) {
         try {
           const attachmentData = {
@@ -228,9 +243,27 @@ const MyLecturesPage = () => {
         }
       }
 
-      // Refresh lectures after creating a new one
+      await refetchLectureData()
+
+      setSuccessMessage(t("lecturesPage.messages.lectureCreatedSuccessfully", "Lecture created successfully!"))
+
+      setTimeout(() => {
+        setSuccessMessage("")
+      }, 5000)
+
+      return true
+    } catch (err) {
+      setError("فشل إنشاء المحاضرة: " + err.message)
+      return false
+    } finally {
+      setCreationLoading(false)
+    }
+  }
+
+  const refetchLectureData = async () => {
+    try {
       if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
-        const allLecturesResult = await getAllLectures()
+        const allLecturesResult = await getAllLectures({ limit: 200 })
         if (allLecturesResult.status === "success") {
           const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
             id: lecture._id,
@@ -249,7 +282,7 @@ const MyLecturesPage = () => {
         }
       } else if (userRole === "Lecturer") {
         const result = await getUserDashboard({
-          params: { fields: "userInfo,containers,purchaseHistory", limit: 100 },
+          params: { fields: "userInfo,containers,purchaseHistory", limit: 200 },
         })
 
         if (result.success) {
@@ -272,13 +305,8 @@ const MyLecturesPage = () => {
           setAllLectures(lecturesData)
         }
       }
-
-      return true
-    } catch (err) {
-      setError("فشل إنشاء المحاضرة: " + err.message)
-      return false
-    } finally {
-      setCreationLoading(false)
+    } catch (error) {
+      console.error("Error refetching lecture data:", error)
     }
   }
 
@@ -289,79 +317,99 @@ const MyLecturesPage = () => {
       </div>
     )
 
-  // Basic error boundary for rendering
   try {
     return (
-    <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
-      <h1 className="text-2xl font-bold mb-2">
-        {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) 
-          ? t('lecturesPage.pageTitle.manage') 
-          : t('lecturesPage.pageTitle.purchased')}
-      </h1>
-      <p className="text-sm opacity-80 mt-2 mb-5">{t('lecturesPage.pageDescription')}</p>
-      
-      {error && (
-        <div className="alert alert-error mb-4">
-          <span>{error}</span>
-          <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
-            {t('lecturesPage.buttons.close')}
-          </button>
-        </div>
-      )}
+      <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
+        <h1 className="text-2xl font-bold mb-2">
+          {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+            ? t("lecturesPage.pageTitle.manage")
+            : t("lecturesPage.pageTitle.purchased")}
+        </h1>
+        <p className="text-sm opacity-80 mt-2 mb-5">{t("lecturesPage.pageDescription")}</p>
 
-      <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
-        <div className="flex flex-col md:flex-row gap-4 flex-1">
-          <select
-            className="select select-bordered w-full md:w-64"
-            value={selectedSubjectFilter}
-            onChange={(e) => {
-              setSelectedSubjectFilter(e.target.value)
-              setCurrentPage(1)
-            }}
-          >
-            <option value="">{t('lecturesPage.filters.allSubjects')}</option>
-            {subjects?.map((subject) => (
-              <option key={subject._id} value={subject._id}>
-                {subject.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="select select-bordered w-full md:w-64"
-            value={selectedLevelFilter}
-            onChange={(e) => {
-              setSelectedLevelFilter(e.target.value)
-              setCurrentPage(1)
-            }}
-          >
-            <option value="">{t('lecturesPage.filters.allLevels')}</option>
-            {levels?.map((level) => (
-              <option key={level._id} value={level._id}>
-                {t(`gradeLevels.${level.name}` , { ns: 'common' })}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) && (
-          <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
-            {t('lecturesPage.buttons.createNewLecture')}
-          </button>
+        {successMessage && (
+          <div className="alert alert-success mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{successMessage}</span>
+            <button className="btn btn-sm btn-ghost" onClick={() => setSuccessMessage("")}>
+              {t("lecturesPage.buttons.close")}
+            </button>
+          </div>
         )}
 
-        <select
-          className="select select-bordered w-full md:w-48"
-          value={itemsPerPage}
-          onChange={handleItemsPerPageChange}
-        >
-          <option value={10}>{t('lecturesPage.itemsPerPage', { count: 10 })}</option>
-          <option value={20}>{t('lecturesPage.itemsPerPage', { count: 20 })}</option>
-          <option value={50}>{t('lecturesPage.itemsPerPage', { count: 50 })}</option>
-        </select>
-      </div>
+        {error && (
+          <div className="alert alert-error mb-4">
+            <span>{error}</span>
+            <button className="btn btn-sm btn-ghost" onClick={() => setError(null)}>
+              {t("lecturesPage.buttons.close")}
+            </button>
+          </div>
+        )}
 
-        {/* Lecture Creation Modal */}
+        <div className="mb-4 flex flex-col md:flex-row justify-between gap-4">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            <select
+              className="select select-bordered w-full md:w-64"
+              value={selectedSubjectFilter}
+              onChange={(e) => {
+                setSelectedSubjectFilter(e.target.value)
+                setCurrentPage(1)
+              }}
+            >
+              <option value="">{t("lecturesPage.filters.allSubjects")}</option>
+              {subjects?.map((subject) => (
+                <option key={subject._id} value={subject._id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="select select-bordered w-full md:w-64"
+              value={selectedLevelFilter}
+              onChange={(e) => {
+                setSelectedLevelFilter(e.target.value)
+                setCurrentPage(1)
+              }}
+            >
+              <option value="">{t("lecturesPage.filters.allLevels")}</option>
+              {levels?.map((level) => (
+                <option key={level._id} value={level._id}>
+                  {t(`gradeLevels.${level.name}`, { ns: "common" })}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) && (
+            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
+              {t("lecturesPage.buttons.createNewLecture")}
+            </button>
+          )}
+
+          <select
+            className="select select-bordered w-full md:w-48"
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+          >
+            <option value={10}>{t("lecturesPage.itemsPerPage", { count: 10 })}</option>
+            <option value={20}>{t("lecturesPage.itemsPerPage", { count: 20 })}</option>
+            <option value={50}>{t("lecturesPage.itemsPerPage", { count: 50 })}</option>
+          </select>
+        </div>
+
         <LectureCreationModal
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
@@ -370,80 +418,110 @@ const MyLecturesPage = () => {
           userId={userId}
           containerLevel={null}
           containerSubject={null}
-          containerType="month" // Set to "month" to enable lecture creation
+          containerType="month"
         />
 
         <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
-          <thead>
-            <tr>
-              <th>{t('lecturesPage.tableHeaders.name')}</th>
-              {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && 
-                <th>{t('lecturesPage.tableHeaders.lecturer')}</th>}
-              <th>{t('lecturesPage.tableHeaders.subject')}</th>
-              <th>{t('lecturesPage.tableHeaders.level')}</th>
-              <th>{t('lecturesPage.tableHeaders.type')}</th>
-              <th>{t('lecturesPage.tableHeaders.price')}</th>
-              {userRole === "Student" && <th>{t('lecturesPage.tableHeaders.purchaseDate')}</th>}
-              {userRole !== "Student" && <th>{t('lecturesPage.tableHeaders.actions')}</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {lectures?.map((lecture) => (
-              <tr key={lecture.id}>
-                <td>{lecture.name}</td>
+          <table className="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>{t("lecturesPage.tableHeaders.thumbnail")}</th> {/* ✅ new column */}
+                <th>{t("lecturesPage.tableHeaders.name")}</th>
                 {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
-                  <td>{lecture.lecturer?.name || t('lecturesPage.unknown')}</td>
+                  <th>{t("lecturesPage.tableHeaders.lecturer")}</th>
                 )}
-                <td>{lecture.subject?.name || t('lecturesPage.notSpecified')}</td>
-                <td>{t(`gradeLevels.${lecture.level?.name}` , { ns: 'common' }) || lecture.level?.name || t('lecturesPage.notSpecified')}</td>
-                <td>{lecture.lecture_type === "Paid" ? t('lecturesPage.lectureType.paid') : t('lecturesPage.lectureType.review')}</td>
-                <td>{lecture.price || 0} {t('lecturesPage.points')}</td>
-                {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
-                <td>
-                  <Link to={`/dashboard/${userRole === "Student" ? 'student' : 'lecturer'}-dashboard/${userRole === "Student" ? 'lecture-display' : 'detailed-lecture-view'}/${lecture.id}`}>
-                    <button className="btn btn-ghost">{t('lecturesPage.buttons.details')}</button>
-                  </Link>
-                </td>
+                <th>{t("lecturesPage.tableHeaders.subject")}</th>
+                <th>{t("lecturesPage.tableHeaders.level")}</th>
+                <th>{t("lecturesPage.tableHeaders.type")}</th>
+                <th>{t("lecturesPage.tableHeaders.price")}</th>
+                {userRole === "Student" && <th>{t("lecturesPage.tableHeaders.purchaseDate")}</th>}
+                {userRole !== "Student" && <th>{t("lecturesPage.tableHeaders.actions")}</th>}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {lectures?.map((lecture) => (
+                <tr key={lecture.id}>
+                  <td>
+                    {lecture.thumbnail ? (
+                      <div className="avatar">
+                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                          <img
+                            src={convertPathToUrl(lecture.thumbnail)}
+                            alt={lecture.name}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="avatar placeholder">
+                        <div className="w-12 h-12 rounded-full bg-neutral-focus text-neutral-content flex items-center justify-center">
+                          <span className="text-sm">N/A</span>
+                        </div>
+                      </div>
+                    )}
+                  </td>
 
-      {lectures.length === 0 && (
-        <div className="alert alert-info mt-4">
-          <span>
-            {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
-              ? t('lecturesPage.emptyStates.noLectures')
-              : t('lecturesPage.emptyStates.noPurchases')}
-          </span>
+                  <td>{lecture.name}</td>
+                  {(userRole === "Student" || ["Admin", "Subadmin", "Moderator"].includes(userRole)) && (
+                    <td>{lecture.lecturer?.name || t("lecturesPage.unknown")}</td>
+                  )}
+                  <td>{lecture.subject?.name || t("lecturesPage.notSpecified")}</td>
+                  <td>
+                    {t(`gradeLevels.${lecture.level?.name}`, { ns: "common" }) ||
+                      lecture.level?.name ||
+                      t("lecturesPage.notSpecified")}
+                  </td>
+                  <td>
+                    {lecture.lecture_type === "Paid"
+                      ? t("lecturesPage.lectureType.paid")
+                      : t("lecturesPage.lectureType.review")}
+                  </td>
+                  <td>
+                    {lecture.price || 0} {t("lecturesPage.points")}
+                  </td>
+                  {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
+                  <td>
+                    <Link
+                      to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
+                        }/${lecture.id}`}
+                    >
+                      <button className="btn btn-ghost">{t("lecturesPage.buttons.details")}</button>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
 
-      {totalPages > 1 && (
-        <div className="join flex justify-center mt-4">
-          <button
-            className="join-item btn"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            {t('lecturesPage.pagination.previous')}
-          </button>
+        {lectures.length === 0 && (
+          <div className="alert alert-info mt-4">
+            <span>
+              {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole)
+                ? t("lecturesPage.emptyStates.noLectures")
+                : t("lecturesPage.emptyStates.noPurchases")}
+            </span>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="join flex justify-center mt-4">
+            <button
+              className="join-item btn"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              {t("lecturesPage.pagination.previous")}
+            </button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              // Show at most 5 page buttons
               let pageNum
               if (totalPages <= 5) {
-                // If 5 or fewer pages, show all
                 pageNum = i + 1
               } else if (currentPage <= 3) {
-                // If near the start, show first 5 pages
                 pageNum = i + 1
               } else if (currentPage >= totalPages - 2) {
-                // If near the end, show last 5 pages
                 pageNum = totalPages - 4 + i
               } else {
-                // Otherwise show 2 before and 2 after current page
                 pageNum = currentPage - 2 + i
               }
 
@@ -458,12 +536,12 @@ const MyLecturesPage = () => {
               )
             })}
             <button
-            className="join-item btn"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            {t('lecturesPage.pagination.next')}
-          </button>
+              className="join-item btn"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              {t("lecturesPage.pagination.next")}
+            </button>
           </div>
         )}
       </div>

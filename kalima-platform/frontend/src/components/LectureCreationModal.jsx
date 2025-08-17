@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { FiX, FiPaperclip } from "react-icons/fi"
+import { FiX, FiPaperclip, FiImage } from "react-icons/fi"
 import { getAllLevels } from "../routes/levels"
 import { getAllSubjects } from "../routes/courses"
 import ExamConfigSection from "./ExamConfigSection"
@@ -27,6 +27,8 @@ const LectureCreationModal = ({
   const [newVideoLink, setNewVideoLink] = useState("")
   const [newLectureType, setNewLectureType] = useState("Revision")
   const [attachmentFile, setAttachmentFile] = useState(null)
+  const [thumbnailFile, setThumbnailFile] = useState(null)
+  const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
   const [numberOfViews, setNumberOfViews] = useState(0)
@@ -107,6 +109,8 @@ const LectureCreationModal = ({
     setNewVideoLink("")
     setNewLectureType("Revision")
     setAttachmentFile(null)
+    setThumbnailFile(null)
+    setThumbnailPreview(null)
     setNumberOfViews(0)
 
     // Reset exam fields
@@ -181,8 +185,7 @@ const LectureCreationModal = ({
         // Passing threshold is now defined in the homework config
       }
 
-      // Call the onSubmit callback with the lecture data and attachment
-      await onSubmit(lectureData, attachmentFile, attachmentType)
+      await onSubmit(lectureData, attachmentFile, attachmentType, thumbnailFile)
 
       // Reset form and close modal on success
       resetForm()
@@ -192,6 +195,20 @@ const LectureCreationModal = ({
       console.error("Creation error:", err)
     } finally {
       setCreationLoading(false)
+    }
+  }
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setThumbnailFile(file)
+
+      // Create preview URL
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setThumbnailPreview(e.target.result)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -218,6 +235,39 @@ const LectureCreationModal = ({
               onChange={(e) => setNewItemName(e.target.value)}
               required
             />
+          </div>
+
+          <div className="form-control w-full mb-4">
+            <label className="label">
+              <span className="label-text">{t("fields.thumbnail", "Thumbnail")}</span>
+            </label>
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type="file"
+                  onChange={handleThumbnailChange}
+                  className="input input-bordered w-full"
+                  accept="image/*"
+                />
+                <FiImage className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
+              </div>
+              {thumbnailFile && (
+                <div className="space-y-2">
+                  <p className="text-sm text-base-content/70">
+                    {t("fields.selectedFile", "Selected file")}: {thumbnailFile.name}
+                  </p>
+                  {thumbnailPreview && (
+                    <div className="flex justify-center">
+                      <img
+                        src={thumbnailPreview || "/placeholder.svg"}
+                        alt="Thumbnail preview"
+                        className="w-32 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Level dropdown */}
@@ -460,12 +510,7 @@ const LectureCreationModal = ({
           )}
 
           <div className="modal-action">
-            <button
-              type="button"
-              className="btn btn-ghost"
-              onClick={handleClose}
-              disabled={creationLoading}
-            >
+            <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
               {t("buttons.cancel")}
             </button>
             <button type="submit" className="btn btn-primary" disabled={creationLoading}>

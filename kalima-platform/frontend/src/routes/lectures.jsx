@@ -197,25 +197,29 @@ export const downloadAttachmentById = async (attachmentId) => {
 
 export const createLecture = async (lectureData) => {
   try {
+    const isFormData = lectureData instanceof FormData
+
     const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
         Authorization: `Bearer ${getToken()}`,
       },
-    });
+    })
 
-    return response.data;
+    return response.data
   } catch (error) {
-    console.error("Error details:", error);
+    console.error("Error details:", error)
     // Return a structured error object instead of a string
     return {
       status: "error",
       message: `Error creating lecture: ${error.message}`,
-      error
-    };
+      error,
+    }
   }
-};
+}
+
+
 export const createContainer = async (formData) => {
   try {
     const response = await axios.post(`${API_URL}/api/v1/containers`, formData, {

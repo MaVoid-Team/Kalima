@@ -32,6 +32,17 @@ export default function LecturesPage() {
   const [pointsBalances, setPointsBalances] = useState([])
   const [purchasedLectures, setPurchasedLectures] = useState([])
 
+  const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
+
+    const normalizedPath = filePath.replace(/\\/g, "/")
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+    const baseUrl = API_URL.replace(/\/$/, "")
+    const filename = normalizedPath.split("/").pop()
+    return `${baseUrl}/uploads/${folder}/${filename}`
+  }
+
   useEffect(() => {
     fetchLectures()
     fetchUserData()
@@ -42,7 +53,6 @@ export default function LecturesPage() {
       const result = await getUserDashboard({
         params: { fields: "userInfo,purchaseHistory,pointsBalances" },
       })
-
       if (result.success) {
         setUserData(result.data.data.userInfo)
         setPointsBalances(result.data.data.pointsBalances || [])
@@ -142,9 +152,11 @@ export default function LecturesPage() {
   }
 
   const generateLectureData = (lecturesData) => {
+    console.log("Lecture from backend:", lecturesData)
     return lecturesData.map((lecture) => ({
+      
       id: lecture._id,
-      image: `/course-${Math.floor(Math.random() * 6) + 1}.png`,
+      thumbnail: convertPathToUrl(lecture.thumbnail, "product_thumbnails"),
       title: lecture.name,
       subject: lecture.subject?.name || "غير محدد",
       teacher: lecture.createdBy?.name || "مدرس غير محدد",
