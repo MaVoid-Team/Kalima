@@ -25,6 +25,41 @@ const checkDoc = async (Model, id, session) => {
   return doc
 }
 
+const parseBoolean = (value) => {
+  console.log("[v0] parseBoolean input:", value, "type:", typeof value)
+
+  if (typeof value === "boolean") {
+    console.log("[v0] parseBoolean boolean result:", value)
+    return value
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim().toLowerCase()
+    if (trimmed === "true" || trimmed === "1" || trimmed === "yes") {
+      console.log("[v0] parseBoolean string true result:", true, "from:", value)
+      return true
+    }
+    if (trimmed === "false" || trimmed === "0" || trimmed === "no" || trimmed === "") {
+      console.log("[v0] parseBoolean string false result:", false, "from:", value)
+      return false
+    }
+  }
+
+  if (value === 1 || value === "1") {
+    console.log("[v0] parseBoolean numeric true result:", true)
+    return true
+  }
+
+  if (value === 0 || value === "0") {
+    console.log("[v0] parseBoolean numeric false result:", false)
+    return false
+  }
+
+  const result = Boolean(value)
+  console.log("[v0] parseBoolean default result:", result, "from:", value)
+  return result
+}
+
 const deleteFile = (filePath) => {
   if (filePath && fs.existsSync(filePath)) {
     fs.unlinkSync(filePath)
@@ -62,6 +97,16 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         homeworkPassingThreshold,
       } = req.body
 
+      console.log("[v0] Raw requiresExam:", requiresExam, "type:", typeof requiresExam)
+      console.log("[v0] Raw requiresHomework:", requiresHomework, "type:", typeof requiresHomework)
+
+      const parsedRequiresExam = requiresExam !== undefined ? parseBoolean(requiresExam) : false
+      const parsedRequiresHomework = requiresHomework !== undefined ? parseBoolean(requiresHomework) : false
+      const parsedTeacherAllowed = teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : true
+
+      console.log("[v0] Parsed requiresExam:", parsedRequiresExam)
+      console.log("[v0] Parsed requiresHomework:", parsedRequiresHomework)
+
       const thumbnailPath = req.file ? req.file.path : null
 
       // Validate lecture type
@@ -77,13 +122,13 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       await checkDoc(Lecturer, createdBy || req.user._id, session)
 
       // Validate exam config if requires exam is true
-      if (requiresExam && !examConfig) {
+      if (parsedRequiresExam && !examConfig) {
         if (thumbnailPath) deleteFile(thumbnailPath)
         throw new AppError("Exam configuration is required when requiresExam is true", 400)
       }
 
       // Validate homework config if requires homework is true
-      if (requiresHomework && !homeworkConfig) {
+      if (parsedRequiresHomework && !homeworkConfig) {
         if (thumbnailPath) deleteFile(thumbnailPath)
         throw new AppError("Homework configuration is required when requiresHomework is true", 400)
       }
@@ -97,7 +142,7 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             price: price || 0,
             level,
             subject,
-            teacherAllowed,
+            teacherAllowed: parsedTeacherAllowed,
             parent,
             createdBy: createdBy || req.user._id,
             videoLink,
@@ -106,17 +151,20 @@ exports.createLecture = catchAsync(async (req, res, next) => {
             lecture_type,
             thumbnail: thumbnailPath,
             // Add exam requirement fields
-            requiresExam: requiresExam || false,
+            requiresExam: parsedRequiresExam,
             examConfig,
             passingThreshold,
             // Homework requirement fields
-            requiresHomework: requiresHomework || false,
+            requiresHomework: parsedRequiresHomework,
             homeworkConfig,
             homeworkPassingThreshold,
           },
         ],
         { session },
       )
+
+      console.log("[v0] Created lecture requiresHomework:", lecture[0].requiresHomework)
+      console.log("[v0] Created lecture requiresExam:", lecture[0].requiresExam)
 
       // Add lecture to parent's children if parent exists
       if (parent) {
@@ -375,7 +423,6 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
       requiresExam,
       examConfig,
       passingThreshold,
-      // Homework requirement fields
       requiresHomework,
       homeworkConfig,
       homeworkPassingThreshold,
@@ -400,7 +447,7 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
         description,
         numberOfViews,
         lecture_type,
-        teacherAllowed,
+        teacherAllowed: teacherAllowed !== undefined ? parseBoolean(teacherAllowed) : undefined,
       }
 
       if (req.file && req.file.path) {
@@ -424,11 +471,12 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
 
       // Handle exam requirement fields
       if (requiresExam !== undefined) {
-        obj.requiresExam = requiresExam
+        const parsedRequiresExam = parseBoolean(requiresExam)
+        obj.requiresExam = parsedRequiresExam
 
         // If requiresExam is true, examConfig is required
         if (
-          requiresExam &&
+          parsedRequiresExam &&
           !examConfig &&
           !(await Lecture.findById(req.params.lectureId)
             .select("examConfig")
@@ -441,9 +489,9 @@ exports.updatelectures = catchAsync(async (req, res, next) => {
           throw new AppError("Exam configuration is required when requiresExam is true", 400)
         }
       }
-      // Only update examConfig if provided
-      if (examConfig) {
-        obj.examConfig = examConfig
+
+      if (requiresHomework !== undefined) {
+        obj.requiresHomework = parseBoolean(requiresHomework)
       }
 
       if (subject) {
@@ -745,4 +793,4 @@ exports.deleteLectureThumbnail = catchAsync(async (req, res, next) => {
   } finally {
     session.endSession()
   }
-});
+})
