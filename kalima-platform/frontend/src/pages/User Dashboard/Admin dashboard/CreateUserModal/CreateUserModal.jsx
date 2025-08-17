@@ -24,7 +24,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     password: "",
     confirmPassword: "",
     gender: "male",
-    level: "",
+    level: [],
     phoneNumber: "",
     parentPhoneNumber: "",
     hobbies: [],
@@ -208,23 +208,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
 
     const filteredData = filterDataByRole(userData)
 
-    // Convert to FormData
-    const formData = new FormData()
-    Object.entries(filteredData).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((v) => formData.append(key, v))
-      } else if (value !== undefined && value !== null) {
-        formData.append(key, value)
-      }
-    })
-
-    // Debug FormData contents
-    console.log("FormData contents:")
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value)
-    }
-
-    onCreateUser(formData)
+    onCreateUser(filteredData)
   }
 
   const filterDataByRole = (data) => {
@@ -269,7 +253,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           expertise: data.expertise || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
-          profilePic: data.profilePic || undefined, // Fixed field name consistency
+          profilePic: data.profilePic || undefined,
         }
 
       case "assistant":
@@ -284,13 +268,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           phoneNumber: data.phoneNumber || undefined,
           phoneNumber2: data.phoneNumber2 || undefined,
           subject: data.subject || undefined,
-          level: data.level || [],
+          level: Array.isArray(data.level) ? data.level : data.level ? [data.level] : [],
           teachesAtType: data.teachesAtType || undefined,
-          centers: data.centers || [],
+          centers: Array.isArray(data.centers) ? data.centers : data.centers ? [data.centers] : [],
           school: data.school || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
-          socialMedia: data.socialMedia || [],
+          socialMedia: Array.isArray(data.socialMedia) ? data.socialMedia : [],
         }
 
       case "subadmin":
