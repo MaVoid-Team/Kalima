@@ -173,6 +173,37 @@ exports.createLecture = catchAsync(async (req, res, next) => {
         await parentContainer.save({ session })
       }
 
+      const lecturerId = createdBy || req.user._id
+
+      // Find or create lecturer's container
+      let lecturerContainer = await Container.findOne({
+        createdBy: lecturerId,
+        type: "lecturer_container",
+      }).session(session)
+
+      if (!lecturerContainer) {
+        // Create lecturer's container if it doesn't exist
+        const lecturer = await Lecturer.findById(lecturerId).session(session)
+        lecturerContainer = await Container.create(
+          [
+            {
+              name: `${lecturer.name || "Lecturer"} Content`,
+              type: "lecturer_container",
+              createdBy: lecturerId,
+              children: [],
+            },
+          ],
+          { session },
+        )
+        lecturerContainer = lecturerContainer[0]
+      }
+
+      // Add lecture to lecturer's container if not already present
+      if (!lecturerContainer.children.includes(lecture[0]._id)) {
+        lecturerContainer.children.push(lecture[0]._id)
+        await lecturerContainer.save({ session })
+      }
+
       // Notification logic - only for paid lectures
       let studentsNotified = 0
       if (lecture_type === "Paid" && parent) {
@@ -280,7 +311,6 @@ exports.createLecture = catchAsync(async (req, res, next) => {
     }
   })
 })
-
 // Get Lecture by ID
 exports.getLectureById = catchAsync(async (req, res, next) => {
   const Role = req.user.role?.toLowerCase()
@@ -325,7 +355,7 @@ exports.getAllLecturesPublic = catchAsync(async (req, res, next) => {
   ])
 
   // Always select only basic, non-sensitive fields for this public route
-  query = query.select("name type subject level createdBy price description lecture_type teacherAllowed")
+  query = query.select("name type subject level createdBy price description lecture_type teacherAllowed thumbnail")
 
   const features = new QueryFeatures(query, req.query).filter().sort().paginate()
 
