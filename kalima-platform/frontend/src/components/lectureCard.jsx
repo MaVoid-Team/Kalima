@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 
 export const LectureCard = ({
   id,
-  image,
+  thumbnail,
   title,
   subject,
   teacher,
@@ -30,7 +30,7 @@ export const LectureCard = ({
   return (
     <div className="card bg-base-100 shadow-xl overflow-hidden h-full">
       <figure className="relative h-48">
-        <img src={image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+        <img src={thumbnail} alt={title} className="w-full h-full object-cover" />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full p-4">
           <h2 className="text-white font-bold text-xl">{title}</h2>
@@ -79,7 +79,7 @@ export const LectureCard = ({
               <div className="flex items-center ml-2 text-xs">
                 <Wallet className="w-3 h-3 mr-1" />
                 <span className={hasEnoughPoints ? "text-green-600" : "text-red-600"}>
-                  {t("available : ")} {userPoints} 
+                  {t("available : ")} {userPoints}
                 </span>
               </div>
             )}
