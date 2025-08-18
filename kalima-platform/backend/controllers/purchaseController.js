@@ -288,43 +288,39 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
   session.startTransaction();
 
   try {
-    // Find the container
-    const container = await Container.findById(containerId).session(session);
-    if (!container) {
-      return next(new AppError("Container not found", 404));
+    // Try to find as Container first, then as Lecture
+    let item = await Container.findById(containerId).session(session);
+    let isLecture = false;
+    if (!item) {
+      const Lecture = require("../models/LectureModel");
+      item = await Lecture.findById(containerId).session(session);
+      if (!item) {
+        return next(new AppError("Container or Lecture not found", 404));
+      }
+      isLecture = true;
     }
 
-    // Ensure the container has a lecturer and a price
-    if (!container.createdBy) {
-      return next(
-        new AppError("Container is not associated with any lecturer", 400)
-      );
+    if (!item.createdBy) {
+      return next(new AppError("Item is not associated with any lecturer", 400));
     }
 
-    const lecturerId = container.createdBy.toString();
-    const pointsRequired = container.price || 0;
+    const lecturerId = item.createdBy.toString();
+    const pointsRequired = item.price || 0;
 
     // Find user model
     let userModel;
-    if (req.user.role === "Teacher" && container.teacherAllowed === false) {
-      return next(
-        new AppError("You are not allowed to purchase this container", 400)
-      );
+    if (req.user.role === "Teacher" && item.teacherAllowed === false) {
+      return next(new AppError("You are not allowed to purchase this item", 400));
     }
-    // Try finding as Student
     userModel = await Student.findById(userId).session(session);
-
-    // If not found, try as Parent
     if (!userModel) {
       userModel = await Parent.findById(userId).session(session);
     }
     if (!userModel) {
       userModel = await Teacher.findById(userId).session(session);
     }
-    // If still not found, check standard User model to determine role
     if (!userModel) {
       const baseUser = await User.findById(userId).session(session);
-
       if (baseUser) {
         if (baseUser.role === "Student") {
           userModel = await Student.findById(userId).session(session);
@@ -333,7 +329,6 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         }
       }
     }
-
     if (!userModel) {
       return next(new AppError(`User not found with ID: ${userId}`, 404));
     }
@@ -347,130 +342,66 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
 
     // First try to use lecturer-specific points
     if (lecturerPoints >= pointsRequired) {
-      // Deduct from lecturer points
       const success = userModel.useLecturerPoints(lecturerId, pointsRequired);
-
       if (!success) {
         await session.abortTransaction();
         return next(new AppError("Failed to deduct lecturer points", 500));
       }
-
-      purchaseType =
-        pointsRequired === 0 ? "Free container (lecturer)" : "Lecturer points";
-    }
-    // If lecturer points aren't enough, check if user has an unused promo code
-    else if (
-      userModel.hasPromoCode &&
-      !userModel.hasUsedPromoCode &&
-      promoPoints > 0
-    ) {
-      // Mark the promo code as used
+      purchaseType = pointsRequired === 0 ? "Free (lecturer)" : "Lecturer points";
+    } else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
       userModel.hasUsedPromoCode = true;
-
-      // Calculate how many promo points would remain after this purchase
-      const promoPointsUsed = pointsRequired;
-      const remainingPromoPoints = promoPoints - promoPointsUsed;
-
-      // Set promoPoints to 0 to remove all promo points
       userModel.promoPoints = 0;
-
-      // Add a log for points deduction
-      console.log(
-        `Removing all promo points. Used: ${promoPointsUsed}, Removed additional: ${remainingPromoPoints}`
-      );
-
       purchaseType = "Promo code (one-time use)";
       isPromoCodePurchase = true;
-    }
-    // If no promo code, try using general points
-    else if (generalPoints >= pointsRequired) {
-      // Deduct from general points
+    } else if (generalPoints >= pointsRequired) {
       userModel.generalPoints -= pointsRequired;
       purchaseType = "General points";
-    }
-    // If neither has enough points
-    else {
+    } else {
       await session.abortTransaction();
-      return next(
-        new AppError(
-          `Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`,
-          400
-        )
-      );
+      return next(new AppError(`Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`, 400));
     }
 
-    await userModel.save({ session }); // Create purchase record
-    const purchase = await Purchase.create(
-      [
+    await userModel.save({ session });
+    // Create purchase record, set lecture field if it's a lecture
+    const purchase = await Purchase.create([
+      isLecture
+        ? {
+            student: userId,
+            lecturer: lecturerId,
+            points: isPromoCodePurchase ? 0 : pointsRequired,
+            lecture: containerId,
+            type: isPromoCodePurchase ? "promoCodePurchase" : "lecturePurchase",
+            description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+          }
+        : {
+            student: userId,
+            lecturer: lecturerId,
+            points: isPromoCodePurchase ? 0 : pointsRequired,
+            container: containerId,
+            type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
+            description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+          },
+    ], { session });
+    // Grant access if it's a lecture
+    let lectureInfo = null;
+    if (isLecture) {
+      await studentLectureAccess.create([
         {
           student: userId,
-          lecturer: lecturerId,
-          points: isPromoCodePurchase ? 0 : pointsRequired, // No points charged for promo purchase
-          container: containerId,
-          type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
-          description: `Purchased container ${container.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+          lecture: containerId,
+          remainingViews: 3, // Default value as per studentLectureAccessModel
         },
-      ],
-      { session }
-    );
-
-    // // Grant access if it's a lecture
-    // if (container.kind === "Lecture") {
-    //   await studentLectureAccess.create(
-    //     [
-    //       {
-    //         student: userId,
-    //         lecture: containerId,
-    //         remainingViews: container.remainingViews,
-    //       },
-    //     ],
-    //     { session }
-    //   );
-    // } // Automatically grant access to all child containers (both free and paid)
-    // // Only do this for parent containers (not lectures as they typically don't have children)
-    // if (container.children && container.children.length > 0) {
-    //   // Find all child containers regardless of price
-    //   const allChildren = await findAllChildContainers(containerId, session);
-
-    //   if (allChildren.length > 0) {
-    //     console.log(
-    //       `Auto-granting access to ${allChildren.length} child containers (free and paid)`
-    //     );
-
-    //     // Create purchase records for all children
-    //     const childPurchases = allChildren.map((childContainer) => ({
-    //       student: userId,
-    //       lecturer: lecturerId,
-    //       points: 0, // No additional points deducted as parent was already purchased
-    //       container: childContainer._id,
-    //       type: "containerPurchase",
-    //       description: `Auto-granted access to container ${childContainer.name} (price: ${childContainer.price || 0}) as child of ${container.name}`,
-    //     }));
-
-    //     await Purchase.create(childPurchases, { session });
-
-    //     // Grant lecture access for any children that are lectures
-    //     const lectureChildren = allChildren.filter(
-    //       (child) => child.kind === "Lecture"
-    //     );
-
-    //     if (lectureChildren.length > 0) {
-    //       const lectureAccesses = lectureChildren.map((lecture) => ({
-    //         student: userId,
-    //         lecture: lecture._id,
-    //       }));
-
-    //       await studentLectureAccess.create(lectureAccesses, { session });
-    //     }
-    //   }
-    // }
-
+      ], { session });
+      // Populate lecture info for response
+      const Lecture = require("../models/LectureModel");
+      lectureInfo = await Lecture.findById(containerId).lean();
+    }
     await session.commitTransaction();
-
     res.status(201).json({
       status: "success",
       data: {
         purchase: purchase[0],
+        lecture: lectureInfo,
         remainingLecturerPoints: userModel.getLecturerPointsBalance(lecturerId),
         remainingGeneralPoints: userModel.generalPoints,
         usedPointsType: purchaseType,
