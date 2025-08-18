@@ -159,26 +159,55 @@ const MyLecturesPage = () => {
 
       if (result.success) {
         const lecturesData = result.data.data.purchaseHistory
-          ?.filter(p => p.container?.type === "lecture")
-          .map(p => ({
-            id: p.container?._id || p._id,
-            name: p.container?.name || p.description.replace("Purchased container ", "").split(" for ")[0],
-            price: p.points,
-            videoLink: p.container?.videoLink,
-            lecture_type: p.container?.lecture_type,
-            purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            }),
-            lecturer: p.lecturer,
-            subject: p.container?.subject,
-            level: p.container?.level,
-            thumbnail: p.container?.thumbnail,
-          })) || [];
+          ?.map(p => {
+            // If lecture field exists (lecturePurchase), use it
+            if (p.lecture) {
+              return {
+                id: p.lecture._id || p._id,
+                name: p.lecture.name,
+                price: p.points,
+                videoLink: p.lecture.videoLink,
+                lecture_type: p.lecture.lecture_type,
+                purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }),
+                lecturer: p.lecturer,
+                subject: p.lecture.subject,
+                level: p.lecture.level,
+                thumbnail: p.lecture.thumbnail,
+              };
+            }
+            // If container is a lecture (containerPurchase), use container
+            if (p.container && p.container.type === "lecture") {
+              return {
+                id: p.container._id || p._id,
+                name: p.container.name || p.description.replace("Purchased container ", "").split(" for ")[0],
+                price: p.points,
+                videoLink: p.container.videoLink,
+                lecture_type: p.container.lecture_type,
+                purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }),
+                lecturer: p.lecturer,
+                subject: p.container.subject,
+                level: p.container.level,
+                thumbnail: p.container.thumbnail,
+              };
+            }
+            // Otherwise, skip
+            return null;
+          })
+          .filter(Boolean) || [];
         setAllLectures(lecturesData);
       }
     }
