@@ -494,6 +494,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
       };
 
+
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
       if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
@@ -512,6 +513,14 @@ const getMyData = catchAsync(async (req, res, next) => {
 
         responseData.containers = containers;
       }
+
+      // Always fetch standalone lectures created by this lecturer (from Lecture model)
+      const lectures = await Lecture.find({ createdBy: userId })
+        .select("name type price subject level createdAt lecture_type teacherAllowed thumbnail")
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+      responseData.lectures = lectures;
 
       // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
       if (!fields || fields.includes("pointPurchases")) {
