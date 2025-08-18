@@ -176,9 +176,10 @@ exports.createLecture = catchAsync(async (req, res, next) => {
       const lecturerId = createdBy || req.user._id
 
       // Find or create lecturer's container
+
       let lecturerContainer = await Container.findOne({
         createdBy: lecturerId,
-        type: "lecturer_container",
+        type: "course", // Use a valid type from the enum
       }).session(session)
 
       if (!lecturerContainer) {
@@ -188,9 +189,10 @@ exports.createLecture = catchAsync(async (req, res, next) => {
           [
             {
               name: `${lecturer.name || "Lecturer"} Content`,
-              type: "lecturer_container",
+              type: "course", // Use a valid type from the enum
               createdBy: lecturerId,
               children: [],
+              teacherAllowed: true, // Required field
             },
           ],
           { session },
