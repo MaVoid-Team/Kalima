@@ -494,6 +494,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
       };
 
+
       // Only fetch additional lecturer data if no specific fields were requested or if these fields were included
       if (!fields || fields.includes("containers")) {
         // Get lecturer-specific data (containers created by this lecturer)
@@ -512,6 +513,14 @@ const getMyData = catchAsync(async (req, res, next) => {
 
         responseData.containers = containers;
       }
+
+      // Always fetch standalone lectures created by this lecturer (from Lecture model)
+      const lectures = await Lecture.find({ createdBy: userId })
+        .select("name type price subject level createdAt lecture_type teacherAllowed thumbnail")
+        .populate("subject", "name")
+        .populate("level", "name")
+        .lean();
+      responseData.lectures = lectures;
 
       // Only fetch point purchases if no specific fields were requested or if pointPurchases field was included
       if (!fields || fields.includes("pointPurchases")) {
@@ -825,16 +834,39 @@ const getStudentParentAdditionalData = async (
       .paginate();
     purchaseQuery = purchaseFeatures.query;
 
-    // Add relevant populated fields
+    // Add relevant populated fields, including lecture for standalone lecture purchases
     const purchaseHistory = await purchaseQuery
       .populate([
-        { path: "container", select: "name type price" },
-        { path: "lecturer", select: "name expertise" },
+        { path: "container", select: "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
+        { path: "lecturer", select: "name expertise role" },
         { path: "package", select: "name type price description" },
+        { path: "lecture", select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
       ])
       .lean();
 
-    responseData.purchaseHistory = purchaseHistory;
+    // For students, attach lecture info for purchases of lectures (from LectureModel)
+    if (responseData.userInfo && responseData.userInfo.role === "Student") {
+      // If lecture is not populated, but container is type lecture, try to populate lecture
+      const lectureIdsToPopulate = purchaseHistory
+        .filter(p => !p.lecture && p.container && p.container.type === "lecture")
+        .map(p => p.container?._id)
+        .filter(Boolean);
+      let lecturesMap = {};
+      if (lectureIdsToPopulate.length > 0) {
+        const lectures = await Lecture.find({ _id: { $in: lectureIdsToPopulate } });
+        lecturesMap = lectures.reduce((acc, lec) => { acc[lec._id.toString()] = lec; return acc; }, {});
+      }
+      responseData.purchaseHistory = purchaseHistory
+        .map(p => {
+          if (p.lecture) return { ...p, lecture: p.lecture };
+          if (p.container && p.container.type === "lecture" && lecturesMap[p.container._id?.toString()]) {
+            return { ...p, lecture: lecturesMap[p.container._id.toString()] };
+          }
+          return p;
+        });
+    } else {
+      responseData.purchaseHistory = purchaseHistory;
+    }
 
     // Get total count of purchases for pagination info
     const totalPurchases = await Purchase.countDocuments({ student: userId });
@@ -848,6 +880,19 @@ const getStudentParentAdditionalData = async (
         ),
       },
     };
+
+    // Ensure student's purchaseHistory array is up to date (if field exists)
+    const StudentModel = require("../models/studentModel.js");
+    const studentDoc = await StudentModel.findById(userId);
+    if (studentDoc && Array.isArray(studentDoc.purchaseHistory)) {
+      // Add any missing purchase IDs
+      const purchaseIds = purchaseHistory.map(p => p._id.toString());
+      const missingIds = purchaseIds.filter(id => !studentDoc.purchaseHistory.map(x => x.toString()).includes(id));
+      if (missingIds.length > 0) {
+        studentDoc.purchaseHistory.push(...missingIds);
+        await studentDoc.save();
+      }
+    }
   }
 
   // Only include redeemed codes if requested or no specific fields were requested
