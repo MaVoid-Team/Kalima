@@ -73,7 +73,7 @@ const lectureSchema = new mongoose.Schema(
     },
     examConfig: {
       type: mongoose.Schema.ObjectId,
-      ref: "ExamConfig",
+      ref: "LecturerExamConfig",
     },
     passingThreshold: {
       type: Number,
