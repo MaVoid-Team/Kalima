@@ -27,7 +27,7 @@ router
   .route("/attachments/:lectureId")
   .get(attachmentController.getLectureAttachments)
   .post(
-    attachmentController.upload.single("attachment"),
+    attachmentController.multiUpload, // Use .fields for multi-file, multi-category
     attachmentController.createAttachment
   );
 
