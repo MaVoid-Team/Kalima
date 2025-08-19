@@ -253,7 +253,8 @@ const MyLecturesPage = () => {
     setCurrentPage(1)
   }
 
-  const handleCreateLecture = async (lectureData, attachmentFile, attachmentType, thumbnailFile) => {
+  // Batch upload all attachments and links for all categories in one request
+  const handleCreateLecture = async (lectureData, _unused, _unused2, thumbnailFile, attachmentFilesByCategory, attachmentLinksByCategory) => {
     setCreationLoading(true)
     setError(null)
     setSuccessMessage("")
@@ -262,13 +263,11 @@ const MyLecturesPage = () => {
       let response
       if (thumbnailFile) {
         const formData = new FormData()
-
         Object.keys(lectureData).forEach((key) => {
           if (lectureData[key] !== null && lectureData[key] !== undefined) {
             formData.append(key, lectureData[key])
           }
         })
-
         formData.append("thumbnail", thumbnailFile)
         response = await createLecture(formData)
       } else {
@@ -290,17 +289,35 @@ const MyLecturesPage = () => {
         lectureId = response.data.id
       }
 
-      if (attachmentFile && lectureId) {
-        try {
-          const attachmentData = {
-            type: attachmentType,
-            attachment: attachmentFile,
+      // Batch upload all files and links for all categories
+      if (lectureId) {
+        const formData = new FormData()
+        // Attach files for each category
+        const categories = ["pdfsandimages", "booklets", "homeworks", "exams"]
+        categories.forEach((cat) => {
+          if (attachmentFilesByCategory && attachmentFilesByCategory[cat] && attachmentFilesByCategory[cat].length > 0) {
+            attachmentFilesByCategory[cat].forEach((file) => {
+              formData.append(cat, file)
+            })
           }
-
-          const attachmentResponse = await createLectureAttachment(lectureId, attachmentData)
-        } catch (attachmentError) {
-          console.error("Error uploading attachment:", attachmentError)
-          setError(`تم إنشاء المحاضرة ولكن فشل تحميل المرفق: ${attachmentError.message}`)
+        })
+        // Attach links for homeworks and exams
+        if (attachmentLinksByCategory) {
+          if (attachmentLinksByCategory.homeworks && attachmentLinksByCategory.homeworks.trim() !== "") {
+            formData.append("homeworks", attachmentLinksByCategory.homeworks)
+          }
+          if (attachmentLinksByCategory.exams && attachmentLinksByCategory.exams.trim() !== "") {
+            formData.append("exams", attachmentLinksByCategory.exams)
+          }
+        }
+        // Only upload if there are files or links
+        if (formData.has("pdfsandimages") || formData.has("booklets") || formData.has("homeworks") || formData.has("exams")) {
+          try {
+            await createLectureAttachment(lectureId, formData, true)
+          } catch (attachmentError) {
+            console.error("Error uploading attachments:", attachmentError)
+            setError(`تم إنشاء المحاضرة ولكن فشل تحميل المرفقات: ${attachmentError.message}`)
+          }
         }
       }
 

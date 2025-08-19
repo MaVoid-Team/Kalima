@@ -34,10 +34,19 @@ const storage = new CloudinaryStorage({
 // Still Considering that one
 // function fileFilter (req, file, cb) {}
 
-(exports.upload = multer({
+// For backward compatibility: .single method
+const upload = multer({
   storage,
-  limits: { fileSize: 20 * 1024 * 1024 }, // Specify the file size limit
-})),
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+});
+exports.upload = upload;
+// For multi-file, multi-category support
+exports.multiUpload = upload.fields([
+  { name: 'booklets', maxCount: 10 },
+  { name: 'pdfsandimages', maxCount: 10 },
+  { name: 'homeworks', maxCount: 10 },
+  { name: 'exams', maxCount: 10 },
+]);
   (exports.getLectureAttachments = catchAsync(async (req, res, next) => {
     const { lectureId } = req.params;
     const lecture = await Lecture.findById(lectureId)
@@ -109,246 +118,70 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
 });
 
 exports.createAttachment = catchAsync(async (req, res, next) => {
-  if (!req.file && !req.file.filename) {
-    return next(new AppError(`No file uploaded`, 404));
+  const { lectureId } = req.params;
+  const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
+  if (!mongoose.isValidObjectId(lectureId)) {
+    throw new AppError(`Invalid Schema ID`, 404);
   }
+  const lecture = await Lecture.findById(lectureId);
+  if (!lecture) {
+    throw new AppError(`Lecture not found`, 404);
+  }
+
+  // Accept links for homeworks and exams
+  const { homeworks: homeworkLink, exams: examLink } = req.body;
+
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { lectureId } = req.params;
-    const { type } = req.body;
-    const validTypes = ["booklets", "pdfsandimages", "homeworks", "exams"];
-
-    if (!mongoose.isValidObjectId(lectureId)) {
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError(`Invalid Schema ID`, 404);
+    let anyUploaded = false;
+    for (const type of validTypes) {
+      if (req.files && req.files[type]) {
+        for (const file of req.files[type]) {
+          const attachment = new Attachment({
+            lectureId,
+            type,
+            fileType: file.mimetype,
+            fileName: file.originalname,
+            filePath: file.path,
+            fileSize: file.size,
+            publicId: file.filename,
+            uploadedOn: new Date(),
+          });
+          const savedAttachment = await attachment.save({ session });
+          lecture.attachments[type].push(savedAttachment._id);
+          anyUploaded = true;
+        }
+      }
+      // If type is homeworks or exams, check for link
+      if ((type === "homeworks" && homeworkLink && homeworkLink.trim() !== "") ||
+          (type === "exams" && examLink && examLink.trim() !== "")) {
+        const linkValue = type === "homeworks" ? homeworkLink : examLink;
+        const attachment = new Attachment({
+          lectureId,
+          type,
+          fileType: "link",
+          fileName: linkValue,
+          filePath: linkValue,
+          fileSize: 0,
+          publicId: null,
+          uploadedOn: new Date(),
+        });
+        const savedAttachment = await attachment.save({ session });
+        lecture.attachments[type].push(savedAttachment._id);
+        anyUploaded = true;
+      }
     }
-
-    const lecture = await Lecture.findById(lectureId).session(session);
-    if (!lecture) {
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError(`Lecture not found`, 404);
+    if (!anyUploaded) {
+      throw new AppError(`No files or links uploaded`, 404);
     }
-
-    if (!type) {
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError(`No file type specified`, 404);
-    }
-    if (!validTypes.includes(type.toLowerCase())) {
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError(`Invalid file type`, 404);
-    }
-
-    const attachment = new Attachment({
-      lectureId: lectureId,
-      type: type,
-      fileType: req.file.mimetype,
-      fileName: req.file.originalname,
-      filePath: req.file.path,
-      fileSize: req.file.size,
-      publicId: req.file.filename,
-      uploadedOn: new Date(),
-    });
-
-    const savedAttachment = await attachment.save({ session });
-    if (!savedAttachment) {
-      await cloudinary.uploader.destroy(req.file.filename);
-      throw new AppError("Error saving attachment", 500);
-    }
-    switch (type.toLowerCase()) {
-      case "booklets":
-        lecture.attachments.booklets.push(savedAttachment._id);
-        break;
-      case "pdfsandimages":
-        lecture.attachments.pdfsandimages.push(savedAttachment._id);
-        break;
-      case "homeworks":
-        lecture.attachments.homeworks.push(savedAttachment._id);
-        break;
-      case "exams":
-        lecture.attachments.exams.push(savedAttachment._id);
-        break;
-      default:
-        await cloudinary.uploader.destroy(req.file.filename);
-        throw new AppError(`Invalid file type`, 404);
-    }
-
     await lecture.save({ session });
-
-    // Send notifications to students who have access to this lecture
-    // when lecturer uploads attachments
-    try {
-      // Get notification template based on type
-      let notificationType = "new_attachment";
-      if (type.toLowerCase() === "exams") {
-        notificationType = "new_exam";
-      } else if (type.toLowerCase() === "homeworks") {
-        notificationType = "new_homework_assignment";
-      }
-
-      const template = await NotificationTemplate.findOne({
-        type: notificationType,
-      }).session(session);
-
-      if (!template) {
-        console.log(`No notification template found for ${notificationType}`);
-      } else {
-        // IMPROVED STUDENT ACCESS DETECTION
-        // Step 1: Get students with direct access
-        const studentAccess = await StudentLectureAccess.find({
-          lecture: lectureId,
-        }).session(session);
-        let studentIdsWithAccess = studentAccess.map((access) =>
-          access.student.toString()
-        );
-
-        // Step 2: Get students with access through container purchases
-        // Find all containers that include this lecture
-        if (lecture && lecture.parent) {
-          // Get the parent container and any containers above it
-          const containerHierarchy = await Container.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(lecture.parent) } },
-            {
-              $graphLookup: {
-                from: "containers",
-                startWith: "$parent",
-                connectFromField: "parent",
-                connectToField: "_id",
-                as: "parentContainers",
-              },
-            },
-          ]).session(session);
-
-          if (containerHierarchy.length > 0) {
-            // Get all container IDs in the hierarchy (including direct parent)
-            const containerIds = [
-              lecture.parent.toString(),
-              ...containerHierarchy[0].parentContainers.map((c) =>
-                c._id.toString()
-              ),
-            ];
-
-            // Find all purchases for these containers
-            const purchases = await Purchase.find({
-              container: {
-                $in: containerIds.map((id) => new mongoose.Types.ObjectId(id)),
-              },
-              type: "containerPurchase",
-            }).session(session);
-
-            // Get student IDs from these purchases
-            const studentIdsFromPurchases = purchases.map((p) =>
-              p.student.toString()
-            );
-
-            // Combine with direct access student IDs, removing duplicates
-            studentIdsWithAccess = [
-              ...new Set([...studentIdsWithAccess, ...studentIdsFromPurchases]),
-            ];
-          }
-        }
-
-        console.log(
-          `Found ${studentIdsWithAccess.length} students with access to lecture ${lectureId} (direct or through purchase)`
-        );
-
-        if (studentIdsWithAccess.length > 0) {
-          const io = req.app.get("io");
-          if (!io) {
-            console.log("Socket.IO instance not found");
-            return;
-          }
-
-          // Prepare notification data
-          const notificationData = {
-            title: template.title,
-            message: template.message
-              .replace("{lecture}", lecture.name || "lecture")
-              .replace("{type}", type.toLowerCase()),
-            type: notificationType,
-            relatedId: lecture._id,
-          };
-
-          console.log("Creating notifications with data:", notificationData);
-
-          // Create notifications for all students
-          const notificationsToCreate = studentIdsWithAccess.map(
-            (studentId) => ({
-              userId: studentId,
-              ...notificationData,
-              isSent: false,
-            })
-          );
-
-          // Bulk create notifications
-          const createdNotifications = await Notification.insertMany(
-            notificationsToCreate,
-            { session }
-          );
-
-          console.log(`Created ${createdNotifications.length} notifications`);
-
-          // Attempt to send to online users
-          let sentCount = 0;
-          for (const studentId of studentIdsWithAccess) {
-            // Check if student is online
-            if (io.sockets.adapter.rooms.has(studentId.toString())) {
-              console.log(
-                `Student ${studentId} is online, sending notification`
-              );
-
-              // Find notification for this student
-              const notification = createdNotifications.find(
-                (n) => n.userId.toString() === studentId.toString()
-              );
-
-              if (notification) {
-                // Send notification
-                const eventType =
-                  notificationType === "new_exam"
-                    ? "newAttachment"
-                    : notificationType === "new_homework_assignment"
-                      ? "newAttachment"
-                      : "newAttachment";
-
-                io.to(studentId.toString()).emit(eventType, {
-                  title: notification.title,
-                  message: notification.message,
-                  type: notification.type,
-                  subjectId: notification.relatedId,
-                  notificationId: notification._id,
-                  createdAt: notification.createdAt,
-                });
-
-                // Mark as sent
-                await Notification.findByIdAndUpdate(
-                  notification._id,
-                  { isSent: true },
-                  { session }
-                );
-
-                sentCount++;
-              }
-            }
-          }
-
-          console.log(`Sent ${sentCount} notifications in real-time`);
-        } else {
-          console.log("No students have access to this lecture yet");
-        }
-      }
-    } catch (notificationError) {
-      console.error("Error sending notifications:", notificationError);
-      // Continue without failing - notifications are not critical
-    }
-
     await session.commitTransaction();
     session.endSession();
-    res.status(201).json({ message: "Attachment uploaded successfully" });
+    res.status(201).json({ message: "Attachments uploaded successfully" });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    await cloudinary.uploader.destroy(req.file.filename);
     return next(error);
   }
 });

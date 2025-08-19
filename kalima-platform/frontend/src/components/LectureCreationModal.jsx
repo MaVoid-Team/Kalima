@@ -26,12 +26,30 @@ const LectureCreationModal = ({
   const [newPrice, setNewPrice] = useState(0)
   const [newVideoLink, setNewVideoLink] = useState("")
   const [newLectureType, setNewLectureType] = useState("Revision")
-  const [attachmentFile, setAttachmentFile] = useState(null)
+  // Tab-like attachment state
+  const attachmentCategories = [
+    { key: "pdfsandimages", label: t("attachmentTypes.pdfsAndImages") },
+    { key: "booklets", label: t("attachmentTypes.booklets") },
+    { key: "homeworks", label: t("attachmentTypes.homeworks") },
+    { key: "exams", label: t("attachmentTypes.exams") },
+  ]
+  const [activeAttachmentTab, setActiveAttachmentTab] = useState("pdfsandimages")
+  const [attachmentFilesByCategory, setAttachmentFilesByCategory] = useState({
+    pdfsandimages: [],
+    booklets: [],
+    homeworks: [],
+    exams: [],
+  })
   const [thumbnailFile, setThumbnailFile] = useState(null)
   const [thumbnailPreview, setThumbnailPreview] = useState(null)
   const [creationLoading, setCreationLoading] = useState(false)
   const [creationError, setCreationError] = useState("")
   const [numberOfViews, setNumberOfViews] = useState(0)
+  // Store links for homework and exams
+  const [attachmentLinksByCategory, setAttachmentLinksByCategory] = useState({
+    homeworks: "",
+    exams: "",
+  })
 
   // Exam related state
   const [requiresExam, setRequiresExam] = useState(false)
@@ -108,7 +126,13 @@ const LectureCreationModal = ({
     setNewPrice(0)
     setNewVideoLink("")
     setNewLectureType("Revision")
-    setAttachmentFile(null)
+    setAttachmentFilesByCategory({
+      pdfsandimages: [],
+      booklets: [],
+      homeworks: [],
+      exams: [],
+    })
+    setActiveAttachmentTab("pdfsandimages")
     setThumbnailFile(null)
     setThumbnailPreview(null)
     setNumberOfViews(0)
@@ -167,27 +191,26 @@ const LectureCreationModal = ({
         if (!selectedExamConfigId) {
           throw new Error(t("validation.examConfigRequired"))
         }
-
-        // Set the exam config ID in the lecture data
         lectureData.examConfig = selectedExamConfigId
-        // Passing threshold is now defined in the exam config
       }
-
-      // Handle homework config if required
       if (requiresHomework) {
         if (!selectedHomeworkConfigId) {
           throw new Error(t("validation.homeworkConfigRequired"))
         }
-
-        // Set the homework config ID in the lecture data
         lectureData.requiresHomework = true
         lectureData.homeworkConfig = selectedHomeworkConfigId
-        // Passing threshold is now defined in the homework config
       }
 
-      await onSubmit(lectureData, attachmentFile, attachmentType, thumbnailFile)
+      // Call onSubmit ONCE with all files and links for all categories
+      await onSubmit(
+        lectureData,
+        null,
+        null,
+        thumbnailFile,
+        attachmentFilesByCategory,
+        attachmentLinksByCategory
+      )
 
-      // Reset form and close modal on success
       resetForm()
       onClose()
     } catch (err) {
@@ -454,38 +477,65 @@ const LectureCreationModal = ({
             </>
           )}
 
-          {/* Attachment section with type selection */}
+          {/* Attachment section with tab UI for categories */}
           <div className="divider">{t("sections.attachments")}</div>
-
           <div className="form-control w-full mb-4">
             <label className="label">
               <span className="label-text">{t("fields.attachmentOptional")}</span>
             </label>
+            <div className="tabs mb-2">
+              {attachmentCategories.map((cat) => (
+                <button
+                  type="button"
+                  key={cat.key}
+                  className={`tab tab-bordered ${activeAttachmentTab === cat.key ? "tab-active" : ""}`}
+                  onClick={() => setActiveAttachmentTab(cat.key)}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
             <div className="space-y-3">
-              <select
-                className="select select-bordered w-full"
-                value={attachmentType}
-                onChange={(e) => setAttachmentType(e.target.value)}
-              >
-                <option value="pdfsandimages">{t("attachmentTypes.pdfsAndImages")}</option>
-                <option value="booklets">{t("attachmentTypes.booklets")}</option>
-                <option value="homeworks">{t("attachmentTypes.homeworks")}</option>
-                <option value="exams">{t("attachmentTypes.exams")}</option>
-              </select>
-
               <div className="relative">
                 <input
                   type="file"
-                  onChange={(e) => setAttachmentFile(e.target.files[0])}
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files)
+                    setAttachmentFilesByCategory((prev) => ({
+                      ...prev,
+                      [activeAttachmentTab]: files,
+                    }))
+                  }}
                   className="input input-bordered w-full"
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 <FiPaperclip className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
               </div>
-              {attachmentFile && (
-                <p className="mt-2 text-sm text-base-content/70">
-                  {t("fields.selectedFile")}: {attachmentFile.name}
-                </p>
+              {attachmentFilesByCategory[activeAttachmentTab] && attachmentFilesByCategory[activeAttachmentTab].length > 0 && (
+                <ul className="mt-2 text-sm text-base-content/70">
+                  {attachmentFilesByCategory[activeAttachmentTab].map((file, idx) => (
+                    <li key={idx}>
+                      {t("fields.selectedFile")}: {file.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {/* If homework or exams tab, show link input */}
+              {(activeAttachmentTab === "homeworks" || activeAttachmentTab === "exams") && (
+                <div>
+                  <input
+                    type="url"
+                    className="input input-bordered w-full mt-2"
+                    placeholder={t("fields.enterGoogleFormOrLink", "Enter Google Form or link")}
+                    value={attachmentLinksByCategory[activeAttachmentTab] || ""}
+                    onChange={e => setAttachmentLinksByCategory(prev => ({
+                      ...prev,
+                      [activeAttachmentTab]: e.target.value,
+                    }))}
+                  />
+                  <span className="text-xs text-base-content/60">{t("fields.orPasteLink", "Or paste a link instead of uploading a file.")}</span>
+                </div>
               )}
             </div>
           </div>
