@@ -24,6 +24,7 @@ const purchaseSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+
   // If this is a container purchase, reference it
   container: {
     type: mongoose.Schema.Types.ObjectId,
@@ -33,6 +34,18 @@ const purchaseSchema = new mongoose.Schema({
         return this.type === "containerPurchase";
       },
       "Container ID is required for specific codes",
+    ],
+  },
+
+  // If this is a lecture purchase, reference it
+  lecture: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Lecture",
+    required: [
+      function () {
+        return this.type === "lecturePurchase";
+      },
+      "Lecture ID is required for lecture purchases",
     ],
   },
 
@@ -49,7 +62,7 @@ const purchaseSchema = new mongoose.Schema({
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,
-    enum: ["pointPurchase", "containerPurchase", "packagePurchase", "promoCodePurchase"],
+    enum: ["pointPurchase", "containerPurchase", "lecturePurchase", "packagePurchase", "promoCodePurchase"],
     required: true,
   },
   // Additional details
