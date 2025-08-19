@@ -53,24 +53,31 @@ export default function LecturesPage() {
       const result = await getUserDashboard({
         params: { fields: "userInfo,purchaseHistory,pointsBalances" },
       })
+
       if (result.success) {
         setUserData(result.data.data.userInfo)
         setPointsBalances(result.data.data.pointsBalances || [])
 
-        // Extract purchased lecture IDs from purchase history
         const purchasedIds = result.data.data.purchaseHistory
-          .filter((purchase) => purchase.type === "containerPurchase")
+          .filter((purchase) =>
+            (purchase.type === "containerPurchase" && purchase.container) ||
+            (purchase.type === "lecturePurchase" && purchase.lecture)
+          )
           .map((purchase) => {
-            // Extract container ID from description if container is null
-            if (!purchase.container) {
-              const match = purchase.description.match(/Purchased container (.*?) for/)
-              return match ? match[1] : null
+            if (purchase.type === "containerPurchase" && purchase.container) {
+              return purchase.container?._id?.toString();
+            } else if (purchase.type === "lecturePurchase" && purchase.lecture) {
+              return purchase.lecture?._id?.toString();
+            } else if (!purchase.container) {
+              const match = purchase.description.match(/Purchased container (.*?) for/);
+              return match ? match[1] : null;
             }
-            return purchase.container?._id
+            return null;
           })
-          .filter((id) => id) // Remove nulls
+          .filter((id) => id)
 
-        setPurchasedLectures(purchasedIds)
+        // Merge backend list with already-purchased, never reset
+  setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), ...purchasedIds.map(String)])))
       } else {
         console.error("Failed to fetch user data:", result.error)
       }
@@ -78,6 +85,7 @@ export default function LecturesPage() {
       console.error("Error fetching user data:", err)
     }
   }
+
 
   const fetchLectures = async () => {
     setLoading(true)
@@ -117,19 +125,17 @@ export default function LecturesPage() {
       return
     }
 
-    // Get the teacher's points
-    const teacherPoints = getTeacherPoints(teacherId);
-    const lecture = lectures.find(lec => lec._id === lectureId);
-    
+    const teacherPoints = getTeacherPoints(teacherId)
+    const lecture = lectures.find((lec) => lec._id === lectureId)
+
     if (!lecture) {
-      toast.error(t("errors.lectureNotFound"));
-      return;
+      toast.error(t("errors.lectureNotFound"))
+      return
     }
-    
-    // Check if user has enough points for this teacher
+
     if (teacherPoints < lecture.price) {
-      toast.error(t("errors.insufficientPoints"));
-      return;
+      toast.error(t("errors.insufficientPoints"))
+      return
     }
 
     try {
@@ -137,12 +143,17 @@ export default function LecturesPage() {
 
       if (response.data && response.data.status === "success") {
         toast.success(t("purchase.success"))
-        // Add the purchased lecture to the list
-        setPurchasedLectures((prev) => [...prev, lectureId])
-        // Refresh user data to get updated points
+
+        // Optimistically add to purchased lectures
+  setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), lectureId.toString()])))
+
+        // Refresh points and merge backend purchases, never reset
         fetchUserData()
       } else {
-        const errorMessage = typeof response === "string" ? response : response.data?.message || t("purchase.failed")
+        const errorMessage =
+          typeof response === "string"
+            ? response
+            : response.data?.message || t("purchase.failed")
         toast.error(errorMessage)
       }
     } catch (err) {
@@ -176,7 +187,7 @@ export default function LecturesPage() {
         : 0,
       views: lecture.numberOfViews || 0,
       description: lecture.description || "لا يوجد وصف",
-      isPurchased: purchasedLectures.includes(lecture._id),
+  isPurchased: purchasedLectures.map(String).includes(lecture._id?.toString()),
       teacherPoints: lecture.createdBy?._id ? getTeacherPoints(lecture.createdBy._id) : 0,
     }))
   }

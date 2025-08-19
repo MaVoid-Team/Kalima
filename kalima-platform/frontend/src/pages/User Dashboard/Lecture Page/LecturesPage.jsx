@@ -474,7 +474,7 @@ const MyLecturesPage = () => {
             </select>
           </div>
 
-          {["Lecturer", "Admin", "Subadmin", "Moderator"].includes(userRole) && (
+          {["Lecturer", "Admin"].includes(userRole) && (
             <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
               {t("lecturesPage.buttons.createNewLecture")}
             </button>
