@@ -145,7 +145,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post(`${API_URL}/auth`, credentials, {
+    const response = await api.post(`/auth`, credentials, {
       headers: { "Content-Type": "application/json" },
     });
 
