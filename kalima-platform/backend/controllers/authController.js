@@ -20,15 +20,17 @@ const login = catchAsync(async (req, res, next) => {
     );
   }
 
+  const newMail = email ? email.toLowerCase() : null;
+  const newPhoneNumber = phoneNumber ? phoneNumber.toLowerCase() : null;
+
   const foundUser = email
-    ? await User.findOne({ email })
-    : await User.findOne({ phoneNumber });
+    ? await User.findOne({ email: newMail })
+    : await User.findOne({ phoneNumber: newPhoneNumber });
 
   if (!foundUser) {
     return next(
       new AppError(
-        `Couldn't find a user with this ${
-          email ? "email" : "phone number"
+        `Couldn't find a user with this ${newMail ? "email" : "phone number"
         } and password.`,
         400
       )
@@ -40,8 +42,7 @@ const login = catchAsync(async (req, res, next) => {
   if (!match) {
     return next(
       new AppError(
-        `Couldn't find a user with this ${
-          email ? "email" : "phone number"
+        `Couldn't find a user with this ${newMail ? "email" : "phone number"
         } and password.`,
         400
       )
