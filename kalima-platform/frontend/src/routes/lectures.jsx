@@ -351,11 +351,16 @@ export const deleteContainerById = async (containerId) => {
   }
 }
 
-export const createLectureAttachment = async (lectureId, attachmentData) => {
+export const createLectureAttachment = async (lectureId, attachmentData, isFormData = false) => {
   try {
-    const formData = new FormData();
-    formData.append("type", attachmentData.type);
-    formData.append("attachment", attachmentData.attachment);
+    let formData;
+    if (isFormData) {
+      formData = attachmentData;
+    } else {
+      formData = new FormData();
+      formData.append("type", attachmentData.type);
+      formData.append("attachment", attachmentData.attachment);
+    }
 
     const response = await axios.post(
       `${API_URL}/api/v1/lectures/attachments/${lectureId}`,
