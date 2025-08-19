@@ -86,7 +86,7 @@ export const LectureCard = ({
           </div>
 
           {isPurchased ? (
-            <button className="btn btn-sm btn-success">{t("purchased")}</button>
+            <button className="btn btn-sm btn-success" disabled>{t("purchased")}</button>
           ) : (
             <button
               className="btn btn-sm btn-primary"

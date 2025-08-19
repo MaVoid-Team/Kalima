@@ -146,35 +146,38 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
   try {
     const response = await api.post(`${API_URL}/api/v1/auth`, credentials, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
 
     if (response.data.accessToken) {
-      setToken(response.data.accessToken)
+      setToken(response.data.accessToken);
       if (response.data.user) {
-        localStorage.setItem("user", JSON.stringify(response.data.user))
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
-      startTokenRefreshCheck() // Start periodic refresh after login
+      startTokenRefreshCheck();
 
       return {
         success: true,
         data: response.data,
         status: response.status,
         headers: response.headers,
-      }
+      };
     } else {
       return {
         success: false,
         error: response.data.error || "Login failed: No access token received",
         details: response.data,
-      }
+      };
     }
   } catch (error) {
-    return `Login failed: ${error.message}`
+    return {
+      success: false,
+      error: error.response?.data?.error || error.message || "Login failed",
+      details: error.response?.data,
+    };
   }
-}
+};
+
 
 export const requestPasswordReset = async (email) => {
   try {
