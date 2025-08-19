@@ -20,7 +20,7 @@ const attachmentSchema = new mongoose.Schema({
   filePath: { type: String, required: true },
   fileType: { type: String, required: true },
   fileSize: { type: String, required: true },
-  publicId: { type: String, required: true },
+  publicId: { type: String, required: false },
   uploadedOn: { type: Date, default: Date.now },
 });
 attachmentSchema.index({ lectureId: 1, type: 1 });
