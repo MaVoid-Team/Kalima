@@ -30,7 +30,10 @@ import {
   FiEdit,
   FiClock,
   FiSave,
+  FiStar,
+  FiMessageSquare
 } from "react-icons/fi"
+// Simple rating component with no external dependencies
 
 const DetailedLectureView = () => {
   const { t, i18n } = useTranslation("lectureDisplay")
@@ -58,6 +61,12 @@ const DetailedLectureView = () => {
   const [submissionsError, setSubmissionsError] = useState(null)
   const [viewingSubmission, setViewingSubmission] = useState(null)
   const [showSubmissionModal, setShowSubmissionModal] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [currentSubmission, setCurrentSubmission] = useState(null)
+  const [rating, setRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false)
+  const [feedbackError, setFeedbackError] = useState(null)
   const fileViewerRef = useRef(null)
 
   // Student lecture access states
@@ -251,6 +260,44 @@ const DetailedLectureView = () => {
   const handleViewSubmission = (submission) => {
     setViewingSubmission(submission)
     setShowSubmissionModal(true)
+  }
+
+  // Handle opening feedback modal
+  const handleOpenFeedback = (submission) => {
+    setCurrentSubmission(submission)
+    setRating(submission.rating || 0)
+    setComment(submission.comment || '')
+    setShowFeedbackModal(true)
+  }
+
+  // Handle submitting feedback
+  const handleSubmitFeedback = async () => {
+    if (!currentSubmission) return
+    
+    setIsSubmittingFeedback(true)
+    setFeedbackError(null)
+    
+    try {
+      // Here you'll need to implement the actual API call to save the feedback
+      // For now, we'll just update the local state
+      const updatedSubmissions = studentSubmissions.map(sub => 
+        sub._id === currentSubmission._id 
+          ? { ...sub, rating, comment, feedbackDate: new Date().toISOString() }
+          : sub
+      )
+      
+      setStudentSubmissions(updatedSubmissions)
+      setShowFeedbackModal(false)
+      
+      // Show success message
+      // You might want to replace this with a toast notification
+      alert('Feedback submitted successfully')
+    } catch (error) {
+      console.error('Error submitting feedback:', error)
+      setFeedbackError('Failed to submit feedback. Please try again.')
+    } finally {
+      setIsSubmittingFeedback(false)
+    }
   }
 
   // Handle editing student lecture access
@@ -761,8 +808,9 @@ const DetailedLectureView = () => {
                         <tr>
                           <th>{t('student')}</th>
                           <th>{t('fileName')}</th>
-                          <th>{t('size')}</th>
                           <th>{t('uploadDate')}</th>
+                          <th>{t('rating')}</th>
+                          <th>{t('comment')}</th>
                           <th>{t('actions')}</th>
                         </tr>
                       </thead>
@@ -783,8 +831,25 @@ const DetailedLectureView = () => {
                               </div>
                             </td>
                             <td>{submission.fileName}</td>
-                            <td>{(submission.fileSize / 1024).toFixed(2)} KB</td>
-                            <td>{new Date(submission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}</td>
+                            <td>{new Date(submission.uploadedOn).toLocaleDateString()}</td>
+                            <td>
+                              <div className="rating rating-sm">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <input 
+                                    key={star}
+                                    type="radio" 
+                                    name={`rating-${submission._id}`} 
+                                    className="mask mask-star-2 bg-primary" 
+                                    checked={submission.rating === star}
+                                    readOnly
+                                  />
+                                ))}
+                                {submission.rating && <span className="ml-2 text-sm">({submission.rating}/5)</span>}
+                              </div>
+                            </td>
+                            <td className="max-w-xs truncate">
+                              {submission.comment || 'No comment'}
+                            </td>
                             <td>
                               <div className="flex gap-2">
                                 <a
@@ -795,12 +860,22 @@ const DetailedLectureView = () => {
                                 >
                                   <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t('view')}
                                 </a>
-                                <button
-                                  className="btn btn-sm btn-primary"
-                                  onClick={() => downloadAttachmentById(submission._id, submission.fileName)}
-                                >
-                                  <FiDownload className={isRTL ? "ml-1" : "mr-1"} /> {t('download')}
-                                </button>
+                                <div className="flex gap-1">
+                                  <button 
+                                    className="btn btn-ghost btn-sm" 
+                                    onClick={() => handleViewSubmission(submission)}
+                                  >
+                                    <FiEye className="w-4 h-4" />
+                                  </button>
+                                  {hasAdminPrivileges && (
+                                    <button 
+                                      className="btn btn-ghost btn-sm"
+                                      onClick={() => handleOpenFeedback(submission)}
+                                    >
+                                      <FiMessageSquare className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -937,6 +1012,78 @@ const DetailedLectureView = () => {
           </div>
         </div>
       </div>
+      
+      {/* Feedback Modal */}
+      {showFeedbackModal && currentSubmission && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+              <FiMessageSquare className="text-primary" />
+              {t('provideFeedback')}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text">{t('rating')} (1-5)</span>
+                </label>
+                <div className="rating rating-lg">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <input 
+                      key={star}
+                      type="radio" 
+                      name="rating" 
+                      className="mask mask-star-2 bg-primary" 
+                      checked={rating === star}
+                      onChange={() => setRating(star)}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text">{t('comment')}</span>
+                </label>
+                <textarea 
+                  className="textarea textarea-bordered w-full h-32"
+                  placeholder={t('enterYourFeedback')}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                ></textarea>
+              </div>
+              
+              {feedbackError && (
+                <div className="alert alert-error">
+                  <FiX className="w-5 h-5" />
+                  <span>{feedbackError}</span>
+                </div>
+              )}
+              
+              <div className="modal-action">
+                <button 
+                  className="btn btn-ghost"
+                  onClick={() => setShowFeedbackModal(false)}
+                  disabled={isSubmittingFeedback}
+                >
+                  {t('cancel')}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={handleSubmitFeedback}
+                  disabled={isSubmittingFeedback}
+                >
+                  {isSubmittingFeedback ? (
+                    <span className="loading loading-spinner"></span>
+                  ) : (
+                    t('submitFeedback')
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
