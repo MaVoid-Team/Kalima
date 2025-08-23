@@ -6,7 +6,8 @@ import { getLectureById, getLectureAttachments, deleteLecture } from "../../../r
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { getStudentSubmissionsByLectureId } from "../../../routes/examsAndHomeworks"
+import { getLectureHomeworks } from "../../../routes/homeworks"
+import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import {
@@ -160,44 +161,34 @@ const DetailedLectureView = () => {
     }
   }, [lectureId, t])
 
-  // Fetch student submissions
+  // Fetch student homework submissions using getLectureHomeworks
   useEffect(() => {
-    const fetchStudentSubmissions = async () => {
-      if (!lectureId || !userRole || !userId) {
-        return
-      }
-
+    const fetchHomeworks = async () => {
+      if (!lectureId) return;
+      setSubmissionsLoading(true);
+      setSubmissionsError(null);
       try {
-        setSubmissionsLoading(true)
-        setSubmissionsError(null)
-
-        const result = await getStudentSubmissionsByLectureId(lectureId)
-
-        if (result.success) {
-          // Store all submissions if user has admin privileges
-          // Otherwise, filter to only show the current user's submissions
+        const res = await getLectureHomeworks(lectureId);
+        if (res.success && res.data && Array.isArray(res.data.attachments)) {
+          // If admin, show all; if student, show only their own
           if (hasAdminPrivileges) {
-            setStudentSubmissions(result.data.students || [])
+            setStudentSubmissions(res.data.attachments);
           } else {
-            // Filter submissions to only show the current user's
-            const userSubmissions = (result.data.students || []).filter(
-              (studentData) => studentData.student._id === userId,
-            )
-            setStudentSubmissions(userSubmissions)
+            setStudentSubmissions(res.data.attachments.filter(att => att.studentId?._id === userId));
           }
         } else {
-          setSubmissionsError(result.error || t("failedToFetchStudentSubmissions"))
+          setStudentSubmissions([]);
+          setSubmissionsError(res.error || t("failedToFetchStudentSubmissions"));
         }
       } catch (err) {
-        console.error("Error fetching student submissions:", err)
-        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"))
+        setStudentSubmissions([]);
+        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"));
       } finally {
-        setSubmissionsLoading(false)
+        setSubmissionsLoading(false);
       }
-    }
-
-    fetchStudentSubmissions()
-  }, [lectureId, userRole, userId, hasAdminPrivileges, t])
+    };
+    fetchHomeworks();
+  }, [lectureId, userRole, userId, hasAdminPrivileges, t]);
 
   // Fetch student lecture accesses
   useEffect(() => {
@@ -746,14 +737,13 @@ const DetailedLectureView = () => {
             </div>
           )}
 
-          {/* Student Submissions */}
+          {/* Student Homeworks */}
           {(hasAdminPrivileges || userRole === "Student") && (
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <FiUpload className="text-primary" />
-               {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
+                {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
               </h2>
-
               {submissionsLoading ? (
                 <div className="flex justify-center py-8 bg-base-200 rounded-lg">
                   <div className="loading loading-spinner loading-md"></div>
@@ -770,72 +760,48 @@ const DetailedLectureView = () => {
                       <thead>
                         <tr>
                           <th>{t('student')}</th>
-                          <th>{t('uploadedFiles')}</th>
+                          <th>{t('fileName')}</th>
+                          <th>{t('size')}</th>
+                          <th>{t('uploadDate')}</th>
                           <th>{t('actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {studentSubmissions.map((studentData) => (
-                          <tr key={studentData.student._id}>
+                        {studentSubmissions.map((submission) => (
+                          <tr key={submission._id}>
                             <td>
                               <div className="flex items-center gap-2">
                                 <div className="avatar avatar-placeholder">
                                   <div className="bg-primary text-primary-content rounded-full w-8">
-                                    <span>{studentData.student.name.charAt(0)}</span>
+                                    <span>{submission.studentId?.name?.charAt(0) || '?'}</span>
                                   </div>
                                 </div>
                                 <div>
-                                  <div className="font-bold">{studentData.student.name}</div>
-                                  <div className="text-sm opacity-70">{studentData.student.email}</div>
+                                  <div className="font-bold">{submission.studentId?.name || t('unknown')}</div>
+                                  <div className="text-sm opacity-70">{submission.studentId?.email || ''}</div>
                                 </div>
                               </div>
                             </td>
+                            <td>{submission.fileName}</td>
+                            <td>{(submission.fileSize / 1024).toFixed(2)} KB</td>
+                            <td>{new Date(submission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}</td>
                             <td>
-                              {studentData.submissions.length > 0 ? (
-                                <div className="space-y-2">
-                                  {studentData.submissions.map((submission) => (
-                                    <div key={submission._id} className="flex items-center gap-2">
-                                      <div className="bg-base-300 p-1 rounded">
-                                        <FiFile className="text-primary" />
-                                      </div>
-                                      <span className="text-sm">{submission.fileName}</span>
-                                      <span className="text-xs bg-base-300 px-2 py-1 rounded">
-                                        {(submission.fileSize / 1024).toFixed(2)} KB
-                                      </span>
-                                      <span className="text-xs opacity-70">
-                                        {new Date(submission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-sm opacity-70">{t('noSubmissions')}</span>
-                              )}
-                            </td>
-                            <td>
-                              {studentData.submissions.length > 0 ? (
-                                <div className="flex gap-2">
-                                  {studentData.submissions.map((submission) => (
-                                    <button
-                                      key={submission._id}
-                                      onClick={() =>
-                                        handleViewSubmission({
-                                          ...submission,
-                                          // This is a placeholder for file data that would come from an API
-                                          // In a real implementation, you would fetch this from the backend
-                                          fileData: null,
-                                        })
-                                      }
-                                      className="btn btn-sm btn-primary"
-                                    >
-                                      <FiEye className={isRTL ? "ml-1" : "mr-1"} />
-                                    {t('view')}
-                                    </button>
-                                  ))}
-                                </div>
-                              ) : (
-                                <button className="btn btn-sm btn-disabled">{t('noFiles')}</button>
-                              )}
+                              <div className="flex gap-2">
+                                <a
+                                  href={submission.filePath}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-sm btn-outline"
+                                >
+                                  <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t('view')}
+                                </a>
+                                <button
+                                  className="btn btn-sm btn-primary"
+                                  onClick={() => downloadAttachmentById(submission._id, submission.fileName)}
+                                >
+                                  <FiDownload className={isRTL ? "ml-1" : "mr-1"} /> {t('download')}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -860,7 +826,7 @@ const DetailedLectureView = () => {
                 <div className="mt-4">
                   <button className="btn btn-outline btn-primary">
                     <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
-                   {t('uploadHomework')}
+                    {t('uploadHomework')}
                   </button>
                 </div>
               )}
