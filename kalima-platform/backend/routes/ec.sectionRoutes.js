@@ -2,7 +2,7 @@ const express = require("express");
 const ecSectionController = require("../controllers/ec.sectionController");
 const verifyJWT = require("../middleware/verifyJWT");
 const authController = require("../controllers/authController");
-
+const ecSubsectionController = require("../controllers/ec.subSectionController");
 const router = express.Router();
 
 // Get all sections visible to the current user's role
@@ -15,6 +15,12 @@ router.route("/").get(ecSectionController.getAllSections).post(
   authController.verifyRoles("Admin", "SubAdmin"),
   ecSectionController.createSection
 );
+
+router.get(
+  "/:sectionId/subsections",
+  ecSubsectionController.getSubsectionsBySection
+);
+router.get('/:id/products', ecSectionController.getSection);
 
 router
   .route("/:id")
@@ -30,6 +36,5 @@ router
     ecSectionController.deleteSection
   );
 
-router.get('/:id/products', ecSectionController.getSectionWithProducts);
 
 module.exports = router;

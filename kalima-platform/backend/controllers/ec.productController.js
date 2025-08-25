@@ -13,7 +13,7 @@ function isValidPDF(file) {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const { title, serial, section, price, priceAfterDiscount, description, whatsAppNumber, paymentNumber } = req.body;
+        const { title, serial, section, price, priceAfterDiscount, description, whatsAppNumber, paymentNumber, subSection } = req.body;
         const createdBy = req.user._id;
         let sample, imageUrl, gallery = [];
         if (req.files && req.files.sample && req.files.sample[0]) {
@@ -42,6 +42,7 @@ exports.createProduct = async (req, res, next) => {
             description,
             whatsAppNumber,
             paymentNumber,
+            subSection,
             createdBy,
         });
 
@@ -61,7 +62,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await ECProduct.find().populate({
             path: "section",
             select: "number"
-        }).sort({ createdAt: -1 });
+        }).sort({ createdAt: -1 }).populate({ path: "subSection", select: "name" });
         // Ensure all fields are present in the response
         const productsWithAllFields = products.map(product => {
             const obj = product.toObject();
@@ -90,7 +91,8 @@ exports.getProductById = async (req, res) => {
         const product = await ECProduct.findById(req.params.id).populate({
             path: "section",
             select: "number"
-        });
+        }).populate({ path: "subSection", select: "name" });
+
         if (!product) return res.status(404).json({ message: "Product not found" });
         const obj = product.toObject();
         res.status(200).json({
@@ -112,7 +114,7 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, priceAfterDiscount, serial, description, whatsAppNumber, paymentNumber, subject } = req.body;
+        const { title, section, price, priceAfterDiscount, serial, description, subSection, whatsAppNumber, paymentNumber, subject } = req.body;
         const updatedBy = req.user._id;
 
         // 1️⃣ Get the existing product first
@@ -131,6 +133,7 @@ exports.updateProduct = async (req, res) => {
             description,
             updatedBy,
             whatsAppNumber,
+            subSection,
             paymentNumber,
             subject: subject || existingProduct.subject,
             thumbnail: existingProduct.thumbnail,

@@ -22,6 +22,12 @@ const sectionSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide a description"],
     },
+    subSections: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ECSubsection",
+      },
+    ],
     allowedFor: {
       type: [String],
       required: [true, "Please specify roles allowed for this section"],
@@ -40,7 +46,7 @@ const sectionSchema = new mongoose.Schema(
 
 // Virtual populate for products
 sectionSchema.virtual("products", {
-  ref: "Product",
+  ref: "ECProduct",
   localField: "_id",
   foreignField: "section",
 });
