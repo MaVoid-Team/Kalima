@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
@@ -31,6 +32,14 @@ const productSchema = new mongoose.Schema(
             required: [true, "WhatsApp number is required"],
             trim: true,
         },
+        subSection: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ECSubsection",
+            default: null,
+            index: true,
+            required: [true, "Subsection is required"]
+        },
+
     },
     {
         timestamps: { createdAt: true, updatedAt: true },
@@ -70,4 +79,4 @@ productSchema.pre("findOneAndUpdate", function (next) {
     });
 });
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.model("ECProduct", productSchema);

@@ -1,5 +1,6 @@
 const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
+const ECSubsection = require("../models/ec.subSectionModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
@@ -19,7 +20,7 @@ exports.createSection = catchAsync(async (req, res, next) => {
 
 // Get all sections
 exports.getAllSections = catchAsync(async (req, res, next) => {
-  const sections = await ECSection.find();
+  const sections = await ECSection.find().populate({ path: "subSections", select: "name _id" });
   res.status(200).json({
     status: "success",
     results: sections.length,
@@ -31,7 +32,7 @@ exports.getAllSections = catchAsync(async (req, res, next) => {
 
 // Get section by ID
 exports.getSectionById = catchAsync(async (req, res, next) => {
-  const section = await ECSection.findById(req.params.id);
+  const section = await ECSection.findById(req.params.id).populate({ path: "subSections", select: "name _id" });
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
@@ -44,23 +45,41 @@ exports.getSectionById = catchAsync(async (req, res, next) => {
 });
 
 // Get section by ID with products
-exports.getSectionWithProducts = catchAsync(async (req, res, next) => {
-  const section = await ECSection.findById(req.params.id).populate({
-    path: "products",
-    select:
-      "title serial thumbnail sample section price paymentNumber discountPercentage priceAfterDiscount createdBy updatedBy createdAt", // Explicitly include all relevant fields
-    options: { sort: { createdAt: -1 } } // Sort products by creation date
-    // You can add more fields if needed
-  });
+exports.getSection = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  // Get section with subsections first
+  const section = await ECSection.findById(id)
+    .populate({
+      path: "subSections",
+      options: { sort: { createdAt: -1 } }
+    });
+
   if (!section) {
-    return next(new AppError("No section found with that ID", 404));
+    return next(new AppError("Section not found", 404));
   }
-  res.status(200).json({
-    status: "success",
-    data: {
-      section,
-    },
-  });
+
+  // Get products for the section
+  const sectionProducts = await ECProduct.find({ section: id }).sort({ createdAt: -1 });
+
+  // Get products for each subsection
+  const subsectionsWithProducts = await Promise.all(
+    section.subSections.map(async (subsection) => {
+      const subsectionProducts = await ECProduct.find({ subSection: subsection._id });
+      const subsectionObj = subsection.toObject();
+      return {
+        ...subsectionObj,
+        products: subsectionProducts
+      };
+    })
+  );
+
+  // Create the final response
+  const response = section.toObject();
+  response.products = sectionProducts;
+  // response.subSections = subsectionsWithProducts;
+
+  res.status(200).json({ status: "success", data: { section: response } });
 });
 
 // Update section
@@ -86,6 +105,9 @@ exports.deleteSection = catchAsync(async (req, res, next) => {
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
+  // Delete all subsections related to this section
+  await ECSubsection.deleteMany({ section: section._id });
+
   // Delete all products related to this section
   await ECProduct.deleteMany({ section: section._id });
   res.status(203).json({
