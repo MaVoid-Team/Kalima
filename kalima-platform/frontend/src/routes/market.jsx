@@ -170,12 +170,6 @@ export const deleteSection = async (sectionId) => {
 
 export const createProduct = async (productData) => {
   try {
-    // 🐛 DEBUG: Log the incoming productData
-    console.log("🔍 DEBUG createProduct - Full productData received:", productData)
-    console.log("🔍 DEBUG createProduct - productData.subSection:", productData.subSection)
-    console.log("🔍 DEBUG createProduct - typeof productData.subSection:", typeof productData.subSection)
-    console.log("🔍 DEBUG createProduct - productData.subSection === '':", productData.subSection === "")
-    console.log("🔍 DEBUG createProduct - productData.subSection === 'undefined':", productData.subSection === "undefined")
 
     // Validate required fields including subSection
     if (!productData.subSection || productData.subSection === "" || productData.subSection === "undefined") {
@@ -183,7 +177,6 @@ export const createProduct = async (productData) => {
       throw new Error("SubSection is required. Please select a subsection before creating the product.")
     }
 
-    console.log("✅ DEBUG createProduct - SubSection validation passed!")
 
     const formData = new FormData()
 
@@ -192,10 +185,7 @@ export const createProduct = async (productData) => {
     formData.append("serial", productData.serial)
     formData.append("section", productData.section)
     
-    // 🐛 DEBUG: Log subSection before and after appending
-    console.log("🔍 DEBUG createProduct - About to append subSection:", productData.subSection)
     formData.append("subSection", productData.subSection)
-    console.log("✅ DEBUG createProduct - subSection appended to FormData")
     
     formData.append("price", productData.price)
     formData.append("priceAfterDiscount", productData.priceAfterDiscount || "0")
@@ -220,19 +210,7 @@ export const createProduct = async (productData) => {
         formData.append("gallery", productData.gallery[i])
       }
     }
-
-    // 🐛 DEBUG: Log FormData contents
-    console.log("🔍 DEBUG createProduct - FormData contents:")
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value)
-    }
     
-    // 🐛 DEBUG: Check specifically for subSection in FormData
-    const subSectionValue = formData.get("subSection")
-    console.log("🔍 DEBUG createProduct - FormData.get('subSection'):", subSectionValue)
-    console.log("🔍 DEBUG createProduct - FormData.has('subSection'):", formData.has("subSection"))
-
-    console.log("🚀 DEBUG createProduct - Sending request to:", `${API_URL}/api/v1/ec/products`)
     
     const response = await axios.post(`${API_URL}/api/v1/ec/products`, formData, {
       withCredentials: true,
@@ -250,10 +228,6 @@ export const createProduct = async (productData) => {
 
 export const createBook = async (bookData) => {
   try {
-    // 🐛 DEBUG: Log the incoming bookData
-    console.log("🔍 DEBUG createBook - Full bookData received:", bookData)
-    console.log("🔍 DEBUG createBook - bookData.subSection:", bookData.subSection)
-    console.log("🔍 DEBUG createBook - typeof bookData.subSection:", typeof bookData.subSection)
 
     // Validate required fields including subSection
     if (!bookData.subSection || bookData.subSection === "" || bookData.subSection === "undefined") {
@@ -261,7 +235,6 @@ export const createBook = async (bookData) => {
       throw new Error("SubSection is required. Please select a subsection before creating the book.")
     }
 
-    console.log("✅ DEBUG createBook - SubSection validation passed!")
 
     const formData = new FormData()
 
@@ -270,10 +243,7 @@ export const createBook = async (bookData) => {
     formData.append("serial", bookData.serial)
     formData.append("section", bookData.section)
     
-    // 🐛 DEBUG: Log subSection before and after appending
-    console.log("🔍 DEBUG createBook - About to append subSection:", bookData.subSection)
     formData.append("subSection", bookData.subSection)
-    console.log("✅ DEBUG createBook - subSection appended to FormData")
     
     formData.append("price", bookData.price)
     formData.append("priceAfterDiscount", bookData.priceAfterDiscount || "0")
@@ -296,18 +266,6 @@ export const createBook = async (bookData) => {
       }
     }
 
-    // 🐛 DEBUG: Log FormData contents for createBook
-    console.log("🔍 DEBUG createBook - FormData contents:")
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}:`, value)
-    }
-    
-    // 🐛 DEBUG: Check specifically for subSection in FormData
-    const subSectionValue = formData.get("subSection")
-    console.log("🔍 DEBUG createBook - FormData.get('subSection'):", subSectionValue)
-    console.log("🔍 DEBUG createBook - FormData.has('subSection'):", formData.has("subSection"))
-
-    console.log("🚀 DEBUG createBook - Sending request to:", `${API_URL}/api/v1/ec/books`)
 
     const response = await axios.post(`${API_URL}/api/v1/ec/books`, formData, {
       withCredentials: true,
