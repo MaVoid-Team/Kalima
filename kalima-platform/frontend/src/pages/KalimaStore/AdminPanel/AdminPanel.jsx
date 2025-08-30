@@ -171,10 +171,6 @@ const AdminPanel = () => {
   const handleCreateBook = async (e) => {
     e.preventDefault()
     
-    // 🐛 DEBUG: Log the current bookForm state
-    console.log("🔍 DEBUG handleCreateBook - Full bookForm:", bookForm)
-    console.log("🔍 DEBUG handleCreateBook - bookForm.subSection:", bookForm.subSection)
-    
     if (
       !bookForm.title ||
       !bookForm.serial ||
@@ -212,8 +208,6 @@ const AdminPanel = () => {
         gallery: bookForm.gallery,
         whatsAppNumber: bookForm.whatsAppNumber,
       }
-      
-      console.log("🔍 DEBUG handleCreateBook - Data being sent to createBook:", dataToSend)
       
       const response = await createBook(dataToSend)
 
@@ -257,9 +251,6 @@ const AdminPanel = () => {
   const handleCreateProduct = async (e) => {
     e.preventDefault()
     
-    // 🐛 DEBUG: Log the current productForm state
-    console.log("🔍 DEBUG handleCreateProduct - Full productForm:", productForm)
-    console.log("🔍 DEBUG handleCreateProduct - productForm.subSection:", productForm.subSection)
     
     if (
       !productForm.title ||
@@ -297,7 +288,6 @@ const AdminPanel = () => {
         description: productForm.description,
       }
       
-      console.log("🔍 DEBUG handleCreateProduct - Data being sent to createProduct:", dataToSend)
       
       const response = await createProduct(dataToSend)
 
