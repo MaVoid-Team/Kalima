@@ -4,7 +4,8 @@
     "tagline": "Discover and purchase products and books from all sections."
   },
   "categories": {
-    "allSections": "All Sections"
+    "allSections": "All Sections",
+    "allSubSections": "All SubSections"
   },
   "search": {
     "placeholder": "Search for products..."

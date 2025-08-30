@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { getAllSections, getAllProducts } from "../../routes/market"
+import { getAllSections, getAllProducts, getAllSubSections } from "../../routes/market"
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market")
@@ -11,8 +11,10 @@ const Market = () => {
   const navigate = useNavigate()
 
   const [activeTab, setActiveTab] = useState("all")
+  const [activeSubSection, setActiveSubSection] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [sections, setSections] = useState([])
+  const [subSections, setSubSections] = useState([])
   const [allProducts, setAllProducts] = useState([]) // Store all products only
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -31,13 +33,21 @@ const Market = () => {
     return `${baseUrl}/uploads/${folder}/${filename}`
   }
 
-  // Filter products based on active tab
+  // Filter products based on active tab and subsection
   const filteredBySection = useMemo(() => {
     if (activeTab === "all") {
       return allProducts
     }
-    return allProducts.filter((product) => product.section?._id === activeTab)
-  }, [activeTab, allProducts])
+    
+    let filtered = allProducts.filter((product) => product.section?._id === activeTab)
+    
+    // Further filter by subsection if one is selected
+    if (activeSubSection !== "all") {
+      filtered = filtered.filter((product) => product.subSection?._id === activeSubSection)
+    }
+    
+    return filtered
+  }, [activeTab, activeSubSection, allProducts])
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
@@ -66,6 +76,12 @@ const Market = () => {
         const sectionsResponse = await getAllSections()
         if (sectionsResponse.status === "success") {
           setSections(sectionsResponse.data.sections)
+        }
+
+        // Fetch subsections
+        const subSectionsResponse = await getAllSubSections()
+        if (subSectionsResponse.status === "success") {
+          setSubSections(subSectionsResponse.data.subsections)
         }
 
         // Fetch ONLY products (removed books fetching)
@@ -98,7 +114,18 @@ const Market = () => {
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [activeTab, searchQuery])
+  }, [activeTab, activeSubSection, searchQuery])
+
+  // Get subsections for the currently selected section
+  const currentSubSections = useMemo(() => {
+    if (activeTab === "all") return []
+    return subSections.filter(subSection => subSection.section?._id === activeTab)
+  }, [activeTab, subSections])
+
+  // Reset subsection when section changes
+  useEffect(() => {
+    setActiveSubSection("all")
+  }, [activeTab])
 
   // Create categories array with "All" option and fetched sections
   const categories = [
@@ -175,6 +202,35 @@ const Market = () => {
           </div>
         </div>
       </div>
+
+      {/* Subsection Tabs (show only when a specific section is selected) */}
+      {activeTab !== "all" && currentSubSections.length > 0 && (
+        <div className="bg-secondary/20 px-4 py-2 border-b">
+          <div className="md:max-w-7xl lg:max-w-7xl sm:max-w-3xl mx-auto">
+            <div className="flex flex-wrap overflow-x-auto scrollbar-hide gap-1">
+              <button
+                onClick={() => setActiveSubSection("all")}
+                className={`flex-shrink-0 px-6 py-1 text-sm font-medium transition-colors rounded ${
+                  activeSubSection === "all" ? "bg-secondary text-white" : "hover:bg-secondary/30"
+                }`}
+              >
+                {t("allSubSections") || "All"}
+              </button>
+              {currentSubSections.map((subSection) => (
+                <button
+                  key={subSection._id}
+                  onClick={() => setActiveSubSection(subSection._id)}
+                  className={`flex-shrink-0 px-6 py-1 text-sm font-medium transition-colors rounded ${
+                    activeSubSection === subSection._id ? "bg-secondary text-white" : "hover:bg-secondary/30"
+                  }`}
+                >
+                  {subSection.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search Bar */}
       <div className="px-4 py-4">
