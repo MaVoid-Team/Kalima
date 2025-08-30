@@ -4,7 +4,8 @@
     "tagline": "اكتشف واشترِ المنتجات والكتب من جميع الأقسام."
   },
   "categories": {
-    "allSections": "جميع الأقسام"
+    "allSections": "جميع الأقسام",
+    "allSubSections": "جميع الأقسام الفرعية"
   },
   "search": {
     "placeholder": "ابحث عن المنتجات..."

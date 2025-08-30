@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { getAllSections, getAllBooks, getAllProducts } from "../../../routes/market"
+import { getAllSections, getAllBooks, getAllProducts, getAllSubSections } from "../../../routes/market"
 import { getAllSubjects } from "../../../routes/courses"
 
 export const useAdminData = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [sections, setSections] = useState([])
+  const [subSections, setSubSections] = useState([])
   const [books, setBooks] = useState([])
   const [products, setProducts] = useState([])
   const [subjects, setSubjects] = useState([])
@@ -24,8 +25,9 @@ export const useAdminData = () => {
       setError(null)
 
       // Fetch all data
-      const [sectionsResponse, booksResponse, productsResponse, subjectsResponse] = await Promise.all([
+      const [sectionsResponse, subSectionsResponse, booksResponse, productsResponse, subjectsResponse] = await Promise.all([
         getAllSections(),
+        getAllSubSections(),
         getAllBooks(),
         getAllProducts(),
         getAllSubjects(),
@@ -37,6 +39,15 @@ export const useAdminData = () => {
       } else {
         console.warn("Sections data not available:", sectionsResponse)
         setSections([])
+      }
+
+      // Process subsections data
+      if (subSectionsResponse?.status === "success" && subSectionsResponse?.data?.subsections) {
+        console.log("SubSections fetched:", subSectionsResponse.data.subsections)
+        setSubSections(subSectionsResponse.data.subsections)
+      } else {
+        console.warn("SubSections data not available:", subSectionsResponse)
+        setSubSections([])
       }
 
       // Process books data
@@ -82,6 +93,7 @@ export const useAdminData = () => {
       setError(err?.message || "Failed to fetch data")
       // Set empty arrays as fallbacks
       setSections([])
+      setSubSections([])
       setBooks([])
       setProducts([])
       setSubjects([])
@@ -94,21 +106,23 @@ export const useAdminData = () => {
     await fetchInitialData()
   }, [])
 
-  // REMOVED AUTO-REFRESH - Commented out the useEffect
-  // useEffect(() => {
-  //   fetchInitialData()
-  // }, [])
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchInitialData()
+  }, [])
 
   return {
     loading,
     error,
     sections,
+    subSections,
     books,
     products,
     subjects,
     stats,
     refetch,
     setSections,
+    setSubSections,
     setBooks,
     setProducts,
   }

@@ -11,6 +11,15 @@ const AdminModals = ({
   setSectionForm,
   onUpdateSection,
 
+  // Edit SubSection Modal
+  showEditSubSectionModal,
+  setShowEditSubSectionModal,
+  editingSubSection,
+  setEditingSubSection,
+  subSectionForm,
+  setSubSectionForm,
+  onUpdateSubSection,
+
   // Edit Product Modal
   showEditProductModal,
   setShowEditProductModal,
@@ -30,6 +39,13 @@ const AdminModals = ({
   setSectionToDelete,
   onDeleteSection,
 
+  // Delete SubSection Modal
+  showDeleteSubSectionModal,
+  setShowDeleteSubSectionModal,
+  subSectionToDelete,
+  setSubSectionToDelete,
+  onDeleteSubSection,
+
   // Delete Product Modal
   showDeleteProductModal,
   setShowDeleteProductModal,
@@ -47,6 +63,13 @@ const AdminModals = ({
       description: "",
       number: "",
       thumbnail: "logo",
+    })
+  }
+
+  const resetSubSectionForm = () => {
+    setSubSectionForm?.({
+      name: "",
+      section: "",
     })
   }
 
@@ -433,6 +456,120 @@ const AdminModals = ({
                   <span className="loading loading-spinner loading-sm"></span>
                 ) : (
                   t("modals.deleteProduct.deleteButton") || "Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ Edit SubSection Modal ============ */}
+      {showEditSubSectionModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg">
+            <h3 className="font-bold text-lg mb-4">
+              {t("modals.editSubSection.title") || "Edit SubSection"}
+            </h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                onUpdateSubSection?.()
+              }}
+            >
+              <div className="space-y-4">
+                {/* SubSection Name */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">
+                      {t("forms.createSubSection.fields.name") || "SubSection Name"} *
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    value={subSectionForm?.name || ""}
+                    onChange={(e) => setSubSectionForm({ ...subSectionForm, name: e.target.value })}
+                    required
+                  />
+                </div>
+
+                {/* Parent Section */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">
+                      {t("forms.createSubSection.fields.section") || "Parent Section"} *
+                    </span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={subSectionForm?.section || ""}
+                    onChange={(e) => setSubSectionForm({ ...subSectionForm, section: e.target.value })}
+                    required
+                  >
+                    <option value="">
+                      {t("forms.createSubSection.placeholders.section") || "Select parent section"}
+                    </option>
+                    {(sections || []).map((section) =>
+                      section?._id && section?.name ? (
+                        <option key={section._id} value={section._id}>
+                          {section.name}
+                        </option>
+                      ) : null
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              <div className="modal-action">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => {
+                    setShowEditSubSectionModal?.(false)
+                    resetSubSectionForm?.()
+                  }}
+                >
+                  {t("modals.editSubSection.cancelButton") || "Cancel"}
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+                  {actionLoading ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    t("modals.editSubSection.updateButton") || "Update SubSection"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============ Delete SubSection Modal ============ */}
+      {showDeleteSubSectionModal && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">
+              {t("modals.deleteSubSection.title") || "Delete SubSection"}
+            </h3>
+            <p className="py-4">
+              {t("modals.deleteSubSection.message") || 
+                `Are you sure you want to delete the subsection "${editingSubSection?.name}"? This action cannot be undone.`}
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() => {
+                  setShowDeleteSubSectionModal?.(false)
+                  setEditingSubSection?.(null)
+                }}
+              >
+                {t("modals.deleteSubSection.cancelButton") || "Cancel"}
+              </button>
+              <button className="btn btn-error" onClick={onDeleteSubSection} disabled={actionLoading}>
+                {actionLoading ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  t("modals.deleteSubSection.deleteButton") || "Delete"
                 )}
               </button>
             </div>

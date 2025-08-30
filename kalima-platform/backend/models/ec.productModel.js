@@ -35,9 +35,8 @@ const productSchema = new mongoose.Schema(
         subSection: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "ECSubsection",
-            default: null,
-            index: true,
-            required: [true, "Subsection is required"]
+            required: [true, "Subsection is required"],
+            index: true
         },
 
     },
