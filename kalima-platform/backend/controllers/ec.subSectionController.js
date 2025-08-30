@@ -136,5 +136,5 @@ exports.deleteSubSection = catchAsync(async (req, res, next) => {
 
   await subsection.deleteOne();
 
-  res.status(204).json({ status: "success", data: null });
+  res.status(200).json({ status: "success", data: null });
 });
