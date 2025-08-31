@@ -22,6 +22,8 @@
     "products": "Products"
   },
   "refresh": "Refresh",
+  "exportCSV": "Export CSV",
+  "exporting": "Exporting...",
   "table": {
     "product": "Product",
     "customer": "Customer",
@@ -82,6 +84,8 @@
   },
   "alerts": {
     "orderConfirmed": "Order confirmed successfully!",
+  "exportSuccess": "Orders exported successfully!",
+  "exportFailed": "Failed to export orders",
     "failedToConfirm": "Failed to confirm order: ",
     "notesSaved": "Notes saved successfully!",
     "failedToSaveNotes": "Failed to save notes: ",

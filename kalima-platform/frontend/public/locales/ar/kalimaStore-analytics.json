@@ -44,4 +44,13 @@
     "tryAdjustingFilters": "جرب تعديل المرشحات",
     "totalCouponValue": "قيمة الكوبون الإجمالية"
   }
+  ,
+  "exportCSV": "تصدير CSV",
+  "exporting": "جارٍ التصدير...",
+  "csv": {
+    "overview": "نظرة عامة",
+    "dailyStats": "إحصاءات يومية",
+    "monthlyStats": "إحصاءات شهرية",
+    "productStats": "إحصاءات المنتجات"
+  }
 } 

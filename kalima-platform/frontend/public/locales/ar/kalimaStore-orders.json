@@ -22,6 +22,8 @@
     "products": "المنتجات"
   },
   "refresh": "تحديث",
+  "exportCSV": "تصدير CSV",
+  "exporting": "جارٍ التصدير...",
   "table": {
     "product": "المنتج",
     "customer": "العميل",
@@ -82,6 +84,8 @@
   },
   "alerts": {
     "orderConfirmed": "تم تأكيد الطلب بنجاح!",
+  "exportSuccess": "تم تصدير الطلبات بنجاح!",
+  "exportFailed": "فشل في تصدير الطلبات",
     "failedToConfirm": "فشل في تأكيد الطلب: ",
     "notesSaved": "تم حفظ الملاحظات بنجاح!",
     "failedToSaveNotes": "فشل في حفظ الملاحظات: ",

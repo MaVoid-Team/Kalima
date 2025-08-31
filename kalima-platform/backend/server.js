@@ -52,6 +52,7 @@ const ecProductRouter = require("./routes/ec.productRoutes.js");
 const ecBookRouter = require("./routes/ec.bookRoutes.js");
 const ecPurchaseRouter = require("./routes/ec.purchaseRoutes.js");
 const ecBookPurchaseRouter = require("./routes/ec.bookpurchaseRoutes.js");
+const ECSubSectionRouter = require("./routes/ec.subSectionRoutes.js");
 // New routes for exam and homework functionality
 const ExamConfigRouter = require("./routes/ExamConfigRoutes.js");
 const studentExamSubmissionRouter = require("./routes/studentExamSubmissionRoutes.js");
@@ -137,6 +138,7 @@ app.use("/api/v1/ec/purchases", auditLogger, ecPurchaseRouter);
 app.use("/api/v1/ec/book-purchases", ecBookPurchaseRouter);
 app.use("/api/v1/ec/coupons", ecCouponRouter);
 app.use("/api/v1/ec/referrals", ecReferralRoutes);
+app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

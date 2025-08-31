@@ -551,7 +551,7 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
     },
     {
       $lookup: {
-        from: "products",
+  from: "ecproducts",
         localField: "_id",
         foreignField: "_id",
         as: "productInfo"

@@ -67,6 +67,7 @@ const StoreAnalytics = () => {
     averagePrice: 0,
   })
   const [searchQuery, setSearchQuery] = useState("")
+  const [exporting, setExporting] = useState(false)
 
   // Generate month options from monthly stats
   const generateMonthOptions = useCallback(() => {
@@ -248,6 +249,85 @@ const StoreAnalytics = () => {
     return `${Math.round(numPrice)} ج`
   }
 
+  // CSV escape helper
+  const escapeCsv = (value) => {
+    if (value === null || value === undefined) return ""
+    const str = String(value)
+    if (/[",\n]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`
+    }
+    return str
+  }
+
+  // Export analytics to CSV
+  const exportAnalytics = async () => {
+    try {
+      setExporting(true)
+      // Build rows: overview, monthlyStats, productStats (filtered)
+      const rows = []
+
+      // Overview
+      rows.push([t("csv.overview")])
+      rows.push([t("stats.totalPurchases"), overviewStats.totalPurchases])
+      rows.push([t("stats.confirmed"), overviewStats.confirmedPurchases])
+      rows.push([t("stats.pending"), overviewStats.pendingPurchases])
+      rows.push([t("stats.totalRevenue"), overviewStats.totalRevenue])
+      rows.push([t("stats.confirmedRevenue"), overviewStats.confirmedRevenue])
+      rows.push([t("stats.averagePrice"), Math.round(overviewStats.averagePrice)])
+      rows.push([])
+
+      // Daily (if selected)
+      if (selectedDate) {
+        rows.push([t("csv.dailyStats"), selectedDate])
+        rows.push([t("stats.totalPurchases"), dailyStats.totalPurchases])
+        rows.push([t("stats.totalRevenue"), dailyStats.totalRevenue])
+        rows.push([t("stats.confirmedRevenue"), dailyStats.confirmedRevenue])
+        rows.push([])
+      }
+
+      // Monthly
+      rows.push([t("csv.monthlyStats")])
+      rows.push([t("table.month"), t("table.totalPurchases"), t("table.confirmed"), t("table.revenue"), t("table.confirmedRevenue")])
+      monthlyStats.forEach((stat) => {
+        const date = new Date(stat._id.year, stat._id.month - 1, 1)
+        const monthName = date.toLocaleDateString(i18n.language, { year: "numeric", month: "long" })
+        rows.push([monthName, stat.count, stat.confirmedCount, stat.revenue, stat.confirmedRevenue])
+      })
+      rows.push([])
+
+      // Products (filtered)
+      rows.push([t("csv.productStats")])
+      rows.push([t("table.rank"), t("table.productName"), t("table.totalPurchases"), t("table.totalValue"), t("table.avgValue")])
+      filteredProductStats.forEach((p, idx) => {
+        const totalValue = Number(p.totalValue) || 0
+        const totalPurchases = Number(p.totalPurchases) || 0
+        const avgValue = totalPurchases > 0 ? Math.round(totalValue / totalPurchases) : 0
+        rows.push([idx + 1, p.productName, totalPurchases, totalValue, avgValue])
+      })
+
+      // Convert to CSV string
+      const csvContent = rows.map((r) => r.map(escapeCsv).join(",")).join("\n")
+
+      // Download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      const filename = `kalima-analytics-${new Date().toISOString().slice(0, 10)}.csv`
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+
+      // Optional success feedback
+      setExporting(false)
+    } catch (err) {
+      console.error("Failed to export analytics:", err)
+      setExporting(false)
+    }
+  }
+
   // Calculate performance metrics
   const getPerformanceMetrics = () => {
     if (productStats.length === 0) return { topProduct: null, totalProducts: 0, averagePerProduct: 0 }
@@ -384,6 +464,15 @@ const StoreAnalytics = () => {
                   {t("clearFilters")}
                 </button>
               )}
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={async () => {
+                  await exportAnalytics()
+                }}
+                disabled={exporting}
+              >
+                {exporting ? t("exporting") : t("exportCSV")}
+              </button>
             </div>
           </div>
         </div>

@@ -36,6 +36,7 @@ const Orders = () => {
     books: 0,
   })
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
+  const [exporting, setExporting] = useState(false)
 
   // Enhanced notes modal state
   const [notesModal, setNotesModal] = useState({
@@ -479,6 +480,63 @@ const Orders = () => {
               {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
               {t("refresh")}
             </button>
+
+              {/* Export CSV button */}
+              <button
+                onClick={async () => {
+                  try {
+                    setExporting(true)
+                    // Build CSV rows from current orders (memoizedOrders contains derived fields)
+                    const rows = memoizedOrders.map((o) => ({
+                      orderId: o._id,
+                      purchaseSerial: o.purchaseSerial || "",
+                      productName: o.productName || o.product?.title || "",
+                      customerName: o.userName || o.createdBy?.name || "",
+                      type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
+                      price: o.price || "",
+                      couponCode: o.couponCode || "",
+                      transferredFrom: o.numberTransferredFrom || "",
+                      status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+                      adminNotes: o.adminNotes || "",
+                      date: o.createdAt || "",
+                    }))
+
+                    // Convert to CSV
+                    const header = Object.keys(rows[0] || {}).map((h) => `"${h}"`).join(",")
+                    const csv = [header]
+                      .concat(
+                        rows.map((r) =>
+                          Object.values(r)
+                            .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                            .join(","),
+                        ),
+                      )
+                      .join("\n")
+
+                    // Create blob and download
+                    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement("a")
+                    a.href = url
+                    a.download = `orders_export_${new Date().toISOString().slice(0, 10)}.csv`
+                    document.body.appendChild(a)
+                    a.click()
+                    a.remove()
+                    URL.revokeObjectURL(url)
+                    alert(t("alerts.exportSuccess") || "Export complete")
+                  } catch (err) {
+                    console.error("Error exporting orders:", err)
+                    alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
+                  } finally {
+                    setExporting(false)
+                  }
+                }}
+                className="btn btn-secondary ml-2"
+                disabled={exporting || loading || memoizedOrders.length === 0}
+              >
+                {exporting ? <span className="loading loading-spinner loading-sm"></span> : "📥"}
+                {t("exportCSV")}
+              </button>
 
             {hasActiveFilters && (
               <button className="btn btn-ghost" onClick={clearFilters}>
