@@ -24,6 +24,7 @@
   "refresh": "تحديث",
   "exportCSV": "تصدير CSV",
   "exporting": "جارٍ التصدير...",
+  "exportXLSX": "تصدير XLSX",
   "table": {
     "product": "المنتج",
     "customer": "العميل",

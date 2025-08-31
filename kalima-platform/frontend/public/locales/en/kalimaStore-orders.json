@@ -24,6 +24,7 @@
   "refresh": "Refresh",
   "exportCSV": "Export CSV",
   "exporting": "Exporting...",
+  "exportXLSX": "Export XLSX",
   "table": {
     "product": "Product",
     "customer": "Customer",
