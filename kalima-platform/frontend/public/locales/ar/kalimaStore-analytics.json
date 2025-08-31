@@ -47,6 +47,7 @@
   ,
   "exportCSV": "تصدير CSV",
   "exporting": "جارٍ التصدير...",
+  "exportXLSX": "تصدير XLSX",
   "csv": {
     "overview": "نظرة عامة",
     "dailyStats": "إحصاءات يومية",
