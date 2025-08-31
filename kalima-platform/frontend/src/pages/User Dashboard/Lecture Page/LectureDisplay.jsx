@@ -341,11 +341,9 @@ const LectureDisplay = () => {
 
   // Step 1: Check all submissions (exam and homework)
   const verificationResult = await verifyExamSubmission(lectureId);
-  console.log('verifyExamSubmission result:', { lectureId, verificationResult });
 
   // Step 2: Check lecture access requirements
   const accessResult = await checkLectureAccess(lectureId);
-  console.log('checkLectureAccess result:', { lectureId, accessResult });
 
       if (accessResult.status === "restricted") {
         // Handle exam requirements
