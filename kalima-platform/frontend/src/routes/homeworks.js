@@ -20,8 +20,9 @@ export const uploadHomework = async (lectureId, homeworkData) => {
 
     // Create form data
     const formData = new FormData();
-    formData.append("type", homeworkData.type || "homeworks");
-    formData.append("file", homeworkData.attachment); // Changed from attachment to file to match backend
+  formData.append("type", homeworkData.type || "homeworks");
+  // Backend expects the file field to be named 'attachment' (see upload.single('attachment'))
+  formData.append("attachment", homeworkData.attachment);
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/lectures/${lectureId}/homework`,
