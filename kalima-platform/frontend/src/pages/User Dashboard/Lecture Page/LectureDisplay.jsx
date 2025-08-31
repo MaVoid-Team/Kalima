@@ -257,7 +257,7 @@ const LectureDisplay = () => {
 
   // Fetch lecture data and attachments
   useEffect(() => {
-    const fetchLecture = async () => {
+  const fetchLecture = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -265,6 +265,7 @@ const LectureDisplay = () => {
         if (result.success) {
           const lectureData = result.data.container;
           setLecture(lectureData);
+      console.log('Lecture fetched:', { lectureId, title: lectureData?.name, requiresExam: lectureData?.requiresExam });
         } else {
           setError(result.error || t("failedToLoadLecture"));
         }
@@ -276,7 +277,7 @@ const LectureDisplay = () => {
       }
     };
 
-    const fetchAttachments = async () => {
+  const fetchAttachments = async () => {
       try {
         const result = await getLectureAttachments(lectureId);
         if (result.status === "success") {
@@ -293,6 +294,12 @@ const LectureDisplay = () => {
           ];
 
           setAllAttachments(allAttachmentsArray);
+          console.log('Attachments fetched:', { lectureId, counts: {
+            pdfsandimages: (result.data.pdfsandimages || []).length,
+            homeworks: (result.data.homeworks || []).length,
+            exams: (result.data.exams || []).length,
+            booklets: (result.data.booklets || []).length,
+          }});
         } else {
           console.error("Failed to fetch attachments:", result.message);
         }
@@ -302,13 +309,14 @@ const LectureDisplay = () => {
     };
 
     // Fetch homeworks if user has permission
-    const fetchHomeworks = async () => {
+  const fetchHomeworks = async () => {
       if (!hasUploadPermission()) return;
 
       try {
         const result = await getLectureHomeworks(lectureId);
         if (result.success) {
           setHomeworks(result.data.attachments || []);
+      console.log('Homeworks fetched:', { lectureId, count: (result.data.attachments || []).length });
         } else {
           console.error("Failed to fetch homeworks:", result.error);
         }
@@ -331,11 +339,13 @@ const LectureDisplay = () => {
     try {
       setExamVerificationLoading(true);
 
-      // Step 1: Check all submissions (exam and homework)
-      const verificationResult = await verifyExamSubmission(lectureId);
+  // Step 1: Check all submissions (exam and homework)
+  const verificationResult = await verifyExamSubmission(lectureId);
+  console.log('verifyExamSubmission result:', { lectureId, verificationResult });
 
-      // Step 2: Check lecture access requirements
-      const accessResult = await checkLectureAccess(lectureId);
+  // Step 2: Check lecture access requirements
+  const accessResult = await checkLectureAccess(lectureId);
+  console.log('checkLectureAccess result:', { lectureId, accessResult });
 
       if (accessResult.status === "restricted") {
         // Handle exam requirements
