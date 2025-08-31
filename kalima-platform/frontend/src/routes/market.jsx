@@ -428,7 +428,7 @@ export const RecalculateInvites = async () => {
 // Function to get all subsections
 export const getAllSubSections = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/subsections`, {
+    const response = await axios.get(`${API_URL}/ec/subsections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -445,7 +445,7 @@ export const getAllSubSections = async (queryParams = {}) => {
 // Function to get subsections by section ID
 export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/sections/${sectionId}/subsections`, {
+    const response = await axios.get(`${API_URL}/ec/sections/${sectionId}/subsections`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -462,7 +462,7 @@ export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
 // Function to get a single subsection with its products
 export const getSubSectionById = async (subSectionId) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, {
+    const response = await axios.get(`${API_URL}/ec/subsections/${subSectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -478,7 +478,7 @@ export const getSubSectionById = async (subSectionId) => {
 // Function to create a new subsection
 export const createSubSection = async (subSectionData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/ec/subsections`, subSectionData, {
+    const response = await axios.post(`${API_URL}/ec/subsections`, subSectionData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -495,7 +495,7 @@ export const createSubSection = async (subSectionData) => {
 // Function to update a subsection
 export const updateSubSection = async (subSectionId, updateData) => {
   try {
-    const response = await axios.patch(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, updateData, {
+    const response = await axios.patch(`${API_URL}/ec/subsections/${subSectionId}`, updateData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -512,7 +512,7 @@ export const updateSubSection = async (subSectionId, updateData) => {
 // Function to delete a subsection
 export const deleteSubSection = async (subSectionId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, {
+    const response = await axios.delete(`${API_URL}/ec/subsections/${subSectionId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
