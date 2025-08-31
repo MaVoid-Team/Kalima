@@ -44,4 +44,13 @@
     "tryAdjustingFilters": "Try adjusting your filters",
     "totalCouponValue": "Total Coupon Value"
   }
+  ,
+  "exportCSV": "Export CSV",
+  "exporting": "Exporting...",
+  "csv": {
+    "overview": "Overview",
+    "dailyStats": "Daily Statistics",
+    "monthlyStats": "Monthly Statistics",
+    "productStats": "Product Statistics"
+  }
 } 
