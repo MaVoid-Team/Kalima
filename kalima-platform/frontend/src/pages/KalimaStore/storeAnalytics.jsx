@@ -68,6 +68,58 @@ const StoreAnalytics = () => {
   })
   const [searchQuery, setSearchQuery] = useState("")
   const [exporting, setExporting] = useState(false)
+  // lazy import xlsx when needed to avoid bundling issues
+  const exportAnalyticsXlsx = async () => {
+    try {
+      setExporting(true)
+      const XLSX = await import("xlsx")
+
+      const rowsOverview = [
+        [t("csv.overview")],
+        [t("stats.totalPurchases"), overviewStats.totalPurchases],
+        [t("stats.confirmed"), overviewStats.confirmedPurchases],
+        [t("stats.pending"), overviewStats.pendingPurchases],
+        [t("stats.totalRevenue"), overviewStats.totalRevenue],
+        [t("stats.confirmedRevenue"), overviewStats.confirmedRevenue],
+        [t("stats.averagePrice"), Math.round(overviewStats.averagePrice)],
+        [],
+      ]
+
+      const ws = XLSX.utils.aoa_to_sheet(rowsOverview)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, "Overview")
+
+      // Monthly sheet
+      const monthlyHeader = [
+        [t("table.month"), t("table.totalPurchases"), t("table.confirmed"), t("table.revenue"), t("table.confirmedRevenue")],
+      ]
+      const monthlyRows = monthlyStats.map((stat) => {
+        const date = new Date(stat._id.year, stat._id.month - 1, 1)
+        const monthName = date.toLocaleDateString(i18n.language, { year: "numeric", month: "long" })
+        return [monthName, stat.count, stat.confirmedCount, stat.revenue, stat.confirmedRevenue]
+      })
+      const wsMonthly = XLSX.utils.aoa_to_sheet(monthlyHeader.concat(monthlyRows))
+      XLSX.utils.book_append_sheet(wb, wsMonthly, "Monthly")
+
+      // Products sheet
+      const productHeader = [[t("table.rank"), t("table.productName"), t("table.totalPurchases"), t("table.totalValue"), t("table.avgValue")]]
+      const productRows = filteredProductStats.map((p, idx) => {
+        const totalValue = Number(p.totalValue) || 0
+        const totalPurchases = Number(p.totalPurchases) || 0
+        const avgValue = totalPurchases > 0 ? Math.round(totalValue / totalPurchases) : 0
+        return [idx + 1, p.productName, totalPurchases, totalValue, avgValue]
+      })
+      const wsProducts = XLSX.utils.aoa_to_sheet(productHeader.concat(productRows))
+      XLSX.utils.book_append_sheet(wb, wsProducts, "Products")
+
+      const filename = `kalima-analytics-${new Date().toISOString().slice(0, 10)}.xlsx`
+      XLSX.writeFile(wb, filename)
+    } catch (err) {
+      console.error("Failed to export analytics xlsx:", err)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   // Generate month options from monthly stats
   const generateMonthOptions = useCallback(() => {
@@ -472,6 +524,15 @@ const StoreAnalytics = () => {
                 disabled={exporting}
               >
                 {exporting ? t("exporting") : t("exportCSV")}
+              </button>
+              <button
+                className="btn btn-outline btn-sm ml-2"
+                onClick={async () => {
+                  await exportAnalyticsXlsx()
+                }}
+                disabled={exporting}
+              >
+                {exporting ? t("exporting") : t("exportXLSX")}
               </button>
             </div>
           </div>
