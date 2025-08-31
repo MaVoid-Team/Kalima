@@ -49,6 +49,7 @@ export const verifyExamSubmission = async (lectureId) => {
     if (!lectureId) {
       throw new Error("Lecture ID is required")
     }
+    console.log('verifyExamSubmission: calling API', { lectureId })
 
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/exam-submissions/verify/${lectureId}`,
@@ -60,6 +61,8 @@ export const verifyExamSubmission = async (lectureId) => {
         },
       }
     )
+
+    console.log('verifyExamSubmission: received response', { lectureId, status: response.status, data: response.data })
 
     return {
       success: true,
@@ -87,6 +90,7 @@ export const checkLectureAccess = async (lectureId) => {
     if (!lectureId) {
       throw new Error("Lecture ID is required")
     }
+    console.log('checkLectureAccess: calling API', { lectureId })
 
     const response = await axios.get(
       `${import.meta.env.VITE_API_URL}/student-lecture-access/check/${lectureId}`,
@@ -97,6 +101,8 @@ export const checkLectureAccess = async (lectureId) => {
         },
       } // Removed extra comma here
     )
+
+    console.log('checkLectureAccess: received response', { lectureId, status: response.status, data: response.data })
 
     // Return the direct response data, which includes status, message, and data
     return response.data
