@@ -10,6 +10,7 @@ import {
 } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
 import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X, Calendar, Filter } from "lucide-react"
+import * as XLSX from "xlsx"
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -536,6 +537,46 @@ const Orders = () => {
               >
                 {exporting ? <span className="loading loading-spinner loading-sm"></span> : "📥"}
                 {t("exportCSV")}
+              </button>
+
+              {/* Export XLSX button */}
+              <button
+                onClick={async () => {
+                  try {
+                    setExporting(true)
+                    const rows = memoizedOrders.map((o) => ({
+                      orderId: o._id,
+                      purchaseSerial: o.purchaseSerial || "",
+                      productName: o.productName || o.product?.title || "",
+                      customerName: o.userName || o.createdBy?.name || "",
+                      type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
+                      price: o.price || "",
+                      couponCode: o.couponCode || "",
+                      transferredFrom: o.numberTransferredFrom || "",
+                      status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+                      adminNotes: o.adminNotes || "",
+                      date: o.createdAt || "",
+                    }))
+
+                    const worksheet = XLSX.utils.json_to_sheet(rows)
+                    const workbook = XLSX.utils.book_new()
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders")
+
+                    const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.xlsx`
+                    XLSX.writeFile(workbook, fileName)
+                    alert(t("alerts.exportSuccess") || "Export complete")
+                  } catch (err) {
+                    console.error("Error exporting orders xlsx:", err)
+                    alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
+                  } finally {
+                    setExporting(false)
+                  }
+                }}
+                className="btn btn-accent ml-2"
+                disabled={exporting || loading || memoizedOrders.length === 0}
+              >
+                {exporting ? <span className="loading loading-spinner loading-sm"></span> : "📥"}
+                {t("exportXLSX")}
               </button>
 
             {hasActiveFilters && (
