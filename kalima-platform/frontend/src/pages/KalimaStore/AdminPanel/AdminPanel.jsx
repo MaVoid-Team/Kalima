@@ -11,12 +11,16 @@ import {
   deleteProduct,
   getProductById,
   createBook,
+  createSubSection,
+  updateSubSection,
+  deleteSubSection,
 } from "../../../routes/market"
 import Orders from "./Orders"
 import { useAdminData } from "./UseAdminData"
 import ExportSection from "./ExportSection"
 import ProductsManagement from "./ProductsManagement"
 import SectionsManagement from "./SectionsManagement"
+import SubSectionsManagement from "./SubSectionsManagement"
 import AdminForms from "./AdminForms"
 import AdminModals from "./AdminModals"
 import ErrorBoundary from "./ErrorBoundary"
@@ -27,7 +31,7 @@ const AdminPanel = () => {
   const isRTL = i18n.language === "ar"
 
   // Use custom hook for data management
-  const { loading, error, sections, books, products, subjects, stats, refetch, setSections, setBooks, setProducts } =
+  const { loading, error, sections, subSections, books, products, subjects, stats, refetch, setSections, setSubSections, setBooks, setProducts } =
     useAdminData()
 
   // Local state
@@ -47,6 +51,11 @@ const AdminPanel = () => {
     number: "",
     thumbnail: "logo",
     allowedFor: [],
+  })
+
+  const [subSectionForm, setSubSectionForm] = useState({
+    name: "",
+    section: "",
   })
 
   const [productForm, setProductForm] = useState({
@@ -80,10 +89,14 @@ const AdminPanel = () => {
 
   // Modal states
   const [editingSection, setEditingSection] = useState(null)
+  const [editingSubSection, setEditingSubSection] = useState(null)
   const [editingProduct, setEditingProduct] = useState(null)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showEditSubSectionModal, setShowEditSubSectionModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDeleteSubSectionModal, setShowDeleteSubSectionModal] = useState(false)
   const [sectionToDelete, setSectionToDelete] = useState(null)
+  const [subSectionToDelete, setSubSectionToDelete] = useState(null)
   const [showEditProductModal, setShowEditProductModal] = useState(false)
   const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
   const [productToDelete, setProductToDelete] = useState(null)
@@ -157,6 +170,7 @@ const AdminPanel = () => {
   // CRUD handlers with improved error handling
   const handleCreateBook = async (e) => {
     e.preventDefault()
+    
     if (
       !bookForm.title ||
       !bookForm.serial ||
@@ -169,12 +183,21 @@ const AdminPanel = () => {
       return
     }
 
+    // Check if subSection is selected
+    if (!bookForm.subSection) {
+      alert(t("alerts.subSectionRequired") || "Please select a subsection")
+      return
+    }
+
     try {
       setActionLoading(true)
-      const response = await createBook({
+      
+      // 🐛 DEBUG: Log the data being sent to createBook
+      const dataToSend = {
         title: bookForm.title,
         serial: bookForm.serial,
         section: bookForm.section,
+        subSection: bookForm.subSection, // Add this field!
         price: bookForm.price,
         priceAfterDiscount: bookForm.priceAfterDiscount || bookForm.price,
         paymentNumber: bookForm.paymentNumber,
@@ -184,7 +207,9 @@ const AdminPanel = () => {
         sample: bookForm.sample,
         gallery: bookForm.gallery,
         whatsAppNumber: bookForm.whatsAppNumber,
-      })
+      }
+      
+      const response = await createBook(dataToSend)
 
       if (response?.message === "ECBook created successfully" || response?.status === "success") {
         // Reset form
@@ -192,6 +217,7 @@ const AdminPanel = () => {
           title: "",
           serial: "",
           section: "",
+          subSection: "", // Reset subSection field
           price: "",
           priceAfterDiscount: "",
           subject: "",
@@ -224,6 +250,8 @@ const AdminPanel = () => {
 
   const handleCreateProduct = async (e) => {
     e.preventDefault()
+    
+    
     if (
       !productForm.title ||
       !productForm.serial ||
@@ -235,12 +263,21 @@ const AdminPanel = () => {
       return
     }
 
+    // Check if subSection is selected
+    if (!productForm.subSection) {
+      alert(t("alerts.subSectionRequired") || "Please select a subsection")
+      return
+    }
+
     try {
       setActionLoading(true)
-      const response = await createProduct({
+      
+      // 🐛 DEBUG: Log the data being sent to createProduct
+      const dataToSend = {
         title: productForm.title,
         serial: productForm.serial,
         section: productForm.section,
+        subSection: productForm.subSection, // Add this field!
         price: productForm.price,
         priceAfterDiscount: productForm.priceAfterDiscount || productForm.price,
         paymentNumber: productForm.paymentNumber,
@@ -249,7 +286,10 @@ const AdminPanel = () => {
         gallery: productForm.gallery,
         whatsAppNumber: productForm.whatsAppNumber,
         description: productForm.description,
-      })
+      }
+      
+      
+      const response = await createProduct(dataToSend)
 
       if (response?.message === "Product created successfully" || response?.status === "success") {
         // Reset form
@@ -257,6 +297,7 @@ const AdminPanel = () => {
           title: "",
           serial: "",
           section: "",
+          subSection: "", // Reset subSection field
           price: "",
           priceAfterDiscount: "",
           paymentNumber: "",
@@ -443,6 +484,38 @@ const AdminPanel = () => {
     }
   }
 
+  const handleCreateSubSection = async (e) => {
+    e.preventDefault()
+    if (!subSectionForm.name || !subSectionForm.section) {
+      alert(t("alerts.fillRequiredFields"))
+      return
+    }
+
+    try {
+      setActionLoading(true)
+      const response = await createSubSection({
+        name: subSectionForm.name,
+        section: subSectionForm.section,
+      })
+
+      if (response?.status === "success") {
+        setSubSectionForm({
+          name: "",
+          section: "",
+        })
+        alert(t("alerts.subSectionCreatedSuccess") || "SubSection created successfully")
+        await refetch()
+      } else {
+        throw new Error(response?.error || "Failed to create subsection")
+      }
+    } catch (err) {
+      console.error("Error creating subsection:", err)
+      alert(t("alerts.subSectionCreateError") + (err?.message || "Unknown error"))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const handleEditSection = (section) => {
     if (!section?._id) {
       alert(t("validation.invalidSectionSelected"))
@@ -512,6 +585,74 @@ const AdminPanel = () => {
     } catch (err) {
       console.error("Error deleting section:", err)
       alert(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleEditSubSection = (subSection) => {
+    if (!subSection?._id) {
+      alert(t("validation.invalidSubSectionSelected") || "Invalid subsection selected")
+      return
+    }
+
+    setEditingSubSection(subSection)
+    setSubSectionForm({
+      name: subSection.name || "",
+      section: subSection.section?._id || subSection.section || "",
+    })
+    setShowEditSubSectionModal(true)
+  }
+
+  const handleUpdateSubSection = async (e) => {
+    e.preventDefault()
+    if (!editingSubSection?._id) return
+
+    try {
+      setActionLoading(true)
+      const response = await updateSubSection(editingSubSection._id, {
+        name: subSectionForm.name,
+        section: subSectionForm.section,
+      })
+
+      if (response?.status === "success") {
+        setShowEditSubSectionModal(false)
+        setEditingSubSection(null)
+        setSubSectionForm({
+          name: "",
+          section: "",
+        })
+        alert(t("alerts.subSectionUpdatedSuccess") || "SubSection updated successfully")
+        await refetch()
+      } else {
+        throw new Error(response?.error || "Failed to update subsection")
+      }
+    } catch (err) {
+      console.error("Error updating subsection:", err)
+      alert(t("alerts.subSectionUpdateError") + (err?.message || "Unknown error"))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleDeleteSubSection = async () => {
+    if (!subSectionToDelete?._id) return
+
+    try {
+      setActionLoading(true)
+      const response = await deleteSubSection(subSectionToDelete._id)
+
+      if (response?.status === "success" || response) {
+        setShowDeleteSubSectionModal(false)
+        setSubSectionToDelete(null)
+        alert(t("alerts.subSectionDeletedSuccess") || "SubSection deleted successfully")
+        await refetch()
+      } else {
+        throw new Error(response?.error || "Failed to delete subsection")
+      }
+    } catch (err) {
+      console.error("Error deleting subsection:", err)
+      alert(t("alerts.subSectionDeleteError") + (err?.message || "Unknown error"))
     } finally {
       setActionLoading(false)
     }
@@ -613,6 +754,20 @@ const AdminPanel = () => {
             isRTL={isRTL}
           />
 
+          <SubSectionsManagement
+            subSections={subSections}
+            sections={sections}
+            products={products}
+            books={books}
+            onEditSubSection={handleEditSubSection}
+            onDeleteSubSection={(subSection) => {
+              setSubSectionToDelete(subSection)
+              setShowDeleteSubSectionModal(true)
+            }}
+            actionLoading={actionLoading}
+            isRTL={isRTL}
+          />
+
           <CreateCoupons
             isRTL={isRTL}
           />
@@ -626,11 +781,15 @@ const AdminPanel = () => {
             setBookForm={setBookForm}
             sectionForm={sectionForm}
             setSectionForm={setSectionForm}
+            subSectionForm={subSectionForm}
+            setSubSectionForm={setSubSectionForm}
             sections={sections}
+            subSections={subSections}
             subjects={subjects}
             onCreateProduct={handleCreateProduct}
             onCreateBook={handleCreateBook}
             onCreateSection={handleCreateSection}
+            onCreateSubSection={handleCreateSubSection}
             onFileChange={handleFileChange}
             actionLoading={actionLoading}
             isRTL={isRTL}
@@ -655,6 +814,13 @@ const AdminPanel = () => {
           sectionForm={sectionForm}
           setSectionForm={setSectionForm}
           onUpdateSection={handleUpdateSection}
+          showEditSubSectionModal={showEditSubSectionModal}
+          setShowEditSubSectionModal={setShowEditSubSectionModal}
+          editingSubSection={editingSubSection}
+          setEditingSubSection={setEditingSubSection}
+          subSectionForm={subSectionForm}
+          setSubSectionForm={setSubSectionForm}
+          onUpdateSubSection={handleUpdateSubSection}
           showEditProductModal={showEditProductModal}
           setShowEditProductModal={setShowEditProductModal}
           editingProduct={editingProduct}
@@ -670,6 +836,9 @@ const AdminPanel = () => {
           sectionToDelete={sectionToDelete}
           setSectionToDelete={setSectionToDelete}
           onDeleteSection={handleDeleteSection}
+          showDeleteSubSectionModal={showDeleteSubSectionModal}
+          setShowDeleteSubSectionModal={setShowDeleteSubSectionModal}
+          onDeleteSubSection={handleDeleteSubSection}
           showDeleteProductModal={showDeleteProductModal}
           setShowDeleteProductModal={setShowDeleteProductModal}
           productToDelete={productToDelete}

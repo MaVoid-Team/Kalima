@@ -7,7 +7,8 @@
     "totalSales": "Total Sales",
     "pendingApplications": "Pending Applications",
     "numberOfProducts": "Number of Products",
-    "numberOfSections": "Number of Sections"
+    "numberOfSections": "Number of Sections",
+    "numberOfSubSections": "Number of SubSections"
   },
   "categories": {
     "designsSection": "Designs Section",
@@ -37,6 +38,26 @@
     "noSections": "No sections found",
     "tryDifferentSearch": "Try a different search term"
   },
+  "subSectionsManagement": {
+    "title": "SubSections Management",
+    "searchPlaceholder": "Search subsections...",
+    "totalSubSections": "Total subsections",
+    "filtered": "Filtered",
+    "search": "Search",
+    "filterBySection": "Filter by section",
+    "allSections": "All sections",
+    "table": {
+      "name": "Name",
+      "section": "Parent Section",
+      "numberOfProducts": "Number of Products",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "noSubSectionsAvailable": "No subsections available",
+    "noSubSections": "No subsections found",
+    "tryDifferentSearch": "Try a different search term"
+  },
   "forms": {
     "createProduct": {
       "title": "Create New Product",
@@ -45,6 +66,7 @@
         "title": "Product Title",
         "serial": "Serial",
         "section": "Section",
+        "subSection": "SubSection",
         "price": "Price",
         "discountPercentage": "Discount Percentage",
         "priceAfterDiscount": "Price After Discount",
@@ -59,6 +81,7 @@
         "title": "Enter product title",
         "serial": "Enter serial number",
         "section": "Select section",
+        "subSection": "Select subsection",
         "paymentNumber": "Enter payment number",
         "whatsAppNumber": "Enter WhatsApp number",
         "description": "Enter product description..."
@@ -78,6 +101,7 @@
         "title": "Book Title",
         "serial": "Serial",
         "section": "Section",
+        "subSection": "SubSection",
         "subject": "Subject",
         "price": "Price",
         "discountPercentage": "Discount Percentage",
@@ -91,6 +115,7 @@
         "title": "Enter book title",
         "serial": "Enter serial number",
         "section": "Select section",
+        "subSection": "Select subsection",
         "subject": "Select subject",
         "paymentNumber": "Enter payment number",
         "whatsAppNumber": "Enter WhatsApp number",
@@ -118,6 +143,18 @@
         "number": "Enter section number",
         "description": "Enter section description",
         "thumbnail": "Enter thumbnail name"
+      }
+    },
+    "createSubSection": {
+      "title": "Create SubSection",
+      "submitButton": "Create SubSection",
+      "fields": {
+        "name": "SubSection Name",
+        "section": "Parent Section"
+      },
+      "placeholders": {
+        "name": "Enter subsection name",
+        "section": "Select parent section"
       }
     }
   },
@@ -177,10 +214,22 @@
       "message": "Are you sure you want to delete the product \"{{productName}}\"? This action cannot be undone.",
       "cancelButton": "Cancel",
       "deleteButton": "Delete"
+    },
+    "editSubSection": {
+      "title": "Edit SubSection",
+      "cancelButton": "Cancel",
+      "updateButton": "Update SubSection"
+    },
+    "deleteSubSection": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete the subsection \"{{subSectionName}}\"? This action cannot be undone.",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete"
     }
   },
   "alerts": {
     "fillRequiredFields": "Please fill in all required fields",
+    "subSectionRequired": "Please select a subsection",
     "productCreatedSuccess": "Product created successfully!",
     "productCreateError": "Error creating product: ",
     "productUpdatedSuccess": "Product updated successfully!",
@@ -195,7 +244,13 @@
     "sectionUpdatedSuccess": "Section updated successfully!",
     "sectionUpdateError": "Error updating section: ",
     "sectionDeletedSuccess": "Section deleted successfully!",
-    "sectionDeleteError": "Error deleting section: "
+    "sectionDeleteError": "Error deleting section: ",
+    "subSectionCreatedSuccess": "SubSection created successfully!",
+    "subSectionCreateError": "Error creating subsection: ",
+    "subSectionUpdatedSuccess": "SubSection updated successfully!",
+    "subSectionUpdateError": "Error updating subsection: ",
+    "subSectionDeletedSuccess": "SubSection deleted successfully!",
+    "subSectionDeleteError": "Error deleting subsection: "
   },
   "error": {
     "title": "Error!",

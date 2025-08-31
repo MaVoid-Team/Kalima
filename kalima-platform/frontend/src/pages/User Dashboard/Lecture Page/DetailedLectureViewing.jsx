@@ -6,7 +6,8 @@ import { getLectureById, getLectureAttachments, deleteLecture } from "../../../r
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
 import { getUserDashboard } from "../../../routes/auth-services"
-import { getStudentSubmissionsByLectureId } from "../../../routes/examsAndHomeworks"
+import { getLectureHomeworks } from "../../../routes/homeworks"
+import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import {
@@ -29,7 +30,10 @@ import {
   FiEdit,
   FiClock,
   FiSave,
+  FiStar,
+  FiMessageSquare
 } from "react-icons/fi"
+// Simple rating component with no external dependencies
 
 const DetailedLectureView = () => {
   const { t, i18n } = useTranslation("lectureDisplay")
@@ -57,6 +61,12 @@ const DetailedLectureView = () => {
   const [submissionsError, setSubmissionsError] = useState(null)
   const [viewingSubmission, setViewingSubmission] = useState(null)
   const [showSubmissionModal, setShowSubmissionModal] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [currentSubmission, setCurrentSubmission] = useState(null)
+  const [rating, setRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false)
+  const [feedbackError, setFeedbackError] = useState(null)
   const fileViewerRef = useRef(null)
 
   // Student lecture access states
@@ -160,44 +170,34 @@ const DetailedLectureView = () => {
     }
   }, [lectureId, t])
 
-  // Fetch student submissions
+  // Fetch student homework submissions using getLectureHomeworks
   useEffect(() => {
-    const fetchStudentSubmissions = async () => {
-      if (!lectureId || !userRole || !userId) {
-        return
-      }
-
+    const fetchHomeworks = async () => {
+      if (!lectureId) return;
+      setSubmissionsLoading(true);
+      setSubmissionsError(null);
       try {
-        setSubmissionsLoading(true)
-        setSubmissionsError(null)
-
-        const result = await getStudentSubmissionsByLectureId(lectureId)
-
-        if (result.success) {
-          // Store all submissions if user has admin privileges
-          // Otherwise, filter to only show the current user's submissions
+        const res = await getLectureHomeworks(lectureId);
+        if (res.success && res.data && Array.isArray(res.data.attachments)) {
+          // If admin, show all; if student, show only their own
           if (hasAdminPrivileges) {
-            setStudentSubmissions(result.data.students || [])
+            setStudentSubmissions(res.data.attachments);
           } else {
-            // Filter submissions to only show the current user's
-            const userSubmissions = (result.data.students || []).filter(
-              (studentData) => studentData.student._id === userId,
-            )
-            setStudentSubmissions(userSubmissions)
+            setStudentSubmissions(res.data.attachments.filter(att => att.studentId?._id === userId));
           }
         } else {
-          setSubmissionsError(result.error || t("failedToFetchStudentSubmissions"))
+          setStudentSubmissions([]);
+          setSubmissionsError(res.error || t("failedToFetchStudentSubmissions"));
         }
       } catch (err) {
-        console.error("Error fetching student submissions:", err)
-        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"))
+        setStudentSubmissions([]);
+        setSubmissionsError(t("unexpectedErrorFetchingSubmissions"));
       } finally {
-        setSubmissionsLoading(false)
+        setSubmissionsLoading(false);
       }
-    }
-
-    fetchStudentSubmissions()
-  }, [lectureId, userRole, userId, hasAdminPrivileges, t])
+    };
+    fetchHomeworks();
+  }, [lectureId, userRole, userId, hasAdminPrivileges, t]);
 
   // Fetch student lecture accesses
   useEffect(() => {
@@ -260,6 +260,44 @@ const DetailedLectureView = () => {
   const handleViewSubmission = (submission) => {
     setViewingSubmission(submission)
     setShowSubmissionModal(true)
+  }
+
+  // Handle opening feedback modal
+  const handleOpenFeedback = (submission) => {
+    setCurrentSubmission(submission)
+    setRating(submission.rating || 0)
+    setComment(submission.comment || '')
+    setShowFeedbackModal(true)
+  }
+
+  // Handle submitting feedback
+  const handleSubmitFeedback = async () => {
+    if (!currentSubmission) return
+    
+    setIsSubmittingFeedback(true)
+    setFeedbackError(null)
+    
+    try {
+      // Here you'll need to implement the actual API call to save the feedback
+      // For now, we'll just update the local state
+      const updatedSubmissions = studentSubmissions.map(sub => 
+        sub._id === currentSubmission._id 
+          ? { ...sub, rating, comment, feedbackDate: new Date().toISOString() }
+          : sub
+      )
+      
+      setStudentSubmissions(updatedSubmissions)
+      setShowFeedbackModal(false)
+      
+      // Show success message
+      // You might want to replace this with a toast notification
+      alert('Feedback submitted successfully')
+    } catch (error) {
+      console.error('Error submitting feedback:', error)
+      setFeedbackError('Failed to submit feedback. Please try again.')
+    } finally {
+      setIsSubmittingFeedback(false)
+    }
   }
 
   // Handle editing student lecture access
@@ -746,14 +784,13 @@ const DetailedLectureView = () => {
             </div>
           )}
 
-          {/* Student Submissions */}
+          {/* Student Homeworks */}
           {(hasAdminPrivileges || userRole === "Student") && (
             <div className="mb-6">
               <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
                 <FiUpload className="text-primary" />
-               {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
+                {hasAdminPrivileges ? t('submissions') : t('mySubmissions')}
               </h2>
-
               {submissionsLoading ? (
                 <div className="flex justify-center py-8 bg-base-200 rounded-lg">
                   <div className="loading loading-spinner loading-md"></div>
@@ -770,72 +807,76 @@ const DetailedLectureView = () => {
                       <thead>
                         <tr>
                           <th>{t('student')}</th>
-                          <th>{t('uploadedFiles')}</th>
+                          <th>{t('fileName')}</th>
+                          <th>{t('uploadDate')}</th>
+                          <th>{t('rating')}</th>
+                          <th>{t('comment')}</th>
                           <th>{t('actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {studentSubmissions.map((studentData) => (
-                          <tr key={studentData.student._id}>
+                        {studentSubmissions.map((submission) => (
+                          <tr key={submission._id}>
                             <td>
                               <div className="flex items-center gap-2">
                                 <div className="avatar avatar-placeholder">
                                   <div className="bg-primary text-primary-content rounded-full w-8">
-                                    <span>{studentData.student.name.charAt(0)}</span>
+                                    <span>{submission.studentId?.name?.charAt(0) || '?'}</span>
                                   </div>
                                 </div>
                                 <div>
-                                  <div className="font-bold">{studentData.student.name}</div>
-                                  <div className="text-sm opacity-70">{studentData.student.email}</div>
+                                  <div className="font-bold">{submission.studentId?.name || t('unknown')}</div>
+                                  <div className="text-sm opacity-70">{submission.studentId?.email || ''}</div>
                                 </div>
                               </div>
                             </td>
+                            <td>{submission.fileName}</td>
+                            <td>{new Date(submission.uploadedOn).toLocaleDateString()}</td>
                             <td>
-                              {studentData.submissions.length > 0 ? (
-                                <div className="space-y-2">
-                                  {studentData.submissions.map((submission) => (
-                                    <div key={submission._id} className="flex items-center gap-2">
-                                      <div className="bg-base-300 p-1 rounded">
-                                        <FiFile className="text-primary" />
-                                      </div>
-                                      <span className="text-sm">{submission.fileName}</span>
-                                      <span className="text-xs bg-base-300 px-2 py-1 rounded">
-                                        {(submission.fileSize / 1024).toFixed(2)} KB
-                                      </span>
-                                      <span className="text-xs opacity-70">
-                                        {new Date(submission.uploadedOn).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-sm opacity-70">{t('noSubmissions')}</span>
-                              )}
+                              <div className="rating rating-sm">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <input 
+                                    key={star}
+                                    type="radio" 
+                                    name={`rating-${submission._id}`} 
+                                    className="mask mask-star-2 bg-primary" 
+                                    checked={submission.rating === star}
+                                    readOnly
+                                  />
+                                ))}
+                                {submission.rating && <span className="ml-2 text-sm">({submission.rating}/5)</span>}
+                              </div>
+                            </td>
+                            <td className="max-w-xs truncate">
+                              {submission.comment || 'No comment'}
                             </td>
                             <td>
-                              {studentData.submissions.length > 0 ? (
-                                <div className="flex gap-2">
-                                  {studentData.submissions.map((submission) => (
-                                    <button
-                                      key={submission._id}
-                                      onClick={() =>
-                                        handleViewSubmission({
-                                          ...submission,
-                                          // This is a placeholder for file data that would come from an API
-                                          // In a real implementation, you would fetch this from the backend
-                                          fileData: null,
-                                        })
-                                      }
-                                      className="btn btn-sm btn-primary"
+                              <div className="flex gap-2">
+                                <a
+                                  href={submission.filePath}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-sm btn-outline"
+                                >
+                                  <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t('view')}
+                                </a>
+                                <div className="flex gap-1">
+                                  <button 
+                                    className="btn btn-ghost btn-sm" 
+                                    onClick={() => handleViewSubmission(submission)}
+                                  >
+                                    <FiEye className="w-4 h-4" />
+                                  </button>
+                                  {hasAdminPrivileges && (
+                                    <button 
+                                      className="btn btn-ghost btn-sm"
+                                      onClick={() => handleOpenFeedback(submission)}
                                     >
-                                      <FiEye className={isRTL ? "ml-1" : "mr-1"} />
-                                    {t('view')}
+                                      <FiMessageSquare className="w-4 h-4" />
                                     </button>
-                                  ))}
+                                  )}
                                 </div>
-                              ) : (
-                                <button className="btn btn-sm btn-disabled">{t('noFiles')}</button>
-                              )}
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -860,7 +901,7 @@ const DetailedLectureView = () => {
                 <div className="mt-4">
                   <button className="btn btn-outline btn-primary">
                     <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
-                   {t('uploadHomework')}
+                    {t('uploadHomework')}
                   </button>
                 </div>
               )}
@@ -971,6 +1012,78 @@ const DetailedLectureView = () => {
           </div>
         </div>
       </div>
+      
+      {/* Feedback Modal */}
+      {showFeedbackModal && currentSubmission && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+              <FiMessageSquare className="text-primary" />
+              {t('provideFeedback')}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text">{t('rating')} (1-5)</span>
+                </label>
+                <div className="rating rating-lg">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <input 
+                      key={star}
+                      type="radio" 
+                      name="rating" 
+                      className="mask mask-star-2 bg-primary" 
+                      checked={rating === star}
+                      onChange={() => setRating(star)}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text">{t('comment')}</span>
+                </label>
+                <textarea 
+                  className="textarea textarea-bordered w-full h-32"
+                  placeholder={t('enterYourFeedback')}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                ></textarea>
+              </div>
+              
+              {feedbackError && (
+                <div className="alert alert-error">
+                  <FiX className="w-5 h-5" />
+                  <span>{feedbackError}</span>
+                </div>
+              )}
+              
+              <div className="modal-action">
+                <button 
+                  className="btn btn-ghost"
+                  onClick={() => setShowFeedbackModal(false)}
+                  disabled={isSubmittingFeedback}
+                >
+                  {t('cancel')}
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={handleSubmitFeedback}
+                  disabled={isSubmittingFeedback}
+                >
+                  {isSubmittingFeedback ? (
+                    <span className="loading loading-spinner"></span>
+                  ) : (
+                    t('submitFeedback')
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

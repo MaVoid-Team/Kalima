@@ -170,12 +170,23 @@ export const deleteSection = async (sectionId) => {
 
 export const createProduct = async (productData) => {
   try {
+
+    // Validate required fields including subSection
+    if (!productData.subSection || productData.subSection === "" || productData.subSection === "undefined") {
+      console.error("❌ DEBUG createProduct - SubSection validation failed!")
+      throw new Error("SubSection is required. Please select a subsection before creating the product.")
+    }
+
+
     const formData = new FormData()
 
     // Append all the required form fields
     formData.append("title", productData.title)
     formData.append("serial", productData.serial)
     formData.append("section", productData.section)
+    
+    formData.append("subSection", productData.subSection)
+    
     formData.append("price", productData.price)
     formData.append("priceAfterDiscount", productData.priceAfterDiscount || "0")
     formData.append("paymentNumber", productData.paymentNumber)
@@ -199,7 +210,8 @@ export const createProduct = async (productData) => {
         formData.append("gallery", productData.gallery[i])
       }
     }
-
+    
+    
     const response = await axios.post(`${API_URL}/ec/products`, formData, {
       withCredentials: true,
       headers: {
@@ -216,12 +228,23 @@ export const createProduct = async (productData) => {
 
 export const createBook = async (bookData) => {
   try {
+
+    // Validate required fields including subSection
+    if (!bookData.subSection || bookData.subSection === "" || bookData.subSection === "undefined") {
+      console.error("❌ DEBUG createBook - SubSection validation failed!")
+      throw new Error("SubSection is required. Please select a subsection before creating the book.")
+    }
+
+
     const formData = new FormData()
 
     // Append all the form fields
     formData.append("title", bookData.title)
     formData.append("serial", bookData.serial)
     formData.append("section", bookData.section)
+    
+    formData.append("subSection", bookData.subSection)
+    
     formData.append("price", bookData.price)
     formData.append("priceAfterDiscount", bookData.priceAfterDiscount || "0")
     formData.append("subject", bookData.subject)
@@ -242,6 +265,8 @@ export const createBook = async (bookData) => {
         formData.append("gallery", bookData.gallery[i])
       }
     }
+
+
     const response = await axios.post(`${API_URL}/ec/books`, formData, {
       withCredentials: true,
       headers: {
@@ -264,6 +289,7 @@ export const updateProduct = async (productId, productData) => {
     if (productData.title !== undefined) formData.append("title", productData.title)
     if (productData.serial !== undefined) formData.append("serial", productData.serial)
     if (productData.section !== undefined) formData.append("section", productData.section)
+    if (productData.subSection !== undefined) formData.append("subSection", productData.subSection)
     if (productData.price !== undefined) formData.append("price", productData.price)
     if (productData.priceAfterDiscount !== undefined) formData.append("priceAfterDiscount", productData.priceAfterDiscount)
     if (productData.paymentNumber !== undefined) formData.append("paymentNumber", productData.paymentNumber)
@@ -393,6 +419,108 @@ export const RecalculateInvites = async () => {
     return response.data
   } catch (error) {
     console.error(`Error Calculating Invites: ${error.message}`)
+    throw error
+  }
+}
+
+// Subsection functions
+
+// Function to get all subsections
+export const getAllSubSections = async (queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/subsections`, {
+      params: queryParams,
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching subsections: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to get subsections by section ID
+export const getSubSectionsBySection = async (sectionId, queryParams = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/sections/${sectionId}/subsections`, {
+      params: queryParams,
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching subsections by section: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to get a single subsection with its products
+export const getSubSectionById = async (subSectionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching subsection by ID: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to create a new subsection
+export const createSubSection = async (subSectionData) => {
+  try {
+    const response = await axios.post(`${API_URL}/api/v1/ec/subsections`, subSectionData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error creating subsection: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to update a subsection
+export const updateSubSection = async (subSectionId, updateData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, updateData, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error updating subsection: ${error.message}`)
+    throw error
+  }
+}
+
+// Function to delete a subsection
+export const deleteSubSection = async (subSectionId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/api/v1/ec/subsections/${subSectionId}`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+    return response.data
+  } catch (error) {
+    console.error(`Error deleting subsection: ${error.message}`)
     throw error
   }
 }

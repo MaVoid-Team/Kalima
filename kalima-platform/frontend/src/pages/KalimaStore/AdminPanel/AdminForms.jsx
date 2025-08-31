@@ -16,11 +16,15 @@ const EnhancedAdminForms = ({
   setBookForm,
   sectionForm,
   setSectionForm,
+  subSectionForm,
+  setSubSectionForm,
   sections = [],
+  subSections = [],
   subjects = [],
   onCreateProduct,
   onCreateBook,
   onCreateSection,
+  onCreateSubSection,
   onFileChange,
   actionLoading,
   isRTL,
@@ -148,6 +152,15 @@ const EnhancedAdminForms = ({
   // Handle form submission with progress
   const handleFormSubmitWithProgress = async (e, submitHandler, formType) => {
     e.preventDefault()
+
+    // Validate subsection selection for products and books
+    if (formType === "Product" || formType === "Book") {
+      const currentForm = formType === "Product" ? productForm : bookForm
+      if (!currentForm?.subSection || currentForm.subSection === "") {
+        alert(t("alerts.fillRequiredFields") || "Please select a subsection before creating the " + formType.toLowerCase())
+        return
+      }
+    }
 
     // Define progress steps
     const steps = [
@@ -528,10 +541,11 @@ const EnhancedAdminForms = ({
                     className="select select-bordered w-full"
                     value={activeTab === "product" ? productForm?.section || "" : bookForm?.section || ""}
                     onChange={(e) => {
+                      const selectedSection = e.target.value
                       if (activeTab === "product") {
-                        setProductForm?.({ ...productForm, section: e.target.value })
+                        setProductForm?.({ ...productForm, section: selectedSection, subSection: "" })
                       } else {
-                        setBookForm?.({ ...bookForm, section: e.target.value })
+                        setBookForm?.({ ...bookForm, section: selectedSection, subSection: "" })
                       }
                     }}
                     required
@@ -546,6 +560,58 @@ const EnhancedAdminForms = ({
                     )}
                   </select>
                 </div>
+
+                {/* SubSection Field */}
+                {((activeTab === "product" && productForm?.section) || (activeTab === "book" && bookForm?.section)) && (
+                  <div>
+                    <label className="label">
+                      <span className="label-text font-medium">
+                        {t("forms.createProduct.fields.subSection") || "SubSection"} *
+                      </span>
+                    </label>
+                    <select
+                      className={`select select-bordered w-full ${
+                        ((activeTab === "product" && productForm?.section && !productForm?.subSection) ||
+                         (activeTab === "book" && bookForm?.section && !bookForm?.subSection))
+                          ? "select-error border-error"
+                          : ""
+                      }`}
+                      value={activeTab === "product" ? productForm?.subSection || "" : bookForm?.subSection || ""}
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm?.({ ...productForm, subSection: e.target.value })
+                        } else {
+                          setBookForm?.({ ...bookForm, subSection: e.target.value })
+                        }
+                      }}
+                      required
+                    >
+                      <option value="">{t("forms.createProduct.placeholders.subSection") || "Select subsection"}</option>
+                      {(subSections || [])
+                        .filter((subSection) => {
+                          const selectedSectionId = activeTab === "product" ? productForm?.section : bookForm?.section
+                          // Handle both ObjectId and string comparisons
+                          const subSectionId = subSection?.section?._id || subSection?.section
+                          return subSectionId === selectedSectionId
+                        })
+                        .map((subSection) =>
+                          subSection?._id && subSection?.name ? (
+                            <option key={subSection._id} value={subSection._id}>
+                              {subSection.name}
+                            </option>
+                          ) : null,
+                        )}
+                    </select>
+                    
+                    {/* Validation message */}
+                    {((activeTab === "product" && productForm?.section && !productForm?.subSection) ||
+                      (activeTab === "book" && bookForm?.section && !bookForm?.subSection)) && (
+                      <div className="text-error text-xs mt-1">
+                        {t("alerts.subSectionRequired") || "Please select a subsection"}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Subject field - only for books */}
                 {activeTab === "book" && (
@@ -724,73 +790,163 @@ const EnhancedAdminForms = ({
           </div>
         </div>
 
-        {/* Create Section Form */}
+        {/* Create Section & SubSection Forms */}
         <div className="card shadow-lg">
           <div className="card-body p-6">
-            <form onSubmit={(e) => handleFormSubmitWithProgress(e, onCreateSection, "Section")}>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold">{t("forms.createSection.title") || "Create Section"}</h3>
-                <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-                  {actionLoading ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : (
-                    t("forms.createSection.submitButton") || "Create Section"
-                  )}
-                </button>
+            <div className="grid grid-rows-2 gap-8">
+              {/* Create Section Form */}
+              <div className="border-b border-base-300 pb-6">
+                <form onSubmit={(e) => handleFormSubmitWithProgress(e, onCreateSection, "Section")}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold">{t("forms.createSection.title") || "Create Section"}</h3>
+                    <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+                      {actionLoading ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        t("forms.createSection.submitButton") || "Create Section"
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">{t("forms.createSection.fields.name") || "Name"} *</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={t("forms.createSection.placeholders.name") || "Enter section name"}
+                        className="input input-bordered w-full"
+                        value={sectionForm?.name || ""}
+                        onChange={(e) => setSectionForm?.({ ...sectionForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">
+                          {t("forms.createSection.fields.number") || "Number"} *
+                        </span>
+                      </label>
+                      <input
+                        type="number"
+                        placeholder={t("forms.createSection.placeholders.number") || "Enter section number"}
+                        className="input input-bordered w-full"
+                        value={sectionForm?.number || ""}
+                        onChange={(e) => setSectionForm?.({ ...sectionForm, number: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="label">
+                        <span className="label-text font-medium">
+                          {t("forms.createSection.fields.description") || "Description"} *
+                        </span>
+                      </label>
+                      <textarea
+                        placeholder={t("forms.createSection.placeholders.description") || "Enter section description"}
+                        className="textarea textarea-bordered w-full h-24"
+                        value={sectionForm?.description || ""}
+                        onChange={(e) => setSectionForm?.({ ...sectionForm, description: e.target.value })}
+                        required
+                      ></textarea>
+                    </div>
+
+                    {/* Allowed Roles */}
+                    <div className="md:col-span-2">
+                      <label className="label">
+                        <span className="label-text font-medium">
+                          {t("forms.createSection.fields.allowedRoles") || "Allowed Roles"}
+                        </span>
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {roleOptions.map((role) => (
+                          <label key={role} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              className="checkbox checkbox-primary"
+                              checked={sectionForm?.allowedFor?.includes(role)}
+                              onChange={(e) => {
+                                const checked = e.target.checked
+                                const updatedRoles = checked
+                                  ? [...(sectionForm?.allowedFor || []), role]
+                                  : sectionForm?.allowedFor?.filter((r) => r !== role)
+
+                                setSectionForm?.((prev) => ({
+                                  ...prev,
+                                  allowedFor: updatedRoles,
+                                }))
+                              }}
+                            />
+                            <span>{role}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">{t("forms.createSection.fields.name") || "Name"} *</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={t("forms.createSection.placeholders.name") || "Enter section name"}
-                    className="input input-bordered w-full"
-                    value={sectionForm?.name || ""}
-                    onChange={(e) => setSectionForm?.({ ...sectionForm, name: e.target.value })}
-                    required
-                  />
-                </div>
+              {/* Create SubSection Form */}
+              <div className="pt-2">
+                <form onSubmit={(e) => handleFormSubmitWithProgress(e, onCreateSubSection, "SubSection")}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold">{t("forms.createSubSection.title") || "Create SubSection"}</h3>
+                    <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+                      {actionLoading ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        t("forms.createSubSection.submitButton") || "Create SubSection"
+                      )}
+                    </button>
+                  </div>
 
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      {t("forms.createSection.fields.number") || "Number"} *
-                    </span>
-                  </label>
-                  <input
-                    type="number"
-                    placeholder={t("forms.createSection.placeholders.number") || "Enter section number"}
-                    className="input input-bordered w-full"
-                    value={sectionForm?.number || ""}
-                    onChange={(e) => setSectionForm?.({ ...sectionForm, number: e.target.value })}
-                    required
-                  />
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">{t("forms.createSubSection.fields.name") || "Name"} *</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={t("forms.createSubSection.placeholders.name") || "Enter subsection name"}
+                        className="input input-bordered w-full"
+                        value={subSectionForm?.name || ""}
+                        onChange={(e) => setSubSectionForm?.({ ...subSectionForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
 
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      {t("forms.createSection.fields.description") || "Description"} *
-                    </span>
-                  </label>
-                  <textarea
-                    placeholder={t("forms.createSection.placeholders.description") || "Enter section description"}
-                    className="textarea textarea-bordered w-full h-32"
-                    value={sectionForm?.description || ""}
-                    onChange={(e) => setSectionForm?.({ ...sectionForm, description: e.target.value })}
-                    required
-                  ></textarea>
-                </div>
+                    <div>
+                      <label className="label">
+                        <span className="label-text font-medium">
+                          {t("forms.createSubSection.fields.section") || "Parent Section"} *
+                        </span>
+                      </label>
+                      <select
+                        className="select select-bordered w-full"
+                        value={subSectionForm?.section || ""}
+                        onChange={(e) => setSubSectionForm?.({ ...subSectionForm, section: e.target.value })}
+                        required
+                      >
+                        <option value="">{t("forms.createSubSection.placeholders.section") || "Select parent section"}</option>
+                        {sections.map((section) => (
+                          <option key={section._id} value={section._id}>
+                            {section.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </form>
               </div>
+            </div>
 
-              {/* Arrow decoration */}
-              <div className="flex justify-center mt-6">
-                <img src="/vector22.png" alt="Decorative arrow" className="w-15 h-8" />
-              </div>
-            </form>
+            {/* Arrow decoration */}
+            <div className="flex justify-center mt-6">
+              <img src="/vector22.png" alt="Decorative arrow" className="w-15 h-8" />
+            </div>
           </div>
         </div>
       </div>
@@ -798,7 +954,7 @@ const EnhancedAdminForms = ({
       {/* Enhanced Progress Bar Modal */}
       <EnhancedProgressBar
         isVisible={progressTracker.isVisible}
-        title={t(`progressSteps.creating${activeTab === "product" ? "Product" : activeTab === "book" ? "Book" : "Section"}`)}
+        title={t(`progressSteps.creating${activeTab === "product" ? "Product" : activeTab === "book" ? "Book" : activeTab === "section" ? "Section" : "SubSection"}`)}
         steps={progressTracker.steps}
         currentStep={progressTracker.currentStep}
         progress={progressTracker.progress}

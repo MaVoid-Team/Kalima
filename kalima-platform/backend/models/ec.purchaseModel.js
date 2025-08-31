@@ -18,7 +18,7 @@ const ecPurchaseSchema = new mongoose.Schema(
     // Product reference
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+  ref: "ECProduct",
       required: [true, "Product ID is required"],
     },
 
