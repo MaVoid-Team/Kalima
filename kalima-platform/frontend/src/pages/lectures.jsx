@@ -37,8 +37,8 @@ export default function LecturesPage() {
     if (filePath.startsWith("http")) return filePath
 
     const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
+  const API_URL = import.meta.env.VITE_API_URL || window.location.origin
+  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1 if present
     const filename = normalizedPath.split("/").pop()
     return `${baseUrl}/uploads/${folder}/${filename}`
   }
