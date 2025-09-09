@@ -64,12 +64,24 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
 
     if (purchaseId) {
       const purchase = await Purchase.findById(purchaseId)
-        .select("container")
+        .select("container lecture type")
         .session(session);
       if (!purchase) {
         throw new AppError("Purchase not found or unauthorized", 403);
       }
-      purchasedContainerId = purchase.container.toString();
+      
+      // Handle both container purchases and lecture purchases
+      if (purchase.type === "containerPurchase" && purchase.container) {
+        purchasedContainerId = purchase.container.toString();
+        console.log("Container purchase found, using container ID:", purchasedContainerId);
+      } else if (purchase.type === "lecturePurchase" && purchase.lecture) {
+        // For lecture purchases, the lecture ID is the container ID
+        purchasedContainerId = purchase.lecture.toString();
+        console.log("Lecture purchase found, using lecture ID:", purchasedContainerId);
+      } else {
+        console.log("Invalid purchase type or missing data:", { type: purchase.type, container: purchase.container, lecture: purchase.lecture });
+        throw new AppError("Invalid purchase type or missing purchase data", 403);
+      }
     }
     //  else {
     //   // Otherwise, fallback to finding any purchase for this student.
@@ -127,13 +139,16 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
       }).session(session);
 
       if (!access) {
-        // console.log("Creating new access record", containerDoc.numberOfViews);
+        const remainingViews = containerDoc.numberOfViews !== undefined && containerDoc.numberOfViews !== null 
+          ? containerDoc.numberOfViews 
+          : 3; // Default to 3 if not set
+        
         const accessRecords = await StudentLectureAccess.create(
           [
             {
               student: studentId,
               lecture: containerDoc._id,
-              remainingViews: containerDoc.numberOfViews,
+              remainingViews: remainingViews,
             },
           ],
           { session }
