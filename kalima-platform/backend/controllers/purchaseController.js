@@ -104,7 +104,13 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
     currentUser.totalPoints -= lecturePrice;
 
     await studentLectureAccess.create(
-      [{ student: req.user._id, lecture: lecture._id }],
+      [{ 
+        student: req.user._id, 
+        lecture: lecture._id,
+        remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null 
+          ? lecture.numberOfViews 
+          : 3 // Only default to 3 if numberOfViews is not set
+      }],
       { session }
     );
 
@@ -389,7 +395,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         {
           student: userId,
           lecture: containerId,
-          remainingViews: 3, // Default value as per studentLectureAccessModel
+          remainingViews: item.numberOfViews !== undefined && item.numberOfViews !== null 
+            ? item.numberOfViews 
+            : 3, // Only default to 3 if numberOfViews is not set
         },
       ], { session });
       // Populate lecture info for response
