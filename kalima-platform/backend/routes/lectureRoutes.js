@@ -23,6 +23,11 @@ router
   .patch(lectureController.updatelectures)
   .delete(lectureController.deletelecture);
 
+// Check student access to standalone lecture
+router
+  .route("/student/:studentId/lecture/:lectureId/purchase/:purchaseId")
+  .get(lectureController.checkStudentLectureAccess);
+
 router
   .route("/attachments/:lectureId")
   .get(attachmentController.getLectureAttachments)

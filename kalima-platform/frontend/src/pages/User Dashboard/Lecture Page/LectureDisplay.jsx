@@ -117,6 +117,7 @@ const LectureDisplay = () => {
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
   const [purchaseId, setPurchaseId] = useState(null);
+  const [currentPurchase, setCurrentPurchase] = useState(null);
 
   // Add this state to track if we should show the exit confirmation
   const [showExitConfirmation, setShowExitConfirmation] = useState(false)
@@ -226,22 +227,33 @@ const LectureDisplay = () => {
             dashboardResult.data.data.purchaseHistory &&
             dashboardResult.data.data.purchaseHistory.length > 0
           ) {
-            // Find the purchase for this lecture
-            const lecturePurchase =
-              dashboardResult.data.data.purchaseHistory.find(
-                (purchase) =>
-                  purchase.container && purchase.container._id === lectureId
-              );
+            
+            // Find the purchase for this lecture - handle both container and direct lecture purchases
+            const lecturePurchase = dashboardResult.data.data.purchaseHistory.find((purchase) => {
+              // Direct lecture purchase (new structure)
+              if (purchase.lecture && purchase.lecture._id === lectureId) {
+                return true;
+              }
+              
+              // Container purchase (old structure)
+              if (purchase.container && purchase.container._id === lectureId) {
+                return true;
+              }
+              
+              // Check if lecture is within a purchased container/course
+              if (purchase.container && purchase.container.lectures) {
+                return purchase.container.lectures.some(lecture => lecture._id === lectureId);
+              }
+              
+              return false;
+            });
 
             if (lecturePurchase) {
               setPurchaseId(lecturePurchase._id);
+              setCurrentPurchase(lecturePurchase); // Store the purchase data
             } else {
-              console.log(
-                "No purchase found for this lecture in purchase history"
-              );
             }
           } else {
-            console.log("No purchase history found in user data");
           }
         } else {
           console.error("Failed to fetch user data:", dashboardResult.error);
@@ -429,20 +441,39 @@ const LectureDisplay = () => {
           userRole === "Assistant" ||
           !userId || // Make sure we have a userId before proceeding
           !purchaseId // Make sure we have a purchaseId before proceeding
-        )
+        ) {
           return;
+        }
 
         try {
-          // Use the new function to check student lecture access
+          
+          
+          let apiLectureId = lectureId; // Default to lecture ID
+          let isStandaloneLecture = false;
+          
+          // Determine if this is a standalone lecture or container-based lecture
+          if (currentPurchase && currentPurchase.type === "containerPurchase" && currentPurchase.container) {
+            // For container purchases, use the container ID
+            apiLectureId = currentPurchase.container._id;
+            isStandaloneLecture = false;
+          } else if (currentPurchase && currentPurchase.type === "lecturePurchase") {
+            // For lecture purchases, use the lecture ID and mark as standalone
+            apiLectureId = lectureId;
+            isStandaloneLecture = true;
+          }
+          
+          // Use the updated function to check student lecture access
           const result = await checkStudentLectureAccess(
             userId,
-            lectureId,
-            purchaseId
+            apiLectureId,
+            purchaseId,
+            isStandaloneLecture
           );
 
           if (result.success && result.data) {
             // The access data is directly in result.data.access
             if (result.data.access) {
+              
               // Only set the studentLectureAccessId, don't update remainingViews yet
               setStudentLectureAccessId(result.data.access._id)
               setAccessDataLoaded(true)
@@ -473,6 +504,8 @@ const LectureDisplay = () => {
 
       if (lectureId && userRole === "Student" && userId && purchaseId) {
         fetchAccessData();
+      } else {
+        setError(t("noAccessToLecture"));
       }
     }, [lectureId, navigate, userRole, userId, purchaseId, t]);
 

@@ -106,28 +106,34 @@ export const updateStudentLectureAccess = async (accessId, data) => {
   }
 }
 
-// Update the checkStudentLectureAccess function to correctly handle the API response
-export const checkStudentLectureAccess = async (studentId, containerId, purchaseId) => {
+// Update the checkStudentLectureAccess function to handle both container and standalone lectures
+export const checkStudentLectureAccess = async (studentId, lectureId, purchaseId, isStandaloneLecture = false) => {
   try {
     if (!studentId) {
       throw new Error("Student ID is required")
     }
-    if (!containerId) {
-      throw new Error("Container ID is required")
+    if (!lectureId) {
+      throw new Error("Lecture ID is required")
     }
     if (!purchaseId) {
       throw new Error("Purchase ID is required")
     }
 
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/containers/student/${studentId}/container/${containerId}/purchase/${purchaseId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "application/json",
-        },
+    let apiUrl;
+    if (isStandaloneLecture) {
+      // Use standalone lecture endpoint
+      apiUrl = `${import.meta.env.VITE_API_URL}/lectures/student/${studentId}/lecture/${lectureId}/purchase/${purchaseId}`;
+    } else {
+      // Use container-based lecture endpoint
+      apiUrl = `${import.meta.env.VITE_API_URL}/containers/student/${studentId}/container/${lectureId}/purchase/${purchaseId}`;
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "Content-Type": "application/json",
       },
-    )
+    })
 
     return {
       success: response.data.status === "success",
