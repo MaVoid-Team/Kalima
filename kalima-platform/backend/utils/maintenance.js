@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const RETENTION_DAYS = parseInt(process.env.PAYMENT_SS_RETENTION_DAYS || "90", 10);
+const RETENTION_DAYS = parseInt(process.env.PAYMENT_SS_RETENTION_DAYS || "30", 10);
 const TARGET_DIR = path.join(__dirname, "..", "uploads", "payment_screenshots");
 
 function deleteOldFiles() {
