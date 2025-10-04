@@ -104,11 +104,11 @@ exports.getSubSectionWithProducts = catchAsync(async (req, res, next) => {
 // Update subsection
 exports.updateSubSection = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { name, description, sortOrder, isActive } = req.body;
+  const { name, section } = req.body;
 
   const subsection = await ECSubsection.findByIdAndUpdate(
     id,
-    { name, description, sortOrder, isActive },
+    { name, section, updatedBy: req.user?._id },
     { new: true, runValidators: true }
   );
 
