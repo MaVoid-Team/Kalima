@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 import { getUserDashboard } from "../../../routes/auth-services"
 import { getAllSubjects } from "../../../routes/courses"
 import { getAllLevels } from "../../../routes/levels"
-import { createLecture, createLectureAttachment } from "../../../routes/lectures"
+import { createLecture, createLectureAttachment, updateLectureById } from "../../../routes/lectures"
 import { getAllLectures } from "../../../routes/lectures"
 import LectureCreationModal from "../../../components/LectureCreationModal"
 
@@ -30,6 +30,18 @@ const MyLecturesPage = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(0)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingLecture, setEditingLecture] = useState(null)
+  const [editForm, setEditForm] = useState({
+    name: "",
+    price: "",
+    videoLink: "",
+    description: "",
+    lecture_type: "",
+    subject: "",
+    level: "",
+    thumbnailFile: null,
+  })
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null
@@ -251,6 +263,61 @@ const MyLecturesPage = () => {
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value))
     setCurrentPage(1)
+  }
+
+  const handleEditLecture = (lecture) => {
+    setEditingLecture(lecture)
+    setEditForm({
+      name: lecture.name || "",
+      price: lecture.price || "",
+      videoLink: lecture.videoLink || "",
+      description: lecture.description || "",
+      lecture_type: lecture.lecture_type || "",
+      subject: lecture.subject?._id || "",
+      level: lecture.level?._id || "",
+      thumbnailFile: null,
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateLecture = async (e) => {
+    e.preventDefault()
+    if (!editingLecture) return
+
+    try {
+      setCreationLoading(true)
+      setError(null)
+
+      const formData = new FormData()
+      formData.append("name", editForm.name)
+      formData.append("price", editForm.price)
+      if (editForm.videoLink) formData.append("videoLink", editForm.videoLink)
+      if (editForm.description) formData.append("description", editForm.description)
+      if (editForm.lecture_type) formData.append("lecture_type", editForm.lecture_type)
+      if (editForm.subject) formData.append("subject", editForm.subject)
+      if (editForm.level) formData.append("level", editForm.level)
+      if (editForm.thumbnailFile) formData.append("thumbnail", editForm.thumbnailFile)
+
+      const result = await updateLectureById(editingLecture.id, formData)
+
+      if (result.status === "success") {
+        setSuccessMessage(t("lecturesPage.messages.lectureUpdatedSuccessfully", "Lecture updated successfully!"))
+        setShowEditModal(false)
+        setEditingLecture(null)
+        await refetchLectureData()
+        
+        setTimeout(() => {
+          setSuccessMessage("")
+        }, 5000)
+      } else {
+        setError(result.message || "Failed to update lecture")
+      }
+    } catch (err) {
+      console.error("Error updating lecture:", err)
+      setError(err.message || "Failed to update lecture")
+    } finally {
+      setCreationLoading(false)
+    }
   }
 
   // Batch upload all attachments and links for all categories in one request
@@ -519,6 +586,164 @@ const MyLecturesPage = () => {
           containerType="month"
         />
 
+        {/* Edit Lecture Modal */}
+        {showEditModal && editingLecture && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-base-100 border-b p-4 flex justify-between items-center">
+                <h3 className="text-xl font-bold">{t("lecturesPage.editLecture", "Edit Lecture")}</h3>
+                <button 
+                  onClick={() => setShowEditModal(false)} 
+                  className="btn btn-ghost btn-sm btn-circle"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateLecture} className="p-6 space-y-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("lecturesPage.lectureName", "Lecture Name")}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="input input-bordered"
+                    required
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("lecturesPage.videoLink", "Video Link")}</span>
+                  </label>
+                  <input
+                    type="url"
+                    value={editForm.videoLink}
+                    onChange={(e) => setEditForm({ ...editForm, videoLink: e.target.value })}
+                    className="input input-bordered"
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("lecturesPage.description", "Description")}</span>
+                  </label>
+                  <textarea
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    className="textarea textarea-bordered h-24"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("lecturesPage.price", "Price")}</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.price}
+                      onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                      className="input input-bordered"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("lecturesPage.lectureType.label", "Lecture Type")}</span>
+                    </label>
+                    <select
+                      value={editForm.lecture_type}
+                      onChange={(e) => setEditForm({ ...editForm, lecture_type: e.target.value })}
+                      className="select select-bordered"
+                    >
+                      <option value="">Select Type</option>
+                      <option value="Free">{t("lecturesPage.lectureType.free", "Free")}</option>
+                      <option value="Paid">{t("lecturesPage.lectureType.paid", "Paid")}</option>
+                      <option value="Revision">{t("lecturesPage.lectureType.revision", "Revision")}</option>
+                      <option value="Teachers Only">{t("lecturesPage.lectureType.teachersOnly", "Teachers Only")}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("lecturesPage.subject", "Subject")}</span>
+                    </label>
+                    <select
+                      value={editForm.subject}
+                      onChange={(e) => setEditForm({ ...editForm, subject: e.target.value })}
+                      className="select select-bordered"
+                    >
+                      <option value="">Select Subject</option>
+                      {subjects?.map((subject) => (
+                        <option key={subject._id} value={subject._id}>
+                          {subject.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("lecturesPage.level", "Level")}</span>
+                    </label>
+                    <select
+                      value={editForm.level}
+                      onChange={(e) => setEditForm({ ...editForm, level: e.target.value })}
+                      className="select select-bordered"
+                    >
+                      <option value="">Select Level</option>
+                      {levels?.map((level) => (
+                        <option key={level._id} value={level._id}>
+                          {t(`gradeLevels.${level.name}`, { ns: "common" })}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("lecturesPage.thumbnail", "Thumbnail")}</span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setEditForm({ ...editForm, thumbnailFile: e.target.files[0] })}
+                    className="file-input file-input-bordered"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowEditModal(false)} 
+                    className="btn btn-ghost"
+                  >
+                    {t("lecturesPage.buttons.cancel", "Cancel")}
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary" 
+                    disabled={creationLoading}
+                  >
+                    {creationLoading ? (
+                      <span className="loading loading-spinner"></span>
+                    ) : (
+                      t("lecturesPage.buttons.saveChanges", "Save Changes")
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         <div className="overflow-x-auto">
           <table className="table table-zebra w-full">
             <thead>
@@ -578,15 +803,27 @@ const MyLecturesPage = () => {
                     {lecture.price || 0} {t("lecturesPage.points")}
                   </td>
                   {userRole === "Student" && <td>{lecture.purchasedAt}</td>}
-                  <td>
-                    <Link
-                      to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${
-                        userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
-                      }/${lecture.id}`}
-                    >
-                      <button className="btn btn-ghost">{t("lecturesPage.buttons.details")}</button>
-                    </Link>
-                  </td>
+                  {userRole !== "Student" && (
+                    <td>
+                      <div className="flex gap-2">
+                        <Link
+                          to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${
+                            userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
+                          }/${lecture.id}`}
+                        >
+                          <button className="btn btn-ghost btn-sm">{t("lecturesPage.buttons.details")}</button>
+                        </Link>
+                        {userRole === "Lecturer" && (
+                          <button 
+                            className="btn btn-primary btn-sm" 
+                            onClick={() => handleEditLecture(lecture)}
+                          >
+                            {t("lecturesPage.buttons.edit", "Edit")}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
