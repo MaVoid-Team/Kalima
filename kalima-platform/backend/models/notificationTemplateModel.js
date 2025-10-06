@@ -15,6 +15,7 @@ const notificationTemplateSchema = new mongoose.Schema(
         "new_exam",
         "new_homework_assignment",
         "lecture_updated",
+        "store_purchase",
       ],
     },
     title: {

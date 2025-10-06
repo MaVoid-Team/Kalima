@@ -6,6 +6,9 @@ const QueryFeatures = require("../utils/queryFeatures");
 const ECProduct = require("../models/ec.productModel");
 const mongoose = require("mongoose");
 const { sendEmail } = require("../utils/emailVerification/emailService");
+const Notification = require("../models/notification");
+const NotificationTemplate = require("../models/notificationTemplateModel");
+const User = require("../models/userModel");
 
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
@@ -215,6 +218,101 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     }
   }
   // --- End referral logic ---
+
+  // --- Real-time notification to Admins and SubAdmins ---
+  try {
+    const template = await NotificationTemplate.findOne({
+      type: "store_purchase",
+    });
+
+    if (template) {
+      const io = req.app.get("io");
+      
+      // Find all admins and subadmins
+      const adminUsers = await User.find({
+        role: { $in: ["Admin", "SubAdmin"] },
+      }).select("_id name email role");
+
+      console.log(`Found ${adminUsers.length} admin/subadmin users to notify`);
+
+      if (adminUsers.length > 0 && io) {
+        const purchaseTime = new Date().toLocaleString("en-US", {
+          timeZone: "Africa/Cairo",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        // Prepare notification data
+        const notificationData = {
+          title: template.title,
+          message: template.message
+            .replace("{buyer}", req.user.name)
+            .replace("{product}", purchase.productName)
+            .replace("{price}", purchase.finalPrice.toString())
+            .replace("{time}", purchaseTime),
+          type: "store_purchase",
+          relatedId: purchase._id,
+          metadata: {
+            buyerId: req.user._id,
+            buyerName: req.user.name,
+            buyerEmail: req.user.email,
+            productId: purchase.productId,
+            productName: purchase.productName,
+            purchaseSerial: purchase.purchaseSerial,
+            price: purchase.price,
+            finalPrice: purchase.finalPrice,
+            purchaseTime: new Date(),
+          },
+        };
+
+        // Send notification to each admin/subadmin
+        await Promise.all(
+          adminUsers.map(async (admin) => {
+            // Check if admin is online
+            const isOnline = io.sockets.adapter.rooms.has(
+              admin._id.toString()
+            );
+
+            // Create notification in database
+            const notification = await Notification.create({
+              userId: admin._id,
+              ...notificationData,
+              isSent: isOnline,
+            });
+
+            console.log(
+              `Created notification for ${admin.role} ${admin.name} (${admin._id}), online: ${isOnline}`
+            );
+
+            // Send immediately if admin is online
+            if (isOnline) {
+              io.to(admin._id.toString()).emit("storePurchase", {
+                ...notificationData,
+                notificationId: notification._id,
+                createdAt: notification.createdAt,
+              });
+              console.log(
+                `Sent real-time notification to ${admin.role} ${admin.name}`
+              );
+            }
+          })
+        );
+
+        console.log(
+          `Store purchase notifications created for ${adminUsers.length} admins/subadmins`
+        );
+      }
+    } else {
+      console.warn("Store purchase notification template not found");
+    }
+  } catch (notificationError) {
+    console.error("Error sending store purchase notifications:", notificationError);
+    // Don't fail the purchase if notification fails
+  }
+  // --- End notification logic ---
 
   // Send email to user after successful purchase
   try {

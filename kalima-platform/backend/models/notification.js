@@ -14,6 +14,10 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {},
+  },
   createdAt: { type: Date, default: Date.now },
 });
 
