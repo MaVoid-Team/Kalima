@@ -17,6 +17,7 @@ import {
   Target,
   Award,
 } from "lucide-react"
+import { FaDownload, FaFileExport } from "react-icons/fa"
 
 const StoreAnalytics = () => {
   const { t, i18n } = useTranslation("kalimaStore-analytics")
@@ -380,6 +381,34 @@ const StoreAnalytics = () => {
     }
   }
 
+  // Export analytics to JSON
+  const exportAnalyticsJSON = async (exportAll = false) => {
+    try {
+      setExporting(true)
+      const dataToExport = exportAll ? productStats : filteredProductStats
+
+      // Convert to JSON string
+      const jsonContent = JSON.stringify(dataToExport, null, 2)
+
+      // Download
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      const filename = `kalima-analytics-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+
+      setExporting(false)
+    } catch (err) {
+      console.error("Failed to export analytics JSON:", err)
+      setExporting(false)
+    }
+  }
+
   // Calculate performance metrics
   const getPerformanceMetrics = () => {
     if (productStats.length === 0) return { topProduct: null, totalProducts: 0, averagePerProduct: 0 }
@@ -516,24 +545,71 @@ const StoreAnalytics = () => {
                   {t("clearFilters")}
                 </button>
               )}
-              <button
-                className="btn btn-outline btn-sm"
-                onClick={async () => {
-                  await exportAnalytics()
-                }}
-                disabled={exporting}
-              >
-                {exporting ? t("exporting") : t("exportCSV")}
-              </button>
-              <button
-                className="btn btn-outline btn-sm ml-2"
-                onClick={async () => {
-                  await exportAnalyticsXlsx()
-                }}
-                disabled={exporting}
-              >
-                {exporting ? t("exporting") : t("exportXLSX")}
-              </button>
+              {/* Export Dropdown */}
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={exporting}>
+                  {exporting ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      {t("export.exporting") || "Exporting..."}
+                    </>
+                  ) : (
+                    <>
+                      <FaDownload className="mr-2" />
+                      {t("export.export") || "Export Data"}
+                    </>
+                  )}
+                </div>
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+                  <li className="menu-title">
+                    <span>{t("export.csvFormat") || "CSV Format"}</span>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalytics()} disabled={exporting || filteredProductStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportPageCSV") || "Export Page (CSV)"}
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalytics(true)} disabled={exporting || productStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportAllCSV") || "Export All (CSV)"}
+                    </button>
+                  </li>
+                  <div className="divider my-1"></div>
+                  <li className="menu-title">
+                    <span>{t("export.jsonFormat") || "JSON Format"}</span>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalyticsJSON()} disabled={exporting || filteredProductStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportPageJSON") || "Export Page (JSON)"}
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalyticsJSON(true)} disabled={exporting || productStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportAllJSON") || "Export All (JSON)"}
+                    </button>
+                  </li>
+                  <div className="divider my-1"></div>
+                  <li className="menu-title">
+                    <span>{t("export.xlsxFormat") || "XLSX Format"}</span>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalyticsXlsx()} disabled={exporting || filteredProductStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportPageXLSX") || "Export Page (XLSX)"}
+                    </button>
+                  </li>
+                  <li>
+                    <button onClick={() => exportAnalyticsXlsx(true)} disabled={exporting || productStats.length === 0}>
+                      <FaFileExport className="mr-2" />
+                      {t("export.exportAllXLSX") || "Export All (XLSX)"}
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

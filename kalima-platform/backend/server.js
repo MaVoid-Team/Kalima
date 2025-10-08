@@ -230,7 +230,9 @@ mongoose.connection.once("open", () => {
                       ? "newAttachment"
                       : notification.type === "lecture_updated"
                         ? "lectureUpdate"
-                        : "notification";
+                        : notification.type === "store_purchase"
+                          ? "storePurchase"
+                          : "notification";
 
             console.log(`Sending ${eventType} notification to user ${userId}`);
 
@@ -241,6 +243,7 @@ mongoose.connection.once("open", () => {
               subjectId: notification.relatedId,
               notificationId: notification._id,
               createdAt: notification.createdAt,
+              metadata: notification.metadata || {},
             });
           });
         }

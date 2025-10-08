@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo, memo } from "react"
 import { useTranslation } from "react-i18next"
-import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText } from "lucide-react"
+import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText, X } from "lucide-react"
 import { Link } from "react-router-dom"
-import { getMyContainers, deleteContainerById } from "../../routes/lectures"
+import { getMyContainers, deleteContainerById, updateContainerById } from "../../routes/lectures"
+import { getAllSubjects } from "../../routes/courses"
+import { getAllLevels } from "../../routes/levels"
 import Pagination from "../../components/Pagination"
 
 // Memoized Course Card Component
@@ -15,6 +17,7 @@ const CourseCard = memo(function CourseCard({
   getContainerTypeTranslation,
   getContainerImage,
   onDelete,
+  onEdit,
   loading,
   t,
   isRTL,
@@ -83,7 +86,7 @@ const CourseCard = memo(function CourseCard({
           </div>
         </div>
 
-        <div className="card-actions justify-end mt-3">
+        <div className="card-actions justify-end mt-3 gap-2">
           <Link to={`container-details/${container._id}`}>
             <button className="btn btn-sm btn-ghost">
               <Eye
@@ -93,6 +96,10 @@ const CourseCard = memo(function CourseCard({
               {t("view")}
             </button>
           </Link>
+          <button className="btn btn-primary btn-sm" onClick={() => onEdit(container)} disabled={loading}>
+            <Edit className="h-4 w-4" />
+            {t("edit")}
+          </button>
           <button className="btn btn-error btn-sm" onClick={() => onDelete(container._id)} disabled={loading}>
             {t("delete")}
           </button>
@@ -112,11 +119,45 @@ export default function CourseGrid() {
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 3
+  const [editingContainer, setEditingContainer] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [subjects, setSubjects] = useState([])
+  const [levels, setLevels] = useState([])
+  const [editForm, setEditForm] = useState({
+    name: "",
+    type: "",
+    price: "",
+    description: "",
+    goal: "",
+    subject: "",
+    level: "",
+    imageFile: null,
+    removeImage: false,
+  })
 
   // Memoized filtered containers
   const filteredContainers = useMemo(() => {
     return containers.filter((container) => container.parent === null || container.type === "lecture")
   }, [containers])
+
+  // Fetch subjects and levels
+  useEffect(() => {
+    const fetchSubjectsAndLevels = async () => {
+      try {
+        const [subjectsResult, levelsResult] = await Promise.all([getAllSubjects(), getAllLevels()])
+
+        if (subjectsResult.success) {
+          setSubjects(subjectsResult.data)
+        }
+        if (levelsResult.success) {
+          setLevels(levelsResult.data)
+        }
+      } catch (err) {
+        console.error("Error fetching subjects/levels:", err)
+      }
+    }
+    fetchSubjectsAndLevels()
+  }, [])
 
   // Fetch lecturer's containers
   const fetchContainers = useCallback(async () => {
@@ -136,6 +177,58 @@ export default function CourseGrid() {
       setLoading(false)
     }
   }, [t])
+
+  const handleEditContainer = useCallback((container) => {
+    setEditingContainer(container)
+    setEditForm({
+      name: container.name || "",
+      type: container.type || "",
+      price: container.price || "",
+      description: container.description || "",
+      goal: container.goal || "",
+      subject: container.subject?._id || "",
+      level: container.level?._id || "",
+      imageFile: null,
+      removeImage: false,
+    })
+    setShowEditModal(true)
+  }, [])
+
+  const handleUpdateContainer = useCallback(
+    async (e) => {
+      e.preventDefault()
+      if (!editingContainer) return
+
+      try {
+        setLoading(true)
+        const formData = new FormData()
+        formData.append("name", editForm.name)
+        formData.append("type", editForm.type)
+        formData.append("price", editForm.price)
+        if (editForm.description) formData.append("description", editForm.description)
+        if (editForm.goal) formData.append("goal", editForm.goal)
+        if (editForm.subject) formData.append("subject", editForm.subject)
+        if (editForm.level) formData.append("level", editForm.level)
+        if (editForm.imageFile) formData.append("image", editForm.imageFile)
+        if (editForm.removeImage) formData.append("removeImage", "true")
+
+        const result = await updateContainerById(editingContainer._id, formData)
+        if (result.status === "success") {
+          setShowEditModal(false)
+          setEditingContainer(null)
+          fetchContainers()
+        } else {
+          alert(result.message || t("failedToUpdateContainer"))
+        }
+      } catch (err) {
+        console.error("Error updating container:", err)
+        alert(err.message || t("errorUpdatingContainer"))
+      } finally {
+        setLoading(false)
+      }
+    },
+    [editForm, editingContainer, fetchContainers, t]
+  )
 
   const handleDeleteContainer = useCallback(
     async (containerId) => {
@@ -266,6 +359,7 @@ export default function CourseGrid() {
               getContainerTypeTranslation={getContainerTypeTranslation}
               getContainerImage={getContainerImage}
               onDelete={handleDeleteContainer}
+              onEdit={handleEditContainer}
               loading={loading}
               t={t}
               isRTL={isRTL}
@@ -273,6 +367,161 @@ export default function CourseGrid() {
           )
         })}
       </div>
+
+      {/* Edit Container Modal */}
+      {showEditModal && editingContainer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-base-100 border-b p-4 flex justify-between items-center">
+              <h3 className="text-xl font-bold">{t("editCourse")}</h3>
+              <button onClick={() => setShowEditModal(false)} className="btn btn-ghost btn-sm btn-circle">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateContainer} className="p-6 space-y-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("courseName")}</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("courseType")}</span>
+                </label>
+                <select
+                  value={editForm.type}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                  className="select select-bordered"
+                  required
+                >
+                  <option value="course">{t("course")}</option>
+                  <option value="lecture">{t("lecture")}</option>
+                </select>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("price")}</span>
+                </label>
+                <input
+                  type="number"
+                  value={editForm.price}
+                  onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                  className="input input-bordered"
+                  required
+                />
+              </div>
+
+              {editForm.type === "course" && (
+                <>
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("description")}</span>
+                    </label>
+                    <textarea
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      className="textarea textarea-bordered h-24"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">{t("goal")}</span>
+                    </label>
+                    <textarea
+                      value={editForm.goal}
+                      onChange={(e) => setEditForm({ ...editForm, goal: e.target.value })}
+                      className="textarea textarea-bordered h-24"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("subject")}</span>
+                  </label>
+                  <select
+                    value={editForm.subject}
+                    onChange={(e) => setEditForm({ ...editForm, subject: e.target.value })}
+                    className="select select-bordered"
+                  >
+                    <option value="">{t("selectSubject")}</option>
+                    {subjects.map((subject) => (
+                      <option key={subject._id} value={subject._id}>
+                        {subject.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">{t("level")}</span>
+                  </label>
+                  <select
+                    value={editForm.level}
+                    onChange={(e) => setEditForm({ ...editForm, level: e.target.value })}
+                    className="select select-bordered"
+                  >
+                    <option value="">{t("selectLevel")}</option>
+                    {levels.map((level) => (
+                      <option key={level._id} value={level._id}>
+                        {level.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">{t("courseImage")}</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditForm({ ...editForm, imageFile: e.target.files[0], removeImage: false })}
+                  className="file-input file-input-bordered"
+                />
+                {editingContainer.image && (
+                  <label className="label cursor-pointer">
+                    <span className="label-text">{t("removeCurrentImage")}</span>
+                    <input
+                      type="checkbox"
+                      checked={editForm.removeImage}
+                      onChange={(e) => setEditForm({ ...editForm, removeImage: e.target.checked, imageFile: null })}
+                      className="checkbox"
+                    />
+                  </label>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-ghost">
+                  {t("cancel")}
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? <span className="loading loading-spinner"></span> : t("saveChanges")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Pagination
         currentPage={currentPage}

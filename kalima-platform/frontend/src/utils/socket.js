@@ -85,6 +85,10 @@ export const initializeSocket = (userId) => {
     console.log("Received lecture update notification:", notification);
   });
 
+  socket.on("storePurchase", (notification) => {
+    console.log("Received store purchase notification:", notification);
+  });
+
   return socket;
 };
 

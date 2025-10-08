@@ -470,12 +470,7 @@ const AdminModals = ({
             <h3 className="font-bold text-lg mb-4">
               {t("modals.editSubSection.title") || "Edit SubSection"}
             </h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                onUpdateSubSection?.()
-              }}
-            >
+            <form onSubmit={onUpdateSubSection}>
               <div className="space-y-4">
                 {/* SubSection Name */}
                 <div>

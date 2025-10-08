@@ -83,7 +83,13 @@
         "exporting": "Exporting...",
         "csvFormat": "CSV Format",
         "jsonFormat": "JSON Format",
-        "exportFiltered": "Export Filtered"
+        "exportFiltered": "Export Filtered",
+        "exportCSVPage": "Export Page (CSV)",
+        "exportCSVAll": "Export All (CSV)",
+        "exportJSONPage": "Export Page (JSON)",
+        "exportJSONAll": "Export All (JSON)",
+        "exportXLSXPage": "Export Page (XLSX)",
+        "exportXLSXAll": "Export All (XLSX)"
       },
       "errors": {
         "fetchLecturers": "Failed to fetch lecturers",
@@ -381,6 +387,5 @@
     "joinedDate": "Joined Date"
   }
 }
-  
-    
-  
+
+

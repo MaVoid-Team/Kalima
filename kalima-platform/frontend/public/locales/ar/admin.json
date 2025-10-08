@@ -83,7 +83,13 @@
         "exporting": "جاري التصدير...",
         "csvFormat": "تنسيق CSV",
         "jsonFormat": "تنسيق JSON",
-        "exportFiltered": "تصدير المفلتر"
+        "exportFiltered": "تصدير المفلتر",
+        "exportCSVPage": "تصدير الصفحة (CSV)",
+        "exportCSVAll": "تصدير الكل (CSV)",
+        "exportJSONPage": "تصدير الصفحة (JSON)",
+        "exportJSONAll": "تصدير الكل (JSON)",
+        "exportXLSXPage": "تصدير الصفحة (XLSX)",
+        "exportXLSXAll": "تصدير الكل (XLSX)"
       },
       "errors": {
         "fetchLecturers": "فشل في جلب المحاضرين",
