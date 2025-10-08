@@ -90,5 +90,13 @@
     "notesSaved": "Notes saved successfully!",
     "failedToSaveNotes": "Failed to save notes: ",
     "unsavedChanges": "You have unsaved changes. Are you sure you want to close?"
+  },
+  "export": {
+    "exportCSVPage": "Export Page (CSV)",
+    "exportCSVAll": "Export All (CSV)",
+    "exportJSONPage": "Export Page (JSON)",
+    "exportJSONAll": "Export All (JSON)",
+    "exportXLSXPage": "Export Page (XLSX)",
+    "exportXLSXAll": "Export All (XLSX)"
   }
-} 
+}
