@@ -80,7 +80,7 @@ const NotificationCenter = ({ userId }) => {
     })
 
     // Custom socket event handlers
-    const eventTypes = ["newHomework", "newLecture", "newContainer", "notification", "newAttachment", "lectureUpdate"]
+    const eventTypes = ["newHomework", "newLecture", "newContainer", "notification", "newAttachment", "lectureUpdate", "storePurchase"]
 
     // Remove existing listeners before adding new ones
     eventTypes.forEach((eventType) => {
@@ -97,6 +97,17 @@ const NotificationCenter = ({ userId }) => {
           return [notification, ...prev]
         })
         setUnreadCount((prev) => prev + 1)
+        
+        // Show browser notification for store purchases (for admins/subadmins)
+        if (eventType === "storePurchase" && "Notification" in window) {
+          if (Notification.permission === "granted") {
+            new Notification(notification.title, {
+              body: notification.message,
+              icon: "/logo192.png",
+              badge: "/logo192.png",
+            })
+          }
+        }
       })
     })
   }, [])
@@ -121,7 +132,7 @@ const NotificationCenter = ({ userId }) => {
       return () => {
         const currentSocket = getSocket()
         if (currentSocket) {
-          ;["newHomework", "newLecture", "newContainer", "notification", "newAttachment", "lectureUpdate"].forEach(
+          ;["newHomework", "newLecture", "newContainer", "notification", "newAttachment", "lectureUpdate", "storePurchase"].forEach(
             (eventType) => currentSocket.off(eventType),
           )
         }

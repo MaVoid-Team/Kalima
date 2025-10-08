@@ -54,6 +54,11 @@ async function seedNotificationTemplates() {
         title: "Lecture Updated",
         message: "The lecture {lecture} has been updated: {update}",
       },
+      {
+        type: "store_purchase",
+        title: "New Store Purchase",
+        message: "{buyer} purchased {product} for {price} EGP at {time}",
+      },
     ];
 
     // For each template, create if it doesn't exist

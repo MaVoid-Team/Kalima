@@ -11,6 +11,7 @@ const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const NotificationTemplate = require("../models/notificationTemplateModel");
 const Notification = require("../models/notification");
 const Student = require("../models/studentModel");
+const Lecture = require("../models/LectureModel");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -462,8 +463,10 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid container ID format.", 400));
   }
 
-  // Fetch the container with enhanced population
-  const container = await Container.findById(containerId).populate([
+  let container;
+  
+  // First try to find the container
+  const containerDoc = await Container.findById(containerId).populate([
     {
       path: "children",
       select: "name type level subject image price description goal",
@@ -472,6 +475,41 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
     { path: "subject", select: "name" },
     { path: "level", select: "name" },
   ]);
+
+  if (containerDoc) {
+    // If container is found, also fetch any lectures that have this container as parent
+    const lectures = await Lecture.find({ parent: containerId })
+      .select("name type level subject thumbnail price description lecture_type")
+      .populate("subject", "name")
+      .populate("level", "name");
+    
+    // Add lectures to the children array with a flag to indicate they're lectures
+    const containerObj = containerDoc.toObject();
+    containerObj.children = [
+      ...(containerObj.children || []),
+      ...lectures.map(lecture => ({
+        ...lecture.toObject(),
+        isLecture: true
+      }))
+    ];
+    container = containerObj;
+  } else {
+    // If container is not found, check if it's a lecture
+    const lecture = await Lecture.findById(containerId)
+      .populate("subject", "name")
+      .populate("level", "name")
+      .populate("createdBy", "name");
+
+    if (lecture) {
+      // Convert lecture to container-like structure for consistent response
+      container = {
+        ...lecture.toObject(),
+        type: 'lecture',
+        kind: 'Lecture',
+        children: []
+      };
+    }
+  }
 
   if (!container) {
     return next(new AppError("Container not found.", 404));

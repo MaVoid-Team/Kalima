@@ -219,6 +219,30 @@ export const createLecture = async (lectureData) => {
   }
 }
 
+// Function to update a lecture by ID
+export const updateLectureById = async (lectureId, lectureData) => {
+  try {
+    const isFormData = lectureData instanceof FormData
+
+    const response = await axios.patch(`${API_URL}/api/v1/lectures/${lectureId}`, lectureData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": isFormData ? "multipart/form-data" : "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return response.data
+  } catch (error) {
+    console.error("Error updating lecture:", error)
+    return {
+      status: "error",
+      message: error.response?.data?.message || `Error updating lecture: ${error.message}`,
+      error,
+    }
+  }
+}
+
 
 export const createContainer = async (formData) => {
   try {
@@ -331,6 +355,24 @@ export const getLectureById = async (lectureId) => {
     }
   } catch (error) {
     return error.message;
+  }
+}
+
+// Function to update a container by ID
+export const updateContainerById = async (containerId, formData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/api/v1/containers/${containerId}`, formData, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return {
+      status: "success",
+      data: response.data
+    }
+  } catch (error) {
+    throw new Error(error.response?.data?.message || `Error updating container: ${error.message}`)
   }
 }
 

@@ -305,7 +305,13 @@
     "export": "تصدير البيانات",
     "exporting": "جاري التصدير...",
     "csvFormat": "تنسيق CSV",
-    "jsonFormat": "تنسيق JSON"
+    "jsonFormat": "تنسيق JSON",
+    "exportCSVPage": "تصدير الصفحة (CSV)",
+    "exportCSVAll": "تصدير الكل (CSV)",
+    "exportJSONPage": "تصدير الصفحة (JSON)",
+    "exportJSONAll": "تصدير الكل (JSON)",
+    "exportXLSXPage": "تصدير الصفحة (XLSX)",
+    "exportXLSXAll": "تصدير الكل (XLSX)"
   },
   "products": {
     "unknownSection": "قسم غير معروف"
