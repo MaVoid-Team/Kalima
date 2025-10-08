@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { FiX, FiFileText, FiChevronDown, FiEdit, FiRotateCw, FiSearch } from "react-icons/fi"
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle, FaDownload, FaFileExport } from "react-icons/fa"
 import { getAuditLogs } from "../../../routes/auditlog"
 import { useTranslation } from "react-i18next"
 import { getAuditLogsByEmail } from "../../../routes/auditlog"
+import * as XLSX from 'xlsx';
 
 const AuditLog = () => {
   const { t, i18n } = useTranslation("admin")
@@ -166,6 +167,53 @@ const AuditLog = () => {
     ].join("\n")
 
     return csvContent
+  }
+
+  const exportToXLSX = async (exportAll = false) => {
+    setIsExporting(true)
+
+    try {
+      const dataToExport = exportAll ? await fetchAllLogs() : logs
+
+      if (dataToExport.length === 0) {
+        alert(t("admin.auditlog.export.noData"))
+        return
+      }
+
+      // Prepare data for XLSX
+      const exportData = dataToExport.map(log => ({
+        [t("admin.auditlog.export.user")]: log.user?.name || t("admin.auditlog.status.unknown") || "Unknown",
+        [t("admin.auditlog.export.role")]: log.user?.role ? translateRole(log.user.role) : "",
+        [t("admin.auditlog.export.action")]: translateAction(log.action),
+        [t("admin.auditlog.export.resource")]: log.resource?.type ? t(`admin.auditlog.resources.${log.resource.type}`) : "",
+        [t("admin.auditlog.export.resourceDetails")]: log.resource?.details?.name || log.resource?.name || (log.resource?.id ? `ID: ${log.resource.id}` : ""),
+        [t("admin.auditlog.export.status")]: translateStatus(log.status),
+        [t("admin.auditlog.export.timestamp")]: new Date(log.timestamp).toLocaleString(i18n.language),
+        [t("admin.auditlog.export.ipAddress")]: log.ipAddress || "",
+        [t("admin.auditlog.export.userAgent")]: log.userAgent || "",
+        [t("admin.auditlog.export.description")]: log.description || ""
+      }))
+
+      // Create worksheet
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+      
+      // Create workbook
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Audit Logs')
+      
+      // Generate file name with current date
+      const timestamp = new Date().toISOString().split('T')[0]
+      const filename = exportAll ? `audit-logs-all-${timestamp}.xlsx` : `audit-logs-filtered-${timestamp}.xlsx`
+      
+      // Save the file
+      XLSX.writeFile(workbook, filename)
+      
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.auditlog.export.error"))
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const exportToCSV = async (exportAll = false) => {
@@ -402,34 +450,50 @@ const AuditLog = () => {
           </div>
           <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
             <li className="menu-title">
-              <span>{t("admin.auditlog.export.csvFormat")}</span>
+              <span>{t("export.csvFormat") || "CSV Format"}</span>
             </li>
             <li>
               <button onClick={() => exportToCSV(false)} disabled={isExporting || logs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportFiltered")} ({logs.length})
+                {t("export.exportPageCSV") || "Export Page (CSV)"}
               </button>
             </li>
             <li>
-              <button onClick={() => exportToCSV(true)} disabled={isExporting}>
+              <button onClick={() => exportToCSV(true)} disabled={isExporting || allLogs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportAll")}
+                {t("export.exportAllCSV") || "Export All (CSV)"}
               </button>
             </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
-              <span>{t("admin.auditlog.export.jsonFormat")}</span>
+              <span>{t("export.jsonFormat") || "JSON Format"}</span>
             </li>
             <li>
               <button onClick={() => exportToJSON(false)} disabled={isExporting || logs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportFiltered")} ({logs.length})
+                {t("export.exportPageJSON") || "Export Page (JSON)"}
               </button>
             </li>
             <li>
-              <button onClick={() => exportToJSON(true)} disabled={isExporting}>
+              <button onClick={() => exportToJSON(true)} disabled={isExporting || allLogs.length === 0}>
                 <FaFileExport className="mr-2" />
-                {t("admin.auditlog.export.exportAll")}
+                {t("export.exportAllJSON") || "Export All (JSON)"}
+              </button>
+            </li>
+            <div className="divider my-1"></div>
+            <li className="menu-title">
+              <span>{t("export.xlsxFormat") || "XLSX Format"}</span>
+            </li>
+            <li>
+              <button onClick={() => exportToXLSX(false)} disabled={isExporting || logs.length === 0}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportPageXLSX") || "Export Page (XLSX)"}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => exportToXLSX(true)} disabled={isExporting || allLogs.length === 0}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportAllXLSX") || "Export All (XLSX)"}
               </button>
             </li>
           </ul>

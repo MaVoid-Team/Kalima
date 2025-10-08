@@ -2,6 +2,7 @@
 import { useTranslation } from "react-i18next"
 import { useState, useMemo, useCallback, memo } from "react"
 import { FaPencilAlt, FaTrash } from "react-icons/fa"
+import * as XLSX from "xlsx"
 
 const ProductsManagement = memo(({
   products = [],
@@ -16,6 +17,7 @@ const ProductsManagement = memo(({
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [isExporting, setIsExporting] = useState(false)
 
   const allItems = useMemo(() => {
     return products.map((item) => ({
@@ -90,6 +92,74 @@ const ProductsManagement = memo(({
     setCurrentPage(1) // Reset to first page when searching
   }, [])
 
+  const handleExport = (type, scope) => {
+    setIsExporting(true)
+    try {
+      let data = scope === 'all' ? allItems : paginatedItems
+      if (type === 'csv') {
+        // CSV export logic
+        const csvContent = [
+          [
+            t("productsManagement.table.title"),
+            t("productsManagement.table.serial"),
+            t("productsManagement.table.section"),
+            t("subject"),
+            t("productsManagement.table.price"),
+            t("productsManagement.table.discount"),
+            t("productsManagement.table.finalPrice"),
+            t("productsManagement.table.actions")
+          ],
+          ...data.map(item => [
+            item.title,
+            item.serial,
+            getSectionName(item.section),
+            item.type === "book" ? getSubjectName(item.subject) : t("dash"),
+            item.price,
+            item.discountPercentage > 0 ? `${item.discountPercentage}%` : t("zeroPercent"),
+            item.priceAfterDiscount ? item.priceAfterDiscount : item.price,
+            "" // Actions column is empty for export
+          ])
+        ]
+
+        const csvBlob = new Blob([
+          "\uFEFF" + csvContent.map(e => e.join(",")).join("\n")
+        ], { type: "text/csv;charset=utf-8;" })
+        const url = URL.createObjectURL(csvBlob)
+        const a = document.createElement("a")
+        a.setAttribute("hidden", "")
+        a.setAttribute("href", url)
+        a.setAttribute("download", `products_${scope === 'all' ? 'all' : 'page'}.csv`)
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      } else if (type === 'xlsx') {
+        // XLSX export logic
+        const worksheet = XLSX.utils.json_to_sheet(data)
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Products")
+
+        XLSX.writeFile(workbook, `products_${scope === 'all' ? 'all' : 'page'}.xlsx`)
+      } else if (type === 'json') {
+        // JSON export logic
+        const jsonBlob = new Blob([
+          JSON.stringify(data, null, 2)
+        ], { type: "application/json;charset=utf-8;" })
+        const url = URL.createObjectURL(jsonBlob)
+        const a = document.createElement("a")
+        a.setAttribute("hidden", "")
+        a.setAttribute("href", url)
+        a.setAttribute("download", `products_${scope === 'all' ? 'all' : 'page'}.json`)
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    } catch (err) {
+      console.error("Export error:", err)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   // Pagination Controls Component
   const PaginationControls = useMemo(() => (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -157,6 +227,36 @@ const ProductsManagement = memo(({
           </button>
         </div>
 
+      </div>
+
+      {/* Export Buttons */}
+      <div className="dropdown dropdown-end mb-4">
+        <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+          {isExporting ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              {t("exporting")}
+            </>
+          ) : (
+            <>
+              <span className="mr-2">📥</span>
+              {t("export")}
+            </>
+          )}
+        </div>
+        <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+          <li className="menu-title"><span>{t("export.csvFormat") || "CSV Format"}</span></li>
+          <li><button onClick={() => handleExport('csv', 'page')} disabled={isExporting || paginatedItems.length === 0}>{t('exportCSVPage') || 'Export Page (CSV)'}</button></li>
+          <li><button onClick={() => handleExport('csv', 'all')} disabled={isExporting || allItems.length === 0}>{t('exportCSVAll') || 'Export All (CSV)'}</button></li>
+          <div className="divider my-1"></div>
+          <li className="menu-title"><span>{t("export.jsonFormat") || "JSON Format"}</span></li>
+          <li><button onClick={() => handleExport('json', 'page')} disabled={isExporting || paginatedItems.length === 0}>{t('exportJSONPage') || 'Export Page (JSON)'}</button></li>
+          <li><button onClick={() => handleExport('json', 'all')} disabled={isExporting || allItems.length === 0}>{t('exportJSONAll') || 'Export All (JSON)'}</button></li>
+          <div className="divider my-1"></div>
+          <li className="menu-title"><span>{t("export.xlsxFormat") || "XLSX Format"}</span></li>
+          <li><button onClick={() => handleExport('xlsx', 'page')} disabled={isExporting || paginatedItems.length === 0}>{t('exportXLSXPage') || 'Export Page (XLSX)'}</button></li>
+          <li><button onClick={() => handleExport('xlsx', 'all')} disabled={isExporting || allItems.length === 0}>{t('exportXLSXAll') || 'Export All (XLSX)'}</button></li>
+        </ul>
       </div>
 
       {/* Products Table */}

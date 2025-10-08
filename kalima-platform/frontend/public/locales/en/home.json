@@ -1,7 +1,7 @@
 {
   "welcome": {
     "title": "Welcome to {{highlight}}Kalima{{/highlight}} Platform",
-    "description": "Kalima Platform is an e-learning platform providing resources for students from 4th grade through 12th grade.",
+    "description": "Kalima Platform is an e-learning platform providing resources for students from 1st grade primary through 12th grade.",
     "kalima": "Kalima",
     "maleStudentAlt": "Male student",
     "femaleStudentAlt": "Female student"
@@ -10,13 +10,13 @@
 "hero": {
       "title": "The shortest path to brilliant success",
       "heading": "Welcome to the Kalima Platform",
-      "description": "Kelma Platform is an e-learning platform that provides resources for students from fourth grade primary to third grade secondary.",
+      "description": "Kelma Platform is an e-learning platform that provides resources for students from 1st grade primary to 12th grade secondary.",
       "cta": "Login"
     },
     "about": {
       "title": "About Us",
       "heading": "Learn Smart, Score High ",
-      "description": "Kelma provides an effective e-learning platform for students from 4th grade primary to 12th grade secondary. We offer the best solutions to ensure student excellence.",
+      "description": "Kelma provides an effective e-learning platform for students from 1st grade primary to 12th grade secondary. We offer the best solutions to ensure student excellence.",
       "features": {
         "teachers": "Professional Teachers",
         "tests": "Lesson-wise Tests",

@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { ImSpinner8 } from "react-icons/im"
-import { FaEnvelope, FaPhone, FaGraduationCap, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa"
+import { FaEnvelope, FaPhone, FaGraduationCap, FaMapMarkerAlt, FaCalendarAlt, FaFileExport } from "react-icons/fa"
 import { getAllLecturers } from "../../../routes/fetch-users"
 import { getUserDashboard } from "../../../routes/auth-services"
+import * as XLSX from "xlsx"
 
 const SignedLecturers = () => {
   const { t, i18n } = useTranslation("admin-signedLecturers")
@@ -29,6 +30,7 @@ const SignedLecturers = () => {
   const [filters, setFilters] = useState({
     expertise: "",
   })
+  const [isExporting, setIsExporting] = useState(false)
 
   // Check user role and fetch data
   useEffect(() => {
@@ -91,6 +93,96 @@ const SignedLecturers = () => {
         isLoading: false,
         error: error.message || t("errors.unexpectedError") || "An unexpected error occurred",
       }))
+    }
+  }
+
+  // Export to XLSX
+  const exportToXLSX = (exportAll = false) => {
+    try {
+      setIsExporting(true)
+      
+      // Prepare data for export
+      const data = exportAll ? state.lecturers : state.filteredLecturers
+      const exportData = data.map(lecturer => ({
+        [t("lecturers.name") || "Name"]: lecturer.name || "N/A",
+        [t("lecturers.sequencedId") || "ID"]: lecturer.sequencedId || "N/A",
+        [t("lecturers.expertise") || "Expertise"]: lecturer.expertise || "N/A",
+        [t("lecturers.email") || "Email"]: lecturer.email || "N/A",
+        [t("lecturers.phone") || "Phone"]: lecturer.phoneNumber || "N/A",
+        [t("lecturers.government") || "Government"]: lecturer.government || "N/A",
+        [t("lecturers.zone") || "Zone"]: lecturer.administrationZone || "N/A",
+        [t("lecturers.joined") || "Joined"]: lecturer.createdAt ? new Date(lecturer.createdAt).toLocaleDateString() : "N/A"
+      }))
+
+      // Create worksheet
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+      
+      // Create workbook
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Lecturers')
+      
+      // Generate file name with current date
+      const timestamp = new Date().toISOString().split('T')[0]
+      const filename = `lecturers_${timestamp}.xlsx`
+      
+      // Save the file
+      XLSX.writeFile(workbook, filename)
+      
+    } catch (error) {
+      console.error('Export error:', error)
+      alert(t("errors.exportFailed") || "Failed to export data")
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // Export to CSV
+  const exportToCSV = (exportAll = false) => {
+    setIsExporting(true)
+    try {
+      const data = exportAll ? state.lecturers : state.filteredLecturers
+      const headers = [
+        t("lecturers.name"), t("lecturers.sequencedId"), t("lecturers.expertise"), t("lecturers.email"), t("lecturers.phone"), t("lecturers.government"), t("lecturers.zone"), t("lecturers.joined")
+      ]
+      const csvRows = [headers.join(",")].concat(
+        data.map(l => [l.name, l.sequencedId, l.expertise, l.email, l.phoneNumber, l.government, l.administrationZone, l.createdAt ? new Date(l.createdAt).toLocaleDateString() : "N/A"].map(x => `"${x || ''}"`).join(","))
+      )
+      const csvContent = csvRows.join("\n")
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = exportAll ? `all-lecturers.csv` : `filtered-lecturers.csv`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      alert(t("errors.exportFailed"))
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // Export to JSON
+  const exportToJSON = (exportAll = false) => {
+    setIsExporting(true)
+    try {
+      const data = exportAll ? state.lecturers : state.filteredLecturers
+      const jsonContent = JSON.stringify(data, null, 2)
+      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = exportAll ? `all-lecturers.json` : `filtered-lecturers.json`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      alert(t("errors.exportFailed"))
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -199,7 +291,39 @@ const SignedLecturers = () => {
               <div className="badge badge-primary">
                 {state.filteredLecturers.length} {t("lecturers.total") || "Total"}
               </div>
-              <button onClick={fetchLecturers} className="btn btn-outline btn-sm" disabled={state.isLoading}>
+              <div className="dropdown dropdown-end mb-4">
+                <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+                  {isExporting ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      {t("actions.exporting")}
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">📥</span>
+                      {t("actions.export")}
+                    </>
+                  )}
+                </div>
+                <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+                  <li className="menu-title"><span>{t("actions.csvFormat") || "CSV Format"}</span></li>
+                  <li><button onClick={() => exportToCSV(false)} disabled={isExporting || state.filteredLecturers.length === 0}>{t('actions.exportCSVPage') || 'Export Page (CSV)'}</button></li>
+                  <li><button onClick={() => exportToCSV(true)} disabled={isExporting || state.lecturers.length === 0}>{t('actions.exportCSVAll') || 'Export All (CSV)'}</button></li>
+                  <div className="divider my-1"></div>
+                  <li className="menu-title"><span>{t("actions.jsonFormat") || "JSON Format"}</span></li>
+                  <li><button onClick={() => exportToJSON(false)} disabled={isExporting || state.filteredLecturers.length === 0}>{t('actions.exportJSONPage') || 'Export Page (JSON)'}</button></li>
+                  <li><button onClick={() => exportToJSON(true)} disabled={isExporting || state.lecturers.length === 0}>{t('actions.exportJSONAll') || 'Export All (JSON)'}</button></li>
+                  <div className="divider my-1"></div>
+                  <li className="menu-title"><span>{t("actions.xlsxFormat") || "XLSX Format"}</span></li>
+                  <li><button onClick={() => exportToXLSX(false)} disabled={isExporting || state.filteredLecturers.length === 0}>{t('actions.exportXLSXPage') || 'Export Page (XLSX)'}</button></li>
+                  <li><button onClick={() => exportToXLSX(true)} disabled={isExporting || state.lecturers.length === 0}>{t('actions.exportXLSXAll') || 'Export All (XLSX)'}</button></li>
+                </ul>
+              </div>
+              <button 
+                onClick={fetchLecturers} 
+                className="btn btn-outline btn-sm" 
+                disabled={state.isLoading}
+              >
                 {state.isLoading ? (
                   <ImSpinner8 className="animate-spin" />
                 ) : (

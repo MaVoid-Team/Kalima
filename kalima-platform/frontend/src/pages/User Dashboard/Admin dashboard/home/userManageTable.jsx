@@ -8,6 +8,7 @@ import CreateUserModal from "../CreateUserModal/CreateUserModal"
 import EditUserModal from "../CreateUserModal/EditUserModal"
 import { getUserDashboard } from "../../../../routes/auth-services"
 import { RecalculateInvites } from "../../../../routes/market"
+import * as XLSX from "xlsx"
 
 const UserManagementTable = () => {
   const { t, i18n } = useTranslation("admin")
@@ -334,6 +335,25 @@ const UserManagementTable = () => {
           : t("admin.export.successFiltered", { count: dataToExport.length })
         alert(successMessage)
       }
+    } catch (error) {
+      console.error("Export error:", error)
+      alert(t("admin.export.error"))
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const exportToXLSX = async (exportAll = false) => {
+    setIsExporting(true)
+    try {
+      const dataToExport = exportAll ? users : filteredUsers
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users")
+      const timestamp = new Date().toISOString().split("T")[0]
+      const filename = exportAll ? `all-users-${timestamp}.xlsx` : `filtered-users-${timestamp}.xlsx`
+      XLSX.writeFile(workbook, filename)
+      alert(t("admin.export.successXLSX", { count: dataToExport.length }))
     } catch (error) {
       console.error("Export error:", error)
       alert(t("admin.export.error"))
@@ -684,7 +704,7 @@ const UserManagementTable = () => {
           <p className="text-base-content/70">{t("admin.userManagement.subtitle") || "Manage and export user data"}</p>
         </div>
         {/* Export Dropdown */}
-        <div className="dropdown dropdown-end">
+        <div className="dropdown dropdown-end mb-4">
           <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
             {isExporting ? (
               <>
@@ -693,43 +713,23 @@ const UserManagementTable = () => {
               </>
             ) : (
               <>
-                <FaDownload className="mr-2" />
+                <span className="mr-2">📥</span>
                 {t("admin.export.export")}
               </>
             )}
           </div>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
-            <li className="menu-title">
-              <span>{t("admin.export.csvFormat")}</span>
-            </li>
-            <li>
-              <button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered")} ({filteredUsers.length})
-              </button>
-            </li>
-            <li>
-              <button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll")} ({users.length})
-              </button>
-            </li>
+          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+            <li className="menu-title"><span>{t("admin.export.csvFormat") || "CSV Format"}</span></li>
+            <li><button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.csvPage') || 'Export Page (CSV)'}</button></li>
+            <li><button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>{t('admin.export.csvAll') || 'Export All (CSV)'}</button></li>
             <div className="divider my-1"></div>
-            <li className="menu-title">
-              <span>{t("admin.export.jsonFormat")}</span>
-            </li>
-            <li>
-              <button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportFiltered")} ({filteredUsers.length})
-              </button>
-            </li>
-            <li>
-              <button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>
-                <FaFileExport className="mr-2" />
-                {t("admin.export.exportAll")} ({users.length})
-              </button>
-            </li>
+            <li className="menu-title"><span>{t("admin.export.jsonFormat") || "JSON Format"}</span></li>
+            <li><button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.jsonPage') || 'Export Page (JSON)'}</button></li>
+            <li><button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>{t('admin.export.jsonAll') || 'Export All (JSON)'}</button></li>
+            <div className="divider my-1"></div>
+            <li className="menu-title"><span>{t("admin.export.xlsxFormat") || "XLSX Format"}</span></li>
+            <li><button onClick={() => exportToXLSX(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.xlsxPage') || 'Export Page (XLSX)'}</button></li>
+            <li><button onClick={() => exportToXLSX(true)} disabled={isExporting || users.length === 0}>{t('admin.export.xlsxAll') || 'Export All (XLSX)'}</button></li>
           </ul>
         </div>
       </div>

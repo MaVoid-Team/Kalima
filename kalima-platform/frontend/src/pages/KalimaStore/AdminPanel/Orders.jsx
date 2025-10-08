@@ -7,6 +7,8 @@ import {
   confirmProductPurchase,
   confirmBookPurchase,
   updatePurchase,
+  deleteProductPurchase,
+  deleteBookPurchase,
 } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
 import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X, Calendar, Filter } from "lucide-react"
@@ -38,6 +40,7 @@ const Orders = () => {
   })
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
   const [exporting, setExporting] = useState(false)
+  const [allOrders, setAllOrders] = useState([])
 
   // Enhanced notes modal state
   const [notesModal, setNotesModal] = useState({
@@ -116,13 +119,28 @@ const Orders = () => {
     }
   }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery, selectedDate])
 
-  const handleRefresh = useCallback(() => {
-    fetchOrders()
-  }, [fetchOrders])
+  const fetchAllOrders = useCallback(async () => {
+    try {
+      const response = await getAllProductPurchases({ all: true })
+      if (response.success) {
+        setAllOrders(response.data.data.purchases)
+      }
+    } catch (err) {
+      // handle error
+    }
+  }, [])
 
   useEffect(() => {
+
     fetchOrders()
-  }, [fetchOrders])
+    fetchAllOrders()
+  }, [fetchOrders, fetchAllOrders])
+
+  // Add handleRefresh to fix missing reference
+  const handleRefresh = useCallback(() => {
+    fetchOrders()
+    fetchAllOrders()
+  }, [fetchOrders, fetchAllOrders])
 
   // Add date change handler
   const handleDateChange = (date) => {
@@ -305,6 +323,109 @@ const Orders = () => {
     setSearchQuery(e.target.value)
   }, [])
 
+  // Delete order handler
+  const handleDeleteOrder = async (order) => {
+    if (!order || !order._id) return
+    let result
+    if (order.type === "book" || order.productType === "book") {
+      result = await deleteBookPurchase(order._id)
+    } else {
+      result = await deleteProductPurchase(order._id)
+    }
+    if (result.success) {
+      setOrders((prev) => prev.filter((o) => o._id !== order._id))
+      setError(null)
+    } else {
+      setError(result.error || t("kalimaStore-orders.errors.deleteFailed"))
+    }
+  }
+
+  const handleExport = async (type, scope) => {
+    setExporting(true)
+    try {
+      let data = scope === 'all' ? allOrders : memoizedOrders
+      if (type === 'csv') {
+        // Build CSV rows from current orders (memoizedOrders contains derived fields)
+        const rows = data.map((o) => ({
+          orderId: o._id,
+          purchaseSerial: o.purchaseSerial || "",
+          productName: o.productName || o.product?.title || "",
+          customerName: o.userName || o.createdBy?.name || "",
+          type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
+          price: o.price || "",
+          couponCode: o.couponCode || "",
+          transferredFrom: o.numberTransferredFrom || "",
+          status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+          adminNotes: o.adminNotes || "",
+          date: o.createdAt || "",
+        }))
+
+        // Convert to CSV
+        const header = Object.keys(rows[0] || {}).map((h) => `"${h}"`).join(",")
+        const csv = [header]
+          .concat(
+            rows.map((r) =>
+              Object.values(r)
+                .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                .join(","),
+            ),
+          )
+          .join("\n")
+
+        // Create blob and download
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `orders_export_${new Date().toISOString().slice(0, 10)}.csv`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+        alert(t("alerts.exportSuccess") || "Export complete")
+      } else if (type === 'xlsx') {
+        const rows = data.map((o) => ({
+          orderId: o._id,
+          purchaseSerial: o.purchaseSerial || "",
+          productName: o.productName || o.product?.title || "",
+          customerName: o.userName || o.createdBy?.name || "",
+          type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
+          price: o.price || "",
+          couponCode: o.couponCode || "",
+          transferredFrom: o.numberTransferredFrom || "",
+          status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+          adminNotes: o.adminNotes || "",
+          date: o.createdAt || "",
+        }))
+
+        const worksheet = XLSX.utils.json_to_sheet(rows)
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Orders")
+
+        const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.xlsx`
+        XLSX.writeFile(workbook, fileName)
+        alert(t("alerts.exportSuccess") || "Export complete")
+      } else if (type === 'json') {
+        const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.json`
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8;" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = fileName
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+        alert(t("alerts.exportSuccess") || "Export complete")
+      }
+    } catch (err) {
+      console.error("Error exporting orders:", err)
+      alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -483,101 +604,34 @@ const Orders = () => {
             </button>
 
               {/* Export CSV button */}
-              <button
-                onClick={async () => {
-                  try {
-                    setExporting(true)
-                    // Build CSV rows from current orders (memoizedOrders contains derived fields)
-                    const rows = memoizedOrders.map((o) => ({
-                      orderId: o._id,
-                      purchaseSerial: o.purchaseSerial || "",
-                      productName: o.productName || o.product?.title || "",
-                      customerName: o.userName || o.createdBy?.name || "",
-                      type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
-                      price: o.price || "",
-                      couponCode: o.couponCode || "",
-                      transferredFrom: o.numberTransferredFrom || "",
-                      status: o.confirmed ? t("table.confirmed") : t("table.pending"),
-                      adminNotes: o.adminNotes || "",
-                      date: o.createdAt || "",
-                    }))
-
-                    // Convert to CSV
-                    const header = Object.keys(rows[0] || {}).map((h) => `"${h}"`).join(",")
-                    const csv = [header]
-                      .concat(
-                        rows.map((r) =>
-                          Object.values(r)
-                            .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-                            .join(","),
-                        ),
-                      )
-                      .join("\n")
-
-                    // Create blob and download
-                    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-                    const url = URL.createObjectURL(blob)
-                    const a = document.createElement("a")
-                    a.href = url
-                    a.download = `orders_export_${new Date().toISOString().slice(0, 10)}.csv`
-                    document.body.appendChild(a)
-                    a.click()
-                    a.remove()
-                    URL.revokeObjectURL(url)
-                    alert(t("alerts.exportSuccess") || "Export complete")
-                  } catch (err) {
-                    console.error("Error exporting orders:", err)
-                    alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
-                  } finally {
-                    setExporting(false)
-                  }
-                }}
-                className="btn btn-secondary ml-2"
-                disabled={exporting || loading || memoizedOrders.length === 0}
-              >
-                {exporting ? <span className="loading loading-spinner loading-sm"></span> : "📥"}
-                {t("exportCSV")}
-              </button>
-
-              {/* Export XLSX button */}
-              <button
-                onClick={async () => {
-                  try {
-                    setExporting(true)
-                    const rows = memoizedOrders.map((o) => ({
-                      orderId: o._id,
-                      purchaseSerial: o.purchaseSerial || "",
-                      productName: o.productName || o.product?.title || "",
-                      customerName: o.userName || o.createdBy?.name || "",
-                      type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
-                      price: o.price || "",
-                      couponCode: o.couponCode || "",
-                      transferredFrom: o.numberTransferredFrom || "",
-                      status: o.confirmed ? t("table.confirmed") : t("table.pending"),
-                      adminNotes: o.adminNotes || "",
-                      date: o.createdAt || "",
-                    }))
-
-                    const worksheet = XLSX.utils.json_to_sheet(rows)
-                    const workbook = XLSX.utils.book_new()
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders")
-
-                    const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.xlsx`
-                    XLSX.writeFile(workbook, fileName)
-                    alert(t("alerts.exportSuccess") || "Export complete")
-                  } catch (err) {
-                    console.error("Error exporting orders xlsx:", err)
-                    alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
-                  } finally {
-                    setExporting(false)
-                  }
-                }}
-                className="btn btn-accent ml-2"
-                disabled={exporting || loading || memoizedOrders.length === 0}
-              >
-                {exporting ? <span className="loading loading-spinner loading-sm"></span> : "📥"}
-                {t("exportXLSX")}
-              </button>
+              <div className="dropdown dropdown-end ml-2">
+  <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={exporting}>
+    {exporting ? (
+      <>
+        <span className="loading loading-spinner loading-sm"></span>
+        {t("exporting")}
+      </>
+    ) : (
+      <>
+        <span className="mr-2">📥</span>
+        {t("export")}
+      </>
+    )}
+  </div>
+  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+    <li className="menu-title"><span>{t("export.csvFormat") || "CSV Format"}</span></li>
+    <li><button onClick={() => handleExport('csv', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportCSVPage') || 'Export Page (CSV)'}</button></li>
+    <li><button onClick={() => handleExport('csv', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportCSVAll') || 'Export All (CSV)'}</button></li>
+    <div className="divider my-1"></div>
+    <li className="menu-title"><span>{t("export.jsonFormat") || "JSON Format"}</span></li>
+    <li><button onClick={() => handleExport('json', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportJSONPage') || 'Export Page (JSON)'}</button></li>
+    <li><button onClick={() => handleExport('json', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportJSONAll') || 'Export All (JSON)'}</button></li>
+    <div className="divider my-1"></div>
+    <li className="menu-title"><span>{t("export.xlsxFormat") || "XLSX Format"}</span></li>
+    <li><button onClick={() => handleExport('xlsx', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportXLSXPage') || 'Export Page (XLSX)'}</button></li>
+    <li><button onClick={() => handleExport('xlsx', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportXLSXAll') || 'Export All (XLSX)'}</button></li>
+  </ul>
+</div>
 
             {hasActiveFilters && (
               <button className="btn btn-ghost" onClick={clearFilters}>
@@ -781,6 +835,14 @@ const Orders = () => {
                             )}
                           </button>
                         )}
+                        {/* Delete button */}
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteOrder(order)}
+                          title={t("table.deleteOrder")}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
