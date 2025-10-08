@@ -301,7 +301,13 @@
     "export": "Export Data",
     "exporting": "Exporting...",
     "csvFormat": "CSV Format",
-    "jsonFormat": "JSON Format"
+    "jsonFormat": "JSON Format",
+    "exportCSVPage": "Export Page (CSV)",
+    "exportCSVAll": "Export All (CSV)",
+    "exportJSONPage": "Export Page (JSON)",
+    "exportJSONAll": "Export All (JSON)",
+    "exportXLSXPage": "Export Page (XLSX)",
+    "exportXLSXAll": "Export All (XLSX)"
   },
   "products": {
     "unknownSection": "Unknown Section"

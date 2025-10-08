@@ -16,7 +16,13 @@
     "joinedTooltip": "تاريخ التسجيل",
     "noLecturers": "لا يوجد محاضرون",
     "noLecturersFiltered": "لا يوجد محاضرون يطابقون الفلاتر الحالية. جرب تعديل البحث أو الفلاتر.",
-    "noLecturersYet": "لم يقم أي محاضر بالتسجيل بعد. يرجى العودة لاحقًا."
+    "noLecturersYet": "لم يقم أي محاضر بالتسجيل بعد. يرجى العودة لاحقًا.",
+    "exportCSVPage": "تصدير الصفحة (CSV)",
+    "exportCSVAll": "تصدير الكل (CSV)",
+    "exportJSONPage": "تصدير الصفحة (JSON)",
+    "exportJSONAll": "تصدير الكل (JSON)",
+    "exportXLSXPage": "تصدير الصفحة (XLSX)",
+    "exportXLSXAll": "تصدير الكل (XLSX)"
   },
   "filters": {
     "allExpertise": "كل التخصصات",
@@ -43,4 +49,4 @@
     "failedToFetchLecturers": "فشل في جلب بيانات المحاضرين.",
     "unexpectedError": "حدث خطأ غير متوقع."
   }
-} 
+}

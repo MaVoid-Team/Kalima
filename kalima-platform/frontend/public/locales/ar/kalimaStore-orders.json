@@ -90,5 +90,13 @@
     "notesSaved": "تم حفظ الملاحظات بنجاح!",
     "failedToSaveNotes": "فشل في حفظ الملاحظات: ",
     "unsavedChanges": "لديك تغييرات غير محفوظة. هل أنت متأكد من أنك تريد الإغلاق؟"
+  },
+  "export": {
+    "exportCSVPage": "تصدير الصفحة (CSV)",
+    "exportCSVAll": "تصدير الكل (CSV)",
+    "exportJSONPage": "تصدير الصفحة (JSON)",
+    "exportJSONAll": "تصدير الكل (JSON)",
+    "exportXLSXPage": "تصدير الصفحة (XLSX)",
+    "exportXLSXAll": "تصدير الكل (XLSX)"
   }
-} 
+}

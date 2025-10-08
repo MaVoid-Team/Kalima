@@ -42,5 +42,13 @@
   "errors": {
     "failedToFetchLecturers": "Failed to fetch lecturers.",
     "unexpectedError": "An unexpected error occurred."
+  },
+  "export": {
+    "exportCSVPage": "Export Page (CSV)",
+    "exportCSVAll": "Export All (CSV)",
+    "exportJSONPage": "Export Page (JSON)",
+    "exportJSONAll": "Export All (JSON)",
+    "exportXLSXPage": "Export Page (XLSX)",
+    "exportXLSXAll": "Export All (XLSX)"
   }
-} 
+}
