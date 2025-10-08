@@ -308,10 +308,7 @@ const ExportSection = ({
               <span>{t("export.csvFormat") || "CSV Format"}</span>
             </li>
             <li>
-              <button
-                onClick={() => handleExportCSV("products")}
-                disabled={isExporting || products.length + books.length === 0}
-              >
+              <button onClick={() => handleExportCSV("products")} disabled={isExporting || products.length + books.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("export.allProducts") || "All Products & Books"} ({products.length + books.length})
               </button>
@@ -328,15 +325,18 @@ const ExportSection = ({
                 {t("export.sections") || "Sections"} ({sections.length})
               </button>
             </li>
+            <li>
+              <button onClick={() => exportToCSV(true)} disabled={isExporting || (products.length + books.length + sections.length === 0)}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportAllCSV") || "Export All (CSV)"}
+              </button>
+            </li>
             <div className="divider my-1"></div>
             <li className="menu-title">
               <span>{t("export.jsonFormat") || "JSON Format"}</span>
             </li>
             <li>
-              <button
-                onClick={() => handleExportJSON("products")}
-                disabled={isExporting || products.length + books.length === 0}
-              >
+              <button onClick={() => handleExportJSON("products")} disabled={isExporting || products.length + books.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("export.allProducts") || "All Products & Books"} ({products.length + books.length})
               </button>
@@ -351,6 +351,28 @@ const ExportSection = ({
               <button onClick={() => handleExportJSON("sections")} disabled={isExporting || sections.length === 0}>
                 <FaFileExport className="mr-2" />
                 {t("export.sections") || "Sections"} ({sections.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => exportToJSON(true)} disabled={isExporting || (products.length + books.length + sections.length === 0)}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportAllJSON") || "Export All (JSON)"}
+              </button>
+            </li>
+            <div className="divider my-1"></div>
+            <li className="menu-title">
+              <span>{t("export.xlsxFormat") || "XLSX Format"}</span>
+            </li>
+            <li>
+              <button onClick={() => exportToXLSX(false)} disabled={isExporting || (products.length + books.length + sections.length === 0)}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportPageXLSX") || "Export Page (XLSX)"}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => exportToXLSX(true)} disabled={isExporting || (products.length + books.length + sections.length === 0)}>
+                <FaFileExport className="mr-2" />
+                {t("export.exportAllXLSX") || "Export All (XLSX)"}
               </button>
             </li>
           </ul>
