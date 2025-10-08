@@ -194,7 +194,7 @@ export const deleteProductPurchase = async (purchaseId) => {
       throw new Error("Not authenticated")
     }
     const response = await axios.delete(
-      `${API_URL}/api/v1/ec/purchases/${purchaseId}`,
+      `${API_URL}/ec/purchases/${purchaseId}`,
       {
         withCredentials: true,
         headers: {
@@ -221,7 +221,7 @@ export const deleteBookPurchase = async (purchaseId) => {
       throw new Error("Not authenticated")
     }
     const response = await axios.delete(
-      `${API_URL}/api/v1/ec/book-purchases/${purchaseId}`,
+      `${API_URL}/ec/book-purchases/${purchaseId}`,
       {
         withCredentials: true,
         headers: {

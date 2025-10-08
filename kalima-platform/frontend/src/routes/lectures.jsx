@@ -224,7 +224,7 @@ export const updateLectureById = async (lectureId, lectureData) => {
   try {
     const isFormData = lectureData instanceof FormData
 
-    const response = await axios.patch(`${API_URL}/api/v1/lectures/${lectureId}`, lectureData, {
+    const response = await axios.patch(`${API_URL}/lectures/${lectureId}`, lectureData, {
       withCredentials: true,
       headers: {
         "Content-Type": isFormData ? "multipart/form-data" : "application/json",
@@ -361,7 +361,7 @@ export const getLectureById = async (lectureId) => {
 // Function to update a container by ID
 export const updateContainerById = async (containerId, formData) => {
   try {
-    const response = await axios.patch(`${API_URL}/api/v1/containers/${containerId}`, formData, {
+    const response = await axios.patch(`${API_URL}/containers/${containerId}`, formData, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
         'Content-Type': 'multipart/form-data',
