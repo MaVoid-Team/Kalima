@@ -3,6 +3,22 @@ import { getToken } from "./auth-services"
 
 const API_URL = import.meta.env.VITE_API_URL
 
+// Helper: generate a safe filename for uploads (preserve extension if present)
+const generateSafeFilename = (file) => {
+  if (!file || !file.name) return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`
+  try {
+    const orig = file.name
+    // Extract extension if present
+    const m = orig.match(/\.([0-9a-zA-Z]+)(?:\?.*)?$/)
+    const ext = m ? m[1] : ""
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
+    const rand = Math.floor(Math.random() * 9000) + 1000
+    return `${timestamp}-${rand}${ext ? `.${ext}` : ""}`
+  } catch (e) {
+    return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`
+  }
+}
+
 // Function to get all sections (categories)
 export const getAllSections = async (queryParams = {}) => {
   try {
@@ -197,17 +213,17 @@ export const createProduct = async (productData) => {
 
     // Append files if they exist
     if (productData.thumbnail) {
-      formData.append("thumbnail", productData.thumbnail)
+      formData.append("thumbnail", productData.thumbnail, generateSafeFilename(productData.thumbnail))
     }
     if (productData.sample) {
-      formData.append("sample", productData.sample)
+      formData.append("sample", productData.sample, generateSafeFilename(productData.sample))
     }
 
     // Handle gallery files (multiple files)
     if (productData.gallery && productData.gallery.length > 0) {
       // If gallery is a FileList or array of files
       for (let i = 0; i < productData.gallery.length; i++) {
-        formData.append("gallery", productData.gallery[i])
+        formData.append("gallery", productData.gallery[i], generateSafeFilename(productData.gallery[i]))
       }
     }
     
@@ -254,15 +270,15 @@ export const createBook = async (bookData) => {
 
     // Append files if they exist
     if (bookData.thumbnail) {
-      formData.append("thumbnail", bookData.thumbnail)
+      formData.append("thumbnail", bookData.thumbnail, generateSafeFilename(bookData.thumbnail))
     }
     if (bookData.sample) {
-      formData.append("sample", bookData.sample)
+      formData.append("sample", bookData.sample, generateSafeFilename(bookData.sample))
     }
     if (bookData.gallery && bookData.gallery.length > 0) {
       // If gallery is a FileList or array of files
       for (let i = 0; i < bookData.gallery.length; i++) {
-        formData.append("gallery", bookData.gallery[i])
+        formData.append("gallery", bookData.gallery[i], generateSafeFilename(bookData.gallery[i]))
       }
     }
 
@@ -299,10 +315,10 @@ export const updateProduct = async (productId, productData) => {
 
     // Append files if they exist
     if (productData.thumbnail) {
-      formData.append("thumbnail", productData.thumbnail)
+      formData.append("thumbnail", productData.thumbnail, generateSafeFilename(productData.thumbnail))
     }
     if (productData.sample) {
-      formData.append("sample", productData.sample)
+      formData.append("sample", productData.sample, generateSafeFilename(productData.sample))
     }
 
     const response = await axios.patch(`${API_URL}/ec/products/${productId}`, formData, {
@@ -342,7 +358,7 @@ export const purchaseProduct = async (purchaseData) => {
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
 
     if (purchaseData.paymentScreenShot) {
-      formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, generateSafeFilename(purchaseData.paymentScreenShot))
     }
 
     if (purchaseData.notes) {
@@ -376,7 +392,7 @@ export const purchaseBook = async (purchaseData) => {
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
     if (purchaseData.paymentScreenShot) {
-      formData.append("paymentScreenShot", purchaseData.paymentScreenShot)
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, generateSafeFilename(purchaseData.paymentScreenShot))
     }
     if(purchaseData.notes){
       formData.append("notes", purchaseData.notes)
