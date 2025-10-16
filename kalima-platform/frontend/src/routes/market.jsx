@@ -213,17 +213,23 @@ export const createProduct = async (productData) => {
 
     // Append files if they exist
     if (productData.thumbnail) {
-      formData.append("thumbnail", productData.thumbnail, generateSafeFilename(productData.thumbnail))
+      const safeThumb = generateSafeFilename(productData.thumbnail)
+      console.log("[createProduct] Appending thumbnail:", productData.thumbnail.name, "=>", safeThumb)
+      formData.append("thumbnail", productData.thumbnail, safeThumb)
     }
     if (productData.sample) {
-      formData.append("sample", productData.sample, generateSafeFilename(productData.sample))
+      const safeSample = generateSafeFilename(productData.sample)
+      console.log("[createProduct] Appending sample:", productData.sample.name, "=>", safeSample)
+      formData.append("sample", productData.sample, safeSample)
     }
 
     // Handle gallery files (multiple files)
     if (productData.gallery && productData.gallery.length > 0) {
       // If gallery is a FileList or array of files
       for (let i = 0; i < productData.gallery.length; i++) {
-        formData.append("gallery", productData.gallery[i], generateSafeFilename(productData.gallery[i]))
+        const safeGallery = generateSafeFilename(productData.gallery[i])
+        console.log(`[createProduct] Appending gallery[${i}]:`, productData.gallery[i].name, "=>", safeGallery)
+        formData.append("gallery", productData.gallery[i], safeGallery)
       }
     }
     
@@ -270,15 +276,21 @@ export const createBook = async (bookData) => {
 
     // Append files if they exist
     if (bookData.thumbnail) {
-      formData.append("thumbnail", bookData.thumbnail, generateSafeFilename(bookData.thumbnail))
+      const safeThumb = generateSafeFilename(bookData.thumbnail)
+      console.log("[createBook] Appending thumbnail:", bookData.thumbnail.name, "=>", safeThumb)
+      formData.append("thumbnail", bookData.thumbnail, safeThumb)
     }
     if (bookData.sample) {
-      formData.append("sample", bookData.sample, generateSafeFilename(bookData.sample))
+      const safeSample = generateSafeFilename(bookData.sample)
+      console.log("[createBook] Appending sample:", bookData.sample.name, "=>", safeSample)
+      formData.append("sample", bookData.sample, safeSample)
     }
     if (bookData.gallery && bookData.gallery.length > 0) {
       // If gallery is a FileList or array of files
       for (let i = 0; i < bookData.gallery.length; i++) {
-        formData.append("gallery", bookData.gallery[i], generateSafeFilename(bookData.gallery[i]))
+        const safeGallery = generateSafeFilename(bookData.gallery[i])
+        console.log(`[createBook] Appending gallery[${i}]:`, bookData.gallery[i].name, "=>", safeGallery)
+        formData.append("gallery", bookData.gallery[i], safeGallery)
       }
     }
 
@@ -315,10 +327,14 @@ export const updateProduct = async (productId, productData) => {
 
     // Append files if they exist
     if (productData.thumbnail) {
-      formData.append("thumbnail", productData.thumbnail, generateSafeFilename(productData.thumbnail))
+      const safeThumb = generateSafeFilename(productData.thumbnail)
+      console.log("[updateProduct] Appending thumbnail:", productData.thumbnail.name, "=>", safeThumb)
+      formData.append("thumbnail", productData.thumbnail, safeThumb)
     }
     if (productData.sample) {
-      formData.append("sample", productData.sample, generateSafeFilename(productData.sample))
+      const safeSample = generateSafeFilename(productData.sample)
+      console.log("[updateProduct] Appending sample:", productData.sample.name, "=>", safeSample)
+      formData.append("sample", productData.sample, safeSample)
     }
 
     const response = await axios.patch(`${API_URL}/ec/products/${productId}`, formData, {
@@ -358,7 +374,9 @@ export const purchaseProduct = async (purchaseData) => {
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
 
     if (purchaseData.paymentScreenShot) {
-      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, generateSafeFilename(purchaseData.paymentScreenShot))
+      const safePayment = generateSafeFilename(purchaseData.paymentScreenShot)
+      console.log("[purchaseProduct] Appending paymentScreenShot:", purchaseData.paymentScreenShot.name, "=>", safePayment)
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment)
     }
 
     if (purchaseData.notes) {
@@ -392,7 +410,9 @@ export const purchaseBook = async (purchaseData) => {
     formData.append("productId", purchaseData.productId)
     formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom)
     if (purchaseData.paymentScreenShot) {
-      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, generateSafeFilename(purchaseData.paymentScreenShot))
+      const safePayment = generateSafeFilename(purchaseData.paymentScreenShot)
+      console.log("[purchaseBook] Appending paymentScreenShot:", purchaseData.paymentScreenShot.name, "=>", safePayment)
+      formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment)
     }
     if(purchaseData.notes){
       formData.append("notes", purchaseData.notes)
