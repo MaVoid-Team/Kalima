@@ -63,6 +63,9 @@ const governmentRoutes = require("./routes/governmentRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const ecCouponRouter = require("./routes/ec.couponRoutes");
 const ecReferralRoutes = require("./routes/ec.referralRoutes");
+const ecCartRoutes = require("./routes/ec.cartRoutes");
+const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
+const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
 
 
 connectDB();
@@ -139,6 +142,10 @@ app.use("/api/v1/ec/book-purchases", ecBookPurchaseRouter);
 app.use("/api/v1/ec/coupons", ecCouponRouter);
 app.use("/api/v1/ec/referrals", ecReferralRoutes);
 app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
+// cartitem routes are now handled in ec.cartRoutes.js
+app.use("/api/v1/ec/cart-items", ecCartItemRoutes);
+app.use("/api/v1/ec/carts", ecCartRoutes);
+app.use("/api/v1/ec/cart-purchases", ecCartPurchaseRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
