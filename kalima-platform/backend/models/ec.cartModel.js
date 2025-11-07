@@ -180,14 +180,12 @@ cartSchema.methods.getRequiredCheckoutFields = async function () {
     }
 
     const hasBooks = this.items.some(item => item.productType === 'ECBook');
-    const hasProducts = this.items.some(item => item.productType === 'ECProduct');
 
     return {
         requiresBookDetails: hasBooks,
         requiredFields: {
             common: ['numberTransferredFrom', 'paymentScreenShot'],
             books: hasBooks ? ['nameOnBook', 'numberOnBook', 'seriesName'] : [],
-            products: hasProducts ? [] : [] // Add any product-specific fields here
         }
     };
 };
