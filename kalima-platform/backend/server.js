@@ -151,7 +151,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB.");
-
   const httpServer = createServer(app);
   const io = new Server(httpServer, {
     cors: {
