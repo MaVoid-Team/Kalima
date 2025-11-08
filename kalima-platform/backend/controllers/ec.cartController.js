@@ -74,17 +74,10 @@ exports.addToCart = catchAsync(async (req, res, next) => {
     }
 
     // Return updated cart
-    await cart.populate({
-        path: 'itemsWithDetails',
-        populate: {
-            path: 'product',
-            select: 'title thumbnail price priceAfterDiscount section'
-        }
-    });
+
 
     res.status(200).json({
-        status: "success",
-        data: { cart }
+        status: "Item added to cart successfully",
     });
 });
 
@@ -103,18 +96,9 @@ exports.removeFromCart = catchAsync(async (req, res, next) => {
 
     await cart.removeItem(itemId);
 
-    // Return updated cart
-    await cart.populate({
-        path: 'itemsWithDetails',
-        populate: {
-            path: 'product',
-            select: 'title thumbnail price priceAfterDiscount section'
-        }
-    });
 
     res.status(200).json({
-        status: "success",
-        data: { cart }
+        status: "Item removed from cart successfully",
     });
 });
 
@@ -141,7 +125,7 @@ exports.applyCoupon = catchAsync(async (req, res, next) => {
     const cart = await ECCart.findOne({
         user: req.user._id,
         status: "active"
-    }).populate('items');
+    })
 
     if (!cart) {
         return next(new AppError("Cart not found", 404));
@@ -155,21 +139,11 @@ exports.applyCoupon = catchAsync(async (req, res, next) => {
     await cart.applyCoupon(coupon._id);
 
     // Return updated cart
-    await cart.populate({
-        path: 'itemsWithDetails',
-        populate: {
-            path: 'product',
-            select: 'title thumbnail price priceAfterDiscount section'
-        }
-    });
 
     res.status(200).json({
-        status: "success",
-        data: { cart }
+        status: "Coupon applied successfully",
     });
 });
-
-
 
 exports.clearCart = catchAsync(async (req, res, next) => {
     const cart = await ECCart.findOne({
@@ -246,13 +220,8 @@ exports.getCheckoutPreview = catchAsync(async (req, res, next) => {
     const cart = await ECCart.findOne({
         user: req.user._id,
         status: "active"
-    }).populate({
-        path: 'itemsWithDetails',
-        populate: {
-            path: 'product',
-            select: 'title priceAfterDiscount serial'
-        }
     });
+
 
     if (!cart) {
         return next(new AppError("Cart not found", 404));

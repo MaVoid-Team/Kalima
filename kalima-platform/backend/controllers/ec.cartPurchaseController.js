@@ -159,9 +159,7 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         status: "success",
-        data: {
-            purchase
-        }
+        purchase: purchase
     });
 });
 
@@ -286,5 +284,41 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
                 totalDiscount: 0
             }
         }
+    });
+});
+
+// Delete purchase (admin only)
+exports.deletePurchase = catchAsync(async (req, res, next) => {
+    const purchase = await ECCartPurchase.findById(req.params.id);
+
+    if (!purchase) {
+        return next(new AppError("Purchase not found", 404));
+    }
+
+    // If the purchase was confirmed and used a coupon, we need to un-mark the coupon as used
+    if (purchase.confirmed && purchase.couponCode) {
+        const coupon = await ECCoupon.findById(purchase.couponCode);
+        if (coupon) {
+            // Remove this purchase from coupon's usedBy array
+            await ECCoupon.findByIdAndUpdate(
+                purchase.couponCode,
+                {
+                    $pull: {
+                        usedBy: {
+                            purchase: purchase._id,
+                            user: purchase.createdBy
+                        }
+                    }
+                }
+            );
+        }
+    }
+
+    // Delete the purchase
+    await ECCartPurchase.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+        status: "success",
+        message: "Purchase deleted successfully"
     });
 });
