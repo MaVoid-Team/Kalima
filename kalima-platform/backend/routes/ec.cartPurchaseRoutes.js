@@ -42,4 +42,11 @@ router.route('/:id/admin-note')
         cartPurchaseController.addAdminNote
     );
 
+
+router.route('/:id')
+    .delete(
+        authController.verifyRoles("Admin", "SubAdmin"),
+        cartPurchaseController.deletePurchase
+    );
+
 module.exports = router;
