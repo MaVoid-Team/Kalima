@@ -43,6 +43,7 @@ const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture P
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
+const CartPage = lazy(() => import("./pages/KalimaStore/CartPage"));
 const AdminPanel = lazy(() => import("./pages/KalimaStore/AdminPanel/AdminPanel"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
 const StoreAnalytics = lazy(() => import("./pages/KalimaStore/storeAnalytics"));
@@ -145,6 +146,7 @@ function App() {
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/market" element={<Market />} />
             <Route path="/market/product-details/:type/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<CartPage />} />
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />

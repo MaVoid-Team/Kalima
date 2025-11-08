@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import NotificationCenter from "./NotificationCenter";
+import CartIcon from "./CartIcon";
 import {
   isLoggedIn,
   getUserDashboard,
@@ -193,6 +194,7 @@ const NavBar = () => {
 
         {/* Auth buttons - Desktop */}
         <div className="flex-none hidden lg:flex items-center gap-2 ml-4">
+          <CartIcon />
           {userId && <NotificationCenter userId={userId} />}
           {userRole ? (
             <button
@@ -299,6 +301,11 @@ const NavBar = () => {
               <div className="flex flex-col gap-2">
                 <div className="mb-4">
                   <LanguageSwitcher />
+                </div>
+
+                <div className="flex py-2 items-center gap-2">
+                  <CartIcon />
+                  <span>{t("cart") || "Cart"}</span>
                 </div>
 
                 {userId && (
