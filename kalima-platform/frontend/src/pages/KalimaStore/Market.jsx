@@ -391,7 +391,7 @@ const Market = () => {
                     ) : (
                       <>
                         <ShoppingCart className="w-4 h-4" />
-                        {t("product.addToCart") || "Add to Cart"}
+                        {t("product.addToCart")}
                       </>
                     )}
                   </button>

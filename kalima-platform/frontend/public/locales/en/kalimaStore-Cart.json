@@ -1,0 +1,61 @@
+{
+  "title": "Shopping Cart",
+  "loading": "Loading cart...",
+  "continueShopping": "Continue Shopping",
+  "backToMarket": "Back to Market",
+  "confirmClearCart": "Are you sure you want to clear your cart?",
+  "clearCart": "Clear Cart",
+  "emptyCart": {
+    "title": "Your cart is empty",
+    "description": "Start shopping to add items to your cart",
+    "shopNow": "Shop Now"
+  },
+  "orderSummary": "Order Summary",
+  "subtotal": "Subtotal",
+  "discount": "Discount",
+  "total": "Total",
+  "currency": "EGP",
+  "couponCode": "Coupon Code",
+  "enterCoupon": "Enter coupon",
+  "apply": "Apply",
+  "transferNumber": "Transfer Number",
+  "enterTransferNumber": "Enter transfer number",
+  "paymentScreenshot": "Payment Screenshot",
+  "fileSelected": "File selected",
+  "bookDetails": "Book Details",
+  "nameOnBook": "Name on book",
+  "numberOnBook": "Number on book",
+  "seriesName": "Series name",
+  "notes": "Notes",
+  "optionalNotes": "Optional notes",
+  "checkout": "Checkout",
+  "processing": "Processing...",
+  "type": {
+    "book": "Book",
+    "product": "Product"
+  },
+  "success": {
+    "couponApplied": "Coupon applied successfully!",
+    "purchaseSubmitted": "Purchase submitted successfully! Your order is being processed.",
+    "itemRemoved": "Item removed from cart",
+    "cartCleared": "Cart cleared successfully"
+  },
+  "errors": {
+    "title": "Error",
+    "noCouponCode": "Please enter a coupon code",
+    "invalidCoupon": "Invalid coupon code. Please check and try again.",
+    "applyCouponFailed": "Failed to apply coupon. Please try again.",
+    "noTransferNumber": "Transfer number is required. Please enter the number you transferred from.",
+    "noFileSelected": "Payment screenshot is required. Please upload a screenshot of your payment.",
+    "fillBookFields": "Please fill all book details",
+    "nameOnBookRequired": "Name on book is required",
+    "numberOnBookRequired": "Number on book is required",
+    "seriesNameRequired": "Series name is required",
+    "validationFailed": "Please fill in all required fields before checkout",
+    "checkoutFailed": "Failed to submit purchase. Please check your information and try again.",
+    "removeItemFailed": "Failed to remove item. Please try again.",
+    "clearCartFailed": "Failed to clear cart. Please try again.",
+    "fetchCartFailed": "Failed to load your cart. Please refresh the page."
+  }
+}
+

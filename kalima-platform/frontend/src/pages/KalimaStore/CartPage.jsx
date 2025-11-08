@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 import {
   getCart,
   removeFromCart,
@@ -40,6 +41,13 @@ const CartPage = () => {
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [requiresBookDetails, setRequiresBookDetails] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({
+    numberTransferredFrom: "",
+    paymentScreenShot: "",
+    nameOnBook: "",
+    numberOnBook: "",
+    seriesName: "",
+  });
 
   // Fetch cart data
   const fetchCart = async () => {
@@ -67,10 +75,14 @@ const CartPage = () => {
           setRequiresBookDetails(false);
         }
       } else {
-        setError(result.error);
+        const errorMessage = result.error || t("errors.fetchCartFailed") || "Failed to load cart";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (err) {
-      setError(err.message);
+      const errorMessage = err.message || t("errors.fetchCartFailed") || "Failed to load cart";
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Error fetching cart:", err);
     } finally {
       setLoading(false);
@@ -90,11 +102,12 @@ const CartPage = () => {
         await fetchCart();
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
+        toast.success(t("success.itemRemoved") || "Item removed from cart");
       } else {
-        alert(result.error);
+        toast.error(result.error || t("errors.removeItemFailed") || "Failed to remove item");
       }
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || t("errors.removeItemFailed") || "Failed to remove item");
     } finally {
       setActionLoading({ ...actionLoading, [itemId]: false });
     }
@@ -114,11 +127,12 @@ const CartPage = () => {
         setCouponValidation({ isValid: false, message: "", discount: 0, loading: false });
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
+        toast.success(t("success.cartCleared") || "Cart cleared successfully");
       } else {
-        alert(result.error);
+        toast.error(result.error || t("errors.clearCartFailed") || "Failed to clear cart");
       }
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || t("errors.clearCartFailed") || "Failed to clear cart");
     } finally {
       setActionLoading({ ...actionLoading, clear: false });
     }
@@ -127,43 +141,59 @@ const CartPage = () => {
   // Handle coupon validation and application
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
-      alert(t("errors.noCouponCode") || "Please enter a coupon code");
+      toast.error(t("errors.noCouponCode") || "Please enter a coupon code");
       return;
     }
 
     setCouponValidation({ ...couponValidation, loading: true, message: "" });
 
-    // First validate the coupon
-    const validationResult = await validateCoupon(couponCode);
-    if (!validationResult.success || validationResult.data?.status === "fail") {
-      setCouponValidation({
-        isValid: false,
-        message: validationResult.data?.message || validationResult.error || t("errors.invalidCoupon"),
-        discount: 0,
-        loading: false,
-      });
-      return;
-    }
+    try {
+      // First validate the coupon
+      const validationResult = await validateCoupon(couponCode);
+      if (!validationResult.success || validationResult.data?.status === "fail") {
+        const errorMessage = validationResult.data?.message || validationResult.error || t("errors.invalidCoupon");
+        setCouponValidation({
+          isValid: false,
+          message: errorMessage,
+          discount: 0,
+          loading: false,
+        });
+        toast.error(errorMessage);
+        return;
+      }
 
-    // If valid, apply to cart
-    const applyResult = await applyCouponToCart(couponCode);
-    if (applyResult.success) {
-      setCouponValidation({
-        isValid: true,
-        message: t("success.couponApplied") || "Coupon applied successfully",
-        discount: validationResult.data?.data?.coupon?.value || 0,
-        loading: false,
-      });
-      await fetchCart(); // Refresh cart to show updated totals
-      // Trigger cart count update (in case cart state changed)
-      window.dispatchEvent(new Event("cart-updated"));
-    } else {
+      // If valid, apply to cart
+      const applyResult = await applyCouponToCart(couponCode);
+      if (applyResult.success) {
+        setCouponValidation({
+          isValid: true,
+          message: t("success.couponApplied") || "Coupon applied successfully",
+          discount: validationResult.data?.data?.coupon?.value || 0,
+          loading: false,
+        });
+        await fetchCart(); // Refresh cart to show updated totals
+        // Trigger cart count update (in case cart state changed)
+        window.dispatchEvent(new Event("cart-updated"));
+        toast.success(t("success.couponApplied") || "Coupon applied successfully");
+      } else {
+        const errorMessage = applyResult.error || t("errors.applyCouponFailed") || "Failed to apply coupon";
+        setCouponValidation({
+          isValid: false,
+          message: errorMessage,
+          discount: 0,
+          loading: false,
+        });
+        toast.error(errorMessage);
+      }
+    } catch (err) {
+      const errorMessage = err.message || t("errors.applyCouponFailed") || "Failed to apply coupon";
       setCouponValidation({
         isValid: false,
-        message: applyResult.error,
+        message: errorMessage,
         discount: 0,
         loading: false,
       });
+      toast.error(errorMessage);
     }
   };
 
@@ -182,29 +212,70 @@ const CartPage = () => {
     }
   };
 
+  // Clear validation errors for a specific field
+  const clearFieldError = (fieldName) => {
+    setValidationErrors((prev) => ({
+      ...prev,
+      [fieldName]: "",
+    }));
+  };
+
+  // Validate checkout form
+  const validateCheckoutForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    if (!checkoutData.numberTransferredFrom.trim()) {
+      errors.numberTransferredFrom = t("errors.noTransferNumber") || "Please enter transfer number";
+      isValid = false;
+    }
+
+    if (!checkoutData.paymentScreenShot) {
+      errors.paymentScreenShot = t("errors.noFileSelected") || "Please upload payment screenshot";
+      isValid = false;
+    }
+
+    if (requiresBookDetails) {
+      if (!checkoutData.nameOnBook.trim()) {
+        errors.nameOnBook = t("errors.nameOnBookRequired") || "Name on book is required";
+        isValid = false;
+      }
+      if (!checkoutData.numberOnBook.trim()) {
+        errors.numberOnBook = t("errors.numberOnBookRequired") || "Number on book is required";
+        isValid = false;
+      }
+      if (!checkoutData.seriesName.trim()) {
+        errors.seriesName = t("errors.seriesNameRequired") || "Series name is required";
+        isValid = false;
+      }
+    }
+
+    setValidationErrors(errors);
+    return isValid;
+  };
+
   // Handle checkout
   const handleCheckout = async () => {
-    // Validation
-    if (!checkoutData.numberTransferredFrom) {
-      alert(t("errors.noTransferNumber") || "Please enter transfer number");
+    // Clear previous validation errors
+    setValidationErrors({
+      numberTransferredFrom: "",
+      paymentScreenShot: "",
+      nameOnBook: "",
+      numberOnBook: "",
+      seriesName: "",
+    });
+
+    // Validate form
+    if (!validateCheckoutForm()) {
+      toast.error(t("errors.validationFailed") || "Please fill in all required fields");
       return;
-    }
-    if (!checkoutData.paymentScreenShot) {
-      alert(t("errors.noFileSelected") || "Please upload payment screenshot");
-      return;
-    }
-    if (requiresBookDetails) {
-      if (!checkoutData.nameOnBook || !checkoutData.numberOnBook || !checkoutData.seriesName) {
-        alert(t("errors.fillBookFields") || "Please fill all book details");
-        return;
-      }
     }
 
     try {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
-        alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
+        toast.success(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         // Reset form and redirect
@@ -216,12 +287,24 @@ const CartPage = () => {
           numberOnBook: "",
           seriesName: "",
         });
-        navigate("/market");
+        setValidationErrors({
+          numberTransferredFrom: "",
+          paymentScreenShot: "",
+          nameOnBook: "",
+          numberOnBook: "",
+          seriesName: "",
+        });
+        // Small delay before redirect to show success message
+        setTimeout(() => {
+          navigate("/market");
+        }, 1000);
       } else {
-        alert(result.error);
+        const errorMessage = result.error || t("errors.checkoutFailed") || "Failed to submit purchase. Please try again.";
+        toast.error(errorMessage);
       }
     } catch (err) {
-      alert(err.message);
+      const errorMessage = err.response?.data?.message || err.message || t("errors.checkoutFailed") || "An error occurred. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setCheckoutLoading(false);
     }
@@ -464,32 +547,48 @@ const CartPage = () => {
                     <label className="label">
                       <span className="label-text font-semibold">
                         {t("transferNumber") || "Transfer Number"}
+                        <span className="text-error ml-1">*</span>
                       </span>
                     </label>
                     <input
                       type="text"
                       placeholder={t("enterTransferNumber") || "Enter transfer number"}
-                      className="input input-bordered"
+                      className={`input input-bordered ${validationErrors.numberTransferredFrom ? "input-error" : ""}`}
                       value={checkoutData.numberTransferredFrom}
-                      onChange={(e) =>
-                        setCheckoutData({ ...checkoutData, numberTransferredFrom: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setCheckoutData({ ...checkoutData, numberTransferredFrom: e.target.value });
+                        clearFieldError("numberTransferredFrom");
+                      }}
                     />
+                    {validationErrors.numberTransferredFrom && (
+                      <label className="label">
+                        <span className="label-text-alt text-error">{validationErrors.numberTransferredFrom}</span>
+                      </label>
+                    )}
                   </div>
 
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-semibold">
                         {t("paymentScreenshot") || "Payment Screenshot"}
+                        <span className="text-error ml-1">*</span>
                       </span>
                     </label>
                     <input
                       type="file"
                       accept="image/*,.pdf"
-                      className="file-input file-input-bordered w-full"
-                      onChange={handleFileChange}
+                      className={`file-input file-input-bordered w-full ${validationErrors.paymentScreenShot ? "file-input-error" : ""}`}
+                      onChange={(e) => {
+                        handleFileChange(e);
+                        clearFieldError("paymentScreenShot");
+                      }}
                     />
-                    {checkoutData.paymentScreenShot && (
+                    {validationErrors.paymentScreenShot && (
+                      <label className="label">
+                        <span className="label-text-alt text-error">{validationErrors.paymentScreenShot}</span>
+                      </label>
+                    )}
+                    {checkoutData.paymentScreenShot && !validationErrors.paymentScreenShot && (
                       <label className="label">
                         <span className="label-text-alt text-success">
                           {t("fileSelected") || "File selected"}: {checkoutData.paymentScreenShot.name}
@@ -503,33 +602,57 @@ const CartPage = () => {
                       <div className="card-body p-4">
                         <h3 className="font-bold mb-2">{t("bookDetails") || "Book Details"}</h3>
                         <div className="space-y-2">
-                          <input
-                            type="text"
-                            placeholder={t("nameOnBook") || "Name on book"}
-                            className="input input-bordered bg-base-100 text-base-content w-full"
-                            value={checkoutData.nameOnBook}
-                            onChange={(e) =>
-                              setCheckoutData({ ...checkoutData, nameOnBook: e.target.value })
-                            }
-                          />
-                          <input
-                            type="text"
-                            placeholder={t("numberOnBook") || "Number on book"}
-                            className="input input-bordered bg-base-100 text-base-content w-full"
-                            value={checkoutData.numberOnBook}
-                            onChange={(e) =>
-                              setCheckoutData({ ...checkoutData, numberOnBook: e.target.value })
-                            }
-                          />
-                          <input
-                            type="text"
-                            placeholder={t("seriesName") || "Series name"}
-                            className="input input-bordered bg-base-100 text-base-content w-full"
-                            value={checkoutData.seriesName}
-                            onChange={(e) =>
-                              setCheckoutData({ ...checkoutData, seriesName: e.target.value })
-                            }
-                          />
+                          <div>
+                            <input
+                              type="text"
+                              placeholder={t("nameOnBook") || "Name on book"}
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.nameOnBook ? "input-error" : ""}`}
+                              value={checkoutData.nameOnBook}
+                              onChange={(e) => {
+                                setCheckoutData({ ...checkoutData, nameOnBook: e.target.value });
+                                clearFieldError("nameOnBook");
+                              }}
+                            />
+                            {validationErrors.nameOnBook && (
+                              <label className="label py-1">
+                                <span className="label-text-alt text-error">{validationErrors.nameOnBook}</span>
+                              </label>
+                            )}
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder={t("numberOnBook") || "Number on book"}
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.numberOnBook ? "input-error" : ""}`}
+                              value={checkoutData.numberOnBook}
+                              onChange={(e) => {
+                                setCheckoutData({ ...checkoutData, numberOnBook: e.target.value });
+                                clearFieldError("numberOnBook");
+                              }}
+                            />
+                            {validationErrors.numberOnBook && (
+                              <label className="label py-1">
+                                <span className="label-text-alt text-error">{validationErrors.numberOnBook}</span>
+                              </label>
+                            )}
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder={t("seriesName") || "Series name"}
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.seriesName ? "input-error" : ""}`}
+                              value={checkoutData.seriesName}
+                              onChange={(e) => {
+                                setCheckoutData({ ...checkoutData, seriesName: e.target.value });
+                                clearFieldError("seriesName");
+                              }}
+                            />
+                            {validationErrors.seriesName && (
+                              <label className="label py-1">
+                                <span className="label-text-alt text-error">{validationErrors.seriesName}</span>
+                              </label>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

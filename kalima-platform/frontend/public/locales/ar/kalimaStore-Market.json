@@ -13,7 +13,8 @@
   "product": {
     "discounts": "خصم",
     "currency": "ج",
-    "viewDetails": "عرض التفاصيل"
+    "viewDetails": "عرض التفاصيل",
+    "addToCart": "إضافة للسلة"
   },
   "sections": {
     "Designs": "تصاميم",
