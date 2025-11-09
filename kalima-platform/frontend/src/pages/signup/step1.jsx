@@ -201,27 +201,6 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      <div className="form-control relative pb-5">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t('form.referralSerial')}</span>
-          </label>
-          <input
-            type="text"
-            name="referralSerial"
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.referralSerial ? 'input-error animate-shake' : ''}`}
-            value={formData.referralSerial}
-            onChange={handleInputChange}
-            required
-          />
-          {errors.referralSerial && (
-            <span className="absolute bottom-0  text-error text-sm mt-1">
-              {t(`validation.${errors.referralSerial}`)}
-            </span>
-          )}
-        </div>
-      </div>
-
       {role === 'teacher' && (
         <>
           <div className="form-control relative pb-5">
