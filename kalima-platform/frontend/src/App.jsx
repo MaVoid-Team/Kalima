@@ -3,6 +3,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
@@ -43,6 +44,7 @@ const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture P
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
+const CartPage = lazy(() => import("./pages/KalimaStore/CartPage"));
 const AdminPanel = lazy(() => import("./pages/KalimaStore/AdminPanel/AdminPanel"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
 const StoreAnalytics = lazy(() => import("./pages/KalimaStore/storeAnalytics"));
@@ -88,6 +90,30 @@ function App() {
 
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
+      <Toaster
+        position={isRTL ? "top-left" : "top-right"}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <NavBar
         showSidebarToggle={showSidebar}
         onSidebarToggle={toggleSidebar}
@@ -145,6 +171,7 @@ function App() {
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/market" element={<Market />} />
             <Route path="/market/product-details/:type/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<CartPage />} />
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
