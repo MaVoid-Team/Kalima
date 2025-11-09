@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { getAllSections, getAllProducts, getAllSubSections } from "../../routes/market"
+import { addToCart } from "../../routes/cart"
+import { isLoggedIn } from "../../routes/auth-services"
+import { ShoppingCart } from "lucide-react"
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market")
@@ -20,6 +23,7 @@ const Market = () => {
   const [error, setError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(6)
+  const [addingToCart, setAddingToCart] = useState({})
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null
@@ -110,6 +114,33 @@ const Market = () => {
 // dummy comment to re-commit
     fetchInitialData()
   }, [t])
+
+  // Handle add to cart
+  const handleAddToCart = async (productId, event) => {
+    event.stopPropagation() // Prevent navigation to product details
+    
+    if (!isLoggedIn()) {
+      alert(t("errors.loginRequired") || "Please login to add items to cart")
+      navigate("/login")
+      return
+    }
+
+    try {
+      setAddingToCart({ ...addingToCart, [productId]: true })
+      const result = await addToCart(productId)
+      if (result.success) {
+        alert(t("success.addedToCart") || "Item added to cart successfully!")
+        // Trigger cart count update
+        window.dispatchEvent(new Event("cart-updated"))
+      } else {
+        alert(result.error || t("errors.addToCartFailed") || "Failed to add to cart")
+      }
+    } catch (error) {
+      alert(error.message || t("errors.addToCartFailed") || "Failed to add to cart")
+    } finally {
+      setAddingToCart({ ...addingToCart, [productId]: false })
+    }
+  }
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -340,16 +371,30 @@ const Market = () => {
                   )}
                 </div>
 
-                <div className="card-actions w-full">
+                <div className="card-actions w-full gap-2">
                   <button
                     onClick={() => {
                       // Determine type from the item data itself, not assumptions
                       const itemType = item.__t === "ECBook" ? "book" : "product"
                       navigate(`/market/product-details/${itemType}/${item._id}`)
                     }}
-                    className="btn btn-primary bg-primary border-primary hover:bg-primary/50 w-full"
+                    className="btn btn-primary bg-primary border-primary hover:bg-primary/50 flex-1"
                   >
                     {t("product.viewDetails")}
+                  </button>
+                  <button
+                    onClick={(e) => handleAddToCart(item._id, e)}
+                    disabled={addingToCart[item._id]}
+                    className="btn btn-outline btn-primary flex-1"
+                  >
+                    {addingToCart[item._id] ? (
+                      <span className="loading loading-spinner loading-sm"></span>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-4 h-4" />
+                        {t("product.addToCart")}
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

@@ -6,6 +6,9 @@ import { useTranslation } from "react-i18next"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
 import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
+import { addToCart } from "../../routes/cart"
+import { isLoggedIn } from "../../routes/auth-services"
+import { ShoppingCart } from "lucide-react"
 
 // Import components
 import ProductHeader from "./components/ProductHeader"
@@ -24,6 +27,7 @@ const ProductDetails = () => {
   const [error, setError] = useState(null)
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   const [uploadedFile, setUploadedFile] = useState(null)
+  const [addingToCart, setAddingToCart] = useState(false)
 
   // Coupon and Price State
   const [couponCode, setCouponCode] = useState("")
@@ -104,6 +108,36 @@ const ProductDetails = () => {
 
     fetchItemData()
   }, [id, type, t])
+
+  // Handle add to cart
+  const handleAddToCart = async () => {
+    if (!isLoggedIn()) {
+      alert(t("errors.loginRequired") || "Please login to add items to cart")
+      navigate("/login")
+      return
+    }
+
+    if (!product) {
+      alert(t("errors.productDataNotLoaded"))
+      return
+    }
+
+    try {
+      setAddingToCart(true)
+      const result = await addToCart(product._id)
+      if (result.success) {
+        alert(t("success.addedToCart") || "Item added to cart successfully!")
+        // Trigger cart count update
+        window.dispatchEvent(new Event("cart-updated"))
+      } else {
+        alert(result.error || t("errors.addToCartFailed") || "Failed to add to cart")
+      }
+    } catch (error) {
+      alert(error.message || t("errors.addToCartFailed") || "Failed to add to cart")
+    } finally {
+      setAddingToCart(false)
+    }
+  }
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
@@ -311,6 +345,26 @@ const ProductDetails = () => {
               </div>
               <div className="p-8 lg:p-12 border-l border-base-200">
                 <ProductInfo product={product} type={displayType} isRTL={isRTL} />
+                {/* Add to Cart Button */}
+                <div className="mt-6">
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={addingToCart}
+                    className="btn btn-primary btn-lg w-full"
+                  >
+                    {addingToCart ? (
+                      <>
+                        <span className="loading loading-spinner loading-sm"></span>
+                        {t("addingToCart") || "Adding to Cart..."}
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="w-5 h-5" />
+                        {t("addToCart") || "Add to Cart"}
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
