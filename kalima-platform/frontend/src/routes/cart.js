@@ -21,7 +21,7 @@ const generateSafeFilename = (file) => {
 // Get user's active cart
 export const getCart = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/carts/`, {
+    const response = await axios.get(`${API_URL}/ec/carts/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -58,7 +58,7 @@ export const getCart = async () => {
 export const addToCart = async (productId) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/carts/add`,
+      `${API_URL}/ec/carts/add`,
       { productId },
       {
         withCredentials: true,
@@ -83,7 +83,7 @@ export const addToCart = async (productId) => {
 // Remove item from cart
 export const removeFromCart = async (itemId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/carts/remove-item/${itemId}`, {
+    const response = await axios.delete(`${API_URL}/ec/carts/remove-item/${itemId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -104,7 +104,7 @@ export const removeFromCart = async (itemId) => {
 // Clear cart
 export const clearCart = async () => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/carts/clear`, {
+    const response = await axios.delete(`${API_URL}/ec/carts/clear`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -126,7 +126,7 @@ export const clearCart = async () => {
 export const applyCouponToCart = async (couponCode) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/carts/apply-coupon`,
+      `${API_URL}/ec/carts/apply-coupon`,
       { couponCode },
       {
         withCredentials: true,
@@ -151,7 +151,7 @@ export const applyCouponToCart = async (couponCode) => {
 // Get checkout preview
 export const getCheckoutPreview = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/carts/checkout-preview`, {
+    const response = await axios.get(`${API_URL}/ec/carts/checkout-preview`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -195,7 +195,7 @@ export const createCartPurchase = async (purchaseData) => {
       formData.append("seriesName", purchaseData.seriesName);
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/cart-purchases`, formData, {
+    const response = await axios.post(`${API_URL}/ec/cart-purchases`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -218,7 +218,7 @@ export const createCartPurchase = async (purchaseData) => {
 // Get cart item count
 export const getCartItemCount = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-items/count`, {
+    const response = await axios.get(`${API_URL}/ec/cart-items/count`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -239,7 +239,7 @@ export const getCartItemCount = async () => {
 
 export const getCartPurchases = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -260,7 +260,7 @@ export const getCartPurchases = async (queryParams = {}) => {
 
 export const getAdminCartPurchases = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/all`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/all`, {
       params: queryParams,
       withCredentials: true,
       headers: {
