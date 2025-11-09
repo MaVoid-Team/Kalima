@@ -3,6 +3,10 @@ const ECCart = require("../models/ec.cartModel");
 const ECCoupon = require("../models/ec.couponModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const { sendEmail } = require("../utils/emailVerification/emailService");
+
+// Default start date for statistics
+const DEFAULT_STATS_START_DATE = new Date('2025-11-01');
 
 exports.createCartPurchase = catchAsync(async (req, res, next) => {
     // Check if user serial exists
@@ -95,9 +99,26 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     }
 
-    // Clear the cart
-    await cart.clear();
+    try {
+        await sendEmail(
+            req.user.email,
+            "Your Order Has Been Received",
+            `<div style='font-family: Arial, sans-serif;'>
+            <h2>Thank you for your purchase!</h2>
+            <p>Dear ${req.user.name},</p>
+            <p>We’re happy to let you know that your order (<b>${purchaseSerial}</b>) has been received.</p>
+            <p>You have ordered <b>${cart.items.length}</b> product(s).</p>
+            <p>Your order will be processed after the payment is reviewed by our team during working hours from <b>9:00 AM to 9:00 PM</b>.</p>
+            <p>If you have any questions, please contact our support team.</p>
+            <br>
+            <p>Best regards,<br><b>Kalima Team</b></p>
+            </div>`
+        );
+    } catch (err) {
+        console.error("Failed to send purchase confirmation email:", err);
+    }
 
+    await cart.clear();
     // Return the created purchase
     res.status(201).json({
         status: "success",
@@ -140,26 +161,68 @@ exports.getCartPurchaseById = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
-    const purchase = await ECCartPurchase.findByIdAndUpdate(
-        req.params.id,
-        {
-            confirmed: true,
-            confirmedBy: req.user._id
-        },
-        {
-            new: true,
-            runValidators: true
-        }
-    );
+exports.receivePurchase = catchAsync(async (req, res, next) => {
+    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
+
+    const purchase = await ECCartPurchase.findById(req.params.id);
 
     if (!purchase) {
         return next(new AppError("Purchase not found", 404));
     }
 
+    if (purchase.status !== 'pending') {
+        return next(new AppError(`Purchase is already ${purchase.status}`, 400));
+    }
+
+    const now = new Date();
+    const updatedPurchase = await ECCartPurchase.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: 'received',
+            receivedBy: req.user._id,
+            receivedAt: now
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+
     res.status(200).json({
         status: "success",
-        purchase: purchase
+        message: "Purchase marked as received successfully",
+    });
+});
+
+exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
+    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
+
+    const purchase = await ECCartPurchase.findById(req.params.id);
+
+    if (!purchase) {
+        return next(new AppError("Purchase not found", 404));
+    }
+
+    if (purchase.status !== 'received') {
+        return next(new AppError("Purchase must be received before it can be confirmed", 400));
+    }
+
+    const now = new Date();
+    const updatedPurchase = await ECCartPurchase.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: 'confirmed',
+            confirmedBy: req.user._id,
+            confirmedAt: now
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+    res.status(200).json({
+        status: "success",
+        message: "Purchase confirmed successfully",
     });
 });
 
@@ -168,9 +231,9 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     // Build query
     const query = {};
 
-    // Filter by confirmation status if specified
-    if (req.query.confirmed !== undefined) {
-        query.confirmed = req.query.confirmed === 'true';
+    // Filter by status if specified
+    if (req.query.status) {
+        query.status = req.query.status;
     }
 
     // Filter by date range if specified
@@ -195,7 +258,8 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
     // Execute query
     const purchases = await ECCartPurchase.find(query)
-        .populate('confirmedBy', 'name email')
+        .populate('confirmedBy', 'name')
+        .populate('receivedBy', 'name')
         .populate('adminNoteBy', 'name')
         .populate('couponCode')
         .sort('-createdAt')
@@ -252,14 +316,25 @@ exports.addAdminNote = catchAsync(async (req, res, next) => {
 });
 
 exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
+    // Build match condition
+    const matchCondition = {
+        status: 'confirmed'
+    };
+
+    // Add date filter if provided
+    if (req.query.startDate || req.query.endDate) {
+        matchCondition.createdAt = {};
+        if (req.query.startDate) {
+            matchCondition.createdAt.$gte = new Date(req.query.startDate);
+        }
+        if (req.query.endDate) {
+            matchCondition.createdAt.$lte = new Date(req.query.endDate);
+        }
+    }
+
     const stats = await ECCartPurchase.aggregate([
         {
-            $match: {
-                confirmed: true,
-                createdAt: {
-                    $gte: new Date(new Date().setDate(new Date().getDate() - 30)) // Last 30 days
-                }
-            }
+            $match: matchCondition
         },
         {
             $group: {
@@ -287,7 +362,211 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
     });
 });
 
-// Delete purchase (admin only)
+exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
+    // Handle date range with default start date
+    let dateFilter = {
+        $gte: DEFAULT_STATS_START_DATE  // Always use default start date as minimum
+    };
+
+    // Override with query dates if provided
+    if (req.query.startDate) {
+        dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+        dateFilter.$lte = new Date(req.query.endDate);
+    }
+
+    // Import business hours calculator
+    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
+
+    // Build match condition with default start date of November 1st, 2025
+    const defaultStartDate = new Date('2025-11-01');
+    const matchCondition = {
+        createdAt: {
+            $gte: defaultStartDate,
+            ...(dateFilter.$lte && { $lte: dateFilter.$lte })
+        }
+    };
+
+    // Override start date if provided in query
+    if (dateFilter.$gte) {
+        matchCondition.createdAt.$gte = dateFilter.$gte;
+    }
+
+    const timeStats = await ECCartPurchase.aggregate([
+        {
+            $match: matchCondition
+        },
+        {
+            $facet: {
+                // Stats for pending to received
+                receiveStats: [
+                    {
+                        $match: {
+                            status: { $in: ['received', 'confirmed'] },
+                            receivedAt: { $exists: true },
+                            createdAt: { $exists: true }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMillis: { $subtract: ["$receivedAt", "$createdAt"] }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            avgTime: { $avg: "$diffInMinutes" },
+                            maxTime: { $max: "$diffInMinutes" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            avgTime: { $round: ["$avgTime", 2] },
+                            maxTime: { $round: ["$maxTime", 2] },
+
+                            count: 1
+                        }
+                    }
+                ],
+
+                // Stats for received to confirmed
+                confirmStats: [
+                    {
+                        $match: {
+                            status: 'confirmed',
+                            confirmedAt: { $exists: true },
+                            receivedAt: { $exists: true }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMillis: { $subtract: ["$confirmedAt", "$receivedAt"] }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            avgTime: { $avg: "$diffInMinutes" },
+                            maxTime: { $max: "$diffInMinutes" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            avgTime: { $round: ["$avgTime", 2] },
+                            maxTime: { $round: ["$maxTime", 2] },
+                            count: 1
+                        }
+                    }
+                ],
+
+                // Stats for total response time
+                totalStats: [
+                    {
+                        $match: {
+                            status: 'confirmed',
+                            confirmedAt: { $exists: true },
+                            createdAt: { $exists: true }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMillis: { $subtract: ["$confirmedAt", "$createdAt"] }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            avgTime: { $avg: "$diffInMinutes" },
+                            maxTime: { $max: "$diffInMinutes" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            avgTime: { $round: ["$avgTime", 2] },
+                            maxTime: { $round: ["$maxTime", 2] },
+                            count: 1
+                        }
+                    }
+                ],
+
+                statusCounts: [
+                    {
+                        $addFields: {
+                            adjustedStatus: { $ifNull: ["$status", "pending"] }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$adjustedStatus",
+                            count: { $sum: 1 }
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    // Format the statistics
+    const stats = timeStats[0];
+    const formatStats = (statArray) => {
+        if (!statArray || !statArray[0]) return null;
+        const data = statArray[0];
+        return {
+            averageMinutes: Math.round(data.avgTime || 0),
+            maxMinutes: data.maxTime || 0,
+            count: data.count || 0
+        };
+    };
+
+    // Convert status counts array to object
+    const statusCounts = {};
+    stats.statusCounts.forEach(status => {
+        statusCounts[status._id] = status.count;
+    });
+
+    // Use default start date from constant
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            period: req.query.startDate || req.query.endDate ? "Custom range" : "Current month",
+            dateRange: {
+                start: req.query.startDate ? new Date(req.query.startDate) : DEFAULT_STATS_START_DATE,
+                end: req.query.endDate ? new Date(req.query.endDate) : new Date(),
+                description: req.query.startDate || req.query.endDate ?
+                    "Custom date range" :
+                    "Since November 1st, 2025"
+            },
+            receiveTime: formatStats(stats.receiveStats),
+            confirmTime: formatStats(stats.confirmStats),
+            totalResponseTime: formatStats(stats.totalStats),
+            currentStatus: statusCounts
+        }
+    });
+});
+
 exports.deletePurchase = catchAsync(async (req, res, next) => {
     const purchase = await ECCartPurchase.findById(req.params.id);
 

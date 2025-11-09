@@ -27,8 +27,20 @@ router.route('/admin/statistics')
         cartPurchaseController.getPurchaseStatistics
     );
 
+router.route('/admin/response-time')
+    .get(
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        cartPurchaseController.getResponseTimeStatistics
+    );
+
 router.route('/:id')
     .get(cartPurchaseController.getCartPurchaseById);
+
+router.route('/:id/receive')
+    .patch(
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        cartPurchaseController.receivePurchase
+    );
 
 router.route('/:id/confirm')
     .patch(
