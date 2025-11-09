@@ -71,14 +71,28 @@ const cartPurchaseSchema = new mongoose.Schema(
         },
 
         // Status
-        confirmed: {
-            type: Boolean,
-            default: false,
+        status: {
+            type: String,
+            enum: ['pending', 'received', 'confirmed'],
+            default: 'pending'
+        },
+        receivedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
+        receivedAt: {
+            type: Date,
+            default: null
         },
         confirmedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             default: null,
+        },
+        confirmedAt: {
+            type: Date,
+            default: null
         },
 
         // Notes
