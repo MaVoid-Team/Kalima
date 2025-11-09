@@ -369,39 +369,6 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
-        <div className="card bg-base-100 shadow-xl mb-8">
-          <div className="card-body">
-            <PurchaseForm
-              type={displayType}
-              purchaseForm={purchaseForm}
-              setPurchaseForm={setPurchaseForm}
-              uploadedFile={uploadedFile}
-              setUploadedFile={setUploadedFile}
-              onSubmit={handleSubmit}
-              purchaseLoading={purchaseLoading}
-              // Coupon and Price Props
-              productPrice={product.price}
-              displayPrice={getDisplayPrice(product)}
-              finalPrice={finalPrice}
-              couponCode={couponCode}
-              setCouponCode={setCouponCode}
-              onValidateCoupon={handleValidateCoupon}
-              onRemoveCoupon={handleRemoveCoupon}
-              couponValidation={couponValidation}
-            />
-          </div>
-        </div>
-        {product && (
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <PaymentSection
-                paymentNumber={product.paymentNumber}
-                isRTL={isRTL}
-                whatsAppNumber={product?.whatsAppNumber || ""}
-              />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
