@@ -4,6 +4,12 @@ const ECCoupon = require("../models/ec.couponModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendEmail } = require("../utils/emailVerification/emailService");
+const { DateTime } = require('luxon');
+
+// Function to get current time in Egypt timezone
+const getCurrentEgyptTime = () => {
+    return DateTime.now().setZone('Africa/Cairo');
+};
 
 // Default start date for statistics
 const DEFAULT_STATS_START_DATE = new Date('2025-11-01');
@@ -55,9 +61,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     }));
 
-    // Generate purchase serial using user's serial, date, and sequence
-    const date = new Date();
-    const formattedDate = date.toISOString().split('T')[0].replace(/-/g, ''); // Format: YYYYMMDD
+    // Generate purchase serial using user's serial, date, and sequence in Egypt time
+    const date = getCurrentEgyptTime();
+    const formattedDate = date.toFormat('yyyyMMdd'); // Format: YYYYMMDD
 
     // Find the last purchase of the day to determine sequence number
     const lastPurchase = await ECCartPurchase.findOne({
@@ -162,8 +168,6 @@ exports.getCartPurchaseById = catchAsync(async (req, res, next) => {
 });
 
 exports.receivePurchase = catchAsync(async (req, res, next) => {
-    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
-
     const purchase = await ECCartPurchase.findById(req.params.id);
 
     if (!purchase) {
@@ -174,13 +178,13 @@ exports.receivePurchase = catchAsync(async (req, res, next) => {
         return next(new AppError(`Purchase is already ${purchase.status}`, 400));
     }
 
-    const now = new Date();
+    const now = getCurrentEgyptTime().toJSDate();
     const updatedPurchase = await ECCartPurchase.findByIdAndUpdate(
         req.params.id,
         {
             status: 'received',
             receivedBy: req.user._id,
-            receivedAt: now
+            receivedAt: now  // Already in Egypt time
         },
         {
             new: true,
@@ -195,8 +199,6 @@ exports.receivePurchase = catchAsync(async (req, res, next) => {
 });
 
 exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
-    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
-
     const purchase = await ECCartPurchase.findById(req.params.id);
 
     if (!purchase) {
@@ -207,13 +209,13 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
         return next(new AppError("Purchase must be received before it can be confirmed", 400));
     }
 
-    const now = new Date();
+    const now = getCurrentEgyptTime().toJSDate();
     const updatedPurchase = await ECCartPurchase.findByIdAndUpdate(
         req.params.id,
         {
             status: 'confirmed',
             confirmedBy: req.user._id,
-            confirmedAt: now
+            confirmedAt: now  // Already in Egypt time
         },
         {
             new: true,
@@ -363,205 +365,128 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
 });
 
 exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
-    // Handle date range with default start date
-    let dateFilter = {
-        $gte: DEFAULT_STATS_START_DATE  // Always use default start date as minimum
-    };
+    const startDate = req.query.startDate
+        ? DateTime.fromISO(req.query.startDate).setZone('Africa/Cairo').startOf('day').toJSDate()
+        : DateTime.fromJSDate(DEFAULT_STATS_START_DATE).setZone('Africa/Cairo').startOf('day').toJSDate();
 
-    // Override with query dates if provided
-    if (req.query.startDate) {
-        dateFilter.$gte = new Date(req.query.startDate);
-    }
-    if (req.query.endDate) {
-        dateFilter.$lte = new Date(req.query.endDate);
-    }
+    const endDate = req.query.endDate
+        ? DateTime.fromISO(req.query.endDate).setZone('Africa/Cairo').endOf('day').toJSDate()
+        : getCurrentEgyptTime().endOf('day').toJSDate();
 
-    // Import business hours calculator
-    const { calculateBusinessHoursDiff } = require('../utils/businessHoursCalculator');
-
-    // Build match condition with default start date of November 1st, 2025
-    const defaultStartDate = new Date('2025-11-01');
-    const matchCondition = {
+    // Get purchases within date range
+    const purchases = await ECCartPurchase.find({
         createdAt: {
-            $gte: defaultStartDate,
-            ...(dateFilter.$lte && { $lte: dateFilter.$lte })
+            $gte: startDate,
+            $lte: endDate
         }
+    }).select('createdAt receivedAt confirmedAt status');
+
+    // Helper function to calculate business minutes between two dates
+    const calculateBusinessMinutes = (startDate, endDate) => {
+        const BUSINESS_START_HOUR = 9; // 9 AM
+        const BUSINESS_END_HOUR = 21;  // 9 PM
+        const BUSINESS_HOURS_PER_DAY = BUSINESS_END_HOUR - BUSINESS_START_HOUR;
+
+        // Convert to local time
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // If same day
+        if (start.toDateString() === end.toDateString()) {
+            let startHour = start.getHours();
+            let endHour = end.getHours();
+            let startMinutes = start.getMinutes();
+            let endMinutes = end.getMinutes();
+
+            // Adjust hours to business hours
+            startHour = Math.max(startHour, BUSINESS_START_HOUR);
+            startHour = Math.min(startHour, BUSINESS_END_HOUR);
+            endHour = Math.max(endHour, BUSINESS_START_HOUR);
+            endHour = Math.min(endHour, BUSINESS_END_HOUR);
+
+            // Calculate minutes within business hours
+            const hourDiff = endHour - startHour;
+            const minuteDiff = endMinutes - startMinutes;
+
+            return Math.max(0, hourDiff * 60 + minuteDiff);
+        }
+
+        // Multiple days
+        let totalMinutes = 0;
+
+        // First day
+        const firstDayEnd = new Date(start);
+        firstDayEnd.setHours(BUSINESS_END_HOUR, 0, 0, 0);
+        if (start.getHours() < BUSINESS_END_HOUR) {
+            const startHour = Math.max(start.getHours(), BUSINESS_START_HOUR);
+            totalMinutes += (BUSINESS_END_HOUR - startHour) * 60 - start.getMinutes();
+        }
+
+        // Last day
+        const lastDayStart = new Date(end);
+        lastDayStart.setHours(BUSINESS_START_HOUR, 0, 0, 0);
+        if (end.getHours() > BUSINESS_START_HOUR) {
+            const endHour = Math.min(end.getHours(), BUSINESS_END_HOUR);
+            totalMinutes += (endHour - BUSINESS_START_HOUR) * 60 + end.getMinutes();
+        }
+
+        // Full days in between
+        const fullDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)) - 1);
+        totalMinutes += fullDays * BUSINESS_HOURS_PER_DAY * 60;
+
+        return Math.max(0, totalMinutes);
     };
 
-    // Override start date if provided in query
-    if (dateFilter.$gte) {
-        matchCondition.createdAt.$gte = dateFilter.$gte;
-    }
+    // Calculate statistics
+    const receiveStats = [];
+    const confirmStats = [];
+    const totalStats = [];
+    const statusCounts = {};
 
-    const timeStats = await ECCartPurchase.aggregate([
-        {
-            $match: matchCondition
-        },
-        {
-            $facet: {
-                // Stats for pending to received
-                receiveStats: [
-                    {
-                        $match: {
-                            status: { $in: ['received', 'confirmed'] },
-                            receivedAt: { $exists: true },
-                            createdAt: { $exists: true }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMillis: { $subtract: ["$receivedAt", "$createdAt"] }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            avgTime: { $avg: "$diffInMinutes" },
-                            maxTime: { $max: "$diffInMinutes" },
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            avgTime: { $round: ["$avgTime", 2] },
-                            maxTime: { $round: ["$maxTime", 2] },
+    purchases.forEach(purchase => {
+        // Count statuses
+        const status = purchase.status || 'pending';
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
 
-                            count: 1
-                        }
-                    }
-                ],
+        if (purchase.receivedAt) {
+            const receiveMinutes = calculateBusinessMinutes(purchase.createdAt, purchase.receivedAt);
+            receiveStats.push(receiveMinutes);
 
-                // Stats for received to confirmed
-                confirmStats: [
-                    {
-                        $match: {
-                            status: 'confirmed',
-                            confirmedAt: { $exists: true },
-                            receivedAt: { $exists: true }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMillis: { $subtract: ["$confirmedAt", "$receivedAt"] }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            avgTime: { $avg: "$diffInMinutes" },
-                            maxTime: { $max: "$diffInMinutes" },
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            avgTime: { $round: ["$avgTime", 2] },
-                            maxTime: { $round: ["$maxTime", 2] },
-                            count: 1
-                        }
-                    }
-                ],
+            if (purchase.confirmedAt) {
+                const confirmMinutes = calculateBusinessMinutes(purchase.receivedAt, purchase.confirmedAt);
+                confirmStats.push(confirmMinutes);
 
-                // Stats for total response time
-                totalStats: [
-                    {
-                        $match: {
-                            status: 'confirmed',
-                            confirmedAt: { $exists: true },
-                            createdAt: { $exists: true }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMillis: { $subtract: ["$confirmedAt", "$createdAt"] }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            diffInMinutes: { $divide: ["$diffInMillis", 60000] }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            avgTime: { $avg: "$diffInMinutes" },
-                            maxTime: { $max: "$diffInMinutes" },
-                            count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            avgTime: { $round: ["$avgTime", 2] },
-                            maxTime: { $round: ["$maxTime", 2] },
-                            count: 1
-                        }
-                    }
-                ],
-
-                statusCounts: [
-                    {
-                        $addFields: {
-                            adjustedStatus: { $ifNull: ["$status", "pending"] }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$adjustedStatus",
-                            count: { $sum: 1 }
-                        }
-                    }
-                ]
+                const totalMinutes = calculateBusinessMinutes(purchase.createdAt, purchase.confirmedAt);
+                totalStats.push(totalMinutes);
             }
         }
-    ]);
-
-    // Format the statistics
-    const stats = timeStats[0];
-    const formatStats = (statArray) => {
-        if (!statArray || !statArray[0]) return null;
-        const data = statArray[0];
-        return {
-            averageMinutes: Math.round(data.avgTime || 0),
-            maxMinutes: data.maxTime || 0,
-            count: data.count || 0
-        };
-    };
-
-    // Convert status counts array to object
-    const statusCounts = {};
-    stats.statusCounts.forEach(status => {
-        statusCounts[status._id] = status.count;
     });
 
-    // Use default start date from constant
+    // Helper function to calculate statistics
+    const calculateStats = (minutes) => {
+        if (!minutes || minutes.length === 0) return null;
+        return {
+            averageMinutes: Math.round(minutes.reduce((a, b) => a + b, 0) / minutes.length),
+            maxMinutes: Math.round(Math.max(...minutes)),
+            minMinutes: Math.round(Math.min(...minutes)),
+            count: minutes.length
+        };
+    };
 
     res.status(200).json({
         status: "success",
         data: {
             period: req.query.startDate || req.query.endDate ? "Custom range" : "Current month",
             dateRange: {
-                start: req.query.startDate ? new Date(req.query.startDate) : DEFAULT_STATS_START_DATE,
-                end: req.query.endDate ? new Date(req.query.endDate) : new Date(),
+                start: startDate,
+                end: endDate,
                 description: req.query.startDate || req.query.endDate ?
                     "Custom date range" :
                     "Since November 1st, 2025"
             },
-            receiveTime: formatStats(stats.receiveStats),
-            confirmTime: formatStats(stats.confirmStats),
-            totalResponseTime: formatStats(stats.totalStats),
+            receiveTime: calculateStats(receiveStats),
+            confirmTime: calculateStats(confirmStats),
+            totalResponseTime: calculateStats(totalStats),
             currentStatus: statusCounts
         }
     });

@@ -10,7 +10,7 @@ router
   .get(levelController.getAllLevels)
   .post(
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     levelController.createLevel
   );
 
@@ -19,7 +19,7 @@ router
   .get(levelController.getLevelById)
   .patch(
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     levelController.updateLevelById
   )
   .delete(
