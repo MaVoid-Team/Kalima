@@ -672,42 +672,45 @@ const CartPage = () => {
                 <div className="space-y-4">
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">
-                        {t("transferNumber") || "Transfer Number"}
-                        <span className="text-error ml-1">*</span>
-                      </span>
-                      {/* أيقونة المعلومات */}
-                      <div className="relative group cursor-pointer">
-                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-[#E69C1B]/15 text-[#E69C1B] hover:bg-[#E69C1B]/25 transition-all duration-200 shadow-sm">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M11.25 11.25v3.75m0-7.5h.008v.008H11.25V7.5zm0 12a8.25 8.25 0 100-16.5 8.25 8.25 0 000 16.5z"
-                            />
-                          </svg>
-                        </div>
+                      <div className="flex items-center  font-semibold">
+                        <span className="label-text">
+                          {t("transferNumber") || "Transfer Number"}
+                          <span className="text-error ml-0.5">*</span>
+                        </span>
 
-                     
-                        <div
-                          dir="ltr"
-                          className="absolute z-[9999] left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-1.5 
-               bg-gradient-to-r from-[#E69C1B] to-[#f7c76d] text-white text-sm font-semibold rounded-md shadow-lg
-               opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
-               transition-all duration-300 ease-out whitespace-nowrap"
-                        >
-                          +20 106 116 5403
-                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#E69C1B]" />
+                        <div className="relative group cursor-pointer">
+                          <div className="w-6 h-6 flex items-center justify-center rounded-full text-[#E69C1B] hover:bg-[#E69C1B]/25 transition-all duration-200 shadow-sm">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                              className="w-4 h-4"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M11.25 11.25v3.75m0-7.5h.008v.008H11.25V7.5zm0 12a8.25 8.25 0 100-16.5 8.25 8.25 0 000 16.5z"
+                              />
+                            </svg>
+                          </div>
+
+                          {/* Tooltip */}
+                          <div
+                            dir="ltr"
+                            className="absolute z-[9999] left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-1.5 
+          bg-gradient-to-r from-[#E69C1B] to-[#f7c76d] text-white text-sm font-semibold rounded-md shadow-lg
+          opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
+          transition-all duration-300 ease-out whitespace-nowrap"
+                          >
+                            +20 106 116 5403
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#E69C1B]" />
+                          </div>
                         </div>
                       </div>
                     </label>
+
                     <input
                       type="text"
                       placeholder={
