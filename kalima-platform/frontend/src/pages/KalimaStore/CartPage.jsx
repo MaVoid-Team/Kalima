@@ -31,7 +31,7 @@ const CartPage = () => {
   const handleCopy = () => {
     navigator.clipboard.writeText("+20 106 116 5403");
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500); // يرجع tooltip للحالة العادية بعد 1.5 ثانية
+    setTimeout(() => setCopied(false), 1500); 
   };
 
   const [cart, setCart] = useState(null);
