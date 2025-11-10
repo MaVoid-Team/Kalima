@@ -5,14 +5,24 @@ import { useTranslation } from "react-i18next"
 import {
   getAllProductPurchases,
   confirmProductPurchase,
-  confirmBookPurchase,
+  receiveProductPurchase,
   updatePurchase,
   deleteProductPurchase,
-  deleteBookPurchase,
 } from "../../../routes/orders"
 import { FaWhatsapp } from "react-icons/fa"
 import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X, Calendar, Filter } from "lucide-react"
 import * as XLSX from "xlsx"
+
+// Helper function to format price (as it was undeclared)
+const formatPrice = (price) => {
+  return `${price || 0} ج` // Assuming 'ج' is the currency symbol
+}
+
+// Helper function to calculate cart total (as it was undeclared)
+const calculateCartTotal = (order) => {
+  if (!order || !order.items) return 0
+  return order.items.reduce((total, item) => total + (item.priceAtPurchase * item.quantity || item.priceAtPurchase), 0)
+}
 
 const Orders = () => {
   const { t, i18n } = useTranslation("kalimaStore-orders")
@@ -73,7 +83,7 @@ const Orders = () => {
         queryParams.search = debouncedSearchQuery.trim()
       }
       if (statusFilter !== "all") {
-        queryParams.confirmed = statusFilter === "confirmed"
+        queryParams.status = statusFilter === "confirmed" ? "confirmed" : "pending"
       }
       // Add date filter to query params
       if (selectedDate) {
@@ -82,27 +92,44 @@ const Orders = () => {
 
       const response = await getAllProductPurchases(queryParams)
       if (response.success) {
-        let purchases = response.data.data.purchases
+        let purchases = response.data.cartPurchases || []
+
         if (typeFilter !== "all") {
-          if (typeFilter === "book") {
-            purchases = purchases.filter((order) => order.__t === "ECBookPurchase")
-          } else if (typeFilter === "product") {
-            purchases = purchases.filter((order) => !order.__t || order.__t !== "ECBookPurchase")
-          }
+          purchases = purchases.filter((purchase) => {
+            const itemTypes = purchase.items?.map((item) => item.productType) || []
+            if (typeFilter === "book") {
+              return itemTypes.some((type) => type === "ECBook")
+            } else if (typeFilter === "product") {
+              return itemTypes.some((type) => type === "ECProduct")
+            }
+            return true
+          })
         }
 
         setOrders(purchases)
-        setTotalPages(response.data.totalPages)
-        setTotalPurchases(response.data.totalPurchases)
+        setTotalPages(response.data.totalPages || 1)
+        setTotalPurchases(response.data.totalPurchases || purchases.length)
 
-        const allPurchases = response.data.data.purchases
-        const confirmed = allPurchases.filter((order) => order.confirmed).length
-        const pending = allPurchases.filter((order) => !order.confirmed).length
-        const products = allPurchases.filter((order) => !order.__t || order.__t !== "ECBookPurchase").length
-        const books = allPurchases.filter((order) => order.__t === "ECBookPurchase").length
+        const allPurchases = purchases
+        const confirmed = allPurchases.filter((order) => order.status === "confirmed").length
+        const pending = allPurchases.filter((order) => order.status !== "confirmed").length
+
+        let products = 0
+        let books = 0
+        allPurchases.forEach((purchase) => {
+          if (purchase.items) {
+            purchase.items.forEach((item) => {
+              if (item.productType === "ECBook") {
+                books++
+              } else if (item.productType === "ECProduct") {
+                products++
+              }
+            })
+          }
+        })
 
         setStats({
-          total: response.data.totalPurchases,
+          total: response.data.totalPurchases || purchases.length,
           confirmed: confirmed,
           pending: pending,
           products: products,
@@ -131,7 +158,6 @@ const Orders = () => {
   }, [])
 
   useEffect(() => {
-
     fetchOrders()
     fetchAllOrders()
   }, [fetchOrders, fetchAllOrders])
@@ -166,27 +192,57 @@ const Orders = () => {
   const handleConfirmOrder = async (order) => {
     try {
       setConfirmLoading({ ...confirmLoading, [order._id]: true })
+
       let response
-      if (order.__t === "ECBookPurchase") {
-        response = await confirmBookPurchase(order._id)
-      } else {
+      if (order.status === "pending") {
+        // First step: pending → received
+        response = await receiveProductPurchase(order._id)
+      } else if (order.status === "received") {
+        // Second step: received → confirmed
         response = await confirmProductPurchase(order._id)
+      } else {
+        // If already confirmed or in an unexpected state, do nothing or handle as error
+        alert(t("alerts.orderAlreadyConfirmedOrInvalidState"))
+        return
       }
 
       if (response.success) {
-        setOrders((prevOrders) => prevOrders.map((o) => (o._id === order._id ? { ...o, confirmed: true } : o)))
-        setStats((prevStats) => ({
-          ...prevStats,
-          confirmed: prevStats.confirmed + 1,
-          pending: prevStats.pending - 1,
-        }))
-        alert(t("alerts.orderConfirmed"))
+        setOrders((prevOrders) =>
+          prevOrders.map((o) => {
+            if (o._id === order._id) {
+              if (order.status === "pending") {
+                return { ...o, status: "received" }
+              } else if (order.status === "received") {
+                return { ...o, status: "confirmed", confirmed: true } // 'confirmed' flag for backward compatibility/UI use
+              }
+            }
+            return o
+          }),
+        )
+
+        setStats((prevStats) => {
+          const updates = { ...prevStats }
+          if (order.status === "pending") {
+            // Moving from pending to received - pending count decreases, received count could increase if tracked
+            updates.pending = Math.max(0, prevStats.pending - 1)
+            // Assuming 'received' is not a direct stat tracked, but pending decreases.
+            // If you want to track received, you'd need to add it to the stats state and increment here.
+          } else if (order.status === "received") {
+            // Moving from received to confirmed
+            updates.confirmed = prevStats.confirmed + 1
+            // Assuming 'received' count is not a main stat, pending count remains unchanged as it was already moved out of 'pending'
+          }
+          return updates
+        })
+
+        const successMessage = order.status === "pending" ? "orderReceived" : "orderConfirmed"
+        alert(t(`alerts.${successMessage}`))
       } else {
         throw new Error(response.error)
       }
     } catch (err) {
       console.error("Error confirming order:", err)
-      alert(t("alerts.failedToConfirm") + err.message)
+      alert(t("alerts.failedToConfirm") + (err?.message || ""))
     } finally {
       setConfirmLoading({ ...confirmLoading, [order._id]: false })
     }
@@ -208,8 +264,9 @@ const Orders = () => {
 
   const handleWhatsAppContact = (order) => {
     const phoneNumber = order.createdBy?.phoneNumber
+    // Updated message to be more generic, assuming product details are in the cart items
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك ${order.productName} بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب ، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`,
+      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`,
     )
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, "_blank")
@@ -221,12 +278,23 @@ const Orders = () => {
     }
   }
 
-  const getOrderType = (order) => {
-    return order.__t === "ECBookPurchase" ? "Book" : "Product"
+  const getProductNames = (order) => {
+    if (!order.items || order.items.length === 0) {
+      return "N/A"
+    }
+    return order.items.map((item) => item.productSnapshot?.title || "Unknown").join(", ")
   }
 
-  const formatPrice = (price) => {
-    return `${price} ج`
+  const getOrderType = (order) => {
+    if (!order.items || order.items.length === 0) {
+      return "Product"
+    }
+    const hasBooks = order.items.some((item) => item.productType === "ECBook")
+    const hasProducts = order.items.some((item) => item.productType === "ECProduct")
+    if (hasBooks && hasProducts) {
+      return "Mixed"
+    }
+    return hasBooks ? "Book" : "Product"
   }
 
   const formatTime = (dateString) =>
@@ -287,7 +355,7 @@ const Orders = () => {
       }
     } catch (error) {
       console.error("Error saving notes:", error)
-      alert(t("alerts.failedToSaveNotes") + error.message)
+      alert(t("alerts.failedToSaveNotes") + (error?.message || ""))
     } finally {
       setNotesModal((prev) => ({ ...prev, loading: false }))
     }
@@ -314,8 +382,13 @@ const Orders = () => {
     return orders.map((order) => ({
       ...order,
       orderType: getOrderType(order),
-      formattedPrice: formatPrice(order.price),
+      productNames: getProductNames(order),
+      formattedPrice: formatPrice(order.total || calculateCartTotal(order)), // Use helper function
       notesPreview: getNotesPreview(order.adminNotes),
+      // Ensure `confirmed` flag is derived from status for UI consistency
+      confirmed: order.status === "confirmed",
+      // Set `status` directly from order data, ensuring it's always available
+      status: order.status || "pending",
     }))
   }, [orders])
 
@@ -326,42 +399,59 @@ const Orders = () => {
   // Delete order handler
   const handleDeleteOrder = async (order) => {
     if (!order || !order._id) return
-    let result
-    if (order.type === "book" || order.productType === "book") {
-      result = await deleteBookPurchase(order._id)
-    } else {
-      result = await deleteProductPurchase(order._id)
-    }
-    if (result.success) {
-      setOrders((prev) => prev.filter((o) => o._id !== order._id))
-      setError(null)
-    } else {
-      setError(result.error || t("kalimaStore-orders.errors.deleteFailed"))
+    if (!confirm(t("alerts.confirmDeleteOrder"))) return // Add confirmation
+
+    try {
+      const result = await deleteProductPurchase(order._id)
+      if (result.success) {
+        setOrders((prev) => prev.filter((o) => o._id !== order._id))
+        setError(null)
+        // Optionally, update stats here if needed
+        alert(t("alerts.orderDeleted"))
+      } else {
+        throw new Error(result.error || t("kalimaStore-orders.errors.deleteFailed"))
+      }
+    } catch (err) {
+      setError(err.message)
+      alert(t("alerts.failedToDeleteOrder") + (err?.message || ""))
     }
   }
 
   const handleExport = async (type, scope) => {
     setExporting(true)
     try {
-      let data = scope === 'all' ? allOrders : memoizedOrders
-      if (type === 'csv') {
+      const data = scope === "all" ? allOrders : memoizedOrders
+      if (data.length === 0) {
+        alert(t("alerts.noDataToExport"))
+        return
+      }
+
+      if (type === "csv") {
         // Build CSV rows from current orders (memoizedOrders contains derived fields)
         const rows = data.map((o) => ({
           orderId: o._id,
           purchaseSerial: o.purchaseSerial || "",
-          productName: o.productName || o.product?.title || "",
+          productName: o.productNames || "", // Use productNames from memoizedOrders
           customerName: o.userName || o.createdBy?.name || "",
-          type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
-          price: o.price || "",
-          couponCode: o.couponCode || "",
-          transferredFrom: o.numberTransferredFrom || "",
-          status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+          type: o.orderType || "", // Use orderType from memoizedOrders
+          itemCount: o.items?.length || (o.productName ? 1 : 0), // Count items
+          price: o.formattedPrice || "", // Use formattedPrice from memoizedOrders
+          couponCode: o.couponCode?.value || o.discountAmount || "",
+          transferredFrom: o.numberTransferredFrom || o.bankTransferFrom || "",
+          status:
+            o.status === "confirmed"
+              ? t("table.confirmed")
+              : o.status === "received"
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }))
 
         // Convert to CSV
-        const header = Object.keys(rows[0] || {}).map((h) => `"${h}"`).join(",")
+        const header = Object.keys(rows[0] || {})
+          .map((h) => `"${h}"`)
+          .join(",")
         const csv = [header]
           .concat(
             rows.map((r) =>
@@ -383,17 +473,23 @@ const Orders = () => {
         a.remove()
         URL.revokeObjectURL(url)
         alert(t("alerts.exportSuccess") || "Export complete")
-      } else if (type === 'xlsx') {
+      } else if (type === "xlsx") {
         const rows = data.map((o) => ({
           orderId: o._id,
           purchaseSerial: o.purchaseSerial || "",
-          productName: o.productName || o.product?.title || "",
+          productName: o.productNames || "", // Use productNames from memoizedOrders
           customerName: o.userName || o.createdBy?.name || "",
-          type: o.orderType || (o.__t === "ECBookPurchase" ? t("table.book") : t("table.productType")),
-          price: o.price || "",
-          couponCode: o.couponCode || "",
-          transferredFrom: o.numberTransferredFrom || "",
-          status: o.confirmed ? t("table.confirmed") : t("table.pending"),
+          type: o.orderType || "", // Use orderType from memoizedOrders
+          itemCount: o.items?.length || (o.productName ? 1 : 0), // Count items
+          price: o.formattedPrice || "", // Use formattedPrice from memoizedOrders
+          couponCode: o.couponCode?.value || o.discountAmount || "",
+          transferredFrom: o.numberTransferredFrom || o.bankTransferFrom || "",
+          status:
+            o.status === "confirmed"
+              ? t("table.confirmed")
+              : o.status === "received"
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }))
@@ -405,9 +501,23 @@ const Orders = () => {
         const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.xlsx`
         XLSX.writeFile(workbook, fileName)
         alert(t("alerts.exportSuccess") || "Export complete")
-      } else if (type === 'json') {
+      } else if (type === "json") {
         const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.json`
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8;" })
+        // Filter out potentially large or sensitive data if necessary before stringifying
+        const dataToExport = data.map((o) => {
+          const { items, ...rest } = o // Destructure to handle items separately if needed
+          return {
+            ...rest,
+            items: items
+              ? items.map(({ product, ...itemProps }) => ({
+                  // Optionally clean up item.product if it's too verbose
+                  ...itemProps,
+                  productName: product?.title || itemProps.productName || "Unknown", // Ensure product name is present
+                }))
+              : [],
+          }
+        })
+        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json;charset=utf-8;" })
         const url = URL.createObjectURL(blob)
         const a = document.createElement("a")
         a.href = url
@@ -583,6 +693,7 @@ const Orders = () => {
                 <option value="all">{t("filters.allStatus")}</option>
                 <option value="confirmed">{t("filters.confirmed")}</option>
                 <option value="pending">{t("filters.pending")}</option>
+                <option value="received">{t("filters.received")}</option> {/* Added received filter */}
               </select>
             </div>
 
@@ -603,35 +714,74 @@ const Orders = () => {
               {t("refresh")}
             </button>
 
-              {/* Export CSV button */}
-              <div className="dropdown dropdown-end ml-2">
-  <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={exporting}>
-    {exporting ? (
-      <>
-        <span className="loading loading-spinner loading-sm"></span>
-        {t("exporting")}
-      </>
-    ) : (
-      <>
-        <span className="mr-2">📥</span>
-        {t("export")}
-      </>
-    )}
-  </div>
-  <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
-    <li className="menu-title"><span>{t("export.csvFormat") || "CSV Format"}</span></li>
-    <li><button onClick={() => handleExport('csv', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportCSVPage') || 'Export Page (CSV)'}</button></li>
-    <li><button onClick={() => handleExport('csv', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportCSVAll') || 'Export All (CSV)'}</button></li>
-    <div className="divider my-1"></div>
-    <li className="menu-title"><span>{t("export.jsonFormat") || "JSON Format"}</span></li>
-    <li><button onClick={() => handleExport('json', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportJSONPage') || 'Export Page (JSON)'}</button></li>
-    <li><button onClick={() => handleExport('json', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportJSONAll') || 'Export All (JSON)'}</button></li>
-    <div className="divider my-1"></div>
-    <li className="menu-title"><span>{t("export.xlsxFormat") || "XLSX Format"}</span></li>
-    <li><button onClick={() => handleExport('xlsx', 'page')} disabled={exporting || memoizedOrders.length === 0}>{t('exportXLSXPage') || 'Export Page (XLSX)'}</button></li>
-    <li><button onClick={() => handleExport('xlsx', 'all')} disabled={exporting || allOrders.length === 0}>{t('exportXLSXAll') || 'Export All (XLSX)'}</button></li>
-  </ul>
-</div>
+            {/* Export CSV button */}
+            <div className="dropdown dropdown-end ml-2">
+              <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={exporting}>
+                {exporting ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    {t("exporting")}
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">📥</span>
+                    {t("export")}
+                  </>
+                )}
+              </div>
+              <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+                <li className="menu-title">
+                  <span>{t("export.csvFormat") || "CSV Format"}</span>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleExport("csv", "page")}
+                    disabled={exporting || memoizedOrders.length === 0}
+                  >
+                    {t("exportCSVPage") || "Export Page (CSV)"}
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleExport("csv", "all")} disabled={exporting || allOrders.length === 0}>
+                    {t("exportCSVAll") || "Export All (CSV)"}
+                  </button>
+                </li>
+                <div className="divider my-1"></div>
+                <li className="menu-title">
+                  <span>{t("export.jsonFormat") || "JSON Format"}</span>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleExport("json", "page")}
+                    disabled={exporting || memoizedOrders.length === 0}
+                  >
+                    {t("exportJSONPage") || "Export Page (JSON)"}
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleExport("json", "all")} disabled={exporting || allOrders.length === 0}>
+                    {t("exportJSONAll") || "Export All (JSON)"}
+                  </button>
+                </li>
+                <div className="divider my-1"></div>
+                <li className="menu-title">
+                  <span>{t("export.xlsxFormat") || "XLSX Format"}</span>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleExport("xlsx", "page")}
+                    disabled={exporting || memoizedOrders.length === 0}
+                  >
+                    {t("exportXLSXPage") || "Export Page (XLSX)"}
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => handleExport("xlsx", "all")} disabled={exporting || allOrders.length === 0}>
+                    {t("exportXLSXAll") || "Export All (XLSX)"}
+                  </button>
+                </li>
+              </ul>
+            </div>
 
             {hasActiveFilters && (
               <button className="btn btn-ghost" onClick={clearFilters}>
@@ -698,7 +848,8 @@ const Orders = () => {
                 <th className="text-center">{t("table.product")}</th>
                 <th className="text-center">{t("table.customer")}</th>
                 <th className="text-center">{t("table.type")}</th>
-                <th className="text-center">{t("table.price")}</th>
+                <th className="text-center">{t("table.itemCount")}</th> {/* Changed from table.price */}
+                <th className="text-center">{t("table.price")}</th> {/* New header for total price */}
                 <th className="text-center">{t("table.couponCode")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
@@ -710,14 +861,18 @@ const Orders = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="text-center py-8">
+                  <td colSpan="11" className="text-center py-8">
+                    {" "}
+                    {/* Adjusted colSpan */}
                     <div className="loading loading-spinner loading-lg"></div>
                     <p className="mt-2 text-gray-500">{t("loading")}</p>
                   </td>
                 </tr>
               ) : memoizedOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="text-center py-8">
+                  <td colSpan="11" className="text-center py-8">
+                    {" "}
+                    {/* Adjusted colSpan */}
                     <p className="text-gray-500">
                       {searchQuery || statusFilter !== "all" || typeFilter !== "all" || selectedDate
                         ? t("noOrdersFound")
@@ -729,7 +884,7 @@ const Orders = () => {
                 memoizedOrders.map((order) => (
                   <tr key={order._id}>
                     <td className="text-center">
-                      <div className="font-bold text-sm">{order.productName}</div>
+                      <div className="font-bold text-sm">{order.productNames}</div>
                       <div className="text-xs opacity-50">{order.purchaseSerial}</div>
                     </td>
                     <td className="text-center">
@@ -740,21 +895,41 @@ const Orders = () => {
                       </div>
                     </td>
                     <td className="text-center">
-                      <div className={`badge ${order.orderType === "Book" ? "badge-primary" : "badge-secondary"}`}>
-                        {t(order.orderType === "Book" ? "table.book" : "table.productType")}
+                      <div
+                        className={`badge ${order.orderType === "Book" || order.orderType === "Mixed" ? "badge-primary" : "badge-secondary"}`}
+                      >
+                        {order.orderType}
                       </div>
                     </td>
-                    <td className="text-center font-bold">{order.finalPrice}</td>
+                    <td className="text-center font-bold">
+                      {order.items?.length || (order.productName ? 1 : 0)} {/* Display item count */}
+                    </td>
+                    <td className="text-center font-bold">{order.formattedPrice}</td> {/* Display cart total */}
                     <td className="text-center font-bold">
                       {order.couponCode != null ? (
-                        <span className="text-green-500">{order.couponCode.value}</span>
+                        <span className="text-green-500">
+                          {order.couponCode.value || order.discountAmount || "Applied"}
+                        </span>
                       ) : (
                         "NA"
                       )}
                     </td>
-                    <td className="text-center font-mono text-sm">{order.numberTransferredFrom}</td>
+                    <td className="text-center font-mono text-sm">
+                      {order.numberTransferredFrom || order.bankTransferFrom || "N/A"}
+                    </td>
                     <td className="text-center">
-                      {order.confirmed ? (
+                      {order.status !== "confirmed" ? (
+                        <div className="flex flex-col items-center gap-1">
+                          <div className={`badge ${order.status === "received" ? "badge-info" : "badge-warning"}`}>
+                            {order.status === "received" ? t("table.received") : t("table.pending")}
+                          </div>
+                          {order.confirmedBy && (
+                            <div className="text-xs opacity-50">
+                              {t("table.by")} {order.confirmedBy.name}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
                         <div className="flex flex-col items-center gap-1">
                           <div className="badge badge-success">{t("table.confirmed")}</div>
                           {order.confirmedBy && (
@@ -763,8 +938,6 @@ const Orders = () => {
                             </div>
                           )}
                         </div>
-                      ) : (
-                        <div className="badge badge-warning">{t("table.pending")}</div>
                       )}
                     </td>
                     <td className="text-center max-w-32">
@@ -780,7 +953,7 @@ const Orders = () => {
                       )}
                     </td>
                     <td className="text-center text-sm">
-                      {order.formattedCreatedAt} - {formatTime(order.createdAt)}
+                      {new Date(order.createdAt).toLocaleDateString(i18n.language)} - {formatTime(order.createdAt)}
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
@@ -812,7 +985,7 @@ const Orders = () => {
                             <ImageIcon className="w-3 h-3" />
                           </button>
                         )}
-                        {order.numberTransferredFrom && (
+                        {(order.numberTransferredFrom || order.bankTransferFrom) && (
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
                             onClick={() => handleWhatsAppContact(order)}
@@ -821,17 +994,20 @@ const Orders = () => {
                             <FaWhatsapp />
                           </button>
                         )}
-                        {!order.confirmed && (
+                        {order.status !== "confirmed" && (
                           <button
                             className="btn btn-success btn-sm"
                             onClick={() => handleConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
-                            title={t("table.confirmOrder")}
+                            title={order.status === "pending" ? t("table.receiveOrder") : t("table.confirmOrder")}
                           >
                             {confirmLoading[order._id] ? (
                               <span className="loading loading-spinner loading-xs"></span>
                             ) : (
-                              <Check className="w-4 h-4" />
+                              <>
+                                <Check className="w-4 h-4" />
+                                {order.status === "pending" ? t("table.receive") : t("table.confirm")}
+                              </>
                             )}
                           </button>
                         )}
@@ -997,7 +1173,7 @@ const Orders = () => {
       {/* Order Details Modal */}
       {showDetailsModal && selectedOrder && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
+          <div className="modal-box max-w-4xl">
             <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1032,31 +1208,51 @@ const Orders = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="label">
-                  <span className="label-text font-medium">{t("table.productInfo")}</span>
-                </label>
-                <div className="bg-base-200 p-3 rounded">
-                  <p>
-                    <strong>{t("table.name")}:</strong> {selectedOrder.productName}
-                  </p>
-                  <p>
-                    <strong>{t("table.type")}:</strong>{" "}
-                    {t(getOrderType(selectedOrder) === "Book" ? "table.book" : "table.productType")}
-                  </p>
-                  <p>
-                    <strong>{t("table.price")}:</strong> {formatPrice(selectedOrder.price)}
-                  </p>
-                  <p>
-                    <strong>{t("table.couponCode")}:</strong> {formatPrice(selectedOrder.couponCode?.value || "NA")}
-                  </p>
-                  {selectedOrder.notes && (
-                    <p>
-                      <strong>{t("table.customerNotes")}:</strong> {selectedOrder.notes}
-                    </p>
-                  )}
+              {selectedOrder.items && selectedOrder.items.length > 0 && (
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">Cart Items ({selectedOrder.items.length})</span>
+                  </label>
+                  <div className="bg-base-200 p-3 rounded space-y-3">
+                    {selectedOrder.items.map((item, idx) => (
+                      <div key={idx} className="border-b pb-2 last:border-b-0">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p>
+                              <strong>{item.productSnapshot?.title || item.productName}:</strong>
+                            </p>
+                            <p className="text-sm opacity-75">Type: {item.productType || "Product"}</p>
+                            {item.quantity && <p className="text-sm">Qty: {item.quantity}</p>}
+                          </div>
+                          <p className="font-bold">{formatPrice(item.priceAtPurchase)}</p>
+                        </div>
+                        {item.productType === "ECBook" && (
+                          <div className="mt-2 ml-4 border-l-2 border-primary pl-2 text-sm">
+                            <label className="label">
+                              <span className="label-text font-medium text-xs">{t("table.bookInfo")}</span>
+                            </label>
+                            {item.nameOnBook && (
+                              <p>
+                                <strong>{t("table.nameOnBook")}:</strong> {item.nameOnBook}
+                              </p>
+                            )}
+                            {item.numberOnBook && (
+                              <p>
+                                <strong>{t("table.numberOnBook")}:</strong> {item.numberOnBook}
+                              </p>
+                            )}
+                            {item.seriesName && (
+                              <p>
+                                <strong>{t("table.seriesName")}:</strong> {item.seriesName}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <label className="label">
@@ -1064,10 +1260,19 @@ const Orders = () => {
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
+                    <strong>{t("table.totalPrice")}:</strong> {formatPrice(calculateCartTotal(selectedOrder))}
+                  </p>
+                  {selectedOrder.discountAmount && (
+                    <p>
+                      <strong>Discount:</strong> {formatPrice(selectedOrder.discountAmount)}
+                    </p>
+                  )}
+                  <p>
                     <strong>{t("table.paymentNumber")}:</strong> {selectedOrder.paymentNumber}
                   </p>
                   <p>
-                    <strong>{t("table.transferredFrom")}:</strong> {selectedOrder.numberTransferredFrom}
+                    <strong>{t("table.transferredFrom")}:</strong>{" "}
+                    {selectedOrder.numberTransferredFrom || selectedOrder.bankTransferFrom || "N/A"}
                   </p>
                   {selectedOrder.paymentScreenShot && (
                     <div className="mt-2">
@@ -1082,25 +1287,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              {selectedOrder.__t === "ECBookPurchase" && (
-                <div>
-                  <label className="label">
-                    <span className="label-text font-medium">{t("table.bookInfo")}</span>
-                  </label>
-                  <div className="bg-base-200 p-3 rounded">
-                    <p>
-                      <strong>{t("table.nameOnBook")}:</strong> {selectedOrder.nameOnBook}
-                    </p>
-                    <p>
-                      <strong>{t("table.numberOnBook")}:</strong> {selectedOrder.numberOnBook}
-                    </p>
-                    <p>
-                      <strong>{t("table.seriesName")}:</strong> {selectedOrder.seriesName}
-                    </p>
-                  </div>
-                </div>
-              )}
-
               <div>
                 <label className="label">
                   <span className="label-text font-medium flex items-center gap-2">
@@ -1111,11 +1297,14 @@ const Orders = () => {
                 <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (
                     <div>
-                    <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
-                    <div className="flex flex-col">
-                    <p>Created By : </p>
-                    <p><strong>{selectedOrder.adminNoteBy.name}</strong></p>
-                    </div>
+                      <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
+                      {selectedOrder.adminNoteBy && (
+                        <div className="flex flex-col mt-2 text-xs opacity-75">
+                          <p>
+                            Created By: <strong>{selectedOrder.adminNoteBy.name}</strong>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
