@@ -214,7 +214,7 @@ export const deleteProductPurchase = async (purchaseId) => {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
-    const response = await axios.delete(`${API_URL}/api/v1/ec/purchases/${purchaseId}`, {
+    const response = await axios.delete(`${API_URL}/api/v1/ec/cart-purchases/${purchaseId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
