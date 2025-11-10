@@ -8,7 +8,7 @@ export default function FloatingContactButton() {
     <motion.button
       onClick={() =>
         window.open(
-          "https://wa.me/01061165403",
+          "https://wa.me/+201061165403",
           "_blank",
           "noopener,noreferrer"
         )
