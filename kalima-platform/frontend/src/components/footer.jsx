@@ -13,7 +13,7 @@ export default function Footer() {
           {/* Contact Info */}
           <div className={isRTL ? 'text-right' : 'text-left'}>
             <h3 className="text-xl font-bold mb-4">{t('contact')}</h3>
-            <p className="mb-2">01027314148</p>
+            <p className="mb-2">01061165403</p>
             <h4 className="text-lg font-bold mb-2">{t('followUs')}</h4>
             <div className='flex gap-4 '>
               <a href="https://www.facebook.com/kalima010" target="_blank" rel="noopener noreferrer">
