@@ -13,7 +13,14 @@ import {
   createCartPurchase,
 } from "../../routes/cart";
 import { validateCoupon } from "../../routes/marketCoupouns";
-import { ShoppingCart, Trash2, X, Check, Loader2, AlertCircle } from "lucide-react";
+import {
+  ShoppingCart,
+  Trash2,
+  X,
+  Check,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -59,15 +66,16 @@ const CartPage = () => {
         // Handle response: {"status":"success","data":{"cart":null,"itemCount":0}}
         const cartData = result.data?.data?.cart || null;
         const itemCount = result.data?.data?.itemCount || 0;
-        
+
         setCart(cartData);
-        
+
         // Check if cart has books (only if cart exists)
         if (cartData) {
           // The items might be in itemsWithDetails or items (need to populate)
           const items = cartData.itemsWithDetails || cartData.items || [];
           const hasBooks = items.some(
-            (item) => item.productType === "ECBook" || item.product?.__t === "ECBook"
+            (item) =>
+              item.productType === "ECBook" || item.product?.__t === "ECBook"
           );
           setRequiresBookDetails(hasBooks);
         } else {
@@ -75,12 +83,14 @@ const CartPage = () => {
           setRequiresBookDetails(false);
         }
       } else {
-        const errorMessage = result.error || t("errors.fetchCartFailed") || "Failed to load cart";
+        const errorMessage =
+          result.error || t("errors.fetchCartFailed") || "Failed to load cart";
         setError(errorMessage);
         toast.error(errorMessage);
       }
     } catch (err) {
-      const errorMessage = err.message || t("errors.fetchCartFailed") || "Failed to load cart";
+      const errorMessage =
+        err.message || t("errors.fetchCartFailed") || "Failed to load cart";
       setError(errorMessage);
       toast.error(errorMessage);
       console.error("Error fetching cart:", err);
@@ -104,10 +114,16 @@ const CartPage = () => {
         window.dispatchEvent(new Event("cart-updated"));
         toast.success(t("success.itemRemoved") || "Item removed from cart");
       } else {
-        toast.error(result.error || t("errors.removeItemFailed") || "Failed to remove item");
+        toast.error(
+          result.error ||
+            t("errors.removeItemFailed") ||
+            "Failed to remove item"
+        );
       }
     } catch (err) {
-      toast.error(err.message || t("errors.removeItemFailed") || "Failed to remove item");
+      toast.error(
+        err.message || t("errors.removeItemFailed") || "Failed to remove item"
+      );
     } finally {
       setActionLoading({ ...actionLoading, [itemId]: false });
     }
@@ -115,7 +131,11 @@ const CartPage = () => {
 
   // Handle clear cart
   const handleClearCart = async () => {
-    if (!confirm(t("confirmClearCart") || "Are you sure you want to clear your cart?")) {
+    if (
+      !confirm(
+        t("confirmClearCart") || "Are you sure you want to clear your cart?"
+      )
+    ) {
       return;
     }
     try {
@@ -124,15 +144,24 @@ const CartPage = () => {
       if (result.success) {
         setCart(null);
         setCouponCode("");
-        setCouponValidation({ isValid: false, message: "", discount: 0, loading: false });
+        setCouponValidation({
+          isValid: false,
+          message: "",
+          discount: 0,
+          loading: false,
+        });
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         toast.success(t("success.cartCleared") || "Cart cleared successfully");
       } else {
-        toast.error(result.error || t("errors.clearCartFailed") || "Failed to clear cart");
+        toast.error(
+          result.error || t("errors.clearCartFailed") || "Failed to clear cart"
+        );
       }
     } catch (err) {
-      toast.error(err.message || t("errors.clearCartFailed") || "Failed to clear cart");
+      toast.error(
+        err.message || t("errors.clearCartFailed") || "Failed to clear cart"
+      );
     } finally {
       setActionLoading({ ...actionLoading, clear: false });
     }
@@ -150,8 +179,14 @@ const CartPage = () => {
     try {
       // First validate the coupon
       const validationResult = await validateCoupon(couponCode);
-      if (!validationResult.success || validationResult.data?.status === "fail") {
-        const errorMessage = validationResult.data?.message || validationResult.error || t("errors.invalidCoupon");
+      if (
+        !validationResult.success ||
+        validationResult.data?.status === "fail"
+      ) {
+        const errorMessage =
+          validationResult.data?.message ||
+          validationResult.error ||
+          t("errors.invalidCoupon");
         setCouponValidation({
           isValid: false,
           message: errorMessage,
@@ -174,9 +209,14 @@ const CartPage = () => {
         await fetchCart(); // Refresh cart to show updated totals
         // Trigger cart count update (in case cart state changed)
         window.dispatchEvent(new Event("cart-updated"));
-        toast.success(t("success.couponApplied") || "Coupon applied successfully");
+        toast.success(
+          t("success.couponApplied") || "Coupon applied successfully"
+        );
       } else {
-        const errorMessage = applyResult.error || t("errors.applyCouponFailed") || "Failed to apply coupon";
+        const errorMessage =
+          applyResult.error ||
+          t("errors.applyCouponFailed") ||
+          "Failed to apply coupon";
         setCouponValidation({
           isValid: false,
           message: errorMessage,
@@ -186,7 +226,10 @@ const CartPage = () => {
         toast.error(errorMessage);
       }
     } catch (err) {
-      const errorMessage = err.message || t("errors.applyCouponFailed") || "Failed to apply coupon";
+      const errorMessage =
+        err.message ||
+        t("errors.applyCouponFailed") ||
+        "Failed to apply coupon";
       setCouponValidation({
         isValid: false,
         message: errorMessage,
@@ -200,7 +243,12 @@ const CartPage = () => {
   // Handle remove coupon
   const handleRemoveCoupon = async () => {
     setCouponCode("");
-    setCouponValidation({ isValid: false, message: "", discount: 0, loading: false });
+    setCouponValidation({
+      isValid: false,
+      message: "",
+      discount: 0,
+      loading: false,
+    });
     // Re-fetch cart to remove coupon
     await fetchCart();
   };
@@ -208,7 +256,10 @@ const CartPage = () => {
   // Handle file upload
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setCheckoutData({ ...checkoutData, paymentScreenShot: e.target.files[0] });
+      setCheckoutData({
+        ...checkoutData,
+        paymentScreenShot: e.target.files[0],
+      });
     }
   };
 
@@ -226,26 +277,31 @@ const CartPage = () => {
     let isValid = true;
 
     if (!checkoutData.numberTransferredFrom.trim()) {
-      errors.numberTransferredFrom = t("errors.noTransferNumber") || "Please enter transfer number";
+      errors.numberTransferredFrom =
+        t("errors.noTransferNumber") || "Please enter transfer number";
       isValid = false;
     }
 
     if (!checkoutData.paymentScreenShot) {
-      errors.paymentScreenShot = t("errors.noFileSelected") || "Please upload payment screenshot";
+      errors.paymentScreenShot =
+        t("errors.noFileSelected") || "Please upload payment screenshot";
       isValid = false;
     }
 
     if (requiresBookDetails) {
       if (!checkoutData.nameOnBook.trim()) {
-        errors.nameOnBook = t("errors.nameOnBookRequired") || "Name on book is required";
+        errors.nameOnBook =
+          t("errors.nameOnBookRequired") || "Name on book is required";
         isValid = false;
       }
       if (!checkoutData.numberOnBook.trim()) {
-        errors.numberOnBook = t("errors.numberOnBookRequired") || "Number on book is required";
+        errors.numberOnBook =
+          t("errors.numberOnBookRequired") || "Number on book is required";
         isValid = false;
       }
       if (!checkoutData.seriesName.trim()) {
-        errors.seriesName = t("errors.seriesNameRequired") || "Series name is required";
+        errors.seriesName =
+          t("errors.seriesNameRequired") || "Series name is required";
         isValid = false;
       }
     }
@@ -267,7 +323,9 @@ const CartPage = () => {
 
     // Validate form
     if (!validateCheckoutForm()) {
-      toast.error(t("errors.validationFailed") || "Please fill in all required fields");
+      toast.error(
+        t("errors.validationFailed") || "Please fill in all required fields"
+      );
       return;
     }
 
@@ -275,7 +333,9 @@ const CartPage = () => {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
-        toast.success(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
+        toast.success(
+          t("success.purchaseSubmitted") || "Purchase submitted successfully!"
+        );
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         // Reset form and redirect
@@ -299,11 +359,18 @@ const CartPage = () => {
           navigate("/market");
         }, 1000);
       } else {
-        const errorMessage = result.error || t("errors.checkoutFailed") || "Failed to submit purchase. Please try again.";
+        const errorMessage =
+          result.error ||
+          t("errors.checkoutFailed") ||
+          "Failed to submit purchase. Please try again.";
         toast.error(errorMessage);
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || t("errors.checkoutFailed") || "An error occurred. Please try again.";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        t("errors.checkoutFailed") ||
+        "An error occurred. Please try again.";
       toast.error(errorMessage);
     } finally {
       setCheckoutLoading(false);
@@ -338,9 +405,14 @@ const CartPage = () => {
         <div className="card bg-base-100 shadow-xl max-w-md w-full">
           <div className="card-body text-center">
             <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">{t("errors.title") || "Error"}</h3>
+            <h3 className="text-xl font-bold mb-2">
+              {t("errors.title") || "Error"}
+            </h3>
             <p className="mb-6">{error}</p>
-            <button onClick={() => navigate("/market")} className="btn btn-primary">
+            <button
+              onClick={() => navigate("/market")}
+              className="btn btn-primary"
+            >
               {t("backToMarket") || "Back to Market"}
             </button>
           </div>
@@ -353,14 +425,25 @@ const CartPage = () => {
   const cartItems = cart?.itemsWithDetails || cart?.items || [];
   if (!cart || cartItems.length === 0) {
     return (
-      <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body text-center py-16">
               <ShoppingCart className="w-24 h-24 mx-auto mb-6 text-gray-400" />
-              <h2 className="text-3xl font-bold mb-4">{t("emptyCart.title") || "Your cart is empty"}</h2>
-              <p className="text-gray-500 mb-8">{t("emptyCart.description") || "Start shopping to add items to your cart"}</p>
-              <button onClick={() => navigate("/market")} className="btn btn-primary btn-lg">
+              <h2 className="text-3xl font-bold mb-4">
+                {t("emptyCart.title") || "Your cart is empty"}
+              </h2>
+              <p className="text-gray-500 mb-8">
+                {t("emptyCart.description") ||
+                  "Start shopping to add items to your cart"}
+              </p>
+              <button
+                onClick={() => navigate("/market")}
+                className="btn btn-primary btn-lg"
+              >
                 {t("emptyCart.shopNow") || "Shop Now"}
               </button>
             </div>
@@ -371,11 +454,16 @@ const CartPage = () => {
   }
 
   return (
-    <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div
+      className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">{t("title") || "Shopping Cart"}</h1>
+          <h1 className="text-3xl font-bold">
+            {t("title") || "Shopping Cart"}
+          </h1>
           <button onClick={() => navigate("/market")} className="btn btn-ghost">
             {t("continueShopping") || "Continue Shopping"}
           </button>
@@ -390,64 +478,84 @@ const CartPage = () => {
               const itemData = item.product || item;
               const productSnapshot = item.productSnapshot || itemData;
               const itemId = item._id;
-              const productType = item.productType || (itemData?.__t === "ECBook" ? "ECBook" : "ECProduct");
-              
+              const productType =
+                item.productType ||
+                (itemData?.__t === "ECBook" ? "ECBook" : "ECProduct");
+
               return (
-              <div key={itemId} className="card bg-base-100 shadow-lg">
-                <div className="card-body">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    {/* Product Image */}
-                    <div className="flex-shrink-0">
-                      <img
-                        src={
-                          convertPathToUrl(productSnapshot?.thumbnail, "product_thumbnails") ||
-                          "/placeholder.svg"
-                        }
-                        alt={productSnapshot?.title || "Product"}
-                        className="w-32 h-32 object-cover rounded-lg"
-                      />
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="flex-grow">
-                      <h3 className="text-xl font-bold mb-2">
-                        {productSnapshot?.title || itemData?.title || "Product"}
-                      </h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="badge badge-secondary">
-                          {productType === "ECBook" ? t("type.book") || "Book" : t("type.product") || "Product"}
-                        </span>
+                <div key={itemId} className="card bg-base-100 shadow-lg">
+                  <div className="card-body">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {/* Product Image */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={
+                            convertPathToUrl(
+                              productSnapshot?.thumbnail,
+                              "product_thumbnails"
+                            ) || "/placeholder.svg"
+                          }
+                          alt={productSnapshot?.title || "Product"}
+                          className="w-32 h-32 object-cover rounded-lg"
+                        />
                       </div>
-                      <div className="flex items-center gap-4 mb-4">
-                        <span className="text-2xl font-bold text-primary">
-                          {item.finalPrice || item.priceAtAdd || productSnapshot?.priceAfterDiscount || productSnapshot?.price} {t("currency") || "EGP"}
-                        </span>
-                        {(productSnapshot?.originalPrice || productSnapshot?.price) &&
-                          (productSnapshot?.originalPrice || productSnapshot?.price) > (item.finalPrice || item.priceAtAdd || productSnapshot?.priceAfterDiscount || productSnapshot?.price) && (
-                            <span className="text-lg line-through text-gray-500">
-                              {productSnapshot.originalPrice || productSnapshot.price} {t("currency") || "EGP"}
-                            </span>
+
+                      {/* Product Info */}
+                      <div className="flex-grow">
+                        <h3 className="text-xl font-bold mb-2">
+                          {productSnapshot?.title ||
+                            itemData?.title ||
+                            "Product"}
+                        </h3>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="badge badge-secondary">
+                            {productType === "ECBook"
+                              ? t("type.book") || "Book"
+                              : t("type.product") || "Product"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="text-2xl font-bold text-primary">
+                            {item.finalPrice ||
+                              item.priceAtAdd ||
+                              productSnapshot?.priceAfterDiscount ||
+                              productSnapshot?.price}{" "}
+                            {t("currency") || "EGP"}
+                          </span>
+                          {(productSnapshot?.originalPrice ||
+                            productSnapshot?.price) &&
+                            (productSnapshot?.originalPrice ||
+                              productSnapshot?.price) >
+                              (item.finalPrice ||
+                                item.priceAtAdd ||
+                                productSnapshot?.priceAfterDiscount ||
+                                productSnapshot?.price) && (
+                              <span className="text-lg line-through text-gray-500">
+                                {productSnapshot.originalPrice ||
+                                  productSnapshot.price}{" "}
+                                {t("currency") || "EGP"}
+                              </span>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* Remove Button */}
+                      <div className="flex items-start">
+                        <button
+                          onClick={() => handleRemoveItem(itemId)}
+                          disabled={actionLoading[itemId]}
+                          className="btn btn-ghost btn-sm text-error"
+                        >
+                          {actionLoading[itemId] ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
                           )}
+                        </button>
                       </div>
-                    </div>
-
-                    {/* Remove Button */}
-                    <div className="flex items-start">
-                      <button
-                        onClick={() => handleRemoveItem(itemId)}
-                        disabled={actionLoading[itemId]}
-                        className="btn btn-ghost btn-sm text-error"
-                      >
-                        {actionLoading[itemId] ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
               );
             })}
 
@@ -475,12 +583,16 @@ const CartPage = () => {
             {/* Order Summary */}
             <div className="card bg-base-100 shadow-lg sticky top-4">
               <div className="card-body">
-                <h2 className="text-2xl font-bold mb-4">{t("orderSummary") || "Order Summary"}</h2>
+                <h2 className="text-2xl font-bold mb-4">
+                  {t("orderSummary") || "Order Summary"}
+                </h2>
 
                 {/* Coupon Section */}
                 <div className="form-control mb-4">
                   <label className="label">
-                    <span className="label-text font-semibold">{t("couponCode") || "Coupon Code"}</span>
+                    <span className="label-text font-semibold">
+                      {t("couponCode") || "Coupon Code"}
+                    </span>
                   </label>
                   <div className="join w-full">
                     <input
@@ -488,11 +600,18 @@ const CartPage = () => {
                       placeholder={t("enterCoupon") || "Enter coupon"}
                       className="input input-bordered join-item w-full"
                       value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      disabled={couponValidation.isValid || couponValidation.loading}
+                      onChange={(e) =>
+                        setCouponCode(e.target.value.toUpperCase())
+                      }
+                      disabled={
+                        couponValidation.isValid || couponValidation.loading
+                      }
                     />
                     {couponValidation.isValid ? (
-                      <button onClick={handleRemoveCoupon} className="btn join-item btn-ghost">
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="btn join-item btn-ghost"
+                      >
                         <X className="w-4 h-4" />
                       </button>
                     ) : (
@@ -513,7 +632,9 @@ const CartPage = () => {
                     <label className="label">
                       <span
                         className={`label-text-alt ${
-                          couponValidation.isValid ? "text-success" : "text-error"
+                          couponValidation.isValid
+                            ? "text-success"
+                            : "text-error"
                         }`}
                       >
                         {couponValidation.message}
@@ -526,18 +647,24 @@ const CartPage = () => {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between">
                     <span>{t("subtotal") || "Subtotal"}</span>
-                    <span className="font-semibold">{cart.subtotal} {t("currency") || "EGP"}</span>
+                    <span className="font-semibold">
+                      {cart.subtotal} {t("currency") || "EGP"}
+                    </span>
                   </div>
                   {cart.discount > 0 && (
                     <div className="flex justify-between text-success">
                       <span>{t("discount") || "Discount"}</span>
-                      <span className="font-semibold">-{cart.discount} {t("currency") || "EGP"}</span>
+                      <span className="font-semibold">
+                        -{cart.discount} {t("currency") || "EGP"}
+                      </span>
                     </div>
                   )}
                   <div className="divider"></div>
                   <div className="flex justify-between text-xl font-bold">
                     <span>{t("total") || "Total"}</span>
-                    <span className="text-primary">{cart.total} {t("currency") || "EGP"}</span>
+                    <span className="text-primary">
+                      {cart.total} {t("currency") || "EGP"}
+                    </span>
                   </div>
                 </div>
 
@@ -549,20 +676,62 @@ const CartPage = () => {
                         {t("transferNumber") || "Transfer Number"}
                         <span className="text-error ml-1">*</span>
                       </span>
+                      {/* أيقونة المعلومات */}
+                      <div className="relative group cursor-pointer">
+                        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-[#E69C1B]/15 text-[#E69C1B] hover:bg-[#E69C1B]/25 transition-all duration-200 shadow-sm">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="currentColor"
+                            className="w-4 h-4"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M11.25 11.25v3.75m0-7.5h.008v.008H11.25V7.5zm0 12a8.25 8.25 0 100-16.5 8.25 8.25 0 000 16.5z"
+                            />
+                          </svg>
+                        </div>
+
+                     
+                        <div
+                          dir="ltr"
+                          className="absolute z-[9999] left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-1.5 
+               bg-gradient-to-r from-[#E69C1B] to-[#f7c76d] text-white text-sm font-semibold rounded-md shadow-lg
+               opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
+               transition-all duration-300 ease-out whitespace-nowrap"
+                        >
+                          +20 106 116 5403
+                          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#E69C1B]" />
+                        </div>
+                      </div>
                     </label>
                     <input
                       type="text"
-                      placeholder={t("enterTransferNumber") || "Enter transfer number"}
-                      className={`input input-bordered ${validationErrors.numberTransferredFrom ? "input-error" : ""}`}
+                      placeholder={
+                        t("enterTransferNumber") || "Enter transfer number"
+                      }
+                      className={`input input-bordered ${
+                        validationErrors.numberTransferredFrom
+                          ? "input-error"
+                          : ""
+                      }`}
                       value={checkoutData.numberTransferredFrom}
                       onChange={(e) => {
-                        setCheckoutData({ ...checkoutData, numberTransferredFrom: e.target.value });
+                        setCheckoutData({
+                          ...checkoutData,
+                          numberTransferredFrom: e.target.value,
+                        });
                         clearFieldError("numberTransferredFrom");
                       }}
                     />
                     {validationErrors.numberTransferredFrom && (
                       <label className="label">
-                        <span className="label-text-alt text-error">{validationErrors.numberTransferredFrom}</span>
+                        <span className="label-text-alt text-error">
+                          {validationErrors.numberTransferredFrom}
+                        </span>
                       </label>
                     )}
                   </div>
@@ -577,7 +746,11 @@ const CartPage = () => {
                     <input
                       type="file"
                       accept="image/*,.pdf"
-                      className={`file-input file-input-bordered w-full ${validationErrors.paymentScreenShot ? "file-input-error" : ""}`}
+                      className={`file-input file-input-bordered w-full ${
+                        validationErrors.paymentScreenShot
+                          ? "file-input-error"
+                          : ""
+                      }`}
                       onChange={(e) => {
                         handleFileChange(e);
                         clearFieldError("paymentScreenShot");
@@ -585,54 +758,78 @@ const CartPage = () => {
                     />
                     {validationErrors.paymentScreenShot && (
                       <label className="label">
-                        <span className="label-text-alt text-error">{validationErrors.paymentScreenShot}</span>
-                      </label>
-                    )}
-                    {checkoutData.paymentScreenShot && !validationErrors.paymentScreenShot && (
-                      <label className="label">
-                        <span className="label-text-alt text-success">
-                          {t("fileSelected") || "File selected"}: {checkoutData.paymentScreenShot.name}
+                        <span className="label-text-alt text-error">
+                          {validationErrors.paymentScreenShot}
                         </span>
                       </label>
                     )}
+                    {checkoutData.paymentScreenShot &&
+                      !validationErrors.paymentScreenShot && (
+                        <label className="label">
+                          <span className="label-text-alt text-success">
+                            {t("fileSelected") || "File selected"}:{" "}
+                            {checkoutData.paymentScreenShot.name}
+                          </span>
+                        </label>
+                      )}
                   </div>
 
                   {requiresBookDetails && (
                     <div className="card bg-info text-info-content">
                       <div className="card-body p-4">
-                        <h3 className="font-bold mb-2">{t("bookDetails") || "Book Details"}</h3>
+                        <h3 className="font-bold mb-2">
+                          {t("bookDetails") || "Book Details"}
+                        </h3>
                         <div className="space-y-2">
                           <div>
                             <input
                               type="text"
                               placeholder={t("nameOnBook") || "Name on book"}
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.nameOnBook ? "input-error" : ""}`}
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${
+                                validationErrors.nameOnBook ? "input-error" : ""
+                              }`}
                               value={checkoutData.nameOnBook}
                               onChange={(e) => {
-                                setCheckoutData({ ...checkoutData, nameOnBook: e.target.value });
+                                setCheckoutData({
+                                  ...checkoutData,
+                                  nameOnBook: e.target.value,
+                                });
                                 clearFieldError("nameOnBook");
                               }}
                             />
                             {validationErrors.nameOnBook && (
                               <label className="label py-1">
-                                <span className="label-text-alt text-error">{validationErrors.nameOnBook}</span>
+                                <span className="label-text-alt text-error">
+                                  {validationErrors.nameOnBook}
+                                </span>
                               </label>
                             )}
                           </div>
                           <div>
                             <input
                               type="text"
-                              placeholder={t("numberOnBook") || "Number on book"}
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.numberOnBook ? "input-error" : ""}`}
+                              placeholder={
+                                t("numberOnBook") || "Number on book"
+                              }
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${
+                                validationErrors.numberOnBook
+                                  ? "input-error"
+                                  : ""
+                              }`}
                               value={checkoutData.numberOnBook}
                               onChange={(e) => {
-                                setCheckoutData({ ...checkoutData, numberOnBook: e.target.value });
+                                setCheckoutData({
+                                  ...checkoutData,
+                                  numberOnBook: e.target.value,
+                                });
                                 clearFieldError("numberOnBook");
                               }}
                             />
                             {validationErrors.numberOnBook && (
                               <label className="label py-1">
-                                <span className="label-text-alt text-error">{validationErrors.numberOnBook}</span>
+                                <span className="label-text-alt text-error">
+                                  {validationErrors.numberOnBook}
+                                </span>
                               </label>
                             )}
                           </div>
@@ -640,16 +837,23 @@ const CartPage = () => {
                             <input
                               type="text"
                               placeholder={t("seriesName") || "Series name"}
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${validationErrors.seriesName ? "input-error" : ""}`}
+                              className={`input input-bordered bg-base-100 text-base-content w-full ${
+                                validationErrors.seriesName ? "input-error" : ""
+                              }`}
                               value={checkoutData.seriesName}
                               onChange={(e) => {
-                                setCheckoutData({ ...checkoutData, seriesName: e.target.value });
+                                setCheckoutData({
+                                  ...checkoutData,
+                                  seriesName: e.target.value,
+                                });
                                 clearFieldError("seriesName");
                               }}
                             />
                             {validationErrors.seriesName && (
                               <label className="label py-1">
-                                <span className="label-text-alt text-error">{validationErrors.seriesName}</span>
+                                <span className="label-text-alt text-error">
+                                  {validationErrors.seriesName}
+                                </span>
                               </label>
                             )}
                           </div>
@@ -660,13 +864,20 @@ const CartPage = () => {
 
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-semibold">{t("notes") || "Notes"}</span>
+                      <span className="label-text font-semibold">
+                        {t("notes") || "Notes"}
+                      </span>
                     </label>
                     <textarea
                       placeholder={t("optionalNotes") || "Optional notes"}
                       className="textarea textarea-bordered h-24"
                       value={checkoutData.notes}
-                      onChange={(e) => setCheckoutData({ ...checkoutData, notes: e.target.value })}
+                      onChange={(e) =>
+                        setCheckoutData({
+                          ...checkoutData,
+                          notes: e.target.value,
+                        })
+                      }
                     ></textarea>
                   </div>
 
@@ -698,4 +909,3 @@ const CartPage = () => {
 };
 
 export default CartPage;
-
