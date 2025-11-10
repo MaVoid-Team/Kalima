@@ -26,6 +26,13 @@ const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("+20 106 116 5403");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500); // يرجع tooltip للحالة العادية بعد 1.5 ثانية
+  };
 
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -677,37 +684,6 @@ const CartPage = () => {
                           {t("transferNumber") || "Transfer Number"}
                           <span className="text-error ml-0.5">*</span>
                         </span>
-
-                        <div className="relative group cursor-pointer">
-                          <div className="w-6 h-6 flex items-center justify-center rounded-full text-[#E69C1B] hover:bg-[#E69C1B]/25 transition-all duration-200 shadow-sm">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                              stroke="currentColor"
-                              className="w-4 h-4"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M11.25 11.25v3.75m0-7.5h.008v.008H11.25V7.5zm0 12a8.25 8.25 0 100-16.5 8.25 8.25 0 000 16.5z"
-                              />
-                            </svg>
-                          </div>
-
-                          {/* Tooltip */}
-                          <div
-                            dir="ltr"
-                            className="absolute z-[9999] left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-1.5 
-          bg-gradient-to-r from-[#E69C1B] to-[#f7c76d] text-white text-sm font-semibold rounded-md shadow-lg
-          opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
-          transition-all duration-300 ease-out whitespace-nowrap"
-                          >
-                            +20 106 116 5403
-                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-[#E69C1B]" />
-                          </div>
-                        </div>
                       </div>
                     </label>
 
@@ -901,6 +877,32 @@ const CartPage = () => {
                       </>
                     )}
                   </button>
+
+                  <div
+                    dir="rtl"
+                    className="text-center md:text-right mt-5 py-4 px-2 border-t border-amber-200 
+      bg-gradient-to-br from-[#f7d37f] via-[#e6b756] to-[#d49a3a] 
+      rounded-2xl relative shadow-[0_8px_30px_rgba(212,154,58,0.25)]"
+                  >
+                    <p
+                      onMouseEnter={handleCopy}
+                      className="text-xl md:text-xl font-bold text-white text-center relative cursor-pointer select-none transition-all duration-300 hover:text-[#fff9e6] group"
+                    >
+                      برجاء دفع المبلغ على الرقم التالي
+                     
+                      <span
+                        dir="ltr"
+                        className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-3 px-5 py-2.5
+          bg-white/90 text-[#b67b18] text-base font-semibold rounded-xl shadow-[0_5px_20px_rgba(0,0,0,0.15)]
+          backdrop-blur-md border border-white/70
+          opacity-0 scale-95 -translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:-translate-y-4
+          transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap pointer-events-none`}
+                      >
+                        {copied ? "تم نسخ الرقم " : "+20 106 116 5403"}
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-white/90 border-r border-b border-white/70 shadow-sm" />
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
