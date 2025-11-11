@@ -12,7 +12,7 @@ router
     .get(productController.getAllProducts)
     .post(
         verifyJWT,
-        authController.verifyRoles("Admin", "SubAdmin"),
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         uploadProductFilesToDisk, // handles both thumbnail and sample
         productController.createProduct
     );
@@ -22,7 +22,7 @@ router
     .get(productController.getProductById)
     .patch(
         verifyJWT,
-        authController.verifyRoles("Admin", "SubAdmin"),
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         uploadProductFilesToDisk, // handles both thumbnail and sample
         productController.updateProduct
     )

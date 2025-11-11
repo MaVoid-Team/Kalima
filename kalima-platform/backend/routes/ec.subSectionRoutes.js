@@ -11,7 +11,7 @@ router.get("/", ecSubsectionController.getAllSubSections);
 router.post(
     "/",
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"), // adjust roles as needed
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"), // adjust roles as needed
     ecSubsectionController.createSubSection
 );
 
@@ -23,7 +23,7 @@ router.get("/:id", ecSubsectionController.getSubSectionWithProducts);
 router.patch(
     "/:id",
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     ecSubsectionController.updateSubSection
 );
 

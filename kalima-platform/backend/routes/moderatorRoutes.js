@@ -5,17 +5,17 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
-router.use(verifyJWT,authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
+router.use(verifyJWT);
 
 router
     .route("/")
-    .post(moderatorController.createModerator)
-    .get(moderatorController.getAllModerators);
+    .post(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.createModerator)
+    .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.getAllModerators);
 
 router
     .route("/:id")
     .get(moderatorController.getModeratorById)
-    .patch(moderatorController.updateModerator)
-    .delete(moderatorController.deleteModerator);
+    .patch(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.updateModerator)
+    .delete(authController.verifyRoles("Admin", "SubAdmin"), moderatorController.deleteModerator);
 
 module.exports = router;
