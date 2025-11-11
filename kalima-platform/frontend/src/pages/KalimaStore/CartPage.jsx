@@ -9,7 +9,6 @@ import {
   removeFromCart,
   clearCart,
   applyCouponToCart,
-  getCheckoutPreview,
   createCartPurchase,
 } from "../../routes/cart";
 import { validateCoupon } from "../../routes/marketCoupouns";
