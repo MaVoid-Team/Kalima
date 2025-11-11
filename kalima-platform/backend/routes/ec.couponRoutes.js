@@ -11,7 +11,7 @@ router.use(verifyJWT);
 // Admin and subadmin can create coupons
 router.post(
   "/",
-  authController.verifyRoles("Admin", "SubAdmin"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   couponController.createCoupon
 );
 
