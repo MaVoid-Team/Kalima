@@ -24,14 +24,10 @@ export default function Overlay() {
       if (result.success) {
         const itemCount = result.data?.data?.itemCount || 0;
         setCartCount(itemCount);
-
-        // Show overlay only for the first added product
         if (itemCount === 1 && !localStorage.getItem("overlayShown")) {
           setShowOverlay(true);
           localStorage.setItem("overlayShown", "true");
         }
-
-        // Reset overlay when the cart becomes empty
         if (itemCount === 0) {
           localStorage.removeItem("overlayShown");
           setShowOverlay(false);
@@ -42,7 +38,6 @@ export default function Overlay() {
     }
   };
 
-  /** 🔁 Update cart count on 'cart-updated' event */
   useEffect(() => {
     fetchCartCount();
     const handleCartUpdate = () => fetchCartCount();
@@ -50,7 +45,6 @@ export default function Overlay() {
     return () => window.removeEventListener("cart-updated", handleCartUpdate);
   }, []);
 
-  /** 🚫 Hide overlay when on the cart page */
   useEffect(() => {
     if (location.pathname === "/cart") setShowOverlay(false);
   }, [location.pathname]);
