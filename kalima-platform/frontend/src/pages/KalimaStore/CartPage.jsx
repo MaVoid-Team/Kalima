@@ -27,6 +27,7 @@ const CartPage = () => {
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+    
 
   const handleCopy = () => {
     navigator.clipboard.writeText("+20 106 116 5403");
@@ -390,7 +391,7 @@ const CartPage = () => {
     if (filePath.startsWith("http")) return filePath;
     const normalizedPath = filePath.replace(/\\/g, "/");
     const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
-    const baseUrl = API_URL.replace(/\/$/, "");
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
     const filename = normalizedPath.split("/").pop();
     return `${baseUrl}/uploads/${folder}/${filename}`;
   };
