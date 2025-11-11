@@ -9,6 +9,7 @@ import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
+import Overlay from "./pages/KalimaStore/Components/overlay";
 
 // Lazy load components
 const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
@@ -310,6 +311,7 @@ function App() {
           <Footer />{" "}
         </footer>
       )}{" "}
+      <Overlay />
     </div>
   );
 }
