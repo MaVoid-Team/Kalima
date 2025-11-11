@@ -260,6 +260,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
     // Execute query
     const purchases = await ECCartPurchase.find(query)
+        .populate({ path: 'createdBy', select: "name email role phoneNumber" })
         .populate('confirmedBy', 'name')
         .populate('receivedBy', 'name')
         .populate('adminNoteBy', 'name')
