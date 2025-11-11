@@ -11,7 +11,7 @@ router
     .get(ecBookController.getAllECBooks)
     .post(
         verifyJWT,
-        authController.verifyRoles("Admin", "SubAdmin"),
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         uploadProductFilesToDisk, // handles both thumbnail and sample
         ecBookController.createECBook
     );
@@ -21,7 +21,7 @@ router
     .get(ecBookController.getECBookById)
     .patch(
         verifyJWT,
-        authController.verifyRoles("Admin", "SubAdmin"),
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         uploadProductFilesToDisk, // handles both thumbnail and sample
         ecBookController.updateECBook
     )
