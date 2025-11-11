@@ -21,9 +21,7 @@ import {
   Check,
   Loader2,
   AlertCircle,
-  ArrowUp,
 } from "lucide-react";
-import { MotionConfig } from "framer-motion";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -671,8 +669,8 @@ const CartPage = () => {
                   )}
                   <div className="divider"></div>
                   <div className="space-y-2">
-                    {/* Total */}
-                    <div className="flex items-center justify-between text-2xl font-bold">
+                   
+                    <div className="flex items-center  justify-between text-2xl font-bold">
                       <span className="text-white">
                         {t("total") || "Total"}
                       </span>
@@ -680,9 +678,7 @@ const CartPage = () => {
                         {cart.total} {t("currency") || "EGP"}
                       </span>
                     </div>
-
                     <div className="divider"></div>
-
                     {/* Payment number section */}
                     <div
                       dir="rtl"
@@ -703,7 +699,6 @@ const CartPage = () => {
                           +20 106 116 5403
                         </span>
 
-                        {/* ✅ “تم النسخ” tooltip بعد الضغط */}
                         <motion.span
                           initial={{ opacity: 0, y: 5 }}
                           animate={{
@@ -714,7 +709,7 @@ const CartPage = () => {
                           className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-green-700 
         text-sm font-semibold px-3 py-1 rounded-lg shadow-lg border border-green-200 whitespace-nowrap"
                         >
-                          ✅ تم النسخ
+                          تم النسخ
                           <span className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-white border-r border-b border-green-200" />
                         </motion.span>
                       </div>
@@ -906,41 +901,24 @@ const CartPage = () => {
                       }
                     ></textarea>
                   </div>
-                  <div className="relative flex justify-center">
-                    {/* Checkout button */}
-                    <button
-                      onClick={handleCheckout}
-                      disabled={checkoutLoading}
-                      className="btn btn-primary btn-lg w-full relative"
-                    >
-                      {checkoutLoading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          {t("processing") || "Processing..."}
-                        </>
-                      ) : (
-                        <>
-                          <Check className="w-5 h-5" />
-                          {t("checkout") || "Checkout"}
-                        </>
-                      )}
-                    </button>
 
-                    {/* 🧭 Animated arrow + tooltip */}
-                    <motion.div
-                      initial={{ y: 0 }}
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ repeat: Infinity, duration: 1.2 }}
-                      className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-amber-500"
-                    >
-                      <span className="text-sm bg-white/90 px-2 py-1 rounded-md shadow-md text-gray-700 mb-1">
-                        {isRTL
-                          ? "اضغط هنا لإتمام الشراء"
-                          : "Click here to complete your order"}
-                      </span>
-                      <ArrowUp className="w-6 h-6 text-amber-500" />
-                    </motion.div>
-                  </div>
+                  <button
+                    onClick={handleCheckout}
+                    disabled={checkoutLoading}
+                    className="btn btn-primary btn-lg w-full"
+                  >
+                    {checkoutLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        {t("processing") || "Processing..."}
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-5 h-5" />
+                        {t("checkout") || "Checkout"}
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
