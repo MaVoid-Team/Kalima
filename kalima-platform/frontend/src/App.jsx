@@ -311,7 +311,7 @@ function App() {
           <Footer />{" "}
         </footer>
       )}{" "}
-      <Overlay />
+      <Overlay/>
     </div>
   );
 }
