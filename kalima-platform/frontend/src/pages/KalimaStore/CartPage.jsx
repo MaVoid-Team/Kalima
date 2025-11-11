@@ -13,6 +13,7 @@ import {
   createCartPurchase,
 } from "../../routes/cart";
 import { validateCoupon } from "../../routes/marketCoupouns";
+import { motion } from "framer-motion";
 import {
   ShoppingCart,
   Trash2,
@@ -20,7 +21,9 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  ArrowUp,
 } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -31,7 +34,7 @@ const CartPage = () => {
   const handleCopy = () => {
     navigator.clipboard.writeText("+20 106 116 5403");
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500); // يرجع tooltip للحالة العادية بعد 1.5 ثانية
+    setTimeout(() => setCopied(false), 1500);
   };
 
   const [cart, setCart] = useState(null);
@@ -667,11 +670,55 @@ const CartPage = () => {
                     </div>
                   )}
                   <div className="divider"></div>
-                  <div className="flex justify-between text-xl font-bold">
-                    <span>{t("total") || "Total"}</span>
-                    <span className="text-primary">
-                      {cart.total} {t("currency") || "EGP"}
-                    </span>
+                  <div className="space-y-2">
+                    {/* Total */}
+                    <div className="flex items-center justify-between text-2xl font-bold">
+                      <span className="text-white">
+                        {t("total") || "Total"}
+                      </span>
+                      <span className="text-primary">
+                        {cart.total} {t("currency") || "EGP"}
+                      </span>
+                    </div>
+
+                    <div className="divider"></div>
+
+                    {/* Payment number section */}
+                    <div
+                      dir="rtl"
+                      className="flex flex-col justify-center md:justify-end items-center mt-2 text-center"
+                    >
+                      <p className="text-[16px] md:text-lg font-medium text-white mb-2">
+                        برجاء دفع المبلغ على الرقم التالي:
+                      </p>
+
+                      {/* رقم الدفع */}
+                      <div
+                        onClick={handleCopy}
+                        className="relative inline-flex items-center gap-2 bg-gradient-to-br from-[#f9d67a] via-[#e3b956] to-[#d19b3c]
+      text-[#4a3000] font-semibold px-4 py-2 rounded-lg shadow-md cursor-pointer 
+      active:scale-95 transition-transform duration-200 select-none"
+                      >
+                        <span dir="ltr" className="select-all">
+                          +20 106 116 5403
+                        </span>
+
+                        {/* ✅ “تم النسخ” tooltip بعد الضغط */}
+                        <motion.span
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{
+                            opacity: copied ? 1 : 0,
+                            y: copied ? 0 : 5,
+                          }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-green-700 
+        text-sm font-semibold px-3 py-1 rounded-lg shadow-lg border border-green-200 whitespace-nowrap"
+                        >
+                          ✅ تم النسخ
+                          <span className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-white border-r border-b border-green-200" />
+                        </motion.span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -859,49 +906,40 @@ const CartPage = () => {
                       }
                     ></textarea>
                   </div>
-
-                  <button
-                    onClick={handleCheckout}
-                    disabled={checkoutLoading}
-                    className="btn btn-primary btn-lg w-full"
-                  >
-                    {checkoutLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {t("processing") || "Processing..."}
-                      </>
-                    ) : (
-                      <>
-                        <Check className="w-5 h-5" />
-                        {t("checkout") || "Checkout"}
-                      </>
-                    )}
-                  </button>
-
-                  <div
-                    dir="rtl"
-                    className="text-center md:text-right mt-5 py-4 px-2 border-t border-amber-200 
-      bg-gradient-to-br from-[#f7d37f] via-[#e6b756] to-[#d49a3a] 
-      rounded-2xl relative shadow-[0_8px_30px_rgba(212,154,58,0.25)]"
-                  >
-                    <p
-                      onMouseEnter={handleCopy}
-                      className="text-xl md:text-xl font-bold text-white text-center relative cursor-pointer select-none transition-all duration-300 hover:text-[#fff9e6] group"
+                  <div className="relative flex justify-center">
+                    {/* Checkout button */}
+                    <button
+                      onClick={handleCheckout}
+                      disabled={checkoutLoading}
+                      className="btn btn-primary btn-lg w-full relative"
                     >
-                      برجاء دفع المبلغ على الرقم التالي
-                     
-                      <span
-                        dir="ltr"
-                        className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-3 px-5 py-2.5
-          bg-white/90 text-[#b67b18] text-base font-semibold rounded-xl shadow-[0_5px_20px_rgba(0,0,0,0.15)]
-          backdrop-blur-md border border-white/70
-          opacity-0 scale-95 -translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:-translate-y-4
-          transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap pointer-events-none`}
-                      >
-                        {copied ? "تم نسخ الرقم " : "+20 106 116 5403"}
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-white/90 border-r border-b border-white/70 shadow-sm" />
+                      {checkoutLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          {t("processing") || "Processing..."}
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-5 h-5" />
+                          {t("checkout") || "Checkout"}
+                        </>
+                      )}
+                    </button>
+
+                    {/* 🧭 Animated arrow + tooltip */}
+                    <motion.div
+                      initial={{ y: 0 }}
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.2 }}
+                      className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center text-amber-500"
+                    >
+                      <span className="text-sm bg-white/90 px-2 py-1 rounded-md shadow-md text-gray-700 mb-1">
+                        {isRTL
+                          ? "اضغط هنا لإتمام الشراء"
+                          : "Click here to complete your order"}
                       </span>
-                    </p>
+                      <ArrowUp className="w-6 h-6 text-amber-500" />
+                    </motion.div>
                   </div>
                 </div>
               </div>
