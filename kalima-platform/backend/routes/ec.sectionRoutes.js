@@ -12,7 +12,7 @@ router.get('/allowed/:id', verifyJWT, ecSectionController.getSectionByIdAllowed)
 
 router.route("/").get(ecSectionController.getAllSections).post(
   verifyJWT,
-  authController.verifyRoles("Admin", "SubAdmin"),
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
   ecSectionController.createSection
 );
 
@@ -27,7 +27,7 @@ router
   .get(ecSectionController.getSectionById)
   .patch(
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     ecSectionController.updateSection
   )
   .delete(

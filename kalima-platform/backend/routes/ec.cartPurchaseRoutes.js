@@ -23,18 +23,19 @@ router.route('/admin/all')
 
 router.route('/admin/statistics')
     .get(
-        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        authController.verifyRoles("Admin"),
         cartPurchaseController.getPurchaseStatistics
     );
 
 router.route('/admin/response-time')
     .get(
-        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        authController.verifyRoles("Admin"),
         cartPurchaseController.getResponseTimeStatistics
     );
 
 router.route('/:id')
-    .get(cartPurchaseController.getCartPurchaseById);
+    .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        cartPurchaseController.getCartPurchaseById);
 
 router.route('/:id/receive')
     .patch(
