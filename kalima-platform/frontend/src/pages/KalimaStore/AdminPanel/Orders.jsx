@@ -847,7 +847,6 @@ const Orders = () => {
               <tr>
                 <th className="text-center">{t("table.product")}</th>
                 <th className="text-center">{t("table.customer")}</th>
-                <th className="text-center">{t("table.type")}</th>
                 <th className="text-center">{t("table.itemCount")}</th> {/* Changed from table.price */}
                 <th className="text-center">{t("table.price")}</th> {/* New header for total price */}
                 <th className="text-center">{t("table.couponCode")}</th>
@@ -892,13 +891,6 @@ const Orders = () => {
                         <div className="font-medium">{order.userName}</div>
                         <div className="text-xs opacity-50">{order.createdBy?.email}</div>
                         <div className="text-xs opacity-50">{order.createdBy?.role}</div>
-                      </div>
-                    </td>
-                    <td className="text-center">
-                      <div
-                        className={`badge ${order.orderType === "Book" || order.orderType === "Mixed" ? "badge-primary" : "badge-secondary"}`}
-                      >
-                        {order.orderType}
                       </div>
                     </td>
                     <td className="text-center font-bold">
