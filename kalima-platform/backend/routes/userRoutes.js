@@ -18,7 +18,7 @@ router
   .patch(
     validateUser,
     verifyJWT,
-    authController.verifyRoles("Admin", "SubAdmin"),
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     userController.updateUser
   )
   .delete(
