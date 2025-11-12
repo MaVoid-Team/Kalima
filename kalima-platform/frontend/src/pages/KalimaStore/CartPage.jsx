@@ -852,7 +852,7 @@ const CartPage = () => {
                  cursor-pointer select-none transition-all duration-300
                  hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
                     >
-                      <span dir="ltr" className="select-all tracking-wide">
+                      <span dir="ltr" className="select-all  text-white tracking-wide">
                         +20 106 116 5403
                       </span>
 
