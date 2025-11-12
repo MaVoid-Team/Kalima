@@ -20,6 +20,10 @@ import {
   Check,
   Loader2,
   AlertCircle,
+  ShoppingBag,
+  CheckCircle2,
+  ShoppingCartIcon,
+  CircleCheckBigIcon,
 } from "lucide-react";
 
 const CartPage = () => {
@@ -468,13 +472,114 @@ const CartPage = () => {
     >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+          <motion.h1
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-3xl font-bold text-center sm:text-left"
+          >
             {t("title") || "Shopping Cart"}
-          </h1>
-          <button onClick={() => navigate("/market")} className="btn btn-ghost">
-            {t("continueShopping") || "Continue Shopping"}
-          </button>
+          </motion.h1>
+
+          <motion.button
+            whileHover={{ scale: 1.07 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/market")}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="relative group overflow-hidden h-12 px-4 w-full sm:w-auto rounded-xl
+             font-semibold text-[15px] tracking-wide flex items-center justify-center gap-2
+             text-white shadow-[0_4px_20px_rgba(255,180,0,0.3)]
+             active:scale-95 transition-all duration-300 border border-yellow-400/50"
+            style={{
+              background:
+                "linear-gradient(270deg, #FFD95A, #F9B208, #F7C948, #E0A400, #FFD95A)",
+              backgroundSize: "400% 400%",
+              animation: "goldFlow 6s ease infinite",
+            }}
+          >
+            {/* Text + Icon */}
+            <motion.span
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center justify-center gap-2 z-10"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {t("continueShopping") || "Continue Shopping"}
+            </motion.span>
+
+            {/* Triple Arrows */}
+            <div className="flex items-center justify-center z-10">
+              {[0, 1, 2].map((index) => (
+                <motion.span
+                  key={index}
+                  animate={{ x: [0, -5, 0], opacity: [1, 0.7, 1] }}
+                  transition={{
+                    duration: 1.6,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: index * 0.15, // slight offset for flowing motion
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`w-4 h-4 text-white ${
+                      index === 0
+                        ? "opacity-100"
+                        : index === 1
+                        ? "opacity-80"
+                        : "opacity-60"
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </motion.span>
+              ))}
+            </div>
+
+            {/* Shine Effect */}
+            <span
+              className="absolute inset-0 opacity-0 group-hover:opacity-100
+             bg-gradient-to-r from-transparent via-white/30 to-transparent
+             transition-opacity duration-700"
+              style={{
+                animation: "shineMove 2.5s linear infinite",
+                pointerEvents: "none",
+                mixBlendMode: "screen",
+              }}
+            ></span>
+
+            <style jsx global>{`
+              @keyframes goldFlow {
+                0% {
+                  background-position: 0% 50%;
+                }
+                50% {
+                  background-position: 100% 50%;
+                }
+                100% {
+                  background-position: 0% 50%;
+                }
+              }
+              @keyframes shineMove {
+                0% {
+                  transform: translateX(-100%);
+                }
+                100% {
+                  transform: translateX(100%);
+                }
+              }
+            `}</style>
+          </motion.button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -588,25 +693,35 @@ const CartPage = () => {
 
           {/* Right Column - Summary & Checkout */}
           <div className="space-y-6">
-            {/* Order Summary */}
             <div className="card bg-base-100 shadow-lg sticky top-4">
               <div className="card-body">
                 <h2 className="text-2xl font-bold mb-4">
                   {t("orderSummary") || "Order Summary"}
                 </h2>
-
                 {/* Coupon Section */}
-                <div className="form-control mb-4">
-                  <label className="label">
-                    <span className="label-text font-semibold">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="form-control mb-8 space-y-3"
+                >
+                  <label className="label mb-1">
+                    <span className="label-text font-semibold text-base text-white mb-1 dark:text-gray-200">
                       {t("couponCode") || "Coupon Code"}
                     </span>
                   </label>
-                  <div className="join w-full">
+
+                  {/* Input + Buttons Container */}
+                  <div
+                    className="flex w-full items-center bg-base-100 border border-base-300 rounded-lg overflow-hidden 
+               shadow-sm hover:shadow-md transition-all duration-300 "
+                  >
+                    {/* Input Field */}
                     <input
                       type="text"
                       placeholder={t("enterCoupon") || "Enter coupon"}
-                      className="input input-bordered join-item w-full"
+                      className="flex-grow h-12 px-4 text-base bg-transparent outline-none 
+                 placeholder:text-gray-400 disabled:opacity-60"
                       value={couponCode}
                       onChange={(e) =>
                         setCouponCode(e.target.value.toUpperCase())
@@ -615,283 +730,326 @@ const CartPage = () => {
                         couponValidation.isValid || couponValidation.loading
                       }
                     />
+
+                    {/* Buttons */}
                     {couponValidation.isValid ? (
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={handleRemoveCoupon}
-                        className="btn join-item btn-ghost"
+                        className="btn btn-ghost h-12 px-5 rounded-none sm:rounded-r-xl 
+                   focus:outline-none focus:ring-0 active:scale-95 transition-all duration-200"
                       >
-                        <X className="w-4 h-4" />
-                      </button>
+                        <X className="w-5 h-5 text-error" />
+                      </motion.button>
                     ) : (
-                      <button
-                        className="btn btn-outline join-item"
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={handleApplyCoupon}
                         disabled={couponValidation.loading || !couponCode}
+                        className="btn btn-primary h-12 px-6 rounded-none sm:rounded-r-sm
+                   text-white font-medium text-base tracking-wide 
+                   focus:outline-none focus:ring-0 transition-all duration-200
+                   disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {couponValidation.loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
                         ) : (
-                          t("apply") || "Apply"
+                          <span>{t("apply") || "Apply"}</span>
                         )}
-                      </button>
+                      </motion.button>
                     )}
                   </div>
+
+                  {/* Coupon Message */}
                   {couponValidation.message && (
-                    <label className="label">
+                    <motion.label
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="label mt-1"
+                    >
                       <span
-                        className={`label-text-alt ${
+                        className={`label-text-alt text-sm font-medium ${
                           couponValidation.isValid
-                            ? "text-success"
+                            ? "text-green-600"
                             : "text-error"
                         }`}
                       >
                         {couponValidation.message}
                       </span>
-                    </label>
+                    </motion.label>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Price Breakdown */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
-                    <span>{t("subtotal") || "Subtotal"}</span>
-                    <span className="font-semibold">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="space-y-4 mb-6 p-5 rounded-2xl bg-gradient-to-br from-base-200/40 to-base-100/60 
+             shadow-inner border border-base-300 backdrop-blur-sm"
+                >
+                  {/* Subtotal */}
+                  <div className="flex justify-between items-center text-sm md:text-base">
+                    <span className="text-gray-400 font-medium">
+                      {t("subtotal") || "Subtotal"}
+                    </span>
+                    <span className="font-semibold text-gray-100">
                       {cart.subtotal} {t("currency") || "EGP"}
                     </span>
                   </div>
+
+                  {/* Discount */}
                   {cart.discount > 0 && (
-                    <div className="flex justify-between text-success">
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4 }}
+                      className="flex justify-between text-success font-medium"
+                    >
                       <span>{t("discount") || "Discount"}</span>
-                      <span className="font-semibold">
+                      <span>
                         -{cart.discount} {t("currency") || "EGP"}
                       </span>
-                    </div>
+                    </motion.div>
                   )}
-                  <div className="divider"></div>
-                  <div className="space-y-2">
-                   
-                    <div className="flex items-center  justify-between text-2xl font-bold">
-                      <span className="text-white">
-                        {t("total") || "Total"}
-                      </span>
-                      <span className="text-primary">
-                        {cart.total} {t("currency") || "EGP"}
-                      </span>
-                    </div>
-                    <div className="divider"></div>
-                    {/* Payment number section */}
-                    <div
-                      dir="rtl"
-                      className="flex flex-col justify-center md:justify-end items-center mt-2 text-center"
-                    >
-                      <p className="text-[16px] md:text-lg font-medium text-white mb-2">
-                        برجاء دفع المبلغ على الرقم التالي:
-                      </p>
 
-                      {/* رقم الدفع */}
-                      <div
-                        onClick={handleCopy}
-                        className="relative inline-flex items-center gap-2 bg-gradient-to-br from-[#f9d67a] via-[#e3b956] to-[#d19b3c]
-      text-[#4a3000] font-semibold px-4 py-2 rounded-lg shadow-md cursor-pointer 
-      active:scale-95 transition-transform duration-200 select-none"
-                      >
-                        <span dir="ltr" className="select-all">
-                          +20 106 116 5403
-                        </span>
+                  {/* Divider */}
+                  <div className="border-t border-base-300 my-2"></div>
 
-                        <motion.span
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{
-                            opacity: copied ? 1 : 0,
-                            y: copied ? 0 : 5,
-                          }}
-                          transition={{ duration: 0.3 }}
-                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white text-green-700 
-        text-sm font-semibold px-3 py-1 rounded-lg shadow-lg border border-green-200 whitespace-nowrap"
-                        >
-                          تم النسخ
-                          <span className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-white border-r border-b border-green-200" />
-                        </motion.span>
-                      </div>
-                    </div>
+                  {/* Total */}
+                  <div className="flex items-center justify-between text-xl md:text-2xl font-bold tracking-wide">
+                    <span className="text-gray-200">
+                      {t("total") || "Total"}
+                    </span>
+                    <span className="text-primary drop-shadow-sm">
+                      {cart.total} {t("currency") || "EGP"}
+                    </span>
                   </div>
-                </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-base-300 my-3"></div>
+
+                  {/* Payment Section */}
+                  <div
+                    dir="rtl"
+                    className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
+                  >
+                    <p className="text-base md:text-lg font-semibold text-gray-100">
+                      برجاء دفع المبلغ على الرقم التالي:
+                    </p>
+
+                    {/* Payment Number */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={handleCopy}
+                      className="relative inline-flex items-center justify-center gap-2
+                 bg-gradient-to-br from-[#f8e3a1] via-[#f1c05a] to-[#dca52f]
+                 text-[#3a2500] font-bold px-6 py-3 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.25)]
+                 cursor-pointer select-none transition-all duration-300
+                 hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
+                    >
+                      <span dir="ltr" className="select-all  text-white tracking-wide">
+                        +20 106 116 5403
+                      </span>
+
+                      {/* Copy Tooltip */}
+                      <motion.span
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{
+                          opacity: copied ? 1 : 0,
+                          y: copied ? 0 : 5,
+                        }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+                   bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-lg shadow-lg
+                   border border-green-200 whitespace-nowrap"
+                      >
+                        تم النسخ
+                        <span
+                          className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 
+                         bg-white border-r border-b border-green-200"
+                        />
+                      </motion.span>
+                    </motion.div>
+
+                    <p className="text-xs text-gray-400 mt-1">
+                      (اضغط على الرقم لنسخه تلقائيًا)
+                    </p>
+                  </div>
+                </motion.div>
 
                 {/* Checkout Form */}
-                <div className="space-y-4">
-                  <div className="form-control">
-                    <label className="label">
-                      <div className="flex items-center  font-semibold">
-                        <span className="label-text">
+                <div className="space-y-6">
+                  {[
+                    {
+                      key: "transferNumber",
+                      label: (
+                        <>
                           {t("transferNumber") || "Transfer Number"}
                           <span className="text-error ml-0.5">*</span>
-                        </span>
-                      </div>
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder={
-                        t("enterTransferNumber") || "Enter transfer number"
-                      }
-                      className={`input input-bordered ${
-                        validationErrors.numberTransferredFrom
-                          ? "input-error"
-                          : ""
-                      }`}
-                      value={checkoutData.numberTransferredFrom}
-                      onChange={(e) => {
-                        setCheckoutData({
-                          ...checkoutData,
-                          numberTransferredFrom: e.target.value,
-                        });
-                        clearFieldError("numberTransferredFrom");
-                      }}
-                    />
-                    {validationErrors.numberTransferredFrom && (
-                      <label className="label">
-                        <span className="label-text-alt text-error">
-                          {validationErrors.numberTransferredFrom}
-                        </span>
+                        </>
+                      ),
+                      input: (
+                        <input
+                          type="text"
+                          placeholder={
+                            t("enterTransferNumber") || "Enter transfer number"
+                          }
+                          className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
+                            validationErrors.numberTransferredFrom
+                              ? "input-error"
+                              : ""
+                          }`}
+                          value={checkoutData.numberTransferredFrom}
+                          onChange={(e) => {
+                            setCheckoutData({
+                              ...checkoutData,
+                              numberTransferredFrom: e.target.value,
+                            });
+                            clearFieldError("numberTransferredFrom");
+                          }}
+                        />
+                      ),
+                      error: validationErrors.numberTransferredFrom,
+                    },
+                    {
+                      key: "paymentScreenshot",
+                      label: (
+                        <>
+                          {t("paymentScreenshot") || "Payment Screenshot"}
+                          <span className="text-error ml-1">*</span>
+                        </>
+                      ),
+                      input: (
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
+                            validationErrors.paymentScreenShot
+                              ? "file-input-error"
+                              : ""
+                          }`}
+                          onChange={(e) => {
+                            handleFileChange(e);
+                            clearFieldError("paymentScreenShot");
+                          }}
+                        />
+                      ),
+                      extra: checkoutData.paymentScreenShot &&
+                        !validationErrors.paymentScreenShot && (
+                          <label className="label mt-1">
+                            <span className="label-text-alt text-success">
+                              {t("fileSelected") || "File selected"}:{" "}
+                              {checkoutData.paymentScreenShot.name}
+                            </span>
+                          </label>
+                        ),
+                      error: validationErrors.paymentScreenShot,
+                    },
+                  ].map((field, index) => (
+                    <motion.div
+                      key={field.key}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="form-control space-y-2"
+                    >
+                      <label className="label mb-2 font-semibold">
+                        <span className="label-text">{field.label}</span>
                       </label>
-                    )}
-                  </div>
-
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
-                        {t("paymentScreenshot") || "Payment Screenshot"}
-                        <span className="text-error ml-1">*</span>
-                      </span>
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*,.pdf"
-                      className={`file-input file-input-bordered w-full ${
-                        validationErrors.paymentScreenShot
-                          ? "file-input-error"
-                          : ""
-                      }`}
-                      onChange={(e) => {
-                        handleFileChange(e);
-                        clearFieldError("paymentScreenShot");
-                      }}
-                    />
-                    {validationErrors.paymentScreenShot && (
-                      <label className="label">
-                        <span className="label-text-alt text-error">
-                          {validationErrors.paymentScreenShot}
-                        </span>
-                      </label>
-                    )}
-                    {checkoutData.paymentScreenShot &&
-                      !validationErrors.paymentScreenShot && (
+                      {field.input}
+                      {field.error && (
                         <label className="label">
-                          <span className="label-text-alt text-success">
-                            {t("fileSelected") || "File selected"}:{" "}
-                            {checkoutData.paymentScreenShot.name}
+                          <span className="label-text-alt text-error">
+                            {field.error}
                           </span>
                         </label>
                       )}
-                  </div>
+                      {field.extra}
+                    </motion.div>
+                  ))}
 
+                  {/* Book Details */}
                   {requiresBookDetails && (
-                    <div className="card bg-info text-info-content">
-                      <div className="card-body p-4">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                      className="card bg-info text-info-content"
+                    >
+                      <div className="card-body p-4 space-y-3">
                         <h3 className="font-bold mb-2">
                           {t("bookDetails") || "Book Details"}
                         </h3>
-                        <div className="space-y-2">
-                          <div>
+
+                        {[
+                          {
+                            key: "nameOnBook",
+                            placeholder: t("nameOnBook") || "Name on book",
+                          },
+                          {
+                            key: "numberOnBook",
+                            placeholder: t("numberOnBook") || "Number on book",
+                          },
+                          {
+                            key: "seriesName",
+                            placeholder: t("seriesName") || "Series name",
+                          },
+                        ].map((field, index) => (
+                          <motion.div
+                            key={field.key}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: index * 0.1 }}
+                            className="space-y-2"
+                          >
                             <input
                               type="text"
-                              placeholder={t("nameOnBook") || "Name on book"}
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${
-                                validationErrors.nameOnBook ? "input-error" : ""
+                              placeholder={field.placeholder}
+                              className={`input input-bordered bg-base-100 text-base-content h-12 w-full ${
+                                validationErrors[field.key] ? "input-error" : ""
                               }`}
-                              value={checkoutData.nameOnBook}
+                              value={checkoutData[field.key]}
                               onChange={(e) => {
                                 setCheckoutData({
                                   ...checkoutData,
-                                  nameOnBook: e.target.value,
+                                  [field.key]: e.target.value,
                                 });
-                                clearFieldError("nameOnBook");
+                                clearFieldError(field.key);
                               }}
                             />
-                            {validationErrors.nameOnBook && (
-                              <label className="label py-1">
+                            {validationErrors[field.key] && (
+                              <label className="label">
                                 <span className="label-text-alt text-error">
-                                  {validationErrors.nameOnBook}
+                                  {validationErrors[field.key]}
                                 </span>
                               </label>
                             )}
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              placeholder={
-                                t("numberOnBook") || "Number on book"
-                              }
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${
-                                validationErrors.numberOnBook
-                                  ? "input-error"
-                                  : ""
-                              }`}
-                              value={checkoutData.numberOnBook}
-                              onChange={(e) => {
-                                setCheckoutData({
-                                  ...checkoutData,
-                                  numberOnBook: e.target.value,
-                                });
-                                clearFieldError("numberOnBook");
-                              }}
-                            />
-                            {validationErrors.numberOnBook && (
-                              <label className="label py-1">
-                                <span className="label-text-alt text-error">
-                                  {validationErrors.numberOnBook}
-                                </span>
-                              </label>
-                            )}
-                          </div>
-                          <div>
-                            <input
-                              type="text"
-                              placeholder={t("seriesName") || "Series name"}
-                              className={`input input-bordered bg-base-100 text-base-content w-full ${
-                                validationErrors.seriesName ? "input-error" : ""
-                              }`}
-                              value={checkoutData.seriesName}
-                              onChange={(e) => {
-                                setCheckoutData({
-                                  ...checkoutData,
-                                  seriesName: e.target.value,
-                                });
-                                clearFieldError("seriesName");
-                              }}
-                            />
-                            {validationErrors.seriesName && (
-                              <label className="label py-1">
-                                <span className="label-text-alt text-error">
-                                  {validationErrors.seriesName}
-                                </span>
-                              </label>
-                            )}
-                          </div>
-                        </div>
+                          </motion.div>
+                        ))}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">
+                  {/* Notes */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="form-control space-y-2"
+                  >
+                    <label className="label mb-2 font-semibold">
+                      <span className="label-text">
                         {t("notes") || "Notes"}
                       </span>
                     </label>
                     <textarea
                       placeholder={t("optionalNotes") || "Optional notes"}
-                      className="textarea textarea-bordered h-24"
+                      className="textarea focus:outline-none textarea-bordered w-full h-28 resize-none"
                       value={checkoutData.notes}
                       onChange={(e) =>
                         setCheckoutData({
@@ -900,12 +1058,15 @@ const CartPage = () => {
                         })
                       }
                     ></textarea>
-                  </div>
+                  </motion.div>
 
-                  <button
+                  {/* Checkout Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={handleCheckout}
                     disabled={checkoutLoading}
-                    className="btn btn-primary btn-lg w-full"
+                    className="btn btn-primary  btn-lg h-12 w-full mt-4"
                   >
                     {checkoutLoading ? (
                       <>
@@ -914,11 +1075,11 @@ const CartPage = () => {
                       </>
                     ) : (
                       <>
-                        <Check className="w-5 h-5" />
+                        <CircleCheckBigIcon className="w-5 h-5" />{" "}
                         {t("checkout") || "Checkout"}
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>
