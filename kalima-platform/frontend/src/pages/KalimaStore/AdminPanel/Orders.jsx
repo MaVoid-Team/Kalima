@@ -1,56 +1,71 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { useTranslation } from "react-i18next"
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   getAllProductPurchases,
   confirmProductPurchase,
   receiveProductPurchase,
   updatePurchase,
   deleteProductPurchase,
-} from "../../../routes/orders"
-import { FaWhatsapp } from "react-icons/fa"
-import { Check, Eye, ImageIcon, Notebook, Edit3, MessageSquare, Save, X, Calendar, Filter } from "lucide-react"
-import * as XLSX from "xlsx"
+} from "../../../routes/orders";
+import { FaWhatsapp } from "react-icons/fa";
+import {
+  Check,
+  Eye,
+  ImageIcon,
+  Notebook,
+  Edit3,
+  MessageSquare,
+  Save,
+  X,
+  Calendar,
+  Filter,
+} from "lucide-react";
+import * as XLSX from "xlsx";
 
 // Helper function to format price (as it was undeclared)
 const formatPrice = (price) => {
-  return `${price || 0} ج` // Assuming 'ج' is the currency symbol
-}
+  return `${price || 0} ج`; // Assuming 'ج' is the currency symbol
+};
 
 // Helper function to calculate cart total (as it was undeclared)
 const calculateCartTotal = (order) => {
-  if (!order || !order.items) return 0
-  return order.items.reduce((total, item) => total + (item.priceAtPurchase * item.quantity || item.priceAtPurchase), 0)
-}
+  if (!order || !order.items) return 0;
+  return order.items.reduce(
+    (total, item) =>
+      total + (item.priceAtPurchase * item.quantity || item.priceAtPurchase),
+    0
+  );
+};
 
 const Orders = () => {
-  const { t, i18n } = useTranslation("kalimaStore-orders")
-  const isRTL = i18n.language === "ar"
+  const { t, i18n } = useTranslation("kalimaStore-orders");
+  const isRTL = i18n.language === "ar";
 
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [confirmLoading, setConfirmLoading] = useState({})
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [selectedDate, setSelectedDate] = useState("") // Add date filter state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [totalPurchases, setTotalPurchases] = useState(0)
-  const [selectedOrder, setSelectedOrder] = useState(null)
-  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(""); // Add date filter state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPurchases, setTotalPurchases] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     confirmed: 0,
     pending: 0,
     products: 0,
     books: 0,
-  })
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
-  const [exporting, setExporting] = useState(false)
-  const [allOrders, setAllOrders] = useState([])
+  });
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [allOrders, setAllOrders] = useState([]);
 
   // Enhanced notes modal state
   const [notesModal, setNotesModal] = useState({
@@ -60,73 +75,79 @@ const Orders = () => {
     originalNotes: "",
     loading: false,
     hasChanges: false,
-  })
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery)
+      setDebouncedSearchQuery(searchQuery);
       if (searchQuery !== debouncedSearchQuery && currentPage !== 1) {
-        setCurrentPage(1)
+        setCurrentPage(1);
       }
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [searchQuery, debouncedSearchQuery, currentPage])
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, debouncedSearchQuery, currentPage]);
 
   const fetchOrders = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
       const queryParams = {
         page: currentPage,
-      }
+      };
       if (debouncedSearchQuery.trim()) {
-        queryParams.search = debouncedSearchQuery.trim()
+        queryParams.search = debouncedSearchQuery.trim();
       }
       if (statusFilter !== "all") {
-        queryParams.status = statusFilter === "confirmed" ? "confirmed" : "pending"
+        queryParams.status =
+          statusFilter === "confirmed" ? "confirmed" : "pending";
       }
       // Add date filter to query params
       if (selectedDate) {
-        queryParams.date = selectedDate
+        queryParams.date = selectedDate;
       }
 
-      const response = await getAllProductPurchases(queryParams)
+      const response = await getAllProductPurchases(queryParams);
       if (response.success) {
-        let purchases = response.data.cartPurchases || []
+        let purchases = response.data.cartPurchases || [];
 
         if (typeFilter !== "all") {
           purchases = purchases.filter((purchase) => {
-            const itemTypes = purchase.items?.map((item) => item.productType) || []
+            const itemTypes =
+              purchase.items?.map((item) => item.productType) || [];
             if (typeFilter === "book") {
-              return itemTypes.some((type) => type === "ECBook")
+              return itemTypes.some((type) => type === "ECBook");
             } else if (typeFilter === "product") {
-              return itemTypes.some((type) => type === "ECProduct")
+              return itemTypes.some((type) => type === "ECProduct");
             }
-            return true
-          })
+            return true;
+          });
         }
 
-        setOrders(purchases)
-        setTotalPages(response.data.totalPages || 1)
-        setTotalPurchases(response.data.totalPurchases || purchases.length)
+        setOrders(purchases);
+        setTotalPages(response.data.totalPages || 1);
+        setTotalPurchases(response.data.totalPurchases || purchases.length);
 
-        const allPurchases = purchases
-        const confirmed = allPurchases.filter((order) => order.status === "confirmed").length
-        const pending = allPurchases.filter((order) => order.status !== "confirmed").length
+        const allPurchases = purchases;
+        const confirmed = allPurchases.filter(
+          (order) => order.status === "confirmed"
+        ).length;
+        const pending = allPurchases.filter(
+          (order) => order.status !== "confirmed"
+        ).length;
 
-        let products = 0
-        let books = 0
+        let products = 0;
+        let books = 0;
         allPurchases.forEach((purchase) => {
           if (purchase.items) {
             purchase.items.forEach((item) => {
               if (item.productType === "ECBook") {
-                books++
+                books++;
               } else if (item.productType === "ECProduct") {
-                products++
+                products++;
               }
-            })
+            });
           }
-        })
+        });
 
         setStats({
           total: response.data.totalPurchases || purchases.length,
@@ -134,76 +155,85 @@ const Orders = () => {
           pending: pending,
           products: products,
           books: books,
-        })
+        });
       } else {
-        throw new Error(response.error)
+        throw new Error(response.error);
       }
     } catch (err) {
-      setError(err.message)
-      console.error("Error fetching orders:", err)
+      setError(err.message);
+      console.error("Error fetching orders:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [currentPage, statusFilter, typeFilter, debouncedSearchQuery, selectedDate])
+  }, [
+    currentPage,
+    statusFilter,
+    typeFilter,
+    debouncedSearchQuery,
+    selectedDate,
+  ]);
 
   const fetchAllOrders = useCallback(async () => {
     try {
-      const response = await getAllProductPurchases({ all: true })
+      const response = await getAllProductPurchases({ all: true });
       if (response.success) {
-        setAllOrders(response.data.data.purchases)
+        setAllOrders(response.data.data.purchases);
       }
     } catch (err) {
       // handle error
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchOrders()
-    fetchAllOrders()
-  }, [fetchOrders, fetchAllOrders])
+    fetchOrders();
+    fetchAllOrders();
+  }, [fetchOrders, fetchAllOrders]);
 
   // Add handleRefresh to fix missing reference
   const handleRefresh = useCallback(() => {
-    fetchOrders()
-    fetchAllOrders()
-  }, [fetchOrders, fetchAllOrders])
+    fetchOrders();
+    fetchAllOrders();
+  }, [fetchOrders, fetchAllOrders]);
 
   // Add date change handler
   const handleDateChange = (date) => {
-    setSelectedDate(date)
+    setSelectedDate(date);
     if (currentPage !== 1) {
-      setCurrentPage(1) // Reset to first page when date changes
+      setCurrentPage(1); // Reset to first page when date changes
     }
-  }
+  };
 
   // Add clear filters function
   const clearFilters = () => {
-    setSearchQuery("")
-    setStatusFilter("all")
-    setTypeFilter("all")
-    setSelectedDate("")
-    setCurrentPage(1)
-  }
+    setSearchQuery("");
+    setStatusFilter("all");
+    setTypeFilter("all");
+    setSelectedDate("");
+    setCurrentPage(1);
+  };
 
   // Check if any filters are active
   const hasActiveFilters =
-    searchQuery.trim() !== "" || statusFilter !== "all" || typeFilter !== "all" || selectedDate !== ""
+    searchQuery.trim() !== "" ||
+    statusFilter !== "all" ||
+    typeFilter !== "all" ||
+    selectedDate !== "";
 
   const handleConfirmOrder = async (order) => {
     try {
-      setConfirmLoading({ ...confirmLoading, [order._id]: true })
+      setConfirmLoading({ ...confirmLoading, [order._id]: true });
 
-      let response
+      let response;
       if (order.status === "pending") {
         // First step: pending → received
-        response = await receiveProductPurchase(order._id)
+        response = await receiveProductPurchase(order._id);
       } else if (order.status === "received") {
         // Second step: received → confirmed
-        response = await confirmProductPurchase(order._id)
+        response = await confirmProductPurchase(order._id);
       } else {
         // If already confirmed or in an unexpected state, do nothing or handle as error
-        alert(t("alerts.orderAlreadyConfirmedOrInvalidState"))
-        return
+        alert(t("alerts.orderAlreadyConfirmedOrInvalidState"));
+        return;
       }
 
       if (response.success) {
@@ -211,101 +241,107 @@ const Orders = () => {
           prevOrders.map((o) => {
             if (o._id === order._id) {
               if (order.status === "pending") {
-                return { ...o, status: "received" }
+                return { ...o, status: "received" };
               } else if (order.status === "received") {
-                return { ...o, status: "confirmed", confirmed: true } // 'confirmed' flag for backward compatibility/UI use
+                return { ...o, status: "confirmed", confirmed: true }; // 'confirmed' flag for backward compatibility/UI use
               }
             }
-            return o
-          }),
-        )
+            return o;
+          })
+        );
 
         setStats((prevStats) => {
-          const updates = { ...prevStats }
+          const updates = { ...prevStats };
           if (order.status === "pending") {
             // Moving from pending to received - pending count decreases, received count could increase if tracked
-            updates.pending = Math.max(0, prevStats.pending - 1)
+            updates.pending = Math.max(0, prevStats.pending - 1);
             // Assuming 'received' is not a direct stat tracked, but pending decreases.
             // If you want to track received, you'd need to add it to the stats state and increment here.
           } else if (order.status === "received") {
             // Moving from received to confirmed
-            updates.confirmed = prevStats.confirmed + 1
+            updates.confirmed = prevStats.confirmed + 1;
             // Assuming 'received' count is not a main stat, pending count remains unchanged as it was already moved out of 'pending'
           }
-          return updates
-        })
+          return updates;
+        });
 
-        const successMessage = order.status === "pending" ? "orderReceived" : "orderConfirmed"
-        alert(t(`alerts.${successMessage}`))
+        const successMessage =
+          order.status === "pending" ? "orderReceived" : "orderConfirmed";
+        alert(t(`alerts.${successMessage}`));
       } else {
-        throw new Error(response.error)
+        throw new Error(response.error);
       }
     } catch (err) {
-      console.error("Error confirming order:", err)
-      alert(t("alerts.failedToConfirm") + (err?.message || ""))
+      console.error("Error confirming order:", err);
+      alert(t("alerts.failedToConfirm") + (err?.message || ""));
     } finally {
-      setConfirmLoading({ ...confirmLoading, [order._id]: false })
+      setConfirmLoading({ ...confirmLoading, [order._id]: false });
     }
-  }
+  };
 
   const handleViewDetails = (order) => {
-    setSelectedOrder(order)
-    setShowDetailsModal(true)
-  }
+    setSelectedOrder(order);
+    setShowDetailsModal(true);
+  };
 
   const handleViewPaymentScreenshot = (screenshotPath) => {
-    if (!screenshotPath) return
-    const baseURL = import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || ""
+    if (!screenshotPath) return;
+    const baseURL =
+      import.meta.env.VITE_API_URL?.replace(/\/api\/v1$/, "") || "";
     const normalizedPath = screenshotPath.startsWith("uploads/")
       ? `${baseURL}/${screenshotPath}`
-      : `${baseURL}/${screenshotPath}`
-    window.open(normalizedPath, "_blank")
-  }
+      : `${baseURL}/${screenshotPath}`;
+    window.open(normalizedPath, "_blank");
+  };
 
   const handleWhatsAppContact = (order) => {
-    const phoneNumber = order.createdBy?.phoneNumber
+    const phoneNumber = order.createdBy?.phoneNumber;
     // Updated message to be more generic, assuming product details are in the cart items
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`,
-    )
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
-    window.open(whatsappUrl, "_blank")
-  }
+      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`
+    );
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
-      setCurrentPage(newPage)
+      setCurrentPage(newPage);
     }
-  }
+  };
 
   const getProductNames = (order) => {
     if (!order.items || order.items.length === 0) {
-      return "N/A"
+      return "N/A";
     }
-    return order.items.map((item) => item.productSnapshot?.title || "Unknown").join(", ")
-  }
+    return order.items
+      .map((item) => item.productSnapshot?.title || "Unknown")
+      .join(", ");
+  };
 
   const getOrderType = (order) => {
     if (!order.items || order.items.length === 0) {
-      return "Product"
+      return "Product";
     }
-    const hasBooks = order.items.some((item) => item.productType === "ECBook")
-    const hasProducts = order.items.some((item) => item.productType === "ECProduct")
+    const hasBooks = order.items.some((item) => item.productType === "ECBook");
+    const hasProducts = order.items.some(
+      (item) => item.productType === "ECProduct"
+    );
     if (hasBooks && hasProducts) {
-      return "Mixed"
+      return "Mixed";
     }
-    return hasBooks ? "Book" : "Product"
-  }
+    return hasBooks ? "Book" : "Product";
+  };
 
   const formatTime = (dateString) =>
     new Date(dateString).toLocaleTimeString(i18n.language, {
       hour: "2-digit",
       minute: "2-digit",
-    })
+    });
 
   // Enhanced notes functionality
   const openNotesModal = (order) => {
-    const currentNotes = order.adminNotes || ""
+    const currentNotes = order.adminNotes || "";
     setNotesModal({
       isOpen: true,
       orderId: order._id,
@@ -313,69 +349,102 @@ const Orders = () => {
       originalNotes: currentNotes,
       loading: false,
       hasChanges: false,
-    })
-  }
+    });
+  };
 
   const handleNotesChange = (newNotes) => {
     setNotesModal((prev) => ({
       ...prev,
       notes: newNotes,
       hasChanges: newNotes !== prev.originalNotes,
-    }))
-  }
+    }));
+  };
 
   const handleSaveNotes = async () => {
     if (!notesModal.hasChanges) {
-      setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
-      return
+      setNotesModal({
+        isOpen: false,
+        orderId: null,
+        notes: "",
+        originalNotes: "",
+        loading: false,
+        hasChanges: false,
+      });
+      return;
     }
 
     try {
-      setNotesModal((prev) => ({ ...prev, loading: true }))
+      setNotesModal((prev) => ({ ...prev, loading: true }));
       const response = await updatePurchase(notesModal.orderId, {
         adminNotes: notesModal.notes,
-      })
+      });
 
       if (response.success) {
         // Update the orders list
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order._id === notesModal.orderId ? { ...order, adminNotes: notesModal.notes } : order,
-          ),
-        )
+            order._id === notesModal.orderId
+              ? { ...order, adminNotes: notesModal.notes }
+              : order
+          )
+        );
         // Update selected order if it's the same one
         if (selectedOrder && selectedOrder._id === notesModal.orderId) {
-          setSelectedOrder((prev) => ({ ...prev, adminNotes: notesModal.notes }))
+          setSelectedOrder((prev) => ({
+            ...prev,
+            adminNotes: notesModal.notes,
+          }));
         }
         // Close modal
-        setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
-        alert(t("alerts.notesSaved"))
+        setNotesModal({
+          isOpen: false,
+          orderId: null,
+          notes: "",
+          originalNotes: "",
+          loading: false,
+          hasChanges: false,
+        });
+        alert(t("alerts.notesSaved"));
       } else {
-        throw new Error(response.error)
+        throw new Error(response.error);
       }
     } catch (error) {
-      console.error("Error saving notes:", error)
-      alert(t("alerts.failedToSaveNotes") + (error?.message || ""))
+      console.error("Error saving notes:", error);
+      alert(t("alerts.failedToSaveNotes") + (error?.message || ""));
     } finally {
-      setNotesModal((prev) => ({ ...prev, loading: false }))
+      setNotesModal((prev) => ({ ...prev, loading: false }));
     }
-  }
+  };
 
   const closeNotesModal = () => {
     if (notesModal.hasChanges) {
       if (confirm(t("alerts.unsavedChanges"))) {
-        setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+        setNotesModal({
+          isOpen: false,
+          orderId: null,
+          notes: "",
+          originalNotes: "",
+          loading: false,
+          hasChanges: false,
+        });
       }
     } else {
-      setNotesModal({ isOpen: false, orderId: null, notes: "", originalNotes: "", loading: false, hasChanges: false })
+      setNotesModal({
+        isOpen: false,
+        orderId: null,
+        notes: "",
+        originalNotes: "",
+        loading: false,
+        hasChanges: false,
+      });
     }
-  }
+  };
 
   // Get notes preview for table display
   const getNotesPreview = (notes) => {
-    if (!notes) return ""
-    return notes.length > 50 ? notes.substring(0, 50) + "..." : notes
-  }
+    if (!notes) return "";
+    return notes.length > 50 ? notes.substring(0, 50) + "..." : notes;
+  };
 
   // Memoize order items to prevent unnecessary re-renders
   const memoizedOrders = useMemo(() => {
@@ -389,41 +458,43 @@ const Orders = () => {
       confirmed: order.status === "confirmed",
       // Set `status` directly from order data, ensuring it's always available
       status: order.status || "pending",
-    }))
-  }, [orders])
+    }));
+  }, [orders]);
 
   const handleSearchChange = useCallback((e) => {
-    setSearchQuery(e.target.value)
-  }, [])
+    setSearchQuery(e.target.value);
+  }, []);
 
   // Delete order handler
   const handleDeleteOrder = async (order) => {
-    if (!order || !order._id) return
-    if (!confirm(t("alerts.confirmDeleteOrder"))) return // Add confirmation
+    if (!order || !order._id) return;
+    if (!confirm(t("alerts.confirmDeleteOrder"))) return; // Add confirmation
 
     try {
-      const result = await deleteProductPurchase(order._id)
+      const result = await deleteProductPurchase(order._id);
       if (result.success) {
-        setOrders((prev) => prev.filter((o) => o._id !== order._id))
-        setError(null)
+        setOrders((prev) => prev.filter((o) => o._id !== order._id));
+        setError(null);
         // Optionally, update stats here if needed
-        alert(t("alerts.orderDeleted"))
+        alert(t("alerts.orderDeleted"));
       } else {
-        throw new Error(result.error || t("kalimaStore-orders.errors.deleteFailed"))
+        throw new Error(
+          result.error || t("kalimaStore-orders.errors.deleteFailed")
+        );
       }
     } catch (err) {
-      setError(err.message)
-      alert(t("alerts.failedToDeleteOrder") + (err?.message || ""))
+      setError(err.message);
+      alert(t("alerts.failedToDeleteOrder") + (err?.message || ""));
     }
-  }
+  };
 
   const handleExport = async (type, scope) => {
-    setExporting(true)
+    setExporting(true);
     try {
-      const data = scope === "all" ? allOrders : memoizedOrders
+      const data = scope === "all" ? allOrders : memoizedOrders;
       if (data.length === 0) {
-        alert(t("alerts.noDataToExport"))
-        return
+        alert(t("alerts.noDataToExport"));
+        return;
       }
 
       if (type === "csv") {
@@ -442,37 +513,39 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-                ? t("table.received")
-                : t("table.pending"),
+              ? t("table.received")
+              : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
-        }))
+        }));
 
         // Convert to CSV
         const header = Object.keys(rows[0] || {})
           .map((h) => `"${h}"`)
-          .join(",")
+          .join(",");
         const csv = [header]
           .concat(
             rows.map((r) =>
               Object.values(r)
                 .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-                .join(","),
-            ),
+                .join(",")
+            )
           )
-          .join("\n")
+          .join("\n");
 
         // Create blob and download
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `orders_export_${new Date().toISOString().slice(0, 10)}.csv`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-        alert(t("alerts.exportSuccess") || "Export complete")
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `orders_export_${new Date()
+          .toISOString()
+          .slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        alert(t("alerts.exportSuccess") || "Export complete");
       } else if (type === "xlsx") {
         const rows = data.map((o) => ({
           orderId: o._id,
@@ -488,60 +561,70 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-                ? t("table.received")
-                : t("table.pending"),
+              ? t("table.received")
+              : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
-        }))
+        }));
 
-        const worksheet = XLSX.utils.json_to_sheet(rows)
-        const workbook = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Orders")
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
 
-        const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.xlsx`
-        XLSX.writeFile(workbook, fileName)
-        alert(t("alerts.exportSuccess") || "Export complete")
+        const fileName = `orders_export_${new Date()
+          .toISOString()
+          .slice(0, 10)}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+        alert(t("alerts.exportSuccess") || "Export complete");
       } else if (type === "json") {
-        const fileName = `orders_export_${new Date().toISOString().slice(0, 10)}.json`
+        const fileName = `orders_export_${new Date()
+          .toISOString()
+          .slice(0, 10)}.json`;
         // Filter out potentially large or sensitive data if necessary before stringifying
         const dataToExport = data.map((o) => {
-          const { items, ...rest } = o // Destructure to handle items separately if needed
+          const { items, ...rest } = o; // Destructure to handle items separately if needed
           return {
             ...rest,
             items: items
               ? items.map(({ product, ...itemProps }) => ({
                   // Optionally clean up item.product if it's too verbose
                   ...itemProps,
-                  productName: product?.title || itemProps.productName || "Unknown", // Ensure product name is present
+                  productName:
+                    product?.title || itemProps.productName || "Unknown", // Ensure product name is present
                 }))
               : [],
-          }
-        })
-        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json;charset=utf-8;" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = fileName
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-        alert(t("alerts.exportSuccess") || "Export complete")
+          };
+        });
+        const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
+          type: "application/json;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        alert(t("alerts.exportSuccess") || "Export complete");
       }
     } catch (err) {
-      console.error("Error exporting orders:", err)
-      alert((t("alerts.exportFailed") || "Export failed") + (err?.message ? `: ${err.message}` : ""))
+      console.error("Error exporting orders:", err);
+      alert(
+        (t("alerts.exportFailed") || "Export failed") +
+          (err?.message ? `: ${err.message}` : "")
+      );
     } finally {
-      setExporting(false)
+      setExporting(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -570,19 +653,32 @@ const Orders = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`min-h-screen p-6 ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+    <div
+      className={`min-h-screen p-6 ${isRTL ? "rtl" : "ltr"}`}
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       {/* Header */}
       <div className="flex items-center justify-center relative mb-8">
         <div className={`absolute ${isRTL ? "right-10" : "left-10"}`}>
-          <img src="/waves.png" alt="Decorative zigzag" className="w-20 h-full animate-float-zigzag" />
+          <img
+            src="/waves.png"
+            alt="Decorative zigzag"
+            className="w-20 h-full animate-float-zigzag"
+          />
         </div>
-        <h1 className="text-3xl font-bold text-center">{t("ordersManagement")}</h1>
+        <h1 className="text-3xl font-bold text-center">
+          {t("ordersManagement")}
+        </h1>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
-          <img src="/ring.png" alt="Decorative circle" className="w-20 h-full animate-float-up-dottedball" />
+          <img
+            src="/ring.png"
+            alt="Decorative circle"
+            className="w-20 h-full animate-float-up-dottedball"
+          />
         </div>
       </div>
 
@@ -591,9 +687,13 @@ const Orders = () => {
         <div className="card bg-blue-600 text-white shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📦</div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                📦
+              </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.totalOrders")}</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  {t("stats.totalOrders")}
+                </h3>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
             </div>
@@ -603,9 +703,13 @@ const Orders = () => {
         <div className="card bg-green-600 text-white shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">✅</div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                ✅
+              </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.confirmed")}</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  {t("stats.confirmed")}
+                </h3>
                 <p className="text-2xl font-bold">{stats.confirmed}</p>
               </div>
             </div>
@@ -615,9 +719,13 @@ const Orders = () => {
         <div className="card bg-orange-600 text-white shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">⏳</div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                ⏳
+              </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.pending")}</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  {t("stats.pending")}
+                </h3>
                 <p className="text-2xl font-bold">{stats.pending}</p>
               </div>
             </div>
@@ -627,9 +735,13 @@ const Orders = () => {
         <div className="card bg-purple-600 text-white shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">📚</div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                📚
+              </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.books")}</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  {t("stats.books")}
+                </h3>
                 <p className="text-2xl font-bold">{stats.books}</p>
               </div>
             </div>
@@ -639,9 +751,13 @@ const Orders = () => {
         <div className="card bg-teal-600 text-white shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">🛍️</div>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                🛍️
+              </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">{t("stats.products")}</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  {t("stats.products")}
+                </h3>
                 <p className="text-2xl font-bold">{stats.products}</p>
               </div>
             </div>
@@ -693,7 +809,8 @@ const Orders = () => {
                 <option value="all">{t("filters.allStatus")}</option>
                 <option value="confirmed">{t("filters.confirmed")}</option>
                 <option value="pending">{t("filters.pending")}</option>
-                <option value="received">{t("filters.received")}</option> {/* Added received filter */}
+                <option value="received">{t("filters.received")}</option>{" "}
+                {/* Added received filter */}
               </select>
             </div>
 
@@ -709,14 +826,27 @@ const Orders = () => {
               </select>
             </div>
 
-            <button onClick={handleRefresh} className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : "🔄"}
+            <button
+              onClick={handleRefresh}
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                "🔄"
+              )}
               {t("refresh")}
             </button>
 
             {/* Export CSV button */}
             <div className="dropdown dropdown-end ml-2">
-              <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={exporting}>
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-outline btn-primary"
+                disabled={exporting}
+              >
                 {exporting ? (
                   <>
                     <span className="loading loading-spinner loading-sm"></span>
@@ -729,7 +859,10 @@ const Orders = () => {
                   </>
                 )}
               </div>
-              <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80"
+              >
                 <li className="menu-title">
                   <span>{t("export.csvFormat") || "CSV Format"}</span>
                 </li>
@@ -742,7 +875,10 @@ const Orders = () => {
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handleExport("csv", "all")} disabled={exporting || allOrders.length === 0}>
+                  <button
+                    onClick={() => handleExport("csv", "all")}
+                    disabled={exporting || allOrders.length === 0}
+                  >
                     {t("exportCSVAll") || "Export All (CSV)"}
                   </button>
                 </li>
@@ -759,7 +895,10 @@ const Orders = () => {
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handleExport("json", "all")} disabled={exporting || allOrders.length === 0}>
+                  <button
+                    onClick={() => handleExport("json", "all")}
+                    disabled={exporting || allOrders.length === 0}
+                  >
                     {t("exportJSONAll") || "Export All (JSON)"}
                   </button>
                 </li>
@@ -776,7 +915,10 @@ const Orders = () => {
                   </button>
                 </li>
                 <li>
-                  <button onClick={() => handleExport("xlsx", "all")} disabled={exporting || allOrders.length === 0}>
+                  <button
+                    onClick={() => handleExport("xlsx", "all")}
+                    disabled={exporting || allOrders.length === 0}
+                  >
                     {t("exportXLSXAll") || "Export All (XLSX)"}
                   </button>
                 </li>
@@ -803,25 +945,37 @@ const Orders = () => {
               {selectedDate && (
                 <div className="badge badge-info gap-2">
                   Date: {selectedDate}
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => handleDateChange("")} />
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => handleDateChange("")}
+                  />
                 </div>
               )}
               {statusFilter !== "all" && (
                 <div className="badge badge-primary gap-2">
                   {t(`filters.${statusFilter}`)}
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => setStatusFilter("all")} />
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => setStatusFilter("all")}
+                  />
                 </div>
               )}
               {typeFilter !== "all" && (
                 <div className="badge badge-secondary gap-2">
                   {t(`filters.${typeFilter === "book" ? "books" : "products"}`)}
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => setTypeFilter("all")} />
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => setTypeFilter("all")}
+                  />
                 </div>
               )}
               {searchQuery.trim() && (
                 <div className="badge badge-accent gap-2">
                   Search: "{searchQuery}"
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => setSearchQuery("")} />
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => setSearchQuery("")}
+                  />
                 </div>
               )}
             </div>
@@ -847,8 +1001,10 @@ const Orders = () => {
               <tr>
                 <th className="text-center">{t("table.product")}</th>
                 <th className="text-center">{t("table.customer")}</th>
-                <th className="text-center">{t("table.itemCount")}</th> {/* Changed from table.price */}
-                <th className="text-center">{t("table.price")}</th> {/* New header for total price */}
+                <th className="text-center">{t("table.itemCount")}</th>{" "}
+                {/* Changed from table.price */}
+                <th className="text-center">{t("table.price")}</th>{" "}
+                {/* New header for total price */}
                 <th className="text-center">{t("table.couponCode")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
@@ -873,7 +1029,10 @@ const Orders = () => {
                     {" "}
                     {/* Adjusted colSpan */}
                     <p className="text-gray-500">
-                      {searchQuery || statusFilter !== "all" || typeFilter !== "all" || selectedDate
+                      {searchQuery ||
+                      statusFilter !== "all" ||
+                      typeFilter !== "all" ||
+                      selectedDate
                         ? t("noOrdersFound")
                         : t("noOrdersAvailable")}
                     </p>
@@ -883,37 +1042,61 @@ const Orders = () => {
                 memoizedOrders.map((order) => (
                   <tr key={order._id}>
                     <td className="text-center">
-                      <div className="font-bold text-sm">{order.productNames}</div>
-                      <div className="text-xs opacity-50">{order.purchaseSerial}</div>
+                      <div className="font-bold text-sm">
+                        {order.productNames}
+                      </div>
+                      <div className="text-xs opacity-50">
+                        {order.purchaseSerial}
+                      </div>
                     </td>
                     <td className="text-center">
                       <div>
                         <div className="font-medium">{order.userName}</div>
-                        <div className="text-xs opacity-50">{order.createdBy?.email}</div>
-                        <div className="text-xs opacity-50">{order.createdBy?.role}</div>
+                        <div className="text-xs opacity-50">
+                          {order.createdBy?.email}
+                        </div>
+                        <div className="text-xs opacity-50">
+                          {order.createdBy?.role}
+                        </div>
                       </div>
                     </td>
                     <td className="text-center font-bold">
-                      {order.items?.length || (order.productName ? 1 : 0)} {/* Display item count */}
+                      {order.items?.length || (order.productName ? 1 : 0)}{" "}
+                      {/* Display item count */}
                     </td>
-                    <td className="text-center font-bold">{order.formattedPrice}</td> {/* Display cart total */}
+                    <td className="text-center font-bold">
+                      {order.formattedPrice}
+                    </td>{" "}
+                    {/* Display cart total */}
                     <td className="text-center font-bold">
                       {order.couponCode != null ? (
                         <span className="text-green-500">
-                          {order.couponCode.value || order.discountAmount || "Applied"}
+                          {order.couponCode.value ||
+                            order.discountAmount ||
+                            "Applied"}
                         </span>
                       ) : (
                         "NA"
                       )}
                     </td>
                     <td className="text-center font-mono text-sm">
-                      {order.numberTransferredFrom || order.bankTransferFrom || "N/A"}
+                      {order.numberTransferredFrom ||
+                        order.bankTransferFrom ||
+                        "N/A"}
                     </td>
                     <td className="text-center">
                       {order.status !== "confirmed" ? (
                         <div className="flex flex-col items-center gap-1">
-                          <div className={`badge ${order.status === "received" ? "badge-info" : "badge-warning"}`}>
-                            {order.status === "received" ? t("table.received") : t("table.pending")}
+                          <div
+                            className={`badge ${
+                              order.status === "received"
+                                ? "badge-info"
+                                : "badge-warning"
+                            }`}
+                          >
+                            {order.status === "received"
+                              ? t("table.received")
+                              : t("table.pending")}
                           </div>
                           {order.confirmedBy && (
                             <div className="text-xs opacity-50">
@@ -923,7 +1106,9 @@ const Orders = () => {
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-1">
-                          <div className="badge badge-success">{t("table.confirmed")}</div>
+                          <div className="badge badge-success">
+                            {t("table.confirmed")}
+                          </div>
                           {order.confirmedBy && (
                             <div className="text-xs opacity-50">
                               {t("table.by")} {order.confirmedBy.name}
@@ -934,18 +1119,28 @@ const Orders = () => {
                     </td>
                     <td className="text-center max-w-32">
                       {order.adminNotes ? (
-                        <div className="tooltip tooltip-left" data-tip={order.adminNotes}>
+                        <div
+                          className="tooltip tooltip-left"
+                          data-tip={order.adminNotes}
+                        >
                           <div className="flex items-center gap-1 text-blue-600 cursor-help">
                             <MessageSquare className="w-4 h-4" />
-                            <span className="text-xs truncate">{order.notesPreview}</span>
+                            <span className="text-xs truncate">
+                              {order.notesPreview}
+                            </span>
                           </div>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-xs">{t("table.noNotes")}</span>
+                        <span className="text-gray-400 text-xs">
+                          {t("table.noNotes")}
+                        </span>
                       )}
                     </td>
                     <td className="text-center text-sm">
-                      {new Date(order.createdAt).toLocaleDateString(i18n.language)} - {formatTime(order.createdAt)}
+                      {new Date(order.createdAt).toLocaleDateString(
+                        i18n.language
+                      )}{" "}
+                      - {formatTime(order.createdAt)}
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
@@ -961,7 +1156,11 @@ const Orders = () => {
                             order.adminNotes ? "text-blue-600" : "text-gray-400"
                           }`}
                           onClick={() => openNotesModal(order)}
-                          title={order.adminNotes ? t("table.viewEditNotes") : t("table.addNotes")}
+                          title={
+                            order.adminNotes
+                              ? t("table.viewEditNotes")
+                              : t("table.addNotes")
+                          }
                         >
                           <Notebook className="w-4 h-4" />
                           {order.adminNotes && (
@@ -971,13 +1170,18 @@ const Orders = () => {
                         {order.paymentScreenShot && (
                           <button
                             className="btn btn-ghost btn-sm"
-                            onClick={() => handleViewPaymentScreenshot(order.paymentScreenShot)}
+                            onClick={() =>
+                              handleViewPaymentScreenshot(
+                                order.paymentScreenShot
+                              )
+                            }
                             title={t("table.viewPaymentScreenshot")}
                           >
                             <ImageIcon className="w-3 h-3" />
                           </button>
                         )}
-                        {(order.numberTransferredFrom || order.bankTransferFrom) && (
+                        {(order.numberTransferredFrom ||
+                          order.bankTransferFrom) && (
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
                             onClick={() => handleWhatsAppContact(order)}
@@ -991,14 +1195,20 @@ const Orders = () => {
                             className="btn btn-success btn-sm"
                             onClick={() => handleConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
-                            title={order.status === "pending" ? t("table.receiveOrder") : t("table.confirmOrder")}
+                            title={
+                              order.status === "pending"
+                                ? t("table.receiveOrder")
+                                : t("table.confirmOrder")
+                            }
                           >
                             {confirmLoading[order._id] ? (
                               <span className="loading loading-spinner loading-xs"></span>
                             ) : (
                               <>
                                 <Check className="w-4 h-4" />
-                                {order.status === "pending" ? t("table.receive") : t("table.confirm")}
+                                {order.status === "pending"
+                                  ? t("table.receive")
+                                  : t("table.confirm")}
                               </>
                             )}
                           </button>
@@ -1023,7 +1233,9 @@ const Orders = () => {
         {orders.length === 0 && (
           <div className="py-8 text-center">
             <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-xl font-semibold mb-2">{t("table.noOrdersFound")}</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              {t("table.noOrdersFound")}
+            </h3>
             <p className="text-gray-500">{t("table.tryAdjustingSearch")}</p>
           </div>
         )}
@@ -1038,33 +1250,45 @@ const Orders = () => {
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1 || loading}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               {t("table.previous")}
             </button>
             {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              let pageToShow
+              let pageToShow;
               if (totalPages <= 5) {
-                pageToShow = i + 1
+                pageToShow = i + 1;
               } else if (currentPage <= 3) {
-                pageToShow = i + 1
+                pageToShow = i + 1;
               } else if (currentPage >= totalPages - 2) {
-                pageToShow = totalPages - 4 + i
+                pageToShow = totalPages - 4 + i;
               } else {
-                pageToShow = currentPage - 2 + i
+                pageToShow = currentPage - 2 + i;
               }
 
               return (
                 <button
                   key={pageToShow}
-                  className={`join-item btn ${currentPage === pageToShow ? "btn-primary" : ""}`}
+                  className={`join-item btn ${
+                    currentPage === pageToShow ? "btn-primary" : ""
+                  }`}
                   onClick={() => handlePageChange(pageToShow)}
                   disabled={loading}
                 >
                   {pageToShow}
                 </button>
-              )
+              );
             })}
             <button
               className="join-item btn"
@@ -1072,13 +1296,24 @@ const Orders = () => {
               disabled={currentPage === totalPages || loading}
             >
               {t("table.next")}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
           <div className="text-sm text-gray-600">
-            {t("table.page")} {currentPage} {t("table.of")} {totalPages} ({totalPurchases} {t("table.totalOrders")})
+            {t("table.page")} {currentPage} {t("table.of")} {totalPages} (
+            {totalPurchases} {t("table.totalOrders")})
           </div>
         </div>
       )}
@@ -1103,7 +1338,9 @@ const Orders = () => {
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-medium">{t("table.notesLabel")}</span>
+                  <span className="label-text font-medium">
+                    {t("table.notesLabel")}
+                  </span>
                   <span className="label-text-alt">
                     {notesModal.notes.length}/500 {t("table.characters")}
                   </span>
@@ -1137,7 +1374,11 @@ const Orders = () => {
               )}
             </div>
             <div className="modal-action">
-              <button className="btn" onClick={closeNotesModal} disabled={notesModal.loading}>
+              <button
+                className="btn"
+                onClick={closeNotesModal}
+                disabled={notesModal.loading}
+              >
                 {t("table.cancel")}
               </button>
               <button
@@ -1166,36 +1407,48 @@ const Orders = () => {
       {showDetailsModal && selectedOrder && (
         <div className="modal modal-open">
           <div className="modal-box max-w-4xl">
-            <h3 className="font-bold text-lg mb-4">{t("table.orderDetails")}</h3>
+            <h3 className="font-bold text-lg mb-4">
+              {t("table.orderDetails")}
+            </h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("table.orderID")}</span>
+                    <span className="label-text font-medium">
+                      {t("table.orderID")}
+                    </span>
                   </label>
                   <p className="font-mono text-sm">{selectedOrder._id}</p>
                 </div>
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">{t("table.purchaseSerial")}</span>
+                    <span className="label-text font-medium">
+                      {t("table.purchaseSerial")}
+                    </span>
                   </label>
-                  <p className="font-mono text-sm">{selectedOrder.purchaseSerial}</p>
+                  <p className="font-mono text-sm">
+                    {selectedOrder.purchaseSerial}
+                  </p>
                 </div>
               </div>
 
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">{t("table.customerInfo")}</span>
+                  <span className="label-text font-medium">
+                    {t("table.customerInfo")}
+                  </span>
                 </label>
                 <div className="bg-base-200 p-3 rounded">
                   <p>
                     <strong>{t("table.name")}:</strong> {selectedOrder.userName}
                   </p>
                   <p>
-                    <strong>{t("table.email")}:</strong> {selectedOrder.createdBy?.email}
+                    <strong>{t("table.email")}:</strong>{" "}
+                    {selectedOrder.createdBy?.email}
                   </p>
                   <p>
-                    <strong>{t("table.role")}:</strong> {selectedOrder.createdBy?.role}
+                    <strong>{t("table.role")}:</strong>{" "}
+                    {selectedOrder.createdBy?.role}
                   </p>
                 </div>
               </div>
@@ -1203,7 +1456,9 @@ const Orders = () => {
               {selectedOrder.items && selectedOrder.items.length > 0 && (
                 <div>
                   <label className="label">
-                    <span className="label-text font-medium">Cart Items ({selectedOrder.items.length})</span>
+                    <span className="label-text font-medium">
+                      Cart Items ({selectedOrder.items.length})
+                    </span>
                   </label>
                   <div className="bg-base-200 p-3 rounded space-y-3">
                     {selectedOrder.items.map((item, idx) => (
@@ -1211,31 +1466,46 @@ const Orders = () => {
                         <div className="flex justify-between items-start">
                           <div>
                             <p>
-                              <strong>{item.productSnapshot?.title || item.productName}:</strong>
+                              <strong>
+                                {item.productSnapshot?.title ||
+                                  item.productName}
+                                :
+                              </strong>
                             </p>
-                            <p className="text-sm opacity-75">Type: {item.productType || "Product"}</p>
-                            {item.quantity && <p className="text-sm">Qty: {item.quantity}</p>}
+                            <p className="text-sm opacity-75">
+                              Type: {item.productType || "Product"}
+                            </p>
+                            {item.quantity && (
+                              <p className="text-sm">Qty: {item.quantity}</p>
+                            )}
                           </div>
-                          <p className="font-bold">{formatPrice(item.priceAtPurchase)}</p>
+                          <p className="font-bold">
+                            {formatPrice(item.priceAtPurchase)}
+                          </p>
                         </div>
                         {item.productType === "ECBook" && (
                           <div className="mt-2 ml-4 border-l-2 border-primary pl-2 text-sm">
                             <label className="label">
-                              <span className="label-text font-medium text-xs">{t("table.bookInfo")}</span>
+                              <span className="label-text font-medium text-xs">
+                                {t("table.bookInfo")}
+                              </span>
                             </label>
                             {item.nameOnBook && (
                               <p>
-                                <strong>{t("table.nameOnBook")}:</strong> {item.nameOnBook}
+                                <strong>{t("table.nameOnBook")}:</strong>{" "}
+                                {item.nameOnBook}
                               </p>
                             )}
                             {item.numberOnBook && (
                               <p>
-                                <strong>{t("table.numberOnBook")}:</strong> {item.numberOnBook}
+                                <strong>{t("table.numberOnBook")}:</strong>{" "}
+                                {item.numberOnBook}
                               </p>
                             )}
                             {item.seriesName && (
                               <p>
-                                <strong>{t("table.seriesName")}:</strong> {item.seriesName}
+                                <strong>{t("table.seriesName")}:</strong>{" "}
+                                {item.seriesName}
                               </p>
                             )}
                           </div>
@@ -1248,33 +1518,63 @@ const Orders = () => {
 
               <div>
                 <label className="label">
-                  <span className="label-text font-medium">{t("table.paymentInfo")}</span>
+                  <span className="label-text font-medium">
+                    {t("table.paymentInfo")}
+                  </span>
                 </label>
+
                 <div className="bg-base-200 p-3 rounded">
                   <p>
-                    <strong>{t("table.totalPrice")}:</strong> {formatPrice(calculateCartTotal(selectedOrder))}
+                    <strong>{t("table.totalPrice")}:</strong>{" "}
+                    {formatPrice(calculateCartTotal(selectedOrder))}
                   </p>
                   {selectedOrder.discountAmount && (
                     <p>
-                      <strong>Discount:</strong> {formatPrice(selectedOrder.discountAmount)}
+                      <strong>Discount:</strong>{" "}
+                      {formatPrice(selectedOrder.discountAmount)}
                     </p>
                   )}
                   <p>
-                    <strong>{t("table.paymentNumber")}:</strong> {selectedOrder.paymentNumber}
+                    <strong>{t("table.paymentNumber")}:</strong>{" "}
+                    {selectedOrder.paymentNumber}
                   </p>
                   <p>
                     <strong>{t("table.transferredFrom")}:</strong>{" "}
-                    {selectedOrder.numberTransferredFrom || selectedOrder.bankTransferFrom || "N/A"}
+                    {selectedOrder.numberTransferredFrom ||
+                      selectedOrder.bankTransferFrom ||
+                      "N/A"}
                   </p>
                   {selectedOrder.paymentScreenShot && (
                     <div className="mt-2">
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => handleViewPaymentScreenshot(selectedOrder.paymentScreenShot)}
+                        onClick={() =>
+                          handleViewPaymentScreenshot(
+                            selectedOrder.paymentScreenShot
+                          )
+                        }
                       >
                         {t("table.viewPaymentScreenshot")}
                       </button>
                     </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium flex items-center gap-2">
+                    📝 {t("table.customerNotes") || "ملاحظات العميل"}
+                  </span>
+                </label>
+                <div className="bg-base-200 p-3 rounded min-h-16">
+                  {selectedOrder.notes ? (
+                    <p className="whitespace-pre-wrap">{selectedOrder.notes}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">
+                      {t("table.noCustomerNotes") ||
+                        "لا توجد ملاحظات من العميل"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -1289,17 +1589,22 @@ const Orders = () => {
                 <div className="bg-base-200 p-3 rounded min-h-16">
                   {selectedOrder.adminNotes ? (
                     <div>
-                      <p className="whitespace-pre-wrap">{selectedOrder.adminNotes}</p>
+                      <p className="whitespace-pre-wrap">
+                        {selectedOrder.adminNotes}
+                      </p>
                       {selectedOrder.adminNoteBy && (
                         <div className="flex flex-col mt-2 text-xs opacity-75">
                           <p>
-                            Created By: <strong>{selectedOrder.adminNoteBy.name}</strong>
+                            Created By:{" "}
+                            <strong>{selectedOrder.adminNoteBy.name}</strong>
                           </p>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-500 italic">{t("table.noAdminNotes")}</p>
+                    <p className="text-gray-500 italic">
+                      {t("table.noAdminNotes")}
+                    </p>
                   )}
                 </div>
               </div>
@@ -1309,8 +1614,8 @@ const Orders = () => {
               <button
                 className="btn"
                 onClick={() => {
-                  setShowDetailsModal(false)
-                  setSelectedOrder(null)
+                  setShowDetailsModal(false);
+                  setSelectedOrder(null);
                 }}
               >
                 {t("table.close")}
@@ -1319,9 +1624,9 @@ const Orders = () => {
                 <button
                   className="btn btn-success"
                   onClick={() => {
-                    handleConfirmOrder(selectedOrder)
-                    setShowDetailsModal(false)
-                    setSelectedOrder(null)
+                    handleConfirmOrder(selectedOrder);
+                    setShowDetailsModal(false);
+                    setSelectedOrder(null);
                   }}
                   disabled={confirmLoading[selectedOrder._id]}
                 >
@@ -1337,7 +1642,7 @@ const Orders = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Orders
+export default Orders;
