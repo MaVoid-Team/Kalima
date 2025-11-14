@@ -230,67 +230,108 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
 // Admin routes
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-    // Build query
-    const query = {};
+  // Base match object
+  const match = {};
 
-    // Filter by status if specified
-    if (req.query.status) {
-        query.status = req.query.status;
-    }
+  // Filter: Status
+  if (req.query.status) {
+    match.status = req.query.status;
+  }
 
-    // Filter by date range if specified
-    if (req.query.startDate && req.query.endDate) {
-        query.createdAt = {
-            $gte: new Date(req.query.startDate),
-            $lte: new Date(req.query.endDate)
-        };
-    }
+  // Filter: Date Range
+  if (req.query.startDate && req.query.endDate) {
+    match.createdAt = {
+      $gte: new Date(req.query.startDate),
+      $lte: new Date(req.query.endDate),
+    };
+  }
 
-    // Filter by minimum/maximum total if specified
-    if (req.query.minTotal || req.query.maxTotal) {
-        query.total = {};
-        if (req.query.minTotal) query.total.$gte = parseFloat(req.query.minTotal);
-        if (req.query.maxTotal) query.total.$lte = parseFloat(req.query.maxTotal);
-    }
+  // Filter: Min/Max Total
+  if (req.query.minTotal || req.query.maxTotal) {
+    match.total = {};
+    if (req.query.minTotal) match.total.$gte = parseFloat(req.query.minTotal);
+    if (req.query.maxTotal) match.total.$lte = parseFloat(req.query.maxTotal);
+  }
 
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+  // Pagination
+  const page = parseInt(req.query.page) ;
+  const limit = parseInt(req.query.limit) ;
+  const skip = (page - 1) * limit;
 
-    // Execute query
-    const purchases = await ECCartPurchase.find(query)
-        .populate({ path: 'createdBy', select: "name email role phoneNumber" })
-        .populate('confirmedBy', 'name')
-        .populate('receivedBy', 'name')
-        .populate('adminNoteBy', 'name')
-        .populate('couponCode')
-        .sort('-createdAt')
-        .skip(skip)
-        .limit(limit);
+  const search = req.query.search ? req.query.search.trim() : null;
+  const searchRegex = search ? new RegExp(search, "i") : null;
 
-    // Get total count for pagination
-    const total = await ECCartPurchase.countDocuments(query);
+  // ----- AGGREGATION PIPELINE -----
+  const pipeline = [];
 
-    res.status(200).json({
-        status: "success",
-        results: purchases.length,
-        pagination: {
-            total,
-            page,
-            pages: Math.ceil(total / limit),
-            limit
-        },
-        data: {
-            purchases
-        }
+  // Basic match
+  pipeline.push({ $match: match });
+
+  // Lookup users
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "createdBy",
+      foreignField: "_id",
+      as: "createdBy",
+    },
+  });
+
+  pipeline.push({ $unwind: "$createdBy" });
+
+  // Search AFTER lookup
+  if (searchRegex) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { userName: searchRegex },
+          { purchaseSerial: searchRegex },
+          { numberTransferredFrom: searchRegex },
+          { "createdBy.email": searchRegex },
+          { "createdBy.name": searchRegex },
+          { "items.productSnapshot.serial": searchRegex },
+        ],
+      },
     });
+  }
+
+  // Sort
+  pipeline.push({ $sort: { createdAt: -1 } });
+
+  // Pagination
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: limit });
+
+  // Execute aggregation
+  const purchases = await ECCartPurchase.aggregate(pipeline);
+
+  // Count total (must re-run without skip/limit)
+  const countPipeline = pipeline.filter(
+    (stage) => !stage.$skip && !stage.$limit
+  );
+
+  countPipeline.push({ $count: "total" });
+  const countResult = await ECCartPurchase.aggregate(countPipeline);
+  const total = countResult.length > 0 ? countResult[0].total : 0;
+
+  // RESPONSE
+  res.status(200).json({
+    status: "success",
+    results: purchases.length,
+    pagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    },
+    data: {
+      purchases,
+    },
+  });
 });
 
+
 exports.addAdminNote = catchAsync(async (req, res, next) => {
-    if (!req.body.adminNotes) {
-        return next(new AppError("Admin note is required", 400));
-    }
 
     const purchase = await ECCartPurchase.findByIdAndUpdate(
         req.params.id,
@@ -319,49 +360,130 @@ exports.addAdminNote = catchAsync(async (req, res, next) => {
 });
 
 exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
-    // Build match condition
-    const matchCondition = {
-        status: 'confirmed'
-    };
+    // 1) Overview statistics
+    const overviewAgg = await ECCartPurchase.aggregate([
+        {
+            $group: {
+                totalPurchases: { $sum: 1 },
+                confirmedPurchases: {
+                    $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] },
+                },
+                pendingPurchases: {
+                    $sum: { $cond: [{ $ne: ["$status", "confirmed"] }, 1, 0] },
+                },
+                totalRevenue: { $sum: "$total" },
+                confirmedRevenue: {
+                    $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, "$total", 0] },
+                },
+                averagePrice: { $avg: "$total" },
+            },
+        },
+        {
+            $project: {
+                totalPurchases: 1,
+                confirmedPurchases: 1,
+                pendingPurchases: 1,
+                totalRevenue: 1,
+                confirmedRevenue: 1,
+                averagePrice: { $round: ["$averagePrice", 2] },
+            },
+        },
+    ]);
 
-    // Add date filter if provided
-    if (req.query.startDate || req.query.endDate) {
-        matchCondition.createdAt = {};
-        if (req.query.startDate) {
-            matchCondition.createdAt.$gte = new Date(req.query.startDate);
-        }
-        if (req.query.endDate) {
-            matchCondition.createdAt.$lte = new Date(req.query.endDate);
+    // 2) Monthly statistics (last 12 months)
+    const startOfWindow = DateTime.now().setZone('Africa/Cairo').minus({ months: 11 }).startOf('month').toJSDate();
+    const monthlyStats = await ECCartPurchase.aggregate([
+        { $match: { createdAt: { $gte: startOfWindow } } },
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" },
+                },
+                count: { $sum: 1 },
+                revenue: { $sum: "$total" },
+                confirmedCount: {
+                    $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] },
+                },
+                confirmedRevenue: {
+                    $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, "$total", 0] },
+                },
+            },
+        },
+        { $sort: { "_id.year": -1, "_id.month": -1 } },
+    ]);
+
+    // 3) Daily statistics if a specific date is requested
+    let dailyStats = null;
+    if (req.query.date) {
+        const dt = DateTime.fromISO(req.query.date, { zone: 'Africa/Cairo' });
+        if (dt.isValid) {
+            const startOfDay = dt.startOf('day').toJSDate();
+            const endOfDay = dt.endOf('day').toJSDate();
+
+            const [day] = await ECCartPurchase.aggregate([
+                {
+                    $match: {
+                        createdAt: { $gte: startOfDay, $lte: endOfDay },
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalPurchases: { $sum: 1 },
+                        confirmedPurchases: {
+                            $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] },
+                        },
+                        pendingPurchases: {
+                            $sum: { $cond: [{ $ne: ["$status", "confirmed"] }, 1, 0] },
+                        },
+                        totalRevenue: { $sum: "$total" },
+                        confirmedRevenue: {
+                            $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, "$total", 0] },
+                        },
+                        averagePrice: { $avg: "$total" },
+                    },
+                },
+                {
+                    $project: {
+                        totalPurchases: 1,
+                        confirmedPurchases: 1,
+                        pendingPurchases: 1,
+                        totalRevenue: 1,
+                        confirmedRevenue: 1,
+                        averagePrice: { $round: ["$averagePrice", 2] },
+                    },
+                },
+            ]);
+
+            dailyStats =
+                day ||
+                {
+                    totalPurchases: 0,
+                    confirmedPurchases: 0,
+                    pendingPurchases: 0,
+                    totalRevenue: 0,
+                    confirmedRevenue: 0,
+                    averagePrice: 0,
+                };
         }
     }
 
-    const stats = await ECCartPurchase.aggregate([
-        {
-            $match: matchCondition
-        },
-        {
-            $group: {
-                _id: null,
-                totalSales: { $sum: "$total" },
-                avgOrderValue: { $avg: "$total" },
-                totalOrders: { $sum: 1 },
-                totalItems: { $sum: { $size: "$items" } },
-                totalDiscount: { $sum: "$discount" }
-            }
-        }
-    ]);
-
+    // 4) Respond
     res.status(200).json({
         status: "success",
         data: {
-            statistics: stats[0] || {
-                totalSales: 0,
-                avgOrderValue: 0,
-                totalOrders: 0,
-                totalItems: 0,
-                totalDiscount: 0
-            }
-        }
+            overview: overviewAgg[0] || {
+                totalPurchases: 0,
+                confirmedPurchases: 0,
+                pendingPurchases: 0,
+                totalRevenue: 0,
+                confirmedRevenue: 0,
+                averagePrice: 0,
+            },
+            monthlyStats,
+            dailyStats,
+        },
     });
 });
 
@@ -525,5 +647,45 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         message: "Purchase deleted successfully"
+    });
+});
+
+// Product-level purchase statistics
+exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
+    // Aggregate purchases by product id inside purchase items
+    const stats = await ECCartPurchase.aggregate([
+        { $unwind: '$items' },
+        {
+            $group: {
+                _id: '$items.product',
+                totalPurchases: { $sum: 1 },
+                totalValue: { $sum: '$items.priceAtPurchase' },
+            },
+        },
+        {
+            $lookup: {
+                from: 'ecproducts',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productInfo',
+            },
+        },
+        { $unwind: { path: '$productInfo', preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 0,
+                productId: '$_id',
+                productName: '$productInfo.title',
+                productSection: '$productInfo.section',
+                totalPurchases: 1,
+                totalValue: 1,
+            },
+        },
+        { $sort: { totalPurchases: -1 } },
+    ]);
+
+    res.status(200).json({
+        status: 'success',
+        data: stats,
     });
 });

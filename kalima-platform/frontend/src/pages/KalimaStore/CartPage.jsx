@@ -487,10 +487,10 @@ const CartPage = () => {
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/market")}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative group overflow-hidden h-12 px-4 w-full sm:w-auto rounded-xl
+            className="relative group overflow-hidden h-12 px-4 w-fit sm:w-auto rounded-xl
              font-semibold text-[15px] tracking-wide flex items-center justify-center gap-2
              text-white shadow-[0_4px_20px_rgba(255,180,0,0.3)]
-             active:scale-95 transition-all duration-300 border border-yellow-400/50"
+             active:scale-95 transition-all duration-300 border border-yellow-400/50  "
             style={{
               background:
                 "linear-gradient(270deg, #FFD95A, #F9B208, #F7C948, #E0A400, #FFD95A)",
