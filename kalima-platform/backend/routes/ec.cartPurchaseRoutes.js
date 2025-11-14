@@ -27,6 +27,11 @@ router.route('/admin/statistics')
         cartPurchaseController.getPurchaseStatistics
     );
 
+router.route('/admin/product-statistics').get(
+    authController.verifyRoles("Admin"),
+    cartPurchaseController.getProductPurchaseStats
+);
+
 router.route('/admin/response-time')
     .get(
         authController.verifyRoles("Admin"),
