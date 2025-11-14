@@ -230,81 +230,106 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
 // Admin routes
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-    // Build query
-    const query = {};
+  // Base match object
+  const match = {};
 
-    // Filter by status if specified
-    if (req.query.status) {
-        query.status = req.query.status;
-    }
+  // Filter: Status
+  if (req.query.status) {
+    match.status = req.query.status;
+  }
 
-    // Filter by date range if specified
-    if (req.query.startDate && req.query.endDate) {
-        query.createdAt = {
-            $gte: new Date(req.query.startDate),
-            $lte: new Date(req.query.endDate)
-        };
-    }
+  // Filter: Date Range
+  if (req.query.startDate && req.query.endDate) {
+    match.createdAt = {
+      $gte: new Date(req.query.startDate),
+      $lte: new Date(req.query.endDate),
+    };
+  }
 
-    // Filter by minimum/maximum total if specified
-    if (req.query.minTotal || req.query.maxTotal) {
-        query.total = {};
-        if (req.query.minTotal) query.total.$gte = parseFloat(req.query.minTotal);
-        if (req.query.maxTotal) query.total.$lte = parseFloat(req.query.maxTotal);
-    }
+  // Filter: Min/Max Total
+  if (req.query.minTotal || req.query.maxTotal) {
+    match.total = {};
+    if (req.query.minTotal) match.total.$gte = parseFloat(req.query.minTotal);
+    if (req.query.maxTotal) match.total.$lte = parseFloat(req.query.maxTotal);
+  }
 
-    // Search across multiple fields (simple, avoids aggregation)
-    if (req.query.search) {
-        const searchTerm = req.query.search;
-        const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive
+  // Pagination
+  const page = parseInt(req.query.page) ;
+  const limit = parseInt(req.query.limit) ;
+  const skip = (page - 1) * limit;
 
-        // Apply OR search on several fields present in the purchase document
-        query.$or = [
-            { userName: searchRegex },
-            { purchaseSerial: searchRegex },
-            { numberTransferredFrom: searchRegex },
-            { 'createdBy.email': searchRegex },
-            { 'createdBy.name': searchRegex },
-            { 'items.productSnapshot.serial': searchRegex }
-        ];
+  const search = req.query.search ? req.query.search.trim() : null;
+  const searchRegex = search ? new RegExp(search, "i") : null;
 
-        // Remove search from query so it doesn't interfere with other code
-        delete req.query.search;
-    }
+  // ----- AGGREGATION PIPELINE -----
+  const pipeline = [];
 
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+  // Basic match
+  pipeline.push({ $match: match });
 
-    // Execute query
-    const purchases = await ECCartPurchase.find(query)
-        .populate({ path: 'createdBy', select: "name email role phoneNumber" })
-        .populate('confirmedBy', 'name')
-        .populate('receivedBy', 'name')
-        .populate('adminNoteBy', 'name')
-        .populate('couponCode')
-        .sort('-createdAt')
-        .skip(skip)
-        .limit(limit);
+  // Lookup users
+  pipeline.push({
+    $lookup: {
+      from: "users",
+      localField: "createdBy",
+      foreignField: "_id",
+      as: "createdBy",
+    },
+  });
 
-    // Get total count for pagination
-    const total = await ECCartPurchase.countDocuments(query);
+  pipeline.push({ $unwind: "$createdBy" });
 
-    res.status(200).json({
-        status: "success",
-        results: purchases.length,
-        pagination: {
-            total,
-            page,
-            pages: Math.ceil(total / limit),
-            limit
-        },
-        data: {
-            purchases
-        }
+  // Search AFTER lookup
+  if (searchRegex) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { userName: searchRegex },
+          { purchaseSerial: searchRegex },
+          { numberTransferredFrom: searchRegex },
+          { "createdBy.email": searchRegex },
+          { "createdBy.name": searchRegex },
+          { "items.productSnapshot.serial": searchRegex },
+        ],
+      },
     });
+  }
+
+  // Sort
+  pipeline.push({ $sort: { createdAt: -1 } });
+
+  // Pagination
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: limit });
+
+  // Execute aggregation
+  const purchases = await ECCartPurchase.aggregate(pipeline);
+
+  // Count total (must re-run without skip/limit)
+  const countPipeline = pipeline.filter(
+    (stage) => !stage.$skip && !stage.$limit
+  );
+
+  countPipeline.push({ $count: "total" });
+  const countResult = await ECCartPurchase.aggregate(countPipeline);
+  const total = countResult.length > 0 ? countResult[0].total : 0;
+
+  // RESPONSE
+  res.status(200).json({
+    status: "success",
+    results: purchases.length,
+    pagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    },
+    data: {
+      purchases,
+    },
+  });
 });
+
 
 exports.addAdminNote = catchAsync(async (req, res, next) => {
 
