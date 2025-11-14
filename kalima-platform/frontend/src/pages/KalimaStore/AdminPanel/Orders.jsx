@@ -1572,8 +1572,7 @@ const Orders = () => {
                     <p className="whitespace-pre-wrap">{selectedOrder.notes}</p>
                   ) : (
                     <p className="text-gray-500 italic">
-                      {t("table.noCustomerNotes") ||
-                        "لا توجد ملاحظات من العميل"}
+                      لا توجد ملاحظات من العميل
                     </p>
                   )}
                 </div>
