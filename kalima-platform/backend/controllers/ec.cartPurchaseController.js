@@ -253,6 +253,25 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         if (req.query.maxTotal) query.total.$lte = parseFloat(req.query.maxTotal);
     }
 
+    // Search across multiple fields (simple, avoids aggregation)
+    if (req.query.search) {
+        const searchTerm = req.query.search;
+        const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive
+
+        // Apply OR search on several fields present in the purchase document
+        query.$or = [
+            { userName: searchRegex },
+            { purchaseSerial: searchRegex },
+            { numberTransferredFrom: searchRegex },
+            { 'createdBy.email': searchRegex },
+            { 'createdBy.name': searchRegex },
+            { 'items.productSnapshot.serial': searchRegex }
+        ];
+
+        // Remove search from query so it doesn't interfere with other code
+        delete req.query.search;
+    }
+
     // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
