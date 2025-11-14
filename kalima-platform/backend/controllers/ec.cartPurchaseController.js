@@ -288,9 +288,6 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 });
 
 exports.addAdminNote = catchAsync(async (req, res, next) => {
-    if (!req.body.adminNotes) {
-        return next(new AppError("Admin note is required", 400));
-    }
 
     const purchase = await ECCartPurchase.findByIdAndUpdate(
         req.params.id,
