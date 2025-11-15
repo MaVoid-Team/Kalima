@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import Step1 from "./step1"
-import Step2 from "./Step2"
-import Step3 from "./Step3"
-import StepParent from "./StepParent"
-import StepTeacher from "./StepTeacher"
-import Step4 from "./Step4"
-import StepsIndicator from "./StepsIndicator"
-import NavigationButtons from "./NavigationButtons"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
-import RoleSelectionModal from "./RoleSelctionModal"
-import { getAllLevels } from "../../routes/levels"
-const apiUrl = import.meta.env.VITE_API_URL
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import Step1 from "./step1";
+import Step2 from "./Step2";
+import Step3 from "./Step3";
+import StepParent from "./StepParent";
+import StepTeacher from "./StepTeacher";
+import Step4 from "./Step4";
+import StepsIndicator from "./StepsIndicator";
+import NavigationButtons from "./NavigationButtons";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import RoleSelectionModal from "./RoleSelctionModal";
+import { getAllLevels } from "../../routes/levels";
+const apiUrl = import.meta.env.VITE_API_URL;
 const hobbiesList = [
   { id: 1, name: "reading", img: "/hobbies/reading.jpg" },
   { id: 2, name: "sports", img: "/hobbies/sports.jpg" },
@@ -25,21 +25,21 @@ const hobbiesList = [
   { id: 7, name: "photography", img: "/hobbies/photography.jpg" },
   { id: 8, name: "bicycling", img: "/hobbies/bicycle.jpg" },
   { id: 9, name: "technology", img: "/hobbies/technology.jpg" },
-]
+];
 
 const totalSteps = {
   student: 4,
   parent: 3,
   teacher: 3,
-}
+};
 
 export default function StudentRegistration() {
-  const [showRoleModal, setShowRoleModal] = useState(true)
-  const [roleLocked, setRoleLocked] = useState(false)
-  const { t, i18n } = useTranslation("register")
-  const [currentStep, setCurrentStep] = useState(1)
-  const navigate = useNavigate()
-  const [role, setRole] = useState("student")
+  const [showRoleModal, setShowRoleModal] = useState(true);
+  const [roleLocked, setRoleLocked] = useState(false);
+  const { t, i18n } = useTranslation("register");
+  const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
+  const [role, setRole] = useState("student");
   const [formData, setFormData] = useState({
     role: "student",
     fullName: "",
@@ -50,7 +50,7 @@ export default function StudentRegistration() {
     phoneNumber2: "",
     gender: "",
     faction: "Alpha",
-    level: [],
+    level: "",
     hobbies: [],
     parentPhoneNumber: "",
     children: [""],
@@ -63,98 +63,114 @@ export default function StudentRegistration() {
     administrationZone: "",
     referralSerial: null,
     profilePic: null,
-  })
-  const [errors, setErrors] = useState({})
-  const [apiError, setApiError] = useState(null)
-  const [gradeLevels, setGradeLevels] = useState([])
+  });
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
+  const [gradeLevels, setGradeLevels] = useState([]);
 
   useEffect(() => {
-    setErrors({})
-    setApiError(null)
-  }, [currentStep])
+    setErrors({});
+    setApiError(null);
+  }, [currentStep]);
 
   const getStepErrors = (step) => {
-    const errors = {}
-    const { role } = formData
-    const phoneRegex = /^\+?[0-9]\d{7,14}$/
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
-    const passwordRegex = /^.{8,}$/
+    const errors = {};
+    const { role } = formData;
+    const phoneRegex = /^(0|\+?20)?1[0-9]{9}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    const passwordRegex = /^.{8,}$/;
 
     if (step === 1) {
-      if (!formData.fullName?.trim()) errors.fullName = "required"
-      if (!formData.gender) errors.gender = "required"
-      if (!formData.government) errors.government = "required"
-      if (!formData.administrationZone) errors.administrationZone = "required"
+      if (!formData.fullName?.trim()) errors.fullName = "required";
+      if (!formData.gender) errors.gender = "required";
+      if (!formData.government) errors.government = "required";
+      if (!formData.administrationZone) errors.administrationZone = "required";
       if (!formData.phoneNumber) {
-        errors.phoneNumber = "required"
+        errors.phoneNumber = "required";
       } else if (!phoneRegex.test(formData.phoneNumber)) {
-        errors.phoneNumber = "phoneInvalid"
+        errors.phoneNumber = "phoneInvalid";
       }
 
-      if (role === "student" && (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0))) {
-        errors.level = "required"
+      if (
+        role === "student" &&
+        (!formData.level ||
+          (Array.isArray(formData.level) && formData.level.length === 0))
+      ) {
+        errors.level = "required";
       }
     }
 
-
     if (step === 2) {
       if (!formData.email) {
-        errors.email = "required"
+        errors.email = "required";
       } else if (!emailRegex.test(formData.email)) {
-        errors.email = "emailInvalid"
+        errors.email = "emailInvalid";
       }
 
       if (!formData.password) {
-        errors.password = "required"
+        errors.password = "required";
       } else if (!passwordRegex.test(formData.password)) {
-        errors.password = "passwordRequirements"
+        errors.password = "passwordRequirements";
       }
 
       if (!formData.confirmPassword) {
-        errors.confirmPassword = "required"
+        errors.confirmPassword = "required";
       } else if (formData.password !== formData.confirmPassword) {
-        errors.confirmPassword = "passwordsMismatch"
+        errors.confirmPassword = "passwordsMismatch";
       }
 
-      if (role === "student" && (formData.parentPhoneNumber === null || formData.parentPhoneNumber === "")) {
-        errors.parentPhoneNumber = "parentPhoneRequired"
-      } else if (role === "student" && !phoneRegex.test(String(formData.parentPhoneNumber))) {
-        errors.parentPhoneNumber = "phoneInvalid"
+      if (role === "student") {
+        if (!formData.parentPhoneNumber) {
+          errors.parentPhoneNumber = "parentPhoneRequired";
+        } else if (!phoneRegex.test(String(formData.parentPhoneNumber))) {
+          errors.parentPhoneNumber = "phoneInvalid";
+        }
       }
-
-
 
       if (role === "teacher") {
         if (!formData.subject?.trim()) {
-          errors.subject = "subjectRequired"
+          errors.subject = "subjectRequired";
         }
 
-        if (!formData.level || (Array.isArray(formData.level) && formData.level.length === 0)) {
-          errors.level = "required"
+        if (
+          !formData.level ||
+          (Array.isArray(formData.level) && formData.level.length === 0)
+        ) {
+          errors.level = "required";
         }
 
         if (!formData.teachesAtType) {
-          errors.teachesAtType = "required"
+          errors.teachesAtType = "required";
         } else {
           if (
-            (formData.teachesAtType === "Center" || formData.teachesAtType === "Both") &&
-            (!formData.centers || formData.centers.length === 0 || !formData.centers.some((c) => c.trim()))
+            (formData.teachesAtType === "Center" ||
+              formData.teachesAtType === "Both") &&
+            (!formData.centers ||
+              formData.centers.length === 0 ||
+              !formData.centers.some((c) => c.trim()))
           ) {
-            errors.centers = "required"
+            errors.centers = "required";
           }
 
           if (
-            (formData.teachesAtType === "School" || formData.teachesAtType === "Both") &&
+            (formData.teachesAtType === "School" ||
+              formData.teachesAtType === "Both") &&
             (!formData.school || !formData.school.trim())
           ) {
-            errors.school = "required"
+            errors.school = "required";
           }
         }
 
         // Validate social media entries if any are provided
-        if (formData.socialMedia && formData.socialMedia.some((s) => s.platform || s.account)) {
+        if (
+          formData.socialMedia &&
+          formData.socialMedia.some((s) => s.platform || s.account)
+        ) {
           formData.socialMedia.forEach((social, index) => {
-            if ((social.platform && !social.account) || (!social.platform && social.account)) {
+            if (
+              (social.platform && !social.account) ||
+              (!social.platform && social.account)
+            ) {
               errors.socialMedia = {
                 ...(errors.socialMedia || {}),
                 [index]: {
@@ -162,38 +178,38 @@ export default function StudentRegistration() {
                   platform: !social.platform ? "required" : undefined,
                   account: !social.account ? "required" : undefined,
                 },
-              }
+              };
             }
-          })
+          });
         }
       }
     }
 
     if (step === 3 && role === "student" && formData.hobbies.length === 0) {
-      errors.hobbies = "hobbiesRequired"
+      errors.hobbies = "hobbiesRequired";
     }
 
-    return errors
-  }
+    return errors;
+  };
 
   useEffect(() => {
     const fetchLevels = async () => {
       try {
-        const response = await getAllLevels()
+        const response = await getAllLevels();
         if (response.success) {
           const levels = response.data.map((level) => ({
             value: level._id,
-            label: level.name
+            label: level.name,
           }));
           setGradeLevels(levels);
         }
       } catch (error) {
-        console.error("Error fetching levels:", error)
+        console.error("Error fetching levels:", error);
       }
-    }
+    };
 
-    fetchLevels()
-  }, [])
+    fetchLevels();
+  }, []);
 
   const toggleHobby = (hobbyId) => {
     try {
@@ -202,29 +218,29 @@ export default function StudentRegistration() {
         hobbies: prev.hobbies.includes(hobbyId)
           ? prev.hobbies.filter((id) => id !== hobbyId)
           : [...prev.hobbies, hobbyId],
-      }))
-      setErrors((prev) => ({ ...prev, hobbies: undefined }))
+      }));
+      setErrors((prev) => ({ ...prev, hobbies: undefined }));
     } catch (error) {
-      console.error("Error toggling hobby:", error)
-      setApiError("Failed to update hobby selection")
+      console.error("Error toggling hobby:", error);
+      setApiError("Failed to update hobby selection");
     }
-  }
+  };
 
   const handleNext = () => {
-    const stepErrors = getStepErrors(currentStep)
+    const stepErrors = getStepErrors(currentStep);
 
     if (Object.keys(stepErrors).length > 0) {
-      setErrors(stepErrors)
-      setApiError(t("validation.submissionError"))
-      return
+      setErrors(stepErrors);
+      setApiError(t("validation.submissionError"));
+      return;
     }
 
     if (currentStep < totalSteps[formData.role]) {
-      setCurrentStep((prev) => prev + 1)
+      setCurrentStep((prev) => prev + 1);
     } else {
-      handleSubmit()
+      handleSubmit();
     }
-  }
+  };
 
   const handleInputChange = (e) => {
     try {
@@ -232,10 +248,7 @@ export default function StudentRegistration() {
 
       setFormData((prev) => ({
         ...prev,
-        [name]:
-          type === "file"
-            ? files[0]
-            : value, // ✅ Always keep as string, especially for phone numbers
+        [name]: type === "file" ? files[0] : value, // ✅ Always keep as string, especially for phone numbers
       }));
 
       setErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -245,21 +258,20 @@ export default function StudentRegistration() {
     }
   };
 
-
   const handleChildrenChange = (index, value) => {
     try {
-      const newChildren = [...formData.children]
-      newChildren[index] = value
-      setFormData((prev) => ({ ...prev, children: newChildren }))
+      const newChildren = [...formData.children];
+      newChildren[index] = value;
+      setFormData((prev) => ({ ...prev, children: newChildren }));
       setErrors((prev) => ({
         ...prev,
         children: { ...prev.children, [index]: undefined },
-      }))
+      }));
     } catch (error) {
-      console.error("Error handling children change:", error)
-      setApiError("Failed to update child sequence ID")
+      console.error("Error handling children change:", error);
+      setApiError("Failed to update child sequence ID");
     }
-  }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -273,7 +285,7 @@ export default function StudentRegistration() {
       data.append("name", formData.fullName.trim());
       data.append("email", formData.email.toLowerCase().trim());
       if (formData.referralSerial) {
-        data.append("referralSerial", formData.referralSerial)
+        data.append("referralSerial", formData.referralSerial);
       }
       data.append("password", formData.password);
       data.append("confirmPassword", formData.confirmPassword);
@@ -292,22 +304,29 @@ export default function StudentRegistration() {
           // Handle level as single value for students
           if (formData.level) {
             if (Array.isArray(formData.level)) {
-              formData.level.forEach((levelValue, index) => {
-                data.append(`level[${index}]`, levelValue);
-              });
-            } else {
               data.append("level", formData.level);
             }
           }
           data.append("faction", formData.faction || "Alpha");
           data.append("parentPhoneNumber", formData.parentPhoneNumber);
 
-          formData.hobbies
-            .map((id) => hobbiesList.find((hobby) => hobby.id === id)?.name)
-            .filter(Boolean)
-            .forEach((hobby, index) => {
-              data.append(`hobbies[${index}]`, hobby);
-            });
+          formData.hobbies.forEach((id, index) => {
+            const predefined = hobbiesList.find((h) => h.id === id);
+
+            let hobbyName;
+
+            if (predefined) {
+              hobbyName = predefined.name;
+            } else {
+              const custom = formData.customHobbies?.find((h) => h.id === id);
+              hobbyName = custom?.name;
+            }
+
+            if (hobbyName) {
+              data.append(`hobbies[${index}]`, hobbyName);
+            }
+          });
+
           break;
 
         case "parent":
@@ -346,7 +365,10 @@ export default function StudentRegistration() {
             .filter((s) => s.platform && s.account)
             .forEach((social, index) => {
               data.append(`socialMedia[${index}][platform]`, social.platform);
-              data.append(`socialMedia[${index}][account]`, social.account.trim());
+              data.append(
+                `socialMedia[${index}][account]`,
+                social.account.trim()
+              );
             });
           break;
 
@@ -364,7 +386,6 @@ export default function StudentRegistration() {
       navigate("/login", {
         state: { message: "Registration successful" },
       });
-
     } catch (error) {
       let errorMessage = t("errors.unexpectedError");
       const fieldErrors = {};
@@ -389,7 +410,8 @@ export default function StudentRegistration() {
             }
 
             if (errorData.field) {
-              fieldErrors[errorData.field] = errorData.errorKey || "invalidInput";
+              fieldErrors[errorData.field] =
+                errorData.errorKey || "invalidInput";
             }
             break;
 
@@ -413,17 +435,18 @@ export default function StudentRegistration() {
         errorMessage = t("errors.networkError");
       }
 
-      console.error("Full error response:", error.response?.data || error.message);
+      console.error(
+        "Full error response:",
+        error.response?.data || error.message
+      );
       setApiError(errorMessage);
       setErrors(fieldErrors);
     }
   };
 
-
-
   const renderStepContent = () => {
     try {
-      const { role } = formData
+      const { role } = formData;
 
       switch (role) {
         case "student":
@@ -438,24 +461,50 @@ export default function StudentRegistration() {
                   role={role}
                   gradeLevels={gradeLevels}
                 />
-              )
+              );
             case 2:
-              return <Step2 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} />
+              return (
+                <Step2
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  t={t}
+                  errors={errors}
+                />
+              );
             case 3:
               return (
-                <Step3 formData={formData} toggleHobby={toggleHobby} t={t} hobbiesList={hobbiesList} errors={errors} />
-              )
+                <Step3
+                  formData={formData}
+                  toggleHobby={toggleHobby}
+                  t={t}
+                  hobbiesList={hobbiesList}
+                  errors={errors}
+                />
+              );
             case 4:
-              return <Step4 formData={formData} t={t} hobbiesList={hobbiesList} gradeLevels={gradeLevels} />
+              return (
+                <Step4
+                  formData={formData}
+                  t={t}
+                  hobbiesList={hobbiesList}
+                  gradeLevels={gradeLevels}
+                />
+              );
             default:
-              return null
+              return null;
           }
         case "parent":
           switch (currentStep) {
             case 1:
               return (
-                <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />
-              )
+                <Step1
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  t={t}
+                  errors={errors}
+                  role={role}
+                />
+              );
             case 2:
               return (
                 <StepParent
@@ -466,18 +515,24 @@ export default function StudentRegistration() {
                   gradeLevels={gradeLevels}
                   errors={errors}
                 />
-              )
+              );
             case 3:
-              return <Step4 formData={formData} t={t} />
+              return <Step4 formData={formData} t={t} />;
             default:
-              return null
+              return null;
           }
         case "teacher":
           switch (currentStep) {
             case 1:
               return (
-                <Step1 formData={formData} handleInputChange={handleInputChange} t={t} errors={errors} role={role} />
-              )
+                <Step1
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  t={t}
+                  errors={errors}
+                  role={role}
+                />
+              );
             case 2:
               return (
                 <StepTeacher
@@ -487,24 +542,29 @@ export default function StudentRegistration() {
                   errors={errors}
                   gradeLevels={gradeLevels}
                 />
-              )
+              );
             case 3:
-              return <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
+              return (
+                <Step4 formData={formData} t={t} gradeLevels={gradeLevels} />
+              );
             default:
-              return null
+              return null;
           }
         default:
-          return null
+          return null;
       }
     } catch (error) {
-      console.error("Error rendering step content:", error)
-      setApiError("Failed to render form content")
-      return null
+      console.error("Error rendering step content:", error);
+      setApiError("Failed to render form content");
+      return null;
     }
-  }
+  };
 
   return (
-    <div className="flex bg-primary" dir={i18n.language === "ar" ? "ltr" : "rtl"}>
+    <div
+      className="flex bg-primary"
+      dir={i18n.language === "ar" ? "ltr" : "rtl"}
+    >
       <div className="sm:hidden absolute inset-0 overflow-hidden z-0">
         <img
           src="/registration-image.png"
@@ -521,7 +581,10 @@ export default function StudentRegistration() {
         />
       </div>
 
-      <div className={`sm:w-2/3  py-2 2xl:w-1/2 `} dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+      <div
+        className={`sm:w-2/3  py-2 2xl:w-1/2 `}
+        dir={i18n.language === "ar" ? "rtl" : "ltr"}
+      >
         <div
           className="mx-auto bg-base-100 rounded-tr-[50px] rounded-bl-[50px] w-full p-10 relative shadow-xl"
           style={{
@@ -548,20 +611,23 @@ export default function StudentRegistration() {
             <RoleSelectionModal
               onSelectRole={(selectedRole) => {
                 try {
-                  setRole(selectedRole)
-                  setFormData((prev) => ({ ...prev, role: selectedRole }))
-                  setShowRoleModal(false)
-                  setRoleLocked(true)
+                  setRole(selectedRole);
+                  setFormData((prev) => ({ ...prev, role: selectedRole }));
+                  setShowRoleModal(false);
+                  setRoleLocked(true);
                 } catch (error) {
-                  console.error("Error selecting role:", error)
-                  setApiError("Failed to select role")
+                  console.error("Error selecting role:", error);
+                  setApiError("Failed to select role");
                 }
               }}
               t={t}
             />
           )}
           {apiError && (
-            <div className="alert alert-error mb-4 animate-fade-in w-1/2" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+            <div
+              className="alert alert-error mb-4 animate-fade-in w-1/2"
+              dir={i18n.language === "ar" ? "rtl" : "ltr"}
+            >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <svg
@@ -595,18 +661,22 @@ export default function StudentRegistration() {
                               className="flex gap-2 items-start"
                               dir={i18n.language === "ar" ? "rtl" : "ltr"}
                             >
-                              <span className="font-medium">{t(`form.${field}`)}:</span>
-                              <span className="text-opacity-80">{t(`validation.${message}`)}</span>
+                              <span className="font-medium">
+                                {t(`form.${field}`)}:
+                              </span>
+                              <span className="text-opacity-80">
+                                {t(`validation.${message}`)}
+                              </span>
                             </li>
-                          ),
+                          )
                       )}
                     </ul>
                     <div className="flex items-center justify-center mt-4">
                       <button
                         className="btn btn-sm btn-ghost hover:bg-error-content/10 mx-auto"
                         onClick={() => {
-                          setApiError(null)
-                          setErrors({})
+                          setApiError(null);
+                          setErrors({});
                         }}
                       >
                         {t("dismiss")}
@@ -628,9 +698,13 @@ export default function StudentRegistration() {
             role={formData.role}
           />
 
-          <StepsIndicator currentStep={currentStep} t={t} role={formData.role} />
+          <StepsIndicator
+            currentStep={currentStep}
+            t={t}
+            role={formData.role}
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }

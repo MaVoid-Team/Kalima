@@ -230,54 +230,53 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
 // Admin routes
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-  // Base match object
+  const {
+    status,
+    startDate,
+    endDate,
+    minTotal,
+    maxTotal,
+    search,
+    page = 1,
+    limit = 10,
+  } = req.query;
+
   const match = {};
 
-  // Filter: Status
-  if (req.query.status) {
-    match.status = req.query.status;
-  }
+  // ----- Filters -----
+  if (status) match.status = status;
 
-  // Filter: Date Range
-  if (req.query.startDate && req.query.endDate) {
+  if (startDate && endDate) {
     match.createdAt = {
-      $gte: new Date(req.query.startDate),
-      $lte: new Date(req.query.endDate),
+      $gte: new Date(startDate),
+      $lte: new Date(endDate),
     };
   }
 
-  // Filter: Min/Max Total
-  if (req.query.minTotal || req.query.maxTotal) {
+  if (minTotal || maxTotal) {
     match.total = {};
-    if (req.query.minTotal) match.total.$gte = parseFloat(req.query.minTotal);
-    if (req.query.maxTotal) match.total.$lte = parseFloat(req.query.maxTotal);
+    if (minTotal) match.total.$gte = parseFloat(minTotal);
+    if (maxTotal) match.total.$lte = parseFloat(maxTotal);
   }
 
-  // Pagination
-  const page = parseInt(req.query.page) ;
-  const limit = parseInt(req.query.limit) ;
-  const skip = (page - 1) * limit;
+  const searchRegex = search ? new RegExp(search.trim(), "i") : null;
 
-  const search = req.query.search ? req.query.search.trim() : null;
-  const searchRegex = search ? new RegExp(search, "i") : null;
+  const skip = (parseInt(page) - 1) * parseInt(limit);
 
-  // ----- AGGREGATION PIPELINE -----
-  const pipeline = [];
+  // ----- Pipeline -----
+  const pipeline = [
+    { $match: match },
 
-  // Basic match
-  pipeline.push({ $match: match });
-
-  // Lookup users
-  pipeline.push({
-    $lookup: {
-      from: "users",
-      localField: "createdBy",
-      foreignField: "_id",
-      as: "createdBy",
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+      },
     },
-  });
-
-  pipeline.push({ $unwind: "$createdBy" });
+    { $unwind: "$createdBy" },
+  ];
 
   // Search AFTER lookup
   if (searchRegex) {
@@ -295,40 +294,39 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Sort
-  pipeline.push({ $sort: { createdAt: -1 } });
+  // Sort + Pagination
+  pipeline.push(
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: parseInt(limit) }
+  );
 
-  // Pagination
-  pipeline.push({ $skip: skip });
-  pipeline.push({ $limit: limit });
-
-  // Execute aggregation
+  // ----- Execute -----
   const purchases = await ECCartPurchase.aggregate(pipeline);
 
-  // Count total (must re-run without skip/limit)
+  // Count pipeline (remove skip/limit)
   const countPipeline = pipeline.filter(
     (stage) => !stage.$skip && !stage.$limit
   );
-
   countPipeline.push({ $count: "total" });
-  const countResult = await ECCartPurchase.aggregate(countPipeline);
-  const total = countResult.length > 0 ? countResult[0].total : 0;
 
-  // RESPONSE
+  const countResult = await ECCartPurchase.aggregate(countPipeline);
+  const total = countResult[0]?.total || 0;
+
+  // ----- Response -----
   res.status(200).json({
     status: "success",
     results: purchases.length,
     pagination: {
       total,
-      page,
+      page: Number(page),
       pages: Math.ceil(total / limit),
-      limit,
+      limit: Number(limit),
     },
-    data: {
-      purchases,
-    },
+    data: { purchases },
   });
 });
+
 
 
 exports.addAdminNote = catchAsync(async (req, res, next) => {
