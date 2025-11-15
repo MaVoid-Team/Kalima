@@ -22,11 +22,12 @@ const teacherValidation = userValidation.concat(
     level: Joi.array()
       .items(Joi.string().valid("primary", "preparatory", "secondary"))
       .min(1)
-      .required(), teachesAtType: Joi.string().valid("Center", "School", "Both").required(),
+    ,
+    teachesAtType: Joi.string().valid("Center", "School", "Both").optional(),
     // Make centers conditionally required but more flexible for updates
     centers: Joi.alternatives().conditional('teachesAtType', {
       is: Joi.string().valid("Center", "Both"),
-      then: Joi.array().items(Joi.string()).min(1).required(),
+      then: Joi.array().items(Joi.string()).min(1),
       otherwise: Joi.array().items(Joi.string()).optional()
     }).messages({
       'any.required': 'Centers are required when teaching at a Center or Both'
@@ -34,7 +35,7 @@ const teacherValidation = userValidation.concat(
     // Make school conditionally required but more flexible for updates
     school: Joi.alternatives().conditional('teachesAtType', {
       is: Joi.string().valid("School", "Both"),
-      then: Joi.string().min(1).required(),
+      then: Joi.string().min(1),
       otherwise: Joi.string().optional()
     }).messages({
       'any.required': 'School is required when teaching at a School or Both'

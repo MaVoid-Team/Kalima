@@ -47,7 +47,6 @@ const teacherSchema = new mongoose.Schema(
       {
         type: String,
         enum: ["primary", "preparatory", "secondary"],
-        required: true,
       },
     ],
     socialMedia: [
@@ -80,7 +79,6 @@ const teacherSchema = new mongoose.Schema(
     teachesAtType: {
       type: String,
       enum: ["Center", "School", "Both"],
-      required: true,
     },
     centers: [{ type: String }], // Array of strings for center names
     school: { type: String },

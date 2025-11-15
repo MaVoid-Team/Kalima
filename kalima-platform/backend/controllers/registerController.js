@@ -105,7 +105,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         (zone) =>
           zone &&
           zone.toLowerCase().trim() ===
-            normalizedAdministrationZone.toLowerCase() // ← Use normalized value
+          normalizedAdministrationZone.toLowerCase() // ← Use normalized value
       );
 
       if (!zoneExistsInGov) {
@@ -248,36 +248,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       } else {
         delete newUser.phoneNumber2;
       }
-      // Validate teacher level (must be valid array of level IDs)
-      if (!Array.isArray(newUser.level) || newUser.level.length === 0) {
-        return next(
-          new AppError(
-            "Level is required for teacher role and must be a non-empty array.",
-            400
-          )
-        );
-      }
 
-      // validate each level ID by checking DB
-      for (const levelId of newUser.level) {
-        const lvl = await Level.findById(levelId);
-        if (!lvl) {
-          return next(new AppError(`Invalid level ID: ${levelId}`, 400));
-        }
-      }
-
-      // Validate teachesAtType
-      if (
-        !newUser.teachesAtType ||
-        !["Center", "School", "Both"].includes(newUser.teachesAtType)
-      ) {
-        return next(
-          new AppError(
-            "teachesAtType is required and must be 'Center', 'School', or 'Both'",
-            400
-          )
-        );
-      }
       // Validate centers
       if (
         newUser.teachesAtType === "Center" &&
