@@ -362,6 +362,7 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
     const overviewAgg = await ECCartPurchase.aggregate([
         {
             $group: {
+                _id: null,
                 totalPurchases: { $sum: 1 },
                 confirmedPurchases: {
                     $sum: { $cond: [{ $eq: ["$status", "confirmed"] }, 1, 0] },

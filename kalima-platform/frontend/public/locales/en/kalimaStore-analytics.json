@@ -23,9 +23,13 @@
     "averagePrice": "Average Price"
   },
   "insights": {
-    "topProduct": "Top Product",
-    "totalProducts": "Total Products",
-    "avgPerProduct": "Avg per Product"
+    "responseTimeTitle": "Response Time Analytics",
+    "avgReceiveTime": "Average Receive time",
+    "avgConfirmTime": "Average Confirm Time",
+    "avgTotalTime": "Average Total Time",
+    "avgTotalTimeDesc": "From creation to confirmation",
+    "avgConfirmTimeDesc": "From receive to confirmation",
+    "avgReceiveTimeDesc": "From creation to receive"
   },
   "productPerformance": "Product Performance",
   "monthlyTrends": "Monthly Trends",
