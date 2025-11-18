@@ -2,7 +2,6 @@ export default function StepsIndicator({ currentStep, t, role }) {
   const stepLabels = {
     student: [
       t('steps.personalInfo'),
-      t('steps.parentInfo'),
       t('steps.hobbies'),
       t('steps.review')
     ],
@@ -13,7 +12,7 @@ export default function StepsIndicator({ currentStep, t, role }) {
     ],
     teacher: [
       t('steps.personalInfo'),
-      t('steps.professionalInfo'),
+     "المعلومات الفرعيه",
       t('steps.review')
     ]
   };
