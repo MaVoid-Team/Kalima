@@ -1,12 +1,44 @@
-import { useState, useEffect } from 'react';
-import { getAllGovernments, getGovernmentZones } from '../../routes/governments';
+import { useState, useEffect } from "react";
+import {
+  getAllGovernments,
+  getGovernmentZones,
+} from "../../routes/governments";
+import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { getAllSubjects } from "../../routes/courses";
 
-export default function Step1({ formData, handleInputChange, t, errors, role, gradeLevels }) {
+export default function Step1({
+  formData,
+  handleInputChange,
+  t,
+  errors,
+  role,
+  gradeLevels,
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [governments, setGovernments] = useState([]);
   const [administrationZones, setAdministrationZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { i18n } = useTranslation();
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [subjects, setSubjects] = useState([]);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const response = await getAllSubjects();
+      if (response.success) {
+        setSubjects(response.data);
+      } else {
+        console.error(response.error);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
 
   const toEnglishDigits = (str) =>
     str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
@@ -15,6 +47,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
     const { name, value } = e.target;
     const cleaned = toEnglishDigits(value);
     handleInputChange({ target: { name, value: cleaned } });
+  };
+
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    handleInputChange({ target: { name, value } });
   };
 
   // Fetch governments on component mount
@@ -29,11 +66,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           setGovernments(result.data);
         } else {
           setError(result.error);
-          console.error('Failed to load governments:', result.error);
+          console.error("Failed to load governments:", result.error);
         }
       } catch (err) {
         setError(err.message);
-        console.error('Failed to load governments:', err);
+        console.error("Failed to load governments:", err);
       } finally {
         setLoading(false);
       }
@@ -57,11 +94,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         if (result.success) {
           setAdministrationZones(result.data);
         } else {
-          console.error('Failed to load administration zones:', result.error);
+          console.error("Failed to load administration zones:", result.error);
           setAdministrationZones([]);
         }
       } catch (err) {
-        console.error('Failed to load administration zones:', err);
+        console.error("Failed to load administration zones:", err);
         setAdministrationZones([]);
       } finally {
         setZonesLoading(false);
@@ -78,9 +115,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
     if (formData.administrationZone) {
       handleInputChange({
         target: {
-          name: 'administrationZone',
-          value: ''
-        }
+          name: "administrationZone",
+          value: "",
+        },
       });
     }
   };
@@ -88,10 +125,10 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   if (loading) {
     return (
       <div className="space-y-2">
-        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <p className="text-2xl font-semibold">{t("form.personalDetails")}</p>
         <div className="flex items-center justify-center py-8">
           <div className="loading loading-spinner loading-lg"></div>
-          <span className="ml-2">{t('common.loading') || 'Loading...'}</span>
+          <span className="ml-2">{t("common.loading") || "Loading..."}</span>
         </div>
       </div>
     );
@@ -100,9 +137,11 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
   if (error) {
     return (
       <div className="space-y-2">
-        <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+        <p className="text-2xl font-semibold">{t("form.personalDetails")}</p>
         <div className="alert alert-error">
-          <span>{t('errors.loadingFailed') || 'Failed to load data:'} {error}</span>
+          <span>
+            {t("errors.loadingFailed") || "Failed to load data:"} {error}
+          </span>
         </div>
       </div>
     );
@@ -110,18 +149,20 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
 
   return (
     <div className="space-y-2">
-      <p className="text-2xl font-semibold">{t('form.personalDetails')}</p>
+      <p className="text-2xl font-semibold">{t("البيانات الاساسيه")}</p>
 
       {/* Common fields */}
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t('form.fullName')}</span>
+            <span className="label-text">{t("form.fullName")}</span>
           </label>
           <input
             type="text"
             name="fullName"
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.fullName ? 'input-error animate-shake' : ''}`}
+            className={`input input-bordered w-2/3 lg:w-1/2 ${
+              errors.fullName ? "input-error animate-shake" : ""
+            }`}
             value={formData.fullName}
             onChange={handleInputChange}
             required
@@ -134,55 +175,105 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      <div className="form-control relative pb-5">
+      {/* Email */}
+      <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t("form.profilePic") || "Profile Picture"}</span>
+            <span className="label-text">{t("form.email")}</span>
           </label>
           <input
-            type="file"
-            name="profilePic"
-            accept=".jpg,.jpeg,.png"
-            className="file-input file-input-bordered w-2/3 lg:w-1/2"
+            type="email"
+            name="email"
+            className={`input input-bordered w-2/3 lg:w-1/2 ${
+              errors.email ? "input-error animate-shake" : ""
+            }`}
+            value={formData.email || ""}
             onChange={handleInputChange}
+            required
           />
-          {formData.profilePic && (
-            <p className="text-xs mt-1 text-base-content/70">
-              Selected file: {formData.profilePic.name}
-            </p>
-          )}
-          {errors.profilePic && (
-            <span className="absolute bottom-0 text-error text-sm mt-1">
-              {t(`validation.${errors.profilePic}`)}
+          {errors.email && (
+            <span className="text-error text-sm mt-1">
+              {t(`validation.${errors.email}`)}
             </span>
           )}
         </div>
       </div>
 
-
-      <div className="form-control relative pb-5">
+      {/* Password */}
+      <div className="form-control">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t('form.gender')}</span>
+            <span className="label-text">{t("form.password")}</span>
           </label>
-          <select
-            name="gender"
-            className={`select select-bordered w-2/3 lg:w-1/2 ${errors.gender ? 'select-error animate-shake' : ''}`}
-            value={formData.gender}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="">{t('form.selectGender')}</option>
-            <option value="male">{t('gender.male')}</option>
-            <option value="female">{t('gender.female')}</option>
-          </select>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              className={`input input-bordered w-2/3 lg:w-1/2 ${
+                i18n.language === "ar" ? "pr-12" : "pl-12"
+              } ${errors.password ? "input-error animate-shake" : ""}`}
+              value={formData.password || ""}
+              onChange={handleInputChange}
+              required
+            />
+            <button
+              type="button"
+              className={`absolute top-1/2 ${
+                i18n.language === "ar" ? "right-3" : "left-3"
+              } -translate-y-1/2 z-10`}
+              onClick={() => setShowPassword((prev) => !prev)}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.password && (
+            <span className="text-error text-sm mt-1">
+              {t("validation.passwordRequirements")}
+            </span>
+          )}
+        </div>
+      </div>
+      {/* Confirm Password */}
+      <div className="form-control relative">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t("form.confirmPassword")}</span>
+          </label>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              className={`input input-bordered w-2/3 lg:w-1/2 ${
+                i18n.language === "ar" ? "pr-12" : "pl-12"
+              } ${errors.confirmPassword ? "input-error animate-shake" : ""}`}
+              value={formData.confirmPassword || ""}
+              onChange={handleInputChange}
+              required
+            />
+            <button
+              type="button"
+              className={`absolute top-1/2 ${
+                i18n.language === "ar" ? "right-3" : "left-3"
+              } -translate-y-1/2 z-10`}
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {errors.confirmPassword && (
+            <span className="text-error text-sm mt-1">
+              {t(`validation.${errors.confirmPassword}`)}
+            </span>
+          )}
         </div>
       </div>
 
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t('form.phoneNumber')}</span>
+            <span className="label-text">{t("form.phoneNumber")}</span>
           </label>
           <input
             type="text"
@@ -190,7 +281,9 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleNumberOnlyChange}
-            className={`input input-bordered w-2/3 lg:w-1/2 ${errors.phoneNumber ? 'input-error animate-shake' : ''}`}
+            className={`input input-bordered w-2/3 lg:w-1/2 ${
+              errors.phoneNumber ? "input-error animate-shake" : ""
+            }`}
             required
           />
           {errors.phoneNumber && (
@@ -201,28 +294,53 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
         </div>
       </div>
 
-      {role === 'teacher' && (
+      <div className="form-control relative pb-5">
+        <div className="flex flex-col gap-2">
+          <label className="label">
+            <span className="label-text">{t("form.gender")}</span>
+          </label>
+          <select
+            name="gender"
+            className={`select select-bordered w-2/3 lg:w-1/2 ${
+              errors.gender ? "select-error animate-shake" : ""
+            }`}
+            value={formData.gender}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="">{t("form.selectGender")}</option>
+            <option value="male">{t("gender.male")}</option>
+            <option value="female">{t("gender.female")}</option>
+          </select>
+        </div>
+      </div>
+
+      {role === "teacher" && (
         <>
-          <div className="form-control relative pb-5">
+          <div className="form-control">
             <div className="flex flex-col gap-2">
               <label className="label">
-                <span className="label-text">{t('form.phoneNumber2')}</span>
+                <span className="label-text">{t("form.subject")}</span>
               </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                name="phoneNumber2"
-                value={formData.phoneNumber2}
-                onChange={handleNumberOnlyChange}
-                className="input input-bordered w-2/3 lg:w-1/2"
+              <select
+                name="subject"
+                className={`select select-bordered w-2/3 lg:w-1/2 ${
+                  errors.subject ? "select-error animate-shake" : ""
+                }`}
+                value={formData.subject}
+                onChange={handleSelectChange}
                 required
-              />
-              <label className="label">
-                <span className="label-text">{t('form.optional')}</span>
-              </label>
-              {errors.phoneNumber2 && (
-                <span className="absolute bottom-0  text-error text-sm mt-1">
-                  {t(`validation.${errors.phoneNumber2}`)}
+              >
+                <option value="">{t("form.selectSubject")}</option>
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {t(`${subject.name}`)}
+                  </option>
+                ))}
+              </select>
+              {errors.subject && (
+                <span className="text-error text-sm mt-1">
+                  {t(`validation.${errors.subject}`)}
                 </span>
               )}
             </div>
@@ -234,15 +352,21 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t("form.government") || "Government"}</span>
+            <span className="label-text">
+              {t("form.government") || "Government"}
+            </span>
           </label>
           <select
             name="government"
-            className={`select select-bordered w-2/3 lg:w-1/2 ${errors.government ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered w-2/3 lg:w-1/2 ${
+              errors.government ? "select-error animate-shake" : ""
+            }`}
             value={formData.government || ""}
             onChange={handleGovernmentChange}
           >
-            <option value="">{t("form.selectGovernment") || "Select Government"}</option>
+            <option value="">
+              {t("form.selectGovernment") || "Select Government"}
+            </option>
             {governments.map((government) => (
               <option key={government._id} value={government.name}>
                 {government.name}
@@ -262,20 +386,24 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
       <div className="form-control relative pb-5">
         <div className="flex flex-col gap-2">
           <label className="label">
-            <span className="label-text">{t("form.administrationZone") || "Administration Zone"}</span>
+            <span className="label-text">
+              {t("form.administrationZone") || "Administration Zone"}
+            </span>
           </label>
           <select
             disabled={!formData.government || zonesLoading}
             name="administrationZone"
-            className={`select select-bordered  w-2/3 lg:w-1/2 ${errors.administrationZone ? "select-error animate-shake" : ""}`}
+            className={`select select-bordered  w-2/3 lg:w-1/2 ${
+              errors.administrationZone ? "select-error animate-shake" : ""
+            }`}
             value={formData.administrationZone || ""}
             onChange={handleInputChange}
           >
             <option value="">
               {zonesLoading
-                ? (t("common.loading") || "Loading...")
-                : (t("form.selectAdministrationZone") || "Select Administration Zone")
-              }
+                ? t("common.loading") || "Loading..."
+                : t("form.selectAdministrationZone") ||
+                  "Select Administration Zone"}
             </option>
             {administrationZones.map((zone) => (
               <option key={zone} value={zone}>
@@ -285,29 +413,32 @@ export default function Step1({ formData, handleInputChange, t, errors, role, gr
           </select>
           {errors.administrationZone && (
             <span className="absolute bottom-0  text-error text-sm mt-1">
-              {t(`validation.${errors.administrationZone}`) || "Administration Zone is required"}
+              {t(`validation.${errors.administrationZone}`) ||
+                "Administration Zone is required"}
             </span>
           )}
         </div>
       </div>
 
       {/* Student-specific fields */}
-      {role === 'student' && (
+      {role === "student" && (
         <>
           <div className="form-control relative pb-5">
             <div className="flex flex-col gap-2">
               <label className="label">
-                <span className="label-text">{t('form.grade')}</span>
+                <span className="label-text">{t("form.grade")}</span>
               </label>
               <select
                 name="level"
-                className={`select select-bordered w-2/3 lg:w-1/2 ${errors.level ? 'select-error animate-shake' : ''}`}
+                className={`select select-bordered w-2/3 lg:w-1/2 ${
+                  errors.level ? "select-error animate-shake" : ""
+                }`}
                 value={formData.level}
                 onChange={handleInputChange}
                 required
               >
-                <option value="">{t('form.selectGrade')}</option>
-                {gradeLevels.map(level => (
+                <option value="">{t("form.selectGrade")}</option>
+                {gradeLevels.map((level) => (
                   <option key={level.value} value={level.value}>
                     {t(`gradeLevels.${level.label}`)}
                   </option>

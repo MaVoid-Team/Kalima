@@ -250,17 +250,17 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
 
       // Validate centers
-      if (
-        newUser.teachesAtType === "Center" &&
-        (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
-      ) {
-        return next(
-          new AppError(
-            "At least one center is required if teachesAtType is 'Center'",
-            400
-          )
-        );
-      }
+      // if (
+      //   newUser.teachesAtType === "Center" &&
+      //   (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
+      // ) {
+      //   return next(
+      //     new AppError(
+      //       "At least one center is required if teachesAtType is 'Center'",
+      //       400
+      //     )
+      //   );
+      // }
       // Validate school
       if (
         newUser.teachesAtType === "School" &&

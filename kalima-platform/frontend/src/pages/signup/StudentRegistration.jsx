@@ -28,7 +28,7 @@ const hobbiesList = [
 ];
 
 const totalSteps = {
-  student: 4,
+  student: 3,
   parent: 3,
   teacher: 3,
 };
@@ -73,6 +73,16 @@ export default function StudentRegistration() {
     setApiError(null);
   }, [currentStep]);
 
+  
+
+ const isTeacherSkip =
+  (formData.role === "teacher") && 
+  currentStep === 2 &&
+  (!formData.subject || !formData.subject.trim()) &&
+  (!formData.teachesAtType || !formData.teachesAtType.trim()) &&
+  (!formData.centers || formData.centers.every((c) => !c || !c.trim())) &&
+  (!formData.school || !formData.school.trim());
+
   const getStepErrors = (step) => {
     const errors = {};
     const { role } = formData;
@@ -82,6 +92,26 @@ export default function StudentRegistration() {
 
     if (step === 1) {
       if (!formData.fullName?.trim()) errors.fullName = "required";
+      if (!formData.email) {
+        errors.email = "required";
+      } else if (!emailRegex.test(formData.email)) {
+        errors.email = "emailInvalid";
+      }
+
+      if (!formData.password) {
+        errors.password = "required";
+      } else if (!passwordRegex.test(formData.password)) {
+        errors.password = "passwordRequirements";
+      }
+
+      if (!formData.confirmPassword) {
+        errors.confirmPassword = "required";
+      } else if (formData.password !== formData.confirmPassword) {
+        errors.confirmPassword = "passwordsMismatch";
+      }
+      if (!formData.subject?.trim()) {
+        errors.subject = "subjectRequired";
+      }
       if (!formData.gender) errors.gender = "required";
       if (!formData.government) errors.government = "required";
       if (!formData.administrationZone) errors.administrationZone = "required";
@@ -132,34 +162,34 @@ export default function StudentRegistration() {
           errors.subject = "subjectRequired";
         }
 
-        if (
-          !formData.level ||
-          (Array.isArray(formData.level) && formData.level.length === 0)
-        ) {
-          errors.level = "required";
-        }
+        // if (
+        //   !formData.level ||
+        //   (Array.isArray(formData.level) && formData.level.length === 0)
+        // ) {
+        //   errors.level = "required";
+        // }
 
-        if (!formData.teachesAtType) {
-          errors.teachesAtType = "required";
-        } else {
-          if (
-            (formData.teachesAtType === "Center" ||
-              formData.teachesAtType === "Both") &&
-            (!formData.centers ||
-              formData.centers.length === 0 ||
-              !formData.centers.some((c) => c.trim()))
-          ) {
-            errors.centers = "required";
-          }
+        // if (!formData.teachesAtType) {
+        //   errors.teachesAtType = "required";
+        // } else {
+        //   if (
+        //     (formData.teachesAtType === "Center" ||
+        //       formData.teachesAtType === "Both") &&
+        //     (!formData.centers ||
+        //       formData.centers.length === 0 ||
+        //       !formData.centers.some((c) => c.trim()))
+        //   ) {
+        //     errors.centers = "required";
+        //   }
 
-          if (
-            (formData.teachesAtType === "School" ||
-              formData.teachesAtType === "Both") &&
-            (!formData.school || !formData.school.trim())
-          ) {
-            errors.school = "required";
-          }
-        }
+        //   if (
+        //     (formData.teachesAtType === "School" ||
+        //       formData.teachesAtType === "Both") &&
+        //     (!formData.school || !formData.school.trim())
+        //   ) {
+        //     errors.school = "required";
+        //   }
+        // }
 
         // Validate social media entries if any are provided
         if (
@@ -464,15 +494,6 @@ export default function StudentRegistration() {
               );
             case 2:
               return (
-                <Step2
-                  formData={formData}
-                  handleInputChange={handleInputChange}
-                  t={t}
-                  errors={errors}
-                />
-              );
-            case 3:
-              return (
                 <Step3
                   formData={formData}
                   toggleHobby={toggleHobby}
@@ -481,7 +502,8 @@ export default function StudentRegistration() {
                   errors={errors}
                 />
               );
-            case 4:
+
+            case 3:
               return (
                 <Step4
                   formData={formData}
@@ -541,6 +563,7 @@ export default function StudentRegistration() {
                   t={t}
                   errors={errors}
                   gradeLevels={gradeLevels}
+                  role={role}
                 />
               );
             case 3:
@@ -696,6 +719,7 @@ export default function StudentRegistration() {
             t={t}
             totalSteps={totalSteps}
             role={formData.role}
+            isTeacherSkip={isTeacherSkip}
           />
 
           <StepsIndicator
