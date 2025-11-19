@@ -40,6 +40,7 @@ export default function StudentRegistration() {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   const [role, setRole] = useState("student");
+  const [isAnyTeacherFieldFilled, setIsAnyTeacherFieldFilled] = useState(false);
   const [formData, setFormData] = useState({
     role: "student",
     fullName: "",
@@ -73,15 +74,28 @@ export default function StudentRegistration() {
     setApiError(null);
   }, [currentStep]);
 
-  
+useEffect(() => {
+  if (formData.role !== "teacher" || currentStep !== 2) {
+    setIsAnyTeacherFieldFilled(false);
+    return;
+  }
 
- const isTeacherSkip =
-  (formData.role === "teacher") && 
-  currentStep === 2 &&
-  (!formData.subject || !formData.subject.trim()) &&
-  (!formData.teachesAtType || !formData.teachesAtType.trim()) &&
-  (!formData.centers || formData.centers.every((c) => !c || !c.trim())) &&
-  (!formData.school || !formData.school.trim());
+  const hasData =
+    formData.teachesAtType?.trim() ||
+    formData.school?.trim() ||
+    formData.phoneNumber2?.trim() ||
+    (Array.isArray(formData.centers) &&
+      formData.centers.some((c) => c?.trim())) ||
+    (Array.isArray(formData.level) && formData.level.length > 0) ||
+    (Array.isArray(formData.socialMedia) &&
+      formData.socialMedia.some(
+        (s) => s.platform?.trim() || s.account?.trim()
+      ));
+
+  setIsAnyTeacherFieldFilled(Boolean(hasData));
+}, [formData, currentStep]);
+
+
 
   const getStepErrors = (step) => {
     const errors = {};
@@ -274,11 +288,23 @@ export default function StudentRegistration() {
 
   const handleInputChange = (e) => {
     try {
+      // If event comes as object with name/value directly
+      if (e.target === undefined) {
+        const { name, value } = e;
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+        setErrors((prev) => ({ ...prev, [name]: undefined }));
+        return;
+      }
+
+      // Normal input (text / select / file)
       const { name, value, type, files } = e.target;
 
       setFormData((prev) => ({
         ...prev,
-        [name]: type === "file" ? files[0] : value, // ✅ Always keep as string, especially for phone numbers
+        [name]: type === "file" ? files[0] : value,
       }));
 
       setErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -635,7 +661,33 @@ export default function StudentRegistration() {
               onSelectRole={(selectedRole) => {
                 try {
                   setRole(selectedRole);
-                  setFormData((prev) => ({ ...prev, role: selectedRole }));
+
+                  // Reset ALL formData to avoid leftover values
+                  setFormData({
+                    role: selectedRole,
+                    fullName: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
+                    phoneNumber: "",
+                    phoneNumber2: "",
+                    gender: "",
+                    faction: "Alpha",
+                    level: [],
+                    hobbies: [],
+                    parentPhoneNumber: "",
+                    children: [""],
+                    subject: "",
+                    teachesAtType: "",
+                    centers: [""],
+                    school: "",
+                    socialMedia: [{ platform: "", account: "" }],
+                    government: "",
+                    administrationZone: "",
+                    referralSerial: null,
+                    profilePic: null,
+                  });
+
                   setShowRoleModal(false);
                   setRoleLocked(true);
                 } catch (error) {
@@ -719,7 +771,7 @@ export default function StudentRegistration() {
             t={t}
             totalSteps={totalSteps}
             role={formData.role}
-            isTeacherSkip={isTeacherSkip}
+            isAnyTeacherFieldFilled={isAnyTeacherFieldFilled}
           />
 
           <StepsIndicator

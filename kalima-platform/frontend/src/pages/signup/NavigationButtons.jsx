@@ -5,7 +5,7 @@ export default function NavigationButtons({
   t,
   isLoading,
   totalSteps,
-  isTeacherSkip,
+  isAnyTeacherFieldFilled,
   role,
 }) {
   return (
@@ -19,7 +19,6 @@ export default function NavigationButtons({
         {t("buttons.previous")}
       </button>
 
-      {/* Next / Skip / Submit */}
       <button
         onClick={handleNext}
         className="btn btn-primary"
@@ -28,7 +27,9 @@ export default function NavigationButtons({
       >
         {isLoading ? (
           <span className="loading loading-spinner"></span>
-        ) : isTeacherSkip ? (
+        ) : role === "teacher" &&
+          currentStep === 2 &&
+          !isAnyTeacherFieldFilled ? (
           t("تخطي")
         ) : currentStep === totalSteps[role] ? (
           t("buttons.submit")
