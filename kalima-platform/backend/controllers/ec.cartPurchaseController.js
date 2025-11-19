@@ -230,101 +230,80 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
 // Admin routes
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-  const {
-    status,
-    startDate,
-    endDate,
-    minTotal,
-    maxTotal,
-    search,
-    page = 1,
-    limit = 10,
-  } = req.query;
+    // Build query
+    const query = {};
 
-  const match = {};
+    // Filter by status if specified
+    if (req.query.status) {
+        query.status = req.query.status;
+    }
 
-  // ----- Filters -----
-  if (status) match.status = status;
+    // Filter by date range if specified
+    if (req.query.startDate && req.query.endDate) {
+        query.createdAt = {
+            $gte: new Date(req.query.startDate),
+            $lte: new Date(req.query.endDate)
+        };
+    }
 
-  if (startDate && endDate) {
-    match.createdAt = {
-      $gte: new Date(startDate),
-      $lte: new Date(endDate),
-    };
-  }
+    // Filter by minimum/maximum total if specified
+    if (req.query.minTotal || req.query.maxTotal) {
+        query.total = {};
+        if (req.query.minTotal) query.total.$gte = parseFloat(req.query.minTotal);
+        if (req.query.maxTotal) query.total.$lte = parseFloat(req.query.maxTotal);
+    }
 
-  if (minTotal || maxTotal) {
-    match.total = {};
-    if (minTotal) match.total.$gte = parseFloat(minTotal);
-    if (maxTotal) match.total.$lte = parseFloat(maxTotal);
-  }
+    // Search across multiple fields (simple, avoids aggregation)
+    if (req.query.search) {
+        const searchTerm = req.query.search;
+        const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive
 
-  const searchRegex = search ? new RegExp(search.trim(), "i") : null;
+        // Apply OR search on several fields present in the purchase document
+        query.$or = [
+            { userName: searchRegex },
+            { purchaseSerial: searchRegex },
+            { numberTransferredFrom: searchRegex },
+            { 'createdBy.email': searchRegex },
+            { 'createdBy.name': searchRegex },
+            { 'items.productSnapshot.serial': searchRegex }
+        ];
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+        // Remove search from query so it doesn't interfere with other code
+        delete req.query.search;
+    }
 
-  // ----- Pipeline -----
-  const pipeline = [
-    { $match: match },
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "createdBy",
-      },
-    },
-    { $unwind: "$createdBy" },
-  ];
+    // Execute query
+    const purchases = await ECCartPurchase.find(query)
+        .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+        .populate('confirmedBy', 'name')
+        .populate('receivedBy', 'name')
+        .populate('adminNoteBy', 'name')
+        .populate('couponCode')
+        .sort('-createdAt')
+        .skip(skip)
+        .limit(limit);
 
-  // Search AFTER lookup
-  if (searchRegex) {
-    pipeline.push({
-      $match: {
-        $or: [
-          { userName: searchRegex },
-          { purchaseSerial: searchRegex },
-          { numberTransferredFrom: searchRegex },
-          { "createdBy.email": searchRegex },
-          { "createdBy.name": searchRegex },
-          { "items.productSnapshot.serial": searchRegex },
-        ],
-      },
+    // Get total count for pagination
+    const total = await ECCartPurchase.countDocuments(query);
+
+    res.status(200).json({
+        status: "success",
+        results: purchases.length,
+        pagination: {
+            total,
+            page,
+            pages: Math.ceil(total / limit),
+            limit
+        },
+        data: {
+            purchases
+        }
     });
-  }
-
-  // Sort + Pagination
-  pipeline.push(
-    { $sort: { createdAt: -1 } },
-    { $skip: skip },
-    { $limit: parseInt(limit) }
-  );
-
-  // ----- Execute -----
-  const purchases = await ECCartPurchase.aggregate(pipeline);
-
-  // Count pipeline (remove skip/limit)
-  const countPipeline = pipeline.filter(
-    (stage) => !stage.$skip && !stage.$limit
-  );
-  countPipeline.push({ $count: "total" });
-
-  const countResult = await ECCartPurchase.aggregate(countPipeline);
-  const total = countResult[0]?.total || 0;
-
-  // ----- Response -----
-  res.status(200).json({
-    status: "success",
-    results: purchases.length,
-    pagination: {
-      total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
-      limit: Number(limit),
-    },
-    data: { purchases },
-  });
 });
 
 
