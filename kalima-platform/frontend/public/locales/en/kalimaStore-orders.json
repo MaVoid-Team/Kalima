@@ -92,7 +92,9 @@
     "edit": "Edit",
     "noNotes": "No notes",
     "noAdminNotes": "No admin notes added yet",
-    "close": "Close"
+    "close": "Close",
+    "receivedBy": "Received by",
+    "confirmedBy": "Confirmed by"
   },
   "alerts": {
     "orderConfirmed": "Order confirmed successfully!",
