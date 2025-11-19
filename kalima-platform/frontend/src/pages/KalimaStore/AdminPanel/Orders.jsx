@@ -79,8 +79,8 @@ const Orders = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-      if (searchQuery !== debouncedSearchQuery && currentPage !== 1) {
+      setDebouncedSearchQuery(searchQuery.trim());
+      if (searchQuery.trim() !== debouncedSearchQuery && currentPage !== 1) {
         setCurrentPage(1);
       }
     }, 500);
@@ -88,44 +88,50 @@ const Orders = () => {
   }, [searchQuery, debouncedSearchQuery, currentPage]);
 
   const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const queryParams = {
-        page: currentPage,
-      };
-      if (debouncedSearchQuery.trim()) {
-        queryParams.search = debouncedSearchQuery.trim();
+  try {
+    setLoading(true);
+    setError(null);
+    const queryParams = {
+      page: currentPage,
+    };
+    if (debouncedSearchQuery.trim()) {
+      queryParams.search = debouncedSearchQuery.trim();
+    }
+    if (statusFilter !== "all") {
+      // Fix: Properly handle all status filters
+      if (statusFilter === "confirmed") {
+        queryParams.status = "confirmed";
+      } else if (statusFilter === "received") {
+        queryParams.status = "received";
+      } else if (statusFilter === "pending") {
+        queryParams.status = "pending";
       }
-      if (statusFilter !== "all") {
-        queryParams.status =
-          statusFilter === "confirmed" ? "confirmed" : "pending";
-      }
-      // Add date filter to query params
-      if (selectedDate) {
-        queryParams.date = selectedDate;
-      }
+    }
+    // Add date filter to query params
+    if (selectedDate) {
+      queryParams.date = selectedDate;
+    }
 
       const response = await getAllProductPurchases(queryParams);
-      if (response.success) {
-        let purchases = response.data.cartPurchases || [];
+    if (response.success) {
+      let purchases = response.data.cartPurchases || [];
 
-        if (typeFilter !== "all") {
-          purchases = purchases.filter((purchase) => {
-            const itemTypes =
-              purchase.items?.map((item) => item.productType) || [];
-            if (typeFilter === "book") {
-              return itemTypes.some((type) => type === "ECBook");
-            } else if (typeFilter === "product") {
-              return itemTypes.some((type) => type === "ECProduct");
-            }
-            return true;
-          });
-        }
+      if (typeFilter !== "all") {
+        purchases = purchases.filter((purchase) => {
+          const itemTypes =
+            purchase.items?.map((item) => item.productType) || [];
+          if (typeFilter === "book") {
+            return itemTypes.some((type) => type === "ECBook");
+          } else if (typeFilter === "product") {
+            return itemTypes.some((type) => type === "ECProduct");
+          }
+          return true;
+        });
+      }
 
-        setOrders(purchases);
-        setTotalPages(response.data.totalPages || 1);
-        setTotalPurchases(response.data.totalPurchases || purchases.length);
+         setOrders(purchases);
+      setTotalPages(response.data.totalPages || 1);
+      setTotalPurchases(response.data.totalPurchases || purchases.length);
 
         const allPurchases = purchases;
         const confirmed = allPurchases.filter(
@@ -157,21 +163,21 @@ const Orders = () => {
           books: books,
         });
       } else {
-        throw new Error(response.error);
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching orders:", err);
-    } finally {
-      setLoading(false);
+      throw new Error(response.error);
     }
-  }, [
-    currentPage,
-    statusFilter,
-    typeFilter,
-    debouncedSearchQuery,
-    selectedDate,
-  ]);
+  } catch (err) {
+    setError(err.message);
+    console.error("Error fetching orders:", err);
+  } finally {
+    setLoading(false);
+  }
+}, [
+  currentPage,
+  statusFilter,
+  typeFilter,
+  debouncedSearchQuery,
+  selectedDate,
+]);
 
   const fetchAllOrders = useCallback(async () => {
     try {
@@ -513,8 +519,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-              ? t("table.received")
-              : t("table.pending"),
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -561,8 +567,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-              ? t("table.received")
-              : t("table.pending"),
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -587,11 +593,11 @@ const Orders = () => {
             ...rest,
             items: items
               ? items.map(({ product, ...itemProps }) => ({
-                  // Optionally clean up item.product if it's too verbose
-                  ...itemProps,
-                  productName:
-                    product?.title || itemProps.productName || "Unknown", // Ensure product name is present
-                }))
+                // Optionally clean up item.product if it's too verbose
+                ...itemProps,
+                productName:
+                  product?.title || itemProps.productName || "Unknown", // Ensure product name is present
+              }))
               : [],
           };
         });
@@ -612,7 +618,7 @@ const Orders = () => {
       console.error("Error exporting orders:", err);
       alert(
         (t("alerts.exportFailed") || "Export failed") +
-          (err?.message ? `: ${err.message}` : "")
+        (err?.message ? `: ${err.message}` : "")
       );
     } finally {
       setExporting(false);
@@ -1030,9 +1036,9 @@ const Orders = () => {
                     {/* Adjusted colSpan */}
                     <p className="text-gray-500">
                       {searchQuery ||
-                      statusFilter !== "all" ||
-                      typeFilter !== "all" ||
-                      selectedDate
+                        statusFilter !== "all" ||
+                        typeFilter !== "all" ||
+                        selectedDate
                         ? t("noOrdersFound")
                         : t("noOrdersAvailable")}
                     </p>
@@ -1088,19 +1094,23 @@ const Orders = () => {
                       {order.status !== "confirmed" ? (
                         <div className="flex flex-col items-center gap-1">
                           <div
-                            className={`badge ${
-                              order.status === "received"
-                                ? "badge-info"
-                                : "badge-warning"
-                            }`}
+                            className={`badge ${order.status === "received" ? "badge-info" : "badge-warning"
+                              }`}
                           >
                             {order.status === "received"
                               ? t("table.received")
                               : t("table.pending")}
                           </div>
-                          {order.confirmedBy && (
+                          {/* Show Received by */}
+                          {order.receivedBy && order.receivedBy.name && (
                             <div className="text-xs opacity-50">
-                              {t("table.by")} {order.confirmedBy.name}
+                              {t("table.receivedBy")} {order.receivedBy.name}
+                            </div>
+                          )}
+                          {/* Show Confirmed by if exists but status is not confirmed */}
+                          {order.confirmedBy && order.confirmedBy.name && (
+                            <div className="text-xs opacity-50">
+                              {t("table.confirmedBy")} {order.confirmedBy.name}
                             </div>
                           )}
                         </div>
@@ -1109,9 +1119,16 @@ const Orders = () => {
                           <div className="badge badge-success">
                             {t("table.confirmed")}
                           </div>
-                          {order.confirmedBy && (
+                          {/* Show Received by for confirmed orders */}
+                          {order.receivedBy && order.receivedBy.name && (
                             <div className="text-xs opacity-50">
-                              {t("table.by")} {order.confirmedBy.name}
+                              {t("table.receivedBy")} {order.receivedBy.name}
+                            </div>
+                          )}
+                          {/* Show Confirmed by */}
+                          {order.confirmedBy && order.confirmedBy.name && (
+                            <div className="text-xs opacity-50">
+                              {t("table.confirmedBy")} {order.confirmedBy.name}
                             </div>
                           )}
                         </div>
@@ -1152,9 +1169,8 @@ const Orders = () => {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          className={`btn btn-ghost btn-sm relative ${
-                            order.adminNotes ? "text-blue-600" : "text-gray-400"
-                          }`}
+                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-blue-600" : "text-gray-400"
+                            }`}
                           onClick={() => openNotesModal(order)}
                           title={
                             order.adminNotes
@@ -1182,17 +1198,18 @@ const Orders = () => {
                         )}
                         {(order.numberTransferredFrom ||
                           order.bankTransferFrom) && (
-                          <button
-                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
-                            onClick={() => handleWhatsAppContact(order)}
-                            title={t("table.contactWhatsApp")}
-                          >
-                            <FaWhatsapp />
-                          </button>
-                        )}
+                            <button
+                              className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
+                              onClick={() => handleWhatsAppContact(order)}
+                              title={t("table.contactWhatsApp")}
+                            >
+                              <FaWhatsapp />
+                            </button>
+                          )}
                         {order.status !== "confirmed" && (
                           <button
-                            className="btn btn-success btn-sm"
+                            className={`btn btn-sm ${order.status === "pending" ? "btn-error" : "btn-success"
+                              }`}
                             onClick={() => handleConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
                             title={
@@ -1280,9 +1297,8 @@ const Orders = () => {
               return (
                 <button
                   key={pageToShow}
-                  className={`join-item btn ${
-                    currentPage === pageToShow ? "btn-primary" : ""
-                  }`}
+                  className={`join-item btn ${currentPage === pageToShow ? "btn-primary" : ""
+                    }`}
                   onClick={() => handlePageChange(pageToShow)}
                   disabled={loading}
                 >
@@ -1453,6 +1469,24 @@ const Orders = () => {
                 </div>
               </div>
 
+              
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium flex items-center gap-2">
+                    📝 {t("table.customerNotes") || "ملاحظات العميل"}
+                  </span>
+                </label>
+                <div className="bg-base-200 p-3 rounded min-h-16">
+                  {selectedOrder.notes ? (
+                    <p className="whitespace-pre-wrap">{selectedOrder.notes}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">
+                      لا توجد ملاحظات من العميل
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {selectedOrder.items && selectedOrder.items.length > 0 && (
                 <div>
                   <label className="label">
@@ -1516,6 +1550,8 @@ const Orders = () => {
                 </div>
               )}
 
+              
+
               <div>
                 <label className="label">
                   <span className="label-text font-medium">
@@ -1557,23 +1593,6 @@ const Orders = () => {
                         {t("table.viewPaymentScreenshot")}
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="label">
-                  <span className="label-text font-medium flex items-center gap-2">
-                    📝 {t("table.customerNotes") || "ملاحظات العميل"}
-                  </span>
-                </label>
-                <div className="bg-base-200 p-3 rounded min-h-16">
-                  {selectedOrder.notes ? (
-                    <p className="whitespace-pre-wrap">{selectedOrder.notes}</p>
-                  ) : (
-                    <p className="text-gray-500 italic">
-                      لا توجد ملاحظات من العميل
-                    </p>
                   )}
                 </div>
               </div>
