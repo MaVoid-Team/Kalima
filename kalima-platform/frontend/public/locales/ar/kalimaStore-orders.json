@@ -93,7 +93,9 @@
     "edit": "تعديل",
     "noNotes": "لا توجد ملاحظات",
     "noAdminNotes": "لم يتم إضافة ملاحظات مدير بعد",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "receivedBy": "تم الاستلام بواسطة",
+    "confirmedBy": "تم التأكيد بواسطة"
   },
   "alerts": {
     "orderConfirmed": "تم تأكيد الطلب بنجاح!",
