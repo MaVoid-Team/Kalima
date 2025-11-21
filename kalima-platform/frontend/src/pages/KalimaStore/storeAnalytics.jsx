@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { getAllStats, getProductStats } from "../../routes/orders"
+import { getAllStats, getProductStats, getResponseTimeStats } from "../../routes/orders"
 import {
   TrendingUp,
   DollarSign,
@@ -16,6 +16,7 @@ import {
   Package,
   Target,
   Award,
+  Zap,
 } from "lucide-react"
 import { FaDownload, FaFileExport } from "react-icons/fa"
 
@@ -26,6 +27,7 @@ const StoreAnalytics = () => {
   // Loading states
   const [overviewLoading, setOverviewLoading] = useState(true)
   const [productStatsLoading, setProductStatsLoading] = useState(true)
+  const [responseTimeLoading, setResponseTimeLoading] = useState(true)
   const [error, setError] = useState(null)
 
   // Data states
@@ -50,11 +52,11 @@ const StoreAnalytics = () => {
 
   const [monthlyStats, setMonthlyStats] = useState([])
   const [productStats, setProductStats] = useState([])
+  const [responseTimeStats, setResponseTimeStats] = useState(null)
   const [filteredProductStats, setFilteredProductStats] = useState([])
 
   // Filter states
   const [selectedMonth, setSelectedMonth] = useState("all")
-  const [revenueFilter, setRevenueFilter] = useState("all") // all, high, medium, low
   const [confirmationFilter, setConfirmationFilter] = useState("all") // all, confirmed, pending
 
   // Add new state for date selection
@@ -141,22 +143,27 @@ const StoreAnalytics = () => {
   }, [monthlyStats, i18n.language, t])
 
   // Fetch overview and monthly stats
-  const fetchOverviewStats = useCallback(async () => {
+  const fetchStats = useCallback(async (date = null) => {
     try {
       setOverviewLoading(true)
       setError(null)
-      const response = await getAllStats()
+      const response = await getAllStats(date) // Pass date to getAllStats
       if (response.success) {
-        const { overview, monthlyStats } = response.data.data
+        const { overview, monthlyStats, dailyStats } = response.data.data
         setOverviewStats(overview)
-        setOriginalOverviewStats(overview) // Store original stats
-        setMonthlyStats(monthlyStats || [])
+        setDailyStats(dailyStats || null) // Set daily stats
+
+        // Only update original stats and monthly stats on the initial full load
+        if (!date) {
+          setOriginalOverviewStats(overview)
+          setMonthlyStats(monthlyStats || [])
+        }
       } else {
         throw new Error(response.error)
       }
     } catch (err) {
       setError(err.message)
-      console.error("Error fetching overview stats:", err)
+      console.error("Error fetching stats:", err)
     } finally {
       setOverviewLoading(false)
     }
@@ -166,19 +173,11 @@ const StoreAnalytics = () => {
   const fetchProductStats = useCallback(async (date = null) => {
     try {
       setProductStatsLoading(true)
-      const response = await getProductStats(date)
+      // The product stats endpoint doesn't seem to support date filtering, so we fetch all.
+      const response = await getProductStats()
       if (response.success) {
-        if (date) {
-          // Handle date-specific stats response
-          const { overview, dailyStats } = response.data.data
-          setOverviewStats(overview)
-          setDailyStats(dailyStats)
-          setProductStats([]) // Clear product stats when viewing daily stats
-        } else {
-          // Handle regular product stats response
-          const productData = response.data.data || []
-          setProductStats(productData)
-        }
+        const productData = response.data.data || []
+        setProductStats(productData)
       } else {
         throw new Error(response.error)
       }
@@ -186,6 +185,23 @@ const StoreAnalytics = () => {
       console.error("Error fetching product stats:", err)
     } finally {
       setProductStatsLoading(false)
+    }
+  }, [])
+
+  const fetchResponseTime = useCallback(async () => {
+    try {
+      setResponseTimeLoading(true)
+      const response = await getResponseTimeStats()
+      if (response.success) {
+        setResponseTimeStats(response.data.data)
+      } else {
+        throw new Error(response.error)
+      }
+    } catch (err) {
+      console.error("Error fetching response time stats:", err)
+      // Don't set main error, as this is a secondary stat
+    } finally {
+      setResponseTimeLoading(false)
     }
   }, [])
 
@@ -198,39 +214,19 @@ const StoreAnalytics = () => {
     if (searchQuery.trim()) {
       filtered = filtered.filter((product) => product.productName.toLowerCase().includes(searchQuery.toLowerCase()))
     }
-
-    // Revenue filter
-    if (revenueFilter !== "all") {
-      const maxRevenue = Math.max(...productStats.map((p) => p.totalValue || 0))
-      const threshold = maxRevenue / 3
-
-      filtered = filtered.filter((product) => {
-        const productValue = product.totalValue || 0
-        switch (revenueFilter) {
-          case "high":
-            return productValue >= threshold * 2
-          case "medium":
-            return productValue >= threshold && productValue < threshold * 2
-          case "low":
-            return productValue < threshold
-          default:
-            return true
-        }
-      })
-    }
-
     // Sort by total purchases (descending)
     filtered.sort((a, b) => (b.totalPurchases || 0) - (a.totalPurchases || 0))
 
     console.log("Filtered product stats:", filtered) // Debug log
     setFilteredProductStats(filtered)
-  }, [productStats, searchQuery, revenueFilter])
+  }, [productStats, searchQuery])
 
   // Initial data fetch
   useEffect(() => {
-    fetchOverviewStats()
+    fetchStats()
     fetchProductStats()
-  }, [fetchOverviewStats, fetchProductStats])
+    fetchResponseTime()
+  }, [fetchStats, fetchProductStats, fetchResponseTime])
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -263,20 +259,17 @@ const StoreAnalytics = () => {
   const handleDateChange = (date) => {
     setSelectedDate(date)
     if (date) {
-      fetchProductStats(date)
+      fetchStats(date) // Fetch daily and overview stats for the selected date
     } else {
-      fetchProductStats()
-      // Restore original overview stats when clearing date
-      if (selectedMonth === "all") {
-        setOverviewStats(originalOverviewStats)
-      }
+      // When clearing the date, restore the original overview stats
+      setOverviewStats(originalOverviewStats)
+      setDailyStats(null) // Clear daily stats
     }
   }
 
   // Update the clearFilters function to properly reset everything
   const clearFilters = () => {
     setSelectedMonth("all")
-    setRevenueFilter("all")
     setConfirmationFilter("all")
     setSearchQuery("")
     setSelectedDate("")
@@ -285,13 +278,12 @@ const StoreAnalytics = () => {
     setOverviewStats(originalOverviewStats)
 
     // Refetch regular product stats
-    fetchProductStats()
+    fetchStats() // Refetch all stats
   }
 
   // Update hasActiveFilters to include selectedDate
   const hasActiveFilters =
     selectedMonth !== "all" ||
-    revenueFilter !== "all" ||
     confirmationFilter !== "all" ||
     searchQuery.trim() !== "" ||
     selectedDate !== ""
@@ -302,6 +294,21 @@ const StoreAnalytics = () => {
     return `${Math.round(numPrice)} ج`
   }
 
+  // Format minutes into a readable string (e.g., 1d 4h 30m)
+  const formatMinutes = (minutes) => {
+    if (minutes === null || isNaN(minutes)) return "N/A"
+    if (minutes < 1) return "< 1m"
+
+    const d = Math.floor(minutes / (24 * 60))
+    const h = Math.floor((minutes % (24 * 60)) / 60)
+    const m = Math.round(minutes % 60)
+
+    let result = ""
+    if (d > 0) result += `${d}d `
+    if (h > 0) result += `${h}h `
+    if (m > 0 || result === "") result += `${m}m`
+    return result.trim()
+  }
   // CSV escape helper
   const escapeCsv = (value) => {
     if (value === null || value === undefined) return ""
@@ -426,7 +433,7 @@ const StoreAnalytics = () => {
 
   const performanceMetrics = getPerformanceMetrics()
 
-  if (overviewLoading && productStatsLoading) {
+  if (overviewLoading && productStatsLoading && responseTimeLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -516,20 +523,6 @@ const StoreAnalytics = () => {
                   value={selectedDate}
                   onChange={(e) => handleDateChange(e.target.value)}
                 />
-              </div>
-              {/* Revenue Filter */}
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                <select
-                  className="select select-bordered select-sm"
-                  value={revenueFilter}
-                  onChange={(e) => setRevenueFilter(e.target.value)}
-                >
-                  <option value="all">{t("filters.allRevenue")}</option>
-                  <option value="high">{t("filters.highRevenue")}</option>
-                  <option value="medium">{t("filters.mediumRevenue")}</option>
-                  <option value="low">{t("filters.lowRevenue")}</option>
-                </select>
               </div>
               {/* Search */}
               <input
@@ -626,12 +619,6 @@ const StoreAnalytics = () => {
                 <div className="badge badge-primary gap-2">
                   {generateMonthOptions().find((opt) => opt.value === selectedMonth)?.label}
                   <X className="w-3 h-3 cursor-pointer" onClick={() => handleMonthFilterChange("all")} />
-                </div>
-              )}
-              {revenueFilter !== "all" && (
-                <div className="badge badge-secondary gap-2">
-                  {t(`filters.${revenueFilter}Revenue`)}
-                  <X className="w-3 h-3 cursor-pointer" onClick={() => setRevenueFilter("all")} />
                 </div>
               )}
               {searchQuery.trim() && (
@@ -812,7 +799,57 @@ const StoreAnalytics = () => {
         </div>
       </div>
 
-      {selectedDate ? (
+      {/* Response Time Analysis */}
+      {responseTimeStats && (
+        <div className="card shadow-lg mb-8">
+          <div className="card-header p-4 border-b border-base-200">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Zap className="w-5 h-5 text-primary" />
+              {t("insights.responseTimeTitle") || "Response Time Analysis"}
+            </h2>
+          </div>
+          <div className="card-body p-4">
+            {responseTimeLoading ? (
+              <div className="flex justify-center items-center h-24">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="stat">
+                  <div className="stat-figure text-info">
+                    <Clock className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">{t("insights.avgReceiveTime") || "Avg. Receive Time"}</div>
+                  <div className="stat-value">
+                    {formatMinutes(responseTimeStats.receiveTime?.averageMinutes)}
+                  </div>
+                  <div className="stat-desc">{responseTimeStats.receiveTime?.count || 0} {t("insights.avgReceiveTimeDesc")}</div>
+                </div>
+                <div className="stat">
+                  <div className="stat-figure text-success">
+                    <CheckCircle className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">{t("insights.avgConfirmTime") || "Avg. Confirm Time"}</div>
+                  <div className="stat-value">
+                    {formatMinutes(responseTimeStats.confirmTime?.averageMinutes)}
+                  </div>
+                  <div className="stat-desc">{responseTimeStats.confirmTime?.count || 0} {t("insights.avgConfirmTimeDesc")}</div>
+                </div>
+                <div className="stat">
+                  <div className="stat-figure text-primary">
+                    <TrendingUp className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">{t("insights.avgTotalTime") || "Avg. Total Time"}</div>
+                  <div className="stat-value">{formatMinutes(responseTimeStats.totalResponseTime?.averageMinutes)}</div>
+                  <div className="stat-desc">{t("insights.avgTotalTimeDesc")}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {selectedDate && dailyStats ? (
         <div className="card shadow-lg overflow-hidden">
           <div className="card-header p-4 border-b border-base-200">
             <h2 className="text-xl font-bold flex items-center gap-2">

@@ -105,13 +105,17 @@ export const confirmBookPurchase = async (purchaseId) => {
   return confirmProductPurchase(purchaseId)
 }
 
-export const getAllStats = async () => {
+export const getAllStats = async (endDate = null, startDate = null) => {
   try {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
     }
 
     const response = await axios.get(`${API_URL}/ec/purchases/stats`, {
+      params: {
+        ...(endDate ? { endDate } : {}),
+        ...(startDate ? { startDate } : {}),
+      },
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -130,7 +134,7 @@ export const getAllStats = async () => {
   }
 }
 
-export const getProductStats = async (date = null) => {
+export const getProductStats = async (endDate = null) => {
   try {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated")
@@ -138,8 +142,8 @@ export const getProductStats = async (date = null) => {
 
     let url = `${API_URL}/ec/purchases/product-purchase-stats`
 
-    if (date) {
-      url = `${API_URL}/ec/purchases/stats?date=${date}`
+    if (endDate) {
+      url = `${API_URL}/ec/purchases/stats?date=${endDate}`
     }
 
     const response = await axios.get(url, {
@@ -157,6 +161,31 @@ export const getProductStats = async (date = null) => {
     return {
       success: false,
       error: `Failed to fetch product stats: ${error.message}`,
+    }
+  }
+}
+
+export const getResponseTimeStats = async () => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+
+    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/response-time`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to fetch response time stats: ${error.message}`,
     }
   }
 }
