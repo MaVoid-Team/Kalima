@@ -28,18 +28,18 @@ const validatePassword = (password) => {
 function formatEgyptianPhoneNumber(number) {
   if (!number) return number;
   // Remove all non-digit characters except leading +
-  let num = number.trim().replace(/[^\d+]/g, '');
+  let num = number.trim().replace(/[^\d+]/g, "");
   // Remove leading zeros (except if it's just '0')
-  if (num.startsWith('00')) num = '+' + num.slice(2);
-  if (num.startsWith('0') && num.length > 1) num = num.slice(1);
+  if (num.startsWith("00")) num = "+" + num.slice(2);
+  if (num.startsWith("0") && num.length > 1) num = num.slice(1);
   // Add +20 if missing
-  if (num.startsWith('+20')) return num;
-  if (num.startsWith('20')) return '+' + num;
-  if (num.startsWith('+')) return num; // fallback for other country codes
+  if (num.startsWith("+20")) return num;
+  if (num.startsWith("20")) return "+" + num;
+  if (num.startsWith("+")) return num; // fallback for other country codes
   // If only 10 or 11 digits, assume it's a local Egyptian number
-  if (num.length === 10) return '+20' + num;
-  if (num.length === 11 && num[0] === '1') return '+20' + num;
-  return '+20' + num;
+  if (num.length === 10) return "+20" + num;
+  if (num.length === 11 && num[0] === "1") return "+20" + num;
+  return "+20" + num;
 }
 
 const registerNewUser = catchAsync(async (req, res, next) => {
@@ -217,7 +217,6 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     newUser.administrationZone = administrationZone;
   }
 
-
   // Normalize phone numbers before saving
   if (phoneNumber) {
     newUser.phoneNumber = formatEgyptianPhoneNumber(phoneNumber);
@@ -249,45 +248,19 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       } else {
         delete newUser.phoneNumber2;
       }
-      // Validate level (must be an array of allowed values)
-      if (
-        !Array.isArray(newUser.level) ||
-        newUser.level.length === 0 ||
-        !newUser.level.every((l) =>
-          ["primary", "preparatory", "secondary"].includes(l)
-        )
-      ) {
-        return next(
-          new AppError(
-            "Level is required for teacher role and must be a non-empty array of: Primary, Preparatory, Secondary",
-            400
-          )
-        );
-      }
-      // Validate teachesAtType
-      if (
-        !newUser.teachesAtType ||
-        !["Center", "School", "Both"].includes(newUser.teachesAtType)
-      ) {
-        return next(
-          new AppError(
-            "teachesAtType is required and must be 'Center', 'School', or 'Both'",
-            400
-          )
-        );
-      }
+
       // Validate centers
-      if (
-        newUser.teachesAtType === "Center" &&
-        (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
-      ) {
-        return next(
-          new AppError(
-            "At least one center is required if teachesAtType is 'Center'",
-            400
-          )
-        );
-      }
+      // if (
+      //   newUser.teachesAtType === "Center" &&
+      //   (!Array.isArray(newUser.centers) || newUser.centers.length === 0)
+      // ) {
+      //   return next(
+      //     new AppError(
+      //       "At least one center is required if teachesAtType is 'Center'",
+      //       400
+      //     )
+      //   );
+      // }
       // Validate school
       if (
         newUser.teachesAtType === "School" &&

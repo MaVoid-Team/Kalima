@@ -23,9 +23,10 @@
     "averagePrice": "متوسط السعر"
   },
   "insights": {
-    "topProduct": "أفضل منتج",
-    "totalProducts": "إجمالي المنتجات",
-    "avgPerProduct": "المتوسط لكل منتج"
+    "responseTimeTitle": "تحليل زمن الاستجابة",
+    "avgReceiveTime": "متوسط زمن الاستلام",
+    "avgConfirmTime": "متوسط زمن التأكيد",
+    "avgTotalTime": "متوسط الزمن الإجمالي"
   },
   "productPerformance": "أداء المنتجات",
   "monthlyTrends": "المبيعات الشهريه",

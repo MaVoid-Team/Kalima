@@ -3,9 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function Step2({ formData, handleInputChange, t, errors }) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const {i18n} = useTranslation();
+ 
   return (
     <div className="space-y-4">
       <p className="text-lg font-semibold">{t('form.parentDetails')}</p>
