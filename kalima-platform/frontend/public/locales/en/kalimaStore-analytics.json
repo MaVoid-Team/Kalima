@@ -29,7 +29,13 @@
     "avgTotalTime": "Average Total Time",
     "avgTotalTimeDesc": "From creation to confirmation",
     "avgConfirmTimeDesc": "From receive to confirmation",
-    "avgReceiveTimeDesc": "From creation to receive"
+    "avgReceiveTimeDesc": "From creation to receive",
+    "avgReceiveTimeMax": "Max Receive Time",
+    "avgReceiveTimeMin": "Min Receive Time",
+    "avgConfirmTimeMax": "Max Confirm Time",
+    "avgConfirmTimeMin": "Min Confirm Time",
+    "avgTotalTimeMax": "Max Total Time",
+    "avgTotalTimeMin": "Min Total Time"
   },
   "productPerformance": "Product Performance",
   "monthlyTrends": "Monthly Trends",
