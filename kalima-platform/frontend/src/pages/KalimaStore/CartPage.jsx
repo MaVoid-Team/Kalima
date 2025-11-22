@@ -98,13 +98,13 @@ const CartPage = () => {
         const errorMessage =
           result.error || t("errors.fetchCartFailed") || "Failed to load cart";
         setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error(t("errors.fetchCartFailed") || "Failed to load cart");
       }
     } catch (err) {
       const errorMessage =
         err.message || t("errors.fetchCartFailed") || "Failed to load cart";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(t("errors.fetchCartFailed") || "Failed to load cart");
       console.error("Error fetching cart:", err);
     } finally {
       setLoading(false);
@@ -345,9 +345,7 @@ const CartPage = () => {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
-        toast.success(
-          t("success.purchaseSubmitted") || "Purchase submitted successfully!"
-        );
+        window.alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         // Reset form and redirect
@@ -420,7 +418,7 @@ const CartPage = () => {
             <h3 className="text-xl font-bold mb-2">
               {t("errors.title") || "Error"}
             </h3>
-            <p className="mb-6">{error}</p>
+            <p className="mb-6">{t("errors.fetchCartFailed") || "Failed to load your cart. Please Log In First."}</p>
             <button
               onClick={() => navigate("/market")}
               className="btn btn-primary"
