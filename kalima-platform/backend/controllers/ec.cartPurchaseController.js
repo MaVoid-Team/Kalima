@@ -566,10 +566,29 @@ exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
     // Helper function to calculate statistics
     const calculateStats = (minutes) => {
         if (!minutes || minutes.length === 0) return null;
+
+        const sum = minutes.reduce((a, b) => a + b, 0);
+        const average = Math.round(sum / minutes.length);
+        const max = Math.round(Math.max(...minutes));
+
+        // Compute min ignoring zero values (zero can mean no business minutes)
+        const positive = minutes.filter(m => m > 0);
+        const min = positive.length ? Math.round(Math.min(...positive)) : 0;
+
+        // Helper to format minutes into "Xh Ym" (or "Zm" if <1 hour)
+        const formatMinutes = (mins) => {
+            if (mins == null) return null;
+            const m = Math.round(mins);
+            const h = Math.floor(m / 60);
+            const mm = m % 60;
+            if (h === 0) return `${mm}m`;
+            return `${h}h ${mm}m`;
+        };
+
         return {
-            averageMinutes: Math.round(minutes.reduce((a, b) => a + b, 0) / minutes.length),
-            maxMinutes: Math.round(Math.max(...minutes)),
-            minMinutes: Math.round(Math.min(...minutes)),
+            averageMinutes: formatMinutes(average),
+            maxMinutes: formatMinutes(max),
+            minMinutes: formatMinutes(min),
             count: minutes.length
         };
     };
