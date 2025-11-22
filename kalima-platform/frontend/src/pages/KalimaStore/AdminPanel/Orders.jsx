@@ -1096,7 +1096,7 @@ const Orders = () => {
                       {order.status !== "confirmed" ? (
                         <div className="flex flex-col items-center gap-1">
                           <div
-                            className={`badge ${order.status === "received" ? "badge-warning" : "badge-info"
+                            className={`badge ${order.status === "received" ? "badge-error" : "badge-info"
                               }`}
                           >
                             {order.status === "received"
