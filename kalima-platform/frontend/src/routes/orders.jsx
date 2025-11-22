@@ -171,7 +171,7 @@ export const getResponseTimeStats = async () => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/response-time`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/response-time`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
