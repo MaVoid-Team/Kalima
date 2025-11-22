@@ -821,7 +821,7 @@ const StoreAnalytics = () => {
                   </div>
                   <div className="stat-title">{t("insights.avgReceiveTime") || "Avg. Receive Time"}</div>
                   <div className="stat-value">
-                    {formatMinutes(responseTimeStats.receiveTime?.averageMinutes)}
+                    {responseTimeStats.receiveTime?.averageMinutes}
                   </div>
                   <div className="stat-desc">{responseTimeStats.receiveTime?.count || 0} {t("insights.avgReceiveTimeDesc")}</div>
                   <div className="stat-desc">{responseTimeStats.receiveTime?.maxMinutes || 0} {t("insights.avgReceiveTimeMax")}</div>
@@ -833,7 +833,7 @@ const StoreAnalytics = () => {
                   </div>
                   <div className="stat-title">{t("insights.avgConfirmTime") || "Avg. Confirm Time"}</div>
                   <div className="stat-value">
-                    {formatMinutes(responseTimeStats.confirmTime?.averageMinutes)}
+                    {responseTimeStats.confirmTime?.averageMinutes}
                   </div>
                   <div className="stat-desc">{responseTimeStats.confirmTime?.count || 0} {t("insights.avgConfirmTimeDesc")}</div>
                   <div className="stat-desc">{responseTimeStats.confirmTime?.maxMinutes || 0} {t("insights.avgConfirmTimeMax")}</div>
@@ -844,7 +844,7 @@ const StoreAnalytics = () => {
                     <TrendingUp className="w-8 h-8" />
                   </div>
                   <div className="stat-title">{t("insights.avgTotalTime") || "Avg. Total Time"}</div>
-                  <div className="stat-value">{formatMinutes(responseTimeStats.totalResponseTime?.averageMinutes)}</div>
+                  <div className="stat-value">{responseTimeStats.totalResponseTime?.averageMinutes}</div>
                   <div className="stat-desc">{t("insights.avgTotalTimeDesc")}</div>
                   <div className="stat-desc">{responseTimeStats.totalResponseTime?.maxMinutes || 0} {t("insights.avgTotalTimeMax")}</div>
                   <div className="stat-desc">{responseTimeStats.totalResponseTime?.minMinutes || 0} {t("insights.avgTotalTimeMin")}</div>
