@@ -23,7 +23,7 @@ const teacherValidation = userValidation.concat(
       .items(Joi.string().valid("primary", "preparatory", "secondary"))
       .min(1)
     ,
-    teachesAtType: Joi.string().valid("Center", "School", "Both").optional(),
+    teachesAtType: Joi.string().valid("Center", "School", "Both" , "").optional(),
     // Make centers conditionally required but more flexible for updates
     centers: Joi.alternatives().conditional('teachesAtType', {
       is: Joi.string().valid("Center", "Both"),
