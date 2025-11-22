@@ -45,6 +45,7 @@ const Orders = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -170,6 +171,7 @@ const Orders = () => {
     console.error("Error fetching orders:", err);
   } finally {
     setLoading(false);
+    setIsInitialLoad(false);
   }
 }, [
   currentPage,
@@ -625,7 +627,7 @@ const Orders = () => {
     }
   };
 
-  if (loading) {
+  if (loading && isInitialLoad) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
@@ -1094,7 +1096,7 @@ const Orders = () => {
                       {order.status !== "confirmed" ? (
                         <div className="flex flex-col items-center gap-1">
                           <div
-                            className={`badge ${order.status === "received" ? "badge-info" : "badge-warning"
+                            className={`badge ${order.status === "received" ? "badge-error" : "badge-info"
                               }`}
                           >
                             {order.status === "received"

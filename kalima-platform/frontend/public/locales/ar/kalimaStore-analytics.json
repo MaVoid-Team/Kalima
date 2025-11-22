@@ -26,7 +26,16 @@
     "responseTimeTitle": "تحليل زمن الاستجابة",
     "avgReceiveTime": "متوسط زمن الاستلام",
     "avgConfirmTime": "متوسط زمن التأكيد",
-    "avgTotalTime": "متوسط الزمن الإجمالي"
+    "avgTotalTime": "متوسط الزمن الإجمالي",
+    "avgTotalTimeDesc": "الوقت من إنشاء الطلب حتى التأكيد",
+    "avgConfirmTimeDesc": "الوقت من استلام الطلب حتى التأكيد",
+    "avgReceiveTimeDesc": "الوقت من إنشاء الطلب حتى استلامه",
+    "avgReceiveTimeMax": "اعلي وقت لزمن الاستلام",
+    "avgReceiveTimeMin": "اقل وقت لزمن الاستلام",
+    "avgConfirmTimeMax": "اعلي وقت لزمن التأكيد",
+    "avgConfirmTimeMin": "اقل وقت لزمن التأكيد",
+    "avgTotalTimeMax": "اعلي وقت للزمن الإجمالي",
+    "avgTotalTimeMin": "اقل وقت للزمن الإجمالي"
   },
   "productPerformance": "أداء المنتجات",
   "monthlyTrends": "الاتجاهات الشهرية",
