@@ -30,12 +30,12 @@
     "avgTotalTimeDesc": "الوقت من إنشاء الطلب حتى التأكيد",
     "avgConfirmTimeDesc": "الوقت من استلام الطلب حتى التأكيد",
     "avgReceiveTimeDesc": "الوقت من إنشاء الطلب حتى استلامه",
-    "avgReceiveTimeMax": "الحد الأقصى لزمن الاستلام",
-    "avgReceiveTimeMin": "الحد الأدنى لزمن الاستلام",
-    "avgConfirmTimeMax": "الحد الأقصى لزمن التأكيد",
-    "avgConfirmTimeMin": "الحد الأدنى لزمن التأكيد",
-    "avgTotalTimeMax": "الحد الأقصى للزمن الإجمالي",
-    "avgTotalTimeMin": "الحد الأدنى للزمن الإجمالي"
+    "avgReceiveTimeMax": "اعلي وقت لزمن الاستلام",
+    "avgReceiveTimeMin": "اقل وقت لزمن الاستلام",
+    "avgConfirmTimeMax": "اعلي وقت لزمن التأكيد",
+    "avgConfirmTimeMin": "اقل وقت لزمن التأكيد",
+    "avgTotalTimeMax": "اعلي وقت للزمن الإجمالي",
+    "avgTotalTimeMin": "اقل وقت للزمن الإجمالي"
   },
   "productPerformance": "أداء المنتجات",
   "monthlyTrends": "الاتجاهات الشهرية",
