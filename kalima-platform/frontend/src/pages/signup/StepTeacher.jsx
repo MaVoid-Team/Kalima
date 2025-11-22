@@ -9,7 +9,6 @@ export default function StepTeacher({
   t,
   errors,
   role,
-  gradeLevels,
 }) {
   const handleNumberOnlyChange = (e) => {
     const { name, value } = e.target;
@@ -42,9 +41,8 @@ export default function StepTeacher({
   return (
     <div className="space-y-4">
       <div className="form-control"></div>
-
       <h1>البيانات الاضافيه للحصول علي مميزات منصه كلمه</h1>
-
+      
       {/* Level Selection */}
       <div className="form-control">
         <div className="flex flex-col gap-2">
