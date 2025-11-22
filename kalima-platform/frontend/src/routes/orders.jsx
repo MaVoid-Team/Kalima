@@ -111,7 +111,7 @@ export const getAllStats = async (endDate = null, startDate = null) => {
       throw new Error("Not authenticated")
     }
 
-    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/stats`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/statistics`, {
       params: {
         ...(endDate ? { endDate } : {}),
         ...(startDate ? { startDate } : {}),
