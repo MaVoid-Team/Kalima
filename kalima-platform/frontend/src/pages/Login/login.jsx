@@ -89,7 +89,7 @@ const TeacherLogin = () => {
       }
       window.dispatchEvent(new Event('user-auth-changed'));
       const userRole = dashboardResult.data.data.userInfo.role;
-      if (userRole === "Admin" || userRole === "SubAdmin") {
+      if (userRole === "Admin" || userRole === "SubAdmin" || userRole === "Moderator") {
         navigate("/dashboard/admin-dashboard");
       } else if (userRole === "Lecturer") {
         navigate("/dashboard/lecturer-dashboard");
