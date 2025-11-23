@@ -78,7 +78,7 @@ const teacherSchema = new mongoose.Schema(
     },
     teachesAtType: {
       type: String,
-      enum: ["Center", "School", "Both"],
+      enum: ["Center", "School", "Both", ""],
     },
     centers: [{ type: String }], // Array of strings for center names
     school: { type: String },

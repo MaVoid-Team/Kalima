@@ -267,6 +267,8 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         return [...studentItems, ...commonItems];
       case 'parent':
         return [...parentItems, ...commonItems];
+      case 'moderator':
+        return [...adminItems, ...commonItems];
       default:
         return commonItems;
     }
