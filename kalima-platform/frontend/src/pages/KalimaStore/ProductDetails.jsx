@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
 import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
-import { addToCart } from "../../routes/cart"
+import { addToCart, getUserPurchasedProducts } from "../../routes/cart"
 import { isLoggedIn } from "../../routes/auth-services"
 import { ShoppingCart } from "lucide-react"
 
@@ -28,6 +28,7 @@ const ProductDetails = () => {
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   const [uploadedFile, setUploadedFile] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
+  const [isPurchased, setIsPurchased] = useState(false)
 
   // Coupon and Price State
   const [couponCode, setCouponCode] = useState("")
@@ -95,6 +96,14 @@ const ProductDetails = () => {
           // Set initial price to the display price (priceAfterDiscount if available)
           const initialDisplayPrice = getDisplayPrice(itemData)
           setFinalPrice(initialDisplayPrice)
+
+          // Check if user has purchased this product
+          if (isLoggedIn()) {
+            const purchasedResult = await getUserPurchasedProducts()
+            if (purchasedResult.success) {
+              setIsPurchased(purchasedResult.productIds.includes(id))
+            }
+          }
         } else {
           throw new Error(t("errors.fetchFailed"))
         }
@@ -120,6 +129,17 @@ const ProductDetails = () => {
     if (!product) {
       alert(t("errors.productDataNotLoaded"))
       return
+    }
+
+    // Check if product was already purchased
+    if (isPurchased) {
+      const confirmMessage = isRTL
+        ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
+        : "You have already purchased this product. Do you want to buy it again?";
+      
+      if (!window.confirm(confirmMessage)) {
+        return; // User cancelled
+      }
     }
 
     try {
@@ -345,6 +365,31 @@ const ProductDetails = () => {
               </div>
               <div className="p-8 lg:p-12 border-l border-base-200">
                 <ProductInfo product={product} type={displayType} isRTL={isRTL} />
+                
+                {/* Already Purchased Badge */}
+                {isPurchased && (
+                  <div className="alert alert-success mt-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="stroke-current shrink-0 h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span>
+                      {isRTL
+                        ? "لقد قمت بشراء هذا المنتج من قبل"
+                        : "You have already purchased this product"}
+                    </span>
+                  </div>
+                )}
+
                 {/* Add to Cart Button */}
                 <div className="mt-6">
                   <button
@@ -360,7 +405,9 @@ const ProductDetails = () => {
                     ) : (
                       <>
                         <ShoppingCart className="w-5 h-5" />
-                        {t("addToCart") || "Add to Cart"}
+                        {isPurchased
+                          ? (isRTL ? "شراء مرة أخرى" : "Buy Again")
+                          : (t("addToCart") || "Add to Cart")}
                       </>
                     )}
                   </button>

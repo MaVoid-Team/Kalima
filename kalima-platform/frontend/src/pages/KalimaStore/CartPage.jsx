@@ -67,6 +67,8 @@ const CartPage = () => {
     numberOnBook: "",
     seriesName: "",
   });
+  const [checkoutCooldown, setCheckoutCooldown] = useState(0);
+  const [cooldownTimer, setCooldownTimer] = useState(null);
 
   // Fetch cart data
   const fetchCart = async () => {
@@ -113,6 +115,44 @@ const CartPage = () => {
 
   useEffect(() => {
     fetchCart();
+  }, []);
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (checkoutCooldown > 0) {
+      const timer = setTimeout(() => {
+        setCheckoutCooldown(checkoutCooldown - 1);
+      }, 1000);
+      setCooldownTimer(timer);
+      return () => clearTimeout(timer);
+    } else {
+      if (cooldownTimer) {
+        clearTimeout(cooldownTimer);
+        setCooldownTimer(null);
+      }
+    }
+  }, [checkoutCooldown]);
+
+  // Load cooldown from localStorage on mount
+  useEffect(() => {
+    const savedCooldown = localStorage.getItem('checkoutCooldownExpiry');
+    if (savedCooldown) {
+      const expiryTime = parseInt(savedCooldown);
+      const now = Date.now();
+      if (expiryTime > now) {
+        const remainingSeconds = Math.ceil((expiryTime - now) / 1000);
+        setCheckoutCooldown(remainingSeconds);
+      } else {
+        localStorage.removeItem('checkoutCooldownExpiry');
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (cooldownTimer) {
+        clearTimeout(cooldownTimer);
+      }
+    };
   }, []);
 
   // Handle remove item
@@ -288,16 +328,19 @@ const CartPage = () => {
     const errors = {};
     let isValid = true;
 
-    if (!checkoutData.numberTransferredFrom.trim()) {
-      errors.numberTransferredFrom =
-        t("errors.noTransferNumber") || "Please enter transfer number";
-      isValid = false;
-    }
+    // Only validate payment fields if cart total > 0
+    if (cart.total > 0) {
+      if (!checkoutData.numberTransferredFrom.trim()) {
+        errors.numberTransferredFrom =
+          t("errors.noTransferNumber") || "Please enter transfer number";
+        isValid = false;
+      }
 
-    if (!checkoutData.paymentScreenShot) {
-      errors.paymentScreenShot =
-        t("errors.noFileSelected") || "Please upload payment screenshot";
-      isValid = false;
+      if (!checkoutData.paymentScreenShot) {
+        errors.paymentScreenShot =
+          t("errors.noFileSelected") || "Please upload payment screenshot";
+        isValid = false;
+      }
     }
 
     if (requiresBookDetails) {
@@ -324,6 +367,15 @@ const CartPage = () => {
 
   // Handle checkout
   const handleCheckout = async () => {
+    // Check cooldown
+    if (checkoutCooldown > 0) {
+      toast.error(
+        t("errors.checkoutCooldown", { seconds: checkoutCooldown }) || 
+        `Please wait ${checkoutCooldown} seconds before checking out again.`
+      );
+      return;
+    }
+
     // Clear previous validation errors
     setValidationErrors({
       numberTransferredFrom: "",
@@ -345,6 +397,12 @@ const CartPage = () => {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
+        // Set 30-second cooldown
+        const cooldownSeconds = 30;
+        const expiryTime = Date.now() + (cooldownSeconds * 1000);
+        localStorage.setItem('checkoutCooldownExpiry', expiryTime.toString());
+        setCheckoutCooldown(cooldownSeconds);
+
         window.alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
@@ -830,124 +888,129 @@ const CartPage = () => {
                   {/* Divider */}
                   <div className="border-t border-base-300 my-3"></div>
 
-                  {/* Payment Section */}
-                  <div
-                    dir="rtl"
-                    className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
-                  >
-                    <p className="text-base md:text-lg font-semibold text-gray-100">
-                      برجاء دفع المبلغ على الرقم التالي:
-                    </p>
-
-                    {/* Payment Number */}
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={handleCopy}
-                      className="relative inline-flex items-center justify-center gap-2
-                 bg-gradient-to-br from-[#f8e3a1] via-[#f1c05a] to-[#dca52f]
-                 text-[#3a2500] font-bold px-6 py-3 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.25)]
-                 cursor-pointer select-none transition-all duration-300
-                 hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
+                  {/* Payment Section - Only show if cart total > 0 */}
+                  {cart.total > 0 && (
+                    <div
+                      dir="rtl"
+                      className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
                     >
-                      <span dir="ltr" className="select-all  text-white tracking-wide">
-                        +20 106 116 5403
-                      </span>
+                      <p className="text-base md:text-lg font-semibold text-gray-100">
+                        برجاء دفع المبلغ على الرقم التالي:
+                      </p>
 
-                      {/* Copy Tooltip */}
-                      <motion.span
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{
-                          opacity: copied ? 1 : 0,
-                          y: copied ? 0 : 5,
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
-                   bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-lg shadow-lg
-                   border border-green-200 whitespace-nowrap"
+                      {/* Payment Number */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={handleCopy}
+                        className="relative inline-flex items-center justify-center gap-2
+                   bg-gradient-to-br from-[#f8e3a1] via-[#f1c05a] to-[#dca52f]
+                   text-[#3a2500] font-bold px-6 py-3 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.25)]
+                   cursor-pointer select-none transition-all duration-300
+                   hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
                       >
-                        تم النسخ
-                        <span
-                          className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 
-                         bg-white border-r border-b border-green-200"
-                        />
-                      </motion.span>
-                    </motion.div>
+                        <span dir="ltr" className="select-all  text-white tracking-wide">
+                          +20 106 116 5403
+                        </span>
 
-                    <p className="text-xs text-gray-400 mt-1">
-                      (اضغط على الرقم لنسخه تلقائيًا)
-                    </p>
-                  </div>
+                        {/* Copy Tooltip */}
+                        <motion.span
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{
+                            opacity: copied ? 1 : 0,
+                            y: copied ? 0 : 5,
+                          }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
+                     bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-lg shadow-lg
+                     border border-green-200 whitespace-nowrap"
+                        >
+                          تم النسخ
+                          <span
+                            className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 
+                           bg-white border-r border-b border-green-200"
+                          />
+                        </motion.span>
+                      </motion.div>
+
+                      <p className="text-xs text-gray-400 mt-1">
+                        (اضغط على الرقم لنسخه تلقائيًا)
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Checkout Form */}
                 <div className="space-y-6">
                   {[
-                    {
-                      key: "transferNumber",
-                      label: (
-                        <>
-                          {t("transferNumber") || "Transfer Number"}
-                          <span className="text-error ml-0.5">*</span>
-                        </>
-                      ),
-                      input: (
-                        <input
-                          type="text"
-                          placeholder={
-                            t("enterTransferNumber") || "Enter transfer number"
-                          }
-                          className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
-                            validationErrors.numberTransferredFrom
-                              ? "input-error"
-                              : ""
-                          }`}
-                          value={checkoutData.numberTransferredFrom}
-                          onChange={(e) => {
-                            setCheckoutData({
-                              ...checkoutData,
-                              numberTransferredFrom: e.target.value,
-                            });
-                            clearFieldError("numberTransferredFrom");
-                          }}
-                        />
-                      ),
-                      error: validationErrors.numberTransferredFrom,
-                    },
-                    {
-                      key: "paymentScreenshot",
-                      label: (
-                        <>
-                          {t("paymentScreenshot") || "Payment Screenshot"}
-                          <span className="text-error ml-1">*</span>
-                        </>
-                      ),
-                      input: (
-                        <input
-                          type="file"
-                          accept="image/*,.pdf"
-                          className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
-                            validationErrors.paymentScreenShot
-                              ? "file-input-error"
-                              : ""
-                          }`}
-                          onChange={(e) => {
-                            handleFileChange(e);
-                            clearFieldError("paymentScreenShot");
-                          }}
-                        />
-                      ),
-                      extra: checkoutData.paymentScreenShot &&
-                        !validationErrors.paymentScreenShot && (
-                          <label className="label mt-1">
-                            <span className="label-text-alt text-success">
-                              {t("fileSelected") || "File selected"}:{" "}
-                              {checkoutData.paymentScreenShot.name}
-                            </span>
-                          </label>
+                    // Only show payment fields if cart total > 0
+                    ...(cart.total > 0 ? [
+                      {
+                        key: "transferNumber",
+                        label: (
+                          <>
+                            {t("transferNumber") || "Transfer Number"}
+                            <span className="text-error ml-0.5">*</span>
+                          </>
                         ),
-                      error: validationErrors.paymentScreenShot,
-                    },
+                        input: (
+                          <input
+                            type="text"
+                            placeholder={
+                              t("enterTransferNumber") || "Enter transfer number"
+                            }
+                            className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
+                              validationErrors.numberTransferredFrom
+                                ? "input-error"
+                                : ""
+                            }`}
+                            value={checkoutData.numberTransferredFrom}
+                            onChange={(e) => {
+                              setCheckoutData({
+                                ...checkoutData,
+                                numberTransferredFrom: e.target.value,
+                              });
+                              clearFieldError("numberTransferredFrom");
+                            }}
+                          />
+                        ),
+                        error: validationErrors.numberTransferredFrom,
+                      },
+                      {
+                        key: "paymentScreenshot",
+                        label: (
+                          <>
+                            {t("paymentScreenshot") || "Payment Screenshot"}
+                            <span className="text-error ml-1">*</span>
+                          </>
+                        ),
+                        input: (
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
+                              validationErrors.paymentScreenShot
+                                ? "file-input-error"
+                                : ""
+                            }`}
+                            onChange={(e) => {
+                              handleFileChange(e);
+                              clearFieldError("paymentScreenShot");
+                            }}
+                          />
+                        ),
+                        extra: checkoutData.paymentScreenShot &&
+                          !validationErrors.paymentScreenShot && (
+                            <label className="label mt-1">
+                              <span className="label-text-alt text-success">
+                                {t("fileSelected") || "File selected"}:{" "}
+                                {checkoutData.paymentScreenShot.name}
+                              </span>
+                            </label>
+                          ),
+                        error: validationErrors.paymentScreenShot,
+                      },
+                    ] : []),
                   ].map((field, index) => (
                     <motion.div
                       key={field.key}
@@ -1060,16 +1123,43 @@ const CartPage = () => {
 
                   {/* Checkout Button */}
                   <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: checkoutCooldown > 0 ? 1 : 1.03 }}
+                    whileTap={{ scale: checkoutCooldown > 0 ? 1 : 0.97 }}
                     onClick={handleCheckout}
-                    disabled={checkoutLoading}
-                    className="btn btn-primary  btn-lg h-12 w-full mt-4"
+                    disabled={checkoutLoading || checkoutCooldown > 0}
+                    className={`btn btn-lg h-12 w-full mt-4 ${
+                      checkoutCooldown > 0 ? "btn-disabled" : "btn-primary"
+                    }`}
                   >
                     {checkoutLoading ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
                         {t("processing") || "Processing..."}
+                      </>
+                    ) : checkoutCooldown > 0 ? (
+                      <>
+                        <svg
+                          className="w-5 h-5 animate-spin"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        {t("waitSeconds", { seconds: checkoutCooldown }) ||
+                          `Wait ${checkoutCooldown}s`}
                       </>
                     ) : (
                       <>
@@ -1078,6 +1168,34 @@ const CartPage = () => {
                       </>
                     )}
                   </motion.button>
+
+                  {/* Cooldown Info Alert */}
+                  {checkoutCooldown > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="alert alert-info mt-4"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-current shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span>
+                        {t("cooldownMessage", { seconds: checkoutCooldown }) ||
+                          `Please wait ${checkoutCooldown} seconds before making another purchase.`}
+                      </span>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </div>
