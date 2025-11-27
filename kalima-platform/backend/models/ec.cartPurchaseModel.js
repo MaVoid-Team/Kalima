@@ -45,21 +45,21 @@ const cartPurchaseSchema = new mongoose.Schema(
         // Items in the purchase
         items: [cartPurchaseItemSchema],
 
-        // Payment information
+        // Payment information (optional for free products)
         numberTransferredFrom: {
             type: String,
-            required: [true, "Transfer number is required"],
             trim: true,
+            default: null,
         },
         paymentNumber: {
             type: String,
-            required: [true, "Payment Number is required"],
             trim: true,
+            default: null,
         },
         paymentScreenShot: {
             type: String,
-            required: [true, "Payment screenshot is required"],
             trim: true,
+            default: null,
         },
 
         // Purchase serial number ("CP-timestamp-userid")

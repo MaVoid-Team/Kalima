@@ -173,7 +173,11 @@ export const getCheckoutPreview = async () => {
 export const createCartPurchase = async (purchaseData) => {
   try {
     const formData = new FormData();
-    formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom);
+    
+    // Only append payment fields if they exist (for paid products)
+    if (purchaseData.numberTransferredFrom) {
+      formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom);
+    }
     
     if (purchaseData.paymentScreenShot) {
       const safePayment = generateSafeFilename(purchaseData.paymentScreenShot);
@@ -258,6 +262,49 @@ export const getCartPurchases = async (queryParams = {}) => {
   }
 };
 
+// Get user's purchased product IDs
+export const getUserPurchasedProducts = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    
+    if (response.data?.status === "success" && response.data?.data?.purchases) {
+      // Extract all product IDs from all purchases
+      const productIds = new Set();
+      response.data.data.purchases.forEach(purchase => {
+        if (purchase.items && Array.isArray(purchase.items)) {
+          purchase.items.forEach(item => {
+            if (item.product) {
+              // Handle both populated and non-populated product references
+              const productId = typeof item.product === 'object' ? item.product._id : item.product;
+              productIds.add(productId);
+            }
+          });
+        }
+      });
+      return {
+        success: true,
+        productIds: Array.from(productIds),
+      };
+    }
+    return {
+      success: true,
+      productIds: [],
+    };
+  } catch (error) {
+    console.error("Error fetching purchased products:", error);
+    return {
+      success: false,
+      productIds: [],
+      error: error.message,
+    };
+  }
+};
+
 export const getAdminCartPurchases = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/all`, {
@@ -275,6 +322,27 @@ export const getAdminCartPurchases = async (queryParams = {}) => {
     return {
       success: false,
       error: `Failed to fetch admin cart purchases: ${error.response?.data?.message || error.message}`,
+    };
+  }
+};
+
+// Get confirmed orders report
+export const getConfirmedOrdersReport = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/confirmed-report`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message}`,
     };
   }
 };
