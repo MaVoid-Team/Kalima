@@ -18,7 +18,22 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     // Check if user serial exists
     if (!req.user.userSerial) {
         return next(new AppError("User serial not found", 400));
-    }    // Get active cart
+    }
+
+    // Rate limiting: Check if user has made a purchase in the last 30 seconds
+    const thirtySecondsAgo = new Date(Date.now() - 30000);
+    const recentPurchase = await ECCartPurchase.findOne({
+        createdBy: req.user._id,
+        createdAt: { $gte: thirtySecondsAgo }
+    }).sort({ createdAt: -1 });
+
+    if (recentPurchase) {
+        const timeSinceLastPurchase = Date.now() - new Date(recentPurchase.createdAt).getTime();
+        const remainingSeconds = Math.ceil((30000 - timeSinceLastPurchase) / 1000);
+        return next(new AppError(`Please wait ${remainingSeconds} seconds before making another purchase`, 429));
+    }
+
+    // Get active cart
     const cart = await ECCart.findOne({
         user: req.user._id,
         status: "active"
@@ -40,9 +55,11 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         return next(new AppError("Book details are required \n name on book \n number on book \n series name", 400));
     }
 
-    // Validate payment info
-    if (!req.body.numberTransferredFrom || !req.file) {
-        return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
+    // Validate payment info only if cart total > 0
+    if (cart.total > 0) {
+        if (!req.body.numberTransferredFrom || !req.file) {
+            return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
+        }
     }
 
     // Prepare items with snapshots
@@ -60,6 +77,10 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
             serial: item.product.serial
         }
     }));
+
+    // Prepare payment data (only if cart total > 0)
+    const paymentScreenShot = cart.total > 0 && req.file ? req.file.path : null;
+    const numberTransferredFrom = cart.total > 0 ? req.body.numberTransferredFrom : null;
 
     // Generate purchase serial using user's serial, date, and sequence in Egypt time
     const date = getCurrentEgyptTime();
@@ -86,9 +107,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         userName: req.user.name,
         createdBy: req.user._id,
         items: items,
-        numberTransferredFrom: req.body.numberTransferredFrom,
-        paymentNumber: cart.items[0].product.paymentNumber, // Assuming same payment number for all products
-        paymentScreenShot: req.file.path,
+        numberTransferredFrom: numberTransferredFrom,
+        paymentNumber: cart.total > 0 ? cart.items[0].product.paymentNumber : null, // Only set payment number if cart has value
+        paymentScreenShot: paymentScreenShot,
         subtotal: cart.subtotal,
         couponCode: cart.couponCode,
         discount: cart.discount,
@@ -105,6 +126,28 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     }
 
+    // Format product list for notifications
+    const productListHTML = cart.items.map((item, index) => {
+        const price = item.priceAtAdd || 0;
+        const priceText = price > 0 ? `${price.toFixed(2)} EGP` : 'FREE';
+        return `
+            <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 10px; text-align: center;">${index + 1}</td>
+                <td style="padding: 10px;">${item.product.title}</td>
+                <td style="padding: 10px; text-align: right; font-weight: bold;">${priceText}</td>
+            </tr>`;
+    }).join('');
+
+    const productListText = cart.items.map((item, index) => {
+        const price = item.priceAtAdd || 0;
+        const priceText = price > 0 ? `${price.toFixed(2)} EGP` : 'FREE';
+        return `${index + 1}. ${item.product.title} - ${priceText}`;
+    }).join('\n');
+
+    const totalText = cart.total > 0 ? `${cart.total.toFixed(2)} EGP` : 'FREE';
+    const discountText = cart.discount > 0 ? `\n- Discount: ${cart.discount.toFixed(2)} EGP` : '';
+
+    // Send email notification
     try {
         await sendEmail(
             req.user.email,
@@ -122,6 +165,19 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         );
     } catch (err) {
         console.error("Failed to send purchase confirmation email:", err);
+    }
+
+    // Send WhatsApp notification
+    try {
+        if (req.user.phoneNumber) {
+            const whatsappMessage = `🎉 *تأكيد الطلب*\n\nعزيزي ${req.user.name}،\n\nشكراً لطلبك!\n\n*رقم الطلب:* ${purchaseSerial}\n\n*المنتجات:*\n${productListText}\n${discountText}\n*الإجمالي: ${totalText}*\n\nسيتم معالجة طلبك خلال ساعات العمل (9 صباحاً - 9 مساءً).\n\nشكراً لاختيارك كلمة! 📚`;
+            
+            console.log(`[WhatsApp Notification] Order confirmation for ${req.user.phoneNumber}:`, whatsappMessage);
+            // In production, integrate with actual WhatsApp API here
+            // await whatsappService.sendMessage(req.user.phoneNumber, whatsappMessage);
+        }
+    } catch (err) {
+        console.error("Failed to send WhatsApp notification:", err);
     }
 
     await cart.clear();
@@ -684,5 +740,102 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: stats,
+    });
+});
+
+// Get confirmed orders report with admin/moderator statistics
+exports.getConfirmedOrdersReport = catchAsync(async (req, res, next) => {
+    // Get all confirmed purchases
+    const confirmedPurchases = await ECCartPurchase.find({
+        status: 'confirmed'
+    })
+        .populate('confirmedBy', 'name email role')
+        .populate('receivedBy', 'name email role')
+        .populate('createdBy', 'name email phoneNumber')
+        .populate('couponCode', 'couponCode value')
+        .sort({ confirmedAt: -1 });
+
+    // Calculate statistics by confirmer
+    const confirmerStats = {};
+    let totalConfirmedOrders = 0;
+    let totalConfirmedRevenue = 0;
+
+    confirmedPurchases.forEach(purchase => {
+        totalConfirmedOrders++;
+        totalConfirmedRevenue += purchase.total || 0;
+
+        if (purchase.confirmedBy) {
+            const confirmerId = purchase.confirmedBy._id.toString();
+            
+            if (!confirmerStats[confirmerId]) {
+                confirmerStats[confirmerId] = {
+                    admin: {
+                        id: purchase.confirmedBy._id,
+                        name: purchase.confirmedBy.name,
+                        email: purchase.confirmedBy.email,
+                        role: purchase.confirmedBy.role
+                    },
+                    totalConfirmed: 0,
+                    totalRevenue: 0,
+                    firstConfirmation: purchase.confirmedAt,
+                    lastConfirmation: purchase.confirmedAt,
+                    orders: []
+                };
+            }
+
+            confirmerStats[confirmerId].totalConfirmed++;
+            confirmerStats[confirmerId].totalRevenue += purchase.total || 0;
+            
+            // Update first and last confirmation dates
+            if (new Date(purchase.confirmedAt) < new Date(confirmerStats[confirmerId].firstConfirmation)) {
+                confirmerStats[confirmerId].firstConfirmation = purchase.confirmedAt;
+            }
+            if (new Date(purchase.confirmedAt) > new Date(confirmerStats[confirmerId].lastConfirmation)) {
+                confirmerStats[confirmerId].lastConfirmation = purchase.confirmedAt;
+            }
+
+            confirmerStats[confirmerId].orders.push({
+                purchaseId: purchase._id,
+                purchaseSerial: purchase.purchaseSerial,
+                customerName: purchase.userName,
+                total: purchase.total,
+                confirmedAt: purchase.confirmedAt,
+                itemCount: purchase.items?.length || 0
+            });
+        }
+    });
+
+    // Convert to array and sort by total confirmed
+    const confirmerStatsArray = Object.values(confirmerStats).sort(
+        (a, b) => b.totalConfirmed - a.totalConfirmed
+    );
+
+    // Calculate average confirmation time (from received to confirmed)
+    const purchasesWithTimes = confirmedPurchases.filter(
+        p => p.receivedAt && p.confirmedAt
+    );
+    
+    let totalConfirmationTime = 0;
+    purchasesWithTimes.forEach(purchase => {
+        const timeDiff = new Date(purchase.confirmedAt) - new Date(purchase.receivedAt);
+        totalConfirmationTime += timeDiff;
+    });
+
+    const averageConfirmationTime = purchasesWithTimes.length > 0
+        ? Math.round(totalConfirmationTime / purchasesWithTimes.length / 1000 / 60) // in minutes
+        : 0;
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            summary: {
+                totalConfirmedOrders,
+                totalConfirmedRevenue,
+                averageConfirmationTimeMinutes: averageConfirmationTime,
+                totalConfirmers: confirmerStatsArray.length
+            },
+            confirmerStats: confirmerStatsArray,
+            recentConfirmedOrders: confirmedPurchases.slice(0, 50) // Last 50 confirmed orders
+        }
     });
 });
