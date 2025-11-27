@@ -38,6 +38,12 @@ router.route('/admin/response-time')
         cartPurchaseController.getResponseTimeStatistics
     );
 
+router.route('/admin/confirmed-report')
+    .get(
+        authController.verifyRoles("Admin", "SubAdmin"),
+        cartPurchaseController.getConfirmedOrdersReport
+    );
+
 router.route('/:id')
     .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         cartPurchaseController.getCartPurchaseById);

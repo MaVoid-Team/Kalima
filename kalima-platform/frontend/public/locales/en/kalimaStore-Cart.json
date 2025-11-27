@@ -55,7 +55,10 @@
     "checkoutFailed": "Failed to submit purchase. Please check your information and try again.",
     "removeItemFailed": "Failed to remove item. Please try again.",
     "clearCartFailed": "Failed to clear cart. Please try again.",
-    "fetchCartFailed": "Failed to load your cart. Please Log In First."
-  }
+    "fetchCartFailed": "Failed to load your cart. Please Log In First.",
+    "checkoutCooldown": "Please wait {{seconds}} seconds before checking out again."
+  },
+  "waitSeconds": "Wait {{seconds}}s",
+  "cooldownMessage": "Please wait {{seconds}} seconds before making another purchase. This prevents duplicate orders."
 }
 
