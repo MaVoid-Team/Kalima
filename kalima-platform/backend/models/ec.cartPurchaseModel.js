@@ -17,7 +17,7 @@ const cartPurchaseItemSchema = new mongoose.Schema({
     },
     // For books
     nameOnBook: String,
-    numberOnBook: String,
+    numberOnBook: Number,
     seriesName: String,
     // Snapshot of product data
     productSnapshot: {
