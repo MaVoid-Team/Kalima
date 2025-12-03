@@ -5,6 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendEmail } = require("../utils/emailVerification/emailService");
 const { DateTime } = require('luxon');
+const mongoose = require('mongoose');
 
 // Function to get current time in Egypt timezone
 const getCurrentEgyptTime = () => {
@@ -18,7 +19,22 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     // Check if user serial exists
     if (!req.user.userSerial) {
         return next(new AppError("User serial not found", 400));
-    }    // Get active cart
+    }
+
+    // Rate limiting: Check if user has made a purchase in the last 30 seconds
+    const thirtySecondsAgo = new Date(Date.now() - 30000);
+    const recentPurchase = await ECCartPurchase.findOne({
+        createdBy: req.user._id,
+        createdAt: { $gte: thirtySecondsAgo }
+    }).sort({ createdAt: -1 });
+
+    if (recentPurchase) {
+        const timeSinceLastPurchase = Date.now() - new Date(recentPurchase.createdAt).getTime();
+        const remainingSeconds = Math.ceil((30000 - timeSinceLastPurchase) / 1000);
+        return next(new AppError(`Please wait ${remainingSeconds} seconds before making another purchase`, 429));
+    }
+
+    // Get active cart
     const cart = await ECCart.findOne({
         user: req.user._id,
         status: "active"
@@ -40,9 +56,11 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         return next(new AppError("Book details are required \n name on book \n number on book \n series name", 400));
     }
 
-    // Validate payment info
-    if (!req.body.numberTransferredFrom || !req.file) {
-        return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
+    // Validate payment info only if cart total > 0
+    if (cart.total > 0) {
+        if (!req.body.numberTransferredFrom || !req.file) {
+            return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
+        }
     }
 
     // Prepare items with snapshots
@@ -60,6 +78,10 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
             serial: item.product.serial
         }
     }));
+
+    // Prepare payment data (only if cart total > 0)
+    const paymentScreenShot = cart.total > 0 && req.file ? req.file.path : null;
+    const numberTransferredFrom = cart.total > 0 ? req.body.numberTransferredFrom : null;
 
     // Generate purchase serial using user's serial, date, and sequence in Egypt time
     const date = getCurrentEgyptTime();
@@ -86,9 +108,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         userName: req.user.name,
         createdBy: req.user._id,
         items: items,
-        numberTransferredFrom: req.body.numberTransferredFrom,
-        paymentNumber: cart.items[0].product.paymentNumber, // Assuming same payment number for all products
-        paymentScreenShot: req.file.path,
+        numberTransferredFrom: numberTransferredFrom,
+        paymentNumber: cart.total > 0 ? cart.items[0].product.paymentNumber : null, // Only set payment number if cart has value
+        paymentScreenShot: paymentScreenShot,
         subtotal: cart.subtotal,
         couponCode: cart.couponCode,
         discount: cart.discount,
@@ -105,15 +127,43 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     }
 
+    // Format product list for notifications
+    const productListHTML = cart.items.map((item, index) => {
+        return `
+            <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 10px; text-align: center;">${index + 1}</td>
+                <td style="padding: 10px;">${item.product.title}</td>
+            </tr>`;
+    }).join('');
+
+    const productListText = cart.items.map((item, index) => {
+        return `${index + 1}. ${item.product.title}`;
+    }).join('\n');
+
+    const totalText = cart.total > 0 ? `${cart.total.toFixed(2)} EGP` : 'FREE';
+    const discountText = cart.discount > 0 ? `\n- Discount: ${cart.discount.toFixed(2)} EGP` : '';
+
+    // Send email notification
     try {
         await sendEmail(
             req.user.email,
             "Your Order Has Been Received",
-            `<div style='font-family: Arial, sans-serif;'>
+            `<div dir="auto" style='font-family: Arial, sans-serif;'>
             <h2>Thank you for your purchase!</h2>
             <p>Dear ${req.user.name},</p>
             <p>We’re happy to let you know that your order (<b>${purchaseSerial}</b>) has been received.</p>
             <p>You have ordered <b>${cart.items.length}</b> product(s).</p>
+            <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr>
+                        <th style="text-align:center; padding: 8px; border-bottom: 1px solid #ddd;">##</th>
+                        <th style="text-align:start; padding: 8px; border-bottom: 1px solid #ddd;">Product</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${productListHTML}
+                </tbody>
+            </table>
             <p>Your order will be processed after the payment is reviewed by our team during working hours from <b>9:00 AM to 9:00 PM</b>.</p>
             <p>If you have any questions, please contact our support team.</p>
             <br>
@@ -122,6 +172,19 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         );
     } catch (err) {
         console.error("Failed to send purchase confirmation email:", err);
+    }
+
+    // Send WhatsApp notification
+    try {
+        if (req.user.phoneNumber) {
+            const whatsappMessage = `🎉 *تأكيد الطلب*\n\nعزيزي ${req.user.name}،\n\nشكراً لطلبك!\n\n*رقم الطلب:* ${purchaseSerial}\n\n*المنتجات:*\n${productListText}\n${discountText}\n*الإجمالي: ${totalText}*\n\nسيتم معالجة طلبك خلال ساعات العمل (9 صباحاً - 9 مساءً).\n\nشكراً لاختيارك كلمة! 📚`;
+
+            //console.log(`[WhatsApp Notification] Order confirmation for ${req.user.phoneNumber}:`, whatsappMessage);
+            // In production, integrate with actual WhatsApp API here
+            // await whatsappService.sendMessage(req.user.phoneNumber, whatsappMessage);
+        }
+    } catch (err) {
+        console.error("Failed to send WhatsApp notification:", err);
     }
 
     await cart.clear();
@@ -230,17 +293,17 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
 
 // Admin routes
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
-    // Build query
-    const query = {};
+    // Build base match filters (these will be applied in aggregation or simple query)
+    const baseMatch = {};
 
     // Filter by status if specified
     if (req.query.status) {
-        query.status = req.query.status;
+        baseMatch.status = req.query.status;
     }
 
     // Filter by date range if specified
     if (req.query.startDate && req.query.endDate) {
-        query.createdAt = {
+        baseMatch.createdAt = {
             $gte: new Date(req.query.startDate),
             $lte: new Date(req.query.endDate)
         };
@@ -248,28 +311,9 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
     // Filter by minimum/maximum total if specified
     if (req.query.minTotal || req.query.maxTotal) {
-        query.total = {};
-        if (req.query.minTotal) query.total.$gte = parseFloat(req.query.minTotal);
-        if (req.query.maxTotal) query.total.$lte = parseFloat(req.query.maxTotal);
-    }
-
-    // Search across multiple fields (simple, avoids aggregation)
-    if (req.query.search) {
-        const searchTerm = req.query.search;
-        const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive
-
-        // Apply OR search on several fields present in the purchase document
-        query.$or = [
-            { userName: searchRegex },
-            { purchaseSerial: searchRegex },
-            { numberTransferredFrom: searchRegex },
-            { 'createdBy.email': searchRegex },
-            { 'createdBy.name': searchRegex },
-            { 'items.productSnapshot.serial': searchRegex }
-        ];
-
-        // Remove search from query so it doesn't interfere with other code
-        delete req.query.search;
+        baseMatch.total = {};
+        if (req.query.minTotal) baseMatch.total.$gte = parseFloat(req.query.minTotal);
+        if (req.query.maxTotal) baseMatch.total.$lte = parseFloat(req.query.maxTotal);
     }
 
     // Pagination
@@ -277,8 +321,158 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Execute query
-    const purchases = await ECCartPurchase.find(query)
+    // If a search term is present, use aggregation to allow matching on referenced `createdBy` user fields
+    if (req.query.search) {
+        const searchTermString = String(req.query.search || '').trim();
+        // Escape special regex characters then create case-insensitive regex
+        const searchRegex = new RegExp(searchTermString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+        // Fast-path: if the search term is a 24-char hex string, treat it as an ObjectId and return that purchase directly
+        if (/^[0-9a-fA-F]{24}$/.test(searchTermString)) {
+            try {
+                // Use the raw string id (Mongoose accepts string ids); this avoids casting issues
+                const found = await ECCartPurchase.findById(searchTermString)
+                    .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+                    .populate('confirmedBy', 'name')
+                    .populate('receivedBy', 'name')
+                    .populate('adminNoteBy', 'name')
+                    .populate('couponCode');
+                // If baseMatch filters exist, ensure the found doc satisfies them
+                let matchesBase = true;
+                if (found && Object.keys(baseMatch).length > 0) {
+                    if (baseMatch.status && found.status !== baseMatch.status) matchesBase = false;
+                    if (baseMatch.createdAt) {
+                        const gte = baseMatch.createdAt.$gte;
+                        const lte = baseMatch.createdAt.$lte;
+                        const created = new Date(found.createdAt);
+                        if (gte && created < gte) matchesBase = false;
+                        if (lte && created > lte) matchesBase = false;
+                    }
+                    if (baseMatch.total) {
+                        if (baseMatch.total.$gte != null && (found.total == null || found.total < baseMatch.total.$gte)) matchesBase = false;
+                        if (baseMatch.total.$lte != null && (found.total == null || found.total > baseMatch.total.$lte)) matchesBase = false;
+                    }
+                }
+
+                const total = found && matchesBase ? 1 : 0;
+                return res.status(200).json({
+                    status: "success",
+                    results: total,
+                    pagination: {
+                        total,
+                        page: 1,
+                        pages: total > 0 ? 1 : 0,
+                        limit: 1
+                    },
+                    data: {
+                        purchases: found && matchesBase ? [found] : []
+                    }
+                });
+            } catch (err) {
+                // if any error occurs, fall through to the aggregation approach
+                console.error('Error in ObjectId fast-path search:', err);
+            }
+        }
+
+        // Build $or conditions covering purchase fields, items snapshot and joined user fields
+        const orMatch = [
+            { userName: searchRegex },
+            { purchaseSerial: searchRegex },
+            { numberTransferredFrom: searchRegex },
+            { 'items.productSnapshot.serial': searchRegex },
+            { 'items.productSnapshot.title': searchRegex },
+            { 'createdByUser.phoneNumber': searchRegex },
+            { 'createdByUser.email': searchRegex },
+            { 'createdByUser.name': searchRegex }
+        ];
+
+        // If the search looks like an ObjectId, add direct _id match
+        if (/^[0-9a-fA-F]{24}$/.test(searchTermString)) {
+            try {
+                orMatch.push({ _id: mongoose.Types.ObjectId(searchTermString) });
+            } catch (e) {
+                // ignore invalid ObjectId conversion
+            }
+        }
+
+        const pipeline = [];
+
+        // Apply base filters first if any
+        if (Object.keys(baseMatch).length > 0) pipeline.push({ $match: baseMatch });
+
+        // Lookup user data for createdBy
+        pipeline.push({
+            $lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'createdByUser'
+            }
+        });
+        pipeline.push({ $unwind: { path: '$createdByUser', preserveNullAndEmptyArrays: true } });
+
+        // Match search OR conditions
+        pipeline.push({ $match: { $or: orMatch } });
+
+        // Sort, paginate
+        pipeline.push({ $sort: { createdAt: -1 } });
+        pipeline.push({ $skip: skip });
+        pipeline.push({ $limit: limit });
+
+        // Execute aggregation for results
+        const purchases = await ECCartPurchase.aggregate(pipeline);
+
+        // Count total matching documents (separate pipeline)
+        const countPipeline = [];
+        if (Object.keys(baseMatch).length > 0) countPipeline.push({ $match: baseMatch });
+        countPipeline.push({
+            $lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'createdByUser'
+            }
+        });
+        countPipeline.push({ $unwind: { path: '$createdByUser', preserveNullAndEmptyArrays: true } });
+        countPipeline.push({ $match: { $or: orMatch } });
+        countPipeline.push({ $count: 'total' });
+
+        const countResult = await ECCartPurchase.aggregate(countPipeline);
+        const total = countResult.length > 0 ? countResult[0].total : 0;
+
+        // Populate referenced fields for API response consistency while preserving aggregation order.
+        // Using a single find with $in does not guarantee order; fetch each id individually in original order.
+        const resultIds = purchases.map(p => p._id);
+        const populated = [];
+        if (resultIds.length > 0) {
+            for (const id of resultIds) {
+                const doc = await ECCartPurchase.findById(id)
+                    .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+                    .populate('confirmedBy', 'name')
+                    .populate('receivedBy', 'name')
+                    .populate('adminNoteBy', 'name')
+                    .populate('couponCode');
+                if (doc) populated.push(doc);
+            }
+        }
+
+        return res.status(200).json({
+            status: "success",
+            results: populated.length,
+            pagination: {
+                total,
+                page,
+                pages: Math.ceil(total / limit),
+                limit
+            },
+            data: {
+                purchases: populated
+            }
+        });
+    }
+
+    // No search — simple find with base filters
+    const purchases = await ECCartPurchase.find(baseMatch)
         .populate({ path: 'createdBy', select: "name email role phoneNumber" })
         .populate('confirmedBy', 'name')
         .populate('receivedBy', 'name')
@@ -288,8 +482,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         .skip(skip)
         .limit(limit);
 
-    // Get total count for pagination
-    const total = await ECCartPurchase.countDocuments(query);
+    const total = await ECCartPurchase.countDocuments(baseMatch);
 
     res.status(200).json({
         status: "success",
@@ -684,5 +877,102 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: 'success',
         data: stats,
+    });
+});
+
+// Get confirmed orders report with admin/moderator statistics
+exports.getConfirmedOrdersReport = catchAsync(async (req, res, next) => {
+    // Get all confirmed purchases
+    const confirmedPurchases = await ECCartPurchase.find({
+        status: 'confirmed'
+    })
+        .populate('confirmedBy', 'name email role')
+        .populate('receivedBy', 'name email role')
+        .populate('createdBy', 'name email phoneNumber')
+        .populate('couponCode', 'couponCode value')
+        .sort({ confirmedAt: -1 });
+
+    // Calculate statistics by confirmer
+    const confirmerStats = {};
+    let totalConfirmedOrders = 0;
+    let totalConfirmedRevenue = 0;
+
+    confirmedPurchases.forEach(purchase => {
+        totalConfirmedOrders++;
+        totalConfirmedRevenue += purchase.total || 0;
+
+        if (purchase.confirmedBy) {
+            const confirmerId = purchase.confirmedBy._id.toString();
+
+            if (!confirmerStats[confirmerId]) {
+                confirmerStats[confirmerId] = {
+                    admin: {
+                        id: purchase.confirmedBy._id,
+                        name: purchase.confirmedBy.name,
+                        email: purchase.confirmedBy.email,
+                        role: purchase.confirmedBy.role
+                    },
+                    totalConfirmed: 0,
+                    totalRevenue: 0,
+                    firstConfirmation: purchase.confirmedAt,
+                    lastConfirmation: purchase.confirmedAt,
+                    orders: []
+                };
+            }
+
+            confirmerStats[confirmerId].totalConfirmed++;
+            confirmerStats[confirmerId].totalRevenue += purchase.total || 0;
+
+            // Update first and last confirmation dates
+            if (new Date(purchase.confirmedAt) < new Date(confirmerStats[confirmerId].firstConfirmation)) {
+                confirmerStats[confirmerId].firstConfirmation = purchase.confirmedAt;
+            }
+            if (new Date(purchase.confirmedAt) > new Date(confirmerStats[confirmerId].lastConfirmation)) {
+                confirmerStats[confirmerId].lastConfirmation = purchase.confirmedAt;
+            }
+
+            confirmerStats[confirmerId].orders.push({
+                purchaseId: purchase._id,
+                purchaseSerial: purchase.purchaseSerial,
+                customerName: purchase.userName,
+                total: purchase.total,
+                confirmedAt: purchase.confirmedAt,
+                itemCount: purchase.items?.length || 0
+            });
+        }
+    });
+
+    // Convert to array and sort by total confirmed
+    const confirmerStatsArray = Object.values(confirmerStats).sort(
+        (a, b) => b.totalConfirmed - a.totalConfirmed
+    );
+
+    // Calculate average confirmation time (from received to confirmed)
+    const purchasesWithTimes = confirmedPurchases.filter(
+        p => p.receivedAt && p.confirmedAt
+    );
+
+    let totalConfirmationTime = 0;
+    purchasesWithTimes.forEach(purchase => {
+        const timeDiff = new Date(purchase.confirmedAt) - new Date(purchase.receivedAt);
+        totalConfirmationTime += timeDiff;
+    });
+
+    const averageConfirmationTime = purchasesWithTimes.length > 0
+        ? Math.round(totalConfirmationTime / purchasesWithTimes.length / 1000 / 60) // in minutes
+        : 0;
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            summary: {
+                totalConfirmedOrders,
+                totalConfirmedRevenue,
+                averageConfirmationTimeMinutes: averageConfirmationTime,
+                totalConfirmers: confirmerStatsArray.length
+            },
+            confirmerStats: confirmerStatsArray,
+            recentConfirmedOrders: confirmedPurchases.slice(0, 50) // Last 50 confirmed orders
+        }
     });
 });
