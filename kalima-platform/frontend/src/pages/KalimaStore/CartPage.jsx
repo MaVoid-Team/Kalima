@@ -345,7 +345,9 @@ const CartPage = () => {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
-        window.alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
+        window.alert(
+          t("success.purchaseSubmitted") || "Purchase submitted successfully!"
+        );
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         // Reset form and redirect
@@ -418,7 +420,10 @@ const CartPage = () => {
             <h3 className="text-xl font-bold mb-2">
               {t("errors.title") || "Error"}
             </h3>
-            <p className="mb-6">{t("errors.fetchCartFailed") || "Failed to load your cart. Please Log In First."}</p>
+            <p className="mb-6">
+              {t("errors.fetchCartFailed") ||
+                "Failed to load your cart. Please Log In First."}
+            </p>
             <button
               onClick={() => navigate("/market")}
               className="btn btn-primary"
@@ -850,7 +855,10 @@ const CartPage = () => {
                  cursor-pointer select-none transition-all duration-300
                  hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
                     >
-                      <span dir="ltr" className="select-all  text-white tracking-wide">
+                      <span
+                        dir="ltr"
+                        className="select-all  text-white tracking-wide"
+                      >
                         +20 106 116 5403
                       </span>
 
@@ -1013,13 +1021,19 @@ const CartPage = () => {
                               }`}
                               value={checkoutData[field.key]}
                               onChange={(e) => {
+                                const value =
+                                  field.key === "numberOnBook"
+                                    ? e.target.value.replace(/\D/g, "") 
+                                    : e.target.value;
+
                                 setCheckoutData({
                                   ...checkoutData,
-                                  [field.key]: e.target.value,
+                                  [field.key]: value,
                                 });
                                 clearFieldError(field.key);
                               }}
                             />
+
                             {validationErrors[field.key] && (
                               <label className="label">
                                 <span className="label-text-alt text-error">

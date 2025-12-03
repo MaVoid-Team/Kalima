@@ -1,21 +1,24 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import { getAllLecturers } from "../../../../routes/fetch-users"
-import { getAllLevels } from "../../../../routes/levels"
-import { getAllSubjects } from "../../../../routes/courses"
-import StudentForm from "./StudentForm"
-import ParentForm from "./ParentForm"
-import LecturerForm from "./LecturerForm"
-import AssistantForm from "./AssistantForm"
-import BulkCreateUsers from "./BulkCreateUsers"
-import TeacherForm from "./TeacherForm"
-import { getAllGovernments, getGovernmentZones } from "../../../../routes/governments"
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { getAllLecturers } from "../../../../routes/fetch-users";
+import { getAllLevels } from "../../../../routes/levels";
+import { getAllSubjects } from "../../../../routes/courses";
+import StudentForm from "./StudentForm";
+import ParentForm from "./ParentForm";
+import LecturerForm from "./LecturerForm";
+import AssistantForm from "./AssistantForm";
+import BulkCreateUsers from "./BulkCreateUsers";
+import TeacherForm from "./TeacherForm";
+import {
+  getAllGovernments,
+  getGovernmentZones,
+} from "../../../../routes/governments";
 
 const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
-  const { t, i18n } = useTranslation("createUser")
-  const isRTL = i18n.language === "ar"
+  const { t, i18n } = useTranslation("createUser");
+  const isRTL = i18n.language === "ar";
 
   const initialUserState = {
     role: "student",
@@ -44,172 +47,198 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     centers: [],
     socialMedia: [],
     profilePic: null,
-  }
+  };
 
-  const [userData, setUserData] = useState(initialUserState)
-  const [formError, setFormError] = useState("")
-  const [isBulkMode, setIsBulkMode] = useState(false)
-  const [levels, setLevels] = useState([])
-  const [subjects, setSubjects] = useState([])
-  const [lecturers, setLecturers] = useState([])
-  const [loadingDropdowns, setLoadingDropdowns] = useState(false)
-  const [governments, setGovernments] = useState([])
-  const [administrationZones, setAdministrationZones] = useState([])
-  const [loadingZones, setLoadingZones] = useState(false)
+  const [userData, setUserData] = useState(initialUserState);
+  const [formError, setFormError] = useState("");
+  const [isBulkMode, setIsBulkMode] = useState(false);
+  const [levels, setLevels] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [lecturers, setLecturers] = useState([]);
+  const [loadingDropdowns, setLoadingDropdowns] = useState(false);
+  const [governments, setGovernments] = useState([]);
+  const [administrationZones, setAdministrationZones] = useState([]);
+  const [loadingZones, setLoadingZones] = useState(false);
+  const [selectedSubjects, setSelectedSubjects] = useState(
+    userData.subject || []
+  );
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setUserData(initialUserState)
-      setFormError("")
-      setIsBulkMode(false)
-      fetchDropdownData()
+      setUserData(initialUserState);
+      setFormError("");
+      setIsBulkMode(false);
+      fetchDropdownData();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Fetch data for dropdowns
   const fetchDropdownData = async () => {
-    setLoadingDropdowns(true)
+    setLoadingDropdowns(true);
     try {
       // Fetch governments
-      const governmentsResult = await getAllGovernments()
+      const governmentsResult = await getAllGovernments();
       if (governmentsResult.success) {
-        setGovernments(governmentsResult.data || [])
+        setGovernments(governmentsResult.data || []);
       } else {
-        console.error("Failed to fetch governments:", governmentsResult.error)
+        console.error("Failed to fetch governments:", governmentsResult.error);
       }
 
-      const levelsResult = await getAllLevels()
+      const levelsResult = await getAllLevels();
       if (levelsResult.success) {
-        setLevels(levelsResult.data || [])
+        setLevels(levelsResult.data || []);
       } else {
-        console.error("Failed to fetch levels:", levelsResult.error)
+        console.error("Failed to fetch levels:", levelsResult.error);
       }
 
-      const subjectsResult = await getAllSubjects()
+      const subjectsResult = await getAllSubjects();
       if (subjectsResult.success) {
-        setSubjects(subjectsResult.data || [])
+        setSubjects(subjectsResult.data || []);
       } else {
-        console.error("Failed to fetch subjects:", subjectsResult.error)
+        console.error("Failed to fetch subjects:", subjectsResult.error);
       }
 
-      const lecturersResult = await getAllLecturers()
+      const lecturersResult = await getAllLecturers();
       if (lecturersResult.success) {
-        setLecturers(lecturersResult.data || [])
+        setLecturers(lecturersResult.data || []);
       } else {
-        console.error("Failed to fetch lecturers:", lecturersResult.error)
+        console.error("Failed to fetch lecturers:", lecturersResult.error);
       }
     } catch (error) {
-      setFormError(t("errors.failedToLoadDropdowns"))
-      console.error("Error fetching dropdown data:", error)
+      setFormError(t("errors.failedToLoadDropdowns"));
+      console.error("Error fetching dropdown data:", error);
     } finally {
-      setLoadingDropdowns(false)
+      setLoadingDropdowns(false);
     }
-  }
+  };
 
   // Display error from parent component
   useEffect(() => {
     if (error) {
-      setFormError(typeof error === "string" ? error : error.message || t("errors.failedToCreateUser"))
+      setFormError(
+        typeof error === "string"
+          ? error
+          : error.message || t("errors.failedToCreateUser")
+      );
     }
-  }, [error, t])
+  }, [error, t]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setUserData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setUserData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const validateForm = () => {
     // Email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(userData.email)) {
-      return t("validation.invalidEmail")
+      return t("validation.invalidEmail");
     }
 
     // Password match and length
     if (userData.password !== userData.confirmPassword) {
-      return t("validation.passwordsDoNotMatch")
+      return t("validation.passwordsDoNotMatch");
     }
 
     if (userData.password.length < 6) {
-      return t("validation.passwordTooShort")
+      return t("validation.passwordTooShort");
     }
 
     // Role-specific validations
     if (userData.role === "student") {
       if (!userData.level) {
-        return t("validation.levelRequired")
+        return t("validation.levelRequired");
       }
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return t("validation.invalidPhoneNumber")
+        return t("validation.invalidPhoneNumber");
       }
     }
 
     if (userData.role === "parent") {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return t("validation.invalidPhoneNumber")
+        return t("validation.invalidPhoneNumber");
       }
     }
 
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
-        return t("validation.subjectsRequired")
+        return t("validation.subjectsRequired");
       }
     }
 
     if (userData.role === "assistant") {
       if (!userData.assignedLecturer) {
-        return t("validation.lecturerRequired")
+        return t("validation.lecturerRequired");
       }
     }
 
     if (userData.role === "Teacher") {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return t("validation.invalidPhoneNumber")
+        return t("validation.invalidPhoneNumber");
       }
       if (!userData.subject) {
-        return t("validation.subjectRequired")
+        return t("validation.subjectRequired");
       }
       if (!userData.level || userData.level.length === 0) {
-        return t("validation.levelRequired")
+        return t("validation.levelRequired");
       }
       if (!userData.teachesAtType) {
-        return t("validation.teachesAtTypeRequired")
+        return t("validation.teachesAtTypeRequired");
       }
       if (
-        (userData.teachesAtType === "Both" || userData.teachesAtType === "Center") &&
+        (userData.teachesAtType === "Both" ||
+          userData.teachesAtType === "Center") &&
         (!userData.centers || userData.centers.length === 0)
       ) {
-        return t("validation.centersRequired")
+        return t("validation.centersRequired");
       }
-      if ((userData.teachesAtType === "Both" || userData.teachesAtType === "School") && !userData.school) {
-        return t("validation.schoolRequired")
+      if (
+        (userData.teachesAtType === "Both" ||
+          userData.teachesAtType === "School") &&
+        !userData.school
+      ) {
+        return t("validation.schoolRequired");
       }
       if (!userData.government) {
-        return t("validation.governmentRequired")
+        return t("validation.governmentRequired");
       }
       if (!userData.administrationZone) {
-        return t("validation.administrationZoneRequired")
+        return t("validation.administrationZoneRequired");
       }
     }
 
-    return ""
-  }
+    return "";
+  };
+
+  const toEnglishDigits = (str) =>
+    str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
+
+  const handlePhoneInputChange = (e) => {
+    const { name, value } = e.target;
+    const cleanedValue = toEnglishDigits(value);
+    handleChange({ target: { name, value: cleanedValue } });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setFormError("")
+    e.preventDefault();
+    setFormError("");
 
-    const validationError = validateForm()
+    const validationError = validateForm();
     if (validationError) {
-      setFormError(validationError)
-      return
+      setFormError(validationError);
+      return;
     }
 
-    const filteredData = filterDataByRole(userData)
+    const filteredData = filterDataByRole(userData);
 
-    onCreateUser(filteredData)
-  }
+    onCreateUser(filteredData);
+  };
+
+  const handleGovernmentSelect = (e) => {
+    const governmentName = e.target.value;
+    handleGovernmentChange(governmentName);
+  };
 
   const filterDataByRole = (data) => {
     const commonFields = {
@@ -219,7 +248,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       password: data.password,
       confirmPassword: data.confirmPassword,
       gender: data.gender,
-    }
+    };
 
     switch (data.role) {
       case "student":
@@ -229,13 +258,14 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           phoneNumber: data.phoneNumber || undefined,
           sequencedId: data.sequencedId || undefined,
           parentPhoneNumber: data.parentPhoneNumber || undefined,
-          hobbies: data.hobbies && data.hobbies.length > 0 ? data.hobbies : undefined,
+          hobbies:
+            data.hobbies && data.hobbies.length > 0 ? data.hobbies : undefined,
           faction: data.faction || undefined,
           school: data.school || undefined,
           parent: data.parent || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
-        }
+        };
 
       case "parent":
         return {
@@ -243,7 +273,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           phoneNumber: data.phoneNumber || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
-        }
+        };
 
       case "lecturer":
         return {
@@ -254,13 +284,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
           profilePic: data.profilePic || undefined,
-        }
+        };
 
       case "assistant":
         return {
           ...commonFields,
           assignedLecturer: data.assignedLecturer || undefined,
-        }
+        };
 
       case "Teacher":
         return {
@@ -268,64 +298,98 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           phoneNumber: data.phoneNumber || undefined,
           phoneNumber2: data.phoneNumber2 || undefined,
           subject: data.subject || undefined,
-          level: Array.isArray(data.level) ? data.level : data.level ? [data.level] : [],
+          level: Array.isArray(data.level)
+            ? data.level
+            : data.level
+            ? [data.level]
+            : [],
           teachesAtType: data.teachesAtType || undefined,
-          centers: Array.isArray(data.centers) ? data.centers : data.centers ? [data.centers] : [],
+          centers: Array.isArray(data.centers)
+            ? data.centers
+            : data.centers
+            ? [data.centers]
+            : [],
           school: data.school || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
           socialMedia: Array.isArray(data.socialMedia) ? data.socialMedia : [],
-        }
+        };
 
       case "subadmin":
       case "moderator":
-        return commonFields
+        return commonFields;
 
       default:
-        return commonFields
+        return commonFields;
     }
-  }
+  };
+
+  const handleSubjectSelect = (e) => {
+    const subjectId = e.target.value;
+    if (!subjectId) return;
+
+    if (!selectedSubjects.includes(subjectId)) {
+      const newSubjects = [...selectedSubjects, subjectId];
+      setSelectedSubjects(newSubjects);
+
+      // Always update as array
+      handleChange({ target: { name: "subject", value: newSubjects } });
+    }
+  };
+
+  const getSubjectNameById = (id) => {
+    const subject = subjects.find((s) => s._id === id);
+    return subject ? subject.name : id;
+  };
 
   const handleGovernmentChange = async (governmentName) => {
     setUserData((prev) => ({
       ...prev,
       government: governmentName,
       administrationZone: "", // Reset zone when government changes
-    }))
+    }));
 
     if (governmentName) {
-      setLoadingZones(true)
+      setLoadingZones(true);
       try {
-        const zonesResult = await getGovernmentZones(governmentName)
+        const zonesResult = await getGovernmentZones(governmentName);
         if (zonesResult.success) {
-          setAdministrationZones(zonesResult.data || [])
+          setAdministrationZones(zonesResult.data || []);
         } else {
-          console.error("Failed to fetch zones:", zonesResult.error)
-          setAdministrationZones([])
+          console.error("Failed to fetch zones:", zonesResult.error);
+          setAdministrationZones([]);
         }
       } catch (error) {
-        console.error("Error fetching zones:", error)
-        setAdministrationZones([])
+        console.error("Error fetching zones:", error);
+        setAdministrationZones([]);
       } finally {
-        setLoadingZones(false)
+        setLoadingZones(false);
       }
     } else {
-      setAdministrationZones([])
+      setAdministrationZones([]);
     }
-  }
+  };
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="modal modal-open" dir={isRTL ? "rtl" : "ltr"}>
       <div className="modal-box max-w-2xl">
-        <h3 className="font-bold text-xl mb-4">{isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}</h3>
+        <h3 className="font-bold text-xl mb-4">
+          {isBulkMode ? t("titles.bulkCreate") : t("titles.createNewUser")}
+        </h3>
 
         <div className="tabs tabs-border mb-4">
-          <button className={`tab ${!isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(false)}>
+          <button
+            className={`tab ${!isBulkMode ? "tab-active" : ""}`}
+            onClick={() => setIsBulkMode(false)}
+          >
             {t("tabs.createSingleUser")}
           </button>
-          <button className={`tab ${isBulkMode ? "tab-active" : ""}`} onClick={() => setIsBulkMode(true)}>
+          <button
+            className={`tab ${isBulkMode ? "tab-active" : ""}`}
+            onClick={() => setIsBulkMode(true)}
+          >
             {t("tabs.bulkCreate")}
           </button>
         </div>
@@ -348,7 +412,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">{t("fields.accountType")}</span>
+                    <span className="label-text">
+                      {t("fields.accountType")}
+                    </span>
                   </label>
                   <select
                     name="role"
@@ -370,58 +436,40 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                   </select>
                 </div>
               </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="form-control">
+                <div className="flex flex-col gap-2">
+                  <label className="label">
+                    <span className="label-text">{t("fields.name")}</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    className="input input-bordered "
+                    value={userData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
 
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">{t("fields.gender")}</span>
+                    <span className="label-text">{t("fields.email")}</span>
                   </label>
-                  <select
-                    name="gender"
-                    className="select select-bordered"
-                    value={userData.gender}
+                  <input
+                    type="email"
+                    name="email"
+                    className="input input-bordered"
+                    value={userData.email}
                     onChange={handleChange}
                     required
-                  >
-                    <option value="male">{t("gender.male")}</option>
-                    <option value="female">{t("gender.female")}</option>
-                  </select>
+                  />
                 </div>
               </div>
             </div>
-
-            <div className="form-control">
-              <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">{t("fields.name")}</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  className="input input-bordered"
-                  value={userData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-control">
-              <div className="flex flex-col gap-2">
-                <label className="label">
-                  <span className="label-text">{t("fields.email")}</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  className="input input-bordered"
-                  value={userData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <div className="flex flex-col gap-2">
@@ -442,7 +490,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <div className="form-control">
                 <div className="flex flex-col gap-2">
                   <label className="label">
-                    <span className="label-text">{t("fields.confirmPassword")}</span>
+                    <span className="label-text">
+                      {t("fields.confirmPassword")}
+                    </span>
                   </label>
                   <input
                     type="password"
@@ -453,6 +503,160 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Phone Numbers */}
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <div className="form-control">
+                  <div className="flex flex-col gap-2">
+                    <label className="label">
+                      <span className="label-text">
+                        {t("fields.phoneNumber") || "Phone Number"}
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      name="phoneNumber"
+                      className="input input-bordered"
+                      value={userData.phoneNumber || ""}
+                      onChange={handlePhoneInputChange}
+                      placeholder={
+                        t("placeholders.phoneNumber") || "Enter phone number"
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-control">
+                <div className="flex flex-col gap-2">
+                  <label className="label">
+                    <span className="label-text">{t("fields.gender")}</span>
+                  </label>
+                  <select
+                    name="gender"
+                    className="select select-bordered"
+                    value={userData.gender}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="male">{t("gender.male")}</option>
+                    <option value="female">{t("gender.female")}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Subjects Selection */}
+              <div className="form-control w-full">
+                <label className="label">
+                  <span className="label-text">{t("fields.subjects")}</span>
+                </label>
+
+                {/* Subject Dropdown */}
+                <select
+                  className="select select-bordered w-full"
+                  onChange={handleSubjectSelect}
+                  value=""
+                >
+                  <option value="">{t("placeholders.selectSubject")}</option>
+                  {subjects.map((subject) => (
+                    <option
+                      key={subject._id}
+                      value={subject._id}
+                      disabled={selectedSubjects.includes(subject._id)}
+                    >
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Selected subjects as badges */}
+                {selectedSubjects.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {selectedSubjects.map((subjectId) => (
+                      <div
+                        key={subjectId}
+                        className="badge badge-secondary gap-1"
+                      >
+                        {getSubjectNameById(subjectId)}
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs"
+                          onClick={() => removeSubject(subjectId)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Government */}
+              <div className="form-control w-full ">
+                <label className="label">
+                  <span className="label-text">
+                    {t("fields.government") || "Government"}
+                  </span>
+                </label>
+
+                <select
+                  name="government"
+                  className="select select-bordered w-full"
+                  value={userData.government || ""}
+                  onChange={handleGovernmentSelect}
+                >
+                  <option value="">
+                    {t("fields.selectGovernment") || "Select Government"}
+                  </option>
+                  {governments.map((government) => (
+                    <option key={government._id} value={government.name}>
+                      {government.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Administration Zone */}
+              <div className="form-control w-full mt-4">
+                <label className="label">
+                  <span className="label-text">
+                    {t("fields.administrationZone") || "Administration Zone"}
+                  </span>
+                </label>
+
+                <select
+                  disabled={!userData.government || loadingZones}
+                  name="administrationZone"
+                  className="select select-bordered w-full"
+                  value={userData.administrationZone || ""}
+                  onChange={handleChange}
+                >
+                  <option value="">
+                    {loadingZones
+                      ? t("fields.loadingZones") || "Loading zones..."
+                      : t("fields.selectAdministrationZone") ||
+                        "Select Administration Zone"}
+                  </option>
+
+                  {administrationZones.map((zone, index) => (
+                    <option key={index} value={zone}>
+                      {zone}
+                    </option>
+                  ))}
+                </select>
+
+                {loadingZones && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="loading loading-spinner loading-xs"></span>
+                    <span className="text-xs text-gray-500">
+                      {t("fields.loadingZones") ||
+                        "Loading administration zones..."}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -526,7 +730,11 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
               <button type="button" className="btn" onClick={onClose}>
                 {t("buttons.cancel")}
               </button>
-              <button type="submit" className="btn btn-primary" disabled={loadingDropdowns}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loadingDropdowns}
+              >
                 {t("buttons.create")}
               </button>
             </div>
@@ -534,7 +742,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateUserModal
+export default CreateUserModal;

@@ -10,7 +10,6 @@ import { getAllSubjects } from "../../routes/courses";
 export default function Step1({
   formData,
   handleInputChange,
-  t,
   errors,
   role,
   gradeLevels,
@@ -21,7 +20,7 @@ export default function Step1({
   const [administrationZones, setAdministrationZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { i18n } = useTranslation();
+  const { t,i18n } = useTranslation("register");
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -420,7 +419,7 @@ export default function Step1({
         </div>
       </div>
 
-      {/* Student-specific fields */}
+      {/* Student-specific fields
       {role === "student" && (
         <>
           <div className="form-control relative pb-5">
@@ -452,7 +451,7 @@ export default function Step1({
             </div>
           </div>
         </>
-      )}
+      )} */}
     </div>
   );
 }
