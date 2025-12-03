@@ -89,50 +89,50 @@ const Orders = () => {
   }, [searchQuery, debouncedSearchQuery, currentPage]);
 
   const fetchOrders = useCallback(async () => {
-  try {
-    setLoading(true);
-    setError(null);
-    const queryParams = {
-      page: currentPage,
-    };
-    if (debouncedSearchQuery.trim()) {
-      queryParams.search = debouncedSearchQuery.trim();
-    }
-    if (statusFilter !== "all") {
-      // Fix: Properly handle all status filters
-      if (statusFilter === "confirmed") {
-        queryParams.status = "confirmed";
-      } else if (statusFilter === "received") {
-        queryParams.status = "received";
-      } else if (statusFilter === "pending") {
-        queryParams.status = "pending";
+    try {
+      setLoading(true);
+      setError(null);
+      const queryParams = {
+        page: currentPage,
+      };
+      if (debouncedSearchQuery.trim()) {
+        queryParams.search = debouncedSearchQuery.trim();
       }
-    }
-    // Add date filter to query params
-    if (selectedDate) {
-      queryParams.date = selectedDate;
-    }
+      if (statusFilter !== "all") {
+        // Fix: Properly handle all status filters
+        if (statusFilter === "confirmed") {
+          queryParams.status = "confirmed";
+        } else if (statusFilter === "received") {
+          queryParams.status = "received";
+        } else if (statusFilter === "pending") {
+          queryParams.status = "pending";
+        }
+      }
+      // Add date filter to query params
+      if (selectedDate) {
+        queryParams.date = selectedDate;
+      }
 
       const response = await getAllProductPurchases(queryParams);
-    if (response.success) {
-      let purchases = response.data.cartPurchases || [];
+      if (response.success) {
+        let purchases = response.data.cartPurchases || [];
 
-      if (typeFilter !== "all") {
-        purchases = purchases.filter((purchase) => {
-          const itemTypes =
-            purchase.items?.map((item) => item.productType) || [];
-          if (typeFilter === "book") {
-            return itemTypes.some((type) => type === "ECBook");
-          } else if (typeFilter === "product") {
-            return itemTypes.some((type) => type === "ECProduct");
-          }
-          return true;
-        });
-      }
+        if (typeFilter !== "all") {
+          purchases = purchases.filter((purchase) => {
+            const itemTypes =
+              purchase.items?.map((item) => item.productType) || [];
+            if (typeFilter === "book") {
+              return itemTypes.some((type) => type === "ECBook");
+            } else if (typeFilter === "product") {
+              return itemTypes.some((type) => type === "ECProduct");
+            }
+            return true;
+          });
+        }
 
-         setOrders(purchases);
-      setTotalPages(response.data.totalPages || 1);
-      setTotalPurchases(response.data.totalPurchases || purchases.length);
+        setOrders(purchases);
+        setTotalPages(response.data.totalPages || 1);
+        setTotalPurchases(response.data.totalPurchases || purchases.length);
 
         const allPurchases = purchases;
         const confirmed = allPurchases.filter(
@@ -164,22 +164,22 @@ const Orders = () => {
           books: books,
         });
       } else {
-      throw new Error(response.error);
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching orders:", err);
+    } finally {
+      setLoading(false);
+      setIsInitialLoad(false);
     }
-  } catch (err) {
-    setError(err.message);
-    console.error("Error fetching orders:", err);
-  } finally {
-    setLoading(false);
-    setIsInitialLoad(false);
-  }
-}, [
-  currentPage,
-  statusFilter,
-  typeFilter,
-  debouncedSearchQuery,
-  selectedDate,
-]);
+  }, [
+    currentPage,
+    statusFilter,
+    typeFilter,
+    debouncedSearchQuery,
+    selectedDate,
+  ]);
 
   const fetchAllOrders = useCallback(async () => {
     try {
@@ -496,6 +496,15 @@ const Orders = () => {
     }
   };
 
+  const groupedItems = selectedOrder?.items
+    ? selectedOrder.items.reduce((acc, item) => {
+        const title = item.productSnapshot?.title || item.productName;
+        if (!acc[title]) acc[title] = [];
+        acc[title].push(item);
+        return acc;
+      }, {})
+    : {};
+
   const handleExport = async (type, scope) => {
     setExporting(true);
     try {
@@ -521,8 +530,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-                ? t("table.received")
-                : t("table.pending"),
+              ? t("table.received")
+              : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -569,8 +578,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-                ? t("table.received")
-                : t("table.pending"),
+              ? t("table.received")
+              : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -595,11 +604,11 @@ const Orders = () => {
             ...rest,
             items: items
               ? items.map(({ product, ...itemProps }) => ({
-                // Optionally clean up item.product if it's too verbose
-                ...itemProps,
-                productName:
-                  product?.title || itemProps.productName || "Unknown", // Ensure product name is present
-              }))
+                  // Optionally clean up item.product if it's too verbose
+                  ...itemProps,
+                  productName:
+                    product?.title || itemProps.productName || "Unknown", // Ensure product name is present
+                }))
               : [],
           };
         });
@@ -620,7 +629,7 @@ const Orders = () => {
       console.error("Error exporting orders:", err);
       alert(
         (t("alerts.exportFailed") || "Export failed") +
-        (err?.message ? `: ${err.message}` : "")
+          (err?.message ? `: ${err.message}` : "")
       );
     } finally {
       setExporting(false);
@@ -1038,9 +1047,9 @@ const Orders = () => {
                     {/* Adjusted colSpan */}
                     <p className="text-gray-500">
                       {searchQuery ||
-                        statusFilter !== "all" ||
-                        typeFilter !== "all" ||
-                        selectedDate
+                      statusFilter !== "all" ||
+                      typeFilter !== "all" ||
+                      selectedDate
                         ? t("noOrdersFound")
                         : t("noOrdersAvailable")}
                     </p>
@@ -1096,8 +1105,11 @@ const Orders = () => {
                       {order.status !== "confirmed" ? (
                         <div className="flex flex-col items-center gap-1">
                           <div
-                            className={`badge ${order.status === "received" ? "badge-error" : "badge-info"
-                              }`}
+                            className={`badge ${
+                              order.status === "received"
+                                ? "badge-error"
+                                : "badge-info"
+                            }`}
                           >
                             {order.status === "received"
                               ? t("table.received")
@@ -1171,8 +1183,9 @@ const Orders = () => {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-blue-600" : "text-gray-400"
-                            }`}
+                          className={`btn btn-ghost btn-sm relative ${
+                            order.adminNotes ? "text-blue-600" : "text-gray-400"
+                          }`}
                           onClick={() => openNotesModal(order)}
                           title={
                             order.adminNotes
@@ -1200,18 +1213,21 @@ const Orders = () => {
                         )}
                         {(order.numberTransferredFrom ||
                           order.bankTransferFrom) && (
-                            <button
-                              className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
-                              onClick={() => handleWhatsAppContact(order)}
-                              title={t("table.contactWhatsApp")}
-                            >
-                              <FaWhatsapp />
-                            </button>
-                          )}
+                          <button
+                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
+                            onClick={() => handleWhatsAppContact(order)}
+                            title={t("table.contactWhatsApp")}
+                          >
+                            <FaWhatsapp />
+                          </button>
+                        )}
                         {order.status !== "confirmed" && (
                           <button
-                            className={`btn btn-sm ${order.status === "pending" ? "btn-error" : "btn-success"
-                              }`}
+                            className={`btn btn-sm ${
+                              order.status === "pending"
+                                ? "btn-error"
+                                : "btn-success"
+                            }`}
                             onClick={() => handleConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
                             title={
@@ -1299,8 +1315,9 @@ const Orders = () => {
               return (
                 <button
                   key={pageToShow}
-                  className={`join-item btn ${currentPage === pageToShow ? "btn-primary" : ""
-                    }`}
+                  className={`join-item btn ${
+                    currentPage === pageToShow ? "btn-primary" : ""
+                  }`}
                   onClick={() => handlePageChange(pageToShow)}
                   disabled={loading}
                 >
@@ -1471,7 +1488,6 @@ const Orders = () => {
                 </div>
               </div>
 
-              
               <div>
                 <label className="label">
                   <span className="label-text font-medium flex items-center gap-2">
@@ -1497,51 +1513,66 @@ const Orders = () => {
                     </span>
                   </label>
                   <div className="bg-base-200 p-3 rounded space-y-3">
-                    {selectedOrder.items.map((item, idx) => (
-                      <div key={idx} className="border-b pb-2 last:border-b-0">
+                    {Object.entries(groupedItems).map(([title, items], idx) => (
+                      <div key={idx} className="border-b pb-3 last:border-b-0">
+                        {/* عنوان الكتاب */}
                         <div className="flex justify-between items-start">
                           <div>
                             <p>
-                              <strong>
-                                {item.productSnapshot?.title ||
-                                  item.productName}
-                                :
-                              </strong>
+                              <strong>{title}</strong>
                             </p>
+
+                            {/* عرض Type */}
                             <p className="text-sm opacity-75">
-                              Type: {item.productType || "Product"}
+                              Type: {items[0].productType}
                             </p>
-                            {item.quantity && (
-                              <p className="text-sm">Qty: {item.quantity}</p>
-                            )}
+
+                            <p className="text-sm">
+                             
+                           عدد الطلبات
+                           :{items.length}
+                            </p>
                           </div>
+
+                          {/* السعر */}
                           <p className="font-bold">
-                            {formatPrice(item.priceAtPurchase)}
+                            {formatPrice(
+                              items.reduce(
+                                (sum, it) =>
+                                  sum + it.priceAtPurchase * (it.quantity || 1),
+                                0
+                              )
+                            )}
                           </p>
                         </div>
-                        {item.productType === "ECBook" && (
+
+                        {/* 📚 Book Info – تظهر مرة واحدة فقط */}
+                        {items[0].productType === "ECBook" && (
                           <div className="mt-2 ml-4 border-l-2 border-primary pl-2 text-sm">
                             <label className="label">
                               <span className="label-text font-medium text-xs">
                                 {t("table.bookInfo")}
                               </span>
                             </label>
-                            {item.nameOnBook && (
+
+                            {items[0].nameOnBook && (
                               <p>
                                 <strong>{t("table.nameOnBook")}:</strong>{" "}
-                                {item.nameOnBook}
+                                {items[0].nameOnBook}
                               </p>
                             )}
-                            {item.numberOnBook && (
+
+                            {items[0].numberOnBook && (
                               <p>
                                 <strong>{t("table.numberOnBook")}:</strong>{" "}
-                                {item.numberOnBook}
+                                {items[0].numberOnBook}
                               </p>
                             )}
-                            {item.seriesName && (
+
+                            {items[0].seriesName && (
                               <p>
                                 <strong>{t("table.seriesName")}:</strong>{" "}
-                                {item.seriesName}
+                                {items[0].seriesName}
                               </p>
                             )}
                           </div>
@@ -1551,8 +1582,6 @@ const Orders = () => {
                   </div>
                 </div>
               )}
-
-              
 
               <div>
                 <label className="label">
