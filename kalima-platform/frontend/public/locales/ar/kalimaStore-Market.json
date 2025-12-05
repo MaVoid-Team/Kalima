@@ -16,7 +16,9 @@
     "viewDetails": "عرض التفاصيل",
     "addToCart": "إضافة للسلة",
     "purchased": "تم الشراء",
-    "new": "جديد"
+    "new": "جديد",
+    "itemAdded": "تمت الإضافة إلى السلة",
+    "itemExists": "المنتج موجود بالفعل في السلة"
   },
   "sections": {
     "Designs": "تصاميم",
