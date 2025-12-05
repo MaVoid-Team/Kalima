@@ -476,7 +476,10 @@ const CartPage = () => {
             <h3 className="text-xl font-bold mb-2">
               {t("errors.title") || "Error"}
             </h3>
-            <p className="mb-6">{t("errors.fetchCartFailed") || "Failed to load your cart. Please Log In First."}</p>
+            <p className="mb-6">
+              {t("errors.fetchCartFailed") ||
+                "Failed to load your cart. Please Log In First."}
+            </p>
             <button
               onClick={() => navigate("/market")}
               className="btn btn-primary"
@@ -1076,13 +1079,19 @@ const CartPage = () => {
                               }`}
                               value={checkoutData[field.key]}
                               onChange={(e) => {
+                                const value =
+                                  field.key === "numberOnBook"
+                                    ? e.target.value.replace(/\D/g, "") 
+                                    : e.target.value;
+
                                 setCheckoutData({
                                   ...checkoutData,
-                                  [field.key]: e.target.value,
+                                  [field.key]: value,
                                 });
                                 clearFieldError(field.key);
                               }}
                             />
+
                             {validationErrors[field.key] && (
                               <label className="label">
                                 <span className="label-text-alt text-error">

@@ -44,62 +44,7 @@ const ParentForm = ({
         </div>
       </div>
 
-      {/* Government Selection */}
-      <div className="form-control">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.government") || "Government"}</span>
-          </label>
-          <select
-            name="government"
-            className="select select-bordered w-2/3 lg:w-1/2"
-            value={userData.government || ""}
-            onChange={handleGovernmentSelect}
-          >
-            <option value="">{t("fields.selectGovernment") || "Select Government"}</option>
-            {governments.map((government) => (
-              <option key={government._id} value={government.name}>
-                {government.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Administration Zone Selection - Only show if government is selected */}
-      <div className="form-control">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">{t("fields.administrationZone") || "Administration Zone"}</span>
-          </label>
-          <select
-            disabled={!userData.government || loadingZones}
-            name="administrationZone"
-            className="select select-bordered w-2/3 lg:w-1/2"
-            value={userData.administrationZone || ""}
-            onChange={handleChange}
-          >
-            <option value="">
-              {loadingZones
-                ? t("fields.loadingZones") || "Loading zones..."
-                : t("fields.selectAdministrationZone") || "Select Administration Zone"}
-            </option>
-            {administrationZones.map((zone, index) => (
-              <option key={index} value={zone}>
-                {zone}
-              </option>
-            ))}
-          </select>
-          {loadingZones && (
-            <div className="flex items-center gap-2 mt-1">
-              <span className="loading loading-spinner loading-xs"></span>
-              <span className="text-xs text-gray-500">
-                {t("fields.loadingZones") || "Loading administration zones..."}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+     
     </div>
   )
 }
