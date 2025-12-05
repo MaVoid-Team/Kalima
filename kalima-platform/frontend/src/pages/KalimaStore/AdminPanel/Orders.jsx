@@ -1229,7 +1229,7 @@ const Orders = () => {
                             <ImageIcon className="w-3 h-3" />
                           </button>
                         )}
-                        {(order.numberTransferredFrom ||
+                        {(order.createdBy?.phoneNumber ||
                           order.bankTransferFrom) && (
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
