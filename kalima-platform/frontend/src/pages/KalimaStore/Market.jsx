@@ -430,7 +430,7 @@ const Market = () => {
                 )}
                 {/*comment for re-commit*/}
                 {/* Discount Badge */}
-                {item.discountPercentage && item.discountPercentage > 0 && (
+                {item.discountPercentage > 0 && (
                   <div
                     className={`absolute top-4 ${
                       isRTL ? "right-4" : "left-4"
