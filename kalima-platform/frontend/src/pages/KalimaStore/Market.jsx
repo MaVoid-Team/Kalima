@@ -8,7 +8,7 @@ import {
   getAllProducts,
   getAllSubSections,
 } from "../../routes/market";
-import { addToCart } from "../../routes/cart";
+import { addToCart, getUserPurchasedProducts } from "../../routes/cart";
 import { isLoggedIn } from "../../routes/auth-services";
 import { ShoppingCart } from "lucide-react";
 
@@ -28,6 +28,7 @@ const Market = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
   const [addingToCart, setAddingToCart] = useState({});
+  const [purchasedProductIds, setPurchasedProductIds] = useState([]);
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null;
@@ -98,6 +99,14 @@ const Market = () => {
           setSubSections(subSectionsResponse.data.subsections);
         }
 
+        // Fetch user's purchased products if logged in
+        if (isLoggedIn()) {
+          const purchasedResult = await getUserPurchasedProducts();
+          if (purchasedResult.success) {
+            setPurchasedProductIds(purchasedResult.productIds);
+          }
+        }
+
         // Fetch ONLY products (removed books fetching)
         const productsResponse = await getAllProducts();
 
@@ -135,6 +144,18 @@ const Market = () => {
       alert(t("errors.loginRequired") || "Please login to add items to cart");
       navigate("/login");
       return;
+    }
+
+    // Check if product was already purchased
+    const isPurchased = purchasedProductIds.includes(productId);
+    if (isPurchased) {
+      const confirmMessage = isRTL
+        ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
+        : "You have already purchased this product. Do you want to buy it again?";
+      
+      if (!window.confirm(confirmMessage)) {
+        return; // User cancelled
+      }
     }
 
     try {
@@ -366,42 +387,83 @@ const Market = () => {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedItems.map((item) => (
-            <div
-              key={item._id}
-              className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
-            >
-              {/* Discount Badge */}
+          {paginatedItems.map((item) => {
+            const isPurchased = purchasedProductIds.includes(item._id);
+            
+            return (
               <div
-                className={`absolute top-4 ${isRTL ? "right-4" : "left-4"} z-10 ${item.discountPercentage && item.discountPercentage > 0 ? "opacity-100 visible" : "opacity-0 invisible"
-                  } transition-opacity duration-300`}
+                key={item._id}
+                className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
               >
-                <div
-                  className={`bg-primary px-3 py-1 ${isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
-                    } text-sm font-medium`}
-                >
-                  {t("product.discounts")}
-                  <br />
-                  <span className="text-lg font-bold">
-                    {item.discountPercentage ? item.discountPercentage + "%" : ""}
-                  </span>
-                </div>
-              </div>
-              {item.isNew && (
-                <div
-                  className={`absolute top-4 ${
-                    isRTL ? "left-4" : "right-4"
-                  } z-10`}
-                >
+                {/* Already Purchased Ribbon */}
+                {isPurchased && (
                   <div
-                    className={`bg-secondary px-3 py-1 ${
-                      isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
-                    } text-sm font-medium`}
+                    className={`absolute top-0 ${
+                      isRTL ? "left-0" : "right-0"
+                    } z-20`}
                   >
-                    {t("product.new") || "NEW"}
+                    <div
+                      className={`bg-success text-success-content px-4 py-2 shadow-lg ${
+                        isRTL
+                          ? "rounded-br-2xl rounded-bl-none"
+                          : "rounded-bl-2xl rounded-br-none"
+                      } text-xs font-bold flex items-center gap-1`}
+                      style={{
+                        transform: isRTL ? "none" : "none",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {t("product.purchased") || "PURCHASED"}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Discount Badge */}
+                {item.discountPercentage && item.discountPercentage > 0 && (
+                  <div
+                    className={`absolute top-4 ${
+                      isRTL ? "right-4" : "left-4"
+                    } z-10`}
+                  >
+                    <div
+                      className={`bg-primary px-3 py-1 ${
+                        isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
+                      } text-sm font-medium`}
+                    >
+                      {t("product.discounts")}
+                      <br />
+                      <span className="text-lg font-bold">
+                        {item.discountPercentage}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {item.isNew && !isPurchased && (
+                  <div
+                    className={`absolute top-4 ${
+                      isRTL ? "left-4" : "right-4"
+                    } z-10`}
+                  >
+                    <div
+                      className={`bg-secondary px-3 py-1 ${
+                        isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium`}
+                    >
+                      {t("product.new") || "NEW"}
+                    </div>
+                  </div>
+                )}
               <figure className="px-4 pt-4">
                 <img
                   src={
@@ -466,7 +528,8 @@ const Market = () => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Empty State */}

@@ -7,6 +7,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaTimes,
+  FaFileInvoice,
   FaChevronRight,
   FaChevronLeft,
   FaUserAlt,
@@ -139,6 +140,12 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         title: t('auditLog') || 'Audit Log',
         icon: <MdDashboard className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/audit-log'
+      },
+      {
+        id: 'confirmed-orders-report',
+        title: t('ConfirmedOrdersReport') || 'Confirmed Orders Report',
+        icon: <FaFileInvoice className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/confirmed-orders-report'
       },
       {
         id: 'create',
