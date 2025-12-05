@@ -188,33 +188,7 @@ const TeacherForm = ({
         البيانات الفرعية للحصول على مميزات منصة كلمة
       </h3>
 
-      {/* Subject Selection */}
-      <div className="form-control">
-        <div className="flex flex-col gap-2">
-          <label className="label">
-            <span className="label-text">
-              {t("fields.subject") || "Subject"}
-            </span>
-          </label>
-
-          <select
-            name="subject"
-            className="select select-bordered"
-            value={userData.subject || ""}
-            onChange={handleChange}
-            required
-          >
-            <option value="">
-              {t("placeholders.selectSubject") || "Select Subject"}
-            </option>
-            {subjects.map((subject) => (
-              <option key={subject._id} value={subject._id}>
-                {subject.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      {/* Subject Selection removed for Teacher form (handled elsewhere) */}
 
       {/* Level Selection (Multiple) - Use predefined level values */}
       <div className="form-control">
@@ -274,7 +248,6 @@ const TeacherForm = ({
             className="select select-bordered"
             value={userData.teachesAtType || ""}
             onChange={handleChange}
-            required
           >
             <option value="">
               {t("placeholders.selectTeachesAt") || "Select where you teach"}

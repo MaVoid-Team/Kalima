@@ -177,9 +177,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
         return t("validation.invalidPhoneNumber");
       }
-      if (!userData.subject) {
-        return t("validation.subjectRequired");
-      }
       if (!userData.level || userData.level.length === 0) {
         return t("validation.levelRequired");
       }
