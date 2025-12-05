@@ -183,9 +183,6 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       if (!userData.level || userData.level.length === 0) {
         return t("validation.levelRequired");
       }
-      if (!userData.teachesAtType) {
-        return t("validation.teachesAtTypeRequired");
-      }
       if (
         (userData.teachesAtType === "Both" ||
           userData.teachesAtType === "Center") &&
