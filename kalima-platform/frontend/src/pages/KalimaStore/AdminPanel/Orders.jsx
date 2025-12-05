@@ -304,9 +304,27 @@ const Orders = () => {
 
   const handleWhatsAppContact = (order) => {
     const phoneNumber = order.createdBy?.phoneNumber;
-    // Updated message to be more generic, assuming product details are in the cart items
+    
+    // Build product list
+    const productList = order.items && order.items.length > 0
+      ? order.items.map((item, index) => {
+          const price = item.priceAtPurchase || 0;
+          const priceText = price > 0 ? `${price.toFixed(2)} جنيه` : 'مجاني';
+          return `${index + 1}. ${item.productSnapshot?.title || 'منتج'} - ${priceText}`;
+        }).join('\n')
+      : 'لا توجد منتجات';
+    
+    // Calculate totals
+    const subtotal = order.subtotal || calculateCartTotal(order);
+    const discount = order.discount || 0;
+    const total = order.total || subtotal;
+    
+    const discountText = discount > 0 ? `\n- الخصم: ${discount.toFixed(2)} جنيه` : '';
+    const totalText = total > 0 ? `${total.toFixed(2)} جنيه` : 'مجاني';
+    
+    // Build complete message with product list
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${order.userName} 👋 تم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.لو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.نتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙مع تحيات فريق عملمنصة كلمة`
+      `أهلاً بك أ/ ${order.userName} 👋\n\nتم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.\n\n*رقم الطلب:* ${order.purchaseSerial || order._id}\n\n*المنتجات:*\n${productList}${discountText}\n*الإجمالي: ${totalText}*\n\nلو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.\n\nنتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙\n\nمع تحيات فريق عمل\nمنصة كلمة`
     );
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, "_blank");

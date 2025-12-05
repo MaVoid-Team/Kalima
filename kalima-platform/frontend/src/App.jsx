@@ -49,6 +49,7 @@ const CartPage = lazy(() => import("./pages/KalimaStore/CartPage"));
 const AdminPanel = lazy(() => import("./pages/KalimaStore/AdminPanel/AdminPanel"));
 const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
 const StoreAnalytics = lazy(() => import("./pages/KalimaStore/storeAnalytics"));
+const ConfirmedOrdersReport = lazy(() => import("./pages/KalimaStore/ConfirmedOrdersReport"));
 
 function App() {
   const location = useLocation();
@@ -261,6 +262,10 @@ function App() {
             <Route
               path="/dashboard/admin-dashboard/store-analytics"
               element={<StoreAnalytics />}
+            />
+            <Route
+              path="/dashboard/admin-dashboard/confirmed-orders-report"
+              element={<ConfirmedOrdersReport />}
             />
             {/* Lecturer Routes */}
             <Route

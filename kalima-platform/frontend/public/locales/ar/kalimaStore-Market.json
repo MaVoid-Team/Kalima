@@ -14,8 +14,9 @@
     "discounts": "خصم",
     "currency": "ج",
     "viewDetails": "عرض التفاصيل",
-    "new": "اضيف حديثا",
-    "addToCart": "إضافة للسلة"
+    "addToCart": "إضافة للسلة",
+    "purchased": "تم الشراء",
+    "new": "جديد"
   },
   "sections": {
     "Designs": "تصاميم",
