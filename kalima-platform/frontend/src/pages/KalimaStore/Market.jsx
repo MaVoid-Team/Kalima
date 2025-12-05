@@ -428,7 +428,7 @@ const Market = () => {
                     </div>
                   </div>
                 )}
-
+                {/*comment for re-commit*/}
                 {/* Discount Badge */}
                 {item.discountPercentage && item.discountPercentage > 0 && (
                   <div
