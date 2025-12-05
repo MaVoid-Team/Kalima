@@ -291,7 +291,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
           phoneNumber2: data.phoneNumber2 || undefined,
-          subject: data.subject || undefined,
+
           level: Array.isArray(data.level)
             ? data.level
             : data.level
@@ -542,51 +542,53 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 </div>
               </div>
 
-              {/* Subjects Selection */}
-              <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text">{t("fields.subjects")}</span>
-                </label>
+              {/* Subjects Selection - hide for Teacher role */}
+              {userData.role !== "Teacher" && (
+                <div className="form-control w-full">
+                  <label className="label">
+                    <span className="label-text">{t("fields.subjects")}</span>
+                  </label>
 
-                {/* Subject Dropdown */}
-                <select
-                  className="select select-bordered w-full"
-                  onChange={handleSubjectSelect}
-                  value=""
-                >
-                  <option value="">{t("placeholders.selectSubject")}</option>
-                  {subjects.map((subject) => (
-                    <option
-                      key={subject._id}
-                      value={subject._id}
-                      disabled={selectedSubjects.includes(subject._id)}
-                    >
-                      {subject.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Selected subjects as badges */}
-                {selectedSubjects.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedSubjects.map((subjectId) => (
-                      <div
-                        key={subjectId}
-                        className="badge badge-secondary gap-1"
+                  {/* Subject Dropdown */}
+                  <select
+                    className="select select-bordered w-full"
+                    onChange={handleSubjectSelect}
+                    value=""
+                  >
+                    <option value="">{t("placeholders.selectSubject")}</option>
+                    {subjects.map((subject) => (
+                      <option
+                        key={subject._id}
+                        value={subject._id}
+                        disabled={selectedSubjects.includes(subject._id)}
                       >
-                        {getSubjectNameById(subjectId)}
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-xs"
-                          onClick={() => removeSubject(subjectId)}
-                        >
-                          ×
-                        </button>
-                      </div>
+                        {subject.name}
+                      </option>
                     ))}
-                  </div>
-                )}
-              </div>
+                  </select>
+
+                  {/* Selected subjects as badges */}
+                  {selectedSubjects.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {selectedSubjects.map((subjectId) => (
+                        <div
+                          key={subjectId}
+                          className="badge badge-secondary gap-1"
+                        >
+                          {getSubjectNameById(subjectId)}
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-xs"
+                            onClick={() => removeSubject(subjectId)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Government */}
               <div className="form-control w-full ">
