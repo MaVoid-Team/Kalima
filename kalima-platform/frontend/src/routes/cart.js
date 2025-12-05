@@ -265,7 +265,7 @@ export const getCartPurchases = async (queryParams = {}) => {
 // Get user's purchased product IDs
 export const getUserPurchasedProducts = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -329,7 +329,7 @@ export const getAdminCartPurchases = async (queryParams = {}) => {
 // Get confirmed orders report
 export const getConfirmedOrdersReport = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/confirmed-report`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/confirmed-report`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
