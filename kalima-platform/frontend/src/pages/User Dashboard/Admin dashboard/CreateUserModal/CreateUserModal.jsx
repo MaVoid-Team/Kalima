@@ -173,40 +173,51 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     }
 
-    if (userData.role === "Teacher") {
-      if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
-        return t("validation.invalidPhoneNumber");
-      }
-      if (!userData.subject) {
-        return t("validation.subjectRequired");
-      }
-      if (!userData.level || userData.level.length === 0) {
-        return t("validation.levelRequired");
-      }
-      if (!userData.teachesAtType) {
-        return t("validation.teachesAtTypeRequired");
-      }
-      if (
-        (userData.teachesAtType === "Both" ||
-          userData.teachesAtType === "Center") &&
-        (!userData.centers || userData.centers.length === 0)
-      ) {
-        return t("validation.centersRequired");
-      }
-      if (
-        (userData.teachesAtType === "Both" ||
-          userData.teachesAtType === "School") &&
-        !userData.school
-      ) {
-        return t("validation.schoolRequired");
-      }
-      if (!userData.government) {
-        return t("validation.governmentRequired");
-      }
-      if (!userData.administrationZone) {
-        return t("validation.administrationZoneRequired");
-      }
-    }
+    // if (userData.role === "Teacher") {
+    //   // Phone Number
+    //   if (!userData.phoneNumber || !/^\d{10,15}$/.test(userData.phoneNumber)) {
+    //     return t("validation.invalidPhoneNumber");
+    //   }
+
+
+    //   // Levels (array)
+    //   if (!userData.level || userData.level.length === 0) {
+    //     return t("validation.levelRequired");
+    //   }
+
+    //   // Teaches At Type
+    //   if (!userData.teachesAtType) {
+    //     return t("validation.teachesAtTypeRequired");
+    //   }
+
+    //   // Centers required
+    //   if (
+    //     (userData.teachesAtType === "Both" ||
+    //       userData.teachesAtType === "Center") &&
+    //     (!userData.centers || userData.centers.length === 0)
+    //   ) {
+    //     return t("validation.centersRequired");
+    //   }
+
+    //   // School required
+    //   if (
+    //     (userData.teachesAtType === "Both" ||
+    //       userData.teachesAtType === "School") &&
+    //     !userData.school
+    //   ) {
+    //     return t("validation.schoolRequired");
+    //   }
+
+    //   // Government
+    //   if (!userData.government) {
+    //     return t("validation.governmentRequired");
+    //   }
+
+    //   // Administration Zone
+    //   if (!userData.administrationZone) {
+    //     return t("validation.administrationZoneRequired");
+    //   }
+    // }
 
     return "";
   };
@@ -324,23 +335,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     }
   };
 
-  const handleSubjectSelect = (e) => {
-    const subjectId = e.target.value;
-    if (!subjectId) return;
 
-    if (!selectedSubjects.includes(subjectId)) {
-      const newSubjects = [...selectedSubjects, subjectId];
-      setSelectedSubjects(newSubjects);
-
-      // Always update as array
-      handleChange({ target: { name: "subject", value: newSubjects } });
-    }
-  };
-
-  const getSubjectNameById = (id) => {
-    const subject = subjects.find((s) => s._id === id);
-    return subject ? subject.name : id;
-  };
 
   const handleGovernmentChange = async (governmentName) => {
     setUserData((prev) => ({
@@ -548,52 +543,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 </div>
               </div>
 
-              {/* Subjects Selection */}
-              <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text">{t("fields.subjects")}</span>
-                </label>
-
-                {/* Subject Dropdown */}
-                <select
-                  className="select select-bordered w-full"
-                  onChange={handleSubjectSelect}
-                  value=""
-                >
-                  <option value="">{t("placeholders.selectSubject")}</option>
-                  {subjects.map((subject) => (
-                    <option
-                      key={subject._id}
-                      value={subject._id}
-                      disabled={selectedSubjects.includes(subject._id)}
-                    >
-                      {subject.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Selected subjects as badges */}
-                {selectedSubjects.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedSubjects.map((subjectId) => (
-                      <div
-                        key={subjectId}
-                        className="badge badge-secondary gap-1"
-                      >
-                        {getSubjectNameById(subjectId)}
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-xs"
-                          onClick={() => removeSubject(subjectId)}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
+              
               {/* Government */}
               <div className="form-control w-full ">
                 <label className="label">
