@@ -5,12 +5,9 @@ import { useEffect, useState } from "react";
 const TeacherForm = ({
   userData,
   handleChange,
-  handleGovernmentChange,
   subjects,
   levels,
-  governments,
-  administrationZones,
-  loadingZones,
+
   t,
   isRTL,
 }) => {
