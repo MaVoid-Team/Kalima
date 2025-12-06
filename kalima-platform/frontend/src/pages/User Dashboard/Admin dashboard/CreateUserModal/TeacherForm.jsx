@@ -55,33 +55,38 @@ const TeacherForm = ({
   const addCenter = () => {
     const centerInput = document.getElementById("centerInput");
     const centerName = centerInput.value.trim();
+
     if (centerName && !selectedCenters.includes(centerName)) {
       const newCenters = [...selectedCenters, centerName];
+
       setSelectedCenters(newCenters);
-      centerInput.value = "";
-      const syntheticEvent = {
+      handleChange({
         target: {
           name: "centers",
           value: newCenters,
         },
-      };
-      handleChange(syntheticEvent);
+      });
+
+      centerInput.value = "";
     }
   };
 
   const removeCenter = (centerName) => {
-    const newCenters = selectedCenters.filter(
-      (center) => center !== centerName
-    );
+    const newCenters = selectedCenters.filter((c) => c !== centerName);
+
     setSelectedCenters(newCenters);
-    const syntheticEvent = {
+
+    handleChange({
       target: {
         name: "centers",
         value: newCenters,
       },
-    };
-    handleChange(syntheticEvent);
+    });
   };
+
+  useEffect(() => {
+    setSelectedCenters(userData.centers || []);
+  }, [userData.centers]);
 
   const toEnglishDigits = (str) =>
     str.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g, "");
@@ -165,11 +170,6 @@ const TeacherForm = ({
     setSelectedLevels(normalized);
   }, [userData.level]);
 
-  const handleGovernmentSelect = (e) => {
-    const governmentName = e.target.value;
-    handleGovernmentChange(governmentName);
-  };
-
   const shouldShowCenters =
     userData.teachesAtType === "Both" || userData.teachesAtType === "Center";
   const shouldShowSchool =
@@ -183,7 +183,7 @@ const TeacherForm = ({
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 novalidate">
       <h3 className="text-xl font-bold mb-4 text-primary text-center">
         البيانات الفرعية للحصول على مميزات منصة كلمة
       </h3>
@@ -217,7 +217,7 @@ const TeacherForm = ({
       </div>
 
       {/* Level Selection (Multiple) - Use predefined level values */}
-      <div className="form-control">
+      <div className="">
         <div className="flex flex-col gap-2">
           <label className="label">
             <span className="label-text">
@@ -262,7 +262,7 @@ const TeacherForm = ({
       </div>
 
       {/* Teaches At Type */}
-      <div className="form-control">
+      <div className=" ">
         <div className="flex flex-col gap-2">
           <label className="label">
             <span className="label-text">
@@ -274,7 +274,6 @@ const TeacherForm = ({
             className="select select-bordered"
             value={userData.teachesAtType || ""}
             onChange={handleChange}
-            required
           >
             <option value="">
               {t("placeholders.selectTeachesAt") || "Select where you teach"}
@@ -294,7 +293,7 @@ const TeacherForm = ({
 
       {/* Centers - Show if teachesAtType is "Both" or "Center" */}
       {shouldShowCenters && (
-        <div className="form-control">
+        <div className="">
           <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text">
@@ -364,7 +363,7 @@ const TeacherForm = ({
       )}
 
       {/* Social Media (Optional) - Updated to use 'account' */}
-      <div className="form-control">
+      <div className="">
         <div className="flex flex-col gap-2">
           <label className="label">
             <span className="label-text">
