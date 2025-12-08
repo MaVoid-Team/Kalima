@@ -88,15 +88,21 @@ const NotificationCenter = ({ userId }) => {
     eventTypes.forEach((eventType) => {
       socket.on(eventType, (notification) => {
         // Add the new notification to the list, avoid duplicates
+        let isNewNotification = false
         setNotifications((prev) => {
           const exists = prev.some((n) => n.notificationId === notification.notificationId)
           if (exists) return prev
+          isNewNotification = true
           return [notification, ...prev]
         })
-        setUnreadCount((prev) => prev + 1)
+        
+        // Only increment counter if it's a new notification
+        if (isNewNotification) {
+          setUnreadCount((prev) => prev + 1)
+        }
         
         // Show browser notification for store purchases (for admins/subadmins)
-        if (eventType === "storePurchase" && "Notification" in window) {
+        if (isNewNotification && eventType === "storePurchase" && "Notification" in window) {
           if (Notification.permission === "granted") {
             new Notification(notification.title, {
               body: notification.message,
