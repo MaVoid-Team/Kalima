@@ -5,6 +5,8 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendEmail } = require("../utils/emailVerification/emailService");
 const { DateTime } = require('luxon');
+const Notification = require("../models/notification");
+const User = require("../models/userModel");
 const mongoose = require('mongoose');
 
 // Function to get current time in Egypt timezone
@@ -185,6 +187,61 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     } catch (err) {
         console.error("Failed to send WhatsApp notification:", err);
+    }
+
+    // Send notifications to Admin, SubAdmin, and Moderator
+    try {
+        // Find all users with admin, subadmin, or moderator roles
+        const adminUsers = await User.find({
+            role: { $in: ['Admin', 'SubAdmin', 'Moderator'] }
+        }).select('_id name role');
+
+        const timestamp = new Date().toISOString();
+        const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Found ${adminUsers.length} admin users:`, adminUsers.map(u => `${u.name} (${u.role})`));
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Purchase ID: ${purchase._id}, Serial: ${purchaseSerial}`);
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Timestamp: ${timestamp}`);
+
+        if (adminUsers && adminUsers.length > 0) {
+            // Create notification for each admin user
+            const notificationPromises = adminUsers.map(admin => {
+                console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Creating notification for ${admin.name} (${admin.role}, ID: ${admin._id})`);
+                return Notification.create({
+                    userId: admin._id,
+                    title: 'طلب جديد في المتجر',
+                    message: `طلب جديد من ${req.user.name}\nرقم الطلب: ${purchaseSerial}\nعدد المنتجات: ${cart.items.length}\nالإجمالي: ${totalText}`,
+                    type: 'store_purchase',
+                    relatedId: purchase._id,
+                    metadata: {
+                        purchaseSerial: purchaseSerial,
+                        customerName: req.user.name,
+                        customerEmail: req.user.email,
+                        customerPhone: req.user.phoneNumber,
+                        itemCount: cart.items.length,
+                        subtotal: cart.subtotal,
+                        discount: cart.discount,
+                        total: cart.total,
+                        productList: productListText,
+                        products: cart.items.map(item => ({
+                            title: item.product.title,
+                            price: item.priceAtAdd
+                        })),
+                        createdAt: new Date()
+                    }
+                });
+            });
+
+            const createdNotifications = await Promise.all(notificationPromises);
+            console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Successfully created ${createdNotifications.length} notifications for purchase ${purchaseSerial}`);
+            createdNotifications.forEach((notif, index) => {
+                console.log(`[CART PURCHASE NOTIFICATION ${requestId}]   - Notification ${index + 1}: ID=${notif._id}, User=${notif.userId}, Title=${notif.title}`);
+            });
+        } else {
+            console.log(`[CART PURCHASE NOTIFICATION ${requestId}] No admin users found to notify`);
+        }
+    } catch (err) {
+        console.error(`[CART PURCHASE NOTIFICATION ${requestId}] Failed to send admin notifications:`, err);
+        // Don't fail the purchase if notifications fail
     }
 
     await cart.clear();
