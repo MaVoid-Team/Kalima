@@ -37,7 +37,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     faction: "",
     school: "",
     parent: "",
-    subject: [],
+    subject: "",
     bio: "",
     expertise: "",
     assignedLecturer: "",
