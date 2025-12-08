@@ -198,7 +198,11 @@ const TeacherForm = ({
             name="subject"
             className="select select-bordered"
             value={userData.subject || ""}
-            onChange={handleChange}
+            onChange={(e) =>
+              handleChange({
+                target: { name: "subject", value: e.target.value },
+              })
+            }
             required
           >
             <option value="">
