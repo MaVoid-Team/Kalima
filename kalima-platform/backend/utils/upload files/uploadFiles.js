@@ -39,6 +39,7 @@ const dynamicDestination = function (req, file, cb) {
   else if (file.fieldname === "gallery") dest = "uploads/product_gallery/";
   else if (file.fieldname === "sample") dest = "uploads/docs/";
   else if (file.fieldname === "paymentScreenShot") dest = "uploads/payment_screenshots/";
+  else if (file.fieldname === "watermark") dest = "uploads/watermarks/";
   else dest = "uploads/other/";
   ensureDir(dest);
   cb(null, dest);
@@ -189,6 +190,53 @@ const uploadPaymentScreenshotToDisk = withCleanup(
   }).single("paymentScreenShot")
 );
 
+const uplaodwatermarkToDisk = withCleanup(
+  multer({
+    storage: multer.diskStorage({
+      destination: dynamicDestination,
+      filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `${Date.now()}-watermark.${ext}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (allowedImageTypes.includes(file.mimetype)) cb(null, true);
+      else cb(new AppError("Invalid file type for watermark", 400), false);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }).single("watermark")
+);
+
+const uploadCartPurchaseFiles = withCleanup(
+  multer({
+    storage: multer.diskStorage({
+      destination: dynamicDestination,
+      filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        const timestamp = Date.now();
+        if (file.fieldname === "paymentScreenShot") {
+          cb(null, `${timestamp}-paymentScreenShot.${ext}`);
+        } else if (file.fieldname === "watermark") {
+          cb(null, `${timestamp}-watermark.${ext}`);
+        } else {
+          cb(null, `${timestamp}-${file.fieldname}.${ext}`);
+        }
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (allowedImageTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new AppError(`Invalid file type for ${file.fieldname}`, 400), false);
+      }
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }).fields([
+    { name: "paymentScreenShot", maxCount: 1 },
+    { name: "watermark", maxCount: 1 },
+  ])
+);
+
 const uploadProductFilesToDisk = withCleanup(
   multer({
     storage: multer.diskStorage({
@@ -224,4 +272,6 @@ module.exports = {
   uploadFileToDisk,
   uploadPaymentScreenshotToDisk,
   uploadProductFilesToDisk,
+  uplaodwatermarkToDisk,
+  uploadCartPurchaseFiles
 };
