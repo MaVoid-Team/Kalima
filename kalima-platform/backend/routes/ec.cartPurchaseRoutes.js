@@ -1,7 +1,7 @@
 const express = require('express');
 const cartPurchaseController = require('../controllers/ec.cartPurchaseController');
 const verifyJWT = require('../middleware/verifyJWT');
-const { uploadPaymentScreenshotToDisk } = require("../utils/upload files/uploadFiles");
+const { uploadCartPurchaseFiles } = require("../utils/upload files/uploadFiles");
 const authController = require('./../controllers/authController');
 
 const router = express.Router();
@@ -11,7 +11,7 @@ router.use(verifyJWT);
 
 // User routes
 router.route('/')
-    .post(uploadPaymentScreenshotToDisk, cartPurchaseController.createCartPurchase)
+    .post(uploadCartPurchaseFiles, cartPurchaseController.createCartPurchase)
     .get(cartPurchaseController.getCartPurchases);
 
 // Admin/Staff routes
@@ -58,6 +58,12 @@ router.route('/:id/confirm')
     .patch(
         authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         cartPurchaseController.confirmCartPurchase
+    );
+
+router.route('/:id/return')
+    .patch(
+        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+        cartPurchaseController.returnCartPurchase
     );
 
 router.route('/:id/admin-note')
