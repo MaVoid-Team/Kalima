@@ -193,7 +193,7 @@ const TeacherForm = ({
               {t("fields.subject") || "Subject"}
             </span>
           </label>
-
+      {/* Subject Selection */}
           <select
             name="subject"
             className="select select-bordered"

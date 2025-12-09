@@ -220,6 +220,9 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   // --- End referral logic ---
 
   // --- Real-time notification to Admins and SubAdmins ---
+  // DISABLED: Notifications are now handled by the cart purchase system (ec.cartPurchaseController.js)
+  // This prevents duplicate notifications when using the cart-based checkout
+  /*
   try {
     const template = await NotificationTemplate.findOne({
       type: "store_purchase",
@@ -312,6 +315,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     console.error("Error sending store purchase notifications:", notificationError);
     // Don't fail the purchase if notification fails
   }
+  */
   // --- End notification logic ---
 
   // Send email to user after successful purchase
