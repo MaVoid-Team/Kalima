@@ -67,11 +67,11 @@ const cartPurchaseSchema = new mongoose.Schema(
             trim: true,
             default: null,
         },
-        paymentMethod: {
-            type: String,
-            enum: ["instapay", "vodafone cash"],
-            default: null,
-        },
+        // paymentMethod: {
+        // type: String,
+        // enum: ["instapay", "vodafone cash"],
+        // default: null,
+        // },
 
         // Purchase serial number ("CP-timestamp-userid")
         purchaseSerial: {
