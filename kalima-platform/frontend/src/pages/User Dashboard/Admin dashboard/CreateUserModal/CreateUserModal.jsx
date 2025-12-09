@@ -163,7 +163,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
         return t("validation.invalidPhoneNumber");
       }
     }
-
+//idk
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
         return t("validation.subjectsRequired");
