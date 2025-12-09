@@ -341,6 +341,97 @@ Enhanced WhatsApp contact feature to include complete order information with pro
 
 ---
 
+## 6. Admin Notifications for New Orders
+
+### Problem
+Admins, sub-admins, and moderators were not notified when new orders were placed, requiring them to manually check for new orders.
+
+### Solution
+Implemented real-time notification system that alerts all admin users when a cart purchase is created.
+
+### Files Changed
+
+#### Backend Changes
+
+**`kalima-platform/backend/controllers/ec.cartPurchaseController.js`**
+- Added notification creation after successful purchase
+- Queries all users with Admin, SubAdmin, or Moderator roles
+- Creates individual notifications for each admin user
+- Includes complete order details in notification metadata
+
+**Notification Details:**
+- **Title**: "طلب جديد في المتجر" (New Store Order)
+- **Message**: Customer name, order number, item count, total
+- **Type**: `store_purchase`
+- **Metadata**: Complete order details including:
+  - Purchase serial number
+  - Customer information (name, email, phone)
+  - Product list with prices
+  - Subtotal, discount, and total
+  - Item count and individual product details
+
+**Key Features:**
+- Real-time notifications via Socket.IO
+- Notifications persist if admin is offline
+- Detailed order information in metadata
+- Non-blocking (purchase succeeds even if notifications fail)
+- Supports multiple admin users simultaneously
+
+**Code Example:**
+```javascript
+// Find all admin users
+const adminUsers = await User.find({
+    role: { $in: ['Admin', 'SubAdmin', 'Moderator'] }
+}).select('_id name role');
+
+// Create notification for each admin
+const notificationPromises = adminUsers.map(admin => {
+    return Notification.create({
+        userId: admin._id,
+        title: 'طلب جديد في المتجر',
+        message: `طلب جديد من ${req.user.name}...`,
+        type: 'store_purchase',
+        relatedId: purchase._id,
+        metadata: { /* order details */ }
+    });
+});
+
+await Promise.all(notificationPromises);
+```
+
+### How It Works
+
+1. **Order Creation**: When a user completes checkout, a purchase is created
+2. **Admin Query**: System finds all users with admin roles
+3. **Notification Creation**: Individual notification created for each admin
+4. **Real-time Delivery**: Socket.IO sends notification to online admins
+5. **Persistence**: Offline admins receive notification when they log in
+
+### Important Note
+
+**Duplicate Notification Fix**: The old single-product purchase system (`ec.purchaseController.js`) also had notification logic that was creating duplicate notifications. This has been disabled since the platform now uses the cart-based purchase system exclusively. If you need to re-enable single-product purchases, uncomment the notification code in `ec.purchaseController.js` and change the notification type to distinguish it from cart purchases.
+
+### Notification Content
+
+**Arabic Message Format:**
+```
+طلب جديد في المتجر
+
+طلب جديد من [Customer Name]
+رقم الطلب: [Purchase Serial]
+عدد المنتجات: [Item Count]
+الإجمالي: [Total] EGP
+```
+
+**Metadata Includes:**
+- Purchase serial number
+- Customer details (name, email, phone)
+- Complete product list with prices
+- Financial details (subtotal, discount, total)
+- Timestamp
+
+---
+
 ## Future Enhancements
 
 - [ ] Add email notifications with product list (currently basic)
@@ -348,9 +439,12 @@ Enhanced WhatsApp contact feature to include complete order information with pro
 - [ ] Add export functionality for confirmed orders report
 - [ ] Add date range filters for confirmed orders
 - [ ] Add customer notes display in WhatsApp messages
+- [ ] Add notification preferences for admins
+- [ ] Add notification sound/badge for new orders
+- [ ] Add bulk notification actions
 
 ---
 
-**Last Updated:** November 27, 2025
-**Version:** 1.0
+**Last Updated:** December 8, 2025
+**Version:** 1.1
 **Authors:** Development Team

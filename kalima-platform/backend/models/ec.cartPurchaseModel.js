@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const cartPurchaseItemSchema = new mongoose.Schema({
@@ -41,6 +42,11 @@ const cartPurchaseSchema = new mongoose.Schema(
             ref: "User",
             required: [true, "Created by user is required"],
         },
+        watermark: {
+            type: String,
+            trim: true,
+            default: null,
+        },
 
         // Items in the purchase
         items: [cartPurchaseItemSchema],
@@ -61,6 +67,11 @@ const cartPurchaseSchema = new mongoose.Schema(
             trim: true,
             default: null,
         },
+        paymentMethod: {
+            type: String,
+            enum: ["instapay", "vodafone cash"],
+            default: null,
+        },
 
         // Purchase serial number ("CP-timestamp-userid")
         purchaseSerial: {
@@ -73,7 +84,7 @@ const cartPurchaseSchema = new mongoose.Schema(
         // Status
         status: {
             type: String,
-            enum: ['pending', 'received', 'confirmed'],
+            enum: ['pending', 'received', 'confirmed', "returned"],
             default: 'pending'
         },
         receivedBy: {
@@ -93,6 +104,15 @@ const cartPurchaseSchema = new mongoose.Schema(
         confirmedAt: {
             type: Date,
             default: null
+        },
+        returnedAt: {
+            type: Date,
+            default: null
+        },
+        returnedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
         },
 
         // Notes
@@ -140,6 +160,7 @@ const cartPurchaseSchema = new mongoose.Schema(
         toObject: { virtuals: true },
     }
 );
+
 
 // Indexes for common queries
 cartPurchaseSchema.index({ createdBy: 1 });
