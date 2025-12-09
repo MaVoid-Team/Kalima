@@ -97,7 +97,7 @@ const logout = catchAsync(async (req, res, next) => {
   await RefreshToken.deleteMany({ user: req.user._id });
   return res.json({ message: "Logged out successfully" });
 });
-
+// Middleware to verify user roles
 const verifyRoles = (...allowedRoles) => {
   return async (req, res, next) => {
     const Role = req.user.role?.toLowerCase();
