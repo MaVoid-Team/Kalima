@@ -261,7 +261,7 @@ const TeacherForm = ({
           )}
         </div>
       </div>
-
+      {/* Phone Number */}
       {/* Teaches At Type */}
       <div className=" ">
         <div className="flex flex-col gap-2">
