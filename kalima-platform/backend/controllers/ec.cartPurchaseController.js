@@ -5,6 +5,8 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendEmail } = require("../utils/emailVerification/emailService");
 const { DateTime } = require('luxon');
+const Notification = require("../models/notification");
+const User = require("../models/userModel");
 const mongoose = require('mongoose');
 
 // Function to get current time in Egypt timezone
@@ -58,11 +60,14 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
 
     // Validate payment info only if cart total > 0
     if (cart.total > 0) {
-        if (!req.body.numberTransferredFrom || !req.file) {
+        const hasPaymentScreenshot = req.file || (req.files && req.files.paymentScreenShot && req.files.paymentScreenShot.length > 0);
+        if (!req.body.numberTransferredFrom || !hasPaymentScreenshot) {
             return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
         }
+        if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
+            return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
+        }
     }
-
     // Prepare items with snapshots
     const items = cart.items.map(item => ({
         product: item.product._id,
@@ -80,8 +85,13 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     }));
 
     // Prepare payment data (only if cart total > 0)
-    const paymentScreenShot = cart.total > 0 && req.file ? req.file.path : null;
+    const paymentFile = req.file || (req.files && req.files.paymentScreenShot && req.files.paymentScreenShot[0]);
+    const paymentScreenShot = cart.total > 0 && paymentFile ? paymentFile.path : null;
     const numberTransferredFrom = cart.total > 0 ? req.body.numberTransferredFrom : null;
+
+    // Prepare watermark file path
+    const watermarkFile = req.files && req.files.watermark && req.files.watermark[0];
+    const watermarkPath = watermarkFile ? watermarkFile.path : null;
 
     // Generate purchase serial using user's serial, date, and sequence in Egypt time
     const date = getCurrentEgyptTime();
@@ -110,13 +120,15 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         items: items,
         numberTransferredFrom: numberTransferredFrom,
         paymentNumber: cart.total > 0 ? cart.items[0].product.paymentNumber : null, // Only set payment number if cart has value
+        paymentMethod: cart.total > 0 ? req.body.paymentMethod : null,
         paymentScreenShot: paymentScreenShot,
         subtotal: cart.subtotal,
         couponCode: cart.couponCode,
         discount: cart.discount,
         total: cart.total,
         notes: req.body.notes,
-        purchaseSerial: purchaseSerial
+        purchaseSerial: purchaseSerial,
+        watermark: watermarkPath,
     });
 
     // If there was a coupon, mark it as used
@@ -185,6 +197,61 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         }
     } catch (err) {
         console.error("Failed to send WhatsApp notification:", err);
+    }
+
+    // Send notifications to Admin, SubAdmin, and Moderator
+    try {
+        // Find all users with admin, subadmin, or moderator roles
+        const adminUsers = await User.find({
+            role: { $in: ['Admin', 'SubAdmin', 'Moderator'] }
+        }).select('_id name role');
+
+        const timestamp = new Date().toISOString();
+        const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Found ${adminUsers.length} admin users:`, adminUsers.map(u => `${u.name} (${u.role})`));
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Purchase ID: ${purchase._id}, Serial: ${purchaseSerial}`);
+        console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Timestamp: ${timestamp}`);
+
+        if (adminUsers && adminUsers.length > 0) {
+            // Create notification for each admin user
+            const notificationPromises = adminUsers.map(admin => {
+                console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Creating notification for ${admin.name} (${admin.role}, ID: ${admin._id})`);
+                return Notification.create({
+                    userId: admin._id,
+                    title: 'طلب جديد في المتجر',
+                    message: `طلب جديد من ${req.user.name}\nرقم الطلب: ${purchaseSerial}\nعدد المنتجات: ${cart.items.length}\nالإجمالي: ${totalText}`,
+                    type: 'store_purchase',
+                    relatedId: purchase._id,
+                    metadata: {
+                        purchaseSerial: purchaseSerial,
+                        customerName: req.user.name,
+                        customerEmail: req.user.email,
+                        customerPhone: req.user.phoneNumber,
+                        itemCount: cart.items.length,
+                        subtotal: cart.subtotal,
+                        discount: cart.discount,
+                        total: cart.total,
+                        productList: productListText,
+                        products: cart.items.map(item => ({
+                            title: item.product.title,
+                            price: item.priceAtAdd
+                        })),
+                        createdAt: new Date()
+                    }
+                });
+            });
+
+            const createdNotifications = await Promise.all(notificationPromises);
+            console.log(`[CART PURCHASE NOTIFICATION ${requestId}] Successfully created ${createdNotifications.length} notifications for purchase ${purchaseSerial}`);
+            createdNotifications.forEach((notif, index) => {
+                console.log(`[CART PURCHASE NOTIFICATION ${requestId}]   - Notification ${index + 1}: ID=${notif._id}, User=${notif.userId}, Title=${notif.title}`);
+            });
+        } else {
+            console.log(`[CART PURCHASE NOTIFICATION ${requestId}] No admin users found to notify`);
+        }
+    } catch (err) {
+        console.error(`[CART PURCHASE NOTIFICATION ${requestId}] Failed to send admin notifications:`, err);
+        // Don't fail the purchase if notifications fail
     }
 
     await cart.clear();
@@ -267,9 +334,11 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
     if (!purchase) {
         return next(new AppError("Purchase not found", 404));
     }
-
-    if (purchase.status !== 'received') {
-        return next(new AppError("Purchase must be received before it can be confirmed", 400));
+    if (purchase.status === 'confirmed') {
+        return next(new AppError("Purchase is already confirmed", 400));
+    }
+    if (purchase.status !== 'received' && purchase.status !== 'returned') {
+        return next(new AppError("Purchase must be received or in returned status before it can be confirmed", 400));
     }
 
     const now = getCurrentEgyptTime().toJSDate();
@@ -288,6 +357,41 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
     res.status(200).json({
         status: "success",
         message: "Purchase confirmed successfully",
+    });
+});
+
+exports.returnCartPurchase = catchAsync(async (req, res, next) => {
+    const purchase = await ECCartPurchase.findById(req.params.id);
+
+    if (!purchase) {
+        return next(new AppError("Purchase not found", 404));
+    }
+    if (purchase.status !== 'confirmed') {
+        return next(new AppError("Only confirmed purchases can be returned", 400));
+    }
+    if (purchase.status === 'returned') {
+        return next(new AppError("Purchase is already returned", 400));
+    }
+    if (purchase.confirmedBy.toString() !== req.user._id.toString()) {
+        return next(new AppError("Only the user who confirmed the purchase can return it", 403));
+    }
+
+    const now = getCurrentEgyptTime().toJSDate();
+    const updatedPurchase = await ECCartPurchase.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: 'returned',
+            returnedAt: now,
+            returnedBy: req.user._id // Already in Egypt time
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    )
+    res.status(200).json({
+        status: "success",
+        message: "Purchase returned successfully",
     });
 });
 
@@ -335,6 +439,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate({ path: 'createdBy', select: "name email role phoneNumber" })
                     .populate('confirmedBy', 'name')
                     .populate('receivedBy', 'name')
+                    .populate('returnedBy', 'name')
                     .populate('adminNoteBy', 'name')
                     .populate('couponCode');
                 // If baseMatch filters exist, ensure the found doc satisfies them
@@ -450,6 +555,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate({ path: 'createdBy', select: "name email role phoneNumber" })
                     .populate('confirmedBy', 'name')
                     .populate('receivedBy', 'name')
+                    .populate('returnedBy', 'name')
                     .populate('adminNoteBy', 'name')
                     .populate('couponCode');
                 if (doc) populated.push(doc);
@@ -476,6 +582,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         .populate({ path: 'createdBy', select: "name email role phoneNumber" })
         .populate('confirmedBy', 'name')
         .populate('receivedBy', 'name')
+        .populate('returnedBy', 'name')
         .populate('adminNoteBy', 'name')
         .populate('couponCode')
         .sort('-createdAt')
@@ -498,8 +605,6 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         }
     });
 });
-
-
 
 exports.addAdminNote = catchAsync(async (req, res, next) => {
 
