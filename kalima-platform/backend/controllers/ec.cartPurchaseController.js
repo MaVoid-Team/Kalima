@@ -64,9 +64,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         if (!req.body.numberTransferredFrom || !hasPaymentScreenshot) {
             return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
         }
-        if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
-            return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
-        }
+        // if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
+        //     return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
+        // }
     }
     // Prepare items with snapshots
     const items = cart.items.map(item => ({
