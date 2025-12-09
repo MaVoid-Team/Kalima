@@ -164,6 +164,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       }
     }
 //idk
+//no way
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
         return t("validation.subjectsRequired");
