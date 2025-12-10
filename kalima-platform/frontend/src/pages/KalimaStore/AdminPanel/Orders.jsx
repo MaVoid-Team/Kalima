@@ -1036,11 +1036,10 @@ const Orders = () => {
               <tr>
                 <th className="text-center">{t("table.product")}</th>
                 <th className="text-center">{t("table.customer")}</th>
-                <th className="text-center">{t("table.itemCount")}</th>{" "}
-                {/* Changed from table.price */}
-                <th className="text-center">{t("table.price")}</th>{" "}
-                {/* New header for total price */}
+                <th className="text-center">{t("table.itemCount")}</th>
+                <th className="text-center">{t("table.price")}</th>
                 <th className="text-center">{t("table.couponCode")}</th>
+                <th className="text-center">{t("table.paymentMethod")}</th>
                 <th className="text-center">{t("table.transferFrom")}</th>
                 <th className="text-center">{t("table.status")}</th>
                 <th className="text-center">{t("table.notes")}</th>
@@ -1051,18 +1050,14 @@ const Orders = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="11" className="text-center py-8">
-                    {" "}
-                    {/* Adjusted colSpan */}
+                  <td colSpan="12" className="text-center py-8">
                     <div className="loading loading-spinner loading-lg"></div>
                     <p className="mt-2 text-gray-500">{t("loading")}</p>
                   </td>
                 </tr>
               ) : memoizedOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="11" className="text-center py-8">
-                    {" "}
-                    {/* Adjusted colSpan */}
+                  <td colSpan="12" className="text-center py-8">
                     <p className="text-gray-500">
                       {searchQuery ||
                       statusFilter !== "all" ||
@@ -1112,6 +1107,15 @@ const Orders = () => {
                         </span>
                       ) : (
                         "NA"
+                      )}
+                    </td>
+                    <td className="text-center">
+                      {order.paymentMethod ? (
+                        <span className="badge badge-primary">
+                          {order.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">N/A</span>
                       )}
                     </td>
                     <td className="text-center font-mono text-sm">
@@ -1227,6 +1231,20 @@ const Orders = () => {
                             title={t("table.viewPaymentScreenshot")}
                           >
                             <ImageIcon className="w-3 h-3" />
+                          </button>
+                        )}
+                        {order.watermark && (
+                          <button
+                            className="btn btn-ghost btn-sm text-purple-600"
+                            onClick={() =>
+                              handleViewPaymentScreenshot(
+                                order.watermark
+                              )
+                            }
+                            title={t("table.viewWatermark") || "View Watermark"}
+                          >
+                            <ImageIcon className="w-3 h-3" />
+                            <span className="text-xs">W</span>
                           </button>
                         )}
                         {(order.numberTransferredFrom ||
@@ -1619,6 +1637,14 @@ const Orders = () => {
                       {formatPrice(selectedOrder.discountAmount)}
                     </p>
                   )}
+                  {selectedOrder.paymentMethod && (
+                    <p>
+                      <strong>{t("table.paymentMethod")}:</strong>{" "}
+                      <span className="badge badge-primary ml-2">
+                        {selectedOrder.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
+                      </span>
+                    </p>
+                  )}
                   <p>
                     <strong>{t("table.paymentNumber")}:</strong>{" "}
                     {selectedOrder.paymentNumber}
@@ -1629,8 +1655,8 @@ const Orders = () => {
                       selectedOrder.bankTransferFrom ||
                       "N/A"}
                   </p>
-                  {selectedOrder.paymentScreenShot && (
-                    <div className="mt-2">
+                  <div className="flex gap-2 mt-2">
+                    {selectedOrder.paymentScreenShot && (
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() =>
@@ -1641,8 +1667,20 @@ const Orders = () => {
                       >
                         {t("table.viewPaymentScreenshot")}
                       </button>
-                    </div>
-                  )}
+                    )}
+                    {selectedOrder.watermark && (
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() =>
+                          handleViewPaymentScreenshot(
+                            selectedOrder.watermark
+                          )
+                        }
+                      >
+                        {t("table.viewWatermark") || "View Watermark"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
