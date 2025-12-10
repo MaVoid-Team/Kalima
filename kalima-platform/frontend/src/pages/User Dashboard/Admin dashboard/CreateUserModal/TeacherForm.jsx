@@ -203,6 +203,7 @@ const TeacherForm = ({
                 target: { name: "subject", value: e.target.value },
               })
             }
+            required
           >
             <option value="">
               {t("placeholders.selectSubject") || "Select Subject"}
@@ -260,7 +261,7 @@ const TeacherForm = ({
           )}
         </div>
       </div>
-      {/* Phone Number */}
+
       {/* Teaches At Type */}
       <div className=" ">
         <div className="flex flex-col gap-2">
