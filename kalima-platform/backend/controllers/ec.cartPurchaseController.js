@@ -18,10 +18,8 @@ const getCurrentEgyptTime = () => {
 const DEFAULT_STATS_START_DATE = new Date('2025-11-01');
 
 exports.createCartPurchase = catchAsync(async (req, res, next) => {
-    // Check if user serial exists
-    if (!req.user.userSerial) {
-        return next(new AppError("User serial not found", 400));
-    }
+    // Get user serial or use user ID as fallback
+    const userSerial = req.user.userSerial || req.user._id.toString().slice(-8).toUpperCase();
 
     // Rate limiting: Check if user has made a purchase in the last 30 seconds
     const thirtySecondsAgo = new Date(Date.now() - 30000);
@@ -64,9 +62,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         if (!req.body.numberTransferredFrom || !hasPaymentScreenshot) {
             return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
         }
-        // if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
-        //     return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
-        // }
+        if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
+            return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
+        }
     }
     // Prepare items with snapshots
     const items = cart.items.map(item => ({
@@ -99,7 +97,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
 
     // Find the last purchase of the day to determine sequence number
     const lastPurchase = await ECCartPurchase.findOne({
-        purchaseSerial: new RegExp(`${req.user.userSerial}-CP-${formattedDate}-\\d+$`),
+        purchaseSerial: new RegExp(`${userSerial}-CP-${formattedDate}-\\d+$`),
     }).sort({ purchaseSerial: -1 });
 
     // Get the next sequence number
@@ -111,7 +109,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
 
     // Format sequence as 3 digits (001, 002, etc.)
     const formattedSequence = sequence.toString().padStart(3, '0');
-    const purchaseSerial = `${req.user.userSerial}-CP-${formattedDate}-${formattedSequence}`;
+    const purchaseSerial = `${userSerial}-CP-${formattedDate}-${formattedSequence}`;
 
     // Create the purchase
     const purchase = await ECCartPurchase.create({
