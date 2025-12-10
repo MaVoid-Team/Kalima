@@ -20,7 +20,7 @@ const teacherValidation = userValidation.concat(
     phoneNumber: Joi.string().required(),
     phoneNumber2: Joi.string().allow(null, "").optional(),
 
-    subject: Joi.string().required(), 
+    subject: Joi.string().optional(), 
 
     level: Joi.array()
       .items(Joi.string().valid("primary", "preparatory", "secondary"))
