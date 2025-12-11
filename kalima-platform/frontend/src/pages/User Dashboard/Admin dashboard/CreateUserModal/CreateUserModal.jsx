@@ -306,7 +306,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           ...commonFields,
           phoneNumber: data.phoneNumber || undefined,
           phoneNumber2: data.phoneNumber2 || undefined,
-
+          subject: data.subject || undefined,
           level: Array.isArray(data.level)
             ? data.level
             : data.level
