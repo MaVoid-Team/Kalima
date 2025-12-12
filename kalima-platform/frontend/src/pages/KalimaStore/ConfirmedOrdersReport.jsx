@@ -302,7 +302,7 @@ const ConfirmedOrdersReport = () => {
           <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
             {/* Start Date */}
             <div className="w-full">
-              <label className="label font-medium">
+              <label className="label font-medium mb-1">
                 {isRTL ? "تاريخ البداية" : "Start Date"}
               </label>
               <input
@@ -315,7 +315,7 @@ const ConfirmedOrdersReport = () => {
 
             {/* Start Time */}
             <div className="w-full">
-              <label className="label font-medium">
+              <label className="label font-medium mb-1">
                 {isRTL ? "وقت البداية" : "Start Time"}
               </label>
               <div className="flex gap-2 w-full">
@@ -338,7 +338,7 @@ const ConfirmedOrdersReport = () => {
 
             {/* End Date */}
             <div className="w-full">
-              <label className="label font-medium">
+              <label className="label font-medium mb-1">
                 {isRTL ? "تاريخ النهاية" : "End Date"}
               </label>
               <input
@@ -351,7 +351,7 @@ const ConfirmedOrdersReport = () => {
 
             {/* End Time */}
             <div className="w-full">
-              <label className="label font-medium">
+              <label className="label font-medium mb-1">
                 {isRTL ? "وقت النهاية" : "End Time"}
               </label>
               <div className="flex gap-2 w-full">
