@@ -100,6 +100,35 @@ export const confirmProductPurchase = async (purchaseId) => {
     }
   }
 }
+export const  ReturnProductPurchase = async (purchaseId) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+
+    const response = await axios.patch(
+      `${API_URL}/api/v1/ec/cart-purchases/${purchaseId}/return`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to confirm purchase: ${error.message}`,
+    }
+  }
+}
 
 export const confirmBookPurchase = async (purchaseId) => {
   return confirmProductPurchase(purchaseId)
