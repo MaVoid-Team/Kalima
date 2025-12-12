@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getConfirmedOrdersReport } from "../../routes/cart";
@@ -12,6 +11,7 @@ import {
   DollarSign,
   Award,
   Calendar,
+  RotateCcw,
   Package,
 } from "lucide-react";
 
@@ -24,15 +24,54 @@ const ConfirmedOrdersReport = () => {
   const [reportData, setReportData] = useState(null);
   const [selectedConfirmer, setSelectedConfirmer] = useState(null);
 
+  const [startDate, setStartDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [startPeriod, setStartPeriod] = useState("AM");
+
+  const [endDate, setEndDate] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [endPeriod, setEndPeriod] = useState("PM");
+
+  const [filtersApplied, setFiltersApplied] = useState(false);
+
+  function convertTo12Hour(time24) {
+    if (!time24) return "";
+
+    let [hours, minutes] = time24.split(":");
+    hours = parseInt(hours, 10);
+
+    const period = hours >= 12 ? "PM" : "AM";
+    const hours12 = hours % 12 || 12;
+
+    return {
+      time: `${hours12}:${minutes}`,
+      period,
+    };
+  }
+
+  const startConverted = convertTo12Hour(startTime);
+  const endConverted = convertTo12Hour(endTime);
+
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [filtersApplied]);
 
   const fetchReport = async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await getConfirmedOrdersReport();
+
+      const params = {
+        startDate,
+        startTime: startConverted.time,
+        startPeriod: startConverted.period,
+        endDate,
+        endTime: endConverted.time,
+        endPeriod: endConverted.period,
+      };
+
+      const result = await getConfirmedOrdersReport(params);
+
       if (result.success) {
         setReportData(result.data.data);
       } else {
@@ -41,7 +80,7 @@ const ConfirmedOrdersReport = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setLoading(false); // ← VERY IMPORTANT
     }
   };
 
@@ -106,7 +145,7 @@ const ConfirmedOrdersReport = () => {
     return null;
   }
 
-  const { summary, confirmerStats, recentConfirmedOrders } = reportData;
+  const { platformSummary, staffReport, recentConfirmedOrders } = reportData;
 
   return (
     <div
@@ -124,7 +163,7 @@ const ConfirmedOrdersReport = () => {
         </div>
         <h1 className="text-3xl font-bold text-center flex items-center gap-3">
           <CheckCircle className="w-8 h-8 text-success" />
-          {isRTL ? "تقرير الطلبات المؤكدة" : "Confirmed Orders Report"}
+          {isRTL ? "تقرير الاداء" : "Confirmed Orders Report"}
         </h1>
         <div className={`absolute ${isRTL ? "left-0" : "right-0"}`}>
           <img
@@ -136,7 +175,8 @@ const ConfirmedOrdersReport = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        {/* 1 — إجمالي الطلبات المؤكدة */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,13 +193,14 @@ const ConfirmedOrdersReport = () => {
                   {isRTL ? "إجمالي الطلبات المؤكدة" : "Total Confirmed Orders"}
                 </h3>
                 <p className="text-3xl font-bold">
-                  {summary.totalConfirmedOrders}
+                  {platformSummary.totalConfirmedOrders}
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
+        {/* 2 — إجمالي المنتجات المؤكدة */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -169,48 +210,73 @@ const ConfirmedOrdersReport = () => {
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6" />
+                <Package className="w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-sm font-medium opacity-90">
-                  {isRTL ? "إجمالي الإيرادات" : "Total Revenue"}
+                  {isRTL ? "إجمالي المنتجات المؤكدة" : "Total Confirmed Items"}
                 </h3>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(summary.totalConfirmedRevenue)}
+                <p className="text-3xl font-bold">
+                  {platformSummary.totalConfirmedItems}
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
+        {/* 3 — إجمالي الطلبات المسترجعة */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="card bg-gradient-to-br from-info to-info/70 text-info-content shadow-lg"
+          className="card bg-gradient-to-br from-warning to-warning/70 text-warning-content shadow-lg"
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6" />
+                <RotateCcw className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-sm font-medium opacity-90">
-                  {isRTL ? "متوسط وقت التأكيد" : "Avg Confirmation Time"}
+                <h3 className="text-sm whitespace-nowrap font-medium opacity-90">
+                  {isRTL ? "إجمالي الطلبات المسترجعة" : "Total Returned Orders"}
                 </h3>
-                <p className="text-2xl font-bold">
-                  {summary.averageConfirmationTimeMinutes}{" "}
-                  {isRTL ? "دقيقة" : "min"}
+                <p className="text-3xl font-bold">
+                  {platformSummary.totalReturnedOrders}
                 </p>
               </div>
             </div>
           </div>
         </motion.div>
 
+        {/* 4 — إجمالي المنتجات المسترجعة */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
+          className="card bg-gradient-to-br from-error to-error/70 text-error-content shadow-lg"
+        >
+          <div className="card-body p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <RotateCcw className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-sm whitespace-nowrap font-medium opacity-90">
+                  {isRTL ? "إجمالي المنتجات المسترجعة" : "Total Returned Items"}
+                </h3>
+                <p className="text-3xl font-bold">
+                  {platformSummary.totalReturnedItems}
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* 5 — عدد الأفراد العاملين */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
           className="card bg-gradient-to-br from-secondary to-secondary/70 text-secondary-content shadow-lg"
         >
           <div className="card-body p-4">
@@ -220,13 +286,122 @@ const ConfirmedOrdersReport = () => {
               </div>
               <div>
                 <h3 className="text-sm font-medium opacity-90">
-                  {isRTL ? "عدد المؤكدين" : "Total Confirmers"}
+                  {isRTL ? "عدد الأفراد العاملين" : "Total Staff"}
                 </h3>
-                <p className="text-3xl font-bold">{summary.totalConfirmers}</p>
+                <p className="text-3xl font-bold">
+                  {platformSummary.totalStaff}
+                </p>
               </div>
             </div>
           </div>
         </motion.div>
+      </div>
+      {/* Filters Card */}
+      <div className="card shadow-lg mb-3">
+        <div className="card-body">
+          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            {/* Start Date */}
+            <div className="w-full">
+              <label className="label font-medium">
+                {isRTL ? "تاريخ البداية" : "Start Date"}
+              </label>
+              <input
+                type="date"
+                className="input input-bordered w-full"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+
+            {/* Start Time */}
+            <div className="w-full">
+              <label className="label font-medium">
+                {isRTL ? "وقت البداية" : "Start Time"}
+              </label>
+              <div className="flex gap-2 w-full">
+                <input
+                  type="time"
+                  className="input input-bordered w-full"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+                <select
+                  className="select select-bordered w-20"
+                  value={startPeriod}
+                  onChange={(e) => setStartPeriod(e.target.value)}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+
+            {/* End Date */}
+            <div className="w-full">
+              <label className="label font-medium">
+                {isRTL ? "تاريخ النهاية" : "End Date"}
+              </label>
+              <input
+                type="date"
+                className="input input-bordered w-full"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+
+            {/* End Time */}
+            <div className="w-full">
+              <label className="label font-medium">
+                {isRTL ? "وقت النهاية" : "End Time"}
+              </label>
+              <div className="flex gap-2 w-full">
+                <input
+                  type="time"
+                  className="input input-bordered w-full"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+
+                <select
+                  className="select select-bordered w-20"
+                  value={endPeriod}
+                  onChange={(e) => setEndPeriod(e.target.value)}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Apply */}
+            <div className="w-full flex items-end">
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => setFiltersApplied((prev) => !prev)}
+              >
+                {isRTL ? "تطبيق" : "Apply"}
+              </button>
+            </div>
+
+            {/* Clear */}
+            <div className="w-full flex items-end">
+              <button
+                className="btn btn-ghost w-full"
+                onClick={() => {
+                  setStartDate("");
+                  setStartTime("");
+                  setStartPeriod("AM");
+                  setEndDate("");
+                  setEndTime("");
+                  setEndPeriod("PM");
+                  setFiltersApplied((prev) => !prev);
+                }}
+              >
+                {isRTL ? "مسح" : "Clear"}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Confirmer Statistics */}
@@ -241,71 +416,89 @@ const ConfirmedOrdersReport = () => {
             <table className="table w-full">
               <thead>
                 <tr>
-                  <th className="text-center">#</th>
+                  <th className="text-center">{isRTL ? "الاسم" : "Name"}</th>
+
                   <th className="text-center">
-                    {isRTL ? "الاسم" : "Name"}
+                    {isRTL ? "الطلبات المستلمة" : "Received Orders"}
                   </th>
-                  <th className="text-center">
-                    {isRTL ? "الدور" : "Role"}
-                  </th>
+
                   <th className="text-center">
                     {isRTL ? "الطلبات المؤكدة" : "Confirmed Orders"}
                   </th>
+
                   <th className="text-center">
-                    {isRTL ? "إجمالي الإيرادات" : "Total Revenue"}
+                    {isRTL ? "المنتجات المؤكدة" : "Confirmed Items"}
                   </th>
+
                   <th className="text-center">
-                    {isRTL ? "أول تأكيد" : "First Confirmation"}
+                    {isRTL ? "الطلبات المسترجعة" : "Returned Orders"}
                   </th>
+
                   <th className="text-center">
-                    {isRTL ? "آخر تأكيد" : "Last Confirmation"}
+                    {isRTL ? "المنتجات المسترجعة" : "Returned Items"}
                   </th>
+
                   <th className="text-center">
-                    {isRTL ? "الإجراءات" : "Actions"}
+                    {isRTL ? "متوسط وقت الاستلام" : "Avg Response Time"}
+                  </th>
+
+                  <th className="text-center">
+                    {isRTL ? "متوسط وقت التأكيد" : "Avg Confirmation Time"}
                   </th>
                 </tr>
               </thead>
+
               <tbody>
-                {confirmerStats.map((stat, index) => (
-                  <tr key={stat.admin.id} className="hover">
-                    <td className="text-center font-bold">{index + 1}</td>
+                {staffReport.map((stat, index) => (
+                  <tr key={stat.staff.id} className="hover">
+                    {/* Name + Email */}
                     <td className="text-center">
                       <div className="flex flex-col items-center">
-                        <span className="font-medium">{stat.admin.name}</span>
+                        <span className="font-medium">{stat.staff.name}</span>
                         <span className="text-xs opacity-70">
-                          {stat.admin.email}
+                          {stat.staff.email}
                         </span>
                       </div>
                     </td>
-                    <td className="text-center">
-                      <div className="badge badge-primary">
-                        {stat.admin.role}
-                      </div>
+
+                    {/* Received Orders */}
+                    <td className="text-center font-bold">
+                      {stat.totalReceivedOrders}
                     </td>
+
+                    {/* Confirmed Orders */}
                     <td className="text-center">
                       <div className="flex items-center justify-center gap-2">
                         <TrendingUp className="w-4 h-4 text-success" />
                         <span className="font-bold text-lg">
-                          {stat.totalConfirmed}
+                          {stat.totalConfirmedOrders}
                         </span>
                       </div>
                     </td>
+
+                    {/* Confirmed Items */}
                     <td className="text-center font-bold text-primary">
-                      {formatCurrency(stat.totalRevenue)}
+                      {stat.totalConfirmedItems}
                     </td>
+
+                    {/* Returned Orders */}
+                    <td className="text-center text-warning font-bold">
+                      {stat.totalReturnedOrders}
+                    </td>
+
+                    {/* Returned Items */}
+                    <td className="text-center text-error font-bold">
+                      {stat.totalReturnedItems}
+                    </td>
+
+                    {/* Avg Response Time */}
                     <td className="text-center text-sm">
-                      {formatDate(stat.firstConfirmation)}
+                      {stat.averageResponseTime}
                     </td>
+
+                    {/* Avg Confirmation Time */}
                     <td className="text-center text-sm">
-                      {formatDate(stat.lastConfirmation)}
-                    </td>
-                    <td className="text-center">
-                      <button
-                        className="btn btn-sm btn-ghost"
-                        onClick={() => setSelectedConfirmer(stat)}
-                      >
-                        {isRTL ? "عرض التفاصيل" : "View Details"}
-                      </button>
+                      {stat.averageConfirmationTime}
                     </td>
                   </tr>
                 ))}
@@ -314,8 +507,7 @@ const ConfirmedOrdersReport = () => {
           </div>
         </div>
       </div>
-
-      {/* Recent Confirmed Orders */}
+      {/* Recent Confirmed Orders
       <div className="card shadow-lg">
         <div className="card-body">
           <h2 className="card-title text-2xl mb-4 flex items-center gap-2">
@@ -390,8 +582,7 @@ const ConfirmedOrdersReport = () => {
             </table>
           </div>
         </div>
-      </div>
-
+      </div> */}
       {/* Confirmer Details Modal */}
       {selectedConfirmer && (
         <div className="modal modal-open">
@@ -446,7 +637,9 @@ const ConfirmedOrdersReport = () => {
                       <td className="font-bold">
                         {formatCurrency(order.total)}
                       </td>
-                      <td className="text-xs">{formatDate(order.confirmedAt)}</td>
+                      <td className="text-xs">
+                        {formatDate(order.confirmedAt)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

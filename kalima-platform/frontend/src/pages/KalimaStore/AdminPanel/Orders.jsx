@@ -8,6 +8,7 @@ import {
   receiveProductPurchase,
   updatePurchase,
   deleteProductPurchase,
+  ReturnProductPurchase,
 } from "../../../routes/orders";
 import { FaWhatsapp } from "react-icons/fa";
 import {
@@ -21,6 +22,7 @@ import {
   X,
   Calendar,
   Filter,
+  RotateCcw,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -99,15 +101,17 @@ const Orders = () => {
         queryParams.search = debouncedSearchQuery.trim();
       }
       if (statusFilter !== "all") {
-        // Fix: Properly handle all status filters
         if (statusFilter === "confirmed") {
           queryParams.status = "confirmed";
         } else if (statusFilter === "received") {
           queryParams.status = "received";
         } else if (statusFilter === "pending") {
           queryParams.status = "pending";
+        } else if (statusFilter === "returned") {
+          queryParams.status = "returned"; 
         }
       }
+
       // Add date filter to query params
       if (selectedDate) {
         queryParams.date = selectedDate;
@@ -227,6 +231,59 @@ const Orders = () => {
     typeFilter !== "all" ||
     selectedDate !== "";
 
+  const handleReturnOrder = async (order) => {
+    try {
+      setConfirmLoading((prev) => ({ ...prev, [order._id]: true }));
+
+      const response = await ReturnProductPurchase(order._id);
+
+      if (response.success) {
+        // Update UI state
+        setOrders((prev) =>
+          prev.map((o) =>
+            o._id === order._id ? { ...o, status: "returned" } : o
+          )
+        );
+
+        alert("تم استرجاع الطلب بنجاح");
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      alert("فشل في استرجاع الطلب: " + err.message);
+    } finally {
+      setConfirmLoading((prev) => ({ ...prev, [order._id]: false }));
+    }
+  };
+
+  const handleReConfirmOrder = async (order) => {
+    try {
+      setConfirmLoading((prev) => ({ ...prev, [order._id]: true }));
+
+      // نفس API بتاع confirm (مش receive)
+      const response = await confirmProductPurchase(order._id);
+
+      if (response.success) {
+        // Update UI
+        setOrders((prev) =>
+          prev.map((o) =>
+            o._id === order._id
+              ? { ...o, status: "confirmed", confirmed: true }
+              : o
+          )
+        );
+
+        alert("تم إعادة تأكيد الطلب");
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (err) {
+      alert("فشل إعادة التأكيد: " + err.message);
+    } finally {
+      setConfirmLoading((prev) => ({ ...prev, [order._id]: false }));
+    }
+  };
+
   const handleConfirmOrder = async (order) => {
     try {
       setConfirmLoading({ ...confirmLoading, [order._id]: true });
@@ -304,27 +361,38 @@ const Orders = () => {
 
   const handleWhatsAppContact = (order) => {
     const phoneNumber = order.createdBy?.phoneNumber;
-    
+
     // Build product list
-    const productList = order.items && order.items.length > 0
-      ? order.items.map((item, index) => {
-          const price = item.priceAtPurchase || 0;
-          const priceText = price > 0 ? `${price.toFixed(2)} جنيه` : 'مجاني';
-          return `${index + 1}. ${item.productSnapshot?.title || 'منتج'} - ${priceText}`;
-        }).join('\n')
-      : 'لا توجد منتجات';
-    
+    const productList =
+      order.items && order.items.length > 0
+        ? order.items
+            .map((item, index) => {
+              const price = item.priceAtPurchase || 0;
+              const priceText =
+                price > 0 ? `${price.toFixed(2)} جنيه` : "مجاني";
+              return `${index + 1}. ${
+                item.productSnapshot?.title || "منتج"
+              } - ${priceText}`;
+            })
+            .join("\n")
+        : "لا توجد منتجات";
+
     // Calculate totals
     const subtotal = order.subtotal || calculateCartTotal(order);
     const discount = order.discount || 0;
     const total = order.total || subtotal;
-    
-    const discountText = discount > 0 ? `\n- الخصم: ${discount.toFixed(2)} جنيه` : '';
-    const totalText = total > 0 ? `${total.toFixed(2)} جنيه` : 'مجاني';
-    
+
+    const discountText =
+      discount > 0 ? `\n- الخصم: ${discount.toFixed(2)} جنيه` : "";
+    const totalText = total > 0 ? `${total.toFixed(2)} جنيه` : "مجاني";
+
     // Build complete message with product list
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${order.userName} 👋\n\nتم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.\n\n*رقم الطلب:* ${order.purchaseSerial || order._id}\n\n*المنتجات:*\n${productList}${discountText}\n*الإجمالي: ${totalText}*\n\nلو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.\n\nنتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙\n\nمع تحيات فريق عمل\nمنصة كلمة`
+      `أهلاً بك أ/ ${
+        order.userName
+      } 👋\n\nتم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.\n\n*رقم الطلب:* ${
+        order.purchaseSerial || order._id
+      }\n\n*المنتجات:*\n${productList}${discountText}\n*الإجمالي: ${totalText}*\n\nلو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.\n\nنتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙\n\nمع تحيات فريق عمل\nمنصة كلمة`
     );
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, "_blank");
@@ -844,7 +912,9 @@ const Orders = () => {
                 <option value="all">{t("filters.allStatus")}</option>
                 <option value="confirmed">{t("filters.confirmed")}</option>
                 <option value="pending">{t("filters.pending")}</option>
-                <option value="received">{t("filters.received")}</option>{" "}
+                <option value="received">{t("filters.received")}</option>
+                <option value="returned">{t("filters.returned")}</option>
+
                 {/* Added received filter */}
               </select>
             </div>
@@ -1124,51 +1194,57 @@ const Orders = () => {
                         "N/A"}
                     </td>
                     <td className="text-center">
-                      {order.status !== "confirmed" ? (
-                        <div className="flex flex-col items-center gap-1">
-                          <div
-                            className={`badge ${
-                              order.status === "received"
-                                ? "badge-error"
-                                : "badge-info"
-                            }`}
-                          >
-                            {order.status === "received"
-                              ? t("table.received")
-                              : t("table.pending")}
+                      <div className="flex flex-col items-center gap-1">
+                        {/* 🟡 Returned */}
+                        {order.status === "returned" && (
+                          <div className="badge badge-warning">
+                            {t("table.returned") || "Returned"}
                           </div>
-                          {/* Show Received by */}
-                          {order.receivedBy && order.receivedBy.name && (
-                            <div className="text-xs opacity-50">
-                              {t("table.receivedBy")} {order.receivedBy.name}
-                            </div>
-                          )}
-                          {/* Show Confirmed by if exists but status is not confirmed */}
-                          {order.confirmedBy && order.confirmedBy.name && (
-                            <div className="text-xs opacity-50">
-                              {t("table.confirmedBy")} {order.confirmedBy.name}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-1">
+                        )}
+
+                        {/* 🟢 Confirmed */}
+                        {order.status === "confirmed" && (
                           <div className="badge badge-success">
                             {t("table.confirmed")}
                           </div>
-                          {/* Show Received by for confirmed orders */}
-                          {order.receivedBy && order.receivedBy.name && (
-                            <div className="text-xs opacity-50">
-                              {t("table.receivedBy")} {order.receivedBy.name}
-                            </div>
-                          )}
-                          {/* Show Confirmed by */}
-                          {order.confirmedBy && order.confirmedBy.name && (
-                            <div className="text-xs opacity-50">
-                              {t("table.confirmedBy")} {order.confirmedBy.name}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        )}
+
+                        {/* 🔵 Received */}
+                        {order.status === "received" && (
+                          <div className="badge badge-info">
+                            {t("table.received")}
+                          </div>
+                        )}
+
+                        {/* 🔴 Pending */}
+                        {order.status === "pending" && (
+                          <div className="badge badge-error">
+                            {t("table.pending")}
+                          </div>
+                        )}
+
+                        {/* Show Received By */}
+                        {order.receivedBy?.name && (
+                          <div className="text-xs opacity-50">
+                            {t("table.receivedBy")} {order.receivedBy.name}
+                          </div>
+                        )}
+
+                        {/* Show Confirmed By */}
+                        {order.confirmedBy?.name && (
+                          <div className="text-xs opacity-50">
+                            {t("table.confirmedBy")} {order.confirmedBy.name}
+                          </div>
+                        )}
+
+                        {/* Show Returned By */}
+                        {order.returnedBy?.name && (
+                          <div className="text-xs opacity-50">
+                            {t("table.returnedBy") || "Returned By"}{" "}
+                            {order.returnedBy.name}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="text-center max-w-32">
                       {order.adminNotes ? (
@@ -1197,6 +1273,7 @@ const Orders = () => {
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
+                        {/* View */}
                         <button
                           className="btn btn-ghost btn-sm"
                           onClick={() => handleViewDetails(order)}
@@ -1204,6 +1281,8 @@ const Orders = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
+
+                        {/* Notes */}
                         <button
                           className={`btn btn-ghost btn-sm relative ${
                             order.adminNotes ? "text-blue-600" : "text-gray-400"
@@ -1220,6 +1299,8 @@ const Orders = () => {
                             <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
                           )}
                         </button>
+
+                        {/* Payment Screenshot */}
                         {order.paymentScreenShot && (
                           <button
                             className="btn btn-ghost btn-sm"
@@ -1247,6 +1328,8 @@ const Orders = () => {
                             <span className="text-xs">W</span>
                           </button>
                         )}
+
+                        {/* WhatsApp */}
                         {(order.numberTransferredFrom ||
                           order.bankTransferFrom) && (
                           <button
@@ -1257,41 +1340,81 @@ const Orders = () => {
                             <FaWhatsapp />
                           </button>
                         )}
-                        {order.status !== "confirmed" && (
+
+                        <button
+                          className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                          onClick={() => handleDeleteOrder(order)}
+                          title={t("table.deleteOrder")}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+
+                        {/* Receive → Confirm Buttons */}
+                        {order.status !== "confirmed" &&
+                          order.status !== "returned" && (
+                            <button
+                              className={`btn btn-sm ${
+                                order.status === "pending"
+                                  ? "btn-error"
+                                  : "btn-success"
+                              }`}
+                              onClick={() => handleConfirmOrder(order)}
+                              disabled={confirmLoading[order._id]}
+                              title={
+                                order.status === "pending"
+                                  ? t("table.receiveOrder")
+                                  : t("table.confirmOrder")
+                              }
+                            >
+                              {confirmLoading[order._id] ? (
+                                <span className="loading loading-spinner loading-xs"></span>
+                              ) : (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  {order.status === "pending"
+                                    ? t("table.receive")
+                                    : t("table.confirm")}
+                                </>
+                              )}
+                            </button>
+                          )}
+
+                        {/* Return / Re-confirm loop */}
+                        {order.status === "confirmed" && (
                           <button
-                            className={`btn btn-sm ${
-                              order.status === "pending"
-                                ? "btn-error"
-                                : "btn-success"
-                            }`}
-                            onClick={() => handleConfirmOrder(order)}
+                            className="btn btn-warning btn-sm hover:bg-yellow-500"
+                            onClick={() => handleReturnOrder(order)}
                             disabled={confirmLoading[order._id]}
-                            title={
-                              order.status === "pending"
-                                ? t("table.receiveOrder")
-                                : t("table.confirmOrder")
-                            }
+                            title={t("table.returnOrder")}
+                          >
+                            {confirmLoading[order._id] ? (
+                              <span className="loading loading-spinner loading-xs"></span>
+                            ) : (
+                              <>
+                                <RotateCcw className="w-4 h-4" />
+                                {t("table.return")}
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        {order.status === "returned" && (
+                          <button
+                            className="btn btn-success btn-sm hover:bg-green-600"
+                            onClick={() => handleReConfirmOrder(order)}
+                            disabled={confirmLoading[order._id]}
+                            title="Re-confirm order"
                           >
                             {confirmLoading[order._id] ? (
                               <span className="loading loading-spinner loading-xs"></span>
                             ) : (
                               <>
                                 <Check className="w-4 h-4" />
-                                {order.status === "pending"
-                                  ? t("table.receive")
-                                  : t("table.confirm")}
+                                {t("table.confirm")}
                               </>
                             )}
                           </button>
                         )}
-                        {/* Delete button */}
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteOrder(order)}
-                          title={t("table.deleteOrder")}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -1564,9 +1687,7 @@ const Orders = () => {
                             </p>
 
                             <p className="text-sm">
-                             
-                           عدد الطلبات
-                           :{items.length}
+                              عدد الطلبات :{items.length}
                             </p>
                           </div>
 
