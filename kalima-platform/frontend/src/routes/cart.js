@@ -184,6 +184,15 @@ export const createCartPurchase = async (purchaseData) => {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment);
     }
 
+    if (purchaseData.paymentMethod) {
+      formData.append("paymentMethod", purchaseData.paymentMethod);
+    }
+
+    if (purchaseData.watermark) {
+      const safeWatermark = generateSafeFilename(purchaseData.watermark);
+      formData.append("watermark", purchaseData.watermark, safeWatermark);
+    }
+
     if (purchaseData.notes) {
       formData.append("notes", purchaseData.notes);
     }
