@@ -13,6 +13,7 @@ import {
   createCartPurchase,
 } from "../../routes/cart";
 import { validateCoupon } from "../../routes/marketCoupouns";
+import { getUserFromToken } from "../../routes/auth-services";
 import { motion } from "framer-motion";
 import {
   ShoppingCart,
@@ -34,9 +35,30 @@ const CartPage = () => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText("+20 106 116 5403");
+    const phoneNumber = getPaymentPhoneNumber();
+    navigator.clipboard.writeText(phoneNumber);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  // Get payment phone number based on selected payment method
+  const getPaymentPhoneNumber = () => {
+    if (checkoutData.paymentMethod === "vodafone cash") {
+      return "01008715756";
+    } else if (checkoutData.paymentMethod === "instapay") {
+      return "01001122334";
+    }
+    return ""; // No payment method selected yet
+  };
+
+  // Get payment method label
+  const getPaymentMethodLabel = () => {
+    if (checkoutData.paymentMethod === "vodafone cash") {
+      return t("vodafoneCash") || "Vodafone Cash";
+    } else if (checkoutData.paymentMethod === "instapay") {
+      return t("instapay") || "Instapay";
+    }
+    return "";
   };
 
   const [cart, setCart] = useState(null);
@@ -53,6 +75,8 @@ const CartPage = () => {
   const [checkoutData, setCheckoutData] = useState({
     numberTransferredFrom: "",
     paymentScreenShot: null,
+    watermark: null,
+    paymentMethod: "",
     notes: "",
     nameOnBook: "",
     numberOnBook: "",
@@ -63,12 +87,14 @@ const CartPage = () => {
   const [validationErrors, setValidationErrors] = useState({
     numberTransferredFrom: "",
     paymentScreenShot: "",
+    paymentMethod: "",
     nameOnBook: "",
     numberOnBook: "",
     seriesName: "",
   });
   const [checkoutCooldown, setCheckoutCooldown] = useState(0);
   const [cooldownTimer, setCooldownTimer] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   // Fetch cart data
   const fetchCart = async () => {
@@ -115,6 +141,17 @@ const CartPage = () => {
 
   useEffect(() => {
     fetchCart();
+    // Get user role
+    const user = getUserFromToken();
+    console.log("CartPage - Full User Object:", user); // Debug log
+    if (user && user.role) {
+      setUserRole(user.role);
+      console.log("CartPage - User Role Set To:", user.role); // Debug log
+      console.log("CartPage - Is Teacher?", user.role === "Teacher");
+      console.log("CartPage - Is Lecturer?", user.role === "Lecturer");
+    } else {
+      console.log("CartPage - No user or no role found");
+    }
   }, []);
 
   // Cooldown timer effect
@@ -315,6 +352,16 @@ const CartPage = () => {
     }
   };
 
+  // Handle watermark upload
+  const handleWatermarkChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setCheckoutData({
+        ...checkoutData,
+        watermark: e.target.files[0],
+      });
+    }
+  };
+
   // Clear validation errors for a specific field
   const clearFieldError = (fieldName) => {
     setValidationErrors((prev) => ({
@@ -339,6 +386,12 @@ const CartPage = () => {
       if (!checkoutData.paymentScreenShot) {
         errors.paymentScreenShot =
           t("errors.noFileSelected") || "Please upload payment screenshot";
+        isValid = false;
+      }
+
+      if (!checkoutData.paymentMethod) {
+        errors.paymentMethod =
+          t("errors.paymentMethodRequired") || "Payment method is required";
         isValid = false;
       }
     }
@@ -410,6 +463,8 @@ const CartPage = () => {
         setCheckoutData({
           numberTransferredFrom: "",
           paymentScreenShot: null,
+          watermark: null,
+          paymentMethod: "",
           notes: "",
           nameOnBook: "",
           numberOnBook: "",
@@ -418,6 +473,7 @@ const CartPage = () => {
         setValidationErrors({
           numberTransferredFrom: "",
           paymentScreenShot: "",
+          paymentMethod: "",
           nameOnBook: "",
           numberOnBook: "",
           seriesName: "",
@@ -891,14 +947,14 @@ const CartPage = () => {
                   {/* Divider */}
                   <div className="border-t border-base-300 my-3"></div>
 
-                  {/* Payment Section - Only show if cart total > 0 */}
-                  {cart.total > 0 && (
+                  {/* Payment Section - Only show if cart total > 0 and payment method selected */}
+                  {cart.total > 0 && checkoutData.paymentMethod && (
                     <div
                       dir="rtl"
                       className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
                     >
                       <p className="text-base md:text-lg font-semibold text-gray-100">
-                        برجاء دفع المبلغ على الرقم التالي:
+                        برجاء دفع المبلغ على رقم {getPaymentMethodLabel()}:
                       </p>
 
                       {/* Payment Number */}
@@ -912,8 +968,8 @@ const CartPage = () => {
                    cursor-pointer select-none transition-all duration-300
                    hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
                       >
-                        <span dir="ltr" className="select-all  text-white tracking-wide">
-                          +20 106 116 5403
+                        <span dir="ltr" className="select-all text-white tracking-wide">
+                          {getPaymentPhoneNumber()}
                         </span>
 
                         {/* Copy Tooltip */}
@@ -1013,7 +1069,89 @@ const CartPage = () => {
                           ),
                         error: validationErrors.paymentScreenShot,
                       },
+                      {
+                        key: "paymentMethod",
+                        label: (
+                          <>
+                            {t("paymentMethod") || "Payment Method"}
+                            <span className="text-error ml-1">*</span>
+                          </>
+                        ),
+                        input: (
+                          <select
+                            className={`select select-bordered h-12 w-full ${
+                              validationErrors.paymentMethod
+                                ? "select-error"
+                                : ""
+                            }`}
+                            value={checkoutData.paymentMethod}
+                            onChange={(e) => {
+                              setCheckoutData({
+                                ...checkoutData,
+                                paymentMethod: e.target.value,
+                              });
+                              clearFieldError("paymentMethod");
+                            }}
+                          >
+                            <option value="">
+                              {t("selectPaymentMethod") || "Select payment method"}
+                            </option>
+                            <option value="vodafone cash">
+                              {t("vodafoneCash") || "Vodafone Cash"} - 01008715756
+                            </option>
+                            <option value="instapay">
+                              {t("instapay") || "Instapay"} - 01001122334
+                            </option>
+                          </select>
+                        ),
+                        error: validationErrors.paymentMethod,
+                      },
                     ] : []),
+                    // Watermark upload (available for all users)
+                    {
+                      key: "watermark",
+                      label: (
+                        <>
+                          {t("watermark") || "Watermark"} ({t("optional") || "Optional"})
+                        </>
+                      ),
+                      helper: (
+                        <div className="alert alert-info mb-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="stroke-current shrink-0 h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <span className="text-sm">
+                            {t("watermarkHelper") || "If you want to upload a watermark feel free to do so."}
+                          </span>
+                        </div>
+                      ),
+                      input: (
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg"
+                          className="file-input file-input-bordered focus:outline-none h-12 w-full"
+                          onChange={handleWatermarkChange}
+                        />
+                      ),
+                      extra: checkoutData.watermark && (
+                        <label className="label mt-1">
+                          <span className="label-text-alt text-success">
+                            {t("fileSelected") || "File selected"}:{" "}
+                            {checkoutData.watermark.name}
+                          </span>
+                        </label>
+                      ),
+                    },
                   ].map((field, index) => (
                     <motion.div
                       key={field.key}
@@ -1022,6 +1160,7 @@ const CartPage = () => {
                       transition={{ duration: 0.4, delay: index * 0.1 }}
                       className="form-control space-y-2"
                     >
+                      {field.helper}
                       <label className="label mb-2 font-semibold">
                         <span className="label-text">{field.label}</span>
                       </label>
