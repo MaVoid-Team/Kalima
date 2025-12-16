@@ -1,6 +1,7 @@
 const ECCartPurchase = require("../models/ec.cartPurchaseModel");
 const ECCart = require("../models/ec.cartModel");
 const ECCoupon = require("../models/ec.couponModel");
+const PaymentMethod = require("../models/paymentMethodModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { sendEmail } = require("../utils/emailVerification/emailService");
@@ -57,13 +58,26 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     }
 
     // Validate payment info only if cart total > 0
+    let paymentMethodDoc = null;
     if (cart.total > 0) {
         const hasPaymentScreenshot = req.file || (req.files && req.files.paymentScreenShot && req.files.paymentScreenShot.length > 0);
         if (!req.body.numberTransferredFrom || !hasPaymentScreenshot) {
             return next(new AppError("Payment Screenshot and Number Transferred From are required", 400));
         }
-        if (!req.body.paymentMethod || !['instapay', 'vodafone cash'].includes(req.body.paymentMethod)) {
-            return next(new AppError("Valid Payment Method is required (instapay or vodafone cash)", 400));
+        if (!req.body.paymentMethod) {
+            return next(new AppError("Payment Method is required", 400));
+        }
+        // Validate that paymentMethod is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(req.body.paymentMethod)) {
+            return next(new AppError("Invalid Payment Method ID format", 400));
+        }
+        // Fetch the payment method and validate it's active
+        paymentMethodDoc = await PaymentMethod.findById(req.body.paymentMethod);
+        if (!paymentMethodDoc) {
+            return next(new AppError("Payment method not found", 404));
+        }
+        if (!paymentMethodDoc.status) {
+            return next(new AppError("Selected payment method is inactive", 400));
         }
     }
     // Prepare items with snapshots
@@ -117,8 +131,8 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         createdBy: req.user._id,
         items: items,
         numberTransferredFrom: numberTransferredFrom,
-        paymentNumber: cart.total > 0 ? cart.items[0].product.paymentNumber : null, // Only set payment number if cart has value
-        paymentMethod: cart.total > 0 ? req.body.paymentMethod : null,
+        paymentNumber: paymentMethodDoc ? paymentMethodDoc.phoneNumber : null, // Use PaymentMethod's phone number
+        paymentMethod: paymentMethodDoc ? paymentMethodDoc._id : null,
         paymentScreenShot: paymentScreenShot,
         subtotal: cart.subtotal,
         couponCode: cart.couponCode,
@@ -439,6 +453,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate('receivedBy', 'name')
                     .populate('returnedBy', 'name')
                     .populate('adminNoteBy', 'name')
+                    .populate({ path: "paymentMethod", select: "name" })
                     .populate('couponCode');
                 // If baseMatch filters exist, ensure the found doc satisfies them
                 let matchesBase = true;
@@ -555,6 +570,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate('receivedBy', 'name')
                     .populate('returnedBy', 'name')
                     .populate('adminNoteBy', 'name')
+                    .populate('paymentMethod', 'name')
                     .populate('couponCode');
                 if (doc) populated.push(doc);
             }
@@ -582,6 +598,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         .populate('receivedBy', 'name')
         .populate('returnedBy', 'name')
         .populate('adminNoteBy', 'name')
+        .populate('paymentMethod', 'name')
         .populate('couponCode')
         .sort('-createdAt')
         .skip(skip)
@@ -991,46 +1008,67 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
     const { startDate, startTime, startPeriod, endDate, endTime, endPeriod } = req.query;
     const dateFilter = {};
 
-    // Helper to parse time with AM/PM format
-    const parseTimeWithPeriod = (dateStr, timeStr, period) => {
-        if (!dateStr || !timeStr || !period) return null;
+    // Helper to convert Egypt time to UTC (Egypt is UTC+2)
+    const egyptTimeToUTC = (dateStr, timeStr, period) => {
+        if (!dateStr) return null;
 
         try {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            if (isNaN(hours) || isNaN(minutes) || hours < 1 || hours > 12 || minutes < 0 || minutes > 59) {
-                throw new Error('Invalid time format');
+            let hour24 = 0;
+            let minutes = 0;
+
+            // Parse time if provided
+            if (timeStr && period) {
+                const [hours, mins] = timeStr.split(':').map(Number);
+                if (isNaN(hours) || isNaN(mins) || hours < 1 || hours > 12 || mins < 0 || mins > 59) {
+                    throw new Error('Invalid time format');
+                }
+
+                // Convert 12-hour to 24-hour format
+                hour24 = hours;
+                if (period.toUpperCase() === 'AM') {
+                    if (hours === 12) hour24 = 0; // 12 AM = 00:00
+                } else if (period.toUpperCase() === 'PM') {
+                    if (hours !== 12) hour24 = hours + 12; // 1 PM = 13:00
+                }
+                minutes = mins;
             }
 
-            // Convert 12-hour to 24-hour format
-            let hour24 = hours;
-            if (period.toUpperCase() === 'AM') {
-                if (hours === 12) hour24 = 0; // 12 AM = 00:00
-            } else if (period.toUpperCase() === 'PM') {
-                if (hours !== 12) hour24 = hours + 12; // 1 PM = 13:00, but 12 PM = 12:00
-            }
+            // Create DateTime in Egypt timezone, then convert to UTC
+            const dt = DateTime.fromISO(`${dateStr}T${String(hour24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`, {
+                zone: 'Africa/Cairo'
+            });
 
-            const dateObj = new Date(dateStr);
-            dateObj.setHours(hour24, minutes, 0, 0);
-            return dateObj;
+            return dt.toJSDate(); // Returns UTC equivalent
         } catch (error) {
-            return new Date(dateStr); // Fallback to just the date
+            console.error('Error parsing Egypt time:', error);
+            return null;
         }
     };
 
     if (startDate || endDate) {
         if (startDate) {
             dateFilter.createdAt = dateFilter.createdAt || {};
-            const startDateTime = parseTimeWithPeriod(startDate, startTime, startPeriod) || new Date(startDate);
-            dateFilter.createdAt.$gte = startDateTime;
+            // Parse start date/time in Egypt timezone, convert to UTC
+            const startDateTime = egyptTimeToUTC(startDate, startTime, startPeriod);
+            if (startDateTime) {
+                dateFilter.createdAt.$gte = startDateTime;
+            }
         }
         if (endDate) {
             dateFilter.createdAt = dateFilter.createdAt || {};
-            let endDateTime = parseTimeWithPeriod(endDate, endTime, endPeriod) || new Date(endDate);
-            // If only date provided (no time), include the entire end date
-            if (!endTime || !endPeriod) {
-                endDateTime.setDate(endDateTime.getDate() + 1);
+            let endDateTime;
+
+            // If time provided, use it; otherwise use end of day (11:59 PM)
+            if (endTime && endPeriod) {
+                endDateTime = egyptTimeToUTC(endDate, endTime, endPeriod);
+            } else {
+                // End of day in Egypt time (11:59 PM = 23:59)
+                endDateTime = egyptTimeToUTC(endDate, '11:59', 'PM');
             }
-            dateFilter.createdAt.$lt = endDateTime;
+
+            if (endDateTime) {
+                dateFilter.createdAt.$lte = endDateTime;
+            }
         }
     }
 
@@ -1082,17 +1120,87 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
         return Math.max(0, totalMinutes);
     };
 
-    // Get all purchases with received, confirmed, or returned status
-    const query = {
-        status: { $in: ['confirmed', 'returned', 'received'] },
-        ...dateFilter
-    };
+    // Get all purchases with received, confirmed, or returned status using aggregation
+    const pipeline = [
+        {
+            $match: {
+                status: { $in: ['confirmed', 'returned', 'received'] },
+                ...dateFilter
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'receivedBy',
+                foreignField: '_id',
+                as: 'receivedByUser'
+            }
+        },
+        {
+            $unwind: {
+                path: '$receivedByUser',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'confirmedBy',
+                foreignField: '_id',
+                as: 'confirmedByUser'
+            }
+        },
+        {
+            $unwind: {
+                path: '$confirmedByUser',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'returnedBy',
+                foreignField: '_id',
+                as: 'returnedByUser'
+            }
+        },
+        {
+            $unwind: {
+                path: '$returnedByUser',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {
+                receivedBy: {
+                    _id: '$receivedByUser._id',
+                    name: '$receivedByUser.name',
+                    email: '$receivedByUser.email',
+                    role: '$receivedByUser.role'
+                },
+                receivedAt: 1,
+                confirmedBy: {
+                    _id: '$confirmedByUser._id',
+                    name: '$confirmedByUser.name',
+                    email: '$confirmedByUser.email',
+                    role: '$confirmedByUser.role'
+                },
+                confirmedAt: 1,
+                returnedBy: {
+                    _id: '$returnedByUser._id',
+                    name: '$returnedByUser.name',
+                    email: '$returnedByUser.email',
+                    role: '$returnedByUser.role'
+                },
+                returnedAt: 1,
+                createdAt: 1,
+                items: 1,
+                status: 1
+            }
+        }
+    ];
 
-    const allPurchases = await ECCartPurchase.find(query)
-        .populate('receivedBy', 'name email role _id')
-        .populate('confirmedBy', 'name email role _id')
-        .populate('returnedBy', 'name email role _id')
-        .select('receivedBy receivedAt confirmedBy confirmedAt returnedBy returnedAt createdAt items status');
+    const allPurchases = await ECCartPurchase.aggregate(pipeline);
 
     // Build staff statistics (receivedBy, confirmedBy, returnedBy)
     const staffStats = {};
@@ -1221,16 +1329,13 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
         })
         .sort((a, b) => (b.totalReceivedOrders + b.totalConfirmedOrders + b.totalReturnedOrders) - (a.totalReceivedOrders + a.totalConfirmedOrders + a.totalReturnedOrders));
 
-    // Calculate platform-wide totals
-    const confirmedPurchases = allPurchases.filter(p => p.status === 'confirmed');
-    const returnedPurchases = allPurchases.filter(p => p.status === 'returned');
-    const receivedPurchases = allPurchases.filter(p => p.status === 'received');
-
+    // Calculate platform-wide totals from staff report (ensures consistency across orders handled by multiple staff)
     const platformTotals = {
-        totalConfirmedOrders: confirmedPurchases.length,
-        totalConfirmedItems: confirmedPurchases.reduce((sum, p) => sum + (p.items?.length || 0), 0),
-        totalReturnedOrders: returnedPurchases.length,
-        totalReturnedItems: returnedPurchases.reduce((sum, p) => sum + (p.items?.length || 0), 0),
+        totalReceivedOrders: staffReportArray.reduce((sum, staff) => sum + staff.totalReceivedOrders, 0),
+        totalConfirmedOrders: staffReportArray.reduce((sum, staff) => sum + staff.totalConfirmedOrders, 0),
+        totalConfirmedItems: staffReportArray.reduce((sum, staff) => sum + staff.totalConfirmedItems, 0),
+        totalReturnedOrders: staffReportArray.reduce((sum, staff) => sum + staff.totalReturnedOrders, 0),
+        totalReturnedItems: staffReportArray.reduce((sum, staff) => sum + staff.totalReturnedItems, 0),
         totalStaff: staffReportArray.length
     };
 
