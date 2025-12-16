@@ -68,8 +68,8 @@ const cartPurchaseSchema = new mongoose.Schema(
             default: null,
         },
         paymentMethod: {
-            type: String,
-            enum: ["instapay", "vodafone cash"],
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "PaymentMethod",
             default: null,
         },
 
