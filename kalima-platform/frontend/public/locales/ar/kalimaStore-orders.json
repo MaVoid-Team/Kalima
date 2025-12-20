@@ -8,6 +8,8 @@
   "stats": {
     "totalOrders": "إجمالي الطلبات",
     "confirmed": "تم التأكيد",
+    "received": "تم الاستلام",
+    "returned": "تم الإرجاع",
     "pending": "قيد الانتظار",
     "books": "الكتب",
     "products": "المنتجات"
@@ -18,6 +20,7 @@
     "confirmed": "تم التأكيد",
     "pending": "قيد الانتظار",
     "received": "تم الاستلام",
+    "returned": "تم الإرجاع",
     "allTypes": "كل الأنواع",
     "books": "الكتب",
     "products": "المنتجات"
@@ -42,6 +45,9 @@
     "date": "التاريخ",
     "actions": "الإجراءات",
     "confirmed": "تم التأكيد",
+    "return": "إرجاع",
+    "returnedBy": "تم الإرجاع بواسطة",
+    "returned": "تم الإرجاع",
     "pending": "قيد الانتظار",
     "received": "تم الاستلام",
     "by": "بواسطة",
@@ -74,8 +80,10 @@
     "productInfo": "معلومات المنتج",
     "customerNotes": "ملاحظات العميل",
     "paymentInfo": "معلومات الدفع",
+    "paymentMethod": "طريقة الدفع",
     "paymentNumber": "رقم الدفع",
     "transferredFrom": "تم التحويل من",
+    "viewWatermark": "عرض العلامة المائية",
     "totalPrice": "السعر الإجمالي",
     "bookInfo": "معلومات الكتاب",
     "nameOnBook": "الاسم على الكتاب",

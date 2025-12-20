@@ -59,6 +59,14 @@
     "checkoutCooldown": "Please wait {{seconds}} seconds before checking out again."
   },
   "waitSeconds": "Wait {{seconds}}s",
-  "cooldownMessage": "Please wait {{seconds}} seconds before making another purchase. This prevents duplicate orders."
+  "cooldownMessage": "Please wait {{seconds}} seconds before making another purchase. This prevents duplicate orders.",
+  "watermark": "Watermark",
+  "watermarkHelper": "If you want to upload a watermark feel free to do so.",
+  "optional": "Optional",
+  "paymentMethod": "Payment Method",
+  "selectPaymentMethod": "Select payment method",
+  "vodafoneCash": "Vodafone Cash",
+  "instapay": "Instapay",
+  "paymentMethodRequired": "Payment method is required"
 }
 

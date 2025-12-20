@@ -66,6 +66,7 @@ const ecReferralRoutes = require("./routes/ec.referralRoutes");
 const ecCartRoutes = require("./routes/ec.cartRoutes");
 const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
 const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
+const ecPaymentMethodRoutes = require("./routes/paymentMethodRoutes");
 
 
 connectDB();
@@ -146,6 +147,8 @@ app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 app.use("/api/v1/ec/cart-items", ecCartItemRoutes);
 app.use("/api/v1/ec/carts", ecCartRoutes);
 app.use("/api/v1/ec/cart-purchases", ecCartPurchaseRoutes);
+app.use("/api/v1/ec/payment-methods", ecPaymentMethodRoutes);
+
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

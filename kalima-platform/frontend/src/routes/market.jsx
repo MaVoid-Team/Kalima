@@ -561,3 +561,122 @@ export const deleteSubSection = async (subSectionId) => {
   }
 }
 
+export const createPaymentMethod = async (data) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/v1/ec/payment-methods`,
+      data,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error creating payment method: ${error.message}`)
+    throw error
+  }
+}
+
+export const getAllPaymentMethods = async (queryParams = {}) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/v1/ec/payment-methods`,
+      {
+        params: queryParams,
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching payment methods: ${error.message}`)
+    throw error
+  }
+}
+
+export const getPaymentMethodById = async (id) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error fetching payment method by id: ${error.message}`)
+    throw error
+  }
+}
+
+export const updatePaymentMethod = async (id, updateData) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      updateData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error updating payment method: ${error.message}`)
+    throw error
+  }
+}
+
+export const changePaymentMethodStatus = async (id, status) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/api/v1/ec/payment-methods/${id}/status`,
+      { status },
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error changing payment method status: ${error.message}`
+    );
+    throw error;
+  }
+};
+
+
+export const deletePaymentMethod = async (id) => {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error(`Error deleting payment method: ${error.message}`)
+    throw error
+  }
+}
+
+
