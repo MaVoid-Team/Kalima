@@ -152,7 +152,7 @@ const Market = () => {
       const confirmMessage = isRTL
         ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
         : "You have already purchased this product. Do you want to buy it again?";
-      
+
       if (!window.confirm(confirmMessage)) {
         return; // User cancelled
       }
@@ -389,7 +389,7 @@ const Market = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedItems.map((item) => {
             const isPurchased = purchasedProductIds.includes(item._id);
-            
+
             return (
               <div
                 key={item._id}
@@ -424,7 +424,9 @@ const Market = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      {t("product.purchased") || "PURCHASED"}
+                      {isRTL
+                        ? "لقد اشتريت هذا المنتج من قبل"
+                        : "Already purchased before"}
                     </div>
                   </div>
                 )}
@@ -464,72 +466,73 @@ const Market = () => {
                     </div>
                   </div>
                 )}
-              <figure className="px-4 pt-4">
-                <img
-                  src={
-                    convertPathToUrl(item.thumbnail, "product_thumbnails") ||
-                    "/placeholder.svg?height=200&width=200" ||
-                    "/placeholder.svg"
-                  }
-                  alt={item.title}
-                  className="rounded-xl w-full h-48 object-cover"
-                />
-              </figure>
 
-              <div className="card-body items-center text-center p-6">
-                <h2 className="card-title text-lg font-semibold mb-2">
-                  {item.title}
-                </h2>
+                <figure className="px-4 pt-4">
+                  <img
+                    src={
+                      convertPathToUrl(item.thumbnail, "product_thumbnails") ||
+                      "/placeholder.svg?height=200&width=200" ||
+                      "/placeholder.svg"
+                    }
+                    alt={item.title}
+                    className="rounded-xl w-full h-48 object-cover"
+                  />
+                </figure>
 
-                <div className="flex items-center gap-2 mb-4">
-                  {item.priceAfterDiscount &&
-                  item.priceAfterDiscount < item.price ? (
-                    <>
+                <div className="card-body items-center text-center p-6">
+                  <h2 className="card-title text-lg font-semibold mb-2">
+                    {item.title}
+                  </h2>
+
+                  <div className="flex items-center gap-2 mb-4">
+                    {item.priceAfterDiscount &&
+                    item.priceAfterDiscount < item.price ? (
+                      <>
+                        <span className="text-2xl font-bold text-primary">
+                          {item.priceAfterDiscount} {t("product.currency")}
+                        </span>
+                        <span className="text-sm line-through text-gray-500">
+                          {item.price} {t("product.currency")}
+                        </span>
+                      </>
+                    ) : (
                       <span className="text-2xl font-bold text-primary">
-                        {item.priceAfterDiscount} {t("product.currency")}
-                      </span>
-                      <span className="text-sm line-through text-gray-500">
                         {item.price} {t("product.currency")}
                       </span>
-                    </>
-                  ) : (
-                    <span className="text-2xl font-bold text-primary">
-                      {item.price} {t("product.currency")}
-                    </span>
-                  )}
-                </div>
-
-                <div className="card-actions w-full gap-2">
-                  <button
-                    onClick={() => {
-                      // Determine type from the item data itself, not assumptions
-                      const itemType =
-                        item.__t === "ECBook" ? "book" : "product";
-                      navigate(
-                        `/market/product-details/${itemType}/${item._id}`
-                      );
-                    }}
-                    className="btn btn-primary bg-primary border-primary hover:bg-primary/50 flex-1"
-                  >
-                    {t("product.viewDetails")}
-                  </button>
-                  <button
-                    onClick={(e) => handleAddToCart(item._id, e)}
-                    disabled={addingToCart[item._id]}
-                    className="btn btn-outline btn-primary flex-1"
-                  >
-                    {addingToCart[item._id] ? (
-                      <span className="loading loading-spinner loading-sm"></span>
-                    ) : (
-                      <>
-                        <ShoppingCart className="w-4 h-4" />
-                        {t("product.addToCart")}
-                      </>
                     )}
-                  </button>
+                  </div>
+
+                  <div className="card-actions w-full gap-2">
+                    <button
+                      onClick={() => {
+                        // Determine type from the item data itself, not assumptions
+                        const itemType =
+                          item.__t === "ECBook" ? "book" : "product";
+                        navigate(
+                          `/market/product-details/${itemType}/${item._id}`
+                        );
+                      }}
+                      className="btn btn-primary bg-primary border-primary hover:bg-primary/50 flex-1"
+                    >
+                      {t("product.viewDetails")}
+                    </button>
+                    <button
+                      onClick={(e) => handleAddToCart(item._id, e)}
+                      disabled={addingToCart[item._id]}
+                      className="btn btn-outline btn-primary flex-1"
+                    >
+                      {addingToCart[item._id] ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-4 h-4" />
+                          {t("product.addToCart")}
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
             );
           })}
         </div>
