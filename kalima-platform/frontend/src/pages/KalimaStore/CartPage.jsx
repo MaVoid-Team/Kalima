@@ -27,6 +27,7 @@ import {
   ShoppingCartIcon,
   CircleCheckBigIcon,
 } from "lucide-react";
+import { getAllPaymentMethods } from "../../routes/market";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -41,25 +42,7 @@ const CartPage = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  // Get payment phone number based on selected payment method
-  const getPaymentPhoneNumber = () => {
-    if (checkoutData.paymentMethod === "vodafone cash") {
-      return "01008715756";
-    } else if (checkoutData.paymentMethod === "instapay") {
-      return "01001122334";
-    }
-    return ""; // No payment method selected yet
-  };
-
   // Get payment method label
-  const getPaymentMethodLabel = () => {
-    if (checkoutData.paymentMethod === "vodafone cash") {
-      return t("vodafoneCash") || "Vodafone Cash";
-    } else if (checkoutData.paymentMethod === "instapay") {
-      return t("instapay") || "Instapay";
-    }
-    return "";
-  };
 
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -83,6 +66,8 @@ const CartPage = () => {
     seriesName: "",
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
   const [requiresBookDetails, setRequiresBookDetails] = useState(false);
   const [validationErrors, setValidationErrors] = useState({
     numberTransferredFrom: "",
@@ -95,6 +80,20 @@ const CartPage = () => {
   const [checkoutCooldown, setCheckoutCooldown] = useState(0);
   const [cooldownTimer, setCooldownTimer] = useState(null);
   const [userRole, setUserRole] = useState(null);
+
+  const getPaymentMethodLabel = () => {
+    const method = paymentMethods.find(
+      (pm) => pm._id === checkoutData.paymentMethod
+    );
+    return method?.name || "";
+  };
+
+  const getPaymentPhoneNumber = () => {
+    const method = paymentMethods.find(
+      (pm) => pm._id === checkoutData.paymentMethod
+    );
+    return method?.phoneNumber || "";
+  };
 
   // Fetch cart data
   const fetchCart = async () => {
@@ -138,6 +137,22 @@ const CartPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const res = await getAllPaymentMethods();
+
+        if (res?.status === "success") {
+          setPaymentMethods(res.data.paymentMethods.filter((pm) => pm.status));
+        }
+      } catch (err) {
+        console.error("Failed to fetch payment methods", err);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   useEffect(() => {
     fetchCart();
@@ -949,7 +964,29 @@ const CartPage = () => {
                   {/* Divider */}
                   <div className="border-t border-base-300 my-3"></div>
 
-                  {/* Payment Section - Only show if cart total > 0 and payment method selected */}
+                  <select
+                    className={`select select-bordered h-12 w-full ${
+                      validationErrors.paymentMethod ? "select-error" : ""
+                    }`}
+                    value={checkoutData.paymentMethod}
+                    onChange={(e) => {
+                      setCheckoutData({
+                        ...checkoutData,
+                        paymentMethod: e.target.value,
+                      });
+                      clearFieldError("paymentMethod");
+                    }}
+                  >
+                    <option value="">
+                      {t("selectPaymentMethod") || "Select payment method"}
+                    </option>
+
+                    {paymentMethods.map((method) => (
+                      <option key={method._id} value={method._id}>
+                        {method.name}
+                      </option>
+                    ))}
+                  </select>
                   {cart.total > 0 && checkoutData.paymentMethod && (
                     <div
                       dir="rtl"
@@ -1076,45 +1113,6 @@ const CartPage = () => {
                               ),
                             error: validationErrors.paymentScreenShot,
                           },
-                          {
-                            key: "paymentMethod",
-                            label: (
-                              <>
-                                {t("paymentMethod") || "Payment Method"}
-                                <span className="text-error ml-1">*</span>
-                              </>
-                            ),
-                            input: (
-                              <select
-                                className={`select select-bordered h-12 w-full ${
-                                  validationErrors.paymentMethod
-                                    ? "select-error"
-                                    : ""
-                                }`}
-                                value={checkoutData.paymentMethod}
-                                onChange={(e) => {
-                                  setCheckoutData({
-                                    ...checkoutData,
-                                    paymentMethod: e.target.value,
-                                  });
-                                  clearFieldError("paymentMethod");
-                                }}
-                              >
-                                <option value="">
-                                  {t("selectPaymentMethod") ||
-                                    "Select payment method"}
-                                </option>
-                                <option value="vodafone cash">
-                                  {t("vodafoneCash") || "Vodafone Cash"} -
-                                  01008715756
-                                </option>
-                                <option value="instapay">
-                                  {t("instapay") || "Instapay"} - 01001122334
-                                </option>
-                              </select>
-                            ),
-                            error: validationErrors.paymentMethod,
-                          },
                         ]
                       : []),
                     // Watermark upload (available for all users)
@@ -1222,7 +1220,6 @@ const CartPage = () => {
                             transition={{ duration: 0.4, delay: index * 0.1 }}
                             className="space-y-1"
                           >
-                            {/* 🚀 Label فوق الـ Input */}
                             <label className="label font-medium">
                               <span className="label-text text-base-content">
                                 {field.label}
