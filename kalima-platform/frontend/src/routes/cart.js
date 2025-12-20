@@ -184,6 +184,15 @@ export const createCartPurchase = async (purchaseData) => {
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment);
     }
 
+    if (purchaseData.paymentMethod) {
+      formData.append("paymentMethod", purchaseData.paymentMethod);
+    }
+
+    if (purchaseData.watermark) {
+      const safeWatermark = generateSafeFilename(purchaseData.watermark);
+      formData.append("watermark", purchaseData.watermark, safeWatermark);
+    }
+
     if (purchaseData.notes) {
       formData.append("notes", purchaseData.notes);
     }
@@ -327,7 +336,7 @@ export const getAdminCartPurchases = async (queryParams = {}) => {
 };
 
 // Get confirmed orders report
-export const getConfirmedOrdersReport = async () => {
+export const getConfirmedOrdersReport = async (params = {}) => {
   try {
     const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/confirmed-report`, {
       withCredentials: true,
@@ -342,8 +351,9 @@ export const getConfirmedOrdersReport = async () => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message}`,
+      error: `Failed to fetch confirmed orders report: ${
+        error.response?.data?.message || error.message
+      }`,
     };
   }
 };
-

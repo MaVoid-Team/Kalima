@@ -448,3 +448,149 @@ await Promise.all(notificationPromises);
 **Last Updated:** December 8, 2025
 **Version:** 1.1
 **Authors:** Development Team
+
+
+---
+
+## 7. Watermark Upload & Payment Method Selection
+
+### Problem
+Teachers needed the ability to upload watermark images for their memos, and all users needed to specify their payment method (Vodafone Cash or Instapay) during checkout.
+
+### Solution
+Added watermark upload field (teachers only) and payment method dropdown (all users) to the cart checkout page, with full admin dashboard integration.
+
+### Files Changed
+
+#### Frontend Changes
+
+**`kalima-platform/frontend/src/pages/KalimaStore/CartPage.jsx`**
+- Added `getUserFromToken` import to check user role
+- Added `userRole` state to track current user's role
+- Added `watermark` and `paymentMethod` fields to `checkoutData` state
+- Added `handleWatermarkChange` function for watermark file upload
+- Added watermark upload field (only visible for teachers)
+- Added warning message about printing issues (English & Arabic)
+- Added payment method dropdown with two options:
+  - Vodafone Cash: 01008715756
+  - Instapay: 01001122334
+- Updated form validation to require payment method for paid orders
+- Updated form reset to include watermark and paymentMethod
+
+**Key Changes:**
+```javascript
+// Watermark upload (only for teachers)
+...(userRole === "Teacher" ? [
+  {
+    key: "watermark",
+    label: t("uploadWatermark"),
+    warning: <WarningAlert message={t("watermarkWarning")} />,
+    input: <FileInput onChange={handleWatermarkChange} />
+  }
+] : [])
+
+// Payment method dropdown (all users)
+{
+  key: "paymentMethod",
+  label: t("paymentMethod"),
+  input: (
+    <select value={checkoutData.paymentMethod}>
+      <option value="vodafone cash">Vodafone Cash - 01008715756</option>
+      <option value="instapay">Instapay - 01001122334</option>
+    </select>
+  )
+}
+```
+
+**`kalima-platform/frontend/src/routes/cart.js`**
+- Updated `createCartPurchase` to append `paymentMethod` to FormData
+- Updated `createCartPurchase` to append `watermark` file to FormData
+
+**`kalima-platform/frontend/src/pages/KalimaStore/AdminPanel/Orders.jsx`**
+- Added "Payment Method" column to orders table
+- Added watermark view button in actions column (purple icon with "W")
+- Updated table colspan from 11 to 12 for new column
+- Added payment method display in order details modal
+- Added watermark view button in order details modal
+- Payment method shown as badge (Vodafone Cash or Instapay)
+
+**Translation Files:**
+- `kalima-platform/frontend/public/locales/ar/kalimaStore-Cart.json`
+- `kalima-platform/frontend/public/locales/en/kalimaStore-Cart.json`
+
+**New Translation Keys:**
+```json
+{
+  "watermark": "Watermark / علامة مائية",
+  "watermarkWarning": "Warning message about printing issues",
+  "uploadWatermark": "Upload Watermark (Optional)",
+  "paymentMethod": "Payment Method / طريقة الدفع",
+  "selectPaymentMethod": "Select payment method",
+  "vodafoneCash": "Vodafone Cash / فودافون كاش",
+  "instapay": "Instapay / انستاباي",
+  "paymentMethodRequired": "Payment method is required"
+}
+```
+
+#### Backend Changes
+
+**`kalima-platform/backend/models/ec.cartPurchaseModel.js`**
+- Uncommented `paymentMethod` field in schema
+- Field type: String
+- Enum values: ["instapay", "vodafone cash"]
+- Default: null
+
+**`kalima-platform/backend/controllers/ec.cartPurchaseController.js`**
+- Uncommented payment method validation
+- Added validation to ensure valid payment method is selected for paid orders
+- Payment method validation: `['instapay', 'vodafone cash']`
+- Error message: "Valid Payment Method is required (instapay or vodafone cash)"
+
+**Note:** Backend watermark upload was already supported via `uploadCartPurchaseFiles` middleware in `uploadFiles.js`. No changes needed to backend upload handling.
+
+### Testing Checklist
+- [ ] Teacher can see watermark upload field
+- [ ] Non-teacher users cannot see watermark upload field
+- [ ] Warning message displays correctly in both languages
+- [ ] Watermark file uploads successfully
+- [ ] Payment method dropdown shows both options with phone numbers
+- [ ] Payment method is required for paid orders
+- [ ] Free orders don't require payment method
+- [ ] Admin can see payment method column in orders table
+- [ ] Admin can view watermark from actions column
+- [ ] Payment method displays correctly in order details modal
+- [ ] Watermark view button works in order details modal
+
+### User Experience
+- Teachers can now upload watermark images for their memos
+- Clear warning about potential printing issues
+- All users must select payment method (Vodafone Cash or Instapay)
+- Phone numbers displayed for each payment method
+- Admin can easily see payment method and view watermarks
+- Improved order tracking and verification
+
+### Update (Latest Changes)
+**Watermark Field Simplified:**
+- Changed from Teacher/Lecturer-only to **available for ALL users**
+- Changed warning message to friendly helper text: "If you want to upload a watermark feel free to do so."
+- File type restricted to PNG/JPG only
+- Added automatic cleanup: Watermarks older than 30 days are automatically deleted
+
+**Automatic Cleanup System:**
+- Created cleanup script: `backend/scripts/cleanupOldWatermarks.js`
+- Script deletes watermark files older than 30 days
+- Updates database to remove watermark references
+- Can be run manually: `npm run cleanup:watermarks`
+- Includes setup instructions for cron jobs (Linux/Mac/Windows)
+- PM2 integration support for production environments
+
+**Files Added:**
+- `kalima-platform/backend/scripts/cleanupOldWatermarks.js` - Cleanup script
+- `kalima-platform/backend/scripts/WATERMARK_CLEANUP_README.md` - Setup instructions
+
+**Files Modified:**
+- `kalima-platform/backend/package.json` - Added cleanup script command
+- `kalima-platform/frontend/src/pages/KalimaStore/CartPage.jsx` - Watermark now available for all users
+- Translation files - Updated helper text
+
+---

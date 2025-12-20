@@ -59,6 +59,14 @@
     "checkoutCooldown": "يرجى الانتظار {{seconds}} ثانية قبل إتمام طلب جديد."
   },
   "waitSeconds": "انتظر {{seconds}} ث",
-  "cooldownMessage": "يرجى الانتظار {{seconds}} ثانية قبل إتمام طلب جديد. هذا لمنع الطلبات المكررة."
+  "cooldownMessage": "يرجى الانتظار {{seconds}} ثانية قبل إتمام طلب جديد. هذا لمنع الطلبات المكررة.",
+  "watermark": "علامة مائية",
+  "watermarkHelper": "يمكن رفع علامة مائية مع العلم انها يمكن ان تسبب مشاكل في الطباعة",
+  "optional": "اختياري",
+  "paymentMethod": "ةطريق الدفع",
+  "selectPaymentMethod": "اختر طريقة الدفع",
+  "vodafoneCash": "فودافون كاش",
+  "instapay": "انستاباي",
+  "paymentMethodRequired": "طريقة الدفع مطلوبة"
 }
 
