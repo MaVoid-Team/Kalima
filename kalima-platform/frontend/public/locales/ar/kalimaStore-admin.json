@@ -21,66 +21,63 @@
     "printingDescription": "خدمات ومواد الطباعة "
   },
 
- "paymentMethod": {
-  "title": "طريقة الدفع",
-  "subtitle": "إعداد طريقة الدفع الافتراضية (للإدارة فقط)",
+  "paymentMethod": {
+    "title": "طريقة الدفع",
+    "subtitle": "إعداد طريقة الدفع الافتراضية (للإدارة فقط)",
 
-  "fields": {
-    "name": "اسم طريقة الدفع",
-    "phoneNumber": "رقم الدفع"
+    "fields": {
+      "name": "اسم طريقة الدفع",
+      "phoneNumber": "رقم الدفع"
+    },
+
+    "placeholders": {
+      "name": "مثال: فودافون كاش",
+      "phoneNumber": "مثال: 012xxxxxxxx"
+    },
+
+    "hints": {
+      "phoneNumber": "سيتم استخدام هذا الرقم في جميع عمليات الدفع"
+    },
+
+    "table": {
+      "name": "الاسم",
+      "phoneNumber": "رقم الدفع",
+      "status": "الحالة",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+
+    "status": {
+      "active": "نشط",
+      "disabled": "معطّل"
+    },
+
+    "actions": {
+      "save": "حفظ طريقة الدفع",
+      "update": "تحديث طريقة الدفع",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "toggle": "تغيير الحالة"
+    },
+
+    "noMethods": "لا توجد طرق دفع",
+
+    "alerts": {
+      "savedSuccess": "تم حفظ طريقة الدفع بنجاح",
+      "updatedSuccess": "تم تحديث طريقة الدفع بنجاح",
+      "deletedSuccess": "تم حذف طريقة الدفع بنجاح",
+      "saveError": "حدث خطأ أثناء حفظ طريقة الدفع",
+      "confirmDelete": "هل أنت متأكد من حذف طريقة الدفع؟"
+    },
+
+    "validation": {
+      "nameRequired": "اسم طريقة الدفع مطلوب",
+      "nameMin": "اسم طريقة الدفع يجب ألا يقل عن 3 أحرف",
+      "phoneRequired": "رقم الدفع مطلوب",
+      "phoneInvalid": "رقم الدفع غير صالح",
+      "phoneLength": "رقم الدفع يجب أن يكون 11 رقمًا"
+    }
   },
-
-  "placeholders": {
-    "name": "مثال: فودافون كاش",
-    "phoneNumber": "مثال: 012xxxxxxxx"
-  },
-
-  "hints": {
-    "phoneNumber": "سيتم استخدام هذا الرقم في جميع عمليات الدفع"
-  },
-
-  "table": {
-    "name": "الاسم",
-    "phoneNumber": "رقم الدفع",
-    "status": "الحالة",
-    "createdAt": "تاريخ الإنشاء",
-    "actions": "الإجراءات"
-  },
-
-  "status": {
-    "active": "نشط",
-    "disabled": "معطّل"
-  },
-
-  "actions": {
-    "save": "حفظ طريقة الدفع",
-    "update": "تحديث طريقة الدفع",
-    "edit": "تعديل",
-    "delete": "حذف",
-    "toggle": "تغيير الحالة"
-  },
-
-  "noMethods": "لا توجد طرق دفع",
-
-  "alerts": {
-    "savedSuccess": "تم حفظ طريقة الدفع بنجاح",
-    "updatedSuccess": "تم تحديث طريقة الدفع بنجاح",
-    "deletedSuccess": "تم حذف طريقة الدفع بنجاح",
-    "saveError": "حدث خطأ أثناء حفظ طريقة الدفع",
-    "confirmDelete": "هل أنت متأكد من حذف طريقة الدفع؟"
-
-  },
-  
-  "validation": {
-  "nameRequired": "اسم طريقة الدفع مطلوب",
-  "nameMin": "اسم طريقة الدفع يجب ألا يقل عن 3 أحرف",
-  "phoneRequired": "رقم الدفع مطلوب",
-  "phoneInvalid": "رقم الدفع غير صالح",
-  "phoneLength": "رقم الدفع يجب أن يكون 11 رقمًا"
-}
-
-}
-,
   "sectionsManagement": {
     "title": "إدارة الأقسام",
     "searchPlaceholder": "البحث في الأقسام...",
@@ -357,16 +354,42 @@
     "description": "الوصف",
     "productCount": "عدد المنتجات",
     "thumbnail": "الصورة المصغرة",
+
     "error": "فشل في تصدير البيانات. يرجى المحاولة مرة أخرى.",
+    "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
+
+    "types": {
+      "product": "منتج",
+      "product_plural": "منتجات",
+      "book": "كتاب",
+      "book_plural": "كتب",
+      "section": "قسم",
+      "section_plural": "أقسام",
+      "item": "عنصر",
+      "item_plural": "عناصر"
+    },
+
     "totalProducts": "إجمالي المنتجات",
     "totalBooks": "إجمالي الكتب",
     "totalSections": "إجمالي الأقسام",
     "totalItems": "إجمالي العناصر",
-    "successMessage": "تم تصدير {{count}} {{type}} بنجاح",
+
     "export": "تصدير البيانات",
     "exporting": "جاري التصدير...",
+
     "csvFormat": "تنسيق CSV",
     "jsonFormat": "تنسيق JSON",
+    "xlsxFormat": "تنسيق XLSX",
+
+    "allProducts": "جميع المنتجات ",
+    "productsOnly":"جميع المنتجات",
+    "booksOnly": "الكتب فقط",
+    "sections": "الأقسام",
+
+    "exportAllCSV": "تصدير الكل (CSV)",
+    "exportAllJSON": "تصدير الكل (JSON)",
+    "exportAllXLSX": "تصدير الكل (XLSX)",
+
     "exportCSVPage": "تصدير الصفحة (CSV)",
     "exportCSVAll": "تصدير الكل (CSV)",
     "exportJSONPage": "تصدير الصفحة (JSON)",
