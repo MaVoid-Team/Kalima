@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import * as XLSX from "xlsx";
 import {
   createSection,
   updateSection,
@@ -134,41 +135,70 @@ const AdminPanel = () => {
   const [showDeleteProductModal, setShowDeleteProductModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
+  const getExportTypeLabel = (type, count) => {
+    if (count === 1) {
+      return t(`export.types.${type}`);
+    }
+    return t(`export.types.${type}_plural`);
+  };
+
   // Export handlers
   const handleExportCSV = async (type, csvContent) => {
     setIsExporting(true);
+
     try {
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
+
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
+      const timestamp = new Date().toISOString().split("T")[0];
+      link.href = url;
+      link.download = `${type}-${timestamp}.csv`;
 
-        const timestamp = new Date().toISOString().split("T")[0];
-        const filename = `${type}-${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-        link.setAttribute("download", filename);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      let count = 0;
+      let typeKey = type;
 
-        const dataCount =
-          type === "products"
-            ? products.length + books.length
-            : type === "sections"
-            ? sections.length
-            : books.length;
-        const successMessage = t("export.successMessage", {
-          count: dataCount,
-          type,
-        });
-        alert(successMessage);
+      switch (type) {
+        case "products":
+          count = products.length;
+          typeKey = "product";
+          break;
+
+        case "books":
+          count = books.length;
+          typeKey = "book";
+          break;
+
+        case "sections":
+          count = sections.length;
+          typeKey = "section";
+          break;
+
+        case "all":
+          count = products.length + books.length + sections.length;
+          typeKey = "item";
+          break;
+
+        default:
+          count = 0;
       }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
     } catch (error) {
-      console.error("Export error:", error);
+      console.error("Export CSV error:", error);
       alert(t("export.error"));
     } finally {
       setIsExporting(false);
@@ -177,35 +207,53 @@ const AdminPanel = () => {
 
   const handleExportJSON = async (type, jsonData) => {
     setIsExporting(true);
+
     try {
-      const jsonContent = JSON.stringify(jsonData, null, 2);
-      const blob = new Blob([jsonContent], {
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
         type: "application/json;charset=utf-8;",
       });
+
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
 
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
+      const timestamp = new Date().toISOString().split("T")[0];
+      link.href = url;
+      link.download = `${type}-${timestamp}.json`;
 
-        const timestamp = new Date().toISOString().split("T")[0];
-        const filename = `${type}-${timestamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-        link.setAttribute("download", filename);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      let count = jsonData.length;
+      let typeKey = type;
 
-        const successMessage = t("export.successMessage", {
-          count: jsonData.length,
-          type,
-        });
-        alert(successMessage);
+      switch (type) {
+        case "products":
+          typeKey = "product";
+          break;
+
+        case "books":
+          typeKey = "book";
+          break;
+
+        case "sections":
+          typeKey = "section";
+          break;
+
+        case "all":
+          typeKey = "item";
+          break;
       }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
     } catch (error) {
-      console.error("Export error:", error);
+      console.error("Export JSON error:", error);
       alert(t("export.error"));
     } finally {
       setIsExporting(false);
@@ -808,9 +856,7 @@ const AdminPanel = () => {
   const handleDeletePaymentMethod = async (method) => {
     if (!method?._id) return;
 
-    const confirmed = window.confirm(
-      t("هل أنت متأكد من حذف طريقة الدفع؟") 
-    );
+    const confirmed = window.confirm(t("هل أنت متأكد من حذف طريقة الدفع؟"));
 
     if (!confirmed) return;
 
@@ -845,6 +891,56 @@ const AdminPanel = () => {
       alert(err?.response?.data?.message || "Failed to change status");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleExportXLSX = async (type, data) => {
+    setIsExporting(true);
+
+    try {
+      if (!data || data.length === 0) {
+        throw new Error("No data to export");
+      }
+
+      // إنشاء sheet
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, type);
+
+      // اسم الملف
+      const timestamp = new Date().toISOString().split("T")[0];
+      XLSX.writeFile(workbook, `${type}-${timestamp}.xlsx`);
+
+      // ✅ حساب العدد + النوع
+      let count = data.length;
+      let typeKey = type;
+
+      switch (type) {
+        case "products":
+          typeKey = "product";
+          break;
+        case "books":
+          typeKey = "book";
+          break;
+        case "sections":
+          typeKey = "section";
+          break;
+        case "all":
+          typeKey = "item";
+          break;
+      }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
+    } catch (error) {
+      console.error("Export XLSX error:", error);
+      alert(t("export.error"));
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -904,6 +1000,7 @@ const AdminPanel = () => {
           subjects={subjects}
           isExporting={isExporting}
           onExportCSV={handleExportCSV}
+          onExportXLSX={handleExportXLSX}
           onExportJSON={handleExportJSON}
         />
 
@@ -954,7 +1051,7 @@ const AdminPanel = () => {
             setEditingPaymentMethod={setEditingPaymentMethod}
             setShowEditPaymentMethodModal={setShowEditPaymentMethodModal}
             onUpdate={handleUpdatePaymentMethod}
-            onDelete={handleDeletePaymentMethod} 
+            onDelete={handleDeletePaymentMethod}
             onToggleStatus={handleTogglePaymentMethodStatus}
             actionLoading={actionLoading}
             isRTL={isRTL}
