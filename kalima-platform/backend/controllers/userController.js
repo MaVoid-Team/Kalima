@@ -26,10 +26,42 @@ const path = require("path");
 const { ref } = require("joi");
 
 const getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find().select("-password").lean();
+  let filter = {};
 
-  if (!users.length) return next(new AppError("Couldn't find users.", 404));
-  res.json(users);
+  // Add date filtering if provided
+  if (req.query.dateFrom || req.query.dateTo) {
+    filter.createdAt = {};
+
+    if (req.query.dateFrom) {
+      // Start of the day
+      const dateFrom = new Date(req.query.dateFrom);
+      dateFrom.setHours(0, 0, 0, 0);
+      filter.createdAt.$gte = dateFrom;
+    }
+
+    if (req.query.dateTo) {
+      // End of the day
+      const dateTo = new Date(req.query.dateTo);
+      dateTo.setHours(23, 59, 59, 999);
+      filter.createdAt.$lte = dateTo;
+    }
+  }
+
+  // Build query with filter
+  let query = User.find(filter).select("-password");
+
+  // Apply query features for sorting (without pagination and without additional filtering)
+  const features = new QueryFeatures(query, req.query)
+    .sort();
+  query = features.query;
+
+  const users = await query.lean();
+
+  res.json({
+    status: "success",
+    results: users.length,
+    data: users
+  });
 });
 
 const getAllUsersByRole = catchAsync(async (req, res, next) => {
