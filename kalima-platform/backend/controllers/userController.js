@@ -146,6 +146,18 @@ const updateUser = catchAsync(async (req, res, next) => {
     updatedUser.subjectNotify = subjectNotify;
   }
 
+  // Handle nested object updates using dot notation for MongoDB
+  // This prevents overwriting the entire nested object when updating only some fields
+  if (updatedUser.preferredContactTime && typeof updatedUser.preferredContactTime === 'object') {
+    const prefContactTime = updatedUser.preferredContactTime;
+    delete updatedUser.preferredContactTime;
+
+    // Convert nested object to dot notation
+    Object.keys(prefContactTime).forEach(key => {
+      updatedUser[`preferredContactTime.${key}`] = prefContactTime[key];
+    });
+  }
+
   let user;
 
   switch (foundUser.role.toLowerCase()) {
@@ -458,6 +470,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         children: parent.children,
         generalPoints: parent.generalPoints || 0,
         profilePic: parent.profilePic || responseData.userInfo.profilePic || null,
+        prefferedContactTime: parent.preferredContactTime || null,
       };
 
       // Get parent purchases, redeemed codes, and lecture access (with query params)
@@ -492,6 +505,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         bio: lecturer.bio,
         expertise: lecturer.expertise,
         profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
+        prefferedContactTime: lecturer.preferredContactTime || null,
       };
 
       // Only fetch additional data if no specific fields were requested or the relevant fields were included
@@ -509,7 +523,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .paginate();
         containerQuery = containerFeatures.query;
         const containers = await containerQuery.lean();
-        
+
         responseData.containers = containers;
         responseData.lecturerContainers = containers; // Alias for compatibility with assistant view
       }
@@ -561,7 +575,7 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("attachments")) {
         // Get all attachments related to lecturer's lectures
-        const lecturerLectures = responseData.lectures || 
+        const lecturerLectures = responseData.lectures ||
           await Lecture.find({ createdBy: userId }).select("_id").lean();
 
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
@@ -576,7 +590,7 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("examSubmissions")) {
         // Get exam submissions for lectures created by the lecturer
-        const lecturerLectures = responseData.lectures || 
+        const lecturerLectures = responseData.lectures ||
           await Lecture.find({ createdBy: userId }).select("_id").lean();
 
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
@@ -595,7 +609,7 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("homeworkSubmissions")) {
         // Get homework submissions for lectures created by the lecturer
-        const lecturerLectures = responseData.lectures || 
+        const lecturerLectures = responseData.lectures ||
           await Lecture.find({ createdBy: userId }).select("_id").lean();
 
         const lectureIds = lecturerLectures.map(lecture => lecture._id);
@@ -625,19 +639,19 @@ const getMyData = catchAsync(async (req, res, next) => {
         };
 
         // Get counts from response data if available, otherwise query the database
-        stats.totalLectures = responseData.lectures?.length || 
+        stats.totalLectures = responseData.lectures?.length ||
           await Lecture.countDocuments({ createdBy: userId });
-        
-        stats.totalContainers = responseData.containers?.length || 
+
+        stats.totalContainers = responseData.containers?.length ||
           await Container.countDocuments({ createdBy: userId });
-        
+
         if (responseData.examSubmissions) {
           stats.totalStudentExamSubmissions = responseData.examSubmissions.length;
           const totalExamScores = responseData.examSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0), 0
           );
-          stats.averageExamScore = responseData.examSubmissions.length > 0 
-            ? totalExamScores / responseData.examSubmissions.length 
+          stats.averageExamScore = responseData.examSubmissions.length > 0
+            ? totalExamScores / responseData.examSubmissions.length
             : 0;
         } else {
           const examSubmissions = await StudentExamSubmission.find({
@@ -648,8 +662,8 @@ const getMyData = catchAsync(async (req, res, next) => {
           const totalExamScores = examSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0), 0
           );
-          stats.averageExamScore = examSubmissions.length > 0 
-            ? totalExamScores / examSubmissions.length 
+          stats.averageExamScore = examSubmissions.length > 0
+            ? totalExamScores / examSubmissions.length
             : 0;
         }
 
@@ -658,8 +672,8 @@ const getMyData = catchAsync(async (req, res, next) => {
           const totalHomeworkScores = responseData.homeworkSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0), 0
           );
-          stats.averageHomeworkScore = responseData.homeworkSubmissions.length > 0 
-            ? totalHomeworkScores / responseData.homeworkSubmissions.length 
+          stats.averageHomeworkScore = responseData.homeworkSubmissions.length > 0
+            ? totalHomeworkScores / responseData.homeworkSubmissions.length
             : 0;
         } else {
           const homeworkSubmissions = await StudentExamSubmission.find({
@@ -670,14 +684,14 @@ const getMyData = catchAsync(async (req, res, next) => {
           const totalHomeworkScores = homeworkSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0), 0
           );
-          stats.averageHomeworkScore = homeworkSubmissions.length > 0 
-            ? totalHomeworkScores / homeworkSubmissions.length 
+          stats.averageHomeworkScore = homeworkSubmissions.length > 0
+            ? totalHomeworkScores / homeworkSubmissions.length
             : 0;
         }
 
-        stats.totalAttachments = responseData.attachments?.length || 
-          await Attachment.countDocuments({ 
-            lectureId: { $in: await Lecture.find({ createdBy: userId }).distinct('_id') } 
+        stats.totalAttachments = responseData.attachments?.length ||
+          await Attachment.countDocuments({
+            lectureId: { $in: await Lecture.find({ createdBy: userId }).distinct('_id') }
           });
 
         responseData.stats = stats;
@@ -979,7 +993,7 @@ const getStudentParentAdditionalData = async (
       // Get all lecture IDs from purchases (both from lecture field and container.type=lecture)
       const lectureIds = [];
       const containerLectureIds = [];
-      
+
       purchaseHistory.forEach(p => {
         if (p.lecture) {
           lectureIds.push(p.lecture._id || p.lecture);
@@ -987,18 +1001,18 @@ const getStudentParentAdditionalData = async (
           containerLectureIds.push(p.container._id || p.container);
         }
       });
-      
+
       // Fetch all lectures in one query
       const allLectureIds = [...new Set([...lectureIds, ...containerLectureIds])];
       const lecturesMap = {};
-      
+
       if (allLectureIds.length > 0) {
         const lectures = await Lecture.find({ _id: { $in: allLectureIds } });
         lectures.forEach(lec => {
           lecturesMap[lec._id.toString()] = lec;
         });
       }
-      
+
       // Map purchases to include lecture data
       responseData.purchaseHistory = purchaseHistory.map(p => {
         // If it's a direct lecture purchase
@@ -1010,7 +1024,7 @@ const getStudentParentAdditionalData = async (
             type: 'lecturePurchase' // Ensure type is set correctly
           };
         }
-        
+
         // If it's a container purchase that's a lecture
         if (p.container && p.container.type === "lecture") {
           const containerId = p.container._id || p.container;
@@ -1021,7 +1035,7 @@ const getStudentParentAdditionalData = async (
             type: p.type || 'containerPurchase' // Maintain backward compatibility
           };
         }
-        
+
         // Regular container purchase
         return p;
       });
@@ -1274,7 +1288,7 @@ const updateMe = catchAsync(async (req, res, next) => {
 
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
-  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic'];
+  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic', 'preferredContactTime'];
 
   // Only copy allowed fields from req.body to filteredBody
   Object.keys(req.body).forEach(field => {
@@ -1282,6 +1296,18 @@ const updateMe = catchAsync(async (req, res, next) => {
       filteredBody[field] = req.body[field];
     }
   });
+
+  // Handle nested object updates using dot notation for MongoDB
+  // This prevents overwriting the entire nested object when updating only some fields
+  if (filteredBody.preferredContactTime && typeof filteredBody.preferredContactTime === 'object') {
+    const prefContactTime = filteredBody.preferredContactTime;
+    delete filteredBody.preferredContactTime;
+
+    // Convert nested object to dot notation
+    Object.keys(prefContactTime).forEach(key => {
+      filteredBody[`preferredContactTime.${key}`] = prefContactTime[key];
+    });
+  }
 
   // Handle profile picture upload (if file is present)
   if (req.file && req.file.fieldname === "profilePic") {
