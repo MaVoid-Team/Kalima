@@ -2,8 +2,6 @@ import axios from "axios";
 import { getToken } from "./auth-services";
 
 
-// Helper function to generate safe filename for uploads
-const API_URL = import.meta.env.VITE_API_URL
 const generateSafeFilename = (file) => {
   if (!file || !file.name) return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   try {
@@ -17,7 +15,7 @@ const generateSafeFilename = (file) => {
     return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   }
 };
-
+const API_URL = import.meta.env.VITE_API_URL;
 // Get user's active cart
 export const getCart = async () => {
   try {

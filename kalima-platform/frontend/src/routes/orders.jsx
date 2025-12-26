@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { getToken } from './auth-services';
+import axios from "axios"
+import { getToken } from "./auth-services"
 
 // Function to check if user is logged in
 
@@ -39,7 +39,8 @@ export const getAllProductPurchases = async (queryParams = {}) => {
       error: `Failed to fetch cart purchases: ${error.message}`,
     };
   }
-};
+}
+
 
 export const receiveProductPurchase = async (purchaseId) => {
   try {
