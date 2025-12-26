@@ -2,10 +2,12 @@ const express = require('express');
 const parentController = require('../controllers/parentController');
 const verifyJWT = require('../middleware/verifyJWT');
 const authController = require('../controllers/authController');
+const convertFormDataToNested = require('../middleware/convertFormDataToNested');
 
 const router = express.Router();
 
 router.use(verifyJWT, authController.verifyRoles('Admin', 'SubAdmin', 'Moderator', 'Assistant'));
+router.use(convertFormDataToNested);
 
 router.post('/', parentController.createParent);
 

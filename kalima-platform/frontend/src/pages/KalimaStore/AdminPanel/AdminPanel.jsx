@@ -902,16 +902,13 @@ const AdminPanel = () => {
         throw new Error("No data to export");
       }
 
-      // إنشاء sheet
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, type);
 
-      // اسم الملف
       const timestamp = new Date().toISOString().split("T")[0];
       XLSX.writeFile(workbook, `${type}-${timestamp}.xlsx`);
 
-      // ✅ حساب العدد + النوع
       let count = data.length;
       let typeKey = type;
 
