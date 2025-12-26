@@ -81,6 +81,7 @@
     "customerNotes": "ملاحظات العميل",
     "paymentInfo": "معلومات الدفع",
     "paymentMethod": "طريقة الدفع",
+    "paymentMethodPhone": "رقم هاتف طريقة الدفع",
     "paymentNumber": "رقم الدفع",
     "transferredFrom": "تم التحويل من",
     "viewWatermark": "عرض العلامة المائية",
