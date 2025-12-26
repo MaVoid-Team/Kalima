@@ -2,6 +2,8 @@ import axios from 'axios';
 import { getToken } from './auth-services';
 
 // Function to check if user is logged in
+
+const API_URL = process.env.REACT_APP_API_URL
 const isLoggedIn = () => {
   return !!getToken();
 };
