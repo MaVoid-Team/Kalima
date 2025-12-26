@@ -30,9 +30,7 @@ const teacherValidation = userValidation.concat(
       .valid("Center", "School", "Both", "")
       .optional(),
 
-    centers: Joi.array()
-      .items(Joi.string())
-      .optional(),
+    centers: Joi.array().items(Joi.string()).optional(),
 
     school: Joi.string().allow("").optional(),
 
@@ -53,18 +51,24 @@ const teacherValidation = userValidation.concat(
     preferredContactTime: Joi.object({
       from: Joi.string()
         .pattern(/^(0[0-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+        .allow("")
         .optional()
         .messages({
-          "string.pattern.base": 'Time format must be HH:MM AM/PM (e.g., "08:00 AM")'
+          "string.pattern.base":
+            'Time format must be HH:MM AM/PM (e.g., "08:00 AM")',
         }),
       to: Joi.string()
         .pattern(/^(0[0-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+        .allow("")
         .optional()
         .messages({
-          "string.pattern.base": 'Time format must be HH:MM AM/PM (e.g., "05:00 PM")'
+          "string.pattern.base":
+            'Time format must be HH:MM AM/PM (e.g., "05:00 PM")',
         }),
-      note: Joi.string().allow('', null).optional()
-    }).unknown(true).optional()
+      note: Joi.string().allow("", null).optional(),
+    })
+      .unknown(true)
+      .optional(),
   })
 );
 
