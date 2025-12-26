@@ -158,7 +158,7 @@ const cartPurchaseSchema = new mongoose.Schema(
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true },
-        strictPopulate: false,
+        strictPopulate: false, // Allow populate on non-reference fields without throwing errors
     }
 );
 
