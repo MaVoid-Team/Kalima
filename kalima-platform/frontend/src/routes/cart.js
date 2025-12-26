@@ -1,7 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from "../utils/apiConfig";
 
 // Helper function to generate safe filename for uploads
 const generateSafeFilename = (file) => {
