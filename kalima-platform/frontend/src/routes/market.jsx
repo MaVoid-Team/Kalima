@@ -564,7 +564,7 @@ export const deleteSubSection = async (subSectionId) => {
 export const createPaymentMethod = async (data) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/payment-methods`,
+      `${API_URL}/ec/payment-methods`,
       data,
       {
         withCredentials: true,
@@ -584,7 +584,7 @@ export const createPaymentMethod = async (data) => {
 export const getAllPaymentMethods = async (queryParams = {}) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/v1/ec/payment-methods`,
+      `${API_URL}/ec/payment-methods`,
       {
         params: queryParams,
         withCredentials: true,
@@ -603,7 +603,7 @@ export const getAllPaymentMethods = async (queryParams = {}) => {
 export const getPaymentMethodById = async (id) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      `${API_URL}/ec/payment-methods/${id}`,
       {
         withCredentials: true,
         headers: {
@@ -621,7 +621,7 @@ export const getPaymentMethodById = async (id) => {
 export const updatePaymentMethod = async (id, updateData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      `${API_URL}/ec/payment-methods/${id}`,
       updateData,
       {
         withCredentials: true,
@@ -641,7 +641,7 @@ export const updatePaymentMethod = async (id, updateData) => {
 export const changePaymentMethodStatus = async (id, status) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/payment-methods/${id}/status`,
+      `${API_URL}/ec/payment-methods/${id}/status`,
       { status },
       {
         withCredentials: true,
@@ -664,7 +664,7 @@ export const changePaymentMethodStatus = async (id, status) => {
 export const deletePaymentMethod = async (id) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/api/v1/ec/payment-methods/${id}`,
+      `${API_URL}/ec/payment-methods/${id}`,
       {
         withCredentials: true,
         headers: {
