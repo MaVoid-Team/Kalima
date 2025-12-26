@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import * as XLSX from "xlsx";
 import {
   createSection,
   updateSection,
@@ -14,35 +15,67 @@ import {
   createSubSection,
   updateSubSection,
   deleteSubSection,
-} from "../../../routes/market"
-import Orders from "./Orders"
-import { useAdminData } from "./UseAdminData"
-import ExportSection from "./ExportSection"
-import ProductsManagement from "./ProductsManagement"
-import SectionsManagement from "./SectionsManagement"
-import SubSectionsManagement from "./SubSectionsManagement"
-import AdminForms from "./AdminForms"
-import AdminModals from "./AdminModals"
-import ErrorBoundary from "./ErrorBoundary"
-import CreateCoupons from "./CreateCoupouns"
+  createPaymentMethod,
+  getAllPaymentMethods,
+  updatePaymentMethod,
+  deletePaymentMethod,
+  changePaymentMethodStatus,
+} from "../../../routes/market";
+import Orders from "./Orders";
+import { useAdminData } from "./UseAdminData";
+import ExportSection from "./ExportSection";
+import ProductsManagement from "./ProductsManagement";
+import SectionsManagement from "./SectionsManagement";
+import SubSectionsManagement from "./SubSectionsManagement";
+import AdminForms from "./AdminForms";
+import AdminModals from "./AdminModals";
+import ErrorBoundary from "./ErrorBoundary";
+import CreateCoupons from "./CreateCoupouns";
+import PaymentMethodsManagement from "./PaymentMethodsManagement";
 
 const AdminPanel = () => {
-  const { t, i18n } = useTranslation("kalimaStore-admin")
-  const isRTL = i18n.language === "ar"
+  const { t, i18n } = useTranslation("kalimaStore-admin");
+  const isRTL = i18n.language === "ar";
 
   // Use custom hook for data management
-  const { loading, error, sections, subSections, books, products, subjects, stats, refetch, setSections, setSubSections, setBooks, setProducts } =
-    useAdminData()
+  const {
+    loading,
+    error,
+    sections,
+    subSections,
+    books,
+    products,
+    subjects,
+    stats,
+    refetch,
+    setSections,
+    setSubSections,
+    setBooks,
+    setProducts,
+  } = useAdminData();
 
   // Local state
-  const [actionLoading, setActionLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("product")
-  const [isExporting, setIsExporting] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("product");
+  const [showEditPaymentMethodModal, setShowEditPaymentMethodModal] =
+    useState(false);
+
+  const [isExporting, setIsExporting] = useState(false);
+  // Payment Methods state
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentMethodForm, setPaymentMethodForm] = useState({
+    name: "",
+    phoneNumber: "",
+  });
+  const [editingPaymentMethod, setEditingPaymentMethod] = useState(null);
+  const [showDeletePaymentMethodModal, setShowDeletePaymentMethodModal] =
+    useState(false);
+  const [paymentMethodToDelete, setPaymentMethodToDelete] = useState(null);
 
   // Manual initial data fetch (since we removed auto-refresh)
   useEffect(() => {
-    refetch()
-  }, [refetch])
+    refetch();
+  }, [refetch]);
 
   // Form states
   const [sectionForm, setSectionForm] = useState({
@@ -51,12 +84,12 @@ const AdminPanel = () => {
     number: "",
     thumbnail: "logo",
     allowedFor: [],
-  })
+  });
 
   const [subSectionForm, setSubSectionForm] = useState({
     name: "",
     section: "",
-  })
+  });
 
   const [productForm, setProductForm] = useState({
     title: "",
@@ -70,7 +103,7 @@ const AdminPanel = () => {
     gallery: [],
     whatsAppNumber: "",
     description: "",
-  })
+  });
 
   const [bookForm, setBookForm] = useState({
     title: "",
@@ -85,92 +118,152 @@ const AdminPanel = () => {
     gallery: [],
     whatsAppNumber: "",
     description: "",
-  })
+  });
 
   // Modal states
-  const [editingSection, setEditingSection] = useState(null)
-  const [editingSubSection, setEditingSubSection] = useState(null)
-  const [editingProduct, setEditingProduct] = useState(null)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showEditSubSectionModal, setShowEditSubSectionModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showDeleteSubSectionModal, setShowDeleteSubSectionModal] = useState(false)
-  const [sectionToDelete, setSectionToDelete] = useState(null)
-  const [subSectionToDelete, setSubSectionToDelete] = useState(null)
-  const [showEditProductModal, setShowEditProductModal] = useState(false)
-  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false)
-  const [productToDelete, setProductToDelete] = useState(null)
+  const [editingSection, setEditingSection] = useState(null);
+  const [editingSubSection, setEditingSubSection] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditSubSectionModal, setShowEditSubSectionModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteSubSectionModal, setShowDeleteSubSectionModal] =
+    useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [subSectionToDelete, setSubSectionToDelete] = useState(null);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+
+  const getExportTypeLabel = (type, count) => {
+    if (count === 1) {
+      return t(`export.types.${type}`);
+    }
+    return t(`export.types.${type}_plural`);
+  };
 
   // Export handlers
   const handleExportCSV = async (type, csvContent) => {
-    setIsExporting(true)
+    setIsExporting(true);
+
     try {
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-      const link = document.createElement("a")
+      const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
 
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob)
-        link.setAttribute("href", url)
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-        const timestamp = new Date().toISOString().split("T")[0]
-        const filename = `${type}-${timestamp}.csv`
+      const timestamp = new Date().toISOString().split("T")[0];
+      link.href = url;
+      link.download = `${type}-${timestamp}.csv`;
 
-        link.setAttribute("download", filename)
-        link.style.visibility = "hidden"
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-        const dataCount =
-          type === "products" ? products.length + books.length : type === "sections" ? sections.length : books.length
-        const successMessage = t("export.successMessage", { count: dataCount, type })
-        alert(successMessage)
+      let count = 0;
+      let typeKey = type;
+
+      switch (type) {
+        case "products":
+          count = products.length;
+          typeKey = "product";
+          break;
+
+        case "books":
+          count = books.length;
+          typeKey = "book";
+          break;
+
+        case "sections":
+          count = sections.length;
+          typeKey = "section";
+          break;
+
+        case "all":
+          count = products.length + books.length + sections.length;
+          typeKey = "item";
+          break;
+
+        default:
+          count = 0;
       }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
     } catch (error) {
-      console.error("Export error:", error)
-      alert(t("export.error"))
+      console.error("Export CSV error:", error);
+      alert(t("export.error"));
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   const handleExportJSON = async (type, jsonData) => {
-    setIsExporting(true)
+    setIsExporting(true);
+
     try {
-      const jsonContent = JSON.stringify(jsonData, null, 2)
-      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
-      const link = document.createElement("a")
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+        type: "application/json;charset=utf-8;",
+      });
 
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob)
-        link.setAttribute("href", url)
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-        const timestamp = new Date().toISOString().split("T")[0]
-        const filename = `${type}-${timestamp}.json`
+      const timestamp = new Date().toISOString().split("T")[0];
+      link.href = url;
+      link.download = `${type}-${timestamp}.json`;
 
-        link.setAttribute("download", filename)
-        link.style.visibility = "hidden"
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-        const successMessage = t("export.successMessage", { count: jsonData.length, type })
-        alert(successMessage)
+      let count = jsonData.length;
+      let typeKey = type;
+
+      switch (type) {
+        case "products":
+          typeKey = "product";
+          break;
+
+        case "books":
+          typeKey = "book";
+          break;
+
+        case "sections":
+          typeKey = "section";
+          break;
+
+        case "all":
+          typeKey = "item";
+          break;
       }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
     } catch (error) {
-      console.error("Export error:", error)
-      alert(t("export.error"))
+      console.error("Export JSON error:", error);
+      alert(t("export.error"));
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   // CRUD handlers with improved error handling
   const handleCreateBook = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (
       !bookForm.title ||
       !bookForm.serial ||
@@ -179,19 +272,19 @@ const AdminPanel = () => {
       !bookForm.paymentNumber ||
       !bookForm.subject
     ) {
-      alert(t("alerts.fillRequiredFields"))
-      return
+      alert(t("alerts.fillRequiredFields"));
+      return;
     }
 
     // Check if subSection is selected
     if (!bookForm.subSection) {
-      alert(t("alerts.subSectionRequired") || "Please select a subsection")
-      return
+      alert(t("alerts.subSectionRequired") || "Please select a subsection");
+      return;
     }
 
     try {
-      setActionLoading(true)
-      
+      setActionLoading(true);
+
       // 🐛 DEBUG: Log the data being sent to createBook
       const dataToSend = {
         title: bookForm.title,
@@ -207,11 +300,14 @@ const AdminPanel = () => {
         sample: bookForm.sample,
         gallery: bookForm.gallery,
         whatsAppNumber: bookForm.whatsAppNumber,
-      }
-      
-      const response = await createBook(dataToSend)
+      };
 
-      if (response?.message === "ECBook created successfully" || response?.status === "success") {
+      const response = await createBook(dataToSend);
+
+      if (
+        response?.message === "ECBook created successfully" ||
+        response?.status === "success"
+      ) {
         // Reset form
         setBookForm({
           title: "",
@@ -227,31 +323,30 @@ const AdminPanel = () => {
           sample: null,
           gallery: [],
           whatsAppNumber: "",
-        })
+        });
 
         // Reset file inputs
-        const thumbnailInput = document.getElementById("book-thumbnail")
-        const sampleInput = document.getElementById("book-sample")
-        if (thumbnailInput) thumbnailInput.value = ""
-        if (sampleInput) sampleInput.value = ""
+        const thumbnailInput = document.getElementById("book-thumbnail");
+        const sampleInput = document.getElementById("book-sample");
+        if (thumbnailInput) thumbnailInput.value = "";
+        if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.bookCreatedSuccess"))
-        await refetch()
+        alert(t("alerts.bookCreatedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to create book")
+        throw new Error(response?.error || "Failed to create book");
       }
     } catch (err) {
-      console.error("Error creating book:", err)
-      alert(t("alerts.bookCreateError") + (err?.message || "Unknown error"))
+      console.error("Error creating book:", err);
+      alert(t("alerts.bookCreateError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleCreateProduct = async (e) => {
-    e.preventDefault()
-    
-    
+    e.preventDefault();
+
     if (
       !productForm.title ||
       !productForm.serial ||
@@ -259,19 +354,19 @@ const AdminPanel = () => {
       !productForm.price ||
       !productForm.paymentNumber
     ) {
-      alert(t("alerts.fillRequiredFields"))
-      return
+      alert(t("alerts.fillRequiredFields"));
+      return;
     }
 
     // Check if subSection is selected
     if (!productForm.subSection) {
-      alert(t("alerts.subSectionRequired") || "Please select a subsection")
-      return
+      alert(t("alerts.subSectionRequired") || "Please select a subsection");
+      return;
     }
 
     try {
-      setActionLoading(true)
-      
+      setActionLoading(true);
+
       // 🐛 DEBUG: Log the data being sent to createProduct
       const dataToSend = {
         title: productForm.title,
@@ -286,12 +381,14 @@ const AdminPanel = () => {
         gallery: productForm.gallery,
         whatsAppNumber: productForm.whatsAppNumber,
         description: productForm.description,
-      }
-      
-      
-      const response = await createProduct(dataToSend)
+      };
 
-      if (response?.message === "Product created successfully" || response?.status === "success") {
+      const response = await createProduct(dataToSend);
+
+      if (
+        response?.message === "Product created successfully" ||
+        response?.status === "success"
+      ) {
         // Reset form
         setProductForm({
           title: "",
@@ -306,40 +403,40 @@ const AdminPanel = () => {
           gallery: [],
           whatsAppNumber: "",
           description: "",
-        })
+        });
 
         // Reset file inputs
-        const thumbnailInput = document.getElementById("product-thumbnail")
-        const sampleInput = document.getElementById("product-sample")
-        if (thumbnailInput) thumbnailInput.value = ""
-        if (sampleInput) sampleInput.value = ""
+        const thumbnailInput = document.getElementById("product-thumbnail");
+        const sampleInput = document.getElementById("product-sample");
+        if (thumbnailInput) thumbnailInput.value = "";
+        if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.productCreatedSuccess"))
-        await refetch()
+        alert(t("alerts.productCreatedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to create product")
+        throw new Error(response?.error || "Failed to create product");
       }
     } catch (err) {
-      console.error("Error creating product:", err)
-      alert(t("alerts.productCreateError") + (err?.message || "Unknown error"))
+      console.error("Error creating product:", err);
+      alert(t("alerts.productCreateError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleEditProduct = async (product) => {
     if (!product?._id) {
-      alert(t("validation.invalidProductSelected"))
-      return
+      alert(t("validation.invalidProductSelected"));
+      return;
     }
 
     try {
-      setActionLoading(true)
-      const response = await getProductById(product._id)
+      setActionLoading(true);
+      const response = await getProductById(product._id);
 
       if (response?.status === "success" && response?.data?.product) {
-        const productData = response.data.product
-        setEditingProduct(productData)
+        const productData = response.data.product;
+        setEditingProduct(productData);
         setProductForm({
           title: productData.title || "",
           serial: productData.serial || "",
@@ -352,25 +449,25 @@ const AdminPanel = () => {
           gallery: productData.gallery || [],
           whatsAppNumber: productData.whatsAppNumber || "",
           description: productData.description || "",
-        })
-        setShowEditProductModal(true)
+        });
+        setShowEditProductModal(true);
       } else {
-        throw new Error(response?.error || "Failed to fetch product details")
+        throw new Error(response?.error || "Failed to fetch product details");
       }
     } catch (err) {
-      console.error("Error fetching product details:", err)
-      alert(t("alerts.productFetchError") + (err?.message || "Unknown error"))
+      console.error("Error fetching product details:", err);
+      alert(t("alerts.productFetchError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleUpdateProduct = async (e) => {
-    e.preventDefault()
-    if (!editingProduct?._id) return
+    e.preventDefault();
+    if (!editingProduct?._id) return;
 
     try {
-      setActionLoading(true)
+      setActionLoading(true);
       const response = await updateProduct(editingProduct._id, {
         title: productForm.title,
         serial: productForm.serial,
@@ -383,13 +480,14 @@ const AdminPanel = () => {
         gallery: productForm.gallery,
         whatsAppNumber: productForm.whatsAppNumber,
         description: productForm.description,
-        ...(editingProduct.__t === "ECBook" && { subject: productForm.subject })
-      }
-    )
+        ...(editingProduct.__t === "ECBook" && {
+          subject: productForm.subject,
+        }),
+      });
 
       if (response?.status === "success") {
-        setShowEditProductModal(false)
-        setEditingProduct(null)
+        setShowEditProductModal(false);
+        setEditingProduct(null);
         setProductForm({
           title: "",
           serial: "",
@@ -402,66 +500,68 @@ const AdminPanel = () => {
           gallery: [],
           whatsAppNumber: "",
           description: "",
-        })
+        });
 
         // Reset file inputs
-        const thumbnailInput = document.getElementById("edit-product-thumbnail")
-        const sampleInput = document.getElementById("edit-product-sample")
-        if (thumbnailInput) thumbnailInput.value = ""
-        if (sampleInput) sampleInput.value = ""
+        const thumbnailInput = document.getElementById(
+          "edit-product-thumbnail"
+        );
+        const sampleInput = document.getElementById("edit-product-sample");
+        if (thumbnailInput) thumbnailInput.value = "";
+        if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.productUpdatedSuccess"))
-        await refetch()
+        alert(t("alerts.productUpdatedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to update product")
+        throw new Error(response?.error || "Failed to update product");
       }
     } catch (err) {
-      console.error("Error updating product:", err)
-      alert(t("alerts.productUpdateError") + (err?.message || "Unknown error"))
+      console.error("Error updating product:", err);
+      alert(t("alerts.productUpdateError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleDeleteProduct = async () => {
-    if (!productToDelete?._id) return
+    if (!productToDelete?._id) return;
 
     try {
-      setActionLoading(true)
-      const response = await deleteProduct(productToDelete._id)
+      setActionLoading(true);
+      const response = await deleteProduct(productToDelete._id);
 
       if (response?.status === "success" || response) {
-        setShowDeleteProductModal(false)
-        setProductToDelete(null)
-        alert(t("alerts.productDeletedSuccess"))
-        await refetch()
+        setShowDeleteProductModal(false);
+        setProductToDelete(null);
+        alert(t("alerts.productDeletedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to delete product")
+        throw new Error(response?.error || "Failed to delete product");
       }
     } catch (err) {
-      console.error("Error deleting product:", err)
-      alert(t("alerts.productDeleteError") + (err?.message || "Unknown error"))
+      console.error("Error deleting product:", err);
+      alert(t("alerts.productDeleteError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleCreateSection = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!sectionForm.name || !sectionForm.description || !sectionForm.number) {
-      alert(t("alerts.fillRequiredFields"))
-      return
+      alert(t("alerts.fillRequiredFields"));
+      return;
     }
 
     try {
-      setActionLoading(true)
+      setActionLoading(true);
       const response = await createSection({
         name: sectionForm.name,
         description: sectionForm.description,
         number: Number.parseInt(sectionForm.number),
         thumbnail: sectionForm.thumbnail,
         allowedFor: sectionForm.allowedFor || [],
-      })
+      });
 
       if (response?.status === "success") {
         setSectionForm({
@@ -470,209 +570,376 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
           allowedFor: [],
-        })
-        alert(t("alerts.sectionCreatedSuccess"))
-        await refetch()
+        });
+        alert(t("alerts.sectionCreatedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to create section")
+        throw new Error(response?.error || "Failed to create section");
       }
     } catch (err) {
-      console.error("Error creating section:", err)
-      alert(t("alerts.sectionCreateError") + (err?.message || "Unknown error"))
+      console.error("Error creating section:", err);
+      alert(t("alerts.sectionCreateError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleCreateSubSection = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!subSectionForm.name || !subSectionForm.section) {
-      alert(t("alerts.fillRequiredFields"))
-      return
+      alert(t("alerts.fillRequiredFields"));
+      return;
     }
 
     try {
-      setActionLoading(true)
+      setActionLoading(true);
       const response = await createSubSection({
         name: subSectionForm.name,
         section: subSectionForm.section,
-      })
+      });
 
       if (response?.status === "success") {
         setSubSectionForm({
           name: "",
           section: "",
-        })
-        alert(t("alerts.subSectionCreatedSuccess") || "SubSection created successfully")
-        await refetch()
+        });
+        alert(
+          t("alerts.subSectionCreatedSuccess") ||
+            "SubSection created successfully"
+        );
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to create subsection")
+        throw new Error(response?.error || "Failed to create subsection");
       }
     } catch (err) {
-      console.error("Error creating subsection:", err)
-      alert(t("alerts.subSectionCreateError") + (err?.message || "Unknown error"))
+      console.error("Error creating subsection:", err);
+      alert(
+        t("alerts.subSectionCreateError") + (err?.message || "Unknown error")
+      );
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleEditSection = (section) => {
     if (!section?._id) {
-      alert(t("validation.invalidSectionSelected"))
-      return
+      alert(t("validation.invalidSectionSelected"));
+      return;
     }
 
-    setEditingSection(section)
+    setEditingSection(section);
     setSectionForm({
       name: section.name || "",
       description: section.description || "",
       number: section.number?.toString() || "",
       thumbnail: section.thumbnail || "logo",
-    })
-    setShowEditModal(true)
-  }
+    });
+    setShowEditModal(true);
+  };
 
   const handleUpdateSection = async (e) => {
-    e.preventDefault()
-    if (!editingSection?._id) return
+    e.preventDefault();
+    if (!editingSection?._id) return;
 
     try {
-      setActionLoading(true)
+      setActionLoading(true);
       const response = await updateSection(editingSection._id, {
         name: sectionForm.name,
         description: sectionForm.description,
         number: Number.parseInt(sectionForm.number),
         thumbnail: sectionForm.thumbnail,
-      })
+      });
 
       if (response?.status === "success") {
-        setShowEditModal(false)
-        setEditingSection(null)
+        setShowEditModal(false);
+        setEditingSection(null);
         setSectionForm({
           name: "",
           description: "",
           number: "",
           thumbnail: "logo",
-        })
-        alert(t("alerts.sectionUpdatedSuccess"))
-        await refetch()
+        });
+        alert(t("alerts.sectionUpdatedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to update section")
+        throw new Error(response?.error || "Failed to update section");
       }
     } catch (err) {
-      console.error("Error updating section:", err)
-      alert(t("alerts.sectionUpdateError") + (err?.message || "Unknown error"))
+      console.error("Error updating section:", err);
+      alert(t("alerts.sectionUpdateError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleDeleteSection = async () => {
-    if (!sectionToDelete?._id) return
+    if (!sectionToDelete?._id) return;
 
     try {
-      setActionLoading(true)
-      const response = await deleteSection(sectionToDelete._id)
+      setActionLoading(true);
+      const response = await deleteSection(sectionToDelete._id);
 
       if (response?.status === "success" || response) {
-        setShowDeleteModal(false)
-        setSectionToDelete(null)
-        alert(t("alerts.sectionDeletedSuccess"))
-        await refetch()
+        setShowDeleteModal(false);
+        setSectionToDelete(null);
+        alert(t("alerts.sectionDeletedSuccess"));
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to delete section")
+        throw new Error(response?.error || "Failed to delete section");
       }
     } catch (err) {
-      console.error("Error deleting section:", err)
-      alert(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"))
+      console.error("Error deleting section:", err);
+      alert(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"));
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleEditSubSection = (subSection) => {
     if (!subSection?._id) {
-      alert(t("validation.invalidSubSectionSelected") || "Invalid subsection selected")
-      return
+      alert(
+        t("validation.invalidSubSectionSelected") ||
+          "Invalid subsection selected"
+      );
+      return;
     }
 
-    setEditingSubSection(subSection)
+    setEditingSubSection(subSection);
     setSubSectionForm({
       name: subSection.name || "",
       section: subSection.section?._id || subSection.section || "",
-    })
-    setShowEditSubSectionModal(true)
-  }
+    });
+    setShowEditSubSectionModal(true);
+  };
 
   const handleUpdateSubSection = async (e) => {
-    e.preventDefault()
-    if (!editingSubSection?._id) return
+    e.preventDefault();
+    if (!editingSubSection?._id) return;
 
     try {
-      setActionLoading(true)
+      setActionLoading(true);
       const response = await updateSubSection(editingSubSection._id, {
         name: subSectionForm.name,
         section: subSectionForm.section,
-      })
+      });
 
       if (response?.status === "success") {
-        setShowEditSubSectionModal(false)
-        setEditingSubSection(null)
+        setShowEditSubSectionModal(false);
+        setEditingSubSection(null);
         setSubSectionForm({
           name: "",
           section: "",
-        })
-        alert(t("alerts.subSectionUpdatedSuccess") || "SubSection updated successfully")
-        await refetch()
+        });
+        alert(
+          t("alerts.subSectionUpdatedSuccess") ||
+            "SubSection updated successfully"
+        );
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to update subsection")
+        throw new Error(response?.error || "Failed to update subsection");
       }
     } catch (err) {
-      console.error("Error updating subsection:", err)
-      alert(t("alerts.subSectionUpdateError") + (err?.message || "Unknown error"))
+      console.error("Error updating subsection:", err);
+      alert(
+        t("alerts.subSectionUpdateError") + (err?.message || "Unknown error")
+      );
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleDeleteSubSection = async () => {
-    if (!subSectionToDelete?._id) return
+    if (!subSectionToDelete?._id) return;
 
     try {
-      setActionLoading(true)
-      const response = await deleteSubSection(subSectionToDelete._id)
+      setActionLoading(true);
+      const response = await deleteSubSection(subSectionToDelete._id);
 
       if (response?.status === "success" || response) {
-        setShowDeleteSubSectionModal(false)
-        setSubSectionToDelete(null)
-        alert(t("alerts.subSectionDeletedSuccess") || "SubSection deleted successfully")
-        await refetch()
+        setShowDeleteSubSectionModal(false);
+        setSubSectionToDelete(null);
+        alert(
+          t("alerts.subSectionDeletedSuccess") ||
+            "SubSection deleted successfully"
+        );
+        await refetch();
       } else {
-        throw new Error(response?.error || "Failed to delete subsection")
+        throw new Error(response?.error || "Failed to delete subsection");
       }
     } catch (err) {
-      console.error("Error deleting subsection:", err)
-      alert(t("alerts.subSectionDeleteError") + (err?.message || "Unknown error"))
+      console.error("Error deleting subsection:", err);
+      alert(
+        t("alerts.subSectionDeleteError") + (err?.message || "Unknown error")
+      );
     } finally {
-      setActionLoading(false)
+      setActionLoading(false);
     }
-  }
+  };
 
   const handleFileChange = (e, fieldName, formType = "product") => {
-    const files = e.target.files
+    const files = e.target.files;
 
     if (formType === "product") {
       setProductForm((prev) => ({
         ...prev,
         [fieldName]: fieldName === "gallery" ? files : files[0],
-      }))
+      }));
     } else if (formType === "book") {
       setBookForm((prev) => ({
         ...prev,
         [fieldName]: fieldName === "gallery" ? files : files[0],
-      }))
+      }));
     }
-  }
+  };
+
+  const fetchPaymentMethods = async () => {
+    try {
+      const res = await getAllPaymentMethods();
+
+      if (res?.status === "success") {
+        setPaymentMethods(res.data?.paymentMethods || []);
+      }
+    } catch (err) {
+      console.error("Error fetching payment methods:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  const handleCreatePaymentMethod = async (e) => {
+    e.preventDefault();
+
+    if (!paymentMethodForm.name || !paymentMethodForm.phoneNumber) {
+      alert(t("alerts.fillRequiredFields"));
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      const res = await createPaymentMethod(paymentMethodForm);
+
+      if (res?.status === "success") {
+        setPaymentMethodForm({ name: "", phoneNumber: "" });
+        alert("Payment method created successfully");
+        fetchPaymentMethods();
+      } else {
+        throw new Error(res?.message || "Failed to create payment method");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Error creating payment method");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdatePaymentMethod = async () => {
+    if (!editingPaymentMethod?._id) return;
+
+    try {
+      setActionLoading(true);
+      await updatePaymentMethod(editingPaymentMethod._id, paymentMethodForm);
+
+      setEditingPaymentMethod(null);
+      setPaymentMethodForm({ name: "", phoneNumber: "" });
+      fetchPaymentMethods();
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeletePaymentMethod = async (method) => {
+    if (!method?._id) return;
+
+    const confirmed = window.confirm(t("هل أنت متأكد من حذف طريقة الدفع؟"));
+
+    if (!confirmed) return;
+
+    try {
+      setActionLoading(true);
+
+      const res = await deletePaymentMethod(method._id);
+
+      if (res?.status === "success") {
+        alert(t("paymentMethod.alerts.deletedSuccess"));
+        fetchPaymentMethods();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Error deleting payment method");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleTogglePaymentMethodStatus = async (id, status) => {
+    try {
+      setActionLoading(true);
+
+      const res = await changePaymentMethodStatus(id, status);
+
+      if (res?.status === "success") {
+        fetchPaymentMethods();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Failed to change status");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleExportXLSX = async (type, data) => {
+    setIsExporting(true);
+
+    try {
+      if (!data || data.length === 0) {
+        throw new Error("No data to export");
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, type);
+
+      const timestamp = new Date().toISOString().split("T")[0];
+      XLSX.writeFile(workbook, `${type}-${timestamp}.xlsx`);
+
+      let count = data.length;
+      let typeKey = type;
+
+      switch (type) {
+        case "products":
+          typeKey = "product";
+          break;
+        case "books":
+          typeKey = "book";
+          break;
+        case "sections":
+          typeKey = "section";
+          break;
+        case "all":
+          typeKey = "item";
+          break;
+      }
+
+      const successMessage = t("export.successMessage", {
+        count,
+        type: getExportTypeLabel(typeKey, count),
+      });
+
+      alert(successMessage);
+    } catch (error) {
+      console.error("Export XLSX error:", error);
+      alert(t("export.error"));
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Loading state
   if (loading) {
@@ -680,7 +947,7 @@ const AdminPanel = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
       </div>
-    )
+    );
   }
 
   // Error state
@@ -704,17 +971,23 @@ const AdminPanel = () => {
           <div>
             <h3 className="font-bold">{t("error.title")}</h3>
             <div className="text-xs">{error}</div>
-            <button className="btn btn-sm btn-outline mt-2" onClick={() => refetch()}>
+            <button
+              className="btn btn-sm btn-outline mt-2"
+              onClick={() => refetch()}
+            >
               {t("error.retry")}
             </button>
           </div>
         </div>
       </div>
-    )
+    );
   }
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
         <Orders />
 
         <ExportSection
@@ -724,6 +997,7 @@ const AdminPanel = () => {
           subjects={subjects}
           isExporting={isExporting}
           onExportCSV={handleExportCSV}
+          onExportXLSX={handleExportXLSX}
           onExportJSON={handleExportJSON}
         />
 
@@ -734,8 +1008,8 @@ const AdminPanel = () => {
             subjects={subjects}
             onEditProduct={handleEditProduct}
             onDeleteProduct={(product) => {
-              setProductToDelete(product)
-              setShowDeleteProductModal(true)
+              setProductToDelete(product);
+              setShowDeleteProductModal(true);
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
@@ -747,8 +1021,8 @@ const AdminPanel = () => {
             books={books}
             onEditSection={handleEditSection}
             onDeleteSection={(section) => {
-              setSectionToDelete(section)
-              setShowDeleteModal(true)
+              setSectionToDelete(section);
+              setShowDeleteModal(true);
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
@@ -761,16 +1035,26 @@ const AdminPanel = () => {
             books={books}
             onEditSubSection={handleEditSubSection}
             onDeleteSubSection={(subSection) => {
-              setSubSectionToDelete(subSection)
-              setShowDeleteSubSectionModal(true)
+              setSubSectionToDelete(subSection);
+              setShowDeleteSubSectionModal(true);
             }}
             actionLoading={actionLoading}
             isRTL={isRTL}
           />
-
-          <CreateCoupons
+          <PaymentMethodsManagement
+            paymentMethods={paymentMethods}
+            paymentMethodForm={paymentMethodForm}
+            setPaymentMethodForm={setPaymentMethodForm}
+            setEditingPaymentMethod={setEditingPaymentMethod}
+            setShowEditPaymentMethodModal={setShowEditPaymentMethodModal}
+            onUpdate={handleUpdatePaymentMethod}
+            onDelete={handleDeletePaymentMethod}
+            onToggleStatus={handleTogglePaymentMethodStatus}
+            actionLoading={actionLoading}
             isRTL={isRTL}
           />
+
+          <CreateCoupons isRTL={isRTL} />
 
           <AdminForms
             activeTab={activeTab}
@@ -790,6 +1074,9 @@ const AdminPanel = () => {
             onCreateBook={handleCreateBook}
             onCreateSection={handleCreateSection}
             onCreateSubSection={handleCreateSubSection}
+            paymentMethodForm={paymentMethodForm}
+            setPaymentMethodForm={setPaymentMethodForm}
+            onCreatePayment={handleCreatePaymentMethod}
             onFileChange={handleFileChange}
             actionLoading={actionLoading}
             isRTL={isRTL}
@@ -797,11 +1084,23 @@ const AdminPanel = () => {
 
           {/* Bottom decorative elements */}
           <div className="relative">
-            <div className={`absolute bottom-16 ${isRTL ? "right-10" : "left-10"}`}>
-              <img src="/rDots.png" alt={t("decorativeDots")} className="w-16 h-full animate-float-up-dottedball" />
+            <div
+              className={`absolute bottom-16 ${isRTL ? "right-10" : "left-10"}`}
+            >
+              <img
+                src="/rDots.png"
+                alt={t("decorativeDots")}
+                className="w-16 h-full animate-float-up-dottedball"
+              />
             </div>
-            <div className={`absolute bottom-8 ${isRTL ? "left-10" : "right-10"}`}>
-              <img src="/ring.png" alt={t("decorativeCircle")} className="w-16 h-full animate-float-down-dottedball" />
+            <div
+              className={`absolute bottom-8 ${isRTL ? "left-10" : "right-10"}`}
+            >
+              <img
+                src="/ring.png"
+                alt={t("decorativeCircle")}
+                className="w-16 h-full animate-float-down-dottedball"
+              />
             </div>
           </div>
         </div>
@@ -848,7 +1147,7 @@ const AdminPanel = () => {
         />
       </div>
     </ErrorBoundary>
-  )
-}
+  );
+};
 
-export default AdminPanel
+export default AdminPanel;

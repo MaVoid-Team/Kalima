@@ -51,7 +51,20 @@ const parentSchema = new mongoose.Schema({
     trim: true,
   },
   referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  successfulInvites: { type: Number, default: 0 }
+  successfulInvites: { type: Number, default: 0 },
+  preferredContactTime: {
+    from: {
+      type: String,
+      required: false
+    }, // e.g., "08:00 AM"
+    to: {
+      type: String,
+      required: false
+    },
+    note: {
+      type: String // e.g., "09:00 PM"
+    }
+  },
 }, {
   timestamps: true
 });

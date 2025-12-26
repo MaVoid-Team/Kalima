@@ -39,7 +39,11 @@
     "subject": "Subject",
     "levels": "Levels",
     "teachesAtType": "Where do you teach?",
-    "socialMedia": "Social Media"
+    "socialMedia": "Social Media",
+    "preferredContactTime": "Preferred Contact Time",
+    "from": "From",
+    "to": "To",
+    "note": "Note"
   },
   "placeholders": {
     "selectAccountType": "Select Account Type",
@@ -60,7 +64,8 @@
     "facebook": "Facebook",
     "twitter": "Twitter",
     "instagram": "Instagram",
-    "phoneNumber2": "Phone Number (Optional)"
+    "phoneNumber2": "Phone Number (Optional)",
+    "contactNote": "Best time to call, WhatsApp preferred, etc."
   },
   "roles": {
     "subadmin": "Sub Admin",
@@ -131,7 +136,7 @@
     "csvRequiredFields": "CSV file should include required fields for the selected account type",
     "csvFormat": "Your CSV file should include the following columns:"
   },
-  
+
   "csvFields": {
     "name": "Name - Full name of the user",
     "phone": "Phone - Full correct Phone number"

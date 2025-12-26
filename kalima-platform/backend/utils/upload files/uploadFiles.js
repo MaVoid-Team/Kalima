@@ -256,7 +256,7 @@ const uploadProductFilesToDisk = withCleanup(
         cb(new AppError("Invalid file type for field: " + file.fieldname, 400), false);
       }
     },
-    limits: { fileSize: 75 * 1024 * 1024 },
+    limits: { fileSize: 150 * 1024 * 1024 },
   }).fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "sample", maxCount: 1 },
