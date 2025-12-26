@@ -75,6 +75,7 @@ export const getAllLecturers = async () => {
   }
 };
 
+//users
 export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/users/${userId}`, {
