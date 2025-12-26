@@ -1,9 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
 
-const API_URL = import.meta.env.VITE_API_URL;
 
-// Helper function to generate safe filename for uploads
 const generateSafeFilename = (file) => {
   if (!file || !file.name) return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   try {
@@ -17,7 +15,7 @@ const generateSafeFilename = (file) => {
     return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   }
 };
-
+const API_URL = import.meta.env.VITE_API_URL;
 // Get user's active cart
 export const getCart = async () => {
   try {
@@ -173,12 +171,12 @@ export const getCheckoutPreview = async () => {
 export const createCartPurchase = async (purchaseData) => {
   try {
     const formData = new FormData();
-    
+
     // Only append payment fields if they exist (for paid products)
     if (purchaseData.numberTransferredFrom) {
       formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom);
     }
-    
+
     if (purchaseData.paymentScreenShot) {
       const safePayment = generateSafeFilename(purchaseData.paymentScreenShot);
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment);
@@ -280,7 +278,7 @@ export const getUserPurchasedProducts = async () => {
         Authorization: `Bearer ${getToken()}`,
       },
     });
-    
+
     if (response.data?.status === "success" && response.data?.data?.purchases) {
       // Extract all product IDs from all purchases
       const productIds = new Set();
@@ -341,7 +339,7 @@ export const getConfirmedOrdersReport = async (params = {}) => {
     const response = await axios.get(
       `${API_URL}/ec/cart-purchases/admin/fullreport`,
       {
-        params, 
+        params,
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -356,9 +354,8 @@ export const getConfirmedOrdersReport = async (params = {}) => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to fetch confirmed orders report: ${
-        error.response?.data?.message || error.message
-      }`,
+      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message
+        }`,
     };
   }
 };
