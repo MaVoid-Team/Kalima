@@ -267,7 +267,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
 exports.getCartPurchases = catchAsync(async (req, res, next) => {
     const purchases = await ECCartPurchase.find({
         createdBy: req.user._id
-    }).sort('-createdAt').populate('couponCode');
+    }).sort('-createdAt')
+        .populate('couponCode')
+        .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false });
 
     res.status(200).json({
         status: "success",
@@ -283,7 +285,8 @@ exports.getCartPurchaseById = catchAsync(async (req, res, next) => {
         .populate('couponCode')
         .populate('createdBy', 'name email')
         .populate('confirmedBy', 'name email')
-        .populate('adminNoteBy', 'name');
+        .populate('adminNoteBy', 'name')
+        .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false });
 
     if (!purchase) {
         return next(new AppError("Purchase not found", 404));
@@ -441,7 +444,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate({ path: 'receivedBy', select: 'name' })
                     .populate({ path: 'returnedBy', select: 'name' })
                     .populate({ path: 'adminNoteBy', select: 'name' })
-                    .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+                    .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false })
                     .populate({ path: 'couponCode' });
                 // If baseMatch filters exist, ensure the found doc satisfies them
                 let matchesBase = true;
@@ -558,7 +561,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                     .populate({ path: 'receivedBy', select: 'name' })
                     .populate({ path: 'returnedBy', select: 'name' })
                     .populate({ path: 'adminNoteBy', select: 'name' })
-                    .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+                    .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false })
                     .populate({ path: 'couponCode' });
                 if (doc) populated.push(doc);
             }
@@ -586,7 +589,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         .populate({ path: 'receivedBy', select: 'name' })
         .populate({ path: 'returnedBy', select: 'name' })
         .populate({ path: 'adminNoteBy', select: 'name' })
-        .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+        .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false })
         .populate({ path: 'couponCode' })
         .sort('-createdAt')
         .skip(skip)
