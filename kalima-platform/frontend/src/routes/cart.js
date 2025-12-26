@@ -336,14 +336,19 @@ export const getAdminCartPurchases = async (queryParams = {}) => {
 };
 
 // Get confirmed orders report
-export const getConfirmedOrdersReport = async () => {
+export const getConfirmedOrdersReport = async (params = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/confirmed-report`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/api/v1/ec/cart-purchases/admin/fullreport`,
+      {
+        params, // ← هنا المهم
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
     return {
       success: true,
       data: response.data,
@@ -351,8 +356,9 @@ export const getConfirmedOrdersReport = async () => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message}`,
+      error: `Failed to fetch confirmed orders report: ${
+        error.response?.data?.message || error.message
+      }`,
     };
   }
 };
-

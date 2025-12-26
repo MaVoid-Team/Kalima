@@ -21,7 +21,7 @@ export const getAllStudents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch students: ${error.message}`
+    return `Failed to fetch students: ${error.message}`;
   }
 };
 
@@ -38,7 +38,7 @@ export const getAllParents = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch parents : ${error.message}`
+    return `Failed to fetch parents : ${error.message}`;
   }
 };
 
@@ -55,7 +55,7 @@ export const getAllAssistants = async () => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch assistants: ${error.message}`
+    return `Failed to fetch assistants: ${error.message}`;
   }
 };
 
@@ -67,14 +67,15 @@ export const getAllLecturers = async () => {
     console.log("Fetched lecturers:", response);
     return {
       success: true,
-      data: response.data.data
+      data: response.data.data,
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch lecturers: ${error.message}`
+    return `Failed to fetch lecturers: ${error.message}`;
   }
 };
 
+//users
 export const getUserById = async (userId) => {
   try {
     const response = await axios.get(`${API_URL}/api/v1/users/${userId}`, {
@@ -87,25 +88,39 @@ export const getUserById = async (userId) => {
     };
   } catch (error) {
     console.error("API Error:", error);
-    return `Failed to fetch user : ${error.message}`
+    return `Failed to fetch user : ${error.message}`;
   }
 };
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (filters = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/`, {
+    const response = await axios.get(`${API_URL}/api/v1/users`, {
       headers: getAuthHeader(),
+      params: {
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
+        ...(filters.dateTo && { dateTo: filters.dateTo }),
+      },
     });
+
+    const usersArray = Array.isArray(response.data)
+      ? response.data
+      : response.data.data;
 
     return {
       success: true,
-      data: response.data,
+      data: usersArray,
     };
   } catch (error) {
-    console.error("API Error:", error);
-    return `Failed to fetch users: ${error.message}`
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
   }
 };
+
+
+
+
 // --------END FETCHING USERS--------
 
 // --------START CREATE USER--------
@@ -119,7 +134,10 @@ export const createUser = async (userData) => {
     if (error.response && error.response.data) {
       return {
         success: false,
-        error: error.response.data.message || error.response.data.error || `Failed to create user: ${error.message}`,
+        error:
+          error.response.data.message ||
+          error.response.data.error ||
+          `Failed to create user: ${error.message}`,
       };
     }
     return {
@@ -131,31 +149,43 @@ export const createUser = async (userData) => {
 
 export const bulkCreateUsers = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/users/accounts/bulk-create`, formData, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    return { success: true, data: response.data }
+    const response = await axios.post(
+      `${API_URL}/api/v1/users/accounts/bulk-create`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeader(),
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return { success: true, data: response.data };
   } catch (error) {
-    console.error("Bulk create users error:", error)
+    console.error("Bulk create users error:", error);
 
     // Handle different error scenarios
     if (error.response) {
       // The server responded with a status code outside the 2xx range
       const errorMessage =
-        error.response.data?.message || error.response.data?.error || `Server error: ${error.response.status}`
-      return { success: false, error: errorMessage }
+        error.response.data?.message ||
+        error.response.data?.error ||
+        `Server error: ${error.response.status}`;
+      return { success: false, error: errorMessage };
     } else if (error.request) {
       // The request was made but no response was received
-      return { success: false, error: "No response from server. Please check your connection." }
+      return {
+        success: false,
+        error: "No response from server. Please check your connection.",
+      };
     } else {
       // Something happened in setting up the request
-      return { success: false, error: `Failed to send request: ${error.message}` }
+      return {
+        success: false,
+        error: `Failed to send request: ${error.message}`,
+      };
     }
   }
-}
+};
 
 // --------END CREATE USER--------
 
@@ -167,7 +197,7 @@ export const deleteUser = async (userId) => {
     });
     return { success: true, data: response.data };
   } catch (error) {
-    return `Failed to delete user: ${error.message}`
+    return `Failed to delete user: ${error.message}`;
   }
 };
 // --------END DELETE USER--------

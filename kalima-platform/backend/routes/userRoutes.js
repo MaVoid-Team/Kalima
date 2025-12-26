@@ -5,6 +5,7 @@ const validateUser = require("../middleware/validateUser");
 const verifyJWT = require("../middleware/verifyJWT");
 const { uploadFileToDisk, uploadProfilePicToDisk } = require("../utils/upload files/uploadFiles");
 const authController = require("../controllers/authController");
+const convertFormDataToNested = require("../middleware/convertFormDataToNested");
 // Routes that don't require authentication
 router
   .route("/")
@@ -45,7 +46,7 @@ router.get("/me/dashboard", userController.getMyData);
 router.get("/me/children", userController.getParentChildrenData);
 
 // Update current user profile information
-router.patch("/me/update", uploadProfilePicToDisk, userController.updateMe);
+router.patch("/me/update", convertFormDataToNested, uploadProfilePicToDisk, userController.updateMe);
 
 router.route("/update/password").patch(userController.changePassword);
 

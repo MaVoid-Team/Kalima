@@ -27,6 +27,7 @@ import {
   ShoppingCartIcon,
   CircleCheckBigIcon,
 } from "lucide-react";
+import { getAllPaymentMethods } from "../../routes/market";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -41,25 +42,7 @@ const CartPage = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  // Get payment phone number based on selected payment method
-  const getPaymentPhoneNumber = () => {
-    if (checkoutData.paymentMethod === "vodafone cash") {
-      return "01008715756";
-    } else if (checkoutData.paymentMethod === "instapay") {
-      return "01001122334";
-    }
-    return ""; // No payment method selected yet
-  };
-
   // Get payment method label
-  const getPaymentMethodLabel = () => {
-    if (checkoutData.paymentMethod === "vodafone cash") {
-      return t("vodafoneCash") || "Vodafone Cash";
-    } else if (checkoutData.paymentMethod === "instapay") {
-      return t("instapay") || "Instapay";
-    }
-    return "";
-  };
 
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -83,6 +66,8 @@ const CartPage = () => {
     seriesName: "",
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
   const [requiresBookDetails, setRequiresBookDetails] = useState(false);
   const [validationErrors, setValidationErrors] = useState({
     numberTransferredFrom: "",
@@ -95,6 +80,20 @@ const CartPage = () => {
   const [checkoutCooldown, setCheckoutCooldown] = useState(0);
   const [cooldownTimer, setCooldownTimer] = useState(null);
   const [userRole, setUserRole] = useState(null);
+
+  const getPaymentMethodLabel = () => {
+    const method = paymentMethods.find(
+      (pm) => pm._id === checkoutData.paymentMethod
+    );
+    return method?.name || "";
+  };
+
+  const getPaymentPhoneNumber = () => {
+    const method = paymentMethods.find(
+      (pm) => pm._id === checkoutData.paymentMethod
+    );
+    return method?.phoneNumber || "";
+  };
 
   // Fetch cart data
   const fetchCart = async () => {
@@ -140,6 +139,22 @@ const CartPage = () => {
   };
 
   useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const res = await getAllPaymentMethods();
+
+        if (res?.status === "success") {
+          setPaymentMethods(res.data.paymentMethods.filter((pm) => pm.status));
+        }
+      } catch (err) {
+        console.error("Failed to fetch payment methods", err);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
+
+  useEffect(() => {
     fetchCart();
     // Get user role
     const user = getUserFromToken();
@@ -172,7 +187,7 @@ const CartPage = () => {
 
   // Load cooldown from localStorage on mount
   useEffect(() => {
-    const savedCooldown = localStorage.getItem('checkoutCooldownExpiry');
+    const savedCooldown = localStorage.getItem("checkoutCooldownExpiry");
     if (savedCooldown) {
       const expiryTime = parseInt(savedCooldown);
       const now = Date.now();
@@ -180,7 +195,7 @@ const CartPage = () => {
         const remainingSeconds = Math.ceil((expiryTime - now) / 1000);
         setCheckoutCooldown(remainingSeconds);
       } else {
-        localStorage.removeItem('checkoutCooldownExpiry');
+        localStorage.removeItem("checkoutCooldownExpiry");
       }
     }
 
@@ -423,8 +438,8 @@ const CartPage = () => {
     // Check cooldown
     if (checkoutCooldown > 0) {
       toast.error(
-        t("errors.checkoutCooldown", { seconds: checkoutCooldown }) || 
-        `Please wait ${checkoutCooldown} seconds before checking out again.`
+        t("errors.checkoutCooldown", { seconds: checkoutCooldown }) ||
+          `Please wait ${checkoutCooldown} seconds before checking out again.`
       );
       return;
     }
@@ -452,11 +467,13 @@ const CartPage = () => {
       if (result.success) {
         // Set 30-second cooldown
         const cooldownSeconds = 30;
-        const expiryTime = Date.now() + (cooldownSeconds * 1000);
-        localStorage.setItem('checkoutCooldownExpiry', expiryTime.toString());
+        const expiryTime = Date.now() + cooldownSeconds * 1000;
+        localStorage.setItem("checkoutCooldownExpiry", expiryTime.toString());
         setCheckoutCooldown(cooldownSeconds);
 
-        window.alert(t("success.purchaseSubmitted") || "Purchase submitted successfully!");
+        window.alert(
+          t("success.purchaseSubmitted") || "Purchase submitted successfully!"
+        );
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         // Reset form and redirect
@@ -947,7 +964,29 @@ const CartPage = () => {
                   {/* Divider */}
                   <div className="border-t border-base-300 my-3"></div>
 
-                  {/* Payment Section - Only show if cart total > 0 and payment method selected */}
+                  <select
+                    className={`select select-bordered h-12 w-full ${
+                      validationErrors.paymentMethod ? "select-error" : ""
+                    }`}
+                    value={checkoutData.paymentMethod}
+                    onChange={(e) => {
+                      setCheckoutData({
+                        ...checkoutData,
+                        paymentMethod: e.target.value,
+                      });
+                      clearFieldError("paymentMethod");
+                    }}
+                  >
+                    <option value="">
+                      {t("selectPaymentMethod") || "Select payment method"}
+                    </option>
+
+                    {paymentMethods.map((method) => (
+                      <option key={method._id} value={method._id}>
+                        {method.name}
+                      </option>
+                    ))}
+                  </select>
                   {cart.total > 0 && checkoutData.paymentMethod && (
                     <div
                       dir="rtl"
@@ -968,7 +1007,10 @@ const CartPage = () => {
                    cursor-pointer select-none transition-all duration-300
                    hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
                       >
-                        <span dir="ltr" className="select-all text-white tracking-wide">
+                        <span
+                          dir="ltr"
+                          className="select-all text-white tracking-wide"
+                        >
                           {getPaymentPhoneNumber()}
                         </span>
 
@@ -1003,116 +1045,83 @@ const CartPage = () => {
                 <div className="space-y-6">
                   {[
                     // Only show payment fields if cart total > 0
-                    ...(cart.total > 0 ? [
-                      {
-                        key: "transferNumber",
-                        label: (
-                          <>
-                            {t("transferNumber") || "Transfer Number"}
-                            <span className="text-error ml-0.5">*</span>
-                          </>
-                        ),
-                        input: (
-                          <input
-                            type="text"
-                            placeholder={
-                              t("enterTransferNumber") || "Enter transfer number"
-                            }
-                            className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
-                              validationErrors.numberTransferredFrom
-                                ? "input-error"
-                                : ""
-                            }`}
-                            value={checkoutData.numberTransferredFrom}
-                            onChange={(e) => {
-                              setCheckoutData({
-                                ...checkoutData,
-                                numberTransferredFrom: e.target.value,
-                              });
-                              clearFieldError("numberTransferredFrom");
-                            }}
-                          />
-                        ),
-                        error: validationErrors.numberTransferredFrom,
-                      },
-                      {
-                        key: "paymentScreenshot",
-                        label: (
-                          <>
-                            {t("paymentScreenshot") || "Payment Screenshot"}
-                            <span className="text-error ml-1">*</span>
-                          </>
-                        ),
-                        input: (
-                          <input
-                            type="file"
-                            accept="image/*,.pdf"
-                            className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
-                              validationErrors.paymentScreenShot
-                                ? "file-input-error"
-                                : ""
-                            }`}
-                            onChange={(e) => {
-                              handleFileChange(e);
-                              clearFieldError("paymentScreenShot");
-                            }}
-                          />
-                        ),
-                        extra: checkoutData.paymentScreenShot &&
-                          !validationErrors.paymentScreenShot && (
-                            <label className="label mt-1">
-                              <span className="label-text-alt text-success">
-                                {t("fileSelected") || "File selected"}:{" "}
-                                {checkoutData.paymentScreenShot.name}
-                              </span>
-                            </label>
-                          ),
-                        error: validationErrors.paymentScreenShot,
-                      },
-                      {
-                        key: "paymentMethod",
-                        label: (
-                          <>
-                            {t("paymentMethod") || "Payment Method"}
-                            <span className="text-error ml-1">*</span>
-                          </>
-                        ),
-                        input: (
-                          <select
-                            className={`select select-bordered h-12 w-full ${
-                              validationErrors.paymentMethod
-                                ? "select-error"
-                                : ""
-                            }`}
-                            value={checkoutData.paymentMethod}
-                            onChange={(e) => {
-                              setCheckoutData({
-                                ...checkoutData,
-                                paymentMethod: e.target.value,
-                              });
-                              clearFieldError("paymentMethod");
-                            }}
-                          >
-                            <option value="">
-                              {t("selectPaymentMethod") || "Select payment method"}
-                            </option>
-                            <option value="vodafone cash">
-                              {t("vodafoneCash") || "Vodafone Cash"} - 01008715756
-                            </option>
-                            <option value="instapay">
-                              {t("instapay") || "Instapay"} - 01001122334
-                            </option>
-                          </select>
-                        ),
-                        error: validationErrors.paymentMethod,
-                      },
-                    ] : []),
+                    ...(cart.total > 0
+                      ? [
+                          {
+                            key: "transferNumber",
+                            label: (
+                              <>
+                                {t("transferNumber") || "Transfer Number"}
+                                <span className="text-error ml-0.5">*</span>
+                              </>
+                            ),
+                            input: (
+                              <input
+                                type="text"
+                                placeholder={
+                                  t("enterTransferNumber") ||
+                                  "Enter transfer number"
+                                }
+                                className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
+                                  validationErrors.numberTransferredFrom
+                                    ? "input-error"
+                                    : ""
+                                }`}
+                                value={checkoutData.numberTransferredFrom}
+                                onChange={(e) => {
+                                  setCheckoutData({
+                                    ...checkoutData,
+                                    numberTransferredFrom: e.target.value,
+                                  });
+                                  clearFieldError("numberTransferredFrom");
+                                }}
+                              />
+                            ),
+                            error: validationErrors.numberTransferredFrom,
+                          },
+                          {
+                            key: "paymentScreenshot",
+                            label: (
+                              <>
+                                {t("paymentScreenshot") || "Payment Screenshot"}
+                                <span className="text-error ml-1">*</span>
+                              </>
+                            ),
+                            input: (
+                              <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
+                                  validationErrors.paymentScreenShot
+                                    ? "file-input-error"
+                                    : ""
+                                }`}
+                                onChange={(e) => {
+                                  handleFileChange(e);
+                                  clearFieldError("paymentScreenShot");
+                                }}
+                              />
+                            ),
+                            extra: checkoutData.paymentScreenShot &&
+                              !validationErrors.paymentScreenShot && (
+                                <label className="label mt-1">
+                                  <span className="label-text-alt text-success">
+                                    {t("fileSelected") || "File selected"}:{" "}
+                                    {checkoutData.paymentScreenShot.name}
+                                  </span>
+                                </label>
+                              ),
+                            error: validationErrors.paymentScreenShot,
+                          },
+                        ]
+                      : []),
                     // Watermark upload (available for all users)
                     {
                       key: "watermark",
                       label: (
                         <>
-                          {t("watermark") || "Watermark"} ({t("optional") || "Optional"})
+                          {t("watermark") || "Watermark"} (
+                          {t("optional") || "Optional"})
                         </>
                       ),
                       helper: (
@@ -1131,7 +1140,8 @@ const CartPage = () => {
                             />
                           </svg>
                           <span className="text-sm">
-                            {t("watermarkHelper") || "If you want to upload a watermark feel free to do so."}
+                            {t("watermarkHelper") ||
+                              "A watermark can be applied, but please note that it may cause printing problems."}
                           </span>
                         </div>
                       ),
@@ -1192,15 +1202,15 @@ const CartPage = () => {
                         {[
                           {
                             key: "nameOnBook",
-                            placeholder: t("nameOnBook") || "Name on book",
+                            label: t("nameOnBook") || "Name on book",
                           },
                           {
                             key: "numberOnBook",
-                            placeholder: t("numberOnBook") || "Number on book",
+                            label: t("numberOnBook") || "Number on book",
                           },
                           {
                             key: "seriesName",
-                            placeholder: t("seriesName") || "Series name",
+                            label: t("seriesName") || "Series name",
                           },
                         ].map((field, index) => (
                           <motion.div
@@ -1208,11 +1218,16 @@ const CartPage = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: index * 0.1 }}
-                            className="space-y-2"
+                            className="space-y-1"
                           >
+                            <label className="label font-medium">
+                              <span className="label-text text-base-content">
+                                {field.label}
+                              </span>
+                            </label>
+
                             <input
                               type="text"
-                              placeholder={field.placeholder}
                               className={`input input-bordered bg-base-100 text-base-content h-12 w-full ${
                                 validationErrors[field.key] ? "input-error" : ""
                               }`}
@@ -1220,7 +1235,7 @@ const CartPage = () => {
                               onChange={(e) => {
                                 const value =
                                   field.key === "numberOnBook"
-                                    ? e.target.value.replace(/\D/g, "") 
+                                    ? e.target.value.replace(/\D/g, "")
                                     : e.target.value;
 
                                 setCheckoutData({
@@ -1231,6 +1246,7 @@ const CartPage = () => {
                               }}
                             />
 
+                            {/* Error message */}
                             {validationErrors[field.key] && (
                               <label className="label">
                                 <span className="label-text-alt text-error">

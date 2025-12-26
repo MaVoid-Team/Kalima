@@ -61,7 +61,7 @@
   "waitSeconds": "انتظر {{seconds}} ث",
   "cooldownMessage": "يرجى الانتظار {{seconds}} ثانية قبل إتمام طلب جديد. هذا لمنع الطلبات المكررة.",
   "watermark": "علامة مائية",
-  "watermarkHelper": "إذا كنت تريد رفع علامة مائية، فلا تتردد في القيام بذلك",
+  "watermarkHelper": "يمكن رفع علامة مائية مع العلم انها يمكن ان تسبب مشاكل في الطباعة",
   "optional": "اختياري",
   "paymentMethod": "ةطريق الدفع",
   "selectPaymentMethod": "اختر طريقة الدفع",
