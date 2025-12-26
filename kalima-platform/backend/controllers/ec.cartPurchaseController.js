@@ -449,12 +449,12 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
                 // Use the raw string id (Mongoose accepts string ids); this avoids casting issues
                 const found = await ECCartPurchase.findById(searchTermString)
                     .populate({ path: 'createdBy', select: "name email role phoneNumber" })
-                    .populate('confirmedBy', 'name')
-                    .populate('receivedBy', 'name')
-                    .populate('returnedBy', 'name')
-                    .populate('adminNoteBy', 'name')
-                    .populate({ path: "paymentMethod", select: "name" })
-                    .populate('couponCode');
+                    .populate({ path: 'confirmedBy', select: 'name' })
+                    .populate({ path: 'receivedBy', select: 'name' })
+                    .populate({ path: 'returnedBy', select: 'name' })
+                    .populate({ path: 'adminNoteBy', select: 'name' })
+                    .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+                    .populate({ path: 'couponCode' });
                 // If baseMatch filters exist, ensure the found doc satisfies them
                 let matchesBase = true;
                 if (found && Object.keys(baseMatch).length > 0) {
@@ -566,12 +566,12 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
             for (const id of resultIds) {
                 const doc = await ECCartPurchase.findById(id)
                     .populate({ path: 'createdBy', select: "name email role phoneNumber" })
-                    .populate('confirmedBy', 'name')
-                    .populate('receivedBy', 'name')
-                    .populate('returnedBy', 'name')
-                    .populate('adminNoteBy', 'name')
-                    .populate('paymentMethod', 'name')
-                    .populate('couponCode');
+                    .populate({ path: 'confirmedBy', select: 'name' })
+                    .populate({ path: 'receivedBy', select: 'name' })
+                    .populate({ path: 'returnedBy', select: 'name' })
+                    .populate({ path: 'adminNoteBy', select: 'name' })
+                    .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+                    .populate({ path: 'couponCode' });
                 if (doc) populated.push(doc);
             }
         }
@@ -594,12 +594,12 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     // No search — simple find with base filters
     const purchases = await ECCartPurchase.find(baseMatch)
         .populate({ path: 'createdBy', select: "name email role phoneNumber" })
-        .populate('confirmedBy', 'name')
-        .populate('receivedBy', 'name')
-        .populate('returnedBy', 'name')
-        .populate('adminNoteBy', 'name')
-        .populate('paymentMethod', 'name')
-        .populate('couponCode')
+        .populate({ path: 'confirmedBy', select: 'name' })
+        .populate({ path: 'receivedBy', select: 'name' })
+        .populate({ path: 'returnedBy', select: 'name' })
+        .populate({ path: 'adminNoteBy', select: 'name' })
+        .populate({ path: 'paymentMethod', select: 'name', strictPopulate: false })
+        .populate({ path: 'couponCode' })
         .sort('-createdAt')
         .skip(skip)
         .limit(limit);
