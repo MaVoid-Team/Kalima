@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
-import { API_URL } from "../utils/apiConfig";
+
 
 // Helper function to generate safe filename for uploads
 const generateSafeFilename = (file) => {
@@ -172,12 +172,12 @@ export const getCheckoutPreview = async () => {
 export const createCartPurchase = async (purchaseData) => {
   try {
     const formData = new FormData();
-    
+
     // Only append payment fields if they exist (for paid products)
     if (purchaseData.numberTransferredFrom) {
       formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom);
     }
-    
+
     if (purchaseData.paymentScreenShot) {
       const safePayment = generateSafeFilename(purchaseData.paymentScreenShot);
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment);
@@ -279,7 +279,7 @@ export const getUserPurchasedProducts = async () => {
         Authorization: `Bearer ${getToken()}`,
       },
     });
-    
+
     if (response.data?.status === "success" && response.data?.data?.purchases) {
       // Extract all product IDs from all purchases
       const productIds = new Set();
@@ -340,7 +340,7 @@ export const getConfirmedOrdersReport = async (params = {}) => {
     const response = await axios.get(
       `${API_URL}/ec/cart-purchases/admin/fullreport`,
       {
-        params, 
+        params,
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -355,9 +355,8 @@ export const getConfirmedOrdersReport = async (params = {}) => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to fetch confirmed orders report: ${
-        error.response?.data?.message || error.message
-      }`,
+      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message
+        }`,
     };
   }
 };
