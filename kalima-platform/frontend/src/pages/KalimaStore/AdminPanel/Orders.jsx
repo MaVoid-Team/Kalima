@@ -1181,9 +1181,18 @@ const Orders = () => {
                     </td>
                     <td className="text-center">
                       {order.paymentMethod ? (
-                        <span className="badge badge-primary">
-                          {order.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
-                        </span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="badge badge-primary">
+                            {typeof order.paymentMethod === 'object' 
+                              ? order.paymentMethod.name 
+                              : order.paymentMethod}
+                          </span>
+                          {typeof order.paymentMethod === 'object' && order.paymentMethod.phoneNumber && (
+                            <span className="text-xs text-gray-600">
+                              {order.paymentMethod.phoneNumber}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-gray-400">N/A</span>
                       )}
@@ -1759,16 +1768,26 @@ const Orders = () => {
                     </p>
                   )}
                   {selectedOrder.paymentMethod && (
-                    <p>
-                      <strong>{t("table.paymentMethod")}:</strong>{" "}
-                      <span className="badge badge-primary ml-2">
-                        {selectedOrder.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
-                      </span>
-                    </p>
+                    <div className="mb-2">
+                      <p>
+                        <strong>{t("table.paymentMethod")}:</strong>{" "}
+                        <span className="badge badge-primary ml-2">
+                          {typeof selectedOrder.paymentMethod === 'object' 
+                            ? selectedOrder.paymentMethod.name 
+                            : selectedOrder.paymentMethod}
+                        </span>
+                      </p>
+                      {typeof selectedOrder.paymentMethod === 'object' && selectedOrder.paymentMethod.phoneNumber && (
+                        <p className="text-sm text-gray-600 mt-1">
+                          <strong>{t("table.paymentMethodPhone")}:</strong>{" "}
+                          {selectedOrder.paymentMethod.phoneNumber}
+                        </p>
+                      )}
+                    </div>
                   )}
                   <p>
                     <strong>{t("table.paymentNumber")}:</strong>{" "}
-                    {selectedOrder.paymentNumber}
+                    {selectedOrder.paymentNumber || "N/A"}
                   </p>
                   <p>
                     <strong>{t("table.transferredFrom")}:</strong>{" "}
