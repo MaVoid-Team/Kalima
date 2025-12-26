@@ -1,7 +1,6 @@
 import axios from "axios"
 import { getToken } from "./auth-services"
-
-const API_URL = import.meta.env.VITE_API_URL
+import { API_URL } from "../utils/apiConfig"
 
 // Function to check if user is logged in
 const isLoggedIn = () => {
