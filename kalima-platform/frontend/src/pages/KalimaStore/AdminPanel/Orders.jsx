@@ -108,7 +108,7 @@ const Orders = () => {
         } else if (statusFilter === "pending") {
           queryParams.status = "pending";
         } else if (statusFilter === "returned") {
-          queryParams.status = "returned"; 
+          queryParams.status = "returned";
         }
       }
 
@@ -1182,7 +1182,13 @@ const Orders = () => {
                     <td className="text-center">
                       {order.paymentMethod ? (
                         <span className="badge badge-primary">
-                          {order.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
+                          {typeof order.paymentMethod === "object"
+                            ? order.paymentMethod.name
+                            : order.paymentMethod === "vodafone cash"
+                            ? "Vodafone Cash"
+                            : order.paymentMethod === "instapay"
+                            ? "Instapay"
+                            : order.paymentMethod}
                         </span>
                       ) : (
                         <span className="text-gray-400">N/A</span>
@@ -1318,9 +1324,7 @@ const Orders = () => {
                           <button
                             className="btn btn-ghost btn-sm text-purple-600"
                             onClick={() =>
-                              handleViewPaymentScreenshot(
-                                order.watermark
-                              )
+                              handleViewPaymentScreenshot(order.watermark)
                             }
                             title={t("table.viewWatermark") || "View Watermark"}
                           >
@@ -1762,7 +1766,13 @@ const Orders = () => {
                     <p>
                       <strong>{t("table.paymentMethod")}:</strong>{" "}
                       <span className="badge badge-primary ml-2">
-                        {selectedOrder.paymentMethod === "vodafone cash" ? "Vodafone Cash" : "Instapay"}
+                        {typeof selectedOrder.paymentMethod === "object"
+                          ? selectedOrder.paymentMethod.name
+                          : selectedOrder.paymentMethod === "vodafone cash"
+                          ? "Vodafone Cash"
+                          : selectedOrder.paymentMethod === "instapay"
+                          ? "Instapay"
+                          : selectedOrder.paymentMethod}
                       </span>
                     </p>
                   )}
@@ -1793,9 +1803,7 @@ const Orders = () => {
                       <button
                         className="btn btn-secondary btn-sm"
                         onClick={() =>
-                          handleViewPaymentScreenshot(
-                            selectedOrder.watermark
-                          )
+                          handleViewPaymentScreenshot(selectedOrder.watermark)
                         }
                       >
                         {t("table.viewWatermark") || "View Watermark"}
