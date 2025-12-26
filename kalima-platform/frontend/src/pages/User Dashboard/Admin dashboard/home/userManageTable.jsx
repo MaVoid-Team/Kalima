@@ -1,236 +1,292 @@
-"use client"
-import { useState, useEffect } from "react"
-import { getAllUsers, deleteUser, createUser } from "../../../../routes/fetch-users"
-import { useTranslation } from "react-i18next"
-import { FaSync, FaWhatsapp, FaEdit, FaDownload, FaFileExport, FaEye, FaTimes, FaCalculator } from "react-icons/fa"
-import Pagination from "../../../../components/Pagination"
-import CreateUserModal from "../CreateUserModal/CreateUserModal"
-import EditUserModal from "../CreateUserModal/EditUserModal"
-import { getUserDashboard } from "../../../../routes/auth-services"
-import { RecalculateInvites } from "../../../../routes/market"
-import * as XLSX from "xlsx"
+"use client";
+import { useState, useEffect } from "react";
+import {
+  getAllUsers,
+  deleteUser,
+  createUser,
+} from "../../../../routes/fetch-users";
+import { useTranslation } from "react-i18next";
+import {
+  FaSync,
+  FaWhatsapp,
+  FaEdit,
+  FaDownload,
+  FaFileExport,
+  FaEye,
+  FaTimes,
+  FaCalculator,
+} from "react-icons/fa";
+import Pagination from "../../../../components/Pagination";
+import CreateUserModal from "../CreateUserModal/CreateUserModal";
+import EditUserModal from "../CreateUserModal/EditUserModal";
+import { getUserDashboard } from "../../../../routes/auth-services";
+import { RecalculateInvites } from "../../../../routes/market";
+import * as XLSX from "xlsx";
 
 const UserManagementTable = () => {
-  const { t, i18n } = useTranslation("admin")
-  const isRTL = i18n.language === "ar"
-  const dir = isRTL ? "rtl" : "ltr"
+  const { t, i18n } = useTranslation("admin");
+  const isRTL = i18n.language === "ar";
+  const dir = isRTL ? "rtl" : "ltr";
 
-  const [users, setUsers] = useState([])
-  const [filteredUsers, setFilteredUsers] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isRecalculating, setIsRecalculating] = useState(false)
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [whatsappModal, setWhatsappModal] = useState({
+    isOpen: false,
+    phoneNumber: "",
+    userName: "",
+  });
+  const [whatsappMessage, setWhatsappMessage] = useState("");
+  const [editModal, setEditModal] = useState({
+    isOpen: false,
+    user: null,
+  });
+
+  // New state for user details modal
+  const [userDetailsModal, setUserDetailsModal] = useState({
+    isOpen: false,
+    user: null,
+  });
+
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSubAdmin, setIsSubAdmin] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [filters, setFilters] = useState({
     name: "",
     phone: "",
     role: "",
     status: "",
     successfulInvites: "",
-  })
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [whatsappModal, setWhatsappModal] = useState({
-    isOpen: false,
-    phoneNumber: "",
-    userName: "",
-  })
-  const [whatsappMessage, setWhatsappMessage] = useState("")
-  const [editModal, setEditModal] = useState({
-    isOpen: false,
-    user: null,
-  })
-
-  // New state for user details modal
-  const [userDetailsModal, setUserDetailsModal] = useState({
-    isOpen: false,
-    user: null,
-  })
-
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isSubAdmin, setIsSubAdmin] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
+    dateFrom: "",
+    dateTo: "",
+  });
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [usersPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
 
   // Check if current user is admin when component mounts
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const result = await getUserDashboard()
+        const result = await getUserDashboard();
         if (result.success && result.data?.data?.userInfo) {
           // Case-insensitive comparison for "admin" role
-          const userRole = result.data.data.userInfo.role
-          setIsAdmin(userRole.toLowerCase() === "admin")
-          setIsSubAdmin(userRole.toLowerCase() === "subadmin")
+          const userRole = result.data.data.userInfo.role;
+          setIsAdmin(userRole.toLowerCase() === "admin");
+          setIsSubAdmin(userRole.toLowerCase() === "subadmin");
         }
       } catch (error) {
-        console.error("Error checking admin status:", error)
-        setIsAdmin(false)
-        setIsSubAdmin(false)
+        console.error("Error checking admin status:", error);
+        setIsAdmin(false);
+        setIsSubAdmin(false);
       }
-    }
-    checkAdminStatus()
-  }, [])
+    };
+    checkAdminStatus();
+  }, []);
 
   // Fetch users on mount
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, []);
+
+  // Helper function to convert date from YYYY-MM-DD to YYYY-M-D format
 
   const fetchUsers = async () => {
     try {
-      setLoading(true)
-      const result = await getAllUsers()
+      setLoading(true);
+
+      const result = await getAllUsers({
+        dateFrom: filters.dateFrom || undefined,
+        dateTo: filters.dateTo || undefined,
+      });
+
       if (result.success) {
-        setUsers(result.data)
-        setFilteredUsers(result.data)
+        console.log("🟢 users received:", result.data.length);
+        setUsers(result.data);
       } else {
-        setError(t("admin.errors.fetchUsers"))
+        setError(result.message);
       }
-    } catch (error) {
-      setError(t("admin.errors.fetchUsers"))
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Fixed recalculate invites function
   const handleRecalculateInvites = async () => {
     try {
-      setIsRecalculating(true)
-      setError(null)
+      setIsRecalculating(true);
+      setError(null);
 
-      const response = await RecalculateInvites()
+      const response = await RecalculateInvites();
 
       if (response.success) {
         // Refresh users data after successful recalculation
-        await fetchUsers()
-        alert(t("admin.invites.refreshSuccess") || "Invites refreshed successfully!")
+        await fetchUsers();
+        alert(
+          t("admin.invites.refreshSuccess") || "Invites refreshed successfully!"
+        );
       } else {
-        setError(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
-        alert(response.message || t("admin.invites.refreshError") || "Error calculating invites data")
+        setError(
+          response.message ||
+            t("admin.invites.refreshError") ||
+            "Error calculating invites data"
+        );
+        alert(
+          response.message ||
+            t("admin.invites.refreshError") ||
+            "Error calculating invites data"
+        );
       }
     } catch (error) {
-      console.error("Error recalculating invites:", error)
+      console.error("Error recalculating invites:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
         t("admin.invites.refreshError") ||
-        "Error calculating invites data"
-      setError(errorMessage)
-      alert(errorMessage)
+        "Error calculating invites data";
+      setError(errorMessage);
+      alert(errorMessage);
     } finally {
-      setIsRecalculating(false)
+      setIsRecalculating(false);
     }
-  }
+  };
 
   // Apply filters when filters or users change
   useEffect(() => {
-    applyFilters()
-    setCurrentPage(1)
-  }, [filters, users])
+    applyFilters();
+    setCurrentPage(1);
+  }, [
+    filters.name,
+    filters.phone,
+    filters.role,
+    filters.status,
+    filters.successfulInvites,
+    users,
+  ]);
 
   const applyFilters = () => {
     const filtered = users.filter(
       (user) =>
-        (!filters.name || user.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+        (!filters.name ||
+          user.name?.toLowerCase().includes(filters.name.toLowerCase())) &&
         (!filters.phone || user.phoneNumber?.includes(filters.phone)) &&
-        (!filters.role || user.role.toLowerCase() === filters.role.toLowerCase()) &&
+        (!filters.role ||
+          user.role?.toLowerCase() === filters.role.toLowerCase()) &&
         (!filters.status || getStatus(user) === filters.status) &&
         (filters.successfulInvites === "" ||
-          (user.successfulInvites || 0) === Number.parseInt(filters.successfulInvites, 10)),
-    )
-    setFilteredUsers(filtered)
-  }
+          (user.successfulInvites || 0) ===
+            Number.parseInt(filters.successfulInvites, 10))
+    );
 
-  const getRoleLabel = (role) => t(`admin.roles.${role.toLowerCase()}`)
+    setFilteredUsers(filtered);
+  };
+
+  useEffect(() => {
+    console.log("🟡 useEffect date changed", filters.dateFrom, filters.dateTo);
+    fetchUsers();
+  }, [filters.dateFrom, filters.dateTo]);
+
+  const getRoleLabel = (role) => t(`admin.roles.${role.toLowerCase()}`);
 
   const getStatus = (user) => {
-    if (!user.phoneNumber) return t("admin.status.missingData")
-    if (user.role === "student" && !user.level) return t("admin.status.missingData")
-    return t("admin.status.valid")
-  }
+    if (!user.phoneNumber) return t("admin.status.missingData");
+    if (user.role === "student" && !user.level)
+      return t("admin.status.missingData");
+    return t("admin.status.valid");
+  };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm(t("admin.confirmDelete"))) return
+    if (!window.confirm(t("admin.confirmDelete"))) return;
     try {
-      const result = await deleteUser(userId)
+      const result = await deleteUser(userId);
       if (result.success) {
-        setUsers((prev) => prev.filter((u) => u._id !== userId))
+        setUsers((prev) => prev.filter((u) => u._id !== userId));
       } else {
-        setError(result.error)
+        setError(result.error);
       }
     } catch (error) {
-      setError(error.message)
+      setError(error.message);
     }
-  }
+  };
 
   const handleCreateUser = async (userData) => {
     try {
-      setError(null)
-      const result = await createUser(userData)
+      setError(null);
+      const result = await createUser(userData);
       if (result.success) {
-        setUsers((prev) => [...prev, result.data])
-        setShowCreateModal(false)
-        fetchUsers() // Refresh users after creation
+        setUsers((prev) => [...prev, result.data]);
+        setShowCreateModal(false);
+        fetchUsers(); // Refresh users after creation
       } else {
-        throw new Error(result.error)
+        throw new Error(result.error);
       }
     } catch (error) {
-      setError(error.message)
+      setError(error.message);
     }
-  }
+  };
 
   // Open edit modal
   const openEditModal = (user) => {
     setEditModal({
       isOpen: true,
       user,
-    })
-  }
+    });
+  };
 
   // Open user details modal
   const openUserDetailsModal = (user) => {
     setUserDetailsModal({
       isOpen: true,
       user,
-    })
-  }
+    });
+  };
 
   // Handle user update
   const handleUserUpdated = (userId, updatedData) => {
-    setUsers((prev) => prev.map((user) => (user._id === userId ? { ...user, ...updatedData } : user)))
-  }
+    setUsers((prev) =>
+      prev.map((user) =>
+        user._id === userId ? { ...user, ...updatedData } : user
+      )
+    );
+  };
 
   // Open WhatsApp modal
   const openWhatsappModal = (phoneNumber, userName) => {
     if (!phoneNumber) {
-      alert(t("admin.noPhoneNumber"))
-      return
+      alert(t("admin.noPhoneNumber"));
+      return;
     }
     setWhatsappModal({
       isOpen: true,
       phoneNumber,
       userName,
-    })
-    setWhatsappMessage("")
-  }
+    });
+    setWhatsappMessage("");
+  };
 
   // Send WhatsApp message
   const sendWhatsappMessage = () => {
-    let formattedNumber = whatsappModal.phoneNumber.replace(/\D/g, "")
+    let formattedNumber = whatsappModal.phoneNumber.replace(/\D/g, "");
     if (!formattedNumber.startsWith("2")) {
-      formattedNumber = "2" + formattedNumber
+      formattedNumber = "2" + formattedNumber;
     }
-    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(whatsappMessage)}`
-    window.open(whatsappUrl, "_blank")
+    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodeURIComponent(
+      whatsappMessage
+    )}`;
+    window.open(whatsappUrl, "_blank");
     setWhatsappModal({
       isOpen: false,
       phoneNumber: "",
       userName: "",
-    })
-  }
+    });
+  };
 
   // Export functionality
   const convertToCSV = (data) => {
@@ -244,7 +300,7 @@ const UserManagementTable = () => {
       t("admin.export.administrationZone"),
       t("admin.export.sequenceId"),
       t("admin.export.joinedDate"),
-    ]
+    ];
     const csvContent = [
       headers.join(","),
       ...data.map((user) =>
@@ -257,50 +313,54 @@ const UserManagementTable = () => {
           `"${user.government || ""}"`,
           `"${user.administrationZone || ""}"`,
           `"${user.sequencedId || ""}"`,
-          `"${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""}"`,
-        ].join(","),
+          `"${
+            user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
+          }"`,
+        ].join(",")
       ),
-    ].join("\n")
-    return csvContent
-  }
+    ].join("\n");
+    return csvContent;
+  };
 
   const exportToCSV = async (exportAll = false) => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      const dataToExport = exportAll ? users : filteredUsers
-      const csvContent = convertToCSV(dataToExport)
+      const dataToExport = exportAll ? users : filteredUsers;
+      const csvContent = convertToCSV(dataToExport);
       // Create blob and download
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-      const link = document.createElement("a")
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
       if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob)
-        link.setAttribute("href", url)
-        const timestamp = new Date().toISOString().split("T")[0]
-        const filename = exportAll ? `all-users-${timestamp}.csv` : `filtered-users-${timestamp}.csv`
-        link.setAttribute("download", filename)
-        link.style.visibility = "hidden"
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        const timestamp = new Date().toISOString().split("T")[0];
+        const filename = exportAll
+          ? `all-users-${timestamp}.csv`
+          : `filtered-users-${timestamp}.csv`;
+        link.setAttribute("download", filename);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         // Show success message
         const successMessage = exportAll
           ? t("admin.export.successAll", { count: dataToExport.length })
-          : t("admin.export.successFiltered", { count: dataToExport.length })
+          : t("admin.export.successFiltered", { count: dataToExport.length });
         // You can replace this with a toast notification if you have one
-        alert(successMessage)
+        alert(successMessage);
       }
     } catch (error) {
-      console.error("Export error:", error)
-      alert(t("admin.export.error"))
+      console.error("Export error:", error);
+      alert(t("admin.export.error"));
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   const exportToJSON = async (exportAll = false) => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      const dataToExport = exportAll ? users : filteredUsers
+      const dataToExport = exportAll ? users : filteredUsers;
       // Clean and format data for JSON export
       const jsonData = dataToExport.map((user) => ({
         name: user.name || "",
@@ -311,93 +371,125 @@ const UserManagementTable = () => {
         government: user.government || "",
         administrationZone: user.administrationZone || "",
         sequenceId: user.sequencedId || "",
-        joinedDate: user.createdAt ? new Date(user.createdAt).toISOString() : "",
+        joinedDate: user.createdAt
+          ? new Date(user.createdAt).toISOString()
+          : "",
         level: user.level || "",
         expertise: user.expertise || "",
-      }))
-      const jsonContent = JSON.stringify(jsonData, null, 2)
+      }));
+      const jsonContent = JSON.stringify(jsonData, null, 2);
       // Create blob and download
-      const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" })
-      const link = document.createElement("a")
+      const blob = new Blob([jsonContent], {
+        type: "application/json;charset=utf-8;",
+      });
+      const link = document.createElement("a");
       if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob)
-        link.setAttribute("href", url)
-        const timestamp = new Date().toISOString().split("T")[0]
-        const filename = exportAll ? `all-users-${timestamp}.json` : `filtered-users-${timestamp}.json`
-        link.setAttribute("download", filename)
-        link.style.visibility = "hidden"
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        const timestamp = new Date().toISOString().split("T")[0];
+        const filename = exportAll
+          ? `all-users-${timestamp}.json`
+          : `filtered-users-${timestamp}.json`;
+        link.setAttribute("download", filename);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         // Show success message
         const successMessage = exportAll
           ? t("admin.export.successAll", { count: dataToExport.length })
-          : t("admin.export.successFiltered", { count: dataToExport.length })
-        alert(successMessage)
+          : t("admin.export.successFiltered", { count: dataToExport.length });
+        alert(successMessage);
       }
     } catch (error) {
-      console.error("Export error:", error)
-      alert(t("admin.export.error"))
+      console.error("Export error:", error);
+      alert(t("admin.export.error"));
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   const exportToXLSX = async (exportAll = false) => {
-    setIsExporting(true)
+    setIsExporting(true);
     try {
-      const dataToExport = exportAll ? users : filteredUsers
-      const worksheet = XLSX.utils.json_to_sheet(dataToExport)
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Users")
-      const timestamp = new Date().toISOString().split("T")[0]
-      const filename = exportAll ? `all-users-${timestamp}.xlsx` : `filtered-users-${timestamp}.xlsx`
-      XLSX.writeFile(workbook, filename)
-      alert(t("admin.export.successXLSX", { count: dataToExport.length }))
+      const dataToExport = exportAll ? users : filteredUsers;
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+      const timestamp = new Date().toISOString().split("T")[0];
+      const filename = exportAll
+        ? `all-users-${timestamp}.xlsx`
+        : `filtered-users-${timestamp}.xlsx`;
+      XLSX.writeFile(workbook, filename);
+      alert(t("admin.export.successXLSX", { count: dataToExport.length }));
     } catch (error) {
-      console.error("Export error:", error)
-      alert(t("admin.export.error"))
+      console.error("Export error:", error);
+      alert(t("admin.export.error"));
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   // Format date for display
   const formatDate = (dateString) => {
-    if (!dateString) return t("admin.NA")
-    return new Date(dateString).toLocaleDateString()
-  }
+    if (!dateString) return t("admin.NA");
+    return new Date(dateString).toLocaleDateString();
+  };
 
   // Render user details based on role
   const renderUserDetails = (user) => {
-    if (!user) return null
+    if (!user) return null;
 
     const commonFields = (
       <>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.name")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.name || t("admin.NA")}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.name")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {user.name || t("admin.NA")}
+            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.email")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.email || t("admin.NA")}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.email")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {user.email || t("admin.NA")}
+            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.gender")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.gender || t("admin.NA")}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.gender")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {user.gender || t("admin.NA")}
+            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.phoneNumber")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.phoneNumber || t("admin.NA")}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.phoneNumber")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {user.phoneNumber || t("admin.NA")}
+            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.role")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{getRoleLabel(user.role)}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.role")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {getRoleLabel(user.role)}
+            </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.joinedDate")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{formatDate(user.createdAt)}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.joinedDate")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {formatDate(user.createdAt)}
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.userSerial")}</label>
@@ -408,7 +500,9 @@ const UserManagementTable = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("admin.userDetails.government")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.government}</p>
+              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                {user.government}
+              </p>
             </div>
           )}
           {user.administrationZone && (
@@ -416,7 +510,9 @@ const UserManagementTable = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("admin.userDetails.administrationZone")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.administrationZone}</p>
+              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                {user.administrationZone}
+              </p>
             </div>
           )}
           {user.isEmailVerified !== undefined && (
@@ -434,19 +530,23 @@ const UserManagementTable = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t("admin.userDetails.successfulInvites")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.successfulInvites || 0}</p>
+              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+                {user.successfulInvites || 0}
+              </p>
             </div>
           )}
         </div>
       </>
-    )
+    );
 
     const roleSpecificFields = () => {
       switch (user.role.toLowerCase()) {
         case "student":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-blue-600">{t("admin.userDetails.studentInfo")}</h4>
+              <h4 className="text-lg font-semibold mb-3 text-blue-600">
+                {t("admin.userDetails.studentInfo")}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.level && (
                   <div>
@@ -454,7 +554,9 @@ const UserManagementTable = () => {
                       {t("admin.userDetails.level")}
                     </label>
                     <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
-                      {typeof user.level === "object" ? user.level.name || user.level._id : user.level}
+                      {typeof user.level === "object"
+                        ? user.level.name || user.level._id
+                        : user.level}
                     </p>
                   </div>
                 )}
@@ -463,7 +565,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.sequenceId")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.sequencedId}</p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                      {user.sequencedId}
+                    </p>
                   </div>
                 )}
                 {user.parentPhoneNumber && (
@@ -471,7 +575,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.parentPhone")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.parentPhoneNumber}</p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                      {user.parentPhoneNumber}
+                    </p>
                   </div>
                 )}
                 {user.faction && (
@@ -479,7 +585,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.faction")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.faction}</p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                      {user.faction}
+                    </p>
                   </div>
                 )}
                 {user.hobbies && user.hobbies.length > 0 && (
@@ -489,7 +597,10 @@ const UserManagementTable = () => {
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {user.hobbies.map((hobby, index) => (
-                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                        >
                           {hobby}
                         </span>
                       ))}
@@ -501,7 +612,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.generalPoints")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.generalPoints || 0}</p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                      {user.generalPoints || 0}
+                    </p>
                   </div>
                 )}
                 {user.totalPoints !== undefined && (
@@ -509,17 +622,21 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.totalPoints")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">{user.totalPoints || 0}</p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                      {user.totalPoints || 0}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          )
+          );
 
         case "parent":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-green-600">{t("admin.userDetails.parentInfo")}</h4>
+              <h4 className="text-lg font-semibold mb-3 text-green-600">
+                {t("admin.userDetails.parentInfo")}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.children && (
                   <div className="md:col-span-2">
@@ -527,7 +644,9 @@ const UserManagementTable = () => {
                       {t("admin.userDetails.children")} ({user.children.length})
                     </label>
                     <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">
-                      {user.children.length > 0 ? user.children.join(", ") : t("admin.userDetails.noChildren")}
+                      {user.children.length > 0
+                        ? user.children.join(", ")
+                        : t("admin.userDetails.noChildren")}
                     </p>
                   </div>
                 )}
@@ -536,17 +655,66 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.views")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">{user.views || 0}</p>
+                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">
+                      {user.views || 0}
+                    </p>
                   </div>
                 )}
+                {user.preferredContactTime &&
+                  (user.preferredContactTime.from ||
+                    user.preferredContactTime.to ||
+                    user.preferredContactTime.note) && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("admin.editUser.preferredContactTime")}
+                      </label>
+                      <div className="bg-green-50 p-3 rounded text-sm text-gray-900 border border-green-100">
+                        {(user.preferredContactTime.from ||
+                          user.preferredContactTime.to) && (
+                          <div className="grid grid-cols-8 gap-2  mb-2">
+                            {user.preferredContactTime.from && (
+                              <div>
+                                <span className="font-semibold">
+                                  {t("admin.editUser.from")}:
+                                </span>{" "}
+                                <span dir="ltr" className="inline-block">
+                                  {user.preferredContactTime.from}
+                                </span>
+                              </div>
+                            )}
+                            {user.preferredContactTime.to && (
+                              <div>
+                                <span className="font-semibold">
+                                  {t("admin.editUser.to")}:
+                                </span>{" "}
+                                <span dir="ltr" className="inline-block">
+                                  {user.preferredContactTime.to}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {user.preferredContactTime.note && (
+                          <div>
+                            <span className="font-semibold">
+                              {t("admin.editUser.note")}:
+                            </span>{" "}
+                            {user.preferredContactTime.note}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
-          )
+          );
 
         case "teacher":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-purple-600">{t("admin.userDetails.teacherInfo")}</h4>
+              <h4 className="text-lg font-semibold mb-3 text-purple-600">
+                {t("admin.userDetails.teacherInfo")}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.subject && (
                   <div>
@@ -554,7 +722,9 @@ const UserManagementTable = () => {
                       {t("admin.userDetails.subject")}
                     </label>
                     <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
-                      {typeof user.subject === "object" ? user.subject.name || user.subject._id : user.subject}
+                      {typeof user.subject === "object"
+                        ? user.subject.name || user.subject._id
+                        : user.subject}
                     </p>
                   </div>
                 )}
@@ -564,7 +734,9 @@ const UserManagementTable = () => {
                       {t("admin.userDetails.teachingLevel")}
                     </label>
                     <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
-                      {Array.isArray(user.level) ? user.level.join(", ") : user.level}
+                      {Array.isArray(user.level)
+                        ? user.level.join(", ")
+                        : user.level}
                     </p>
                   </div>
                 )}
@@ -573,7 +745,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.school")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.school}</p>
+                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                      {user.school}
+                    </p>
                   </div>
                 )}
                 {user.teachesAtType && (
@@ -581,7 +755,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.teachesAt")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.teachesAtType}</p>
+                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                      {user.teachesAtType}
+                    </p>
                   </div>
                 )}
                 {user.centers && user.centers.length > 0 && (
@@ -589,7 +765,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.centers")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.centers.join(", ")}</p>
+                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                      {user.centers.join(", ")}
+                    </p>
                   </div>
                 )}
                 {user.phoneNumber2 && (
@@ -597,7 +775,9 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.secondPhone")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">{user.phoneNumber2}</p>
+                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                      {user.phoneNumber2}
+                    </p>
                   </div>
                 )}
                 {user.socialMedia && user.socialMedia.length > 0 && (
@@ -607,28 +787,91 @@ const UserManagementTable = () => {
                     </label>
                     <div className="space-y-2">
                       {user.socialMedia.map((social, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-purple-50 p-2 rounded">
-                          <span className="font-medium">{social.platform}:</span>
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2 bg-purple-50 p-2 rounded"
+                        >
+                          <span className="font-medium">
+                            {social.platform}:
+                          </span>
                           <span>{social.account}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
+                {user.preferredContactTime &&
+                  (user.preferredContactTime.from ||
+                    user.preferredContactTime.to ||
+                    user.preferredContactTime.note) && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("admin.editUser.preferredContactTime")}
+                      </label>
+                      <div className="bg-purple-50 p-3 rounded text-sm text-gray-900 border border-purple-100">
+                        {(user.preferredContactTime.from ||
+                          user.preferredContactTime.to) && (
+                          <div
+                            className="grid grid-cols-8 gap-2  mb-2"
+                            dir={isRTL ? "rtl" : "ltr"}
+                          >
+                            {user.preferredContactTime.from && (
+                              <div
+                                className="col-span-4 flex items-center gap-1"
+                              >
+                                <span className="font-semibold whitespace-nowrap">
+                                  {t("admin.editUser.from")}:
+                                </span>{" "}
+                                <span dir="ltr" className="inline-block">
+                                  {user.preferredContactTime.from}
+                                </span>
+                              </div>
+                            )}
+                            {user.preferredContactTime.to && (
+                              <div className="col-span-4 flex items-center gap-1">
+                                <span className="font-semibold whitespace-nowrap">
+                                  {t("admin.editUser.to")}:
+                                </span>{" "}
+                                <span dir="ltr" className="inline-block">
+                                  {user.preferredContactTime.to}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {user.preferredContactTime.note && (
+                          <div className="mt-2 pt-2 border-t border-purple-200">
+                            <span className="font-semibold block mb-1">
+                              {t("admin.editUser.note")}:
+                            </span>
+                            <p className="italic opacity-90 break-words">
+                              {user.preferredContactTime.note}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
-          )
+          );
 
         case "lecturer":
         case "lecturers":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-indigo-600">{t("admin.userDetails.lecturerInfo")}</h4>
+              <h4 className="text-lg font-semibold mb-3 text-indigo-600">
+                {t("admin.userDetails.lecturerInfo")}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.bio && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.bio")}</label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">{user.bio}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t("admin.userDetails.bio")}
+                    </label>
+                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">
+                      {user.bio}
+                    </p>
                   </div>
                 )}
                 {user.expertise && (
@@ -636,58 +879,64 @@ const UserManagementTable = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.expertise")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">{user.expertise}</p>
+                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">
+                      {user.expertise}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          )
+          );
 
         case "assistant":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-orange-600">{t("admin.userDetails.assistantInfo")}</h4>
+              <h4 className="text-lg font-semibold mb-3 text-orange-600">
+                {t("admin.userDetails.assistantInfo")}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.assignedLecturer && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t("admin.userDetails.assignedLecturer")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-orange-50 p-2 rounded">{user.assignedLecturer}</p>
+                    <p className="text-sm text-gray-900 bg-orange-50 p-2 rounded">
+                      {user.assignedLecturer}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          )
+          );
 
         default:
-          return null
+          return null;
       }
-    }
+    };
 
     return (
       <div className="max-h-96 overflow-y-auto">
         {commonFields}
         {roleSpecificFields()}
       </div>
-    )
-  }
+    );
+  };
 
   // Pagination
-  const indexOfLastUser = currentPage * usersPerPage
-  const indexOfFirstUser = indexOfLastUser - usersPerPage
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser)
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
 
   if (loading) {
     return (
       <div className="text-center p-8">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
-    )
+    );
   }
 
   if (error && !showCreateModal) {
@@ -695,21 +944,36 @@ const UserManagementTable = () => {
       <div className="alert alert-error max-w-md mx-auto mt-8">
         <span>{error}</span>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-primary" dir={dir}>
+    <div
+      className="rounded-xl font-sans w-full mx-auto p-4 my-14 border border-primary"
+      dir={dir}
+    >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className={`text-3xl font-bold mb-2 ${isRTL ? "text-right" : "text-left"}`}>
+          <h1
+            className={`text-3xl font-bold mb-2 ${
+              isRTL ? "text-right" : "text-left"
+            }`}
+          >
             {t("admin.userManagement.title")}
           </h1>
-          <p className="text-base-content/70">{t("admin.userManagement.subtitle") || "Manage and export user data"}</p>
+          <p className="text-base-content/70">
+            {t("admin.userManagement.subtitle") ||
+              "Manage and export user data"}
+          </p>
         </div>
         {/* Export Dropdown */}
         <div className="dropdown dropdown-end mb-4">
-          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-outline btn-primary"
+            disabled={isExporting}
+          >
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
@@ -722,89 +986,250 @@ const UserManagementTable = () => {
               </>
             )}
           </div>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80">
-            <li className="menu-title"><span>{t("admin.export.csvFormat") || "CSV Format"}</span></li>
-            <li><button onClick={() => exportToCSV(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.csvPage') || 'Export Page (CSV)'}</button></li>
-            <li><button onClick={() => exportToCSV(true)} disabled={isExporting || users.length === 0}>{t('admin.export.csvAll') || 'Export All (CSV)'}</button></li>
+          <ul
+            tabIndex={0}
+            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80"
+          >
+            <li className="menu-title">
+              <span>{t("admin.export.csvFormat") || "CSV Format"}</span>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToCSV(false)}
+                disabled={isExporting || filteredUsers.length === 0}
+              >
+                {t("admin.export.csvPage") || "Export Page (CSV)"}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToCSV(true)}
+                disabled={isExporting || users.length === 0}
+              >
+                {t("admin.export.csvAll") || "Export All (CSV)"}
+              </button>
+            </li>
             <div className="divider my-1"></div>
-            <li className="menu-title"><span>{t("admin.export.jsonFormat") || "JSON Format"}</span></li>
-            <li><button onClick={() => exportToJSON(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.jsonPage') || 'Export Page (JSON)'}</button></li>
-            <li><button onClick={() => exportToJSON(true)} disabled={isExporting || users.length === 0}>{t('admin.export.jsonAll') || 'Export All (JSON)'}</button></li>
+            <li className="menu-title">
+              <span>{t("admin.export.jsonFormat") || "JSON Format"}</span>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToJSON(false)}
+                disabled={isExporting || filteredUsers.length === 0}
+              >
+                {t("admin.export.jsonPage") || "Export Page (JSON)"}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToJSON(true)}
+                disabled={isExporting || users.length === 0}
+              >
+                {t("admin.export.jsonAll") || "Export All (JSON)"}
+              </button>
+            </li>
             <div className="divider my-1"></div>
-            <li className="menu-title"><span>{t("admin.export.xlsxFormat") || "XLSX Format"}</span></li>
-            <li><button onClick={() => exportToXLSX(false)} disabled={isExporting || filteredUsers.length === 0}>{t('admin.export.xlsxPage') || 'Export Page (XLSX)'}</button></li>
-            <li><button onClick={() => exportToXLSX(true)} disabled={isExporting || users.length === 0}>{t('admin.export.xlsxAll') || 'Export All (XLSX)'}</button></li>
+            <li className="menu-title">
+              <span>{t("admin.export.xlsxFormat") || "XLSX Format"}</span>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToXLSX(false)}
+                disabled={isExporting || filteredUsers.length === 0}
+              >
+                {t("admin.export.xlsxPage") || "Export Page (XLSX)"}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => exportToXLSX(true)}
+                disabled={isExporting || users.length === 0}
+              >
+                {t("admin.export.xlsxAll") || "Export All (XLSX)"}
+              </button>
+            </li>
           </ul>
         </div>
       </div>
 
       {/* Filters and Actions */}
-      <div className="flex flex-wrap gap-4 mb-8 justify-between items-center">
-        <div className="flex gap-4 flex-wrap">
-          <input
-            type="text"
-            placeholder={t("admin.filters.name")}
-            className="input input-bordered"
-            value={filters.name}
-            onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder={t("admin.filters.phone")}
-            className="input input-bordered"
-            value={filters.phone}
-            onChange={(e) => setFilters({ ...filters, phone: e.target.value })}
-          />
-          <select
-            className="select select-bordered"
-            value={filters.role}
-            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-          >
-            <option value="">{t("admin.filters.allTypes")}</option>
-            {["student", "parent", "lecturer", "Teacher", "moderator", "subAdmin"].map((role) => (
-              <option key={role} value={role}>
-                {t(`admin.roles.${role}`)}
+      <div className="mb-8 space-y-6">
+        {/* First Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
+          {/* Name */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.name")}
+            </label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              value={filters.name}
+              onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.phone")}
+            </label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              value={filters.phone}
+              onChange={(e) =>
+                setFilters({ ...filters, phone: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Role */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.role")}
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.role}
+              onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+            >
+              <option value="">{t("admin.filters.allTypes")}</option>
+              {[
+                "student",
+                "parent",
+                "lecturer",
+                "Teacher",
+                "moderator",
+                "subAdmin",
+              ].map((role) => (
+                <option key={role} value={role}>
+                  {t(`admin.roles.${role}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.status")}
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters({ ...filters, status: e.target.value })
+              }
+            >
+              <option value="">{t("admin.filters.allStatus")}</option>
+              <option value={t("admin.status.valid")}>
+                {t("admin.status.valid")}
               </option>
-            ))}
-          </select>
-          <select
-            className="select select-bordered"
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          >
-            <option value="">{t("admin.filters.allStatus")}</option>
-            <option value={t("admin.status.valid")}>{t("admin.status.valid")}</option>
-            <option value={t("admin.status.missingData")}>{t("admin.status.missingData")}</option>
-          </select>
-          <input
-            type="number"
-            min="0"
-            placeholder={t("admin.filters.invites")}
-            className="input input-bordered"
-            value={filters.successfulInvites}
-            onChange={(e) => setFilters({ ...filters, successfulInvites: e.target.value })}
-          />
+              <option value={t("admin.status.missingData")}>
+                {t("admin.status.missingData")}
+              </option>
+            </select>
+          </div>
         </div>
-        <div className="flex gap-4">
-          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-            {t("admin.userManagement.createUser")}
-          </button>
-          <button className="btn btn-ghost" onClick={fetchUsers}>
-            <FaSync />
-          </button>
-          <button className="btn btn-secondary" onClick={handleRecalculateInvites} disabled={isRecalculating}>
-            {isRecalculating ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                {t("admin.invites.calculating") || "Calculating..."}
-              </>
-            ) : (
-              <>
-                <FaCalculator className="mr-2" />
-                {t("admin.invites.refresh") || "Refresh Invites"}
-              </>
-            )}
-          </button>
+
+        {/* Second Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
+          {/* Successful Invites */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.invites")}
+            </label>
+            <input
+              type="number"
+              min="0"
+              className="input input-bordered w-full"
+              value={filters.successfulInvites}
+              onChange={(e) =>
+                setFilters({ ...filters, successfulInvites: e.target.value })
+              }
+            />
+          </div>
+
+          {/* Date From */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.dateFrom")}
+            </label>
+            <input
+              type="date"
+              className="input input-bordered w-full"
+              value={filters.dateFrom}
+              max={filters.dateTo || undefined}
+              onChange={(e) => {
+                const newFrom = e.target.value;
+
+                setFilters((prev) => ({
+                  ...prev,
+                  dateFrom: newFrom,
+                  dateTo:
+                    prev.dateTo && new Date(prev.dateTo) < new Date(newFrom)
+                      ? ""
+                      : prev.dateTo,
+                }));
+              }}
+            />
+          </div>
+
+          {/* Date To */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-base-content/70">
+              {t("admin.filters.dateTo")}
+            </label>
+            <input
+              type="date"
+              className="input input-bordered w-full"
+              value={filters.dateTo}
+              min={filters.dateFrom || undefined}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  dateTo: e.target.value,
+                }))
+              }
+            />
+          </div>
+
+          {/* Spacer */}
+          <div className="hidden xl:block xl:col-span-1" />
+
+          {/* Actions */}
+          <div className="flex items-end gap-3 col-span-1 md:col-span-2 xl:col-span-2 justify-end">
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreateModal(true)}
+            >
+              {t("admin.userManagement.createUser")}
+            </button>
+
+            <button className="btn btn-ghost" onClick={fetchUsers}>
+              <FaSync />
+            </button>
+
+            <button
+              className="btn btn-secondary"
+              onClick={handleRecalculateInvites}
+              disabled={isRecalculating}
+            >
+              {isRecalculating ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  {t("admin.invites.calculating") || "Calculating..."}
+                </>
+              ) : (
+                <>
+                  <FaCalculator className="mr-2" />
+                  {t("admin.invites.refresh") || "Refresh Invites"}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -825,8 +1250,8 @@ const UserManagementTable = () => {
             ></path>
           </svg>
           <span>
-            {t("admin.export.filterInfo")} {filteredUsers.length} {t("admin.export.of")} {users.length}{" "}
-            {t("admin.export.usersShown")}
+            {t("admin.export.filterInfo")} {filteredUsers.length}{" "}
+            {t("admin.export.of")} {users.length} {t("admin.export.usersShown")}
           </span>
         </div>
       )}
@@ -836,8 +1261,18 @@ const UserManagementTable = () => {
         <table className="table w-full">
           <thead>
             <tr className={`${isRTL ? "text-right" : "text-left"}`}>
-              {["name", "phone", "accountType", "status", "successfulInvites", "actions"].map((header) => (
-                <th key={header} className="pb-4 text-lg font-medium whitespace-nowrap">
+              {[
+                "name",
+                "phone",
+                "accountType",
+                "status",
+                "successfulInvites",
+                "actions",
+              ].map((header) => (
+                <th
+                  key={header}
+                  className="pb-4 text-lg font-medium whitespace-nowrap"
+                >
                   {t(`admin.table.${header}`)}
                 </th>
               ))}
@@ -845,14 +1280,27 @@ const UserManagementTable = () => {
           </thead>
           <tbody>
             {currentUsers.map((user) => (
-              <tr key={user._id} className={`${isRTL ? "text-right" : "text-left"} border-t`}>
+              <tr
+                key={user._id}
+                className={`${isRTL ? "text-right" : "text-left"} border-t`}
+              >
                 <td className="py-4 whitespace-nowrap">{user.name}</td>
-                <td className="py-4 whitespace-nowrap">{user.phoneNumber || t("admin.NA")}</td>
-                <td className="py-4 whitespace-nowrap">{getRoleLabel(user.role)}</td>
-                <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
-                <td className="py-4 whitespace-nowrap">{user.successfulInvites || 0}</td>
                 <td className="py-4 whitespace-nowrap">
-                  <div className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"}`}>
+                  {user.phoneNumber || t("admin.NA")}
+                </td>
+                <td className="py-4 whitespace-nowrap">
+                  {getRoleLabel(user.role)}
+                </td>
+                <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
+                <td className="py-4 whitespace-nowrap">
+                  {user.successfulInvites || 0}
+                </td>
+                <td className="py-4 whitespace-nowrap">
+                  <div
+                    className={`flex items-center gap-2 ${
+                      isRTL ? "text-right" : "text-left"
+                    }`}
+                  >
                     <button
                       className="btn btn-primary btn-xs"
                       onClick={() => openUserDetailsModal(user)}
@@ -872,13 +1320,18 @@ const UserManagementTable = () => {
                     {user.phoneNumber && (
                       <button
                         className="btn btn-success btn-xs"
-                        onClick={() => openWhatsappModal(user.phoneNumber, user.name)}
+                        onClick={() =>
+                          openWhatsappModal(user.phoneNumber, user.name)
+                        }
                         title={t("admin.actions.whatsapp")}
                       >
                         <FaWhatsapp />
                       </button>
                     )}
-                    <button className="btn btn-error btn-xs" onClick={() => handleDelete(user._id)}>
+                    <button
+                      className="btn btn-error btn-xs"
+                      onClick={() => handleDelete(user._id)}
+                    >
                       {t("admin.actions.delete")}
                     </button>
                   </div>
@@ -909,12 +1362,15 @@ const UserManagementTable = () => {
                 />
               </svg>
             </div>
-            <p className="text-lg font-medium mb-2">{t("admin.noUsers") || "No users found"}</p>
+            <p className="text-lg font-medium mb-2">
+              {t("admin.noUsers") || "No users found"}
+            </p>
             <p className="text-sm opacity-70 max-w-md">
               {filters.name || filters.phone || filters.role || filters.status
                 ? t("admin.noUsersFiltered") ||
                   "No users match your current filters. Try adjusting your search criteria."
-                : t("admin.noUsersYet") || "No users have registered yet. Check back later."}
+                : t("admin.noUsersYet") ||
+                  "No users have registered yet. Check back later."}
             </p>
           </div>
         </div>
@@ -962,14 +1418,21 @@ const UserManagementTable = () => {
               </h3>
               <button
                 className="btn btn-sm btn-circle btn-ghost"
-                onClick={() => setUserDetailsModal({ isOpen: false, user: null })}
+                onClick={() =>
+                  setUserDetailsModal({ isOpen: false, user: null })
+                }
               >
                 <FaTimes />
               </button>
             </div>
             {renderUserDetails(userDetailsModal.user)}
             <div className="modal-action">
-              <button className="btn btn-ghost" onClick={() => setUserDetailsModal({ isOpen: false, user: null })}>
+              <button
+                className="btn btn-ghost"
+                onClick={() =>
+                  setUserDetailsModal({ isOpen: false, user: null })
+                }
+              >
                 {t("admin.userDetails.close")}
               </button>
             </div>
@@ -981,7 +1444,9 @@ const UserManagementTable = () => {
       {whatsappModal.isOpen && (
         <div className="modal modal-open">
           <div className="modal-box" dir={dir}>
-            <h3 className="font-bold text-lg">{t("admin.whatsappModal.title", { name: whatsappModal.userName })}</h3>
+            <h3 className="font-bold text-lg">
+              {t("admin.whatsappModal.title", { name: whatsappModal.userName })}
+            </h3>
             <textarea
               className="textarea textarea-bordered w-full mt-4"
               placeholder={t("admin.whatsappModal.placeholder")}
@@ -991,11 +1456,21 @@ const UserManagementTable = () => {
             <div className="modal-action">
               <button
                 className="btn btn-ghost"
-                onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", userName: "" })}
+                onClick={() =>
+                  setWhatsappModal({
+                    isOpen: false,
+                    phoneNumber: "",
+                    userName: "",
+                  })
+                }
               >
                 {t("admin.whatsappModal.cancel")}
               </button>
-              <button className="btn btn-primary" onClick={sendWhatsappMessage} disabled={!whatsappMessage.trim()}>
+              <button
+                className="btn btn-primary"
+                onClick={sendWhatsappMessage}
+                disabled={!whatsappMessage.trim()}
+              >
                 {t("admin.whatsappModal.send")}
               </button>
             </div>
@@ -1003,7 +1478,7 @@ const UserManagementTable = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default UserManagementTable
+export default UserManagementTable;

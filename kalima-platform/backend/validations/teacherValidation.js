@@ -20,21 +20,19 @@ const teacherValidation = userValidation.concat(
     phoneNumber: Joi.string().required(),
     phoneNumber2: Joi.string().allow(null, "").optional(),
 
-    subject: Joi.string().optional(), 
+    subject: Joi.string().optional(),
 
     level: Joi.array()
       .items(Joi.string().valid("primary", "preparatory", "secondary"))
-      .optional(),   
+      .optional(),
 
     teachesAtType: Joi.string()
       .valid("Center", "School", "Both", "")
       .optional(),
 
-    centers: Joi.array()
-      .items(Joi.string())
-      .optional(),    
+    centers: Joi.array().items(Joi.string()).optional(),
 
-    school: Joi.string().allow("").optional(), 
+    school: Joi.string().allow("").optional(),
 
     socialMedia: Joi.array()
       .items(
@@ -49,6 +47,28 @@ const teacherValidation = userValidation.concat(
     administrationZone: Joi.string().required(),
 
     referralSerial: Joi.string().allow("").optional(),
+
+    preferredContactTime: Joi.object({
+      from: Joi.string()
+        .pattern(/^(0[0-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+        .allow("")
+        .optional()
+        .messages({
+          "string.pattern.base":
+            'Time format must be HH:MM AM/PM (e.g., "08:00 AM")',
+        }),
+      to: Joi.string()
+        .pattern(/^(0[0-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+        .allow("")
+        .optional()
+        .messages({
+          "string.pattern.base":
+            'Time format must be HH:MM AM/PM (e.g., "05:00 PM")',
+        }),
+      note: Joi.string().allow("", null).optional(),
+    })
+      .unknown(true)
+      .optional(),
   })
 );
 

@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import SectionHeader from "./SectionHeader"
-import { useTranslation } from "react-i18next"
-import { getUserDashboard } from "../../routes/auth-services"
-import { updateCurrentUser } from "../../routes/update-user"
-import { Check, X, Camera, Upload } from "lucide-react"
+import { useState, useEffect } from "react";
+import SectionHeader from "./SectionHeader";
+import { useTranslation } from "react-i18next";
+import { getUserDashboard } from "../../routes/auth-services";
+import { updateCurrentUser } from "../../routes/update-user";
+import { Check, X, Camera, Upload } from "lucide-react";
 
 function PersonalInfoSection() {
-  const { t, i18n } = useTranslation("settings")
-  const isRTL = i18n.language === "ar"
+  const { t, i18n } = useTranslation("settings");
+  const isRTL = i18n.language === "ar";
 
   // State for user data
-  const [userData, setUserData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // States for editing
   const [isEditing, setIsEditing] = useState({
     fullName: false,
     phoneNumber: false,
     email: false,
-  })
+  });
 
   // Form data for editing
   const [formData, setFormData] = useState({
@@ -29,14 +29,14 @@ function PersonalInfoSection() {
     phoneNumber: "",
     email: "",
     profilePic: null,
-  })
+  });
 
   // Profile picture upload states
-  const [profilePicPreview, setProfilePicPreview] = useState(null)
-  const [profilePicUploading, setProfilePicUploading] = useState(false)
+  const [profilePicPreview, setProfilePicPreview] = useState(null);
+  const [profilePicUploading, setProfilePicUploading] = useState(false);
 
   // Email validation state
-  const [emailError, setEmailError] = useState("")
+  const [emailError, setEmailError] = useState("");
 
   // State for update status
   const [updateStatus, setUpdateStatus] = useState({
@@ -44,61 +44,71 @@ function PersonalInfoSection() {
     success: false,
     error: null,
     field: null,
-  })
+  });
 
   const handleProfilePicChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"]
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
-        alert(t("validation.invalidImageType") || "Please select a valid image file (JPEG, PNG, GIF)")
-        return
+        alert(
+          t("validation.invalidImageType") ||
+            "Please select a valid image file (JPEG, PNG, GIF)"
+        );
+        return;
       }
 
       // Validate file size (5MB limit)
-      const maxSize = 5 * 1024 * 1024 // 5MB in bytes
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
-        alert(t("validation.fileTooLarge") || "File size must be less than 5MB")
-        return
+        alert(
+          t("validation.fileTooLarge") || "File size must be less than 5MB"
+        );
+        return;
       }
 
-      setFormData((prev) => ({ ...prev, profilePic: file }))
+      setFormData((prev) => ({ ...prev, profilePic: file }));
 
       // Create preview URL
-      const previewUrl = URL.createObjectURL(file)
-      setProfilePicPreview(previewUrl)
+      const previewUrl = URL.createObjectURL(file);
+      setProfilePicPreview(previewUrl);
     }
-  }
+  };
 
   const handleProfilePicUpload = async () => {
-    if (!formData.profilePic) return
+    if (!formData.profilePic) return;
 
-    setProfilePicUploading(true)
+    setProfilePicUploading(true);
     setUpdateStatus({
       loading: true,
       success: false,
       error: null,
       field: "profilePic",
-    })
+    });
 
     try {
       // Create FormData for file upload
-      const uploadData = new FormData()
-      uploadData.append("profilePic", formData.profilePic)
+      const uploadData = new FormData();
+      uploadData.append("profilePic", formData.profilePic);
 
-      const result = await updateCurrentUser(uploadData)
+      const result = await updateCurrentUser(uploadData);
 
       if (result.success) {
         // Update local userData state with new profile picture
         setUserData((prev) => ({
           ...prev,
           profilePic: result.data.data?.profilePic || result.data.profilePic,
-        }))
+        }));
 
         // Clear the form data and preview
-        setFormData((prev) => ({ ...prev, profilePic: null }))
-        setProfilePicPreview(null)
+        setFormData((prev) => ({ ...prev, profilePic: null }));
+        setProfilePicPreview(null);
 
         // Set success status
         setUpdateStatus({
@@ -106,7 +116,7 @@ function PersonalInfoSection() {
           success: true,
           error: null,
           field: "profilePic",
-        })
+        });
 
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -114,111 +124,112 @@ function PersonalInfoSection() {
             ...prev,
             success: false,
             field: null,
-          }))
-        }, 3000)
+          }));
+        }, 3000);
       } else {
         setUpdateStatus({
           loading: false,
           success: false,
           error: result.error || "Failed to upload profile picture",
           field: "profilePic",
-        })
+        });
       }
     } catch (error) {
-      console.error("Error uploading profile picture:", error)
+      console.error("Error uploading profile picture:", error);
       setUpdateStatus({
         loading: false,
         success: false,
         error: "An unexpected error occurred while uploading",
         field: "profilePic",
-      })
+      });
     } finally {
-      setProfilePicUploading(false)
+      setProfilePicUploading(false);
     }
-  }
+  };
 
   const cancelProfilePicUpload = () => {
-    setFormData((prev) => ({ ...prev, profilePic: null }))
+    setFormData((prev) => ({ ...prev, profilePic: null }));
     if (profilePicPreview) {
-      URL.revokeObjectURL(profilePicPreview)
-      setProfilePicPreview(null)
+      URL.revokeObjectURL(profilePicPreview);
+      setProfilePicPreview(null);
     }
-  }
+  };
 
   // Fetch user data on component mount
   useEffect(() => {
     const fetchUserData = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const result = await getUserDashboard()
+        const result = await getUserDashboard();
         if (result.success) {
-          const userInfo = result.data.data.userInfo
-          setUserData(userInfo)
+          const userInfo = result.data.data.userInfo;
+          setUserData(userInfo);
           // Initialize form data with user info
           setFormData({
             fullName: userInfo.name || "",
             phoneNumber: userInfo.phoneNumber || "",
             email: userInfo.email || "",
             profilePic: null,
-          })
+          });
         } else {
-          setError(result.error || "Failed to fetch user data")
+          setError(result.error || "Failed to fetch user data");
         }
       } catch (error) {
-        console.error("Error fetching user data:", error)
-        setError("An error occurred while fetching your information")
+        console.error("Error fetching user data:", error);
+        setError("An error occurred while fetching your information");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUserData()
-  }, [])
+    fetchUserData();
+  }, []);
 
   // Cleanup preview URL on unmount
   useEffect(() => {
     return () => {
       if (profilePicPreview) {
-        URL.revokeObjectURL(profilePicPreview)
+        URL.revokeObjectURL(profilePicPreview);
       }
-    }
-  }, [profilePicPreview])
+    };
+  }, [profilePicPreview]);
 
   // Handle input changes
   const handleInputChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     // Email validation
     if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
-        setEmailError(t("validation.invalidEmail") || "Invalid email address")
+        setEmailError(t("validation.invalidEmail") || "Invalid email address");
       } else {
-        setEmailError("")
+        setEmailError("");
       }
     }
 
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // Toggle edit mode for a field
   const toggleEdit = (field) => {
     setIsEditing((prev) => ({
       ...prev,
       [field]: !prev[field],
-    }))
+    }));
 
     // Reset form data to current user data if canceling edit
     if (isEditing[field]) {
       setFormData((prev) => ({
         ...prev,
-        [field === "fullName" ? "fullName" : field]: field === "fullName" ? userData?.name : userData?.[field] || "",
-      }))
+        [field === "fullName" ? "fullName" : field]:
+          field === "fullName" ? userData?.name : userData?.[field] || "",
+      }));
     }
-  }
+  };
 
   // Handle save changes
   const handleSave = async (field) => {
@@ -228,7 +239,7 @@ function PersonalInfoSection() {
       success: false,
       error: null,
       field,
-    })
+    });
 
     try {
       // Map form field names to API field names
@@ -236,22 +247,22 @@ function PersonalInfoSection() {
         fullName: "name",
         phoneNumber: "phoneNumber",
         email: "email",
-      }
+      };
 
       // Create update data object with the correct field name
       const updateData = {
         [fieldMapping[field]]: formData[field],
-      }
+      };
 
       // Call the update API using the new service
-      const result = await updateCurrentUser(updateData)
+      const result = await updateCurrentUser(updateData);
 
       if (result.success) {
         // Update local userData state
         setUserData((prev) => ({
           ...prev,
           [fieldMapping[field]]: formData[field],
-        }))
+        }));
 
         // Set success status
         setUpdateStatus({
@@ -259,10 +270,10 @@ function PersonalInfoSection() {
           success: true,
           error: null,
           field,
-        })
+        });
 
         // Exit edit mode
-        toggleEdit(field)
+        toggleEdit(field);
 
         // Clear success message after 3 seconds
         setTimeout(() => {
@@ -270,8 +281,8 @@ function PersonalInfoSection() {
             ...prev,
             success: false,
             field: null,
-          }))
-        }, 3000)
+          }));
+        }, 3000);
       } else {
         // Set error status
         setUpdateStatus({
@@ -279,34 +290,21 @@ function PersonalInfoSection() {
           success: false,
           error: result.error || "Failed to update",
           field,
-        })
+        });
       }
     } catch (error) {
-      console.error("Error updating user data:", error)
+      console.error("Error updating user data:", error);
       setUpdateStatus({
         loading: false,
         success: false,
         error: "An unexpected error occurred",
         field,
-      })
+      });
     }
-  }
+  };
 
   // Get all translations under personalInfo namespace
   const personalInfo = t("personalInfo", { returnObjects: true })
-
-  const convertPathToUrl = (filePath) => {
-    if (!filePath) return null;
-    if (filePath.startsWith("http")) return filePath;
-
-    const normalizedPath = filePath.replace(/\\/g, "/");
-
-    // Remove `/api` or `/api/v1` from the end of the API base URL
-    const API_URL = import.meta.env.VITE_API_URL;
-    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
-
-    return `${baseUrl}/${normalizedPath}`;
-  };
 
   if (loading) {
     return (
@@ -318,7 +316,7 @@ function PersonalInfoSection() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -329,27 +327,34 @@ function PersonalInfoSection() {
           <div className="card-body">
             <div className="alert alert-error">
               <span>{error}</span>
-              <button className="btn btn-sm btn-outline" onClick={() => window.location.reload()}>
+              <button
+                className="btn btn-sm btn-outline"
+                onClick={() => window.location.reload()}
+              >
                 {t("retry")}
               </button>
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  const hasProfilePic = userData?.profilePic
+  const hasProfilePic = userData?.profilePic;
   const currentProfilePicUrl = hasProfilePic
-  ? convertPathToUrl(userData.profilePic)
-  : "/default-avatar.png"
+    ? `${import.meta.env.VITE_API_URL}/${userData.profilePic.replace(/\\/g, "/")}`
+    : "/default-avatar.png"
 
   return (
     <div className="mb-8">
       <SectionHeader title={personalInfo.title} />
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
-          <h3 className={`text-lg font-semibold mb-4 ${isRTL ? "text-right" : "text-left"}`}>
+          <h3
+            className={`text-lg font-semibold mb-4 ${
+              isRTL ? "text-right" : "text-left"
+            }`}
+          >
             {personalInfo.subtitle}
           </h3>
 
@@ -372,7 +377,10 @@ function PersonalInfoSection() {
                 <label
                   htmlFor="profilePicInput"
                   className="absolute bottom-0 right-0 btn btn-circle btn-sm btn-primary cursor-pointer"
-                  title={t("personalInfo.uploadProfilePic") || "Upload Profile Picture"}
+                  title={
+                    t("personalInfo.uploadProfilePic") ||
+                    "Upload Profile Picture"
+                  }
                 >
                   <Camera className="w-4 h-4" />
                 </label>
@@ -392,11 +400,14 @@ function PersonalInfoSection() {
             {formData.profilePic && (
               <div className="mt-4 flex flex-col items-center gap-2">
                 <div className="text-sm text-gray-600">
-                  {t("personalInfo.selectedFile") || "Selected:"} {formData.profilePic.name}
+                  {t("personalInfo.selectedFile") || "Selected:"}{" "}
+                  {formData.profilePic.name}
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className={`btn btn-primary btn-sm ${profilePicUploading ? "loading" : ""}`}
+                    className={`btn btn-primary btn-sm ${
+                      profilePicUploading ? "loading" : ""
+                    }`}
                     onClick={handleProfilePicUpload}
                     disabled={profilePicUploading}
                   >
@@ -417,18 +428,22 @@ function PersonalInfoSection() {
 
             {/* Upload status messages */}
             {updateStatus.field === "profilePic" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm text-center">{updateStatus.error}</div>
+              <div className="mt-2 text-error text-sm text-center">
+                {updateStatus.error}
+              </div>
             )}
             {updateStatus.field === "profilePic" && updateStatus.success && (
               <div className="mt-2 text-success text-sm text-center">
-                {t("personalInfo.profilePicUpdated") || "Profile picture updated successfully!"}
+                {t("personalInfo.profilePicUpdated") ||
+                  "Profile picture updated successfully!"}
               </div>
             )}
 
             {/* Upload hint for users without profile picture */}
             {!hasProfilePic && !formData.profilePic && (
               <div className="mt-2 text-sm text-gray-500 text-center">
-                {t("personalInfo.noProfilePicHint") || "Click the camera icon to upload a profile picture"}
+                {t("personalInfo.noProfilePicHint") ||
+                  "Click the camera icon to upload a profile picture"}
               </div>
             )}
           </div>
@@ -448,11 +463,19 @@ function PersonalInfoSection() {
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
+            <div
+              className={`flex gap-4 ${
+                isRTL ? "flex-row" : "flex-row-reverse"
+              }`}
+            >
               {isEditing.fullName ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "fullName" ? "loading" : ""}`}
+                    className={`btn btn-sm btn-primary ${
+                      updateStatus.loading && updateStatus.field === "fullName"
+                        ? "loading"
+                        : ""
+                    }`}
                     onClick={() => handleSave("fullName")}
                     disabled={updateStatus.loading}
                   >
@@ -461,29 +484,40 @@ function PersonalInfoSection() {
                   <button
                     className="btn btn-sm btn-outline"
                     onClick={() => toggleEdit("fullName")}
-                    disabled={updateStatus.loading && updateStatus.field === "fullName"}
+                    disabled={
+                      updateStatus.loading && updateStatus.field === "fullName"
+                    }
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("fullName")}>
+                <button
+                  className={`btn btn-sm ${isRTL ? "" : "order-last"}`}
+                  onClick={() => toggleEdit("fullName")}
+                >
                   {personalInfo.buttons.edit}
                 </button>
               )}
               <input
                 type="text"
                 name="fullName"
-                value={isEditing.fullName ? formData.fullName : userData?.name || ""}
+                value={
+                  isEditing.fullName ? formData.fullName : userData?.name || ""
+                }
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.fullName}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.fullName}
               />
             </div>
             {updateStatus.field === "fullName" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+              <div className="mt-2 text-error text-sm">
+                {updateStatus.error}
+              </div>
             )}
             {updateStatus.field === "fullName" && updateStatus.success && (
               <div className="mt-2 text-success text-sm">
@@ -500,11 +534,20 @@ function PersonalInfoSection() {
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
+            <div
+              className={`flex gap-4 ${
+                isRTL ? "flex-row" : "flex-row-reverse"
+              }`}
+            >
               {isEditing.phoneNumber ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "phoneNumber" ? "loading" : ""}`}
+                    className={`btn btn-sm btn-primary ${
+                      updateStatus.loading &&
+                      updateStatus.field === "phoneNumber"
+                        ? "loading"
+                        : ""
+                    }`}
                     onClick={() => handleSave("phoneNumber")}
                     disabled={updateStatus.loading}
                   >
@@ -513,29 +556,43 @@ function PersonalInfoSection() {
                   <button
                     className="btn btn-sm btn-outline"
                     onClick={() => toggleEdit("phoneNumber")}
-                    disabled={updateStatus.loading && updateStatus.field === "phoneNumber"}
+                    disabled={
+                      updateStatus.loading &&
+                      updateStatus.field === "phoneNumber"
+                    }
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("phoneNumber")}>
+                <button
+                  className={`btn btn-sm ${isRTL ? "" : "order-last"}`}
+                  onClick={() => toggleEdit("phoneNumber")}
+                >
                   {personalInfo.buttons.edit}
                 </button>
               )}
               <input
                 type="text"
                 name="phoneNumber"
-                value={isEditing.phoneNumber ? formData.phoneNumber : userData?.phoneNumber || ""}
+                value={
+                  isEditing.phoneNumber
+                    ? formData.phoneNumber
+                    : userData?.phoneNumber || ""
+                }
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.phoneNumber}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.phoneNumber}
               />
             </div>
             {updateStatus.field === "phoneNumber" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+              <div className="mt-2 text-error text-sm">
+                {updateStatus.error}
+              </div>
             )}
             {updateStatus.field === "phoneNumber" && updateStatus.success && (
               <div className="mt-2 text-success text-sm">
@@ -552,11 +609,19 @@ function PersonalInfoSection() {
                 <span className="text-error">*</span>
               </span>
             </label>
-            <div className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"}`}>
+            <div
+              className={`flex gap-4 ${
+                isRTL ? "flex-row" : "flex-row-reverse"
+              }`}
+            >
               {isEditing.email ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "email" ? "loading" : ""}`}
+                    className={`btn btn-sm btn-primary ${
+                      updateStatus.loading && updateStatus.field === "email"
+                        ? "loading"
+                        : ""
+                    }`}
                     onClick={() => handleSave("email")}
                     disabled={updateStatus.loading || !!emailError}
                   >
@@ -565,13 +630,18 @@ function PersonalInfoSection() {
                   <button
                     className="btn btn-sm btn-outline"
                     onClick={() => toggleEdit("email")}
-                    disabled={updateStatus.loading && updateStatus.field === "email"}
+                    disabled={
+                      updateStatus.loading && updateStatus.field === "email"
+                    }
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <button className={`btn btn-sm ${isRTL ? "" : "order-last"}`} onClick={() => toggleEdit("email")}>
+                <button
+                  className={`btn btn-sm ${isRTL ? "" : "order-last"}`}
+                  onClick={() => toggleEdit("email")}
+                >
                   {personalInfo.buttons.edit}
                 </button>
               )}
@@ -581,32 +651,98 @@ function PersonalInfoSection() {
                 value={isEditing.email ? formData.email : userData?.email || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"} ${emailError && isEditing.email ? "input-error animate-shake" : ""}`}
+                className={`input input-bordered w-full ${
+                  isRTL ? "text-right" : "text-left"
+                } ${
+                  emailError && isEditing.email
+                    ? "input-error animate-shake"
+                    : ""
+                }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.email}
               />
             </div>
             {updateStatus.field === "email" && updateStatus.error && (
-              <div className="mt-2 text-error text-sm">{updateStatus.error}</div>
+              <div className="mt-2 text-error text-sm">
+                {updateStatus.error}
+              </div>
             )}
             {updateStatus.field === "email" && updateStatus.success && (
               <div className="mt-2 text-success text-sm">
                 {personalInfo.messages?.updateSuccess || "Updated successfully"}
               </div>
             )}
-            {emailError && isEditing.email && <div className="mt-2 text-error text-sm">{emailError}</div>}
+            {emailError && isEditing.email && (
+              <div className="mt-2 text-error text-sm">{emailError}</div>
+            )}
           </div>
+
+          {/* Preferred Contact Time (Read Only) */}
+          {(userData?.preferredContactTime?.from ||
+            userData?.preferredContactTime?.to ||
+            userData?.preferredContactTime?.note) && (
+            <div className="form-control mb-4">
+              <label className={`label justify-end mb-1`}>
+                <span className="label-text font-semibold mb-1 text-primary">
+                  {t("personalInfo.preferredContactTime.title")}
+                </span>
+              </label>
+              <div
+                className={`bg-base-200/50 p-4 rounded-lg border border-base-300`}
+              >
+                <div
+                  className="grid grid-cols-2 gap-4"
+                  dir={isRTL ? "rtl" : "ltr"}
+                >
+                  {userData.preferredContactTime.from && (
+                    <div>
+                      <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
+                        {t("personalInfo.preferredContactTime.from")}
+                      </span>
+                      <div className="font-medium inline-block text-base-content">
+                        {userData.preferredContactTime.from}
+                      </div>
+                    </div>
+                  )}
+                  {userData.preferredContactTime.to && (
+                    <div>
+                      <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
+                        {t("personalInfo.preferredContactTime.to")}
+                      </span>
+                      <div className="font-medium inline-block text-base-content">
+                        {userData.preferredContactTime.to}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {userData.preferredContactTime.note && (
+                  <div className="mt-3 pt-3 border-t border-base-content/10">
+                    <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
+                      {t("personalInfo.preferredContactTime.note")}
+                    </span>
+                    <div className="text-sm italic opacity-80">
+                      {userData.preferredContactTime.note}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Student-specific fields */}
           {userData?.role === "Student" && userData?.level && (
             <div className="form-control mb-4">
               <label className={`label justify-end`}>
-                <span className="label-text">{personalInfo.labels.level || "Level"}</span>
+                <span className="label-text">
+                  {personalInfo.labels.level || "Level"}
+                </span>
               </label>
               <input
                 type="text"
                 value={userData.level.name || ""}
-                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"}`}
+                className={`input input-bordered w-full ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly
               />
@@ -617,11 +753,15 @@ function PersonalInfoSection() {
           {userData?.role === "Student" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.generalPoints || t("General Points")}</div>
+                <div className="stat-title">
+                  {personalInfo.labels.generalPoints || t("General Points")}
+                </div>
                 <div className="stat-value">{userData.generalPoints || 0}</div>
               </div>
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-title">{personalInfo.labels.totalPoints || t("Total Points")}</div>
+                <div className="stat-title">
+                  {personalInfo.labels.totalPoints || t("Total Points")}
+                </div>
                 <div className="stat-value">{userData.totalPoints || 0}</div>
               </div>
             </div>
@@ -629,7 +769,7 @@ function PersonalInfoSection() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default PersonalInfoSection
+export default PersonalInfoSection;

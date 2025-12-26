@@ -50,6 +50,12 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     centers: [],
     socialMedia: [],
     profilePic: null,
+    // Parent-specific fields
+    preferredContactTime: {
+      from: "",
+      to: "",
+      note: "",
+    },
   };
 
   const [userData, setUserData] = useState(initialUserState);
@@ -229,6 +235,18 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
     handleChange({ target: { name, value: cleanedValue } });
   };
 
+  const toAmPm = (time24) => {
+    if (!time24) return "";
+
+    const [h, m] = time24.split(":").map(Number);
+    const period = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+
+    return `${hour12.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")} ${period}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormError("");
@@ -239,8 +257,18 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       return;
     }
 
-    const filteredData = filterDataByRole(userData);
+    const preparedData = {
+      ...userData,
+      preferredContactTime: userData.preferredContactTime
+        ? {
+            ...userData.preferredContactTime,
+            from: toAmPm(userData.preferredContactTime.from),
+            to: toAmPm(userData.preferredContactTime.to),
+          }
+        : undefined,
+    };
 
+    const filteredData = filterDataByRole(preparedData);
     onCreateUser(filteredData);
   };
 
@@ -282,6 +310,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           phoneNumber: data.phoneNumber || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
+          preferredContactTime:
+            data.preferredContactTime &&
+            (data.preferredContactTime.from ||
+              data.preferredContactTime.to ||
+              data.preferredContactTime.note)
+              ? data.preferredContactTime
+              : undefined,
         };
 
       case "lecturer":
@@ -322,6 +357,13 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
           socialMedia: Array.isArray(data.socialMedia) ? data.socialMedia : [],
+          preferredContactTime:
+            data.preferredContactTime &&
+            (data.preferredContactTime.from ||
+              data.preferredContactTime.to ||
+              data.preferredContactTime.note)
+              ? data.preferredContactTime
+              : undefined,
         };
 
       case "subadmin":
@@ -506,7 +548,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
-                      className="input input-bordered w-full pl-12" 
+                      className="input input-bordered w-full pl-12"
                       value={userData.confirmPassword}
                       onChange={handleChange}
                       required

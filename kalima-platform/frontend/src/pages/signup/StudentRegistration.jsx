@@ -123,9 +123,7 @@ useEffect(() => {
       } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = "passwordsMismatch";
       }
-      if (!formData.subject?.trim()) {
-        errors.subject = "subjectRequired";
-      }
+     
       if (!formData.gender) errors.gender = "required";
       if (!formData.government) errors.government = "required";
       if (!formData.administrationZone) errors.administrationZone = "required";

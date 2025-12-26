@@ -7,7 +7,7 @@ function isValidPDF(file) {
     return (
         file &&
         file.mimetype === "application/pdf" &&
-        file.size <= 75 * 1024 * 1024 // 50MB
+        file.size <= 150 * 1024 * 1024 // 50MB
     );
 }
 
@@ -18,8 +18,8 @@ exports.createProduct = async (req, res, next) => {
         let sample, imageUrl, gallery = [];
         if (req.files && req.files.sample && req.files.sample[0]) {
             const file = req.files.sample[0];
-            if (file.mimetype !== "application/pdf" || file.size > 75 * 1024 * 1024) {
-                return res.status(400).json({ message: "Sample must be a PDF and <= 75MB" });
+            if (file.mimetype !== "application/pdf" || file.size > 150 * 1024 * 1024) {
+                return res.status(400).json({ message: "Sample must be a PDF and <= 150MB" });
             }
             sample = file.path;
         }
@@ -149,8 +149,8 @@ exports.updateProduct = async (req, res) => {
             if (file.mimetype !== "application/pdf") {
                 return res.status(400).json({ message: "Sample must be a PDF file" });
             }
-            if (file.size > 75 * 1024 * 1024) {
-                return res.status(400).json({ message: "Sample file size must be <= 75MB" });
+            if (file.size > 150 * 1024 * 1024) {
+                return res.status(400).json({ message: "Sample file size must be <= 150MB" });
             }
 
             if (existingProduct.sample && fs.existsSync(existingProduct.sample)) {
