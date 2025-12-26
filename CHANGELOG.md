@@ -5,6 +5,85 @@ This document summarizes all changes made to the Kalima Platform to support free
 
 ---
 
+## Latest Fixes (December 26, 2024)
+
+### 1. Payment Method Information Not Showing in Cart Purchases ✅ FIXED
+
+**Problem:**
+When retrieving cart purchases (both for users and admins), the payment method details (name and phone number) were not being populated, making it difficult to see which payment method was used.
+
+**Solution:**
+Updated all cart purchase retrieval endpoints to properly populate the `paymentMethod` field with both `name` and `phoneNumber`.
+
+**Files Changed:**
+
+**Backend:**
+- `kalima-platform/backend/controllers/ec.cartPurchaseController.js`
+  - Updated `getAllPurchases()` - Added `phoneNumber` to paymentMethod population
+  - Updated `getCartPurchases()` - Added paymentMethod population with name and phoneNumber
+  - Updated `getCartPurchaseById()` - Added paymentMethod population with name and phoneNumber
+  - All populate calls now include: `.populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false })`
+
+**Frontend:**
+- `kalima-platform/frontend/src/pages/KalimaStore/AdminPanel/Orders.jsx`
+  - Updated table display to show payment method as an object with `name` and `phoneNumber`
+  - Updated details modal to display payment method name and phone number separately
+  - Changed from hardcoded string checks to dynamic object property access
+  - Now displays: Payment method name as badge + phone number below it in table
+  - Details modal shows both payment method name and phone number
+
+- `kalima-platform/frontend/public/locales/en/kalimaStore-orders.json`
+  - Added `paymentMethodPhone` translation key
+
+- `kalima-platform/frontend/public/locales/ar/kalimaStore-orders.json`
+  - Added `paymentMethodPhone` translation key (رقم هاتف طريقة الدفع)
+
+### 2. Duplicate /api/v1 in Return Purchase Endpoint ✅ FIXED
+
+**Problem:**
+The return purchase endpoint was failing with error: `Cannot PATCH /api/v1/api/v1/ec/cart-purchases/{id}/return`
+This indicates the URL had a duplicate `/api/v1` prefix.
+
+**Root Cause:**
+The `BACKEND_URL` or `VITE_API_URL` environment variable in production/docker was set to include `/api/v1` (e.g., `http://backend:5000/api/v1`) when it should only be the base URL (e.g., `http://backend:5000`).
+
+**Solution Implemented:**
+Created a robust code-level fix that automatically handles this issue:
+
+**New File:**
+- `kalima-platform/frontend/src/utils/apiConfig.js`
+  - Utility function that normalizes the API URL
+  - Automatically strips `/api/v1` or `/api/v1/` from the end of `VITE_API_URL`
+  - Works correctly regardless of how the environment variable is configured
+  - Prevents duplicate `/api/v1` paths in all API calls
+
+**Updated Files:**
+- `kalima-platform/frontend/src/routes/orders.jsx`
+  - Now imports `API_URL` from `apiConfig` utility
+  - Ensures all cart purchase endpoints use normalized URL
+  
+- `kalima-platform/frontend/src/routes/cart.js`
+  - Now imports `API_URL` from `apiConfig` utility
+  - Ensures cart operations use normalized URL
+
+**How It Works:**
+The utility uses regex to remove `/api/v1` from the end:
+```javascript
+rawApiUrl.replace(/\/api\/v1\/?$/, '')
+```
+
+This means:
+- `http://backend:5000` → `http://backend:5000` ✅
+- `http://backend:5000/api/v1` → `http://backend:5000` ✅
+- `http://backend:5000/api/v1/` → `http://backend:5000` ✅
+
+**Recommendation:**
+While the code now handles this automatically, it's still best practice to set environment variables correctly:
+- ✅ Correct: `VITE_API_URL=http://backend:5000`
+- ❌ Incorrect: `VITE_API_URL=http://backend:5000/api/v1`
+
+---
+
 ## 1. Free Products Support (Cart Total = 0)
 
 ### Problem
