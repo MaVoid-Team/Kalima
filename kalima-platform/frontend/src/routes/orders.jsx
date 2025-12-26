@@ -107,7 +107,7 @@ export const  ReturnProductPurchase = async (purchaseId) => {
     }
 
     const response = await axios.patch(
-      `${API_URL}/api/v1/ec/cart-purchases/${purchaseId}/return`,
+      `${API_URL}/ec/cart-purchases/${purchaseId}/return`,
       {},
       {
         withCredentials: true,
@@ -142,8 +142,8 @@ export const getAllStats = async (endDate = null, startDate = null) => {
 
     const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/statistics`, {
       params: {
-        ...(endDate ? { endDate } : {}),
-        ...(startDate ? { startDate } : {}),
+        endDate,
+        startDate,
       },
       withCredentials: true,
       headers: {
@@ -172,7 +172,7 @@ export const getProductStats = async (endDate = null) => {
     let url = `${API_URL}/ec/cart-purchases/admin/product-statistics`
 
     if (endDate) {
-      url = `${API_URL}/ec/cart-purchases/admin/product-statistics?date=${endDate}`
+      url = `${API_URL}/ec/cart-purchases/admin/product-statistics?endDate=${endDate}`
     }
 
     const response = await axios.get(url, {
