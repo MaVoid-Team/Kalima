@@ -75,6 +75,7 @@
     "customerNotes": "Customer Notes",
     "paymentInfo": "Payment Information",
     "paymentMethod": "Payment Method",
+    "paymentMethodPhone": "Payment Method Phone",
     "paymentNumber": "Payment Number",
     "transferredFrom": "Transferred From",
     "viewWatermark": "View Watermark",
