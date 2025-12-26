@@ -3,7 +3,7 @@ import { getToken } from "./auth-services";
 
 
 // Helper function to generate safe filename for uploads
-const API_URL = process.env.REACT_APP_API_URL
+const API_URL = import.meta.env.VITE_API_URL
 const generateSafeFilename = (file) => {
   if (!file || !file.name) return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   try {
