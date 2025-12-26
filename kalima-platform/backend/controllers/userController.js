@@ -51,8 +51,7 @@ const getAllUsers = catchAsync(async (req, res, next) => {
   let query = User.find(filter).select("-password");
 
   // Apply query features for sorting (without pagination and without additional filtering)
-  const features = new QueryFeatures(query, req.query)
-    .sort();
+  const features = new QueryFeatures(query, req.query).sort();
   query = features.query;
 
   const users = await query.lean();
@@ -60,7 +59,7 @@ const getAllUsers = catchAsync(async (req, res, next) => {
   res.json({
     status: "success",
     results: users.length,
-    data: users
+    data: users,
   });
 });
 
@@ -180,12 +179,15 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   // Handle nested object updates using dot notation for MongoDB
   // This prevents overwriting the entire nested object when updating only some fields
-  if (updatedUser.preferredContactTime && typeof updatedUser.preferredContactTime === 'object') {
+  if (
+    updatedUser.preferredContactTime &&
+    typeof updatedUser.preferredContactTime === "object"
+  ) {
     const prefContactTime = updatedUser.preferredContactTime;
     delete updatedUser.preferredContactTime;
 
     // Convert nested object to dot notation
-    Object.keys(prefContactTime).forEach(key => {
+    Object.keys(prefContactTime).forEach((key) => {
       updatedUser[`preferredContactTime.${key}`] = prefContactTime[key];
     });
   }
@@ -383,7 +385,7 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
     await handleCSV(req.file.buffer, accountType, res, next);
   } else if (
     fileType ===
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     fileType === "application/vnd.ms-excel"
   ) {
     await handleExcel(req.file.buffer, accountType, res, next);
@@ -426,7 +428,8 @@ const getMyData = catchAsync(async (req, res, next) => {
       role: userRole,
       referredBy: req.user.referredBy || null,
       profilePic: req.user.profilePic || null,
-      userSerial: req.user.userSerial || null, // Assuming userSrial is a field in User model
+      userSerial: req.user.userSerial || null,
+      preferredContactTime: req.user.preferredContactTime || null,
     },
   };
 
@@ -456,7 +459,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         hobbies: student.hobbies,
         faction: student.faction,
         sequencedId: student.sequencedId,
-        profilePic: student.profilePic || responseData.userInfo.profilePic || null,
+        profilePic:
+          student.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -501,8 +505,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         level: parent.level,
         children: parent.children,
         generalPoints: parent.generalPoints || 0,
-        profilePic: parent.profilePic || responseData.userInfo.profilePic || null,
-        prefferedContactTime: parent.preferredContactTime || null,
+        profilePic:
+          parent.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get parent purchases, redeemed codes, and lecture access (with query params)
@@ -536,15 +540,21 @@ const getMyData = catchAsync(async (req, res, next) => {
         ...responseData.userInfo,
         bio: lecturer.bio,
         expertise: lecturer.expertise,
-        profilePic: lecturer.profilePic || responseData.userInfo.profilePic || null,
-        prefferedContactTime: lecturer.preferredContactTime || null,
+        profilePic:
+          lecturer.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Only fetch additional data if no specific fields were requested or the relevant fields were included
-      if (!fields || fields.includes("containers") || fields.includes("lecturerContainers")) {
+      if (
+        !fields ||
+        fields.includes("containers") ||
+        fields.includes("lecturerContainers")
+      ) {
         // Get containers (courses, terms, etc.) created by the lecturer
         let containerQuery = Container.find({ createdBy: userId })
-          .select("name type price subject level createdAt thumbnail description")
+          .select(
+            "name type price subject level createdAt thumbnail description"
+          )
           .populate("subject", "name")
           .populate("level", "name");
 
@@ -563,7 +573,9 @@ const getMyData = catchAsync(async (req, res, next) => {
       if (!fields || fields.includes("lectures")) {
         // Get all lectures created by the lecturer
         const lectures = await Lecture.find({ createdBy: userId })
-          .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type subject level createdAt thumbnail")
+          .select(
+            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type subject level createdAt thumbnail"
+          )
           .populate("subject", "name")
           .populate("level", "name")
           .lean();
@@ -607,12 +619,15 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("attachments")) {
         // Get all attachments related to lecturer's lectures
-        const lecturerLectures = responseData.lectures ||
-          await Lecture.find({ createdBy: userId }).select("_id").lean();
+        const lecturerLectures =
+          responseData.lectures ||
+          (await Lecture.find({ createdBy: userId }).select("_id").lean());
 
-        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        const lectureIds = lecturerLectures.map((lecture) => lecture._id);
 
-        const attachments = await Attachment.find({ lectureId: { $in: lectureIds } })
+        const attachments = await Attachment.find({
+          lectureId: { $in: lectureIds },
+        })
           .populate("lectureId", "name")
           .populate("studentId", "name")
           .lean();
@@ -622,14 +637,15 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("examSubmissions")) {
         // Get exam submissions for lectures created by the lecturer
-        const lecturerLectures = responseData.lectures ||
-          await Lecture.find({ createdBy: userId }).select("_id").lean();
+        const lecturerLectures =
+          responseData.lectures ||
+          (await Lecture.find({ createdBy: userId }).select("_id").lean());
 
-        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        const lectureIds = lecturerLectures.map((lecture) => lecture._id);
 
         const examSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "exam"
+          type: "exam",
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -641,14 +657,15 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("homeworkSubmissions")) {
         // Get homework submissions for lectures created by the lecturer
-        const lecturerLectures = responseData.lectures ||
-          await Lecture.find({ createdBy: userId }).select("_id").lean();
+        const lecturerLectures =
+          responseData.lectures ||
+          (await Lecture.find({ createdBy: userId }).select("_id").lean());
 
-        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        const lectureIds = lecturerLectures.map((lecture) => lecture._id);
 
         const homeworkSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "homework"
+          type: "homework",
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -671,60 +688,79 @@ const getMyData = catchAsync(async (req, res, next) => {
         };
 
         // Get counts from response data if available, otherwise query the database
-        stats.totalLectures = responseData.lectures?.length ||
-          await Lecture.countDocuments({ createdBy: userId });
+        stats.totalLectures =
+          responseData.lectures?.length ||
+          (await Lecture.countDocuments({ createdBy: userId }));
 
-        stats.totalContainers = responseData.containers?.length ||
-          await Container.countDocuments({ createdBy: userId });
+        stats.totalContainers =
+          responseData.containers?.length ||
+          (await Container.countDocuments({ createdBy: userId }));
 
         if (responseData.examSubmissions) {
-          stats.totalStudentExamSubmissions = responseData.examSubmissions.length;
+          stats.totalStudentExamSubmissions =
+            responseData.examSubmissions.length;
           const totalExamScores = responseData.examSubmissions.reduce(
-            (sum, sub) => sum + (sub.score || 0), 0
+            (sum, sub) => sum + (sub.score || 0),
+            0
           );
-          stats.averageExamScore = responseData.examSubmissions.length > 0
-            ? totalExamScores / responseData.examSubmissions.length
-            : 0;
+          stats.averageExamScore =
+            responseData.examSubmissions.length > 0
+              ? totalExamScores / responseData.examSubmissions.length
+              : 0;
         } else {
           const examSubmissions = await StudentExamSubmission.find({
-            lecture: { $in: await Lecture.find({ createdBy: userId }).distinct('_id') },
-            type: "exam"
+            lecture: {
+              $in: await Lecture.find({ createdBy: userId }).distinct("_id"),
+            },
+            type: "exam",
           });
           stats.totalStudentExamSubmissions = examSubmissions.length;
           const totalExamScores = examSubmissions.reduce(
-            (sum, sub) => sum + (sub.score || 0), 0
+            (sum, sub) => sum + (sub.score || 0),
+            0
           );
-          stats.averageExamScore = examSubmissions.length > 0
-            ? totalExamScores / examSubmissions.length
-            : 0;
+          stats.averageExamScore =
+            examSubmissions.length > 0
+              ? totalExamScores / examSubmissions.length
+              : 0;
         }
 
         if (responseData.homeworkSubmissions) {
-          stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions.length;
+          stats.totalStudentHomeworkSubmissions =
+            responseData.homeworkSubmissions.length;
           const totalHomeworkScores = responseData.homeworkSubmissions.reduce(
-            (sum, sub) => sum + (sub.score || 0), 0
+            (sum, sub) => sum + (sub.score || 0),
+            0
           );
-          stats.averageHomeworkScore = responseData.homeworkSubmissions.length > 0
-            ? totalHomeworkScores / responseData.homeworkSubmissions.length
-            : 0;
+          stats.averageHomeworkScore =
+            responseData.homeworkSubmissions.length > 0
+              ? totalHomeworkScores / responseData.homeworkSubmissions.length
+              : 0;
         } else {
           const homeworkSubmissions = await StudentExamSubmission.find({
-            lecture: { $in: await Lecture.find({ createdBy: userId }).distinct('_id') },
-            type: "homework"
+            lecture: {
+              $in: await Lecture.find({ createdBy: userId }).distinct("_id"),
+            },
+            type: "homework",
           });
           stats.totalStudentHomeworkSubmissions = homeworkSubmissions.length;
           const totalHomeworkScores = homeworkSubmissions.reduce(
-            (sum, sub) => sum + (sub.score || 0), 0
+            (sum, sub) => sum + (sub.score || 0),
+            0
           );
-          stats.averageHomeworkScore = homeworkSubmissions.length > 0
-            ? totalHomeworkScores / homeworkSubmissions.length
-            : 0;
+          stats.averageHomeworkScore =
+            homeworkSubmissions.length > 0
+              ? totalHomeworkScores / homeworkSubmissions.length
+              : 0;
         }
 
-        stats.totalAttachments = responseData.attachments?.length ||
-          await Attachment.countDocuments({
-            lectureId: { $in: await Lecture.find({ createdBy: userId }).distinct('_id') }
-          });
+        stats.totalAttachments =
+          responseData.attachments?.length ||
+          (await Attachment.countDocuments({
+            lectureId: {
+              $in: await Lecture.find({ createdBy: userId }).distinct("_id"),
+            },
+          }));
 
         responseData.stats = stats;
       }
@@ -747,7 +783,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         faction: teacher.faction,
         school: teacher.school,
         ...teacher,
-        profilePic: teacher.profilePic || responseData.userInfo.profilePic || null,
+        profilePic:
+          teacher.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Get student purchases, redeemed codes, and lecture access (with query params)
@@ -780,7 +817,8 @@ const getMyData = catchAsync(async (req, res, next) => {
       }
       responseData.userInfo = {
         ...responseData.userInfo,
-        profilePic: admin.profilePic || responseData.userInfo.profilePic || null,
+        profilePic:
+          admin.profilePic || responseData.userInfo.profilePic || null,
       };
       // No additional fields needed for admin roles
       break;
@@ -790,7 +828,7 @@ const getMyData = catchAsync(async (req, res, next) => {
       const assistant = await Assistant.findById(userId)
         .populate({
           path: "assignedLecturer",
-          select: "name expertise bio profilePicture"
+          select: "name expertise bio profilePicture",
         })
         .lean();
 
@@ -802,13 +840,20 @@ const getMyData = catchAsync(async (req, res, next) => {
       responseData.userInfo = {
         ...responseData.userInfo,
         assignedLecturer: assistant.assignedLecturer,
-        profilePic: assistant.profilePic || responseData.userInfo.profilePic || null,
+        profilePic:
+          assistant.profilePic || responseData.userInfo.profilePic || null,
       };
 
       // Only fetch additional data if no specific fields were requested or the relevant fields were included
-      if (!fields || fields.includes("lecturerContainers") || fields.includes("lectures")) {
+      if (
+        !fields ||
+        fields.includes("lecturerContainers") ||
+        fields.includes("lectures")
+      ) {
         // Get containers (courses, terms, etc.) created by the assigned lecturer
-        const containers = await Container.find({ createdBy: assistant.assignedLecturer._id })
+        const containers = await Container.find({
+          createdBy: assistant.assignedLecturer._id,
+        })
           .populate("subject", "name")
           .populate("level", "name")
           .lean();
@@ -818,10 +863,14 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("lectures")) {
         // Get all lectures from the assigned lecturer
-        const lectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+        const lectures = await Lecture.find({
+          createdBy: assistant.assignedLecturer._id,
+        })
           .populate("subject", "name")
           .populate("level", "name")
-          .select("name description videoLink numberOfViews requiresExam requiresHomework lecture_type")
+          .select(
+            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type"
+          )
           .lean();
 
         responseData.lectures = lectures;
@@ -829,13 +878,17 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("attachments")) {
         // Get all attachments related to lecturer's lectures
-        const lecturerLectures = await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+        const lecturerLectures = await Lecture.find({
+          createdBy: assistant.assignedLecturer._id,
+        })
           .select("_id")
           .lean();
 
-        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        const lectureIds = lecturerLectures.map((lecture) => lecture._id);
 
-        const attachments = await Attachment.find({ lectureId: { $in: lectureIds } })
+        const attachments = await Attachment.find({
+          lectureId: { $in: lectureIds },
+        })
           .populate("lectureId", "name")
           .populate("studentId", "name")
           .lean();
@@ -845,15 +898,17 @@ const getMyData = catchAsync(async (req, res, next) => {
 
       if (!fields || fields.includes("examSubmissions")) {
         // Get exam submissions for lectures created by the assigned lecturer
-        const lecturerLectures = !responseData.lectures ?
-          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
-          responseData.lectures;
+        const lecturerLectures = !responseData.lectures
+          ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+              .select("_id")
+              .lean()
+          : responseData.lectures;
 
-        const lectureIds = lecturerLectures.map(lecture => lecture._id);
+        const lectureIds = lecturerLectures.map((lecture) => lecture._id);
 
         const examSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "exam"
+          type: "exam",
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -861,22 +916,29 @@ const getMyData = catchAsync(async (req, res, next) => {
           .lean();
 
         responseData.examSubmissions = examSubmissions;
-      } if (!fields || fields.includes("homeworkSubmissions")) {
+      }
+      if (!fields || fields.includes("homeworkSubmissions")) {
         // Get homework submissions for lectures created by the assigned lecturer
-        const lecturerLectures = !responseData.lectures && !responseData.examSubmissions ?
-          await Lecture.find({ createdBy: assistant.assignedLecturer._id }).select("_id").lean() :
-          (responseData.lectures || responseData.examSubmissions);
+        const lecturerLectures =
+          !responseData.lectures && !responseData.examSubmissions
+            ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
+                .select("_id")
+                .lean()
+            : responseData.lectures || responseData.examSubmissions;
 
         // Get lecture IDs, handling both direct lecture objects and exam submission objects
-        const lectureIds = lecturerLectures.map(lecture => {
-          if (lecture._id) return lecture._id;
-          if (lecture.lecture && lecture.lecture._id) return lecture.lecture._id;
-          return lecture;
-        }).filter(id => id); // Filter out any undefined values
+        const lectureIds = lecturerLectures
+          .map((lecture) => {
+            if (lecture._id) return lecture._id;
+            if (lecture.lecture && lecture.lecture._id)
+              return lecture.lecture._id;
+            return lecture;
+          })
+          .filter((id) => id); // Filter out any undefined values
 
         const homeworkSubmissions = await StudentExamSubmission.find({
           lecture: { $in: lectureIds },
-          type: "homework"
+          type: "homework",
         })
           .populate("student", "name sequencedId")
           .populate("lecture", "name")
@@ -893,47 +955,63 @@ const getMyData = catchAsync(async (req, res, next) => {
           totalStudentExamSubmissions: 0,
           totalStudentHomeworkSubmissions: 0,
           totalAttachments: 0,
-          lectureViews: 0
+          lectureViews: 0,
         };
 
         if (responseData.lectures) {
           stats.totalLectures = responseData.lectures.length;
           stats.lectureViews = responseData.lectures.reduce(
-            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+            (sum, lecture) => sum + (lecture.numberOfViews || 0),
+            0
           );
         } else {
           const lectureCount = await Lecture.countDocuments({
-            createdBy: assistant.assignedLecturer._id
+            createdBy: assistant.assignedLecturer._id,
           });
           stats.totalLectures = lectureCount;
 
           const lectures = await Lecture.find({
-            createdBy: assistant.assignedLecturer._id
-          }).select("numberOfViews").lean();
+            createdBy: assistant.assignedLecturer._id,
+          })
+            .select("numberOfViews")
+            .lean();
 
           stats.lectureViews = lectures.reduce(
-            (sum, lecture) => sum + (lecture.numberOfViews || 0), 0
+            (sum, lecture) => sum + (lecture.numberOfViews || 0),
+            0
           );
         }
-        stats.totalStudentExamSubmissions = responseData.examSubmissions ?
-          responseData.examSubmissions.length :
-          await StudentExamSubmission.countDocuments({
-            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
-            type: "exam"
-          });
+        stats.totalStudentExamSubmissions = responseData.examSubmissions
+          ? responseData.examSubmissions.length
+          : await StudentExamSubmission.countDocuments({
+              lecture: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+              type: "exam",
+            });
 
-        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions ?
-          responseData.homeworkSubmissions.length :
-          await StudentExamSubmission.countDocuments({
-            lecture: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") },
-            type: "homework"
-          });
+        stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions
+          ? responseData.homeworkSubmissions.length
+          : await StudentExamSubmission.countDocuments({
+              lecture: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+              type: "homework",
+            });
 
-        stats.totalAttachments = responseData.attachments ?
-          responseData.attachments.length :
-          await Attachment.countDocuments({
-            lectureId: { $in: await Lecture.find({ createdBy: assistant.assignedLecturer._id }).distinct("_id") }
-          });
+        stats.totalAttachments = responseData.attachments
+          ? responseData.attachments.length
+          : await Attachment.countDocuments({
+              lectureId: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+            });
 
         responseData.stats = stats;
       }
@@ -983,9 +1061,12 @@ const getStudentParentAdditionalData = async (
     // Get all types of purchases for the user, including both container and lecture purchases
     let purchaseQuery = Purchase.find({
       $or: [
-        { student: userId, type: { $in: ['containerPurchase', 'lecturePurchase'] } },
-        { student: userId, type: { $exists: false } } // For backward compatibility
-      ]
+        {
+          student: userId,
+          type: { $in: ["containerPurchase", "lecturePurchase"] },
+        },
+        { student: userId, type: { $exists: false } }, // For backward compatibility
+      ],
     });
 
     // Add date filtering if provided
@@ -1013,10 +1094,18 @@ const getStudentParentAdditionalData = async (
     // Add relevant populated fields, including lecture for standalone lecture purchases
     const purchaseHistory = await purchaseQuery
       .populate([
-        { path: "container", select: "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
+        {
+          path: "container",
+          select:
+            "name type price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail",
+        },
         { path: "lecturer", select: "name expertise role" },
         { path: "package", select: "name type price description" },
-        { path: "lecture", select: "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail" },
+        {
+          path: "lecture",
+          select:
+            "name price subject level videoLink lecture_type requiresExam examConfig createdBy thumbnail",
+        },
       ])
       .lean();
 
@@ -1026,7 +1115,7 @@ const getStudentParentAdditionalData = async (
       const lectureIds = [];
       const containerLectureIds = [];
 
-      purchaseHistory.forEach(p => {
+      purchaseHistory.forEach((p) => {
         if (p.lecture) {
           lectureIds.push(p.lecture._id || p.lecture);
         } else if (p.container && p.container.type === "lecture") {
@@ -1035,25 +1124,27 @@ const getStudentParentAdditionalData = async (
       });
 
       // Fetch all lectures in one query
-      const allLectureIds = [...new Set([...lectureIds, ...containerLectureIds])];
+      const allLectureIds = [
+        ...new Set([...lectureIds, ...containerLectureIds]),
+      ];
       const lecturesMap = {};
 
       if (allLectureIds.length > 0) {
         const lectures = await Lecture.find({ _id: { $in: allLectureIds } });
-        lectures.forEach(lec => {
+        lectures.forEach((lec) => {
           lecturesMap[lec._id.toString()] = lec;
         });
       }
 
       // Map purchases to include lecture data
-      responseData.purchaseHistory = purchaseHistory.map(p => {
+      responseData.purchaseHistory = purchaseHistory.map((p) => {
         // If it's a direct lecture purchase
         if (p.lecture) {
           const lectureId = p.lecture._id || p.lecture;
           return {
             ...p,
             lecture: lecturesMap[lectureId.toString()] || p.lecture,
-            type: 'lecturePurchase' // Ensure type is set correctly
+            type: "lecturePurchase", // Ensure type is set correctly
           };
         }
 
@@ -1064,7 +1155,7 @@ const getStudentParentAdditionalData = async (
             ...p,
             container: p.container,
             lecture: lecturesMap[containerId.toString()] || null,
-            type: p.type || 'containerPurchase' // Maintain backward compatibility
+            type: p.type || "containerPurchase", // Maintain backward compatibility
           };
         }
 
@@ -1093,8 +1184,11 @@ const getStudentParentAdditionalData = async (
     const studentDoc = await StudentModel.findById(userId);
     if (studentDoc && Array.isArray(studentDoc.purchaseHistory)) {
       // Add any missing purchase IDs
-      const purchaseIds = purchaseHistory.map(p => p._id.toString());
-      const missingIds = purchaseIds.filter(id => !studentDoc.purchaseHistory.map(x => x.toString()).includes(id));
+      const purchaseIds = purchaseHistory.map((p) => p._id.toString());
+      const missingIds = purchaseIds.filter(
+        (id) =>
+          !studentDoc.purchaseHistory.map((x) => x.toString()).includes(id)
+      );
       if (missingIds.length > 0) {
         studentDoc.purchaseHistory.push(...missingIds);
         await studentDoc.save();
@@ -1224,7 +1318,9 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
 
   // Check if user is a parent
   if (req.user.role !== "Parent") {
-    return next(new AppError("Only parents can access their children's data", 403));
+    return next(
+      new AppError("Only parents can access their children's data", 403)
+    );
   }
 
   // Find parent with children and get IDs
@@ -1239,10 +1335,10 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
       status: "success",
       results: 0,
       data: {
-        children: []
-      }
+        children: [],
+      },
     });
-  }  // Find all children with detailed information
+  } // Find all children with detailed information
   const children = await Student.find({ _id: { $in: parent.children } })
     .populate("level", "name")
     .select("name level sequencedId hobbies faction generalPoints totalPoints")
@@ -1258,28 +1354,32 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
           select: "name type price subject level",
           populate: [
             { path: "subject", select: "name" },
-            { path: "level", select: "name" }
-          ]
+            { path: "level", select: "name" },
+          ],
         })
         .sort({ createdAt: -1 })
         .lean();
 
       // Get lecture access
-      const lectureAccess = await StudentLectureAccess.find({ student: child._id })
+      const lectureAccess = await StudentLectureAccess.find({
+        student: child._id,
+      })
         .populate("lecture", "name")
         .lean();
 
       // Get exam scores with lecture information
-      const examScores = await StudentExamSubmission.find({ student: child._id })
+      const examScores = await StudentExamSubmission.find({
+        student: child._id,
+      })
         .populate({
           path: "lecture",
-          select: "name description"
+          select: "name description",
         })
         .sort({ submittedAt: -1 })
-        .lean();      // Get redeemed promo codes
+        .lean(); // Get redeemed promo codes
       const redeemedCodes = await Code.find({
         redeemedBy: child._id,
-        isRedeemed: true
+        isRedeemed: true,
       }).lean();
 
       // Return child with additional data
@@ -1288,7 +1388,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         purchaseHistory,
         lectureAccess,
         redeemedCodes,
-        examScores // Include exam scores in the response
+        examScores, // Include exam scores in the response
       };
     })
   );
@@ -1297,8 +1397,8 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
     status: "success",
     results: childrenWithData.length,
     data: {
-      children: childrenWithData
-    }
+      children: childrenWithData,
+    },
   });
 });
 
@@ -1310,7 +1410,10 @@ const updateMe = catchAsync(async (req, res, next) => {
   // 1) Check if password is being updated
   if (req.body.password) {
     return next(
-      new AppError("This route is not for password updates. Please use /update/password", 400)
+      new AppError(
+        "This route is not for password updates. Please use /update/password",
+        400
+      )
     );
   }
 
@@ -1320,10 +1423,18 @@ const updateMe = catchAsync(async (req, res, next) => {
 
   // 3) Filter out unwanted fields that shouldn't be updated
   const filteredBody = {};
-  const allowedFields = ['name', 'email', 'phoneNumber', 'address', 'referralSerial', 'profilePic', 'preferredContactTime'];
+  const allowedFields = [
+    "name",
+    "email",
+    "phoneNumber",
+    "address",
+    "referralSerial",
+    "profilePic",
+    "preferredContactTime",
+  ];
 
   // Only copy allowed fields from req.body to filteredBody
-  Object.keys(req.body).forEach(field => {
+  Object.keys(req.body).forEach((field) => {
     if (allowedFields.includes(field)) {
       filteredBody[field] = req.body[field];
     }
@@ -1331,12 +1442,15 @@ const updateMe = catchAsync(async (req, res, next) => {
 
   // Handle nested object updates using dot notation for MongoDB
   // This prevents overwriting the entire nested object when updating only some fields
-  if (filteredBody.preferredContactTime && typeof filteredBody.preferredContactTime === 'object') {
+  if (
+    filteredBody.preferredContactTime &&
+    typeof filteredBody.preferredContactTime === "object"
+  ) {
     const prefContactTime = filteredBody.preferredContactTime;
     delete filteredBody.preferredContactTime;
 
     // Convert nested object to dot notation
-    Object.keys(prefContactTime).forEach(key => {
+    Object.keys(prefContactTime).forEach((key) => {
       filteredBody[`preferredContactTime.${key}`] = prefContactTime[key];
     });
   }
@@ -1344,8 +1458,14 @@ const updateMe = catchAsync(async (req, res, next) => {
   // Handle profile picture upload (if file is present)
   if (req.file && req.file.fieldname === "profilePic") {
     // Delete old profile picture if it exists
-    const currentUser = await User.findById(userId).select('profilePic referredBy userSerial');
-    if (currentUser && currentUser.profilePic && fs.existsSync(currentUser.profilePic)) {
+    const currentUser = await User.findById(userId).select(
+      "profilePic referredBy userSerial"
+    );
+    if (
+      currentUser &&
+      currentUser.profilePic &&
+      fs.existsSync(currentUser.profilePic)
+    ) {
       try {
         fs.unlinkSync(currentUser.profilePic);
       } catch (err) {
@@ -1356,13 +1476,17 @@ const updateMe = catchAsync(async (req, res, next) => {
     filteredBody.profilePic = req.file.path;
   } else {
     // If not uploading a new profilePic, still need currentUser for referral logic
-    var currentUser = await User.findById(userId).select('referredBy userSerial');
+    var currentUser = await User.findById(userId).select(
+      "referredBy userSerial"
+    );
   }
 
   // Handle referralSerial update: allow user to set referredBy if not already set
   if (req.body.referralSerial) {
     if (!currentUser.referredBy) {
-      const inviter = await User.findOne({ userSerial: req.body.referralSerial });
+      const inviter = await User.findOne({
+        userSerial: req.body.referralSerial,
+      });
       if (inviter && inviter._id.toString() !== userId.toString()) {
         // Prevent self-referral by serial
         if (inviter.userSerial === currentUser.userSerial) {
@@ -1375,7 +1499,9 @@ const updateMe = catchAsync(async (req, res, next) => {
         return next(new AppError("Referral serial not found.", 400));
       }
     } else {
-      return next(new AppError("Referral code already set and cannot be changed.", 400));
+      return next(
+        new AppError("Referral code already set and cannot be changed.", 400)
+      );
     }
   }
 
@@ -1407,7 +1533,9 @@ const updateMe = catchAsync(async (req, res, next) => {
       if (child) {
         // Check if child is already in the list to avoid duplicates
         const childIdStr = child._id.toString();
-        const alreadyAdded = childrenToAdd.some(id => id.toString() === childIdStr);
+        const alreadyAdded = childrenToAdd.some(
+          (id) => id.toString() === childIdStr
+        );
 
         if (!alreadyAdded) {
           childrenToAdd.push(child._id); // Always store MongoDB IDs in the database
@@ -1500,8 +1628,8 @@ const updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      user: updatedUser
-    }
+      user: updatedUser,
+    },
   });
 });
 
@@ -1523,7 +1651,7 @@ const confirmTeacher = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Teacher confirmed successfully",
-    data: { teacher }
+    data: { teacher },
   });
 });
 
@@ -1539,5 +1667,5 @@ module.exports = {
   getMyData,
   getParentChildrenData,
   updateMe,
-  confirmTeacher
+  confirmTeacher,
 };

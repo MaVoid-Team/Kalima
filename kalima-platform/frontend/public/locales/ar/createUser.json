@@ -80,7 +80,11 @@
     "yourCustomHobbies": "هواياتك الخاصة",
     "referralSerial": "كود الدعوه",
     "profilePic": "صورة الملف الشخصي",
-    "accountType": "نوع الحساب"
+    "accountType": "نوع الحساب",
+    "preferredContactTime": "الوقت المفضل للتواصل",
+    "from": "من",
+    "to": "إلى",
+    "note": "ملاحظة"
   },
   "placeholders": {
     "selectAccountType": "اختر نوع الحساب",
@@ -102,7 +106,8 @@
     "facebook": "فيسبوك",
     "twitter": "تويتر",
     "instagram": "إنستاغرام",
-    "phoneNumber2": "رقم الهاتف (اختياري)"
+    "phoneNumber2": "رقم الهاتف (اختياري)",
+    "contactNote": "أفضل وقت للاتصال، يفضل واتساب، إلخ."
   },
   "roles": {
     "subadmin": "مدير فرعي",

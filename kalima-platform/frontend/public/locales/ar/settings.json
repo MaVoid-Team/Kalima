@@ -1,10 +1,10 @@
 {
-    "title": "الإعدادات",
-    "toggleSidebar": "تبديل القائمة الجانبية",
-    "General Points": "نقاط عامة",
-    "Total Points": "نقاط كلية",
+  "title": "الإعدادات",
+  "toggleSidebar": "تبديل القائمة الجانبية",
+  "General Points": "نقاط عامة",
+  "Total Points": "نقاط كلية",
 
-    "personalInfo": {
+  "personalInfo": {
     "title": "المعلومات الشخصية",
     "subtitle": "المعلومات الشخصية",
     "labels": {
@@ -22,9 +22,15 @@
     "buttons": {
       "edit": "تعديل",
       "add": "إضافة"
+    },
+    "preferredContactTime": {
+      "title": "الوقت المفضل للتواصل",
+      "from": "من",
+      "to": "إلى",
+      "note": "ملاحظة"
     }
   },
-    "languageAppearance": {
+  "languageAppearance": {
     "title": "اللغة والمظهر",
     "showThemes": "اظهار السمات",
     "hideThemes": "اغلق السمات",
@@ -41,31 +47,31 @@
       "selected": "محدد"
     }
   },
-    "security": {
-      "title": "الأمان",
-      "labels": {
-        "currentPassword": "كلمة المرور الحالية",
-        "newPassword": "كلمة المرور الجديدة",
-        "confirmPassword": "تأكيد كلمة المرور"
-      },
-      "errors": {
-        "mismatch": "كلمات المرور غير متطابقة",
-        "length": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
-        "general": "حدث خطأ أثناء تحديث كلمة المرور"
-      },
-      "success": "تم تحديث كلمة المرور بنجاح",
-      "changePassword": "تغيير كلمة السر",
-      "showPassword": "إظهار كلمة المرور",
-      "hidePassword": "إخفاء كلمة المرور",
-      "passwordRequirement": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
-      "updateButton": "تحديث كلمة السر",
-      "placeholders": {
-        "currentPassword": "أدخل كلمة المرور الحالية",
-        "newPassword": "كلمة السر الجديدة",
-        "confirmPassword": "تأكيد كلمة السر الجديدة"
-      }
+  "security": {
+    "title": "الأمان",
+    "labels": {
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور"
     },
-    "notifications": {
+    "errors": {
+      "mismatch": "كلمات المرور غير متطابقة",
+      "length": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
+      "general": "حدث خطأ أثناء تحديث كلمة المرور"
+    },
+    "success": "تم تحديث كلمة المرور بنجاح",
+    "changePassword": "تغيير كلمة السر",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "passwordRequirement": "كلمة المرور يجب أن تكون على الأقل 8 أحرف",
+    "updateButton": "تحديث كلمة السر",
+    "placeholders": {
+      "currentPassword": "أدخل كلمة المرور الحالية",
+      "newPassword": "كلمة السر الجديدة",
+      "confirmPassword": "تأكيد كلمة السر الجديدة"
+    }
+  },
+  "notifications": {
     "title": "الإشعارات",
     "studentType": "إشعارات الطالب",
     "teacherType": "إشعارات المعلم",
@@ -82,4 +88,4 @@
       "deadlineReminder": "إشعار بموعد تحديد أو موعد تسليم"
     }
   }
-  }
+}
