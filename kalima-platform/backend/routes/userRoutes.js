@@ -6,12 +6,18 @@ const verifyJWT = require("../middleware/verifyJWT");
 const { uploadFileToDisk, uploadProfilePicToDisk } = require("../utils/upload files/uploadFiles");
 const authController = require("../controllers/authController");
 const convertFormDataToNested = require("../middleware/convertFormDataToNested");
-// Routes that don't require authentication
+router
+  .route("/stats/created-accounts")
+  .get(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"), userController.getCreatedAccountsStats);
+
 router
   .route("/")
-  .get(userController.getAllUsers)
-  .post(uploadProfilePicToDisk,
-    validateUser, userController.createUser);
+  .get(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"), userController.getAllUsers)
+  .post(verifyJWT,
+    uploadProfilePicToDisk,
+    validateUser,
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    userController.createUser);
 
 router
   .route("/:userId")
