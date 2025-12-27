@@ -35,6 +35,7 @@ const userSchema = new mongoose.Schema(
   {
     discriminatorKey: "role", // Sets the name of the discriminator identifier filed.
     timestamps: true,
+    strictPopulate: false,
   },
 );
 
