@@ -1181,18 +1181,11 @@ const Orders = () => {
                     </td>
                     <td className="text-center">
                       {order.paymentMethod ? (
-                        <div className="flex flex-col items-center gap-1">
-                          <span className="badge badge-primary">
-                            {typeof order.paymentMethod === 'object' 
-                              ? order.paymentMethod.name 
-                              : order.paymentMethod}
-                          </span>
-                          {typeof order.paymentMethod === 'object' && order.paymentMethod.phoneNumber && (
-                            <span className="text-xs text-gray-600">
-                              {order.paymentMethod.phoneNumber}
-                            </span>
-                          )}
-                        </div>
+                        <span className="badge badge-primary">
+                          {typeof order.paymentMethod === "object"
+                            ? order.paymentMethod.name
+                            : order.paymentMethod}
+                        </span>
                       ) : (
                         <span className="text-gray-400">N/A</span>
                       )}
@@ -1338,7 +1331,8 @@ const Orders = () => {
 
                         {/* WhatsApp */}
                         {(order.numberTransferredFrom ||
-                          order.bankTransferFrom) && (
+                          order.bankTransferFrom ||
+                          (order.total || calculateCartTotal(order)) === 0) && (
                           <button
                             className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
                             onClick={() => handleWhatsAppContact(order)}
@@ -1770,17 +1764,11 @@ const Orders = () => {
                       <p>
                         <strong>{t("table.paymentMethod")}:</strong>{" "}
                         <span className="badge badge-primary ml-2">
-                          {typeof selectedOrder.paymentMethod === 'object' 
-                            ? selectedOrder.paymentMethod.name 
+                          {typeof selectedOrder.paymentMethod === "object"
+                            ? selectedOrder.paymentMethod.name
                             : selectedOrder.paymentMethod}
                         </span>
                       </p>
-                      {typeof selectedOrder.paymentMethod === 'object' && selectedOrder.paymentMethod.phoneNumber && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          <strong>{t("table.paymentMethodPhone")}:</strong>{" "}
-                          {selectedOrder.paymentMethod.phoneNumber}
-                        </p>
-                      )}
                     </div>
                   )}
                   <p>
