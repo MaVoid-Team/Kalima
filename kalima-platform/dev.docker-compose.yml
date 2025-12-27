@@ -7,7 +7,7 @@ services:
       - "8089:80"
       - "4449:443"
     environment:
-      - VITE_API_URL=${VITE_API_URL}
+      - VITE_API_URL=/api/v1
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
@@ -32,6 +32,8 @@ services:
       - CLOUDINARY_SECRET=CLOUDINARYSECRET
       - RESEND_API_KEY=RESENDAPIKEY
       - EMAIL_FROM=EMAILFROM@gmail.com
+      - GOOGLE_CLIENT_EMAIL=CLIENTEMAIL
+      - GOOGLE_PRIVATE_KEY=PRIVATEKEY
       - PAYMENT_SS_RETENTION_DAYS=30
     networks:
       - dev-network
