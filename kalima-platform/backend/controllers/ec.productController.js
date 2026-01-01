@@ -125,22 +125,27 @@ exports.updateProduct = async (req, res) => {
 
         // 2️⃣ Start building the update object after we have existingProduct
         const update = {
-            title,
-            section,
-            price,
-            priceAfterDiscount,
-            serial,
-            description,
             updatedBy,
-            whatsAppNumber,
-            subSection,
-            paymentNumber,
-            subject: subject || existingProduct.subject,
-            thumbnail: existingProduct.thumbnail,
-            sample: existingProduct.sample,
-            gallery: existingProduct.gallery,
             updatedAt: new Date(),
+            // Always include price and priceAfterDiscount so the middleware can calculate discount
+            price: price !== undefined ? price : existingProduct.price,
+            priceAfterDiscount: priceAfterDiscount !== undefined ? priceAfterDiscount : existingProduct.priceAfterDiscount,
         };
+
+        // Only include other fields if they are provided (not undefined)
+        if (title !== undefined) update.title = title;
+        if (section !== undefined) update.section = section;
+        if (serial !== undefined) update.serial = serial;
+        if (description !== undefined) update.description = description;
+        if (whatsAppNumber !== undefined) update.whatsAppNumber = whatsAppNumber;
+        if (subSection !== undefined) update.subSection = subSection;
+        if (paymentNumber !== undefined) update.paymentNumber = paymentNumber;
+        if (subject !== undefined) update.subject = subject;
+
+        // Preserve existing file paths if not being updated
+        update.thumbnail = existingProduct.thumbnail;
+        update.sample = existingProduct.sample;
+        update.gallery = existingProduct.gallery;
 
         // Handle PDF sample update
         if (req.files?.sample?.[0]) {
