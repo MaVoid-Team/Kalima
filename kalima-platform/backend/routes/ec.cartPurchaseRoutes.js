@@ -44,6 +44,9 @@ router.route('/admin/fullreport')
         cartPurchaseController.getFullOrdersReport
     );
 
+router.get('/confirmed-count', authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getMonthlyConfirmedPurchasesCount);
+
 router.route('/:id')
     .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         cartPurchaseController.getCartPurchaseById);
