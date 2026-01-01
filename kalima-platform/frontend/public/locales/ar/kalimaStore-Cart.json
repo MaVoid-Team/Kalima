@@ -23,7 +23,7 @@
   "paymentScreenshot": "لقطة شاشة الدفع",
   "fileSelected": "تم اختيار الملف",
   "bookDetails": "تفاصيل الكتاب",
-  "nameOnBook": "الاسم على الكتاب",
+  "nameOnBook": "اسم المدرس علي الكتاب",
   "numberOnBook": "الرقم على الكتاب",
   "seriesName": "اسم السلسلة",
   "notes": "ملاحظات",
@@ -69,4 +69,3 @@
   "instapay": "انستاباي",
   "paymentMethodRequired": "طريقة الدفع مطلوبة"
 }
-
