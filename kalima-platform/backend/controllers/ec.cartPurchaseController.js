@@ -102,7 +102,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     // Prepare payment data (only if cart total > 0)
     const paymentFile = req.file || (req.files && req.files.paymentScreenShot && req.files.paymentScreenShot[0]);
     const paymentScreenShot = cart.total > 0 && paymentFile ? paymentFile.path : null;
-    const numberTransferredFrom = cart.total > 0 ? req.body.numberTransferredFrom : null;
+    const numberTransferredFrom = cart.total > 0 ? (req.body.numberTransferredFrom || '').replace(/\s/g, '') : null;
 
     // Prepare watermark file path
     const watermarkFile = req.files && req.files.watermark && req.files.watermark[0];
