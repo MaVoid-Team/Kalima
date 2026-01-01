@@ -3,7 +3,8 @@ const User = require("./userModel");
 
 
 const moderatorSchema = new mongoose.Schema({
-
+    monthlyConfirmedCount: { type: Number, default: 0 },
+    lastConfirmedCountUpdate: { type: Date }
 }, {
     timestamps: true,
 }

@@ -9,7 +9,8 @@
     "dev": "cross-env NODE_OPTIONS=--no-warnings=DEP0040 node server.js",
     "seed": "node scripts/seed.js",
     "seed:governments": "node utils/seeds/seedGovernments.js",
-    "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js"
+    "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js",
+    "backfill:monthly-count": "node scripts/backfillMonthlyConfirmedCount.js"
   },
   "keywords": [],
   "author": "",

@@ -372,6 +372,30 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
             runValidators: true
         }
     )
+
+    // Auto-calculate and update monthly count
+    const currentMonth = getCurrentEgyptTime();
+    const monthStart = currentMonth.startOf('month').toJSDate();
+    const monthEnd = currentMonth.endOf('month').toJSDate();
+
+    const monthlyCount = await ECCartPurchase.countDocuments({
+        confirmedBy: req.user._id,
+        status: 'confirmed',
+        confirmedAt: {
+            $gte: monthStart,
+            $lte: monthEnd
+        }
+    });
+
+    // Update user's monthly confirmed count
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            monthlyConfirmedCount: monthlyCount,
+            lastConfirmedCountUpdate: new Date()
+        }
+    );
+
     res.status(200).json({
         status: "success",
         message: "Purchase confirmed successfully",
@@ -966,6 +990,49 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.getMonthlyConfirmedPurchasesCount = catchAsync(async (req, res, next) => {
+    // Get current month in Egypt timezone
+    const now = getCurrentEgyptTime();
+    const monthStart = now.startOf('month').toJSDate();
+
+    // Get user
+    const user = await User.findById(req.user._id).select('monthlyConfirmedCount lastConfirmedCountUpdate');
+
+    // Check if we need to reset the counter (new month)
+    let count = user?.monthlyConfirmedCount || 0;
+    if (user?.lastConfirmedCountUpdate) {
+        const lastUpdate = DateTime.fromJSDate(user.lastConfirmedCountUpdate).setZone('Africa/Cairo');
+        const lastUpdateMonth = lastUpdate.startOf('month').toJSDate();
+
+        // If the last update was in a different month, reset and recalculate
+        if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
+            const monthEnd = now.endOf('month').toJSDate();
+            count = await ECCartPurchase.countDocuments({
+                confirmedBy: req.user._id,
+                status: 'confirmed',
+                confirmedAt: {
+                    $gte: monthStart,
+                    $lte: monthEnd
+                }
+            });
+
+            // Update the stored count
+            await User.findByIdAndUpdate(req.user._id, {
+                monthlyConfirmedCount: count,
+                lastConfirmedCountUpdate: new Date()
+            });
+        }
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            confirmedPurchasesCount: count,
+            month: now.toFormat('MMMM yyyy')
+        }
+    });
+});
+
 // Product-level purchase statistics
 exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
     // Aggregate purchases by product id inside purchase items
@@ -1005,7 +1072,6 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
         data: stats,
     });
 });
-
 
 exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
     // Extract optional date/time filters from query parameters
