@@ -70,6 +70,9 @@ exports.addToCart = catchAsync(async (req, res, next) => {
         if (error.message === 'Product already exists in cart') {
             return next(new AppError("Product is already in cart", 400));
         }
+        if (error.message.includes('Cannot add item of type')) {
+            return next(new AppError(error.message, 400));
+        }
         throw error;
     }
 
