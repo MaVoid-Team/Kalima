@@ -79,6 +79,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         if (!paymentMethodDoc.status) {
             return next(new AppError("Selected payment method is inactive", 400));
         }
+        if (paymentMethodDoc.phoneNumber === req.body.numberTransferredFrom) {
+            return next(new AppError("Please enter the number that you used to pay not the number of the payment method", 400));
+        }
     }
     // Prepare items with snapshots
     const items = cart.items.map(item => ({
