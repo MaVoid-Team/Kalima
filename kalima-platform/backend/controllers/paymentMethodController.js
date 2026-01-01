@@ -3,11 +3,11 @@ const catchAsync = require("../utils/catchAsync");
 const PaymentMethod = require("../models/paymentMethodModel");
 
 exports.createPaymentMethod = catchAsync(async (req, res, next) => {
-    const { name, phoneNumber } = req.body;
+    const { name, phoneNumber, paymentMethodImg } = req.body;
 
     // Validation
-    if (!name || !phoneNumber) {
-        return next(new AppError("Name and phone number are required", 400));
+    if (!name || !phoneNumber || (!req.file && !paymentMethodImg)) {
+        return next(new AppError("Name, phone number, and payment method image are required", 400));
     }
 
     // Check if payment method with this name already exists
@@ -19,6 +19,7 @@ exports.createPaymentMethod = catchAsync(async (req, res, next) => {
     const paymentMethod = await PaymentMethod.create({
         name,
         phoneNumber,
+        paymentMethodImg: req.file ? req.file.path : paymentMethodImg,
     });
 
     res.status(201).json({
@@ -58,7 +59,7 @@ exports.getPaymentMethodById = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePaymentMethod = catchAsync(async (req, res, next) => {
-    const { name, phoneNumber } = req.body;
+    const { name, phoneNumber, paymentMethodImg } = req.body;
 
     // Check if updating name and if it's already taken by another method
     if (name) {
@@ -68,9 +69,18 @@ exports.updatePaymentMethod = catchAsync(async (req, res, next) => {
         }
     }
 
+    const updateData = { name, phoneNumber };
+
+    // Add image to update if a new file is uploaded
+    if (req.file) {
+        updateData.paymentMethodImg = req.file.path;
+    } else if (paymentMethodImg) {
+        updateData.paymentMethodImg = paymentMethodImg;
+    }
+
     const paymentMethod = await PaymentMethod.findByIdAndUpdate(
         req.params.id,
-        { name, phoneNumber },
+        updateData,
         {
             new: true,
             runValidators: true,
