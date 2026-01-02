@@ -284,7 +284,8 @@ exports.getCartPurchases = catchAsync(async (req, res, next) => {
         createdBy: req.user._id
     }).sort('-createdAt')
         .populate('couponCode')
-        .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false });
+        .populate({ path: 'paymentMethod', select: 'name phoneNumber', strictPopulate: false })
+        .select('-confirmedBy -adminNoteBy -receivedBy -returnedBy -returnedAt -confirmedAt -adminNotes -receivedAt');
 
     res.status(200).json({
         status: "success",
