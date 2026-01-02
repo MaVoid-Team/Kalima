@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getConfirmedOrdersReport } from "../../routes/cart";
+import { getCreatedAccountsStats } from "../../routes/fetch-users";
 import { motion } from "framer-motion";
 import {
   CheckCircle,
@@ -13,6 +14,7 @@ import {
   Calendar,
   RotateCcw,
   Package,
+  Users,
 } from "lucide-react";
 
 const ConfirmedOrdersReport = () => {
@@ -26,35 +28,45 @@ const ConfirmedOrdersReport = () => {
 
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
-  const [startPeriod, setStartPeriod] = useState("AM");
 
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [endPeriod, setEndPeriod] = useState("PM");
 
   const [filtersApplied, setFiltersApplied] = useState(false);
 
-  function convertTo12Hour(time24) {
-    if (!time24) return "";
-
-    let [hours, minutes] = time24.split(":");
-    hours = parseInt(hours, 10);
-
-    const period = hours >= 12 ? "PM" : "AM";
-    const hours12 = hours % 12 || 12;
-
-    return {
-      time: `${hours12}:${minutes}`,
-      period,
-    };
-  }
-
-  const startConverted = convertTo12Hour(startTime);
-  const endConverted = convertTo12Hour(endTime);
+  // Created Accounts Stats
+  const [createdAccountsData, setCreatedAccountsData] = useState([]);
+  const [createdAccountsLoading, setCreatedAccountsLoading] = useState(false);
+  const [accountsStartDate, setAccountsStartDate] = useState("");
+  const [accountsEndDate, setAccountsEndDate] = useState("");
+  const [accountsFiltersApplied, setAccountsFiltersApplied] = useState(false);
 
   useEffect(() => {
     fetchReport();
   }, [filtersApplied]);
+
+  useEffect(() => {
+    fetchCreatedAccountsStats();
+  }, [accountsFiltersApplied]);
+
+  const fetchCreatedAccountsStats = async () => {
+    try {
+      setCreatedAccountsLoading(true);
+      const params = {};
+      if (accountsStartDate) params.dateFrom = accountsStartDate;
+      if (accountsEndDate) params.dateTo = accountsEndDate;
+
+      const result = await getCreatedAccountsStats(params);
+
+      if (result.success) {
+        setCreatedAccountsData(result.data.data || []);
+      }
+    } catch (err) {
+      console.error("Error fetching created accounts stats:", err);
+    } finally {
+      setCreatedAccountsLoading(false);
+    }
+  };
 
   const fetchReport = async () => {
     try {
@@ -63,11 +75,9 @@ const ConfirmedOrdersReport = () => {
 
       const params = {
         startDate,
-        startTime: startConverted.time,
-        startPeriod: startConverted.period,
+        startTime,
         endDate,
-        endTime: endConverted.time,
-        endPeriod: endConverted.period,
+        endTime,
       };
 
       const result = await getConfirmedOrdersReport(params);
@@ -296,113 +306,6 @@ const ConfirmedOrdersReport = () => {
           </div>
         </motion.div>
       </div>
-      {/* Filters Card */}
-      <div className="card shadow-lg mb-3">
-        <div className="card-body">
-          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
-            {/* Start Date */}
-            <div className="w-full">
-              <label className="label font-medium mb-1">
-                {isRTL ? "تاريخ البداية" : "Start Date"}
-              </label>
-              <input
-                type="date"
-                className="input input-bordered w-full"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </div>
-
-            {/* Start Time */}
-            <div className="w-full">
-              <label className="label font-medium mb-1">
-                {isRTL ? "وقت البداية" : "Start Time"}
-              </label>
-              <div className="flex gap-2 w-full">
-                <input
-                  type="time"
-                  className="input input-bordered w-full"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-                <select
-                  className="select select-bordered w-20"
-                  value={startPeriod}
-                  onChange={(e) => setStartPeriod(e.target.value)}
-                >
-                  <option value="AM">AM</option>
-                  <option value="PM">PM</option>
-                </select>
-              </div>
-            </div>
-
-            {/* End Date */}
-            <div className="w-full">
-              <label className="label font-medium mb-1">
-                {isRTL ? "تاريخ النهاية" : "End Date"}
-              </label>
-              <input
-                type="date"
-                className="input input-bordered w-full"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-
-            {/* End Time */}
-            <div className="w-full">
-              <label className="label font-medium mb-1">
-                {isRTL ? "وقت النهاية" : "End Time"}
-              </label>
-              <div className="flex gap-2 w-full">
-                <input
-                  type="time"
-                  className="input input-bordered w-full"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                />
-
-                <select
-                  className="select select-bordered w-20"
-                  value={endPeriod}
-                  onChange={(e) => setEndPeriod(e.target.value)}
-                >
-                  <option value="AM">AM</option>
-                  <option value="PM">PM</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Apply */}
-            <div className="w-full flex items-end">
-              <button
-                className="btn btn-primary w-full"
-                onClick={() => setFiltersApplied((prev) => !prev)}
-              >
-                {isRTL ? "تطبيق" : "Apply"}
-              </button>
-            </div>
-
-            {/* Clear */}
-            <div className="w-full flex items-end">
-              <button
-                className="btn btn-ghost w-full"
-                onClick={() => {
-                  setStartDate("");
-                  setStartTime("");
-                  setStartPeriod("AM");
-                  setEndDate("");
-                  setEndTime("");
-                  setEndPeriod("PM");
-                  setFiltersApplied((prev) => !prev);
-                }}
-              >
-                {isRTL ? "مسح" : "Clear"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Confirmer Statistics */}
       <div className="card shadow-lg mb-8">
@@ -411,17 +314,119 @@ const ConfirmedOrdersReport = () => {
             <Award className="w-6 h-6 text-warning" />
             {isRTL ? "إحصائيات المؤكدين" : "Confirmer Statistics"}
           </h2>
+          {/* Filters Card */}
+          <div className="card shadow-lg mb-3">
+            <div className="card-body">
+              <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+                {/* Start Date */}
+                <div className="w-full">
+                  <label className="label font-medium mb-1">
+                    {isRTL ? "تاريخ البداية" : "Start Date"}
+                  </label>
+                  <input
+                    type="date"
+                    className="input input-bordered w-full"
+                    value={startDate}
+                    onChange={(e) => {
+                      const newStartDate = e.target.value;
+                      setStartDate(newStartDate);
+                      if (endDate && newStartDate > endDate) {
+                        setEndDate("");
+                        setEndTime("");
+                      }
+                    }}
+                  />
+                </div>
 
+                {/* Start Time */}
+                <div className="w-full">
+                  <label className="label font-medium mb-1">
+                    {isRTL ? "وقت البداية" : "Start Time"}
+                  </label>
+                  <input
+                    type="time"
+                    className="input input-bordered w-full"
+                    value={startTime}
+                    disabled={!startDate}
+                    onChange={(e) => {
+                      const newStartTime = e.target.value;
+                      setStartTime(newStartTime);
+                      if (
+                        startDate === endDate &&
+                        endTime &&
+                        newStartTime > endTime
+                      ) {
+                        setEndTime("");
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* End Date */}
+                <div className="w-full">
+                  <label className="label font-medium mb-1">
+                    {isRTL ? "تاريخ النهاية" : "End Date"}
+                  </label>
+                  <input
+                    type="date"
+                    className="input input-bordered w-full"
+                    value={endDate}
+                    min={startDate}
+                    disabled={!startDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
+
+                {/* End Time */}
+                <div className="w-full">
+                  <label className="label font-medium mb-1">
+                    {isRTL ? "وقت النهاية" : "End Time"}
+                  </label>
+                  <input
+                    type="time"
+                    className="input input-bordered w-full"
+                    value={endTime}
+                    min={startDate === endDate ? startTime : undefined}
+                    disabled={!endDate}
+                    onChange={(e) => setEndTime(e.target.value)}
+                  />
+                </div>
+
+                {/* Apply */}
+                <div className="w-full flex items-end">
+                  <button
+                    className="btn btn-primary w-full"
+                    onClick={() => setFiltersApplied((prev) => !prev)}
+                  >
+                    {isRTL ? "تطبيق" : "Apply"}
+                  </button>
+                </div>
+
+                {/* Clear */}
+                <div className="w-full flex items-end">
+                  <button
+                    className="btn btn-ghost w-full"
+                    onClick={() => {
+                      setStartDate("");
+                      setStartTime("");
+                      setEndDate("");
+                      setEndTime("");
+                      setFiltersApplied((prev) => !prev);
+                    }}
+                  >
+                    {isRTL ? "مسح" : "Clear"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="table w-full">
               <thead>
                 <tr>
                   <th className="text-center">{isRTL ? "الاسم" : "Name"}</th>
 
-                  <th className="text-center">
-                    {isRTL ? "الطلبات المستلمة" : "Received Orders"}
-                  </th>
-
+                
                   <th className="text-center">
                     {isRTL ? "الطلبات المؤكدة" : "Confirmed Orders"}
                   </th>
@@ -461,11 +466,7 @@ const ConfirmedOrdersReport = () => {
                       </div>
                     </td>
 
-                    {/* Received Orders */}
-                    <td className="text-center font-bold">
-                      {stat.totalReceivedOrders}
-                    </td>
-
+                  
                     {/* Confirmed Orders */}
                     <td className="text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -507,6 +508,192 @@ const ConfirmedOrdersReport = () => {
           </div>
         </div>
       </div>
+
+      {/* Created Accounts Statistics */}
+      <div className="card shadow-lg mb-8">
+        <div className="card-body">
+          <h2 className="card-title text-2xl mb-4 flex items-center gap-2">
+            <Users className="w-6 h-6 text-info" />
+            {isRTL
+              ? "إحصائيات الحسابات المنشأة"
+              : "Created Accounts Statistics"}
+          </h2>
+
+          {/* Accounts Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+            {/* Start Date */}
+            <div className="w-full">
+              <label className="label font-medium mb-1">
+                {isRTL ? "تاريخ البداية" : "Start Date"}
+              </label>
+              <input
+                type="date"
+                className="input input-bordered w-full"
+                value={accountsStartDate}
+                onChange={(e) => {
+                  const newStartDate = e.target.value;
+                  setAccountsStartDate(newStartDate);
+                  if (accountsEndDate && newStartDate > accountsEndDate) {
+                    setAccountsEndDate("");
+                  }
+                }}
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="w-full">
+              <label className="label font-medium mb-1">
+                {isRTL ? "تاريخ النهاية" : "End Date"}
+              </label>
+              <input
+                type="date"
+                className="input input-bordered w-full"
+                value={accountsEndDate}
+                min={accountsStartDate}
+                disabled={!accountsStartDate}
+                onChange={(e) => setAccountsEndDate(e.target.value)}
+              />
+            </div>
+
+            {/* Apply */}
+            <div className="w-full flex items-end">
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => setAccountsFiltersApplied((prev) => !prev)}
+              >
+                {isRTL ? "تطبيق" : "Apply"}
+              </button>
+            </div>
+
+            {/* Clear */}
+            <div className="w-full flex items-end">
+              <button
+                className="btn btn-ghost w-full"
+                onClick={() => {
+                  setAccountsStartDate("");
+                  setAccountsEndDate("");
+                  setAccountsFiltersApplied((prev) => !prev);
+                }}
+              >
+                {isRTL ? "مسح" : "Clear"}
+              </button>
+            </div>
+          </div>
+
+          {createdAccountsLoading ? (
+            <div className="flex justify-center py-8">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : createdAccountsData.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              {isRTL ? "لا توجد بيانات" : "No data available"}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr>
+                    <th className="text-center">{isRTL ? "الاسم" : "Name "}</th>
+                    <th className="text-center">
+                      {isRTL ? "مدرس" : "Teacher"}
+                    </th>
+                    <th className="text-center">
+                      {isRTL ? "ولي أمر" : "Parent"}
+                    </th>
+                    <th className="text-center">
+                      {isRTL ? "طالب" : "Student"}
+                    </th>
+                    <th className="text-center">
+                      {isRTL ? "مساعد" : "Assistant"}
+                    </th>
+                    <th className="text-center">
+                      {isRTL ? "الإجمالي" : "Total"}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {createdAccountsData.map((creator, index) => (
+                    <tr
+                      key={creator.stats?.creatorId || index}
+                      className="hover"
+                    >
+                      <td className="text-center">
+                        <div className="flex flex-col items-center">
+                          <span className="font-medium">
+                            {creator.creatorName}
+                          </span>
+                          <span className="text-xs opacity-70">
+                            {creator.creatorEmail}
+                          </span>
+                          <span className="badge badge-sm badge-outline mt-1">
+                            {creator.creatorRole}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-center font-bold text-primary">
+                        {creator.stats?.byRole?.Teacher || 0}
+                      </td>
+                      <td className="text-center font-bold text-secondary">
+                        {creator.stats?.byRole?.Parent || 0}
+                      </td>
+                      <td className="text-center font-bold text-accent">
+                        {creator.stats?.byRole?.Student || 0}
+                      </td>
+                      <td className="text-center font-bold text-info">
+                        {creator.stats?.byRole?.Assistant || 0}
+                      </td>
+                      <td className="text-center">
+                        <span className="badge badge-lg badge-success font-bold">
+                          {creator.stats?.totalAccounts || 0}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Total Row */}
+                  <tr className="bg-base-200 font-bold">
+                    <td className="text-center">
+                      {isRTL ? "الإجمالي" : "Total"}
+                    </td>
+                    <td className="text-center text-primary">
+                      {createdAccountsData.reduce(
+                        (sum, c) => sum + (c.stats?.byRole?.Teacher || 0),
+                        0
+                      )}
+                    </td>
+                    <td className="text-center text-secondary">
+                      {createdAccountsData.reduce(
+                        (sum, c) => sum + (c.stats?.byRole?.Parent || 0),
+                        0
+                      )}
+                    </td>
+                    <td className="text-center text-accent">
+                      {createdAccountsData.reduce(
+                        (sum, c) => sum + (c.stats?.byRole?.Student || 0),
+                        0
+                      )}
+                    </td>
+                    <td className="text-center text-info">
+                      {createdAccountsData.reduce(
+                        (sum, c) => sum + (c.stats?.byRole?.Assistant || 0),
+                        0
+                      )}
+                    </td>
+                    <td className="text-center">
+                      <span className="badge badge-lg badge-success">
+                        {createdAccountsData.reduce(
+                          (sum, c) => sum + (c.stats?.totalAccounts || 0),
+                          0
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Recent Confirmed Orders
       <div className="card shadow-lg">
         <div className="card-body">

@@ -10,7 +10,8 @@ import {
 } from "../../routes/market";
 import { addToCart, getUserPurchasedProducts } from "../../routes/cart";
 import { isLoggedIn } from "../../routes/auth-services";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, AlertTriangle, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market");
@@ -29,6 +30,7 @@ const Market = () => {
   const [itemsPerPage] = useState(6);
   const [addingToCart, setAddingToCart] = useState({});
   const [purchasedProductIds, setPurchasedProductIds] = useState([]);
+  const [cartTypeError, setCartTypeError] = useState({ show: false, message: "" });
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null;
@@ -167,14 +169,30 @@ const Market = () => {
         localStorage.setItem("cartCount", currentCount + 1);
         window.dispatchEvent(new Event("cart-updated"));
       } else {
-        alert(
-          result.error || t("errors.addToCartFailed") || "Failed to add to cart"
-        );
+        // Check if it's a cart type mismatch error
+        if (result.error && result.error.includes("Cannot add item of type")) {
+          setCartTypeError({
+            show: true,
+            message: result.error
+          });
+        } else {
+          alert(
+            result.error || t("errors.addToCartFailed") || "Failed to add to cart"
+          );
+        }
       }
     } catch (error) {
-      alert(
-        error.message || t("errors.addToCartFailed") || "Failed to add to cart"
-      );
+      // Check if it's a cart type mismatch error
+      if (error.message && error.message.includes("Cannot add item of type")) {
+        setCartTypeError({
+          show: true,
+          message: error.message
+        });
+      } else {
+        alert(
+          error.message || t("errors.addToCartFailed") || "Failed to add to cart"
+        );
+      }
     } finally {
       setAddingToCart({ ...addingToCart, [productId]: false });
     }
@@ -395,22 +413,17 @@ const Market = () => {
                 key={item._id}
                 className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
               >
-                {/* Already Purchased Ribbon */}
+                {/* Already Purchased Badge */}
                 {isPurchased && (
                   <div
-                    className={`absolute top-0 ${
-                      isRTL ? "left-0" : "right-0"
-                    } z-20`}
+                    className={`absolute top-4 ${
+                      isRTL ? "left-4" : "right-4"
+                    } z-10`}
                   >
                     <div
-                      className={`bg-success text-success-content px-4 py-2 shadow-lg ${
-                        isRTL
-                          ? "rounded-br-2xl rounded-bl-none"
-                          : "rounded-bl-2xl rounded-br-none"
-                      } text-xs font-bold flex items-center gap-1`}
-                      style={{
-                        transform: isRTL ? "none" : "none",
-                      }}
+                      className={`bg-secondary text-secondary-content px-3 py-1 ${
+                        isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium flex items-center gap-1`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -424,10 +437,9 @@ const Market = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      {isRTL
+ {isRTL
                         ? "لقد اشتريت هذا المنتج من قبل"
-                        : "Already purchased before"}
-                    </div>
+                        : "Already purchased before"}                    </div>
                   </div>
                 )}
 
@@ -616,6 +628,63 @@ const Market = () => {
           </div>
         )}
       </div>
+
+      {/* Cart Type Mismatch Modal */}
+      <AnimatePresence>
+        {cartTypeError.show && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-center relative">
+                <button
+                  onClick={() => setCartTypeError({ show: false, message: "" })}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">
+                  {isRTL ? "تنبيه!" : "Warning!"}
+                </h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
+                  {isRTL
+                    ? "لا يمكن إضافة هذا المنتج للسلة"
+                    : "Cannot add this item to cart"}
+                </p>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "السلة تحتوي على نوع مختلف من المنتجات. يجب أن تكون جميع المنتجات في السلة من نفس النوع (كتب فقط أو منتجات فقط)."
+                    : "Your cart contains a different type of items. All items in cart must be of the same type (books only or products only)."}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setCartTypeError({ show: false, message: "" });
+                    navigate("/cart");
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  {isRTL ? "عرض السلة" : "View Cart"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

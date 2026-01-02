@@ -80,6 +80,9 @@ const CartPage = () => {
   const [checkoutCooldown, setCheckoutCooldown] = useState(0);
   const [cooldownTimer, setCooldownTimer] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [showNoPaymentModal, setShowNoPaymentModal] = useState(false);
+  const [paymentMethodsLoaded, setPaymentMethodsLoaded] = useState(false);
+  const [showWrongTransferNumberModal, setShowWrongTransferNumberModal] = useState(false);
 
   const getPaymentMethodLabel = () => {
     const method = paymentMethods.find(
@@ -144,10 +147,20 @@ const CartPage = () => {
         const res = await getAllPaymentMethods();
 
         if (res?.status === "success") {
-          setPaymentMethods(res.data.paymentMethods.filter((pm) => pm.status));
+          const activeMethods = res.data.paymentMethods.filter((pm) => pm.status);
+          setPaymentMethods(activeMethods);
+          setPaymentMethodsLoaded(true);
+          if (activeMethods.length === 0) {
+            setShowNoPaymentModal(true);
+          }
+        } else {
+          setPaymentMethodsLoaded(true);
+          setShowNoPaymentModal(true);
         }
       } catch (err) {
         console.error("Failed to fetch payment methods", err);
+        setPaymentMethodsLoaded(true);
+        setShowNoPaymentModal(true);
       }
     };
 
@@ -1058,6 +1071,8 @@ const CartPage = () => {
                             input: (
                               <input
                                 type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 placeholder={
                                   t("enterTransferNumber") ||
                                   "Enter transfer number"
@@ -1069,11 +1084,23 @@ const CartPage = () => {
                                 }`}
                                 value={checkoutData.numberTransferredFrom}
                                 onChange={(e) => {
+                                  const value = e.target.value.replace(/[^0-9]/g, "");
                                   setCheckoutData({
                                     ...checkoutData,
-                                    numberTransferredFrom: e.target.value,
+                                    numberTransferredFrom: value,
                                   });
                                   clearFieldError("numberTransferredFrom");
+                                }}
+                                onBlur={(e) => {
+                                  const value = e.target.value.trim();
+                                  const paymentPhone = getPaymentPhoneNumber();
+                                  if (value && paymentPhone && value === paymentPhone) {
+                                    setShowWrongTransferNumberModal(true);
+                                    setCheckoutData({
+                                      ...checkoutData,
+                                      numberTransferredFrom: "",
+                                    });
+                                  }
                                 }}
                               />
                             ),
@@ -1366,6 +1393,96 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+
+      {/* No Payment Methods Modal */}
+      {showNoPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+          >
+            {/* Header with gradient */}
+            <div className="bg-gradient-to-r from-warning to-orange-500 p-6 text-center">
+              <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                <AlertCircle className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                {isRTL ? "عذراً!" : "Sorry!"}
+              </h3>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 text-center">
+              <p className="text-lg text-base-content mb-2">
+                {isRTL
+                  ? "المنصة متوقفة عن استقبال الطلبات حالياً"
+                  : "The platform is currently not accepting orders"}
+              </p>
+              <p className="text-base-content/70">
+                {isRTL
+                  ? "يرجى المحاولة مرة أخرى في وقت لاحق"
+                  : "Please try again later"}
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-base-200">
+              <button
+                onClick={() => navigate("/market")}
+                className="btn btn-primary w-full"
+              >
+                {isRTL ? "العودة للمتجر" : "Back to Store"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Wrong Transfer Number Modal */}
+      {showWrongTransferNumberModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-error to-red-500 p-6 text-center">
+              <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                <AlertCircle className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                {isRTL ? "خطأ!" : "Error!"}
+              </h3>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 text-center">
+              <p className="text-lg text-base-content mb-3">
+                {isRTL
+                  ? "هذا ليس رقم التحويل!"
+                  : "This is not the transfer number!"}
+              </p>
+              <p className="text-base-content/70">
+                {isRTL
+                  ? "لقد أدخلت رقم المحفظة وليس رقم التحويل. الرقم التحويل هو الرقم الذي استخدمته لتحويل المبلغ."
+                  : "You entered the wallet number, not the transfer number. The transfer number is the reference number that appears after completing the transfer."}
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-base-200">
+              <button
+                onClick={() => setShowWrongTransferNumberModal(false)}
+                className="btn btn-primary w-full"
+              >
+                {isRTL ? "فهمت" : "I Understand"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
