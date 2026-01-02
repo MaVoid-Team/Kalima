@@ -25,36 +25,12 @@ const EnhancedAdminForms = ({
   onCreateBook,
   onCreateSection,
   onCreateSubSection,
-  paymentMethodForm,
-  setPaymentMethodForm,
-  onCreatePayment,
   onFileChange,
   actionLoading,
   isRTL,
 }) => {
   const { t } = useTranslation("kalimaStore-admin");
   const progressTracker = useFormProgress();
-  const [errors, setErrors] = useState({});
-
-  const validatePaymentMethod = () => {
-    const newErrors = {};
-
-    if (!paymentMethodForm.name.trim()) {
-      newErrors.name =
-        t("paymentMethod.validation.nameRequired") || "الاسم مطلوب";
-    }
-
-    if (!paymentMethodForm.phoneNumber.trim()) {
-      newErrors.phoneNumber =
-        t("paymentMethod.validation.phoneRequired") || "رقم الهاتف مطلوب";
-    } else if (!/^01[0-9]{9}$/.test(paymentMethodForm.phoneNumber)) {
-      newErrors.phoneNumber =
-        t("paymentMethod.validation.phoneInvalid") || "رقم الهاتف غير صحيح";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   // Enhanced upload states
   const [uploadStates, setUploadStates] = useState({
@@ -1322,86 +1298,6 @@ const EnhancedAdminForms = ({
                           </option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-                </form>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-
-                    if (!validatePaymentMethod()) return;
-
-                    onCreatePayment(e);
-                  }}
-                >
-                  <div className="card shadow-lg mt-5 ">
-                    <h3 className="text-2xl font-bold mb-5">
-                      {t("paymentMethod.title")}
-                    </h3>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="label mb-1">
-                          <span className="label-text font-medium">
-                            {t("paymentMethod.fields.name")} *
-                          </span>
-                        </label>
-                        <input
-                          type="text"
-                          className={`input input-bordered w-full ${
-                            errors.name ? "input-error" : ""
-                          }`}
-                          value={paymentMethodForm.name}
-                          onChange={(e) =>
-                            setPaymentMethodForm((prev) => ({
-                              ...prev,
-                              name: e.target.value,
-                            }))
-                          }
-                        />
-                        {errors.name && (
-                          <p className="text-error text-sm mt-1">
-                            {errors.name}
-                          </p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="label mb-1">
-                          <span className="label-text font-medium">
-                            {t("paymentMethod.fields.phoneNumber")} *
-                          </span>
-                        </label>
-                        <input
-                          type="text"
-                          className={`input input-bordered w-full ${
-                            errors.phoneNumber ? "input-error" : ""
-                          }`}
-                          value={paymentMethodForm.phoneNumber}
-                          onChange={(e) =>
-                            setPaymentMethodForm((prev) => ({
-                              ...prev,
-                              phoneNumber: e.target.value,
-                            }))
-                          }
-                        />
-                        {errors.phoneNumber && (
-                          <p className="text-error text-sm mt-1">
-                            {errors.phoneNumber}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 flex justify-end">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={actionLoading}
-                      >
-                        {t("paymentMethod.actions.save")}
-                      </button>
                     </div>
                   </div>
                 </form>
