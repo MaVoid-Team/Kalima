@@ -981,6 +981,33 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
         }
     }
 
+    // If the purchase was confirmed, update the confirmedBy user's monthly count
+    if (purchase.status === 'confirmed' && purchase.confirmedBy) {
+        const currentMonth = getCurrentEgyptTime();
+        const monthStart = currentMonth.startOf('month').toJSDate();
+        const monthEnd = currentMonth.endOf('month').toJSDate();
+
+        // Recalculate the monthly confirmed count for the user who confirmed this purchase
+        const monthlyCount = await ECCartPurchase.countDocuments({
+            confirmedBy: purchase.confirmedBy,
+            status: 'confirmed',
+            confirmedAt: {
+                $gte: monthStart,
+                $lte: monthEnd
+            },
+            _id: { $ne: purchase._id } // Exclude the purchase being deleted
+        });
+
+        // Update the confirmedBy user's monthly count
+        await User.findByIdAndUpdate(
+            purchase.confirmedBy,
+            {
+                monthlyConfirmedCount: monthlyCount,
+                lastConfirmedCountUpdate: new Date()
+            }
+        );
+    }
+
     // Delete the purchase
     await ECCartPurchase.findByIdAndDelete(req.params.id);
 
@@ -994,34 +1021,43 @@ exports.getMonthlyConfirmedPurchasesCount = catchAsync(async (req, res, next) =>
     // Get current month in Egypt timezone
     const now = getCurrentEgyptTime();
     const monthStart = now.startOf('month').toJSDate();
+    const monthEnd = now.endOf('month').toJSDate();
 
     // Get user
     const user = await User.findById(req.user._id).select('monthlyConfirmedCount lastConfirmedCountUpdate');
 
-    // Check if we need to reset the counter (new month)
+    // Determine if we need to recalculate
     let count = user?.monthlyConfirmedCount || 0;
-    if (user?.lastConfirmedCountUpdate) {
+    let needsRecalculation = false;
+
+    if (!user?.lastConfirmedCountUpdate) {
+        // First time or never updated - recalculate
+        needsRecalculation = true;
+    } else {
+        // Check if we're in a different month
         const lastUpdate = DateTime.fromJSDate(user.lastConfirmedCountUpdate).setZone('Africa/Cairo');
         const lastUpdateMonth = lastUpdate.startOf('month').toJSDate();
-
-        // If the last update was in a different month, reset and recalculate
         if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
-            const monthEnd = now.endOf('month').toJSDate();
-            count = await ECCartPurchase.countDocuments({
-                confirmedBy: req.user._id,
-                status: 'confirmed',
-                confirmedAt: {
-                    $gte: monthStart,
-                    $lte: monthEnd
-                }
-            });
-
-            // Update the stored count
-            await User.findByIdAndUpdate(req.user._id, {
-                monthlyConfirmedCount: count,
-                lastConfirmedCountUpdate: new Date()
-            });
+            needsRecalculation = true;
         }
+    }
+
+    // Recalculate if needed
+    if (needsRecalculation) {
+        count = await ECCartPurchase.countDocuments({
+            confirmedBy: req.user._id,
+            status: 'confirmed',
+            confirmedAt: {
+                $gte: monthStart,
+                $lte: monthEnd
+            }
+        });
+
+        // Update the stored count
+        await User.findByIdAndUpdate(req.user._id, {
+            monthlyConfirmedCount: count,
+            lastConfirmedCountUpdate: new Date()
+        });
     }
 
     res.status(200).json({
