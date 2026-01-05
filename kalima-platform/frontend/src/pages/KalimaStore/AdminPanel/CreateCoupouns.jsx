@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 import {
   getAllCoupons,
@@ -167,7 +168,7 @@ const CreateCoupons = () => {
   // Handle create coupon
   const handleCreateCoupon = async () => {
     if (!createForm.value || !createForm.expirationDays) {
-      alert(t("alerts.fillAllFields"))
+      toast.warning(t("alerts.fillAllFields"))
       return
     }
 
@@ -182,7 +183,7 @@ const CreateCoupons = () => {
       const response = await createCoupon(couponData)
 
       if (response.success) {
-        alert(t("alerts.couponCreated"))
+        toast.success(t("alerts.couponCreated"))
         setShowCreateModal(false)
         setCreateForm({ value: "", expirationDays: "" })
         setCurrentPage(1) // Reset to first page to see new coupon
@@ -191,7 +192,7 @@ const CreateCoupons = () => {
         throw new Error(response.error)
       }
     } catch (err) {
-      alert(t("alerts.createFailed") + err.message)
+      toast.error(t("alerts.createFailed") + err.message)
     } finally {
       setCreateLoading(false)
     }
@@ -207,7 +208,7 @@ const CreateCoupons = () => {
       const response = await deleteCoupon(selectedCoupon._id)
 
       if (response.success) {
-        alert(t("alerts.couponDeleted"))
+        toast.success(t("alerts.couponDeleted"))
         setShowDeleteModal(false)
         setSelectedCoupon(null)
 
@@ -223,7 +224,7 @@ const CreateCoupons = () => {
         throw new Error(response.error)
       }
     } catch (err) {
-      alert(t("alerts.deleteFailed") + err.message)
+      toast.error(t("alerts.deleteFailed") + err.message)
     } finally {
       setDeleteLoading({ ...deleteLoading, [selectedCoupon._id]: false })
     }
@@ -232,7 +233,7 @@ const CreateCoupons = () => {
   // Handle copy coupon code
   const handleCopyCouponCode = (couponCode) => {
     navigator.clipboard.writeText(couponCode)
-    alert(t("alerts.codeCopied"))
+    toast.success(t("alerts.codeCopied"))
   }
 
   // Get coupon status

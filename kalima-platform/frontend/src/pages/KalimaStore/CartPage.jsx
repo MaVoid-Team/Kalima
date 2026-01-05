@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import {
   getCart,
   removeFromCart,
@@ -128,13 +128,13 @@ const CartPage = () => {
         const errorMessage =
           result.error || t("errors.fetchCartFailed") || "Failed to load cart";
         setError(errorMessage);
-        toast.error(t("errors.fetchCartFailed") || "Failed to load cart");
+        toast.error(t("errors.fetchCartFailed") || "فشل في تحميل السلة");
       }
     } catch (err) {
       const errorMessage =
         err.message || t("errors.fetchCartFailed") || "Failed to load cart";
       setError(errorMessage);
-      toast.error(t("errors.fetchCartFailed") || "Failed to load cart");
+      toast.error(t("errors.fetchCartFailed") || "فشل في تحميل السلة");
       console.error("Error fetching cart:", err);
     } finally {
       setLoading(false);
@@ -198,6 +198,19 @@ const CartPage = () => {
     }
   }, [checkoutCooldown]);
 
+  // Close payment dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.getElementById("payment-dropdown-cart");
+      const trigger = event.target.closest("[data-payment-trigger]");
+      if (dropdown && !dropdown.contains(event.target) && !trigger) {
+        dropdown.classList.add("hidden");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Load cooldown from localStorage on mount
   useEffect(() => {
     const savedCooldown = localStorage.getItem("checkoutCooldownExpiry");
@@ -229,17 +242,17 @@ const CartPage = () => {
         await fetchCart();
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
-        toast.success(t("success.itemRemoved") || "Item removed from cart");
+        toast.success(t("success.itemRemoved") || "تم حذف العنصر من السلة");
       } else {
         toast.error(
           result.error ||
             t("errors.removeItemFailed") ||
-            "Failed to remove item"
+            "فشل في حذف العنصر"
         );
       }
     } catch (err) {
       toast.error(
-        err.message || t("errors.removeItemFailed") || "Failed to remove item"
+        err.message || t("errors.removeItemFailed") || "فشل في حذف العنصر"
       );
     } finally {
       setActionLoading({ ...actionLoading, [itemId]: false });
@@ -250,7 +263,7 @@ const CartPage = () => {
   const handleClearCart = async () => {
     if (
       !confirm(
-        t("confirmClearCart") || "Are you sure you want to clear your cart?"
+        t("confirmClearCart") || "هل أنت متأكد من إفراغ السلة؟"
       )
     ) {
       return;
@@ -269,15 +282,15 @@ const CartPage = () => {
         });
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
-        toast.success(t("success.cartCleared") || "Cart cleared successfully");
+        toast.success(t("success.cartCleared") || "تم إفراغ السلة بنجاح");
       } else {
         toast.error(
-          result.error || t("errors.clearCartFailed") || "Failed to clear cart"
+          result.error || t("errors.clearCartFailed") || "فشل في إفراغ السلة"
         );
       }
     } catch (err) {
       toast.error(
-        err.message || t("errors.clearCartFailed") || "Failed to clear cart"
+        err.message || t("errors.clearCartFailed") || "فشل في إفراغ السلة"
       );
     } finally {
       setActionLoading({ ...actionLoading, clear: false });
@@ -287,7 +300,7 @@ const CartPage = () => {
   // Handle coupon validation and application
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.error(t("errors.noCouponCode") || "Please enter a coupon code");
+      toast.error(t("errors.noCouponCode") || "يرجى إدخال كود الخصم");
       return;
     }
 
@@ -319,7 +332,7 @@ const CartPage = () => {
       if (applyResult.success) {
         setCouponValidation({
           isValid: true,
-          message: t("success.couponApplied") || "Coupon applied successfully",
+          message: t("success.couponApplied") || "تم تطبيق الكوبون بنجاح",
           discount: validationResult.data?.data?.coupon?.value || 0,
           loading: false,
         });
@@ -327,13 +340,13 @@ const CartPage = () => {
         // Trigger cart count update (in case cart state changed)
         window.dispatchEvent(new Event("cart-updated"));
         toast.success(
-          t("success.couponApplied") || "Coupon applied successfully"
+          t("success.couponApplied") || "تم تطبيق الكوبون بنجاح"
         );
       } else {
         const errorMessage =
           applyResult.error ||
           t("errors.applyCouponFailed") ||
-          "Failed to apply coupon";
+          "فشل في تطبيق الكوبون";
         setCouponValidation({
           isValid: false,
           message: errorMessage,
@@ -346,7 +359,7 @@ const CartPage = () => {
       const errorMessage =
         err.message ||
         t("errors.applyCouponFailed") ||
-        "Failed to apply coupon";
+        "فشل في تطبيق الكوبون";
       setCouponValidation({
         isValid: false,
         message: errorMessage,
@@ -407,13 +420,17 @@ const CartPage = () => {
     if (cart.total > 0) {
       if (!checkoutData.numberTransferredFrom.trim()) {
         errors.numberTransferredFrom =
-          t("errors.noTransferNumber") || "Please enter transfer number";
+          t("errors.noTransferNumber") || "يرجى إدخال رقم التحويل";
+        isValid = false;
+      } else if (checkoutData.numberTransferredFrom.trim().length !== 11) {
+        errors.numberTransferredFrom =
+          t("errors.invalidTransferNumberLength") || "رقم التحويل يجب أن يتكون من 11 رقم";
         isValid = false;
       }
 
       if (!checkoutData.paymentScreenShot) {
         errors.paymentScreenShot =
-          t("errors.noFileSelected") || "Please upload payment screenshot";
+          t("errors.noFileSelected") || "يرجى رفع صورة الدفع";
         isValid = false;
       }
 
@@ -452,7 +469,7 @@ const CartPage = () => {
     if (checkoutCooldown > 0) {
       toast.error(
         t("errors.checkoutCooldown", { seconds: checkoutCooldown }) ||
-          `Please wait ${checkoutCooldown} seconds before checking out again.`
+          `يرجى الانتظار ${checkoutCooldown} ثانية قبل إتمام الشراء مرة أخرى.`
       );
       return;
     }
@@ -469,7 +486,7 @@ const CartPage = () => {
     // Validate form
     if (!validateCheckoutForm()) {
       toast.error(
-        t("errors.validationFailed") || "Please fill in all required fields"
+        t("errors.validationFailed") || "يرجى ملء جميع الحقول المطلوبة"
       );
       return;
     }
@@ -484,8 +501,8 @@ const CartPage = () => {
         localStorage.setItem("checkoutCooldownExpiry", expiryTime.toString());
         setCheckoutCooldown(cooldownSeconds);
 
-        window.alert(
-          t("success.purchaseSubmitted") || "Purchase submitted successfully!"
+        toast.success(
+          t("success.purchaseSubmitted") || "تم تقديم الطلب بنجاح!"
         );
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
@@ -516,7 +533,7 @@ const CartPage = () => {
         const errorMessage =
           result.error ||
           t("errors.checkoutFailed") ||
-          "Failed to submit purchase. Please try again.";
+          "فشل في تقديم الطلب. حاول مرة أخرى.";
         toast.error(errorMessage);
       }
     } catch (err) {
@@ -524,7 +541,7 @@ const CartPage = () => {
         err.response?.data?.message ||
         err.message ||
         t("errors.checkoutFailed") ||
-        "An error occurred. Please try again.";
+        "حدث خطأ. حاول مرة أخرى.";
       toast.error(errorMessage);
     } finally {
       setCheckoutLoading(false);
@@ -973,34 +990,97 @@ const CartPage = () => {
                       {cart.total} {t("currency") || "EGP"}
                     </span>
                   </div>
+                </motion.div>
 
-                  {/* Divider */}
-                  <div className="border-t border-base-300 my-3"></div>
-
-                  <select
-                    className={`select select-bordered h-12 w-full ${
-                      validationErrors.paymentMethod ? "select-error" : ""
-                    }`}
-                    value={checkoutData.paymentMethod}
-                    onChange={(e) => {
-                      setCheckoutData({
-                        ...checkoutData,
-                        paymentMethod: e.target.value,
-                      });
-                      clearFieldError("paymentMethod");
+                {/* Custom Payment Method Selector with Images - Outside the overflow container */}
+                <div className="relative mb-4">
+                  <label className="label">
+                    <span className="label-text font-semibold">
+                      {t("selectPaymentMethod") || "Payment Method"} <span className="text-error">*</span>
+                    </span>
+                  </label>
+                  <div
+                    data-payment-trigger
+                    className={`flex items-center justify-between h-12 px-4 border rounded-lg cursor-pointer transition-all ${
+                      validationErrors.paymentMethod
+                        ? "border-error"
+                        : "border-base-300 hover:border-primary"
+                    } bg-base-100`}
+                    onClick={() => {
+                      const dropdown = document.getElementById("payment-dropdown-cart");
+                      if (dropdown) dropdown.classList.toggle("hidden");
                     }}
                   >
-                    <option value="">
-                      {t("selectPaymentMethod") || "Select payment method"}
-                    </option>
+                    {checkoutData.paymentMethod ? (
+                      <div className="flex items-center gap-3">
+                        {paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.paymentMethodImg && (
+                          <img
+                            src={convertPathToUrl(
+                              paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.paymentMethodImg,
+                              "payment_methods"
+                            )}
+                            alt=""
+                            className="w-8 h-8 object-contain rounded"
+                          />
+                        )}
+                        <span className="font-medium">
+                          {paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-base-content/50">
+                        {t("selectPaymentMethod") || "Select payment method"}
+                      </span>
+                    )}
+                    <svg className="w-4 h-4 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
 
+                  {/* Dropdown Options */}
+                  <div
+                    id="payment-dropdown-cart"
+                    className="hidden absolute z-[999] w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-xl max-h-60 overflow-y-auto"
+                  >
                     {paymentMethods.map((method) => (
-                      <option key={method._id} value={method._id}>
-                        {method.name}
-                      </option>
+                      <div
+                        key={method._id}
+                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-primary/10 ${
+                          checkoutData.paymentMethod === method._id ? "bg-primary/20" : ""
+                        }`}
+                        onClick={() => {
+                          setCheckoutData({
+                            ...checkoutData,
+                            paymentMethod: method._id,
+                          });
+                          clearFieldError("paymentMethod");
+                          const dropdown = document.getElementById("payment-dropdown-cart");
+                          if (dropdown) dropdown.classList.add("hidden");
+                        }}
+                      >
+                        {method.paymentMethodImg && (
+                          <img
+                            src={convertPathToUrl(method.paymentMethodImg, "payment_methods")}
+                            alt={method.name}
+                            className="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <span className="font-medium">{method.name}</span>
+                        </div>
+                        {checkoutData.paymentMethod === method._id && (
+                          <CheckCircle2 className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
                     ))}
-                  </select>
-                  {cart.total > 0 && checkoutData.paymentMethod && (
+                  </div>
+                  {validationErrors.paymentMethod && (
+                    <span className="text-error text-sm mt-1">{validationErrors.paymentMethod}</span>
+                  )}
+                </div>
+
+                {/* Payment Phone Number Display */}
+                {cart.total > 0 && checkoutData.paymentMethod && (
                     <div
                       dir="rtl"
                       className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
@@ -1051,8 +1131,7 @@ const CartPage = () => {
                         (اضغط على الرقم لنسخه تلقائيًا)
                       </p>
                     </div>
-                  )}
-                </motion.div>
+                )}
 
                 {/* Checkout Form */}
                 <div className="space-y-6">
@@ -1073,6 +1152,7 @@ const CartPage = () => {
                                 type="text"
                                 inputMode="numeric"
                                 pattern="[0-9]*"
+                                maxLength={11}
                                 placeholder={
                                   t("enterTransferNumber") ||
                                   "Enter transfer number"
@@ -1084,12 +1164,22 @@ const CartPage = () => {
                                 }`}
                                 value={checkoutData.numberTransferredFrom}
                                 onChange={(e) => {
-                                  const value = e.target.value.replace(/[^0-9]/g, "");
+                                  const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
                                   setCheckoutData({
                                     ...checkoutData,
                                     numberTransferredFrom: value,
                                   });
-                                  clearFieldError("numberTransferredFrom");
+                                  // Real-time validation
+                                  if (value.length > 0 && value.length !== 11) {
+                                    setValidationErrors((prev) => ({
+                                      ...prev,
+                                      numberTransferredFrom:
+                                        t("errors.invalidTransferNumberLength") ||
+                                        `رقم التحويل يجب أن يتكون من 11 رقم (${value.length}/11)`,
+                                    }));
+                                  } else {
+                                    clearFieldError("numberTransferredFrom");
+                                  }
                                 }}
                                 onBlur={(e) => {
                                   const value = e.target.value.trim();
@@ -1100,6 +1190,15 @@ const CartPage = () => {
                                       ...checkoutData,
                                       numberTransferredFrom: "",
                                     });
+                                  }
+                                  // Validate length on blur
+                                  if (value.length > 0 && value.length !== 11) {
+                                    setValidationErrors((prev) => ({
+                                      ...prev,
+                                      numberTransferredFrom:
+                                        t("errors.invalidTransferNumberLength") ||
+                                        "رقم التحويل يجب أن يتكون من 11 رقم",
+                                    }));
                                   }
                                 }}
                               />
@@ -1464,10 +1563,15 @@ const CartPage = () => {
                   ? "هذا ليس رقم التحويل!"
                   : "This is not the transfer number!"}
               </p>
+              <p className="text-base-content/70 mb-2">
+                {isRTL
+                  ? "لقد أدخلت رقم المحفظة وليس رقم التحويل."
+                  : "You entered the wallet number, not the transfer number."}
+              </p>
               <p className="text-base-content/70">
                 {isRTL
-                  ? "لقد أدخلت رقم المحفظة وليس رقم التحويل. الرقم التحويل هو الرقم الذي استخدمته لتحويل المبلغ."
-                  : "You entered the wallet number, not the transfer number. The transfer number is the reference number that appears after completing the transfer."}
+                  ? "رقم التحويل هو الرقم الذي حولت منه المبلغ."
+                  : "The transfer number is the number you transferred from."}
               </p>
             </div>
 

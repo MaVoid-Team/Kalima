@@ -19,9 +19,12 @@ export const useAdminData = () => {
     totalSections: 0,
   })
 
-  const fetchInitialData = async () => {
+  const fetchInitialData = async (isRefetch = false) => {
     try {
-      setLoading(true)
+      // Only show loading on initial load, not on refetch
+      if (!isRefetch) {
+        setLoading(true)
+      }
       setError(null)
 
       // Fetch all data
@@ -98,12 +101,14 @@ export const useAdminData = () => {
       setProducts([])
       setSubjects([])
     } finally {
-      setLoading(false)
+      if (!isRefetch) {
+        setLoading(false)
+      }
     }
   }
 
   const refetch = useCallback(async () => {
-    await fetchInitialData()
+    await fetchInitialData(true)
   }, [])
 
   // Fetch data on component mount

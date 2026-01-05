@@ -4,13 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "./LanguageSwitcher";
 import NotificationCenter from "./NotificationCenter";
 import CartIcon from "./CartIcon";
+import MonthlyCounter from "./MonthlyCounter";
 import {
   isLoggedIn,
   getUserDashboard,
   logoutUser,
 } from "../routes/auth-services";
 import { FaCartPlus, FaHome, FaBook, FaChalkboardTeacher, FaBox, FaVideo } from "react-icons/fa";
-import { Layout } from "lucide-react";
+import { Layout, Receipt } from "lucide-react";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
@@ -194,7 +195,22 @@ const NavBar = () => {
 
         {/* Auth buttons - Desktop */}
         <div className="flex-none hidden lg:flex items-center gap-2 ml-4">
+          {/* Monthly Counter for employees */}
+          {userRole && ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
+            <MonthlyCounter />
+          )}
           <CartIcon />
+          {/* My Orders link for customers only (Student, Parent, Teacher) */}
+          {userRole && ["Student", "Parent", "Teacher"].includes(userRole) && (
+            <Link
+              to="/my-orders"
+              className="btn btn-ghost btn-sm rounded-2xl gap-1"
+              title={isAr ? "طلباتي" : "My Orders"}
+            >
+              <Receipt className="w-4 h-4" />
+              <span className="hidden xl:inline">{isAr ? "طلباتي" : "My Orders"}</span>
+            </Link>
+          )}
           {userId && <NotificationCenter userId={userId} />}
           {userRole ? (
             <button
@@ -303,10 +319,29 @@ const NavBar = () => {
                   <LanguageSwitcher />
                 </div>
 
+                {/* Monthly Counter for employees - Mobile */}
+                {userRole && ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
+                  <div className="flex py-2 items-center gap-2">
+                    <MonthlyCounter />
+                  </div>
+                )}
+
                 <div className="flex py-2 items-center gap-2">
                   <CartIcon />
                   <span>{t("cart") || "Cart"}</span>
                 </div>
+
+                {/* My Orders link - Mobile (customers only) */}
+                {userRole && ["Student", "Parent", "Teacher"].includes(userRole) && (
+                  <Link
+                    to="/my-orders"
+                    className="flex py-2 items-center gap-2"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Receipt className="w-5 h-5" />
+                    <span>{isAr ? "طلباتي" : "My Orders"}</span>
+                  </Link>
+                )}
 
                 {userId && (
                   <div className="flex py-2">

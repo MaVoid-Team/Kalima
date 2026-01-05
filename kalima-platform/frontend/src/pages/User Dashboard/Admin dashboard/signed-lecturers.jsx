@@ -8,6 +8,7 @@ import { FaEnvelope, FaPhone, FaGraduationCap, FaMapMarkerAlt, FaCalendarAlt, Fa
 import { getAllLecturers } from "../../../routes/fetch-users"
 import { getUserDashboard } from "../../../routes/auth-services"
 import * as XLSX from "xlsx"
+import { toast } from "sonner"
 
 const SignedLecturers = () => {
   const { t, i18n } = useTranslation("admin-signedLecturers")
@@ -130,7 +131,7 @@ const SignedLecturers = () => {
       
     } catch (error) {
       console.error('Export error:', error)
-      alert(t("errors.exportFailed") || "Failed to export data")
+      toast.error(t("errors.exportFailed") || "فشل في تصدير البيانات")
     } finally {
       setIsExporting(false)
     }
@@ -158,7 +159,7 @@ const SignedLecturers = () => {
       a.remove()
       URL.revokeObjectURL(url)
     } catch (err) {
-      alert(t("errors.exportFailed"))
+      toast.error(t("errors.exportFailed"))
     } finally {
       setIsExporting(false)
     }
@@ -180,7 +181,7 @@ const SignedLecturers = () => {
       a.remove()
       URL.revokeObjectURL(url)
     } catch (err) {
-      alert(t("errors.exportFailed"))
+      toast.error(t("errors.exportFailed"))
     } finally {
       setIsExporting(false)
     }

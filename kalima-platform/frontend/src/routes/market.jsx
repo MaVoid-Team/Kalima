@@ -566,14 +566,21 @@ export const deleteSubSection = async (subSectionId) => {
 
 export const createPaymentMethod = async (data) => {
   try {
+    const formData = new FormData()
+    formData.append("name", data.name)
+    formData.append("phoneNumber", data.phoneNumber)
+    if (data.paymentMethodImg) {
+      formData.append("paymentMethodImg", data.paymentMethodImg)
+    }
+
     const response = await axios.post(
       `${API_URL}/api/v1/ec/payment-methods`,
-      data,
+      formData,
       {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       }
     )
@@ -623,14 +630,21 @@ export const getPaymentMethodById = async (id) => {
 
 export const updatePaymentMethod = async (id, updateData) => {
   try {
+    const formData = new FormData()
+    if (updateData.name) formData.append("name", updateData.name)
+    if (updateData.phoneNumber) formData.append("phoneNumber", updateData.phoneNumber)
+    if (updateData.paymentMethodImg) {
+      formData.append("paymentMethodImg", updateData.paymentMethodImg)
+    }
+
     const response = await axios.patch(
       `${API_URL}/api/v1/ec/payment-methods/${id}`,
-      updateData,
+      formData,
       {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       }
     )

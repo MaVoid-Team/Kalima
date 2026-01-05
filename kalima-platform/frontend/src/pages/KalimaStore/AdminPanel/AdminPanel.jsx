@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import {
   createSection,
@@ -177,10 +178,10 @@ const AdminPanel = () => {
         type: getExportTypeLabel(typeKey, count),
       });
 
-      alert(successMessage);
+      toast.success(successMessage);
     } catch (error) {
       console.error("Export CSV error:", error);
-      alert(t("export.error"));
+      toast.error(t("export.error"));
     } finally {
       setIsExporting(false);
     }
@@ -232,10 +233,10 @@ const AdminPanel = () => {
         type: getExportTypeLabel(typeKey, count),
       });
 
-      alert(successMessage);
+      toast.success(successMessage);
     } catch (error) {
       console.error("Export JSON error:", error);
-      alert(t("export.error"));
+      toast.error(t("export.error"));
     } finally {
       setIsExporting(false);
     }
@@ -253,13 +254,13 @@ const AdminPanel = () => {
       !bookForm.paymentNumber ||
       !bookForm.subject
     ) {
-      alert(t("alerts.fillRequiredFields"));
+      toast.warning(t("alerts.fillRequiredFields"));
       return;
     }
 
     // Check if subSection is selected
     if (!bookForm.subSection) {
-      alert(t("alerts.subSectionRequired") || "Please select a subsection");
+      toast.warning(t("alerts.subSectionRequired") || "يرجى اختيار القسم الفرعي");
       return;
     }
 
@@ -312,14 +313,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = "";
         if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.bookCreatedSuccess"));
+        toast.success(t("alerts.bookCreatedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to create book");
       }
     } catch (err) {
       console.error("Error creating book:", err);
-      alert(t("alerts.bookCreateError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.bookCreateError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -335,13 +336,13 @@ const AdminPanel = () => {
       !productForm.price ||
       !productForm.paymentNumber
     ) {
-      alert(t("alerts.fillRequiredFields"));
+      toast.warning(t("alerts.fillRequiredFields"));
       return;
     }
 
     // Check if subSection is selected
     if (!productForm.subSection) {
-      alert(t("alerts.subSectionRequired") || "Please select a subsection");
+      toast.warning(t("alerts.subSectionRequired") || "يرجى اختيار القسم الفرعي");
       return;
     }
 
@@ -392,14 +393,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = "";
         if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.productCreatedSuccess"));
+        toast.success(t("alerts.productCreatedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to create product");
       }
     } catch (err) {
       console.error("Error creating product:", err);
-      alert(t("alerts.productCreateError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.productCreateError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -407,7 +408,7 @@ const AdminPanel = () => {
 
   const handleEditProduct = async (product) => {
     if (!product?._id) {
-      alert(t("validation.invalidProductSelected"));
+      toast.error(t("validation.invalidProductSelected"));
       return;
     }
 
@@ -423,13 +424,14 @@ const AdminPanel = () => {
           serial: productData.serial || "",
           section: productData.section?._id || productData.section || "",
           price: productData.price?.toString() || "",
-          discountPercentage: productData.discountPercentage?.toString() || "",
+          priceAfterDiscount: productData.priceAfterDiscount?.toString() || "",
           paymentNumber: productData.paymentNumber || "",
           thumbnail: null,
           sample: null,
           gallery: productData.gallery || [],
           whatsAppNumber: productData.whatsAppNumber || "",
           description: productData.description || "",
+          subject: productData.subject?._id || productData.subject || "",
         });
         setShowEditProductModal(true);
       } else {
@@ -437,7 +439,7 @@ const AdminPanel = () => {
       }
     } catch (err) {
       console.error("Error fetching product details:", err);
-      alert(t("alerts.productFetchError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.productFetchError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -491,14 +493,14 @@ const AdminPanel = () => {
         if (thumbnailInput) thumbnailInput.value = "";
         if (sampleInput) sampleInput.value = "";
 
-        alert(t("alerts.productUpdatedSuccess"));
+        toast.success(t("alerts.productUpdatedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to update product");
       }
     } catch (err) {
       console.error("Error updating product:", err);
-      alert(t("alerts.productUpdateError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.productUpdateError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -514,14 +516,14 @@ const AdminPanel = () => {
       if (response?.status === "success" || response) {
         setShowDeleteProductModal(false);
         setProductToDelete(null);
-        alert(t("alerts.productDeletedSuccess"));
+        toast.success(t("alerts.productDeletedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to delete product");
       }
     } catch (err) {
       console.error("Error deleting product:", err);
-      alert(t("alerts.productDeleteError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.productDeleteError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -530,7 +532,7 @@ const AdminPanel = () => {
   const handleCreateSection = async (e) => {
     e.preventDefault();
     if (!sectionForm.name || !sectionForm.description || !sectionForm.number) {
-      alert(t("alerts.fillRequiredFields"));
+      toast.warning(t("alerts.fillRequiredFields"));
       return;
     }
 
@@ -552,14 +554,14 @@ const AdminPanel = () => {
           thumbnail: "logo",
           allowedFor: [],
         });
-        alert(t("alerts.sectionCreatedSuccess"));
+        toast.success(t("alerts.sectionCreatedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to create section");
       }
     } catch (err) {
       console.error("Error creating section:", err);
-      alert(t("alerts.sectionCreateError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.sectionCreateError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -568,7 +570,7 @@ const AdminPanel = () => {
   const handleCreateSubSection = async (e) => {
     e.preventDefault();
     if (!subSectionForm.name || !subSectionForm.section) {
-      alert(t("alerts.fillRequiredFields"));
+      toast.warning(t("alerts.fillRequiredFields"));
       return;
     }
 
@@ -584,7 +586,7 @@ const AdminPanel = () => {
           name: "",
           section: "",
         });
-        alert(
+        toast.success(
           t("alerts.subSectionCreatedSuccess") ||
             "SubSection created successfully"
         );
@@ -594,7 +596,7 @@ const AdminPanel = () => {
       }
     } catch (err) {
       console.error("Error creating subsection:", err);
-      alert(
+      toast.error(
         t("alerts.subSectionCreateError") + (err?.message || "Unknown error")
       );
     } finally {
@@ -604,7 +606,7 @@ const AdminPanel = () => {
 
   const handleEditSection = (section) => {
     if (!section?._id) {
-      alert(t("validation.invalidSectionSelected"));
+      toast.error(t("validation.invalidSectionSelected"));
       return;
     }
 
@@ -640,14 +642,14 @@ const AdminPanel = () => {
           number: "",
           thumbnail: "logo",
         });
-        alert(t("alerts.sectionUpdatedSuccess"));
+        toast.success(t("alerts.sectionUpdatedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to update section");
       }
     } catch (err) {
       console.error("Error updating section:", err);
-      alert(t("alerts.sectionUpdateError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.sectionUpdateError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -663,14 +665,14 @@ const AdminPanel = () => {
       if (response?.status === "success" || response) {
         setShowDeleteModal(false);
         setSectionToDelete(null);
-        alert(t("alerts.sectionDeletedSuccess"));
+        toast.success(t("alerts.sectionDeletedSuccess"));
         await refetch();
       } else {
         throw new Error(response?.error || "Failed to delete section");
       }
     } catch (err) {
       console.error("Error deleting section:", err);
-      alert(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"));
+      toast.error(t("alerts.sectionDeleteError") + (err?.message || "Unknown error"));
     } finally {
       setActionLoading(false);
     }
@@ -678,7 +680,7 @@ const AdminPanel = () => {
 
   const handleEditSubSection = (subSection) => {
     if (!subSection?._id) {
-      alert(
+      toast.error(
         t("validation.invalidSubSectionSelected") ||
           "Invalid subsection selected"
       );
@@ -711,7 +713,7 @@ const AdminPanel = () => {
           name: "",
           section: "",
         });
-        alert(
+        toast.success(
           t("alerts.subSectionUpdatedSuccess") ||
             "SubSection updated successfully"
         );
@@ -721,7 +723,7 @@ const AdminPanel = () => {
       }
     } catch (err) {
       console.error("Error updating subsection:", err);
-      alert(
+      toast.error(
         t("alerts.subSectionUpdateError") + (err?.message || "Unknown error")
       );
     } finally {
@@ -739,7 +741,7 @@ const AdminPanel = () => {
       if (response?.status === "success" || response) {
         setShowDeleteSubSectionModal(false);
         setSubSectionToDelete(null);
-        alert(
+        toast.success(
           t("alerts.subSectionDeletedSuccess") ||
             "SubSection deleted successfully"
         );
@@ -749,7 +751,7 @@ const AdminPanel = () => {
       }
     } catch (err) {
       console.error("Error deleting subsection:", err);
-      alert(
+      toast.error(
         t("alerts.subSectionDeleteError") + (err?.message || "Unknown error")
       );
     } finally {
@@ -815,10 +817,10 @@ const AdminPanel = () => {
         type: getExportTypeLabel(typeKey, count),
       });
 
-      alert(successMessage);
+      toast.success(successMessage);
     } catch (error) {
       console.error("Export XLSX error:", error);
-      alert(t("export.error"));
+      toast.error(t("export.error"));
     } finally {
       setIsExporting(false);
     }

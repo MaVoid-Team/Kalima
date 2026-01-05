@@ -7,6 +7,7 @@ import { getAuditLogs } from "../../../routes/auditlog"
 import { useTranslation } from "react-i18next"
 import { getAuditLogsByEmail } from "../../../routes/auditlog"
 import * as XLSX from 'xlsx';
+import { toast } from "sonner";
 
 const AuditLog = () => {
   const { t, i18n } = useTranslation("admin")
@@ -70,23 +71,34 @@ const AuditLog = () => {
   }, [page, limit, filters])
 
   const handleSearchByEmail = async () => {
-    if (!filters.email || filters.email.trim() === "") return
+    if (!filters.email || filters.email.trim() === "") {
+      toast.warning(t("admin.auditlog.search.enterEmail"))
+      return
+    }
 
     setLoading(true)
     try {
       const response = await getAuditLogsByEmail(filters.email.trim())
 
       if (response.status === "success") {
-        setLogs(response.data.logs || [])
+        const logsFound = response.data.logs || []
+        setLogs(logsFound)
         setPage(1)
         setError(null)
+        if (logsFound.length > 0) {
+          toast.success(t("admin.auditlog.search.found", { count: logsFound.length }))
+        } else {
+          toast.info(t("admin.auditlog.search.noResults"))
+        }
       } else {
         setLogs([])
         setError(response.error)
+        toast.error(t("admin.auditlog.search.error"))
       }
     } catch (e) {
       setLogs([])
       setError("Error searching by email")
+      toast.error(t("admin.auditlog.search.error"))
     } finally {
       setLoading(false)
     }
@@ -176,7 +188,7 @@ const AuditLog = () => {
       const dataToExport = exportAll ? await fetchAllLogs() : logs
 
       if (dataToExport.length === 0) {
-        alert(t("admin.auditlog.export.noData"))
+        toast.warning(t("admin.auditlog.export.noData"))
         return
       }
 
@@ -207,10 +219,16 @@ const AuditLog = () => {
       
       // Save the file
       XLSX.writeFile(workbook, filename)
-      
+
+      // Show success message
+      const successMessage = exportAll
+        ? t("admin.auditlog.export.successAll", { count: dataToExport.length })
+        : t("admin.auditlog.export.successFiltered", { count: dataToExport.length })
+      toast.success(successMessage)
+
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.auditlog.export.error"))
+      toast.error(t("admin.auditlog.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -223,7 +241,7 @@ const AuditLog = () => {
       const dataToExport = exportAll ? await fetchAllLogs() : logs
 
       if (dataToExport.length === 0) {
-        alert(t("admin.auditlog.export.noData"))
+        toast.warning(t("admin.auditlog.export.noData"))
         return
       }
 
@@ -251,11 +269,11 @@ const AuditLog = () => {
           ? t("admin.auditlog.export.successAll", { count: dataToExport.length })
           : t("admin.auditlog.export.successFiltered", { count: dataToExport.length })
 
-        alert(successMessage)
+        toast.success(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.auditlog.export.error"))
+      toast.error(t("admin.auditlog.export.error"))
     } finally {
       setIsExporting(false)
     }
@@ -268,7 +286,7 @@ const AuditLog = () => {
       const dataToExport = exportAll ? await fetchAllLogs() : logs
 
       if (dataToExport.length === 0) {
-        alert(t("admin.auditlog.export.noData"))
+        toast.warning(t("admin.auditlog.export.noData"))
         return
       }
 
@@ -327,11 +345,11 @@ const AuditLog = () => {
           ? t("admin.auditlog.export.successAll", { count: dataToExport.length })
           : t("admin.auditlog.export.successFiltered", { count: dataToExport.length })
 
-        alert(successMessage)
+        toast.success(successMessage)
       }
     } catch (error) {
       console.error("Export error:", error)
-      alert(t("admin.auditlog.export.error"))
+      toast.error(t("admin.auditlog.export.error"))
     } finally {
       setIsExporting(false)
     }
