@@ -90,11 +90,13 @@
     "invalidCoupon": "كوبون غير صالح أو منتهي الصلاحية.",
     "invalidDiscountValue": "قيمة الخصم المستلمة من الخادم غير صالحة.",
     "productDataNotLoaded": "بيانات المنتج غير محملة.",
-    "unknownError": "حدث خطأ غير معروف"
+    "unknownError": "حدث خطأ غير معروف",
+    "addToCartFailed": "فشل في الإضافة إلى السلة"
   },
   "success": {
     "purchaseSubmitted": "تم إرسال الشراء بنجاح!",
-    "couponApplied": "تم تطبيق الكوبون بنجاح!"
+    "couponApplied": "تم تطبيق الكوبون بنجاح!",
+    "addedToCart": "تمت الإضافة إلى السلة بنجاح!"
   },
   "logs": {
     "submittingPurchase": "جاري إرسال الشراء مع الملف:"

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Upload, X, FileText, ImageIcon } from "lucide-react";
+import { toast } from "sonner";
 import EnhancedProgressBar from "../../../components/EnhancedProgressBar";
 import { useFormProgress } from "./useFormProgress";
 import { simulateFileUpload } from "../../../routes/uploadService";
@@ -191,7 +192,7 @@ const EnhancedAdminForms = ({
     if (formType === "Product" || formType === "Book") {
       const currentForm = formType === "Product" ? productForm : bookForm;
       if (!currentForm?.subSection || currentForm.subSection === "") {
-        alert(
+        toast.error(
           t("alerts.fillRequiredFields") ||
             "Please select a subsection before creating the " +
               formType.toLowerCase()

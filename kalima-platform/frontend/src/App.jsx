@@ -3,7 +3,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import NavBar from "./components/navbar";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
@@ -12,44 +12,84 @@ import { useTranslation } from "react-i18next";
 import Overlay from "./pages/KalimaStore/Components/overlay";
 
 // Lazy load components
-const AuditLog = lazy(() => import("./pages/User Dashboard/Admin dashboard/auditLog"))
-const AdminDashboard = lazy(() => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"))
-const CourseDetails = lazy(() => import("./pages/CourseDetails"))
-const LecturesPage = lazy(() => import("./pages/lectures"))
-const TeacherLogin = lazy(() => import("./pages/Login/login"))
-const Footer = lazy(() => import("./components/footer"))
-const CoursesPage = lazy(() => import("./pages/courses"))
-const RegisterStudent = lazy(() => import("./pages/signup/StudentRegistration"))
-const Teachers = lazy(() => import("./pages/Teachers"))
-const TeacherDetails = lazy(() => import("./pages/teacher details/Teacher-details"))
-const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"))
-const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"))
-const Services = lazy(() => import("./pages/Services/Services"))
-const DashboardPage = lazy(() => import("./pages/Lecturer Dashboard/LecturerDashboard"))
-const ContainersPage = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerPage"))
-const ContainerDetails = lazy(() => import("./pages/User Dashboard/Lecture Page/ContainerDetails"))
-const LectureDisplay = lazy(() => import("./pages/User Dashboard/Lecture Page/LectureDisplay"))
-const AssistantPage = lazy(() => import("./pages/User Dashboard/assistantPage/assistantPage"))
-const CoursesDashboard = lazy(() => import("./pages/CoursesDashboard/CoursesDashboard"))
-const CenterDashboard = lazy(() => import("./pages/CenterDashboard/CenterDashboard"))
-const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"))
-const PackageDetails = lazy(() => import("./pages/Packages Page/packageDetails"))
-const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"))
-const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"))
-const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"))
-const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"))
-const LessonDetailsSection = lazy(() => import("./pages/CenterDashboard/LessonDetails"))
-const AdminCreate = lazy(() => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"))
-const MyLecturesPage = lazy(() => import("./pages/User Dashboard/Lecture Page/LecturesPage"))
-const DetailedLectureView = lazy(() => import ("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"))
+const AuditLog = lazy(() =>
+  import("./pages/User Dashboard/Admin dashboard/auditLog")
+);
+const AdminDashboard = lazy(() =>
+  import("./pages/User Dashboard/Admin dashboard/home/adminDashboard")
+);
+const CourseDetails = lazy(() => import("./pages/CourseDetails"));
+const LecturesPage = lazy(() => import("./pages/lectures"));
+const TeacherLogin = lazy(() => import("./pages/Login/login"));
+const Footer = lazy(() => import("./components/footer"));
+const CoursesPage = lazy(() => import("./pages/courses"));
+const RegisterStudent = lazy(() =>
+  import("./pages/signup/StudentRegistration")
+);
+const Teachers = lazy(() => import("./pages/Teachers"));
+const TeacherDetails = lazy(() =>
+  import("./pages/teacher details/Teacher-details")
+);
+const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"));
+const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"));
+const Services = lazy(() => import("./pages/Services/Services"));
+const DashboardPage = lazy(() =>
+  import("./pages/Lecturer Dashboard/LecturerDashboard")
+);
+const ContainersPage = lazy(() =>
+  import("./pages/User Dashboard/Lecture Page/ContainerPage")
+);
+const ContainerDetails = lazy(() =>
+  import("./pages/User Dashboard/Lecture Page/ContainerDetails")
+);
+const LectureDisplay = lazy(() =>
+  import("./pages/User Dashboard/Lecture Page/LectureDisplay")
+);
+const AssistantPage = lazy(() =>
+  import("./pages/User Dashboard/assistantPage/assistantPage")
+);
+const CoursesDashboard = lazy(() =>
+  import("./pages/CoursesDashboard/CoursesDashboard")
+);
+const CenterDashboard = lazy(() =>
+  import("./pages/CenterDashboard/CenterDashboard")
+);
+const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"));
+const PackageDetails = lazy(() =>
+  import("./pages/Packages Page/packageDetails")
+);
+const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"));
+const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"));
+const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"));
+const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"));
+const LessonDetailsSection = lazy(() =>
+  import("./pages/CenterDashboard/LessonDetails")
+);
+const AdminCreate = lazy(() =>
+  import("./pages/User Dashboard/Admin dashboard/AddNewStuff")
+);
+const MyLecturesPage = lazy(() =>
+  import("./pages/User Dashboard/Lecture Page/LecturesPage")
+);
+const DetailedLectureView = lazy(() =>
+  import("./pages/User Dashboard/Lecture Page/DetailedLectureViewing")
+);
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
 const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
 const CartPage = lazy(() => import("./pages/KalimaStore/CartPage"));
-const AdminPanel = lazy(() => import("./pages/KalimaStore/AdminPanel/AdminPanel"));
-const SignedLecturers = lazy(() => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"));
+const DirectCheckout = lazy(() => import("./pages/KalimaStore/DirectCheckout"));
+const MyOrders = lazy(() => import("./pages/KalimaStore/MyOrders"));
+const AdminPanel = lazy(() =>
+  import("./pages/KalimaStore/AdminPanel/AdminPanel")
+);
+const SignedLecturers = lazy(() =>
+  import("./pages/User Dashboard/Admin dashboard/signed-lecturers")
+);
 const StoreAnalytics = lazy(() => import("./pages/KalimaStore/storeAnalytics"));
-const ConfirmedOrdersReport = lazy(() => import("./pages/KalimaStore/ConfirmedOrdersReport"));
+const ConfirmedOrdersReport = lazy(() =>
+  import("./pages/KalimaStore/ConfirmedOrdersReport")
+);
 
 function App() {
   const location = useLocation();
@@ -93,28 +133,10 @@ function App() {
   return (
     <div className={`App ${isRTL ? "rtl" : "ltr"}`}>
       <Toaster
-        position={isRTL ? "top-left" : "top-right"}
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#4ade80',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
+        position="top-left"
+        duration={2000}
+        richColors
+        dir={isRTL ? "rtl" : "ltr"}
       />
       <NavBar
         showSidebarToggle={showSidebar}
@@ -172,8 +194,13 @@ function App() {
             <Route path="/teachers" element={<Teachers />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/market" element={<Market />} />
-            <Route path="/market/product-details/:type/:id" element={<ProductDetails />} />
+            <Route
+              path="/market/product-details/:type/:id"
+              element={<ProductDetails />}
+            />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<DirectCheckout />} />
+            <Route path="/my-orders" element={<MyOrders />} />
 
             {/* Authentication Routes */}
             <Route path="/login" element={<TeacherLogin />} />
@@ -229,11 +256,23 @@ function App() {
             <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             {/* Assistant Routes */}
-            <Route path="/dashboard/assistant-page" element={<AssistantPage />} />
-            <Route path="/dashboard/assistant-page/lectures-page" element={<MyLecturesPage />} />
-            <Route path="/dashboard/assistant-page/detailed-lecture-view/:lectureId" element={<DetailedLectureView />} />
-            <Route path="/dashboard/assistant-page/lecture-display/:lectureId" element={<LectureDisplay />} />
-            
+            <Route
+              path="/dashboard/assistant-page"
+              element={<AssistantPage />}
+            />
+            <Route
+              path="/dashboard/assistant-page/lectures-page"
+              element={<MyLecturesPage />}
+            />
+            <Route
+              path="/dashboard/assistant-page/detailed-lecture-view/:lectureId"
+              element={<DetailedLectureView />}
+            />
+            <Route
+              path="/dashboard/assistant-page/lecture-display/:lectureId"
+              element={<LectureDisplay />}
+            />
+
             {/* Admin Routes */}
             <Route
               path="/dashboard/admin-dashboard"

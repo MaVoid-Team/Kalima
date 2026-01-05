@@ -10,7 +10,7 @@ import { LoadingSpinner } from "../components/LoadingSpinner"
 import { ErrorAlert } from "../components/ErrorAlert"
 import { LectureCard } from "../components/lectureCard"
 import { motion, AnimatePresence } from "framer-motion"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 
 export default function LecturesPage() {
   const [lectures, setLectures] = useState([])

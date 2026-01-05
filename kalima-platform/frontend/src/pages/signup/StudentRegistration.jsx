@@ -10,7 +10,7 @@ import StepTeacher from "./StepTeacher";
 import Step4 from "./Step4";
 import StepsIndicator from "./StepsIndicator";
 import NavigationButtons from "./NavigationButtons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import RoleSelectionModal from "./RoleSelctionModal";
 import { getAllLevels } from "../../routes/levels";
@@ -39,6 +39,8 @@ export default function StudentRegistration() {
   const { t, i18n } = useTranslation("register");
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [role, setRole] = useState("student");
   const [isAnyTeacherFieldFilled, setIsAnyTeacherFieldFilled] = useState(false);
   const [formData, setFormData] = useState({
@@ -437,7 +439,11 @@ useEffect(() => {
         },
       });
 
-      navigate("/login", {
+      // Redirect to login with the original redirect URL preserved
+      const loginUrl = redirectTo
+        ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+        : "/login";
+      navigate(loginUrl, {
         state: { message: "Registration successful" },
       });
     } catch (error) {

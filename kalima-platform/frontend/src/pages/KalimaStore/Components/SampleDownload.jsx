@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 const SampleDownload = ({ sample, title, type, isRTL }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
@@ -45,7 +46,7 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
       window.URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Download failed:", error)
-      alert("Failed to download sample. Please try again.")
+      toast.error(t("downloadFailed") || "فشل في التحميل. حاول مرة أخرى.")
     } finally {
       setDownloadLoading(false)
     }
@@ -107,19 +108,6 @@ const SampleDownload = ({ sample, title, type, isRTL }) => {
             )}
           </button>
 
-          <div className="alert alert-info mt-4">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="text-sm">
-              {t("sample.fileWillBeDownloadedAs", { filename: title.replace(/[^a-z0-9]/gi, "_").toLowerCase() + "_sample.pdf" })}
-            </span>
-          </div>
         </div>
       </div>
     </div>

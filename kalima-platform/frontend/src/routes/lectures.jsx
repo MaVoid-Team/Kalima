@@ -1,4 +1,5 @@
 import axios from "axios"
+import { toast } from "sonner"
 import { getToken, isLoggedIn } from "./auth-services"
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -385,7 +386,7 @@ export const deleteContainerById = async (containerId) => {
       },
     })
     if (response.status === 200) {
-      alert(`Container ${containerId} deleted successfully`)
+      toast.success("تم حذف الحاوية بنجاح")
     }
     return response.data
   } catch (error) {

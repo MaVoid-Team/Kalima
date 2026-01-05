@@ -6,6 +6,7 @@ import {
   createUser,
 } from "../../../../routes/fetch-users";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
   FaSync,
   FaWhatsapp,
@@ -129,7 +130,7 @@ const UserManagementTable = () => {
       if (response.success) {
         // Refresh users data after successful recalculation
         await fetchUsers();
-        alert(
+        toast.success(
           t("admin.invites.refreshSuccess") || "Invites refreshed successfully!"
         );
       } else {
@@ -138,7 +139,7 @@ const UserManagementTable = () => {
             t("admin.invites.refreshError") ||
             "Error calculating invites data"
         );
-        alert(
+        toast.error(
           response.message ||
             t("admin.invites.refreshError") ||
             "Error calculating invites data"
@@ -152,7 +153,7 @@ const UserManagementTable = () => {
         t("admin.invites.refreshError") ||
         "Error calculating invites data";
       setError(errorMessage);
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsRecalculating(false);
     }
@@ -208,11 +209,14 @@ const UserManagementTable = () => {
       const result = await deleteUser(userId);
       if (result.success) {
         setUsers((prev) => prev.filter((u) => u._id !== userId));
+        toast.success(t("admin.deleteSuccess") || "تم حذف المستخدم بنجاح");
       } else {
         setError(result.error);
+        toast.error(result.error || t("admin.deleteError") || "فشل في حذف المستخدم");
       }
     } catch (error) {
       setError(error.message);
+      toast.error(error.message || t("admin.deleteError") || "فشل في حذف المستخدم");
     }
   };
 
@@ -224,11 +228,13 @@ const UserManagementTable = () => {
         setUsers((prev) => [...prev, result.data]);
         setShowCreateModal(false);
         fetchUsers(); // Refresh users after creation
+        toast.success(t("admin.createSuccess") || "تم إنشاء المستخدم بنجاح");
       } else {
         throw new Error(result.error);
       }
     } catch (error) {
       setError(error.message);
+      toast.error(error.message || t("admin.createError") || "فشل في إنشاء المستخدم");
     }
   };
 
@@ -260,7 +266,7 @@ const UserManagementTable = () => {
   // Open WhatsApp modal
   const openWhatsappModal = (phoneNumber, userName) => {
     if (!phoneNumber) {
-      alert(t("admin.noPhoneNumber"));
+      toast.warning(t("admin.noPhoneNumber"));
       return;
     }
     setWhatsappModal({
@@ -346,12 +352,11 @@ const UserManagementTable = () => {
         const successMessage = exportAll
           ? t("admin.export.successAll", { count: dataToExport.length })
           : t("admin.export.successFiltered", { count: dataToExport.length });
-        // You can replace this with a toast notification if you have one
-        alert(successMessage);
+        toast.success(successMessage);
       }
     } catch (error) {
       console.error("Export error:", error);
-      alert(t("admin.export.error"));
+      toast.error(t("admin.export.error"));
     } finally {
       setIsExporting(false);
     }
@@ -399,11 +404,11 @@ const UserManagementTable = () => {
         const successMessage = exportAll
           ? t("admin.export.successAll", { count: dataToExport.length })
           : t("admin.export.successFiltered", { count: dataToExport.length });
-        alert(successMessage);
+        toast.success(successMessage);
       }
     } catch (error) {
       console.error("Export error:", error);
-      alert(t("admin.export.error"));
+      toast.error(t("admin.export.error"));
     } finally {
       setIsExporting(false);
     }
@@ -421,10 +426,10 @@ const UserManagementTable = () => {
         ? `all-users-${timestamp}.xlsx`
         : `filtered-users-${timestamp}.xlsx`;
       XLSX.writeFile(workbook, filename);
-      alert(t("admin.export.successXLSX", { count: dataToExport.length }));
+      toast.success(t("admin.export.successXLSX", { count: dataToExport.length }));
     } catch (error) {
       console.error("Export error:", error);
-      alert(t("admin.export.error"));
+      toast.error(t("admin.export.error"));
     } finally {
       setIsExporting(false);
     }

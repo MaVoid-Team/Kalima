@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import {
   getAllStats,
   getProductStats,
@@ -48,7 +49,9 @@ const StoreAnalytics = () => {
   const [paymentMethodForm, setPaymentMethodForm] = useState({
     name: "",
     phoneNumber: "",
+    paymentMethodImg: null,
   });
+  const [imagePreview, setImagePreview] = useState(null);
   const [editingPaymentMethod, setEditingPaymentMethod] = useState(null);
   const [openEditPopup, setOpenEditPopup] = useState(false);
   const [paymentErrors, setPaymentErrors] = useState({});
@@ -527,7 +530,7 @@ const StoreAnalytics = () => {
     fetchPaymentMethods();
   }, [fetchPaymentMethods]);
 
-  const validatePaymentMethod = () => {
+  const validatePaymentMethod = (isCreate = false) => {
     const newErrors = {};
     if (!paymentMethodForm.name?.trim()) {
       newErrors.name = isRTL ? "الاسم مطلوب" : "Name is required";
@@ -541,20 +544,37 @@ const StoreAnalytics = () => {
         ? "رقم الهاتف غير صحيح"
         : "Invalid phone number";
     }
+    if (isCreate && !paymentMethodForm.paymentMethodImg) {
+      newErrors.paymentMethodImg = isRTL
+        ? "صورة طريقة الدفع مطلوبة"
+        : "Payment method image is required";
+    }
     setPaymentErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPaymentMethodForm((prev) => ({
+        ...prev,
+        paymentMethodImg: file,
+      }));
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleCreatePaymentMethod = async (e) => {
     e.preventDefault();
-    if (!validatePaymentMethod()) return;
+    if (!validatePaymentMethod(true)) return;
 
     try {
       setActionLoading(true);
       const res = await createPaymentMethod(paymentMethodForm);
       if (res?.status === "success") {
-        setPaymentMethodForm({ name: "", phoneNumber: "" });
-        alert(
+        setPaymentMethodForm({ name: "", phoneNumber: "", paymentMethodImg: null });
+        setImagePreview(null);
+        toast.success(
           isRTL
             ? "تم إنشاء طريقة الدفع بنجاح"
             : "Payment method created successfully"
@@ -565,7 +585,7 @@ const StoreAnalytics = () => {
       }
     } catch (err) {
       console.error(err);
-      alert(err?.message || "Error creating payment method");
+      toast.error(err?.message || (isRTL ? "خطأ في إنشاء طريقة الدفع" : "Error creating payment method"));
     } finally {
       setActionLoading(false);
     }
@@ -573,18 +593,24 @@ const StoreAnalytics = () => {
 
   const handleUpdatePaymentMethod = async (e) => {
     e.preventDefault();
-    if (!editingPaymentMethod?._id || !validatePaymentMethod()) return;
+    if (!editingPaymentMethod?._id || !validatePaymentMethod(false)) return;
 
     try {
       setActionLoading(true);
       await updatePaymentMethod(editingPaymentMethod._id, paymentMethodForm);
       setEditingPaymentMethod(null);
-      setPaymentMethodForm({ name: "", phoneNumber: "" });
+      setPaymentMethodForm({ name: "", phoneNumber: "", paymentMethodImg: null });
+      setImagePreview(null);
       setOpenEditPopup(false);
+      toast.success(
+        isRTL
+          ? "تم تحديث طريقة الدفع بنجاح"
+          : "Payment method updated successfully"
+      );
       fetchPaymentMethods();
     } catch (err) {
       console.error(err);
-      alert(err?.message || "Error updating payment method");
+      toast.error(err?.message || (isRTL ? "خطأ في تحديث طريقة الدفع" : "Error updating payment method"));
     } finally {
       setActionLoading(false);
     }
@@ -603,12 +629,12 @@ const StoreAnalytics = () => {
       setActionLoading(true);
       const res = await deletePaymentMethod(method._id);
       if (res?.status === "success") {
-        alert(isRTL ? "تم حذف طريقة الدفع بنجاح" : "Payment method deleted successfully");
+        toast.success(isRTL ? "تم حذف طريقة الدفع بنجاح" : "Payment method deleted successfully");
         fetchPaymentMethods();
       }
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || "Error deleting payment method");
+      toast.error(err?.response?.data?.message || (isRTL ? "خطأ في حذف طريقة الدفع" : "Error deleting payment method"));
     } finally {
       setActionLoading(false);
     }
@@ -624,7 +650,7 @@ const StoreAnalytics = () => {
       }
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || "Failed to change status");
+      toast.error(err?.response?.data?.message || (isRTL ? "فشل في تغيير الحالة" : "Failed to change status"));
     } finally {
       setActionLoading(false);
     }
@@ -634,15 +660,23 @@ const StoreAnalytics = () => {
     setPaymentMethodForm({
       name: method.name,
       phoneNumber: method.phoneNumber,
+      paymentMethodImg: null,
     });
     setEditingPaymentMethod(method);
+    // Show existing image as preview
+    if (method.paymentMethodImg) {
+      setImagePreview(`${import.meta.env.VITE_API_URL}/${method.paymentMethodImg.replace(/\\/g, "/")}`);
+    } else {
+      setImagePreview(null);
+    }
     setOpenEditPopup(true);
   };
 
   const closeEditPaymentMethod = () => {
     setOpenEditPopup(false);
     setEditingPaymentMethod(null);
-    setPaymentMethodForm({ name: "", phoneNumber: "" });
+    setPaymentMethodForm({ name: "", phoneNumber: "", paymentMethodImg: null });
+    setImagePreview(null);
     setPaymentErrors({});
   };
 
@@ -1496,6 +1530,37 @@ const StoreAnalytics = () => {
                 </div>
               </div>
 
+              {/* Image Upload */}
+              <div className="mt-4">
+                <label className="label">
+                  <span className="label-text font-medium">
+                    {isRTL ? "صورة طريقة الدفع" : "Payment Method Image"} *
+                  </span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={`file-input file-input-bordered w-full ${
+                    paymentErrors.paymentMethodImg ? "file-input-error" : ""
+                  }`}
+                  onChange={handleImageChange}
+                />
+                {paymentErrors.paymentMethodImg && (
+                  <p className="text-error text-sm mt-1">
+                    {paymentErrors.paymentMethodImg}
+                  </p>
+                )}
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-24 h-24 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
@@ -1527,6 +1592,7 @@ const StoreAnalytics = () => {
             <table className="table w-full">
               <thead>
                 <tr>
+                  <th className="text-center">{isRTL ? "الصورة" : "Image"}</th>
                   <th className="text-center">{isRTL ? "الاسم" : "Name"}</th>
                   <th className="text-center">
                     {isRTL ? "رقم الهاتف" : "Phone Number"}
@@ -1543,7 +1609,7 @@ const StoreAnalytics = () => {
               <tbody>
                 {paymentMethods.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-8 text-gray-500">
+                    <td colSpan="6" className="text-center py-8 text-gray-500">
                       {isRTL
                         ? "لا توجد طرق دفع متاحة"
                         : "No payment methods available"}
@@ -1552,6 +1618,25 @@ const StoreAnalytics = () => {
                 ) : (
                   paymentMethods.map((method) => (
                     <tr key={method._id}>
+                      <td className="text-center">
+                        <div className="flex justify-center">
+                          {method.paymentMethodImg ? (
+                            <div className="avatar">
+                              <div className="w-12 h-12 rounded-lg">
+                                <img
+                                  src={`${import.meta.env.VITE_API_URL}/${method.paymentMethodImg.replace(/\\/g, "/")}`}
+                                  alt={method.name}
+                                  className="object-cover"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 bg-base-200 rounded-lg flex items-center justify-center">
+                              <CreditCard className="w-6 h-6 text-base-content/50" />
+                            </div>
+                          )}
+                        </div>
+                      </td>
                       <td className="text-center font-medium">
                         {method.name || "-"}
                       </td>
@@ -1682,6 +1767,30 @@ const StoreAnalytics = () => {
                   <p className="text-error text-sm mt-1">
                     {paymentErrors.phoneNumber}
                   </p>
+                )}
+              </div>
+
+              {/* Image Upload in Edit Modal */}
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">
+                    {isRTL ? "صورة طريقة الدفع" : "Payment Method Image"}
+                  </span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="file-input file-input-bordered w-full"
+                  onChange={handleImageChange}
+                />
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-24 h-24 object-cover rounded-lg border"
+                    />
+                  </div>
                 )}
               </div>
 

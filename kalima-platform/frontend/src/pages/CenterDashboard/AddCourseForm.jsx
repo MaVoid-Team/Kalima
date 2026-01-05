@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PlusCircle, ChevronDown, X } from 'lucide-react';
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { addNewLesson } from "../../routes/center";
 import { getAllSubjects } from "../../routes/courses";
 import { getAllLevels } from "../../routes/levels";
@@ -90,7 +91,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
       const response = await addNewLesson(payload);
 
       if (response.status === "success") {
-        alert(t('addCourseForm.successMessage'));
+        toast.success(t('addCourseForm.successMessage'));
         setFormData({
           subject: "",
           lecturer: "",
