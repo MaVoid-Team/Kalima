@@ -47,35 +47,70 @@ const productSchema = new mongoose.Schema(
 
 // Middleware to calculate discountPercentage from price and priceAfterDiscount
 productSchema.pre("save", function (next) {
+    this.calculateDiscount();
+    next();
+});
+
+// Calculate discount helper
+productSchema.methods.calculateDiscount = function () {
     if (this.price && this.priceAfterDiscount !== undefined && this.price !== 0) {
         this.discountPercentage = Math.round(((this.price - this.priceAfterDiscount) / this.price) * 100);
     } else {
         this.discountPercentage = 0;
     }
-    next();
-});
+};
 
-productSchema.pre("findOneAndUpdate", function (next) {
+// Handle updates with pre-hook
+productSchema.pre(/^findOneAndUpdate|^findByIdAndUpdate|^updateOne|^updateMany/, async function (next) {
     const update = this.getUpdate();
-    let price = update.price;
-    let priceAfterDiscount = update.priceAfterDiscount;
-    if (update.$set) {
-        price = update.$set.price !== undefined ? update.$set.price : price;
-        priceAfterDiscount = update.$set.priceAfterDiscount !== undefined ? update.$set.priceAfterDiscount : priceAfterDiscount;
-    }
-    this.model.findOne(this.getQuery()).then((doc) => {
-        const finalPrice = typeof price === "number" ? price : doc ? doc.price : 0;
-        const finalPriceAfterDiscount = typeof priceAfterDiscount === "number" ? priceAfterDiscount : doc ? doc.priceAfterDiscount : finalPrice;
-        let discount = 0;
-        if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
-            discount = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
-            ;
+    const updateObj = update.$set || update;
+
+    // Always calculate discount if price or priceAfterDiscount exists in update
+    if (updateObj.price !== undefined || updateObj.priceAfterDiscount !== undefined) {
+        try {
+            const doc = await this.model.findOne(this.getQuery());
+
+            if (!doc) {
+                // Try with filter as ID for findByIdAndUpdate
+                const filterId = this.getFilter()._id;
+                if (filterId) {
+                    const docById = await this.model.findById(filterId);
+                    if (docById) {
+                        const finalPrice = updateObj.price !== undefined ? updateObj.price : docById.price;
+                        const finalPriceAfterDiscount = updateObj.priceAfterDiscount !== undefined ? updateObj.priceAfterDiscount : docById.priceAfterDiscount;
+
+                        let discount = 0;
+                        if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
+                            discount = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+                        }
+
+                        if (update.$set) {
+                            update.$set.discountPercentage = discount;
+                        } else {
+                            update.discountPercentage = discount;
+                        }
+                    }
+                }
+            } else {
+                const finalPrice = updateObj.price !== undefined ? updateObj.price : doc.price;
+                const finalPriceAfterDiscount = updateObj.priceAfterDiscount !== undefined ? updateObj.priceAfterDiscount : doc.priceAfterDiscount;
+
+                let discount = 0;
+                if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
+                    discount = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+                }
+
+                if (update.$set) {
+                    update.$set.discountPercentage = discount;
+                } else {
+                    update.discountPercentage = discount;
+                }
+            }
+        } catch (error) {
+            console.error("Error in discount calculation middleware:", error);
         }
-        if (update.$set) update.$set.discountPercentage = discount;
-        else update.discountPercentage = discount;
-        this.setUpdate(update);
-        next();
-    });
+    }
+    next();
 });
 
 module.exports = mongoose.model("ECProduct", productSchema);

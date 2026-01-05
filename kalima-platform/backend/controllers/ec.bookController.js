@@ -91,8 +91,28 @@ exports.getECBookById = async (req, res) => {
 exports.updateECBook = async (req, res) => {
     try {
         const updateData = { ...req.body };
+        updateData.updatedBy = req.user._id;
+
+        // Get existing book to retrieve price values if not being updated
+        const existingBook = await ECBook.findById(req.params.id);
+        if (!existingBook) {
+            return res.status(404).json({ message: "ECBook not found" });
+        }
+
+        // Calculate discount percentage if price or priceAfterDiscount is being updated
+        const finalPrice = updateData.price !== undefined ? updateData.price : existingBook.price;
+        const finalPriceAfterDiscount = updateData.priceAfterDiscount !== undefined ? updateData.priceAfterDiscount : existingBook.priceAfterDiscount;
+
+        if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
+            updateData.discountPercentage = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+        } else {
+            updateData.discountPercentage = 0;
+        }
+
+        // Handle file uploads
         if (req.files?.thumbnail?.[0]) updateData.thumbnail = req.files.thumbnail[0].path;
         if (req.files?.sample?.[0]) updateData.sample = req.files.sample[0].path;
+
         // Handle gallery update
         if (req.files?.gallery) {
             updateData.gallery = req.files.gallery.map(file => file.path);
@@ -100,8 +120,10 @@ exports.updateECBook = async (req, res) => {
             // If gallery is sent as array or string in body
             updateData.gallery = Array.isArray(updateData.gallery) ? updateData.gallery : [updateData.gallery];
         }
+
         const book = await ECBook.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
         if (!book) return res.status(404).json({ message: "ECBook not found" });
+
         res.status(201).json({
             message: "Book updated successfully",
             data: { book }
