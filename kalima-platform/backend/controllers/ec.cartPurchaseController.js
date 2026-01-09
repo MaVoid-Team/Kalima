@@ -1018,6 +1018,52 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     });
 });
 
+exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
+    const purchaseId = req.params.purchaseId;
+    const itemId = req.params.itemId;
+    const purchase = await ECCartPurchase.findById(purchaseId);
+    if (!purchase) {
+        return next(new AppError("No purchase found with that ID", 404))
+    }
+    if (!purchase.items.id(itemId)) {
+        return next(new AppError("No item found with that ID in the purchase", 404))
+    }
+    if (purchase.items.length === 1) {
+        return next(new AppError("Cannot remove the last item from the purchase. Delete the entire purchase instead.", 400))
+    }
+
+    // Remove the item from the purchase
+    purchase.items.id(itemId).deleteOne();
+
+    // Recalculate subtotal based on remaining items
+    const newSubtotal = purchase.items.reduce((sum, item) => {
+        return sum + (item.priceAtPurchase || 0);
+    }, 0);
+
+    // Update purchase totals
+    purchase.subtotal = newSubtotal;
+
+    // Recalculate total (subtotal - discount)
+    purchase.total = Math.max(0, newSubtotal - (purchase.discount || 0));
+
+    // If no items left, clear the coupon as well
+    if (purchase.items.length === 0) {
+        purchase.couponCode = null;
+        purchase.discount = 0;
+        purchase.total = 0;
+    }
+
+    await purchase.save();
+    res.status(200).json({
+        status: "success",
+        message: "Item removed from purchase successfully",
+        data: {
+            purchase
+        }
+    });
+
+})
+
 exports.getMonthlyConfirmedPurchasesCount = catchAsync(async (req, res, next) => {
     // Get current month in Egypt timezone
     const now = getCurrentEgyptTime();
