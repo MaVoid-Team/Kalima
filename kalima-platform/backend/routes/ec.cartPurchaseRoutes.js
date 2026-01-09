@@ -82,4 +82,10 @@ router.route('/:id')
         cartPurchaseController.deletePurchase
     );
 
+router.route('/delete/:purchaseId/item/:itemId')
+    .delete(
+        authController.verifyRoles("Admin", "SubAdmin"),
+        cartPurchaseController.deleteItemFromPurchase
+    );
+
 module.exports = router;
