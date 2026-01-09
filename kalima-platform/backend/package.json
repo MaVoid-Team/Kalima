@@ -10,7 +10,8 @@
     "seed": "node scripts/seed.js",
     "seed:governments": "node utils/seeds/seedGovernments.js",
     "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js",
-    "backfill:monthly-count": "node scripts/backfillMonthlyConfirmedCount.js"
+    "backfill:monthly-count": "node scripts/backfillMonthlyConfirmedCount.js",
+    "backfill:user-purchase-stats": "node scripts/migrateUserPurchaseStats.js"
   },
   "keywords": [],
   "author": "",

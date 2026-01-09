@@ -91,6 +91,14 @@ const studentSchema = new mongoose.Schema(
       type: String, // local file path
       trim: true,
     },
+    numberOfPurchases: {
+      type: Number,
+      default: 0,
+    },
+    TotalSpentAmount: {
+      type: Number,
+      default: 0,
+    },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     successfulInvites: { type: Number, default: 0 },
     createdBy: {
