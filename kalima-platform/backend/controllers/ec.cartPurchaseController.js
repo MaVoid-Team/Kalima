@@ -268,7 +268,31 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
         console.error(`[CART PURCHASE NOTIFICATION ${requestId}] Failed to send admin notifications:`, err);
         // Don't fail the purchase if notifications fail
     }
+    // Update user statistics: increment purchase count and total spent
+    let updatedUser = await User.findById(req.user._id);
 
+    if (!updatedUser) {
+        // User doesn't exist, create with initial values
+        updatedUser = await User.create({
+            _id: req.user._id,
+            numberOfPurchases: 1,
+            TotalSpentAmount: cart.total
+        });
+    } else {
+        // User exists, increment the values
+        updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $inc: {
+                    numberOfPurchases: 1,
+                    TotalSpentAmount: cart.total
+                }
+            },
+            { new: true }
+        );
+    }
+
+    console.log(`[Purchase Created] User ${req.user._id}: numberOfPurchases=${updatedUser.numberOfPurchases}, TotalSpentAmount=${updatedUser.TotalSpentAmount}`);
     await cart.clear();
     // Return the created purchase
     res.status(201).json({
@@ -479,7 +503,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
             try {
                 // Use the raw string id (Mongoose accepts string ids); this avoids casting issues
                 const found = await ECCartPurchase.findById(searchTermString)
-                    .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+                    .populate({ path: 'createdBy', select: "name email role phoneNumber TotalSpentAmount numberOfPurchases" })
                     .populate({ path: 'confirmedBy', select: 'name' })
                     .populate({ path: 'receivedBy', select: 'name' })
                     .populate({ path: 'returnedBy', select: 'name' })
@@ -596,7 +620,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         if (resultIds.length > 0) {
             for (const id of resultIds) {
                 const doc = await ECCartPurchase.findById(id)
-                    .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+                    .populate({ path: 'createdBy', select: "name email role phoneNumber TotalSpentAmount numberOfPurchases" })
                     .populate({ path: 'confirmedBy', select: 'name' })
                     .populate({ path: 'receivedBy', select: 'name' })
                     .populate({ path: 'returnedBy', select: 'name' })
@@ -624,7 +648,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
     // No search — simple find with base filters
     const purchases = await ECCartPurchase.find(baseMatch)
-        .populate({ path: 'createdBy', select: "name email role phoneNumber" })
+        .populate({ path: 'createdBy', select: "name email role phoneNumber TotalSpentAmount numberOfPurchases" })
         .populate({ path: 'confirmedBy', select: 'name' })
         .populate({ path: 'receivedBy', select: 'name' })
         .populate({ path: 'returnedBy', select: 'name' })
@@ -1008,6 +1032,18 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
             }
         );
     }
+    // Update user statistics: decrement purchase count and total spent
+    const updatedUserAfterDelete = await User.findByIdAndUpdate(
+        purchase.createdBy,
+        {
+            $inc: {
+                numberOfPurchases: -1,
+                TotalSpentAmount: -purchase.total
+            }
+        },
+        { new: true }
+    );
+    console.log(`[Purchase Deleted] User ${purchase.createdBy}: numberOfPurchases=${updatedUserAfterDelete.numberOfPurchases}, TotalSpentAmount=${updatedUserAfterDelete.TotalSpentAmount}`);
 
     // Delete the purchase
     await ECCartPurchase.findByIdAndDelete(req.params.id);
@@ -1025,12 +1061,30 @@ exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
     if (!purchase) {
         return next(new AppError("No purchase found with that ID", 404))
     }
-    if (!purchase.items.id(itemId)) {
+
+    // Find the item to get its price before deletion
+    const itemToDelete = purchase.items.id(itemId);
+    if (!itemToDelete) {
         return next(new AppError("No item found with that ID in the purchase", 404))
     }
     if (purchase.items.length === 1) {
         return next(new AppError("Cannot remove the last item from the purchase. Delete the entire purchase instead.", 400))
     }
+
+    // Get the price of the item being deleted
+    const deletedItemPrice = itemToDelete.priceAtPurchase || 0;
+
+    // Update user's total spent amount by removing only the deleted item's price
+    const updatedUserAfterItemDelete = await User.findByIdAndUpdate(
+        purchase.createdBy,
+        {
+            $inc: {
+                TotalSpentAmount: -deletedItemPrice
+            }
+        },
+        { new: true }
+    );
+    console.log(`[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`);
 
     // Remove the item from the purchase
     purchase.items.id(itemId).deleteOne();

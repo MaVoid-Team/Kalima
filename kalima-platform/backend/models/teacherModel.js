@@ -121,6 +121,14 @@ const teacherSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    numberOfPurchases: {
+      type: Number,
+      default: 0,
+    },
+    TotalSpentAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

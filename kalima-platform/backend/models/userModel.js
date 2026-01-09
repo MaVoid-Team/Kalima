@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true }, // Added password field
     passwordChangedAt: Date,
     isEmailVerified: { type: Boolean, default: false },
+    numberOfPurchases: { type: Number, default: 0 },
+    TotalSpentAmount: { type: Number, default: 0 },
+    monthlyConfirmedCount: { type: Number, default: 0 },
+    lastConfirmedCountUpdate: Date,
+
     //  government: {
     // type: String,
     // required: [true, 'Government is required.'],
