@@ -71,6 +71,10 @@
       "confirmPassword": "تأكيد كلمة السر الجديدة"
     }
   },
+  "validation": {
+    "invalidImageType": "يرجى اختيار صورة صالحة (JPEG, PNG, GIF)",
+    "fileTooLarge": "حجم الملف يجب أن يكون أقل من 5 ميجابايت"
+  },
   "notifications": {
     "title": "الإشعارات",
     "studentType": "إشعارات الطالب",

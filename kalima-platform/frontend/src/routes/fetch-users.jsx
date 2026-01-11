@@ -201,3 +201,28 @@ export const deleteUser = async (userId) => {
   }
 };
 // --------END DELETE USER--------
+
+// --------START CREATED ACCOUNTS STATS--------
+export const getCreatedAccountsStats = async (filters = {}) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/users/stats/created-accounts`, {
+      headers: getAuthHeader(),
+      params: {
+        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
+        ...(filters.dateTo && { dateTo: filters.dateTo }),
+      },
+    });
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("API Error:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message,
+    };
+  }
+};
+// --------END CREATED ACCOUNTS STATS--------

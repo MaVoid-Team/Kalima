@@ -40,6 +40,7 @@ const dynamicDestination = function (req, file, cb) {
   else if (file.fieldname === "sample") dest = "uploads/docs/";
   else if (file.fieldname === "paymentScreenShot") dest = "uploads/payment_screenshots/";
   else if (file.fieldname === "watermark") dest = "uploads/watermarks/";
+  else if (file.fieldname === "paymentMethodImg") dest = "uploads/payment_methods/";
   else dest = "uploads/other/";
   ensureDir(dest);
   cb(null, dest);
@@ -264,6 +265,23 @@ const uploadProductFilesToDisk = withCleanup(
   ])
 );
 
+const uploadPaymentMethodImgToDisk = withCleanup(
+  multer({
+    storage: multer.diskStorage({
+      destination: dynamicDestination,
+      filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `${Date.now()}-paymentMethod.${ext}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (allowedImageTypes.includes(file.mimetype)) cb(null, true);
+      else cb(new AppError("Invalid file type for payment method", 400), false);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }).single("paymentMethodImg")
+);
+
 module.exports = {
   uploadSingleImageToDisk,
   uploadProfilePicToDisk,
@@ -273,5 +291,6 @@ module.exports = {
   uploadPaymentScreenshotToDisk,
   uploadProductFilesToDisk,
   uplaodwatermarkToDisk,
-  uploadCartPurchaseFiles
+  uploadCartPurchaseFiles,
+  uploadPaymentMethodImgToDisk
 };

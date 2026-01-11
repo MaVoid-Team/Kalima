@@ -46,6 +46,7 @@
     "invalidCoupon": "Invalid coupon code. Please check and try again.",
     "applyCouponFailed": "Failed to apply coupon. Please try again.",
     "noTransferNumber": "Transfer number is required. Please enter the number you transferred from.",
+    "invalidTransferNumberLength": "Transfer number must be exactly 11 digits",
     "noFileSelected": "Payment screenshot is required. Please upload a screenshot of your payment.",
     "fillBookFields": "Please fill all book details",
     "nameOnBookRequired": "Name on book is required",

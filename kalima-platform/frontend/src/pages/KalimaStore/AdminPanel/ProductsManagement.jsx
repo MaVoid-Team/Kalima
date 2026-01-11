@@ -20,10 +20,20 @@ const ProductsManagement = memo(({
   const [isExporting, setIsExporting] = useState(false)
 
   const allItems = useMemo(() => {
-    return products.map((item) => ({
-      ...item,
-      type: item.subject ? 'book' : 'product', // auto-detect based on presence of 'subject'
-    }))
+    return products.map((item) => {
+      // Calculate discount percentage from price and priceAfterDiscount if not provided or incorrect
+      let calculatedDiscountPercentage = item.discountPercentage || 0;
+
+      if (item.price && item.priceAfterDiscount && item.price > item.priceAfterDiscount) {
+        calculatedDiscountPercentage = Math.round(((item.price - item.priceAfterDiscount) / item.price) * 100);
+      }
+
+      return {
+        ...item,
+        type: item.subject ? 'book' : 'product', // auto-detect based on presence of 'subject'
+        discountPercentage: calculatedDiscountPercentage,
+      };
+    })
   }, [products])
 
   // Filter items based on search

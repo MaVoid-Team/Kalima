@@ -6,6 +6,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
 import PromoCodesTable from "./PromoCodesTable";
 import LecturerRevenue from "./LecturerRevenue";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation('admin');
@@ -36,7 +37,7 @@ const AdminDashboard = () => {
     const { phoneNumber, message } = whatsappModal;
 
     if (!phoneNumber) {
-      alert(t('admin.errors.phoneRequired'));
+      toast.error(t('admin.errors.phoneRequired'));
       return;
     }
 

@@ -92,6 +92,18 @@ cartSchema.methods.addItem = async function (productId) {
     throw new Error("Product not found");
   }
 
+  // Check if cart has items and validate product type matches
+  if (this.items.length > 0) {
+    // Get the first item in the cart to determine the type
+    const firstCartItem = await ECCartItem.findById(this.items[0]);
+    const firstProductType = firstCartItem.productType;
+    const newProductType = product.__t || "ECProduct";
+
+    if (newProductType !== firstProductType) {
+      throw new Error(`Cannot add item of type ${newProductType} to cart containing ${firstProductType} items. All items in cart must be of the same type.`);
+    }
+  }
+
   let cartItem = await ECCartItem.findOne({
     cart: this._id,
     product: productId,

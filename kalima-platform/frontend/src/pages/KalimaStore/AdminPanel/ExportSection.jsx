@@ -1,6 +1,7 @@
 "use client";
 import { useTranslation } from "react-i18next";
 import { FaDownload, FaFileExport } from "react-icons/fa";
+import { toast } from "sonner";
 
 const ExportSection = ({
   products = [],
@@ -285,7 +286,7 @@ const ExportSection = ({
       await onExportCSV(type, csvContent);
     } catch (error) {
       console.error("Export CSV error:", error);
-      alert(t("export.error") || "Failed to export data. Please try again.");
+      toast.error(t("export.error") || "فشل في تصدير البيانات. حاول مرة أخرى.");
     }
   };
 
@@ -342,7 +343,7 @@ const ExportSection = ({
       await onExportJSON("all", data);
     } catch (error) {
       console.error("Export ALL JSON error:", error);
-      alert(t("export.error") || "Failed to export data.");
+      toast.error(t("export.error") || "فشل في تصدير البيانات.");
     }
   };
 
@@ -379,7 +380,7 @@ const ExportSection = ({
       await onExportCSV("all", csv);
     } catch (e) {
       console.error(e);
-      alert("Export failed");
+      toast.error(t("export.error") || "فشل في التصدير");
     }
   };
 
@@ -459,7 +460,7 @@ const ExportSection = ({
       await onExportJSON(type, jsonData);
     } catch (error) {
       console.error("Export JSON error:", error);
-      alert(t("export.error") || "Failed to export data. Please try again.");
+      toast.error(t("export.error") || "فشل في تصدير البيانات. حاول مرة أخرى.");
     }
   };
 
@@ -491,7 +492,7 @@ const ExportSection = ({
       await onExportXLSX(type, data);
     } catch (error) {
       console.error("Export XLSX error:", error);
-      alert(t("export.error") || "Failed to export data.");
+      toast.error(t("export.error") || "فشل في تصدير البيانات.");
     }
   };
 
@@ -506,7 +507,7 @@ const ExportSection = ({
       await onExportXLSX("all", data);
     } catch (error) {
       console.error("Export ALL XLSX error:", error);
-      alert(t("export.error") || "Failed to export data.");
+      toast.error(t("export.error") || "فشل في تصدير البيانات.");
     }
   };
 

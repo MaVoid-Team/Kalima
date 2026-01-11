@@ -68,6 +68,8 @@
   "ConfirmedOrdersReport":"تقرير الاداء",
   "market": "المتجر",
   "signedLecturers": "المحاضرين الموقعين",
-  "Analytics": "التحليلات"
+  "Analytics": "التحليلات",
+  "performanceReport": "تقرير الأداء",
+  "analyticsDashboard": "لوحة التحليلات"
 
   }
