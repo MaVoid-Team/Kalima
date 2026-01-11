@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import WaveBackground from "./WaveBackground";
 import { loginUser, getUserDashboard } from "../../routes/auth-services";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { getAccessToken } from "../../utils/useLocalStroage";
 const TeacherLogin = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const { t, i18n } = useTranslation("login");
   const isRTL = i18n.language === "ar";
   const [activeTab, setActiveTab] = useState("email_tab");
@@ -27,6 +29,12 @@ const TeacherLogin = () => {
           const dashboardResult = await getUserDashboard();
 
           if (dashboardResult.success) {
+            // If there's a redirect URL, go back to that page
+            if (redirectTo) {
+              navigate(redirectTo);
+              return;
+            }
+
             const userRole = dashboardResult.data.data.userInfo.role;
 
             // Redirect based on user role
@@ -48,7 +56,7 @@ const TeacherLogin = () => {
     };
 
     checkAuthStatus();
-  }, [accessToken, navigate]);
+  }, [accessToken, navigate, redirectTo]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,6 +96,14 @@ const TeacherLogin = () => {
         return;
       }
       window.dispatchEvent(new Event('user-auth-changed'));
+
+      // If there's a redirect URL saved, go back to that page
+      if (redirectTo) {
+        navigate(redirectTo);
+        return;
+      }
+
+      // Otherwise, redirect based on user role
       const userRole = dashboardResult.data.data.userInfo.role;
       if (userRole === "Admin" || userRole === "SubAdmin" || userRole === "Moderator") {
         navigate("/dashboard/admin-dashboard");
@@ -235,7 +251,10 @@ const TeacherLogin = () => {
             <div className="text-center mt-4">
               <p>
                 {t("needAccount", "Don't have an account?")}{" "}
-                <Link to="/register" className="link link-primary">
+                <Link
+                  to={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : "/register"}
+                  className="link link-primary"
+                >
                   {t("register", "Register here")}
                 </Link>
               </p>

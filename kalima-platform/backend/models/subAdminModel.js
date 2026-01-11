@@ -4,7 +4,8 @@ const User = require("./userModel");
 
 const subAdminSchema = new mongoose.Schema(
     {
-
+        monthlyConfirmedCount: { type: Number, default: 0 },
+        lastConfirmedCountUpdate: { type: Date }
     },
     {
         timestamps: true,

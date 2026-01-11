@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo, memo } from "react"
+import { toast } from "sonner"
 import { useTranslation } from "react-i18next"
 import { User, BookOpen, Star, Edit, Eye, Clock, Users, FileText, X } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -218,11 +219,11 @@ export default function CourseGrid() {
           setEditingContainer(null)
           fetchContainers()
         } else {
-          alert(result.message || t("failedToUpdateContainer"))
+          toast.error(result.message || t("failedToUpdateContainer"))
         }
       } catch (err) {
         console.error("Error updating container:", err)
-        alert(err.message || t("errorUpdatingContainer"))
+        toast.error(err.message || t("errorUpdatingContainer"))
       } finally {
         setLoading(false)
       }

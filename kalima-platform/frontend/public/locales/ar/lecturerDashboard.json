@@ -6,6 +6,8 @@
   "confirmDeleteContainer": "هل أنت متأكد من حذف هذا الكورس؟",
   "failedToDeleteContainer": "فشل في حذف الكورس",
   "errorDeletingContainer": "حدث خطأ أثناء حذف الكورس",
+  "failedToUpdateContainer": "فشل في تحديث الكورس",
+  "errorUpdatingContainer": "حدث خطأ أثناء تحديث الكورس",
   "noCoursesTitle": "لا توجد كورسات",
   "noCoursesDescription": "لم تقم بإنشاء أي كورسات بعد. ابدأ بإضافة أول كورس لك.",
   "noCourses": "لم تقم بإنشاء أي كورسات بعد.",

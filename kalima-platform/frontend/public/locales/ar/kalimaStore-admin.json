@@ -67,7 +67,8 @@
       "updatedSuccess": "تم تحديث طريقة الدفع بنجاح",
       "deletedSuccess": "تم حذف طريقة الدفع بنجاح",
       "saveError": "حدث خطأ أثناء حفظ طريقة الدفع",
-      "confirmDelete": "هل أنت متأكد من حذف طريقة الدفع؟"
+      "confirmDelete": "هل أنت متأكد من حذف طريقة الدفع؟",
+      "toggleError": "فشل في تغيير الحالة"
     },
 
     "validation": {

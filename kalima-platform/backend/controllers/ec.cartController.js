@@ -63,18 +63,21 @@ exports.addToCart = catchAsync(async (req, res, next) => {
         });
     }
 
-    try {
-        // Add item to cart (quantity is fixed to 1)
-        await cart.addItem(productId);
-    } catch (error) {
-        if (error.message === 'Product already exists in cart') {
-            return next(new AppError("Product is already in cart", 400));
+    // Populate items with product details to check for duplicates
+    await cart.populate({
+        path: 'items',
+        populate: {
+            path: 'product'
         }
-        throw error;
+    });
+
+    // Check if this product already exists in cart
+    const itemExists = cart.items.some(item => item.product._id.toString() === productId.toString());
+    if (itemExists) {
+        return next(new AppError("Item already in cart", 400));
     }
 
-    // Return updated cart
-
+    await cart.addItem(productId);
 
     res.status(200).json({
         status: "Item added to cart successfully",

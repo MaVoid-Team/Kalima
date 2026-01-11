@@ -68,5 +68,7 @@
   "storeDashboard": "Store Dashboard",
   "market": "Market",
   "signedLecturers": "Signed Lecturers",
-  "Analytics": "Analytics"
+  "Analytics": "Analytics",
+  "performanceReport": "Performance Report",
+  "analyticsDashboard": "Analytics Dashboard"
 }

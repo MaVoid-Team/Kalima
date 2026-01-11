@@ -142,12 +142,6 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         path: '/dashboard/admin-dashboard/audit-log'
       },
       {
-        id: 'confirmed-orders-report',
-        title: t('ConfirmedOrdersReport') || 'Confirmed Orders Report',
-        icon: <FaFileInvoice className="w-5 h-5" />,
-        path: '/dashboard/admin-dashboard/confirmed-orders-report'
-      },
-      {
         id: 'create',
         title: t('Create') || 'Create',
         icon: <Edit className="w-5 h-5" />,
@@ -171,9 +165,19 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
         icon: <Lightbulb className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/signed-lecturers'
       },
+    ];
+
+    // Admin-only items (not for Subadmin or Moderator)
+    const adminOnlyItems = [
+      {
+        id: 'confirmed-orders-report',
+        title: t('performanceReport') || 'Performance Report',
+        icon: <FaFileInvoice className="w-5 h-5" />,
+        path: '/dashboard/admin-dashboard/confirmed-orders-report'
+      },
       {
         id: 'store-analytics',
-        title: t('Analytics') || 'Analytics',
+        title: t('analyticsDashboard') || 'Analytics Dashboard',
         icon: <MdAnalytics className="w-5 h-5" />,
         path: '/dashboard/admin-dashboard/store-analytics'
       },
@@ -263,7 +267,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
     // Return appropriate menu items based on role
     switch (userRole.toLowerCase()) {
       case 'admin':
-        return [...adminItems, ...commonItems];
+        return [...adminItems, ...adminOnlyItems, ...commonItems];
       case 'subadmin':
         return [...adminItems, ...commonItems];
       case 'lecturer':

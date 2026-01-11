@@ -39,7 +39,11 @@
   },
   "errors": {
     "loadingError": "Error loading data",
-    "fetchErrorLog": "Error fetching data:"
+    "fetchErrorLog": "Error fetching data:",
+    "addToCartFailed": "Failed to add to cart"
+  },
+  "success": {
+    "addedToCart": "Added to cart successfully!"
   },
   "empty": {
     "noProducts": "No products found.",

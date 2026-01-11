@@ -213,7 +213,11 @@
     "lab": "مختبر"
   },
   "lecturer": "المحاضر",
-  "level": "المستوى"
+  "level": "المستوى",
+  "errors": {
+    "invalidLessonId": "معرف الدرس غير صالح",
+    "fetchLessonFailed": "فشل في جلب تفاصيل الدرس: {{message}}"
+  }
 },
 "schedule": {
   "title": "جدول الحصص"

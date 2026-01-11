@@ -63,9 +63,22 @@ const parentSchema = new mongoose.Schema({
     },
     note: {
       type: String // e.g., "09:00 PM"
-    }
+    },
+    numberOfPurchases: {
+      type: Number,
+      default: 0,
+    },
+    TotalSpentAmount: {
+      type: Number,
+      default: 0,
+    },
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
 }, {
+  strictPopulate: false,
   timestamps: true
 });
 
