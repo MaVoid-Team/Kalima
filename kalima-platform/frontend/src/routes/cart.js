@@ -315,7 +315,7 @@ export const getUserPurchasedProducts = async () => {
 // Get confirmed purchases count for current month (for employee counter)
 export const getConfirmedPurchasesCount = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/confirmed-count`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/confirmed-count`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

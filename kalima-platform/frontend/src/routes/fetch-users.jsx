@@ -205,7 +205,7 @@ export const deleteUser = async (userId) => {
 // --------START CREATED ACCOUNTS STATS--------
 export const getCreatedAccountsStats = async (filters = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/users/stats/created-accounts`, {
+    const response = await axios.get(`${API_URL}/users/stats/created-accounts`, {
       headers: getAuthHeader(),
       params: {
         ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
