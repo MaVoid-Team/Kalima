@@ -391,9 +391,9 @@ const DirectCheckout = () => {
 
         toast.success(t("success.purchaseSubmitted") || "تم تقديم الطلب بنجاح!");
 
-        // Redirect to market after success
+        // Redirect to my orders page after success
         setTimeout(() => {
-          navigate("/market");
+          navigate("/my-orders");
         }, 1500);
       } else {
         throw new Error(response.message || "Purchase failed");
