@@ -117,9 +117,22 @@ const teacherSchema = new mongoose.Schema(
         type: String // e.g., "09:00 PM"
       }
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    numberOfPurchases: {
+      type: Number,
+      default: 0,
+    },
+    TotalSpentAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
+    strictPopulate: false,
   }
 );
 

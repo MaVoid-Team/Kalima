@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { fetchPackages, purchasePackage } from "../../routes/packages"
 import { getUserDashboard } from "../../routes/auth-services"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 import { Wallet, Search, Filter, Package, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useTranslation } from "react-i18next"
 

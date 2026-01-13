@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 const PaymentMethodsManagement = ({
   paymentMethods = [],
@@ -62,7 +63,7 @@ const PaymentMethodsManagement = ({
         )
       );
 
-      alert(
+      toast.error(
         err?.response?.data?.message ||
           t("alerts.toggleError") ||
           "Failed to change status"

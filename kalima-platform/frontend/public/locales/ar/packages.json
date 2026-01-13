@@ -127,6 +127,7 @@
   "purchaseModal": {
     "title": "تأكيد الشراء",
     "confirmMessage": "هل أنت متأكد من رغبتك في شراء هذه الباقة؟",
+    "insufficientPoints": "نقاطك العامة غير كافية لشراء هذه الباقة",
     "type": "النوع",
     "price": "السعر",
     "teachers": "المعلمون",

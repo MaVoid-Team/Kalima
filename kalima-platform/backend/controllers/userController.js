@@ -385,7 +385,7 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
     await handleCSV(req.file.buffer, accountType, res, next);
   } else if (
     fileType ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     fileType === "application/vnd.ms-excel"
   ) {
     await handleExcel(req.file.buffer, accountType, res, next);
@@ -900,8 +900,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get exam submissions for lectures created by the assigned lecturer
         const lecturerLectures = !responseData.lectures
           ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
-              .select("_id")
-              .lean()
+            .select("_id")
+            .lean()
           : responseData.lectures;
 
         const lectureIds = lecturerLectures.map((lecture) => lecture._id);
@@ -922,8 +922,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         const lecturerLectures =
           !responseData.lectures && !responseData.examSubmissions
             ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
-                .select("_id")
-                .lean()
+              .select("_id")
+              .lean()
             : responseData.lectures || responseData.examSubmissions;
 
         // Get lecture IDs, handling both direct lecture objects and exam submission objects
@@ -984,34 +984,34 @@ const getMyData = catchAsync(async (req, res, next) => {
         stats.totalStudentExamSubmissions = responseData.examSubmissions
           ? responseData.examSubmissions.length
           : await StudentExamSubmission.countDocuments({
-              lecture: {
-                $in: await Lecture.find({
-                  createdBy: assistant.assignedLecturer._id,
-                }).distinct("_id"),
-              },
-              type: "exam",
-            });
+            lecture: {
+              $in: await Lecture.find({
+                createdBy: assistant.assignedLecturer._id,
+              }).distinct("_id"),
+            },
+            type: "exam",
+          });
 
         stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions
           ? responseData.homeworkSubmissions.length
           : await StudentExamSubmission.countDocuments({
-              lecture: {
-                $in: await Lecture.find({
-                  createdBy: assistant.assignedLecturer._id,
-                }).distinct("_id"),
-              },
-              type: "homework",
-            });
+            lecture: {
+              $in: await Lecture.find({
+                createdBy: assistant.assignedLecturer._id,
+              }).distinct("_id"),
+            },
+            type: "homework",
+          });
 
         stats.totalAttachments = responseData.attachments
           ? responseData.attachments.length
           : await Attachment.countDocuments({
-              lectureId: {
-                $in: await Lecture.find({
-                  createdBy: assistant.assignedLecturer._id,
-                }).distinct("_id"),
-              },
-            });
+            lectureId: {
+              $in: await Lecture.find({
+                createdBy: assistant.assignedLecturer._id,
+              }).distinct("_id"),
+            },
+          });
 
         responseData.stats = stats;
       }
@@ -1655,6 +1655,105 @@ const confirmTeacher = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get account creation statistics by employee
+const getCreatedAccountsStats = catchAsync(async (req, res, next) => {
+  // Build match filter
+  const matchFilter = {
+    createdBy: { $ne: null },
+  };
+
+  // Add date filtering if provided
+  if (req.query.dateFrom || req.query.dateTo) {
+    matchFilter.createdAt = {};
+
+    if (req.query.dateFrom) {
+      // Start of the day
+      const dateFrom = new Date(req.query.dateFrom);
+      dateFrom.setHours(0, 0, 0, 0);
+      matchFilter.createdAt.$gte = dateFrom;
+    }
+
+    if (req.query.dateTo) {
+      // End of the day
+      const dateTo = new Date(req.query.dateTo);
+      dateTo.setHours(23, 59, 59, 999);
+      matchFilter.createdAt.$lte = dateTo;
+    }
+  }
+
+  // Aggregate accounts by creator and role
+  const stats = await User.aggregate([
+    // Match only users created by someone (createdBy is not null) and apply date filter
+    {
+      $match: matchFilter,
+    },
+    // Group by creator and role, count occurrences
+    {
+      $group: {
+        _id: {
+          createdBy: "$createdBy",
+          role: "$role",
+        },
+        count: { $sum: 1 },
+      },
+    },
+    // Sort by creator
+    {
+      $sort: { "_id.createdBy": 1 },
+    },
+  ]);
+
+  // Restructure the data for better readability
+  const creatorMap = {};
+
+  for (const stat of stats) {
+    const creatorId = stat._id.createdBy.toString();
+    const role = stat._id.role;
+    const count = stat.count;
+
+    if (!creatorMap[creatorId]) {
+      creatorMap[creatorId] = {
+        creatorId,
+        totalAccounts: 0,
+        byRole: {},
+      };
+    }
+
+    creatorMap[creatorId].byRole[role] = count;
+    creatorMap[creatorId].totalAccounts += count;
+  }
+
+  // Convert to array and populate creator details
+  const result = [];
+  for (const creatorId of Object.keys(creatorMap)) {
+    const creator = await User.findById(creatorId).select(
+      "name email role"
+    ).lean();
+
+    if (creator) {
+      result.push({
+        creatorName: creator.name,
+        creatorEmail: creator.email,
+        creatorRole: creator.role,
+        stats: creatorMap[creatorId],
+      });
+    }
+  }
+
+  // Sort by total accounts created (descending)
+  result.sort((a, b) => b.stats.totalAccounts - a.stats.totalAccounts);
+
+  res.status(200).json({
+    status: "success",
+    results: result.length,
+    dateFilter: {
+      from: req.query.dateFrom || null,
+      to: req.query.dateTo || null,
+    },
+    data: result,
+  });
+});
+
 module.exports = {
   getAllUsers,
   getAllUsersByRole,
@@ -1668,4 +1767,5 @@ module.exports = {
   getParentChildrenData,
   updateMe,
   confirmTeacher,
+  getCreatedAccountsStats,
 };
