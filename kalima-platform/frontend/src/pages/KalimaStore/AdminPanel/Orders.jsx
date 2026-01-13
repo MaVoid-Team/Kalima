@@ -10,6 +10,7 @@ import {
   updatePurchase,
   deleteProductPurchase,
   ReturnProductPurchase,
+  deleteItemFromPurchase,
 } from "../../../routes/orders";
 import { FaWhatsapp } from "react-icons/fa";
 import {
@@ -24,6 +25,7 @@ import {
   Calendar,
   Filter,
   RotateCcw,
+  Trash2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -88,6 +90,9 @@ const Orders = () => {
     loading: false,
     hasChanges: false,
   });
+
+  // Delete item loading state
+  const [deletingItemId, setDeletingItemId] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -662,6 +667,45 @@ const Orders = () => {
     }
   };
 
+  // Handle delete item from purchase
+  const handleDeleteItem = async (itemId) => {
+    if (!selectedOrder || !itemId) return;
+
+    // Check if this is the last item
+    if (selectedOrder.items.length === 1) {
+      toast.error(t("alerts.cannotDeleteLastItem"));
+      return;
+    }
+
+    if (!confirm(t("alerts.confirmDeleteItem"))) return;
+
+    try {
+      setDeletingItemId(itemId);
+      const result = await deleteItemFromPurchase(selectedOrder._id, itemId);
+
+      if (result.success) {
+        // Update the selected order with new data
+        const updatedPurchase = result.data.data.purchase;
+        setSelectedOrder(updatedPurchase);
+
+        // Update the orders list
+        setOrders((prev) =>
+          prev.map((o) =>
+            o._id === selectedOrder._id ? updatedPurchase : o
+          )
+        );
+
+        toast.success(t("alerts.itemDeletedSuccess"));
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      toast.error(t("alerts.failedToDeleteItem") + ": " + err.message);
+    } finally {
+      setDeletingItemId(null);
+    }
+  };
+
   const groupedItems = selectedOrder?.items
     ? selectedOrder.items.reduce((acc, item) => {
         const title = item.productSnapshot?.title || item.productName;
@@ -1231,7 +1275,24 @@ const Orders = () => {
                     </td>
                     <td className="text-center">
                       <div>
-                        <div className="font-medium">{order.userName}</div>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="font-medium">{order.userName}</span>
+                          {order.createdBy?.numberOfPurchases > 5 && (
+                            <span className="badge badge-success badge-xs" title={t("table.frequentBuyer")}>
+                              🌟 {order.createdBy.numberOfPurchases}
+                            </span>
+                          )}
+                          {order.createdBy?.numberOfPurchases > 0 && order.createdBy?.numberOfPurchases <= 5 && (
+                            <span className="badge badge-primary badge-xs">
+                              {order.createdBy.numberOfPurchases}
+                            </span>
+                          )}
+                          {(!order.createdBy?.numberOfPurchases || order.createdBy?.numberOfPurchases === 0) && (
+                            <span className="badge badge-ghost badge-xs" title={t("table.newClient")}>
+                              {t("table.new")}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs opacity-50">
                           {order.createdBy?.email}
                         </div>
@@ -1733,6 +1794,22 @@ const Orders = () => {
                     <strong>{t("table.role")}:</strong>{" "}
                     {selectedOrder.createdBy?.role}
                   </p>
+                  <p className="mt-2">
+                    <strong>{t("table.totalPurchases")}:</strong>{" "}
+                    <span className={`badge ${selectedOrder.createdBy?.numberOfPurchases > 5 ? 'badge-success' : selectedOrder.createdBy?.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                      {selectedOrder.createdBy?.numberOfPurchases || 0}
+                    </span>
+                    {selectedOrder.createdBy?.numberOfPurchases > 5 && (
+                      <span className="ml-2 text-xs text-green-600 font-semibold">
+                        🌟 {t("table.frequentBuyer")}
+                      </span>
+                    )}
+                    {(!selectedOrder.createdBy?.numberOfPurchases || selectedOrder.createdBy?.numberOfPurchases === 0) && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        {t("table.newClient")}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -1757,53 +1834,65 @@ const Orders = () => {
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">
-                      Cart Items ({selectedOrder.items.length})
+                      {t("table.cartItems")} ({selectedOrder.items.length})
                     </span>
+                    {selectedOrder.items.length > 1 && (
+                      <span className="label-text-alt text-warning">
+                        {t("table.canDeleteItems")}
+                      </span>
+                    )}
                   </label>
                   <div className="bg-base-200 p-3 rounded space-y-3">
-                    {Object.entries(groupedItems).map(([title, items], idx) => (
-                      <div key={idx} className="border-b pb-3 last:border-b-0">
-                        {/* عنوان الكتاب */}
+                    {selectedOrder.items.map((item, idx) => (
+                      <div key={item._id || idx} className="border-b pb-3 last:border-b-0">
+                        {/* عنوان المنتج */}
                         <div className="flex justify-between items-start">
-                          <div>
+                          <div className="flex-1">
                             <p>
-                              <strong>{title}</strong>
+                              <strong>{item.productSnapshot?.title || item.productName}</strong>
                             </p>
 
                             {/* عرض Type */}
                             <p className="text-sm opacity-75">
-                              Type: {items[0].productType}
+                              {t("table.type")}: {item.productType === "ECBook" ? t("table.book") : t("table.productType")}
                             </p>
 
                             {/* Product Serial */}
-                            {items[0].productSnapshot?.serial && (
+                            {item.productSnapshot?.serial && (
                               <p className="text-sm font-mono">
                                 <strong>{t("table.productSerial") || "Serial"}:</strong>{" "}
                                 <span className="badge badge-ghost badge-sm">
-                                  {items[0].productSnapshot.serial}
+                                  {item.productSnapshot.serial}
                                 </span>
                               </p>
                             )}
-
-                            <p className="text-sm">
-                              عدد الطلبات :{items.length}
-                            </p>
                           </div>
 
-                          {/* السعر */}
-                          <p className="font-bold">
-                            {formatPrice(
-                              items.reduce(
-                                (sum, it) =>
-                                  sum + it.priceAtPurchase * (it.quantity || 1),
-                                0
-                              )
+                          {/* السعر وزرار الحذف */}
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold">
+                              {formatPrice(item.priceAtPurchase * (item.quantity || 1))}
+                            </p>
+                            {/* Delete button - only show if more than 1 item */}
+                            {selectedOrder.items.length > 1 && (
+                              <button
+                                className="btn btn-ghost btn-xs text-error hover:bg-error hover:text-white"
+                                onClick={() => handleDeleteItem(item._id)}
+                                disabled={deletingItemId === item._id}
+                                title={t("table.deleteItem")}
+                              >
+                                {deletingItemId === item._id ? (
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
                             )}
-                          </p>
+                          </div>
                         </div>
 
-                        {/* 📚 Book Info – تظهر مرة واحدة فقط */}
-                        {items[0].productType === "ECBook" && (
+                        {/* 📚 Book Info */}
+                        {item.productType === "ECBook" && (
                           <div className="mt-2 ml-4 border-l-2 border-primary pl-2 text-sm">
                             <label className="label">
                               <span className="label-text font-medium text-xs">
@@ -1811,24 +1900,24 @@ const Orders = () => {
                               </span>
                             </label>
 
-                            {items[0].nameOnBook && (
+                            {item.nameOnBook && (
                               <p>
                                 <strong>{t("table.nameOnBook")}:</strong>{" "}
-                                {items[0].nameOnBook}
+                                {item.nameOnBook}
                               </p>
                             )}
 
-                            {items[0].numberOnBook && (
+                            {item.numberOnBook && (
                               <p>
                                 <strong>{t("table.numberOnBook")}:</strong>{" "}
-                                {items[0].numberOnBook}
+                                {item.numberOnBook}
                               </p>
                             )}
 
-                            {items[0].seriesName && (
+                            {item.seriesName && (
                               <p>
                                 <strong>{t("table.seriesName")}:</strong>{" "}
-                                {items[0].seriesName}
+                                {item.seriesName}
                               </p>
                             )}
                           </div>

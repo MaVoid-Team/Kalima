@@ -527,7 +527,7 @@ const CartPage = () => {
         });
         // Small delay before redirect to show success message
         setTimeout(() => {
-          navigate("/market");
+          navigate("/my-orders");
         }, 1000);
       } else {
         const errorMessage =
