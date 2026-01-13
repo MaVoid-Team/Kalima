@@ -67,7 +67,14 @@
     "loading": "جاري التحميل..."
   },
   "errors": {
-    "fetchStudents": "فشل في جلب بيانات الطلاب"
+    "fetchStudents": "فشل في جلب بيانات الطلاب",
+    "loginRequired": "يرجى تسجيل الدخول أولاً",
+    "lectureNotFound": "لم يتم العثور على المحاضرة",
+    "insufficientPoints": "نقاطك غير كافية لشراء هذه المحاضرة"
+  },
+  "purchase": {
+    "success": "تم شراء المحاضرة بنجاح!",
+    "failed": "فشل في شراء المحاضرة"
   },
   "lesson": {
     "detailsTitle": "تفاصيل الدرس",

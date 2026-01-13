@@ -3,7 +3,7 @@ const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
 const paymentMethodController = require("../controllers/paymentMethodController");
 const authController = require("../controllers/authController");
-
+const { uploadPaymentMethodImgToDisk } = require("../utils/upload files/uploadFiles");
 router.use(verifyJWT);
 
 router
@@ -11,6 +11,7 @@ router
     .get(paymentMethodController.getAllPaymentMethods)
     .post(
         authController.verifyRoles("Admin"),
+        uploadPaymentMethodImgToDisk,
         paymentMethodController.createPaymentMethod
     );
 
@@ -19,6 +20,7 @@ router
     .get(paymentMethodController.getPaymentMethodById)
     .patch(
         authController.verifyRoles("Admin"),
+        uploadPaymentMethodImgToDisk,
         paymentMethodController.updatePaymentMethod
     )
     .delete(

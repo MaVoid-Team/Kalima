@@ -141,5 +141,6 @@
   "unexpectedErrorFetchingAccesses": "حدث خطأ غير متوقع أثناء جلب سجلات وصول الطلاب",
   "failedToDeleteLecture": "فشل في حذف المحاضرة",
   "unexpectedErrorDeletingLecture": "حدث خطأ غير متوقع أثناء حذف المحاضرة",
-  "unexpectedErrorUpdatingAccess": "حدث خطأ غير متوقع أثناء تحديث وصول الطالب للمحاضرة"
+  "unexpectedErrorUpdatingAccess": "حدث خطأ غير متوقع أثناء تحديث وصول الطالب للمحاضرة",
+  "feedbackSubmittedSuccess": "تم إرسال التقييم بنجاح"
 }

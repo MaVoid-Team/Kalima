@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   getAllSections,
@@ -9,13 +9,17 @@ import {
   getAllSubSections,
 } from "../../routes/market";
 import { addToCart, getUserPurchasedProducts } from "../../routes/cart";
-import { isLoggedIn } from "../../routes/auth-services";
-import { ShoppingCart } from "lucide-react";
+import { isLoggedIn, getToken } from "../../routes/auth-services";
+// Note: Using getToken() for sync check, isLoggedIn() is async
+import { ShoppingCart, AlertTriangle, X, LogIn, UserPlus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market");
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("all");
   const [activeSubSection, setActiveSubSection] = useState("all");
@@ -29,6 +33,12 @@ const Market = () => {
   const [itemsPerPage] = useState(6);
   const [addingToCart, setAddingToCart] = useState({});
   const [purchasedProductIds, setPurchasedProductIds] = useState([]);
+  const [cartTypeError, setCartTypeError] = useState({
+    show: false,
+    message: "",
+  });
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingProductId, setPendingProductId] = useState(null); // Store product ID when auth is needed
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null;
@@ -137,12 +147,13 @@ const Market = () => {
   }, [t]);
 
   // Handle add to cart
-  const handleAddToCart = async (productId, event) => {
+  const handleAddToCart = async (productId, event, product) => {
     event.stopPropagation(); // Prevent navigation to product details
 
-    if (!isLoggedIn()) {
-      alert(t("errors.loginRequired") || "Please login to add items to cart");
-      navigate("/login");
+    if (!getToken()) {
+      // Store the product info for redirect after login
+      setPendingProductId({ id: productId, type: product?.__t === "ECBook" ? "book" : "product" });
+      setShowAuthModal(true);
       return;
     }
 
@@ -162,19 +173,41 @@ const Market = () => {
       setAddingToCart({ ...addingToCart, [productId]: true });
       const result = await addToCart(productId);
       if (result.success) {
-        alert(t("success.addedToCart") || "Item added to cart successfully!");
+        toast.success(
+          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!"
+        );
         const currentCount = Number(localStorage.getItem("cartCount")) || 0;
         localStorage.setItem("cartCount", currentCount + 1);
         window.dispatchEvent(new Event("cart-updated"));
       } else {
-        alert(
-          result.error || t("errors.addToCartFailed") || "Failed to add to cart"
-        );
+        // Check if it's a cart type mismatch error
+        if (result.error && result.error.includes("Cannot add item of type")) {
+          setCartTypeError({
+            show: true,
+            message: result.error,
+          });
+        } else {
+          toast.error(
+            result.error ||
+              t("errors.addToCartFailed") ||
+              "فشل في الإضافة إلى السلة"
+          );
+        }
       }
     } catch (error) {
-      alert(
-        error.message || t("errors.addToCartFailed") || "Failed to add to cart"
-      );
+      // Check if it's a cart type mismatch error
+      if (error.message && error.message.includes("Cannot add item of type")) {
+        setCartTypeError({
+          show: true,
+          message: error.message,
+        });
+      } else {
+        toast.error(
+          error.message ||
+            t("errors.addToCartFailed") ||
+            "فشل في الإضافة إلى السلة"
+        );
+      }
     } finally {
       setAddingToCart({ ...addingToCart, [productId]: false });
     }
@@ -395,22 +428,17 @@ const Market = () => {
                 key={item._id}
                 className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
               >
-                {/* Already Purchased Ribbon */}
+                {/* Already Purchased Badge */}
                 {isPurchased && (
                   <div
-                    className={`absolute top-0 ${
-                      isRTL ? "left-0" : "right-0"
-                    } z-20`}
+                    className={`absolute top-4 ${
+                      isRTL ? "left-4" : "right-4"
+                    } z-10`}
                   >
                     <div
-                      className={`bg-success text-success-content px-4 py-2 shadow-lg ${
-                        isRTL
-                          ? "rounded-br-2xl rounded-bl-none"
-                          : "rounded-bl-2xl rounded-br-none"
-                      } text-xs font-bold flex items-center gap-1`}
-                      style={{
-                        transform: isRTL ? "none" : "none",
-                      }}
+                      className={`bg-secondary text-secondary-content px-3 py-1 ${
+                        isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium flex items-center gap-1`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -426,7 +454,7 @@ const Market = () => {
                       </svg>
                       {isRTL
                         ? "لقد اشتريت هذا المنتج من قبل"
-                        : "Already purchased before"}
+                        : "Already purchased before"}{" "}
                     </div>
                   </div>
                 )}
@@ -517,7 +545,7 @@ const Market = () => {
                       {t("product.viewDetails")}
                     </button>
                     <button
-                      onClick={(e) => handleAddToCart(item._id, e)}
+                      onClick={(e) => handleAddToCart(item._id, e, item)}
                       disabled={addingToCart[item._id]}
                       className="btn btn-outline btn-primary flex-1"
                     >
@@ -616,6 +644,139 @@ const Market = () => {
           </div>
         )}
       </div>
+
+      {/* Cart Type Mismatch Modal */}
+      <AnimatePresence>
+        {cartTypeError.show && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-center relative">
+                <button
+                  onClick={() => setCartTypeError({ show: false, message: "" })}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">
+                  {isRTL ? "تنبيه!" : "Warning!"}
+                </h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
+                  {isRTL
+                    ? "لا يمكن إضافة هذا المنتج للسلة"
+                    : "Cannot add this item to cart"}
+                </p>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "السلة تحتوي على نوع مختلف من المنتجات. يجب أن تكون جميع المنتجات في السلة من نفس النوع (كتب فقط أو منتجات فقط)."
+                    : "Your cart contains a different type of items. All items in cart must be of the same type (books only or products only)."}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setCartTypeError({ show: false, message: "" });
+                    navigate("/cart");
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  {isRTL ? "عرض السلة" : "View Cart"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Auth Required Modal - Login or Register Choice */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">
+                  {isRTL ? "تسجيل الدخول مطلوب" : "Login Required"}
+                </h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
+                  {isRTL
+                    ? "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
+                    : "You need to login to add items to cart"}
+                </p>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "هل لديك حساب بالفعل؟ قم بتسجيل الدخول. أو أنشئ حساب جديد."
+                    : "Already have an account? Login. Or create a new account."}
+                </p>
+              </div>
+
+              {/* Footer - Two Buttons */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    // Redirect to product details page after login
+                    const redirectUrl = pendingProductId
+                      ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
+                      : location.pathname + location.search;
+                    navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  <LogIn className="w-5 h-5" />
+                  {isRTL ? "تسجيل الدخول" : "Login"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    // Redirect to product details page after register
+                    const redirectUrl = pendingProductId
+                      ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
+                      : location.pathname + location.search;
+                    navigate(`/register?redirect=${encodeURIComponent(redirectUrl)}`);
+                  }}
+                  className="btn btn-outline btn-primary flex-1"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  {isRTL ? "إنشاء حساب" : "Register"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

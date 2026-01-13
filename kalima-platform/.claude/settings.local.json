@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"d:\\\\Kalima\\\\kalima-platform\\\\frontend\\\\src\\\\components\\\\CustomToast.jsx\")",
+      "Bash(del \"d:\\\\Kalima\\\\kalima-platform\\\\frontend\\\\src\\\\assets\\\\styles\\\\toast.css\")",
+      "Bash(npm install:*)",
+      "Bash(npx eslint:*)"
+    ]
+  }
+}
