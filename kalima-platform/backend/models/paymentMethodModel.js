@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 
 const paymentMethodSchema = new mongoose.Schema(
@@ -17,6 +18,11 @@ const paymentMethodSchema = new mongoose.Schema(
             type: Boolean,
             enum: [true, false],
             default: true,
+        },
+        paymentMethodImg: {
+            type: String, // local file path
+            trim: true,
+            required: [true, "Payment method image is required"],
         },
     },
     { timestamps: true }

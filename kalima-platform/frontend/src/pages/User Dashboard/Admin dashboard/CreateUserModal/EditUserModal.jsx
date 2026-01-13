@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { updateUser } from "../../../../routes/update-user";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
   const { t, i18n } = useTranslation("admin");
@@ -125,12 +126,15 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
         // Remove password from the data we pass back to the parent component
         const { password, ...dataToUpdate } = updateData;
         onUserUpdated(user._id, dataToUpdate);
+        toast.success(t("admin.editSuccess") || "تم تعديل المستخدم بنجاح");
         onClose();
       } else {
         setError(result.error);
+        toast.error(result.error || t("admin.editError") || "فشل في تعديل المستخدم");
       }
     } catch (err) {
       setError(err.message || "An error occurred while updating the user");
+      toast.error(err.message || t("admin.editError") || "فشل في تعديل المستخدم");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { getLessonById } from "../../routes/center";
 import { getAllSubjects } from "../../routes/courses";
 
@@ -40,7 +41,7 @@ const CourseCard = ({ course }) => {
     const lessonId = course._id || course.id;
     if (!lessonId) {
       console.error("Course ID is undefined:", course);
-      alert(t('courseCard.errors.invalidLessonId'));
+      toast.error(t('courseCard.errors.invalidLessonId'));
       return;
     }
 
@@ -53,7 +54,7 @@ const CourseCard = ({ course }) => {
       }
     } catch (error) {
       console.error("Error fetching lesson details:", error);
-      alert(t('courseCard.errors.fetchLessonFailed', { message: error.message }));
+      toast.error(t('courseCard.errors.fetchLessonFailed', { message: error.message }));
     }
   };
 

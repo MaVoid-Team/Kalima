@@ -312,6 +312,27 @@ export const getUserPurchasedProducts = async () => {
   }
 };
 
+// Get confirmed purchases count for current month (for employee counter)
+export const getConfirmedPurchasesCount = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/confirmed-count`, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: `Failed to fetch confirmed count: ${error.response?.data?.message || error.message}`,
+    };
+  }
+};
+
 export const getAdminCartPurchases = async (queryParams = {}) => {
   try {
     const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/all`, {

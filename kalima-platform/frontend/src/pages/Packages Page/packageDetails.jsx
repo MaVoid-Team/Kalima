@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { fetchPackageById, purchasePackage } from "../../routes/packages"
 import { getUserDashboard } from "../../routes/auth-services"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 import { ArrowLeft, Calendar, Users, Book, Award, Check, X } from 'lucide-react'
 import { useTranslation } from "react-i18next"
 

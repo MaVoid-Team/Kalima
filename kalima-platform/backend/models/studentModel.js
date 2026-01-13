@@ -64,6 +64,7 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
     // Flag for tracking if a promo code has been used
     hasPromoCode: {
       type: Boolean,
@@ -90,12 +91,25 @@ const studentSchema = new mongoose.Schema(
       type: String, // local file path
       trim: true,
     },
+    numberOfPurchases: {
+      type: Number,
+      default: 0,
+    },
+    TotalSpentAmount: {
+      type: Number,
+      default: 0,
+    },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    successfulInvites: { type: Number, default: 0 }
+    successfulInvites: { type: Number, default: 0 },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
 
   {
     timestamps: true,
+    strictPopulate: false,
     // toJSON: { virtuals: true },
     // toObject: { virtuals: true },
   }

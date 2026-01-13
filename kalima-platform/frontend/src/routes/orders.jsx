@@ -291,6 +291,33 @@ export const deleteProductPurchase = async (purchaseId) => {
   }
 };
 
+// Delete an item from a purchase (only if multiple items exist)
+export const deleteItemFromPurchase = async (purchaseId, itemId) => {
+  try {
+    if (!isLoggedIn()) {
+      throw new Error("Not authenticated")
+    }
+    const response = await axios.delete(
+      `${API_URL}/api/v1/ec/cart-purchases/delete/${purchaseId}/item/${itemId}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    )
+    return {
+      success: true,
+      data: response.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || `Failed to delete item from purchase: ${error.message}`,
+    }
+  }
+}
+
 // Delete a book purchase
 export const deleteBookPurchase = async (purchaseId) => {
   try {

@@ -114,75 +114,59 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        const { title, section, price, priceAfterDiscount, serial, description, subSection, whatsAppNumber, paymentNumber, subject } = req.body;
-        const updatedBy = req.user._id;
+        const updateData = { ...req.body };
+        updateData.updatedBy = req.user._id;
 
-        // 1️⃣ Get the existing product first
+        // Get existing product to handle file operations
         const existingProduct = await ECProduct.findById(req.params.id);
         if (!existingProduct) {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        // 2️⃣ Start building the update object after we have existingProduct
-        const update = {
-            title,
-            section,
-            price,
-            priceAfterDiscount,
-            serial,
-            description,
-            updatedBy,
-            whatsAppNumber,
-            subSection,
-            paymentNumber,
-            subject: subject || existingProduct.subject,
-            thumbnail: existingProduct.thumbnail,
-            sample: existingProduct.sample,
-            gallery: existingProduct.gallery,
-            updatedAt: new Date(),
-        };
+        // Calculate discount percentage if price or priceAfterDiscount is being updated
+        const finalPrice = updateData.price !== undefined ? updateData.price : existingProduct.price;
+        const finalPriceAfterDiscount = updateData.priceAfterDiscount !== undefined ? updateData.priceAfterDiscount : existingProduct.priceAfterDiscount;
+
+        if (finalPrice && finalPriceAfterDiscount !== undefined && finalPrice !== 0) {
+            updateData.discountPercentage = Math.round(((finalPrice - finalPriceAfterDiscount) / finalPrice) * 100);
+        } else {
+            updateData.discountPercentage = 0;
+        }
 
         // Handle PDF sample update
         if (req.files?.sample?.[0]) {
             const file = req.files.sample[0];
-
             if (file.mimetype !== "application/pdf") {
                 return res.status(400).json({ message: "Sample must be a PDF file" });
             }
             if (file.size > 150 * 1024 * 1024) {
                 return res.status(400).json({ message: "Sample file size must be <= 150MB" });
             }
-
             if (existingProduct.sample && fs.existsSync(existingProduct.sample)) {
                 fs.unlinkSync(existingProduct.sample);
             }
-
-            update.sample = file.path;
+            updateData.sample = file.path;
         }
 
         // Handle thumbnail update
         if (req.files?.thumbnail?.[0]) {
             const file = req.files.thumbnail[0];
             const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
             if (!allowedImageTypes.includes(file.mimetype)) {
                 return res.status(400).json({ message: "Thumbnail must be JPEG, PNG, or WebP" });
             }
             if (file.size > 5 * 1024 * 1024) {
                 return res.status(400).json({ message: "Thumbnail file size must be <= 5MB" });
             }
-
             if (existingProduct.thumbnail && fs.existsSync(existingProduct.thumbnail)) {
                 fs.unlinkSync(existingProduct.thumbnail);
             }
-
-            update.thumbnail = file.path;
+            updateData.thumbnail = file.path;
         }
 
         // Handle gallery update
         if (req.files?.gallery?.length > 0) {
             const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
             for (const file of req.files.gallery) {
                 if (!allowedImageTypes.includes(file.mimetype)) {
                     return res.status(400).json({ message: "All gallery images must be JPEG, PNG, or WebP" });
@@ -191,7 +175,6 @@ exports.updateProduct = async (req, res) => {
                     return res.status(400).json({ message: "Each gallery image must be <= 5MB" });
                 }
             }
-
             if (existingProduct.gallery?.length > 0) {
                 existingProduct.gallery.forEach((imagePath) => {
                     if (fs.existsSync(imagePath)) {
@@ -199,12 +182,13 @@ exports.updateProduct = async (req, res) => {
                     }
                 });
             }
-
-            update.gallery = req.files.gallery.map((file) => file.path);
+            updateData.gallery = req.files.gallery.map((file) => file.path);
+        } else if (updateData.gallery) {
+            // If gallery is sent as array or string in body
+            updateData.gallery = Array.isArray(updateData.gallery) ? updateData.gallery : [updateData.gallery];
         }
 
-        // 3️⃣ Save the updated product
-        const product = await ECProduct.findByIdAndUpdate(req.params.id, update, {
+        const product = await ECProduct.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         }).populate({ path: "section", select: "number" });

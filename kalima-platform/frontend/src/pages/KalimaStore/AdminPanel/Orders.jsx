@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import {
   getAllProductPurchases,
@@ -9,6 +10,7 @@ import {
   updatePurchase,
   deleteProductPurchase,
   ReturnProductPurchase,
+  deleteItemFromPurchase,
 } from "../../../routes/orders";
 import { FaWhatsapp } from "react-icons/fa";
 import {
@@ -23,6 +25,7 @@ import {
   Calendar,
   Filter,
   RotateCcw,
+  Trash2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -70,6 +73,14 @@ const Orders = () => {
   const [exporting, setExporting] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
 
+  // Inline notes editing state for details modal
+  const [detailsNotes, setDetailsNotes] = useState({
+    value: "",
+    isEditing: false,
+    loading: false,
+    hasChanges: false,
+  });
+
   // Enhanced notes modal state
   const [notesModal, setNotesModal] = useState({
     isOpen: false,
@@ -79,6 +90,9 @@ const Orders = () => {
     loading: false,
     hasChanges: false,
   });
+
+  // Delete item loading state
+  const [deletingItemId, setDeletingItemId] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -245,12 +259,12 @@ const Orders = () => {
           )
         );
 
-        alert("تم استرجاع الطلب بنجاح");
+        toast.success(t("alerts.orderReturnSuccess"));
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
-      alert("فشل في استرجاع الطلب: " + err.message);
+      toast.error(t("alerts.orderReturnFailed") + ": " + err.message);
     } finally {
       setConfirmLoading((prev) => ({ ...prev, [order._id]: false }));
     }
@@ -273,12 +287,12 @@ const Orders = () => {
           )
         );
 
-        alert("تم إعادة تأكيد الطلب");
+        toast.success(t("alerts.orderReconfirmed"));
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
-      alert("فشل إعادة التأكيد: " + err.message);
+      toast.error(t("alerts.orderReconfirmFailed") + ": " + err.message);
     } finally {
       setConfirmLoading((prev) => ({ ...prev, [order._id]: false }));
     }
@@ -297,7 +311,7 @@ const Orders = () => {
         response = await confirmProductPurchase(order._id);
       } else {
         // If already confirmed or in an unexpected state, do nothing or handle as error
-        alert(t("alerts.orderAlreadyConfirmedOrInvalidState"));
+        toast.warning(t("alerts.orderAlreadyConfirmedOrInvalidState"));
         return;
       }
 
@@ -332,13 +346,13 @@ const Orders = () => {
 
         const successMessage =
           order.status === "pending" ? "orderReceived" : "orderConfirmed";
-        alert(t(`alerts.${successMessage}`));
+        toast.success(t(`alerts.${successMessage}`));
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
       console.error("Error confirming order:", err);
-      alert(t("alerts.failedToConfirm") + (err?.message || ""));
+      toast.error(t("alerts.failedToConfirm") + (err?.message || ""));
     } finally {
       setConfirmLoading({ ...confirmLoading, [order._id]: false });
     }
@@ -498,13 +512,13 @@ const Orders = () => {
           loading: false,
           hasChanges: false,
         });
-        alert(t("alerts.notesSaved"));
+        toast.success(t("alerts.notesSaved"));
       } else {
         throw new Error(response.error);
       }
     } catch (error) {
       console.error("Error saving notes:", error);
-      alert(t("alerts.failedToSaveNotes") + (error?.message || ""));
+      toast.error(t("alerts.failedToSaveNotes") + (error?.message || ""));
     } finally {
       setNotesModal((prev) => ({ ...prev, loading: false }));
     }
@@ -531,6 +545,77 @@ const Orders = () => {
         loading: false,
         hasChanges: false,
       });
+    }
+  };
+
+  // Inline notes editing functions for details modal
+  const startEditingDetailsNotes = () => {
+    setDetailsNotes({
+      value: selectedOrder?.adminNotes || "",
+      isEditing: true,
+      loading: false,
+      hasChanges: false,
+    });
+  };
+
+  const cancelEditingDetailsNotes = () => {
+    setDetailsNotes({
+      value: "",
+      isEditing: false,
+      loading: false,
+      hasChanges: false,
+    });
+  };
+
+  const handleDetailsNotesChange = (newValue) => {
+    setDetailsNotes((prev) => ({
+      ...prev,
+      value: newValue,
+      hasChanges: newValue !== (selectedOrder?.adminNotes || ""),
+    }));
+  };
+
+  const saveDetailsNotes = async () => {
+    if (!selectedOrder || !detailsNotes.hasChanges) {
+      cancelEditingDetailsNotes();
+      return;
+    }
+
+    try {
+      setDetailsNotes((prev) => ({ ...prev, loading: true }));
+      const response = await updatePurchase(selectedOrder._id, {
+        adminNotes: detailsNotes.value,
+      });
+
+      if (response.success) {
+        // Update orders list
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === selectedOrder._id
+              ? { ...order, adminNotes: detailsNotes.value }
+              : order
+          )
+        );
+        // Update selected order
+        setSelectedOrder((prev) => ({
+          ...prev,
+          adminNotes: detailsNotes.value,
+        }));
+        // Reset editing state
+        setDetailsNotes({
+          value: "",
+          isEditing: false,
+          loading: false,
+          hasChanges: false,
+        });
+        toast.success(t("alerts.notesSaved"));
+      } else {
+        throw new Error(response.error);
+      }
+    } catch (error) {
+      console.error("Error saving notes:", error);
+      toast.error(t("alerts.failedToSaveNotes") + (error?.message || ""));
+      setDetailsNotes((prev) => ({ ...prev, loading: false }));
     }
   };
 
@@ -570,7 +655,7 @@ const Orders = () => {
         setOrders((prev) => prev.filter((o) => o._id !== order._id));
         setError(null);
         // Optionally, update stats here if needed
-        alert(t("alerts.orderDeleted"));
+        toast.success(t("alerts.orderDeleted"));
       } else {
         throw new Error(
           result.error || t("kalimaStore-orders.errors.deleteFailed")
@@ -578,7 +663,46 @@ const Orders = () => {
       }
     } catch (err) {
       setError(err.message);
-      alert(t("alerts.failedToDeleteOrder") + (err?.message || ""));
+      toast.error(t("alerts.failedToDeleteOrder") + (err?.message || ""));
+    }
+  };
+
+  // Handle delete item from purchase
+  const handleDeleteItem = async (itemId) => {
+    if (!selectedOrder || !itemId) return;
+
+    // Check if this is the last item
+    if (selectedOrder.items.length === 1) {
+      toast.error(t("alerts.cannotDeleteLastItem"));
+      return;
+    }
+
+    if (!confirm(t("alerts.confirmDeleteItem"))) return;
+
+    try {
+      setDeletingItemId(itemId);
+      const result = await deleteItemFromPurchase(selectedOrder._id, itemId);
+
+      if (result.success) {
+        // Update the selected order with new data
+        const updatedPurchase = result.data.data.purchase;
+        setSelectedOrder(updatedPurchase);
+
+        // Update the orders list
+        setOrders((prev) =>
+          prev.map((o) =>
+            o._id === selectedOrder._id ? updatedPurchase : o
+          )
+        );
+
+        toast.success(t("alerts.itemDeletedSuccess"));
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err) {
+      toast.error(t("alerts.failedToDeleteItem") + ": " + err.message);
+    } finally {
+      setDeletingItemId(null);
     }
   };
 
@@ -596,7 +720,7 @@ const Orders = () => {
     try {
       const data = scope === "all" ? allOrders : memoizedOrders;
       if (data.length === 0) {
-        alert(t("alerts.noDataToExport"));
+        toast.warning(t("alerts.noDataToExport"));
         return;
       }
 
@@ -648,7 +772,7 @@ const Orders = () => {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        alert(t("alerts.exportSuccess") || "Export complete");
+        toast.success(t("alerts.exportSuccess") || "تم التصدير بنجاح");
       } else if (type === "xlsx") {
         const rows = data.map((o) => ({
           orderId: o._id,
@@ -678,7 +802,7 @@ const Orders = () => {
           .toISOString()
           .slice(0, 10)}.xlsx`;
         XLSX.writeFile(workbook, fileName);
-        alert(t("alerts.exportSuccess") || "Export complete");
+        toast.success(t("alerts.exportSuccess") || "تم التصدير بنجاح");
       } else if (type === "json") {
         const fileName = `orders_export_${new Date()
           .toISOString()
@@ -709,12 +833,12 @@ const Orders = () => {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        alert(t("alerts.exportSuccess") || "Export complete");
+        toast.success(t("alerts.exportSuccess") || "تم التصدير بنجاح");
       }
     } catch (err) {
       console.error("Error exporting orders:", err);
-      alert(
-        (t("alerts.exportFailed") || "Export failed") +
+      toast.error(
+        (t("alerts.exportFailed") || "فشل في التصدير") +
           (err?.message ? `: ${err.message}` : "")
       );
     } finally {
@@ -1151,7 +1275,24 @@ const Orders = () => {
                     </td>
                     <td className="text-center">
                       <div>
-                        <div className="font-medium">{order.userName}</div>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="font-medium">{order.userName}</span>
+                          {order.createdBy?.numberOfPurchases > 5 && (
+                            <span className="badge badge-success badge-xs" title={t("table.frequentBuyer")}>
+                              🌟 {order.createdBy.numberOfPurchases}
+                            </span>
+                          )}
+                          {order.createdBy?.numberOfPurchases > 0 && order.createdBy?.numberOfPurchases <= 5 && (
+                            <span className="badge badge-primary badge-xs">
+                              {order.createdBy.numberOfPurchases}
+                            </span>
+                          )}
+                          {(!order.createdBy?.numberOfPurchases || order.createdBy?.numberOfPurchases === 0) && (
+                            <span className="badge badge-ghost badge-xs" title={t("table.newClient")}>
+                              {t("table.new")}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs opacity-50">
                           {order.createdBy?.email}
                         </div>
@@ -1645,6 +1786,22 @@ const Orders = () => {
                     <strong>{t("table.role")}:</strong>{" "}
                     {selectedOrder.createdBy?.role}
                   </p>
+                  <p className="mt-2">
+                    <strong>{t("table.totalPurchases")}:</strong>{" "}
+                    <span className={`badge ${selectedOrder.createdBy?.numberOfPurchases > 5 ? 'badge-success' : selectedOrder.createdBy?.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                      {selectedOrder.createdBy?.numberOfPurchases || 0}
+                    </span>
+                    {selectedOrder.createdBy?.numberOfPurchases > 5 && (
+                      <span className="ml-2 text-xs text-green-600 font-semibold">
+                        🌟 {t("table.frequentBuyer")}
+                      </span>
+                    )}
+                    {(!selectedOrder.createdBy?.numberOfPurchases || selectedOrder.createdBy?.numberOfPurchases === 0) && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        {t("table.newClient")}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -1669,43 +1826,65 @@ const Orders = () => {
                 <div>
                   <label className="label">
                     <span className="label-text font-medium">
-                      Cart Items ({selectedOrder.items.length})
+                      {t("table.cartItems")} ({selectedOrder.items.length})
                     </span>
+                    {selectedOrder.items.length > 1 && (
+                      <span className="label-text-alt text-warning">
+                        {t("table.canDeleteItems")}
+                      </span>
+                    )}
                   </label>
                   <div className="bg-base-200 p-3 rounded space-y-3">
-                    {Object.entries(groupedItems).map(([title, items], idx) => (
-                      <div key={idx} className="border-b pb-3 last:border-b-0">
-                        {/* عنوان الكتاب */}
+                    {selectedOrder.items.map((item, idx) => (
+                      <div key={item._id || idx} className="border-b pb-3 last:border-b-0">
+                        {/* عنوان المنتج */}
                         <div className="flex justify-between items-start">
-                          <div>
+                          <div className="flex-1">
                             <p>
-                              <strong>{title}</strong>
+                              <strong>{item.productSnapshot?.title || item.productName}</strong>
                             </p>
 
                             {/* عرض Type */}
                             <p className="text-sm opacity-75">
-                              Type: {items[0].productType}
+                              {t("table.type")}: {item.productType === "ECBook" ? t("table.book") : t("table.productType")}
                             </p>
 
-                            <p className="text-sm">
-                              عدد الطلبات :{items.length}
-                            </p>
+                            {/* Product Serial */}
+                            {item.productSnapshot?.serial && (
+                              <p className="text-sm font-mono">
+                                <strong>{t("table.productSerial") || "Serial"}:</strong>{" "}
+                                <span className="badge badge-ghost badge-sm">
+                                  {item.productSnapshot.serial}
+                                </span>
+                              </p>
+                            )}
                           </div>
 
-                          {/* السعر */}
-                          <p className="font-bold">
-                            {formatPrice(
-                              items.reduce(
-                                (sum, it) =>
-                                  sum + it.priceAtPurchase * (it.quantity || 1),
-                                0
-                              )
+                          {/* السعر وزرار الحذف */}
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold">
+                              {formatPrice(item.priceAtPurchase * (item.quantity || 1))}
+                            </p>
+                            {/* Delete button - only show if more than 1 item */}
+                            {selectedOrder.items.length > 1 && (
+                              <button
+                                className="btn btn-ghost btn-xs text-error hover:bg-error hover:text-white"
+                                onClick={() => handleDeleteItem(item._id)}
+                                disabled={deletingItemId === item._id}
+                                title={t("table.deleteItem")}
+                              >
+                                {deletingItemId === item._id ? (
+                                  <span className="loading loading-spinner loading-xs"></span>
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
                             )}
-                          </p>
+                          </div>
                         </div>
 
-                        {/* 📚 Book Info – تظهر مرة واحدة فقط */}
-                        {items[0].productType === "ECBook" && (
+                        {/* 📚 Book Info */}
+                        {item.productType === "ECBook" && (
                           <div className="mt-2 ml-4 border-l-2 border-primary pl-2 text-sm">
                             <label className="label">
                               <span className="label-text font-medium text-xs">
@@ -1713,24 +1892,24 @@ const Orders = () => {
                               </span>
                             </label>
 
-                            {items[0].nameOnBook && (
+                            {item.nameOnBook && (
                               <p>
                                 <strong>{t("table.nameOnBook")}:</strong>{" "}
-                                {items[0].nameOnBook}
+                                {item.nameOnBook}
                               </p>
                             )}
 
-                            {items[0].numberOnBook && (
+                            {item.numberOnBook && (
                               <p>
                                 <strong>{t("table.numberOnBook")}:</strong>{" "}
-                                {items[0].numberOnBook}
+                                {item.numberOnBook}
                               </p>
                             )}
 
-                            {items[0].seriesName && (
+                            {item.seriesName && (
                               <p>
                                 <strong>{t("table.seriesName")}:</strong>{" "}
-                                {items[0].seriesName}
+                                {item.seriesName}
                               </p>
                             )}
                           </div>
@@ -1814,28 +1993,77 @@ const Orders = () => {
                     <MessageSquare className="w-4 h-4" />
                     {t("table.adminNotes")}
                   </span>
-                </label>
-                <div className="bg-base-200 p-3 rounded min-h-16">
-                  {selectedOrder.adminNotes ? (
-                    <div>
-                      <p className="whitespace-pre-wrap">
-                        {selectedOrder.adminNotes}
-                      </p>
-                      {selectedOrder.adminNoteBy && (
-                        <div className="flex flex-col mt-2 text-xs opacity-75">
-                          <p>
-                            Created By:{" "}
-                            <strong>{selectedOrder.adminNoteBy.name}</strong>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">
-                      {t("table.noAdminNotes")}
-                    </p>
+                  {!detailsNotes.isEditing && (
+                    <button
+                      className="btn btn-ghost btn-xs gap-1"
+                      onClick={startEditingDetailsNotes}
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      {selectedOrder.adminNotes
+                        ? (t("table.editNotes") || (isRTL ? "تعديل" : "Edit"))
+                        : (t("table.addNotes") || (isRTL ? "إضافة ملاحظة" : "Add Note"))}
+                    </button>
                   )}
-                </div>
+                </label>
+
+                {detailsNotes.isEditing ? (
+                  <div className="space-y-3">
+                    <textarea
+                      className="textarea textarea-bordered w-full min-h-24 text-sm"
+                      placeholder={isRTL ? "اكتب ملاحظاتك هنا..." : "Write your notes here..."}
+                      value={detailsNotes.value}
+                      onChange={(e) => handleDetailsNotesChange(e.target.value)}
+                      disabled={detailsNotes.loading}
+                      autoFocus
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        className="btn btn-ghost btn-sm gap-1"
+                        onClick={cancelEditingDetailsNotes}
+                        disabled={detailsNotes.loading}
+                      >
+                        <X className="w-4 h-4" />
+                        {t("table.cancel") || (isRTL ? "إلغاء" : "Cancel")}
+                      </button>
+                      <button
+                        className={`btn btn-primary btn-sm gap-1 ${
+                          detailsNotes.hasChanges ? "" : "btn-disabled"
+                        }`}
+                        onClick={saveDetailsNotes}
+                        disabled={detailsNotes.loading || !detailsNotes.hasChanges}
+                      >
+                        {detailsNotes.loading ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : (
+                          <Save className="w-4 h-4" />
+                        )}
+                        {t("table.saveNotes") || (isRTL ? "حفظ" : "Save")}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-base-200 p-3 rounded min-h-16">
+                    {selectedOrder.adminNotes ? (
+                      <div>
+                        <p className="whitespace-pre-wrap">
+                          {selectedOrder.adminNotes}
+                        </p>
+                        {selectedOrder.adminNoteBy && (
+                          <div className="flex flex-col mt-2 text-xs opacity-75">
+                            <p>
+                              Created By:{" "}
+                              <strong>{selectedOrder.adminNoteBy.name}</strong>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic">
+                        {t("table.noAdminNotes")}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1845,6 +2073,7 @@ const Orders = () => {
                 onClick={() => {
                   setShowDetailsModal(false);
                   setSelectedOrder(null);
+                  cancelEditingDetailsNotes();
                 }}
               >
                 {t("table.close")}
@@ -1856,6 +2085,7 @@ const Orders = () => {
                     handleConfirmOrder(selectedOrder);
                     setShowDetailsModal(false);
                     setSelectedOrder(null);
+                    cancelEditingDetailsNotes();
                   }}
                   disabled={confirmLoading[selectedOrder._id]}
                 >

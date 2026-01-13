@@ -44,6 +44,9 @@ router.route('/admin/fullreport')
         cartPurchaseController.getFullOrdersReport
     );
 
+router.get('/confirmed-count', authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getMonthlyConfirmedPurchasesCount);
+
 router.route('/:id')
     .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         cartPurchaseController.getCartPurchaseById);
@@ -77,6 +80,12 @@ router.route('/:id')
     .delete(
         authController.verifyRoles("Admin", "SubAdmin"),
         cartPurchaseController.deletePurchase
+    );
+
+router.route('/delete/:purchaseId/item/:itemId')
+    .delete(
+        authController.verifyRoles("Admin", "SubAdmin"),
+        cartPurchaseController.deleteItemFromPurchase
     );
 
 module.exports = router;

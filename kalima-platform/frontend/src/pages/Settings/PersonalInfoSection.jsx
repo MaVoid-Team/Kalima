@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import SectionHeader from "./SectionHeader";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { getUserDashboard } from "../../routes/auth-services";
 import { updateCurrentUser } from "../../routes/update-user";
 import { Check, X, Camera, Upload } from "lucide-react";
@@ -57,7 +58,7 @@ function PersonalInfoSection() {
         "image/gif",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert(
+        toast.error(
           t("validation.invalidImageType") ||
             "Please select a valid image file (JPEG, PNG, GIF)"
         );
@@ -67,7 +68,7 @@ function PersonalInfoSection() {
       // Validate file size (5MB limit)
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
-        alert(
+        toast.error(
           t("validation.fileTooLarge") || "File size must be less than 5MB"
         );
         return;
