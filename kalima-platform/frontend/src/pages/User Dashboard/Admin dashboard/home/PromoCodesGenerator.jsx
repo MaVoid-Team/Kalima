@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { Ticket, Copy, Check, AlertCircle, Download, Printer } from 'lucide-react'
 import { generatePromoCodes } from "../../../../routes/codes"
 import { getAllLecturers } from "../../../../routes/fetch-users"
@@ -211,7 +212,7 @@ const PromoCodeGenerator = () => {
   
     const printWindow = window.open("", "_blank")
     if (!printWindow) {
-      alert("Please allow pop-ups to print QR codes")
+      toast.warning(t("allowPopupsMessage") || "يرجى السماح بالنوافذ المنبثقة لطباعة أكواد QR")
       return
     }
   

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { ImageIcon, Video, ChevronDown } from "lucide-react"
+import { toast } from "sonner"
 import { createContainer } from "../../routes/lectures"
 
 function BasicInfoForm({
@@ -24,14 +25,14 @@ function BasicInfoForm({
     if (file && file.size <= 1024 * 1024 * 1024) {
       setCourseImage(file)
     } else {
-      alert(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
+      toast.error(isRTL ? "حجم الملف يجب أن يكون أقل من 1 جيجابايت" : "File size must be less than 1GB")
     }
   }
 
   const handleCreateParentContainer = async (e) => {
     e.preventDefault()
     if (!formData.courseName || !formData.gradeLevel || !formData.subject) {
-      alert(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
+      toast.error(isRTL ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields")
       return
     }
 
@@ -68,14 +69,14 @@ function BasicInfoForm({
             type: container.type,
           },
         })
-        alert(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully")
+        toast.success(isRTL ? "تم إنشاء الحاوية الرئيسية بنجاح" : "Parent container created successfully")
       } else {
-        alert(isRTL ? "فشل إنشاء الحاوية الرئيسية" : "Failed to create parent container")
+        toast.error(isRTL ? "فشل إنشاء الحاوية الرئيسية" : "Failed to create parent container")
       }
     } catch (error) {
       console.error("Error creating parent container:", error)
       const errorMessage = error.response?.data?.message || "حدث خطأ أثناء إنشاء الحاوية الرئيسية"
-      alert(isRTL ? errorMessage : "Error creating parent container")
+      toast.error(isRTL ? errorMessage : "Error creating parent container")
     } finally {
       setIsSubmitting(false)
     }

@@ -99,6 +99,9 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     if (!paymentMethodDoc) {
       return next(new AppError("Invalid Payment Method Selected", 400));
     }
+        if (paymentMethodDoc.phoneNumber === req.body.numberTransferredFrom) {
+            return next(new AppError("Please enter the number that you used to pay not the number of the payment method", 400));
+        }
   }
   // Prepare items with snapshots
   const items = cart.items.map((item) => ({
@@ -126,7 +129,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
   const paymentScreenShot =
     cart.total > 0 && paymentFile ? paymentFile.path : null;
   const numberTransferredFrom =
-    cart.total > 0 ? req.body.numberTransferredFrom : null;
+    cart.total > 0 ? (req.body.numberTransferredFrom || '').replace(/\s/g, '') : null;
 
   // Prepare watermark file path
   const watermarkFile =
@@ -316,7 +319,31 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     );
     // Don't fail the purchase if notifications fail
   }
+    // Update user statistics: increment purchase count and total spent
+    let updatedUser = await User.findById(req.user._id);
 
+    if (!updatedUser) {
+        // User doesn't exist, create with initial values
+        updatedUser = await User.create({
+            _id: req.user._id,
+            numberOfPurchases: 1,
+            TotalSpentAmount: cart.total
+        });
+    } else {
+        // User exists, increment the values
+        updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $inc: {
+                    numberOfPurchases: 1,
+                    TotalSpentAmount: cart.total
+                }
+            },
+            { new: true }
+        );
+    }
+
+    console.log(`[Purchase Created] User ${req.user._id}: numberOfPurchases=${updatedUser.numberOfPurchases}, TotalSpentAmount=${updatedUser.TotalSpentAmount}`);
   await cart.clear();
   // Return the created purchase
   res.status(201).json({
@@ -335,9 +362,10 @@ exports.getCartPurchases = catchAsync(async (req, res, next) => {
     .populate("couponCode")
     .populate({
       path: "paymentMethod",
-      select: "name phoneNumber",
+      select: "name",
       strictPopulate: false,
-    });
+    })
+        .select('-confirmedBy -adminNoteBy -receivedBy -returnedBy -returnedAt -confirmedAt -adminNotes -receivedAt -userName -createdBy');
 
   res.status(200).json({
     status: "success",
@@ -434,6 +462,30 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+    // Auto-calculate and update monthly count
+    const currentMonth = getCurrentEgyptTime();
+    const monthStart = currentMonth.startOf('month').toJSDate();
+    const monthEnd = currentMonth.endOf('month').toJSDate();
+
+    const monthlyCount = await ECCartPurchase.countDocuments({
+        confirmedBy: req.user._id,
+        status: 'confirmed',
+        confirmedAt: {
+            $gte: monthStart,
+            $lte: monthEnd
+        }
+    });
+
+    // Update user's monthly confirmed count
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            monthlyConfirmedCount: monthlyCount,
+            lastConfirmedCountUpdate: new Date()
+        }
+    );
+
   res.status(200).json({
     status: "success",
     message: "Purchase confirmed successfully",
@@ -528,7 +580,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         const found = await ECCartPurchase.findById(searchTermString)
           .populate({
             path: "createdBy",
-            select: "name email role phoneNumber",
+            select: "name email role phoneNumber TotalSpentAmount numberOfPurchases",
           })
           .populate({ path: "confirmedBy", select: "name" })
           .populate({ path: "receivedBy", select: "name" })
@@ -666,7 +718,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         const doc = await ECCartPurchase.findById(id)
           .populate({
             path: "createdBy",
-            select: "name email role phoneNumber",
+            select: "name email role phoneNumber TotalSpentAmount numberOfPurchases",
           })
           .populate({ path: "confirmedBy", select: "name" })
           .populate({ path: "receivedBy", select: "name" })
@@ -699,7 +751,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
   // No search — simple find with base filters
   const purchases = await ECCartPurchase.find(baseMatch)
-    .populate({ path: "createdBy", select: "name email role phoneNumber" })
+    .populate({ path: "createdBy", select: "name email role phoneNumber TotalSpentAmount numberOfPurchases" })
     .populate({ path: "confirmedBy", select: "name" })
     .populate({ path: "receivedBy", select: "name" })
     .populate({ path: "returnedBy", select: "name" })
@@ -1085,6 +1137,45 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     }
   }
 
+    // If the purchase was confirmed, update the confirmedBy user's monthly count
+    if (purchase.status === 'confirmed' && purchase.confirmedBy) {
+        const currentMonth = getCurrentEgyptTime();
+        const monthStart = currentMonth.startOf('month').toJSDate();
+        const monthEnd = currentMonth.endOf('month').toJSDate();
+
+        // Recalculate the monthly confirmed count for the user who confirmed this purchase
+        const monthlyCount = await ECCartPurchase.countDocuments({
+            confirmedBy: purchase.confirmedBy,
+            status: 'confirmed',
+            confirmedAt: {
+                $gte: monthStart,
+                $lte: monthEnd
+            },
+            _id: { $ne: purchase._id } // Exclude the purchase being deleted
+        });
+
+        // Update the confirmedBy user's monthly count
+        await User.findByIdAndUpdate(
+            purchase.confirmedBy,
+            {
+                monthlyConfirmedCount: monthlyCount,
+                lastConfirmedCountUpdate: new Date()
+            }
+        );
+    }
+    // Update user statistics: decrement purchase count and total spent
+    const updatedUserAfterDelete = await User.findByIdAndUpdate(
+        purchase.createdBy,
+        {
+            $inc: {
+                numberOfPurchases: -1,
+                TotalSpentAmount: -purchase.total
+            }
+        },
+        { new: true }
+    );
+    console.log(`[Purchase Deleted] User ${purchase.createdBy}: numberOfPurchases=${updatedUserAfterDelete.numberOfPurchases}, TotalSpentAmount=${updatedUserAfterDelete.TotalSpentAmount}`);
+
   // Delete the purchase
   await ECCartPurchase.findByIdAndDelete(req.params.id);
 
@@ -1092,6 +1183,238 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
     status: "success",
     message: "Purchase deleted successfully",
   });
+});
+
+exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
+    const purchaseId = req.params.purchaseId;
+    const itemId = req.params.itemId;
+    const purchase = await ECCartPurchase.findById(purchaseId);
+    if (!purchase) {
+        return next(new AppError("No purchase found with that ID", 404))
+    }
+
+    // Find the item to get its price before deletion
+    const itemToDelete = purchase.items.id(itemId);
+    if (!itemToDelete) {
+        return next(new AppError("No item found with that ID in the purchase", 404))
+    }
+    if (purchase.items.length === 1) {
+        return next(new AppError("Cannot remove the last item from the purchase. Delete the entire purchase instead.", 400))
+    }
+
+    // Get the price of the item being deleted
+    const deletedItemPrice = itemToDelete.priceAtPurchase || 0;
+
+    // Update user's total spent amount by removing only the deleted item's price
+    const updatedUserAfterItemDelete = await User.findByIdAndUpdate(
+        purchase.createdBy,
+        {
+            $inc: {
+                TotalSpentAmount: -deletedItemPrice
+            }
+        },
+        { new: true }
+    );
+    console.log(`[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`);
+
+    // Remove the item from the purchase
+    purchase.items.id(itemId).deleteOne();
+
+    // Recalculate subtotal based on remaining items
+    const newSubtotal = purchase.items.reduce((sum, item) => {
+        return sum + (item.priceAtPurchase || 0);
+    }, 0);
+
+    // Update purchase totals
+    purchase.subtotal = newSubtotal;
+
+    // Recalculate total (subtotal - discount)
+    purchase.total = Math.max(0, newSubtotal - (purchase.discount || 0));
+
+    // If no items left, clear the coupon as well
+    if (purchase.items.length === 0) {
+        purchase.couponCode = null;
+        purchase.discount = 0;
+        purchase.total = 0;
+    }
+
+    await purchase.save();
+    res.status(200).json({
+        status: "success",
+        message: "Item removed from purchase successfully",
+        data: {
+            purchase
+        }
+    });
+
+})
+
+exports.getMonthlyConfirmedPurchasesCount = catchAsync(async (req, res, next) => {
+    // Get current month in Egypt timezone
+    const now = getCurrentEgyptTime();
+    const monthStart = now.startOf('month').toJSDate();
+    const monthEnd = now.endOf('month').toJSDate();
+
+    // Get user
+    const user = await User.findById(req.user._id).select('monthlyConfirmedCount lastConfirmedCountUpdate');
+
+    // Determine if we need to recalculate
+    let count = user?.monthlyConfirmedCount || 0;
+    let needsRecalculation = false;
+
+    if (!user?.lastConfirmedCountUpdate) {
+        // First time or never updated - recalculate
+        needsRecalculation = true;
+    } else {
+        // Check if we're in a different month
+        const lastUpdate = DateTime.fromJSDate(user.lastConfirmedCountUpdate).setZone('Africa/Cairo');
+        const lastUpdateMonth = lastUpdate.startOf('month').toJSDate();
+        if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
+            needsRecalculation = true;
+        }
+    }
+
+    // Recalculate if needed
+    if (needsRecalculation) {
+        count = await ECCartPurchase.countDocuments({
+            confirmedBy: req.user._id,
+            status: 'confirmed',
+            confirmedAt: {
+                $gte: monthStart,
+                $lte: monthEnd
+            }
+        });
+
+        // Update the stored count
+        await User.findByIdAndUpdate(req.user._id, {
+            monthlyConfirmedCount: count,
+            lastConfirmedCountUpdate: new Date()
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            confirmedPurchasesCount: count,
+            month: now.toFormat('MMMM yyyy')
+        }
+    });
+});
+
+exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
+    const purchaseId = req.params.purchaseId;
+    const itemId = req.params.itemId;
+    const purchase = await ECCartPurchase.findById(purchaseId);
+    if (!purchase) {
+        return next(new AppError("No purchase found with that ID", 404))
+    }
+
+    // Find the item to get its price before deletion
+    const itemToDelete = purchase.items.id(itemId);
+    if (!itemToDelete) {
+        return next(new AppError("No item found with that ID in the purchase", 404))
+    }
+    if (purchase.items.length === 1) {
+        return next(new AppError("Cannot remove the last item from the purchase. Delete the entire purchase instead.", 400))
+    }
+
+    // Get the price of the item being deleted
+    const deletedItemPrice = itemToDelete.priceAtPurchase || 0;
+
+    // Update user's total spent amount by removing only the deleted item's price
+    const updatedUserAfterItemDelete = await User.findByIdAndUpdate(
+        purchase.createdBy,
+        {
+            $inc: {
+                TotalSpentAmount: -deletedItemPrice
+            }
+        },
+        { new: true }
+    );
+    console.log(`[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`);
+
+    // Remove the item from the purchase
+    purchase.items.id(itemId).deleteOne();
+
+    // Recalculate subtotal based on remaining items
+    const newSubtotal = purchase.items.reduce((sum, item) => {
+        return sum + (item.priceAtPurchase || 0);
+    }, 0);
+
+    // Update purchase totals
+    purchase.subtotal = newSubtotal;
+
+    // Recalculate total (subtotal - discount)
+    purchase.total = Math.max(0, newSubtotal - (purchase.discount || 0));
+
+    // If no items left, clear the coupon as well
+    if (purchase.items.length === 0) {
+        purchase.couponCode = null;
+        purchase.discount = 0;
+        purchase.total = 0;
+    }
+
+    await purchase.save();
+    res.status(200).json({
+        status: "success",
+        message: "Item removed from purchase successfully",
+        data: {
+            purchase
+        }
+    });
+
+})
+
+exports.getMonthlyConfirmedPurchasesCount = catchAsync(async (req, res, next) => {
+    // Get current month in Egypt timezone
+    const now = getCurrentEgyptTime();
+    const monthStart = now.startOf('month').toJSDate();
+    const monthEnd = now.endOf('month').toJSDate();
+
+    // Get user
+    const user = await User.findById(req.user._id).select('monthlyConfirmedCount lastConfirmedCountUpdate');
+
+    // Determine if we need to recalculate
+    let count = user?.monthlyConfirmedCount || 0;
+    let needsRecalculation = false;
+
+    if (!user?.lastConfirmedCountUpdate) {
+        // First time or never updated - recalculate
+        needsRecalculation = true;
+    } else {
+        // Check if we're in a different month
+        const lastUpdate = DateTime.fromJSDate(user.lastConfirmedCountUpdate).setZone('Africa/Cairo');
+        const lastUpdateMonth = lastUpdate.startOf('month').toJSDate();
+        if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
+            needsRecalculation = true;
+        }
+    }
+
+    // Recalculate if needed
+    if (needsRecalculation) {
+        count = await ECCartPurchase.countDocuments({
+            confirmedBy: req.user._id,
+            status: 'confirmed',
+            confirmedAt: {
+                $gte: monthStart,
+                $lte: monthEnd
+            }
+        });
+
+        // Update the stored count
+        await User.findByIdAndUpdate(req.user._id, {
+            monthlyConfirmedCount: count,
+            lastConfirmedCountUpdate: new Date()
+        });
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            confirmedPurchasesCount: count,
+            month: now.toFormat('MMMM yyyy')
+        }
+    });
 });
 
 // Product-level purchase statistics

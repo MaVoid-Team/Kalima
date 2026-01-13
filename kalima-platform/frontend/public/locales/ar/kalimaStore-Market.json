@@ -41,7 +41,11 @@
   },
   "errors": {
     "loadingError": "خطأ في تحميل البيانات",
-    "fetchErrorLog": "خطأ في جلب البيانات:"
+    "fetchErrorLog": "خطأ في جلب البيانات:",
+    "addToCartFailed": "فشل في الإضافة إلى السلة"
+  },
+  "success": {
+    "addedToCart": "تمت الإضافة إلى السلة بنجاح!"
   },
   "empty": {
     "noProducts": "لم يتم العثور على منتجات.",

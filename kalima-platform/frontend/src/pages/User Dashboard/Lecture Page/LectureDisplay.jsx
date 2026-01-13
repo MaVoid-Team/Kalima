@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   getLectureById,
   getLectureAttachments,
@@ -639,7 +639,7 @@ const LectureDisplay = () => {
           if (response.data.remainingViews <= 0) {
             setVideoBlocked(true);
             playerRef.current?.pause();
-            alert(t("noMoreViewsAlert"));
+            toast.error(t("noMoreViewsAlert"));
             redirectTimeoutRef.current = setTimeout(() => navigate(-1), 180000);
           }
         } else {

@@ -13,6 +13,7 @@ const catchAsync = require("../utils/catchAsync");
 const Level = require("../models/levelModel.js");
 const Government = require("../models/governmentModel.js");
 const AdministrationZone = require("../models/administrationZonesModel.js");
+const { create } = require("lodash");
 const validatePassword = (password) => {
   const requiredLength = 8;
 
@@ -43,6 +44,7 @@ function formatEgyptianPhoneNumber(number) {
 }
 
 const registerNewUser = catchAsync(async (req, res, next) => {
+  const actor = req.user; // The user making the request (admin, subadmin, etc.)
   const {
     role,
     name,
@@ -105,7 +107,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         (zone) =>
           zone &&
           zone.toLowerCase().trim() ===
-            normalizedAdministrationZone.toLowerCase() // ← Use normalized value
+          normalizedAdministrationZone.toLowerCase() // ← Use normalized value
       );
 
       if (!zoneExistsInGov) {
@@ -208,6 +210,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
     password: hashedPwd,
     children: childrenById,
     isEmailVerified: true, // Set users to already verified by default
+    createdBy: actor ? actor._id : null, // Track who created the user if available
     ...userData,
   };
 

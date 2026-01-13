@@ -1,14 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
 import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
 import { addToCart, getUserPurchasedProducts } from "../../routes/cart"
-import { isLoggedIn } from "../../routes/auth-services"
-import { ShoppingCart } from "lucide-react"
+import { isLoggedIn, getToken } from "../../routes/auth-services"
+import { ShoppingCart, Zap, X, LogIn, UserPlus } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Import components
 import ProductHeader from "./components/ProductHeader"
@@ -29,6 +31,7 @@ const ProductDetails = () => {
   const [uploadedFile, setUploadedFile] = useState(null)
   const [addingToCart, setAddingToCart] = useState(false)
   const [isPurchased, setIsPurchased] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // Coupon and Price State
   const [couponCode, setCouponCode] = useState("")
@@ -51,6 +54,7 @@ const ProductDetails = () => {
 
   const { id, type } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const getItemType = (item) => {
     return item && item.__t === "ECBook" ? "book" : "product"
@@ -120,14 +124,14 @@ const ProductDetails = () => {
 
   // Handle add to cart
   const handleAddToCart = async () => {
-    if (!isLoggedIn()) {
-      alert(t("errors.loginRequired") || "Please login to add items to cart")
-      navigate("/login")
+    if (!getToken()) {
+      // Show auth modal to let user choose login or register
+      setShowAuthModal(true)
       return
     }
 
     if (!product) {
-      alert(t("errors.productDataNotLoaded"))
+      toast.error(t("errors.productDataNotLoaded"))
       return
     }
 
@@ -146,14 +150,14 @@ const ProductDetails = () => {
       setAddingToCart(true)
       const result = await addToCart(product._id)
       if (result.success) {
-        alert(t("success.addedToCart") || "Item added to cart successfully!")
+        toast.success(t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!")
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"))
       } else {
-        alert(result.error || t("errors.addToCartFailed") || "Failed to add to cart")
+        toast.error(result.error || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
       }
     } catch (error) {
-      alert(error.message || t("errors.addToCartFailed") || "Failed to add to cart")
+      toast.error(error.message || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
     } finally {
       setAddingToCart(false)
     }
@@ -161,7 +165,7 @@ const ProductDetails = () => {
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
-      alert(t("errors.noCouponCode"))
+      toast.warning(t("errors.noCouponCode"))
       return
     }
 
@@ -242,24 +246,24 @@ const ProductDetails = () => {
 
   const handleSubmit = async () => {
     if (!product) {
-      alert(t("errors.productDataNotLoaded"))
+      toast.error(t("errors.productDataNotLoaded"))
       return
     }
 
     const actualType = getItemType(product)
 
     if (!uploadedFile) {
-      alert(t("errors.noFileSelected"))
+      toast.warning(t("errors.noFileSelected"))
       return
     }
 
     if (!purchaseForm.numberTransferredFrom) {
-      alert(t("errors.noTransferNumber"))
+      toast.warning(t("errors.noTransferNumber"))
       return
     }
 
     if (actualType === "book" && (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName)) {
-      alert(t("errors.fillBookFields"))
+      toast.warning(t("errors.fillBookFields"))
       return
     }
 
@@ -293,7 +297,7 @@ const ProductDetails = () => {
       }
 
       if (response.status === "success" || response.message) {
-        alert(t("success.purchaseSubmitted"))
+        toast.success(t("success.purchaseSubmitted"))
 
         // Reset form
         setUploadedFile(null)
@@ -314,7 +318,7 @@ const ProductDetails = () => {
     } catch (err) {
       console.error("💥 Error submitting purchase:", err)
       const errorMessage = err.response?.data?.message || err.message || t("errors.unknownError")
-      alert(t("errors.purchaseSubmissionFailed") + errorMessage)
+      toast.error(t("errors.purchaseSubmissionFailed") + errorMessage)
     } finally {
       setPurchaseLoading(false)
     }
@@ -390,12 +394,30 @@ const ProductDetails = () => {
                   </div>
                 )}
 
-                {/* Add to Cart Button */}
-                <div className="mt-6">
+                {/* Action Buttons */}
+                <div className="mt-6 space-y-3">
+                  {/* Buy Now Button */}
+                  <button
+                    onClick={() => {
+                      if (!getToken()) {
+                        // Show auth modal to let user choose login or register
+                        setShowAuthModal(true)
+                        return
+                      }
+                      // Go directly to checkout
+                      navigate(`/checkout?productId=${product._id}&type=${displayType}`)
+                    }}
+                    className="btn btn-primary btn-lg w-full"
+                  >
+                    <Zap className="w-5 h-5" />
+                    {isRTL ? "اشتري الآن" : "Buy Now"}
+                  </button>
+
+                  {/* Add to Cart Button */}
                   <button
                     onClick={handleAddToCart}
                     disabled={addingToCart}
-                    className="btn btn-primary btn-lg w-full"
+                    className="btn btn-outline btn-lg w-full"
                   >
                     {addingToCart ? (
                       <>
@@ -406,7 +428,7 @@ const ProductDetails = () => {
                       <>
                         <ShoppingCart className="w-5 h-5" />
                         {isPurchased
-                          ? (isRTL ? "شراء مرة أخرى" : "Buy Again")
+                          ? (isRTL ? "أضف للسلة مجددًا" : "Add to Cart Again")
                           : (t("addToCart") || "Add to Cart")}
                       </>
                     )}
@@ -417,6 +439,76 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Auth Required Modal - Login or Register Choice */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">
+                  {isRTL ? "تسجيل الدخول مطلوب" : "Login Required"}
+                </h3>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
+                  {isRTL
+                    ? "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
+                    : "You need to login to add items to cart"}
+                </p>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "هل لديك حساب بالفعل؟ قم بتسجيل الدخول. أو أنشئ حساب جديد."
+                    : "Already have an account? Login. Or create a new account."}
+                </p>
+              </div>
+
+              {/* Footer - Two Buttons */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false)
+                    const currentUrl = location.pathname + location.search
+                    navigate(`/login?redirect=${encodeURIComponent(currentUrl)}`)
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  <LogIn className="w-5 h-5" />
+                  {isRTL ? "تسجيل الدخول" : "Login"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false)
+                    const currentUrl = location.pathname + location.search
+                    navigate(`/register?redirect=${encodeURIComponent(currentUrl)}`)
+                  }}
+                  className="btn btn-outline btn-primary flex-1"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  {isRTL ? "إنشاء حساب" : "Register"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

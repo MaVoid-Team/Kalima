@@ -9,6 +9,7 @@ import { getUserDashboard } from "../../../routes/auth-services"
 import { getLectureHomeworks } from "../../../routes/homeworks"
 import { downloadAttachmentById } from "../../../routes/lectures"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 import { getAllStudentLectureAccess, updateStudentLectureAccess } from "../../../routes/student-lecture-access"
 import {
   FiArrowLeft,
@@ -290,11 +291,10 @@ const DetailedLectureView = () => {
       setShowFeedbackModal(false)
       
       // Show success message
-      // You might want to replace this with a toast notification
-      alert('Feedback submitted successfully')
+      toast.success(t("feedbackSubmittedSuccess") || "تم إرسال التقييم بنجاح")
     } catch (error) {
       console.error('Error submitting feedback:', error)
-      setFeedbackError('Failed to submit feedback. Please try again.')
+      setFeedbackError(t("feedbackSubmitError") || "فشل في إرسال التقييم. حاول مرة أخرى.")
     } finally {
       setIsSubmittingFeedback(false)
     }
