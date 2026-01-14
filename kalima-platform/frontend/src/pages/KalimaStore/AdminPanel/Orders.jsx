@@ -690,9 +690,7 @@ const Orders = () => {
 
         // Update the orders list
         setOrders((prev) =>
-          prev.map((o) =>
-            o._id === selectedOrder._id ? updatedPurchase : o
-          )
+          prev.map((o) => (o._id === selectedOrder._id ? updatedPurchase : o))
         );
 
         toast.success(t("alerts.itemDeletedSuccess"));
@@ -1278,17 +1276,25 @@ const Orders = () => {
                         <div className="flex items-center justify-center gap-2">
                           <span className="font-medium">{order.userName}</span>
                           {order.createdBy?.numberOfPurchases > 5 && (
-                            <span className="badge badge-success badge-xs" title={t("table.frequentBuyer")}>
+                            <span
+                              className="badge badge-success badge-xs"
+                              title={t("table.frequentBuyer")}
+                            >
                               🌟 {order.createdBy.numberOfPurchases}
                             </span>
                           )}
-                          {order.createdBy?.numberOfPurchases > 0 && order.createdBy?.numberOfPurchases <= 5 && (
-                            <span className="badge badge-primary badge-xs">
-                              {order.createdBy.numberOfPurchases}
-                            </span>
-                          )}
-                          {(!order.createdBy?.numberOfPurchases || order.createdBy?.numberOfPurchases === 0) && (
-                            <span className="badge badge-ghost badge-xs" title={t("table.newClient")}>
+                          {order.createdBy?.numberOfPurchases > 0 &&
+                            order.createdBy?.numberOfPurchases <= 5 && (
+                              <span className="badge badge-primary badge-xs">
+                                {order.createdBy.numberOfPurchases}
+                              </span>
+                            )}
+                          {(!order.createdBy?.numberOfPurchases ||
+                            order.createdBy?.numberOfPurchases === 0) && (
+                            <span
+                              className="badge badge-ghost badge-xs"
+                              title={t("table.newClient")}
+                            >
                               {t("table.new")}
                             </span>
                           )}
@@ -1314,10 +1320,10 @@ const Orders = () => {
                         <span className="text-green-500">
                           {order.couponCode.value ||
                             order.discountAmount ||
-                            "Applied"}
+                            t("table.couponApplied")}
                         </span>
                       ) : (
-                        "NA"
+                        t("table.notAvailable")
                       )}
                     </td>
                     <td className="text-center">
@@ -1335,13 +1341,15 @@ const Orders = () => {
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-400">N/A</span>
+                        <span className="text-gray-400">
+                          {t("table.notAvailable")}
+                        </span>
                       )}
                     </td>
                     <td className="text-center font-mono text-sm">
                       {order.numberTransferredFrom ||
                         order.bankTransferFrom ||
-                        "N/A"}
+                        t("table.notAvailable")}
                     </td>
                     <td className="text-center">
                       <div className="flex flex-col items-center gap-1">
@@ -1431,7 +1439,6 @@ const Orders = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-
                         {/* Notes */}
                         <button
                           className={`btn btn-ghost btn-sm relative ${
@@ -1449,7 +1456,6 @@ const Orders = () => {
                             <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
                           )}
                         </button>
-
                         {/* Payment Screenshot */}
                         {order.paymentScreenShot && (
                           <button
@@ -1478,7 +1484,6 @@ const Orders = () => {
                             <span className="text-xs">W</span>
                           </button>
                         )}
-
                         {/* WhatsApp */}
                         {(order.numberTransferredFrom ||
                           order.bankTransferFrom) && (
@@ -1490,7 +1495,6 @@ const Orders = () => {
                             <FaWhatsapp />
                           </button>
                         )}
-
                         <button
                           className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
                           onClick={() => handleDeleteOrder(order)}
@@ -1498,7 +1502,6 @@ const Orders = () => {
                         >
                           <X className="w-4 h-4" />
                         </button>
-
                         {/* Receive → Confirm Buttons */}
                         {order.status !== "confirmed" &&
                           order.status !== "returned" && (
@@ -1528,7 +1531,6 @@ const Orders = () => {
                               )}
                             </button>
                           )}
-
                         {/* Return / Re-confirm loop */}
                         {order.status === "confirmed" && (
                           <button
@@ -1547,13 +1549,12 @@ const Orders = () => {
                             )}
                           </button>
                         )}
-
                         {order.status === "returned" && (
                           <button
                             className="btn btn-success btn-sm hover:bg-green-600"
                             onClick={() => handleReConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
-                            title="Re-confirm order"
+                            title={t("table.reconfirmOrder")}
                           >
                             {confirmLoading[order._id] ? (
                               <span className="loading loading-spinner loading-xs"></span>
@@ -1796,7 +1797,15 @@ const Orders = () => {
                   </p>
                   <p className="mt-2">
                     <strong>{t("table.totalPurchases")}:</strong>{" "}
-                    <span className={`badge ${selectedOrder.createdBy?.numberOfPurchases > 5 ? 'badge-success' : selectedOrder.createdBy?.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                    <span
+                      className={`badge ${
+                        selectedOrder.createdBy?.numberOfPurchases > 5
+                          ? "badge-success"
+                          : selectedOrder.createdBy?.numberOfPurchases > 0
+                          ? "badge-primary"
+                          : "badge-ghost"
+                      }`}
+                    >
                       {selectedOrder.createdBy?.numberOfPurchases || 0}
                     </span>
                     {selectedOrder.createdBy?.numberOfPurchases > 5 && (
@@ -1804,7 +1813,8 @@ const Orders = () => {
                         🌟 {t("table.frequentBuyer")}
                       </span>
                     )}
-                    {(!selectedOrder.createdBy?.numberOfPurchases || selectedOrder.createdBy?.numberOfPurchases === 0) && (
+                    {(!selectedOrder.createdBy?.numberOfPurchases ||
+                      selectedOrder.createdBy?.numberOfPurchases === 0) && (
                       <span className="ml-2 text-xs text-gray-500">
                         {t("table.newClient")}
                       </span>
@@ -1844,23 +1854,34 @@ const Orders = () => {
                   </label>
                   <div className="bg-base-200 p-3 rounded space-y-3">
                     {selectedOrder.items.map((item, idx) => (
-                      <div key={item._id || idx} className="border-b pb-3 last:border-b-0">
+                      <div
+                        key={item._id || idx}
+                        className="border-b pb-3 last:border-b-0"
+                      >
                         {/* عنوان المنتج */}
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <p>
-                              <strong>{item.productSnapshot?.title || item.productName}</strong>
+                              <strong>
+                                {item.productSnapshot?.title ||
+                                  item.productName}
+                              </strong>
                             </p>
 
                             {/* عرض Type */}
                             <p className="text-sm opacity-75">
-                              {t("table.type")}: {item.productType === "ECBook" ? t("table.book") : t("table.productType")}
+                              {t("table.type")}:{" "}
+                              {item.productType === "ECBook"
+                                ? t("table.book")
+                                : t("table.productType")}
                             </p>
 
                             {/* Product Serial */}
                             {item.productSnapshot?.serial && (
                               <p className="text-sm font-mono">
-                                <strong>{t("table.productSerial") || "Serial"}:</strong>{" "}
+                                <strong>
+                                  {t("table.productSerial") || "Serial"}:
+                                </strong>{" "}
                                 <span className="badge badge-ghost badge-sm">
                                   {item.productSnapshot.serial}
                                 </span>
@@ -1871,7 +1892,9 @@ const Orders = () => {
                           {/* السعر وزرار الحذف */}
                           <div className="flex items-center gap-2">
                             <p className="font-bold">
-                              {formatPrice(item.priceAtPurchase * (item.quantity || 1))}
+                              {formatPrice(
+                                item.priceAtPurchase * (item.quantity || 1)
+                              )}
                             </p>
                             {/* Delete button - only show if more than 1 item */}
                             {selectedOrder.items.length > 1 && (
@@ -2016,8 +2039,9 @@ const Orders = () => {
                     >
                       <Edit3 className="w-3 h-3" />
                       {selectedOrder.adminNotes
-                        ? (t("table.editNotes") || (isRTL ? "تعديل" : "Edit"))
-                        : (t("table.addNotes") || (isRTL ? "إضافة ملاحظة" : "Add Note"))}
+                        ? t("table.editNotes") || (isRTL ? "تعديل" : "Edit")
+                        : t("table.addNotes") ||
+                          (isRTL ? "إضافة ملاحظة" : "Add Note")}
                     </button>
                   )}
                 </label>
@@ -2026,7 +2050,11 @@ const Orders = () => {
                   <div className="space-y-3">
                     <textarea
                       className="textarea textarea-bordered w-full min-h-24 text-sm"
-                      placeholder={isRTL ? "اكتب ملاحظاتك هنا..." : "Write your notes here..."}
+                      placeholder={
+                        isRTL
+                          ? "اكتب ملاحظاتك هنا..."
+                          : "Write your notes here..."
+                      }
                       value={detailsNotes.value}
                       onChange={(e) => handleDetailsNotesChange(e.target.value)}
                       disabled={detailsNotes.loading}
@@ -2046,7 +2074,9 @@ const Orders = () => {
                           detailsNotes.hasChanges ? "" : "btn-disabled"
                         }`}
                         onClick={saveDetailsNotes}
-                        disabled={detailsNotes.loading || !detailsNotes.hasChanges}
+                        disabled={
+                          detailsNotes.loading || !detailsNotes.hasChanges
+                        }
                       >
                         {detailsNotes.loading ? (
                           <span className="loading loading-spinner loading-xs"></span>
