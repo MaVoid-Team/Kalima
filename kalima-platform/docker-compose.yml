@@ -37,6 +37,24 @@ services:
       - app-network
     volumes:
       - uploads:/app/uploads
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0
+    container_name: kalima-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=Ismk7@wscxSpjdbI
+      - MONGO_INITDB_DATABASE=kalima
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - app-network
 
 networks:
   app-network:
@@ -44,3 +62,5 @@ networks:
 
 volumes:
   uploads:
+  mongodb_data:
+  mongodb_config:
