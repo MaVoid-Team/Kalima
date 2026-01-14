@@ -1,13 +1,10 @@
-import React, {  useMemo } from "react";
-
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-
 import {
   FaAward,
-
   FaChalkboardTeacher,
   FaClock,
- 
+  FaUsers,
 } from "react-icons/fa";
 
 const AboutSection = React.memo(({ isRTL }) => {
@@ -29,19 +26,56 @@ const AboutSection = React.memo(({ isRTL }) => {
     [isRTL]
   );
 
+  const stats = useMemo(
+    () => [
+      {
+        id: 1,
+        number: "10K+",
+        label: isRTL ? "طالب نشط" : "Active Students",
+        icon: <FaUsers />,
+      },
+      {
+        id: 2,
+        number: "500+",
+        label: isRTL ? "دورة تدريبية" : "Courses",
+        icon: <FaAward />,
+      },
+      {
+        id: 3,
+        number: "98%",
+        label: isRTL ? "رضا الطلاب" : "Satisfaction",
+        icon: <FaClock />,
+      },
+    ],
+    [isRTL]
+  );
+
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 rounded-3xl">
+    <section className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div
-          className={`flex flex-col lg:flex-row items-center gap-8 ${
+          className={`flex flex-col lg:flex-row items-center gap-12 ${
             isRTL ? "lg:flex-row-reverse" : ""
           }`}
         >
-          <div className="w-full lg:w-1/2 space-y-6">
-            <h3 className="text-xl font-bold text-primary">
-              {isRTL ? "معلومات عنا" : "About Us"}
-            </h3>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-base-content leading-tight">
+          {/* Left Content */}
+          <motion.div
+            initial={{ opacity: 0, x: isRTL ? 50 : -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="w-full lg:w-1/2 space-y-8"
+          >
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/20">
+              <FaAward className="text-primary" />
+              <span className="text-sm font-[family-name:var(--font-malmoom)] text-primary">
+                {isRTL ? "معلومات عنا" : "About Us"}
+              </span>
+            </div>
+
+            {/* Heading */}
+            <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight font-[family-name:var(--font-headline)] ${isRTL ? "text-right" : "text-left"}`}>
               {isRTL ? (
                 <>
                   تعلم وجيب الدرجات النهائية{" "}
@@ -86,8 +120,10 @@ const AboutSection = React.memo(({ isRTL }) => {
                 </>
               )}
             </h2>
+
+            {/* Description */}
             <p
-              className={`text-lg text-base-content/80 leading-relaxed ${
+              className={`text-lg text-base-content/70 leading-relaxed font-[family-name:var(--font-body)] ${
                 isRTL ? "text-right" : "text-left"
               }`}
             >
@@ -95,42 +131,60 @@ const AboutSection = React.memo(({ isRTL }) => {
                 ? "منصة كلمة هي منصة تعليم إلكتروني توفر المنصة موارد للطلاب من الصف الرابع الابتدائي حتى الصف الثالث الثانوي."
                 : "Kalima Platform is an e-learning platform that provides resources for students from 4th grade through 12th grade."}
             </p>
-            <div className="relative">
-              <div className="flex flex-col gap-4 relative z-10">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-4">
-                    <div className="text-primary text-xl bg-white dark:bg-gray-800 p-2 rounded-full shadow-sm">
-                      {feature.icon}
-                    </div>
-                    <span className="text-base-content font-medium flex-1">
-                      {feature.text}
-                    </span>
-                    {index === 0 && (
-                      <div
-                        className={`hidden sm:block ${isRTL ? "mr-4" : "ml-4"}`}
-                      >
-                        <img
-                          src={
-                            isRTL
-                              ? "/curved-arrow-about.png"
-                              : "/curved-arrow-services.png"
-                          }
-                          alt=""
-                          className="h-12 w-auto object-contain"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          <div
+            {/* Features List */}
+            <div className="space-y-4">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""}`}
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                    {feature.icon}
+                  </div>
+                  <span className="text-base-content font-medium font-[family-name:var(--font-body)] flex-1">
+                    {feature.text}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-4 pt-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={stat.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl font-bold text-primary font-[family-name:var(--font-bigx)]">
+                    {stat.number}
+                  </div>
+                  <div className="text-sm text-base-content/60 font-[family-name:var(--font-malmoom)] mt-1">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right Image */}
+          <motion.div
+            initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
             className="w-full lg:w-1/2 relative"
             style={{ height: "clamp(400px, 60vw, 500px)" }}
           >
+            {/* Dot Pattern Background */}
             <div className="absolute inset-0 overflow-hidden z-0">
               <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                 <pattern
@@ -140,7 +194,6 @@ const AboutSection = React.memo(({ isRTL }) => {
                   width="25"
                   height="25"
                   patternUnits="userSpaceOnUse"
-                  patternTransform="rotate(0)"
                 >
                   <circle
                     cx="2.5"
@@ -160,29 +213,50 @@ const AboutSection = React.memo(({ isRTL }) => {
               </svg>
             </div>
 
+            {/* Image Container */}
             <motion.div
               className="absolute inset-0 flex items-center justify-center p-4 sm:p-8 z-10"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
               whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
             >
               <div className="relative w-full h-full max-w-[500px]">
-                <img
-                  src="/man-working.jpg"
-                  alt={isRTL ? "طلاب يدرسون" : "Students learning"}
-                  className="w-full h-full object-contain rounded-xl"
-                  loading="lazy"
-                />
-                <div className="absolute -inset-4 rounded-xl bg-primary/10 mix-blend-multiply filter blur-xl z-0" />
+                <div className="relative w-full h-full rounded-3xl overflow-hidden border-4 border-primary/20 shadow-2xl">
+                  <img
+                    src="/man-working.jpg"
+                    alt={isRTL ? "طلاب يدرسون" : "Students learning"}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent" />
+                </div>
+                {/* Glow Effect */}
+                <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 blur-3xl opacity-50 -z-10" />
               </div>
             </motion.div>
-            <div className="absolute -left-12 -top-12 w-48 h-48 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl z-0" />
-            <div className="absolute -right-6 bottom-6 w-32 h-32 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl z-0" />
-          </div>
+
+            {/* Decorative Orbs */}
+            <motion.div
+              animate={{
+                y: [0, -20, 0],
+                scale: [1, 1.1, 1],
+              }}
+              transition={{ duration: 6, repeat: Infinity }}
+              className="absolute -left-12 -top-12 w-48 h-48 rounded-full bg-gradient-to-br from-primary/20 to-transparent blur-3xl z-0"
+            />
+            <motion.div
+              animate={{
+                y: [0, 20, 0],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{ duration: 8, repeat: Infinity }}
+              className="absolute -right-6 bottom-6 w-32 h-32 rounded-full bg-gradient-to-br from-secondary/20 to-transparent blur-3xl z-0"
+            />
+          </motion.div>
         </div>
       </div>
     </section>
   );
 });
+
 export default AboutSection;

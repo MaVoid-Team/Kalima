@@ -1,225 +1,462 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useTranslation, Trans } from "react-i18next";
+import { motion, animate } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import Lottie from "lottie-react";
+import {
+  Search,
+  Play,
+  BookOpen,
+  Users,
+  Award,
+  Sparkles,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Rocket,
+  GraduationCap,
+  CheckCircle2,
+} from "lucide-react";
 
 const WelcomeSection = React.memo(() => {
   const { t, i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [animationData, setAnimationData] = useState(null);
 
-  const images = useMemo(
-    () => ({
-      maleStudent: "/servicesherosection2",
-      femaleStudent: "/servicesherosection1",
-    }),
-    []
-  );
-  const titleParts = t("welcome.title").split(/({{highlight}}|{{\/highlight}})/);
-  const HighlightedText = ({ children, isRTL }) => (
-    <span className="relative inline-block text-primary">
-      {children}
-      <svg
-        className={`absolute -bottom-3 w-full ${isRTL ? "right-0" : "left-0"}`}
-        width="140"
-        height="16"
-        viewBox="0 0 140 16"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      </svg>
-    </span>
-  );
-  const fadeIn = (direction, type, delay, duration) => ({
-    hidden: {
-      x: direction === "left" ? 50 : direction === "right" ? -50 : 0,
-      y: direction === "up" ? 50 : direction === "down" ? -50 : 0,
-      opacity: 0,
-    },
-    show: {
-      x: 0,
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: type || "spring",
-        delay: delay || 0,
-        duration: duration || 1,
+  useEffect(() => {
+    fetch("/STUDENT.json")
+      .then((res) => res.json())
+      .then((data) => setAnimationData(data))
+      .catch((err) => console.error("Failed to load Lottie:", err));
+  }, []);
+
+  // Custom Counter Component using Framer Motion
+  const CountUp = ({ from, to, prefix = "", suffix = "" }) => {
+    const nodeRef = React.useRef();
+
+    useEffect(() => {
+      const node = nodeRef.current;
+      if (!node) return;
+
+      const controls = animate(from, to, {
+        duration: 2.5,
         ease: "easeOut",
+        onUpdate: (value) => {
+          node.textContent = `${prefix}${Math.round(
+            value
+          ).toLocaleString()}${suffix}`;
+        },
+      });
+
+      return () => controls.stop();
+    }, [from, to, prefix, suffix]);
+
+    return <span ref={nodeRef} />;
+  };
+
+  const stats = useMemo(
+    () => [
+      {
+        id: 1,
+        value: 5200,
+        prefix: "+",
+        label: t("welcome.stats.students") || "طالب متفوق",
+        icon: Users,
+        color: "text-red-600",
+        bg: "bg-red-50",
       },
-    },
-  });
+      {
+        id: 2,
+        value: 150,
+        prefix: "+",
+        label: t("welcome.stats.teachers") || "معلم خبير",
+        icon: GraduationCap,
+        color: "text-orange-500",
+        bg: "bg-orange-50",
+      },
+      {
+        id: 3,
+        value: 500,
+        prefix: "+",
+        label: t("welcome.stats.courses") || "كورس تعليمي",
+        icon: BookOpen,
+        color: "text-yellow-500",
+        bg: "bg-yellow-50",
+      },
+    ],
+    [t]
+  );
+
+  const features = useMemo(
+    () => [
+      {
+        label: t("welcome.features.interactive") || "محتوى تفاعلي",
+        icon: CheckCircle2,
+      },
+      {
+        label: t("welcome.features.certified") || "شهادات معتمدة",
+        icon: CheckCircle2,
+      },
+      {
+        label: t("welcome.features.progress") || "تقدم مستمر",
+        icon: CheckCircle2,
+      },
+    ],
+    [t]
+  );
 
   return (
-    <div
-      className={`flex flex-col lg:flex-row items-center gap-8 ${
-        isRTL ? "lg:flex-row-reverse" : ""
-      }`}
-    >
-      <motion.div
-        variants={fadeIn(isRTL ? "left" : "right", "tween", 0.2, 1)}
-        className="w-full lg:w-1/2 relative"
-        style={{ height: "clamp(350px, 55vw, 500px)" }}
-      >
+    // Warm peachy background matching screenshot exactly
+    // Premium "Living" background with Aurora effect and Noise texture
+    <div className="relative min-h-[90vh] flex flex-col items-center justify-center pt-10 pb-20 overflow-hidden bg-[#FEFBF9]">
+      {/* Dynamic Animated Glow Layers (Aurora Effect) - Airy & Subtle */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          animate={{ rotate: 360 }}
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], x: [0, 50, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -left-20 -top-20 w-64 h-64 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute top-[-30%] right-[-10%] w-[60rem] h-[60rem] bg-gradient-to-br from-[#FF5C28]/20 to-[#AF0D0E]/20 rounded-full blur-[140px] opacity-40 mixture-blend-overlay"
         />
         <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute -right-10 bottom-10 w-40 h-40 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl opacity-70"
-        />
-        <div className="relative h-full w-full z-10">
-          <motion.div
-            className="absolute left-8 sm:left-12 md:left-16 bottom-0 h-[70%] sm:h-[75%] md:h-[80%] w-[45%] sm:w-[40%] md:w-[35%] rounded-t-full rounded-b-full p-2 sm:p-3 md:p-4 z-0"
-            whileHover={{ y: -10 }}
-          >
-            <img
-              src={images.maleStudent}
-              alt={t("welcome.maleStudentAlt")}
-              className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-secondary/30"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = "servicesherosection2.png";
-              }}
-            />
-          </motion.div>
-          <motion.div
-            className="absolute right-8 sm:right-12 md:right-16 bottom-8 sm:bottom-12 md:bottom-16 h-[85%] sm:h-[90%] md:h-[100%] w-[55%] sm:w-[50%] md:w-[45%] rounded-t-full rounded-b-full p-2 sm:p-3 md:p-4 z-10"
-            whileHover={{ y: -10 }}
-          >
-            <img
-              src={images.femaleStudent}
-              alt={t("welcome.femaleStudentAlt")}
-              className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-primary/30"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = "servicesherosection1.png";
-              }}
-            />
-            <motion.div
-              className="absolute -top-5 sm:-top-6 md:-top-7 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-2xl font-bold text-primary whitespace-nowrap"
-              initial={{ y: -20 }}
-              animate={{ y: 0 }}
-            >
-              {t("welcome.kalima")}
-            </motion.div>
-          </motion.div>
-        </div>
-        <motion.div
-          className="absolute top-6 sm:top-8 md:top-10 left-6 sm:left-8 md:left-10 w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-accent"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 3, repeat: Infinity }}
+          animate={{ scale: [1.2, 1, 1.2], rotate: [0, -60, 0], y: [0, 40, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[20%] left-[-20%] w-[50rem] h-[50rem] bg-[#AF0D0E]/15 rounded-full blur-[150px] opacity-30 mixture-blend-multiply"
         />
         <motion.div
-          className="absolute bottom-12 sm:bottom-16 md:bottom-20 right-12 sm:right-16 md:right-20 w-5 sm:w-6 md:w-6 h-5 sm:h-6 md:h-6 rounded-full bg-error"
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+          animate={{ scale: [1, 1.3, 1], x: [0, -30, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-[-20%] right-[10%] w-[55rem] h-[55rem] bg-[#FF5C28]/15 rounded-full blur-[160px] opacity-30"
         />
-      </motion.div>
+      </div>
 
-      <motion.div
-        variants={fadeIn(isRTL ? "right" : "left", "tween", 0.2, 1)}
-        className="w-full lg:w-1/2 space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0"
+      {/* Noise Texture Overlay for Premium Feel */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Giant Animated Watermark */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden select-none">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.03, scale: 1 }}
+          transition={{ duration: 2 }}
+          className={`text-[20rem] lg:text-[45rem] font-bold leading-none tracking-tighter ${
+            isRTL
+              ? "font-[family-name:var(--font-shakhabeet)]"
+              : "font-[family-name:var(--font-bigx)]"
+          }`}
+          style={{
+            WebkitTextStroke: "2px #AF0D0E",
+            color: "transparent",
+          }}
+        >
+          {isRTL ? "كلمة" : "KALIMA"}
+        </motion.div>
+      </div>
+
+      {/* Decorative Floating Particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.img
+          animate={{ y: [0, -20, 0] }}
+          transition={{ duration: 4, repeat: Infinity }}
+          src="/bDots.png"
+          className="absolute top-40 left-20 w-32 opacity-20"
+          alt=""
+        />
+        <motion.img
+          animate={{ y: [0, 20, 0] }}
+          transition={{ duration: 5, repeat: Infinity }}
+          src="/rDots.png"
+          className="absolute bottom-40 right-20 w-32 opacity-20"
+          alt=""
+        />
+      </div>
+
+      <div
+        className={`container mx-auto px-6 flex flex-col lg:flex-row items-center gap-12 ${
+          isRTL ? "lg:flex-row-reverse" : ""
+        }`}
       >
-        <div className="relative">
-        <motion.h1
-  initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
-  animate={{ x: 0, opacity: 1 }}
-  transition={{ duration: 0.6 }}
-  className={`text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-base-content leading-tight ${
-    isRTL ? "text-right" : "text-left"
-  }`}
->
-  {(() => {
-    const title = t("welcome.title");
-    const parts = [];
-    const regex = /\{\{highlight\}\}(.*?)\{\{\/highlight\}\}/g;
-    let lastIndex = 0;
-    let match;
-
-    while ((match = regex.exec(title)) !== null) {
-      // Add text before the match
-      if (match.index > lastIndex) {
-        parts.push(title.substring(lastIndex, match.index));
-      }
-      // Add highlighted component
-      parts.push(
-        <HighlightedText key={match[1]} isRTL={isRTL}>
-          {match[1]}
-        </HighlightedText>
-      );
-      lastIndex = regex.lastIndex;
-    }
-    // Add remaining text after last match
-    if (lastIndex < title.length) {
-      parts.push(title.substring(lastIndex));
-    }
-
-    return parts;
-  })()}
-</motion.h1>
-        </div>
-
+        {/* Left Section: Illustration (Lottie) - Elite Levitation */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className={`relative ${isRTL ? "text-right" : "text-left"}`}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1, y: [0, -20, 0] }}
+          transition={{
+            opacity: { duration: 1 },
+            scale: { duration: 1 },
+            y: { duration: 5, repeat: Infinity, ease: "easeInOut" },
+          }}
+          viewport={{ once: true }}
+          className="w-full lg:w-5/12 flex justify-center relative"
         >
-          <motion.p className="text-lg sm:text-xl md:text-2xl text-base-content/80 leading-relaxed mb-6">
-            {t("welcome.description")}
-          </motion.p>
-          <div className="w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mb-6"></div>
+          <div className="relative w-full max-w-lg aspect-square flex items-center justify-center">
+            {/* Multi-layered soft glow behind illustration */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#FF5C28]/15 to-[#AF0D0E]/5 rounded-full blur-[100px]" />
+            <div className="absolute w-3/4 h-3/4 bg-[#AF0D0E]/5 rounded-full blur-[60px] animate-pulse" />
+
+            {animationData ? (
+              <Lottie
+                animationData={animationData}
+                className="w-full h-full relative z-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+                loop={true}
+              />
+            ) : (
+              <img
+                src="/student_illustration.png"
+                className="w-full h-full object-contain relative z-10 drop-shadow-2xl"
+                alt="Student Illustration"
+              />
+            )}
+
+            {/* Red Accent Dot from Screenshot - Inner position */}
+            <div
+              className={`absolute ${
+                isRTL ? "-right-4" : "-left-4"
+              } top-1/2 w-4 h-4 bg-[#AF0D0E] rounded-full shadow-[0_0_20px_rgba(175,13,14,0.4)] z-20`}
+            />
+          </div>
         </motion.div>
 
+        {/* Right Section: Content - Staggered Container */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className={`flex flex-wrap gap-4 ${isRTL ? "justify-start" : "justify-end"}`}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.2,
+              },
+            },
+          }}
+          className={`w-full lg:w-7/12 space-y-10 ${
+            isRTL ? "text-right pr-4" : "text-left pl-4"
+          }`}
         >
-          <motion.button
-            onClick={() => navigate("/login")}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 10px 25px -5px rgba(var(--p), 0.2)",
+          {/* Elite Capsule Badge */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, x: isRTL ? 50 : -50 },
+              visible: { opacity: 1, x: 0 },
             }}
-            whileTap={{ scale: 0.98 }}
-            className="btn btn-primary btn-md gap-2"
+            className={`inline-flex items-center gap-3 px-6 py-3 bg-white/60 backdrop-blur-xl rounded-full border border-orange-100/30 shadow-[0_4px_15px_rgba(255,92,40,0.08)] hover:shadow-[0_8px_25px_rgba(255,92,40,0.15)] transition-all cursor-pointer group ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
           >
-            {t("signIn")}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            <div className="p-1.5 bg-orange-50 rounded-full group-hover:scale-110 transition-transform">
+              <Rocket className="w-4 h-4 text-[#FF5C28]" />
+            </div>
+            <span className="text-sm font-bold text-gray-800 tracking-tight">
+              {t("welcome.badge") || "الانطلاق في سماء الإبداع"}
+            </span>
+            <Sparkles className="w-4 h-4 text-[#AF0D0E] animate-pulse" />
+          </motion.div>
+
+          {/* Hero Typography - High Fidelity */}
+          <div className="space-y-6">
+            <motion.h1
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              className="text-6xl lg:text-[5.5rem] font-black text-[#1A1A1A] leading-[1.05] tracking-tight"
             >
-              {isRTL ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              <span className="font-[family-name:var(--font-headline)]">
+                {t("welcome.heading1") || "منصة"}
+              </span>{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#FF5C28] to-[#AF0D0E] bg-[length:200%_auto] animate-gradient font-[family-name:var(--font-bigx)] drop-shadow-sm filter brightness-110">
+                {t("welcome.kalima") || "كلمة"}
+              </span>{" "}
+              <span className="font-[family-name:var(--font-headline)]">
+                {t("welcome.heading2") || "التعليمية"}
+              </span>
+            </motion.h1>
+
+            <motion.p
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              className="text-xl lg:text-2xl text-gray-500 font-medium font-[family-name:var(--font-body)] max-w-2xl leading-relaxed opacity-80"
+            >
+              {t("welcome.description") ||
+                "منصة تعليمية متكاملة توفر لك أفضل المعلمين والكورسات من الصف الرابع الابتدائي حتى الثالث الثانوي"}
+            </motion.p>
+          </div>
+
+          {/* Features List - Elite Styling */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+            }}
+            className={`flex flex-wrap gap-x-12 gap-y-6 items-center ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
+            {features.map((feature, idx) => (
+              <div
+                key={idx}
+                className={`flex items-center gap-2.5 group cursor-default ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <div className="text-[#AF0D0E] p-0.5 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-5 h-5" />
+                </div>
+                <span className="text-[0.95rem] font-bold text-gray-600 group-hover:text-black transition-colors">
+                  {feature.label}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Integrated Search Bar - Pixel Perfect from Screenshot */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.95 },
+              visible: { opacity: 1, scale: 1 },
+            }}
+            className="relative max-w-2xl w-full"
+          >
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-red-200 to-orange-100 rounded-[2.2rem] blur-xl opacity-0 group-hover:opacity-30 transition-all duration-500" />
+              <div className="relative flex items-center bg-[#F9F9F9] rounded-[2rem] border border-gray-100 p-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_50px_rgba(175,13,14,0.06)] transition-all duration-500">
+                <div className="p-4 opacity-40">
+                  <Search className="w-7 h-7 text-gray-600" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={
+                    t("welcome.searchPlaceholder") ||
+                    "أبحث عن كورس، معلم، أو مادة..."
+                  }
+                  className={`flex-1 bg-transparent border-none outline-none px-4 py-4 text-lg text-gray-800 font-bold placeholder:text-gray-300 ${
+                    isRTL ? "text-right" : "text-left"
+                  }`}
                 />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+
+                {/* Magnetic-style Search Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-[#AF0D0E] hover:bg-[#8d0a0b] text-white px-10 py-4 rounded-[1.5rem] font-bold flex items-center gap-3 transition-all shadow-xl shadow-[#AF0D0E]/20"
+                  onClick={() => navigate(`/courses?search=${searchQuery}`)}
+                >
+                  <ChevronLeft
+                    className={`w-5 h-5 ${isRTL ? "" : "rotate-180"}`}
+                  />
+                  <span>{t("welcome.search") || "ابحث"}</span>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CTA Buttons - Magnetic Polish */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="flex flex-wrap items-center gap-12 pt-4"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05, x: isRTL ? -5 : 5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/courses")}
+              className="px-12 py-5 rounded-[1.8rem] font-bold text-white flex items-center gap-3 shadow-[0_20px_40px_rgba(175,13,14,0.15)] transition-all bg-gradient-to-l from-[#AF0D0E] to-[#FF5C28]"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span>{t("welcome.browseCourses") || "تصفح الكورسات"}</span>
+              <ChevronLeft className={`w-5 h-5 ${isRTL ? "" : "rotate-180"}`} />
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05, x: isRTL ? 5 : -5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/teachers")}
+              className="group flex items-center gap-6 text-[#1A1A1A] font-black hover:text-[#AF0D0E] transition-all"
+            >
+              <div className="w-14 h-14 bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] rounded-full flex items-center justify-center group-hover:bg-[#AF0D0E] group-hover:text-white group-hover:border-[#AF0D0E] transition-all duration-300">
+                <Play
+                  className={`w-5 h-5 fill-current ${
+                    isRTL ? "" : "rotate-180"
+                  }`}
                 />
-              )}
-            </svg>
-          </motion.button>
+              </div>
+              <span className="text-xl tracking-tight">
+                {t("welcome.teachers") || "المعلمين"}
+              </span>
+            </motion.button>
+          </motion.div>
+
+          {/* Stats Cards Row - Elite Perspective Tilt */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 40 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12"
+          >
+            {stats
+              .sort((a, b) => a.id - b.id)
+              .map((stat, index) => (
+                <motion.div
+                  key={stat.id}
+                  whileHover={{
+                    scale: 1.05,
+                    rotateY: isRTL ? 5 : -5,
+                    translateZ: 20,
+                  }}
+                  className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-[0_15px_60px_rgba(0,0,0,0.03)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.06)] transition-all duration-500 flex flex-col items-center gap-4 group/card cursor-pointer perspective-1000"
+                >
+                  <div
+                    className={`${stat.bg} ${stat.color} p-5 rounded-[1.2rem] group-hover/card:bg-[#AF0D0E] group-hover/card:text-white transition-all duration-300`}
+                  >
+                    <stat.icon className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1 text-center">
+                    <div
+                      className={`text-5xl font-black font-[family-name:var(--font-bigx)] ${stat.color} group-hover/card:text-[#1A1A1A] transition-colors`}
+                    >
+                      <CountUp from={0} to={stat.value} prefix={stat.prefix} />
+                    </div>
+                    <div className="text-[0.95rem] text-gray-400 font-black tracking-wide pt-1">
+                      {stat.label}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+          </motion.div>
         </motion.div>
+      </div>
+
+      {/* Discover More Scroll Indicator - Centered */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 cursor-pointer group"
+      >
+        <div className="flex flex-col items-end">
+          <span className="text-xs text-gray-300 font-bold group-hover:text-red-400 transition-colors">
+            {t("welcome.discoverMore") || "اكتشف المزيد"}
+          </span>
+        </div>
+        <div className="w-10 h-16 border-2 border-red-50 rounded-full relative p-2 shadow-inner group-hover:border-red-100 transition-all">
+          <motion.div
+            animate={{ y: [0, 18, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-2 h-4 bg-[#AF0D0E]/80 rounded-full mx-auto"
+          />
+        </div>
       </motion.div>
     </div>
   );
