@@ -189,7 +189,9 @@
       "accountType": "نوع الحساب",
       "phone": "رقم الهاتف",
       "name": "الاسم",
-      "successfulInvites": "الدعوات الناجحة"
+      "successfulInvites": "الدعوات الناجحة",
+      "purchases": "المشتريات",
+      "totalPaid": "إجمالي المدفوع"
     },
 
     "pagination": {
@@ -206,6 +208,7 @@
     "editSuccess": "تم تعديل المستخدم بنجاح",
     "editError": "فشل في تعديل المستخدم",
     "NA": "غير متوفر",
+    "currency": "جنيه",
 
     "auditlog": {
       "title": "سجل العمليات",
@@ -397,6 +400,8 @@
     "government": "المحافظة",
     "administrationZone": "المنطقة الإدارية",
     "sequenceId": "الرقم التسلسلي",
+    "purchases": "المشتريات",
+    "totalPaid": "إجمالي المدفوع",
     "joinedDate": "تاريخ الانضمام"
   },
 

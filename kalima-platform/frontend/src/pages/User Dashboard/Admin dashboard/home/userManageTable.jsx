@@ -212,11 +212,15 @@ const UserManagementTable = () => {
         toast.success(t("admin.deleteSuccess") || "تم حذف المستخدم بنجاح");
       } else {
         setError(result.error);
-        toast.error(result.error || t("admin.deleteError") || "فشل في حذف المستخدم");
+        toast.error(
+          result.error || t("admin.deleteError") || "فشل في حذف المستخدم"
+        );
       }
     } catch (error) {
       setError(error.message);
-      toast.error(error.message || t("admin.deleteError") || "فشل في حذف المستخدم");
+      toast.error(
+        error.message || t("admin.deleteError") || "فشل في حذف المستخدم"
+      );
     }
   };
 
@@ -234,7 +238,9 @@ const UserManagementTable = () => {
       }
     } catch (error) {
       setError(error.message);
-      toast.error(error.message || t("admin.createError") || "فشل في إنشاء المستخدم");
+      toast.error(
+        error.message || t("admin.createError") || "فشل في إنشاء المستخدم"
+      );
     }
   };
 
@@ -306,6 +312,7 @@ const UserManagementTable = () => {
       t("admin.export.administrationZone"),
       t("admin.export.sequenceId"),
       t("admin.export.purchases"),
+      t("admin.export.totalPaid"),
       t("admin.export.joinedDate"),
     ];
     const csvContent = [
@@ -321,6 +328,7 @@ const UserManagementTable = () => {
           `"${user.administrationZone || ""}"`,
           `"${user.sequencedId || ""}"`,
           `"${user.numberOfPurchases || 0}"`,
+          `"${user.totalPaid || 0}"`,
           `"${
             user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
           }"`,
@@ -379,6 +387,7 @@ const UserManagementTable = () => {
         administrationZone: user.administrationZone || "",
         sequenceId: user.sequencedId || "",
         numberOfPurchases: user.numberOfPurchases || 0,
+        totalPaid: user.totalPaid || 0,
         joinedDate: user.createdAt
           ? new Date(user.createdAt).toISOString()
           : "",
@@ -429,7 +438,9 @@ const UserManagementTable = () => {
         ? `all-users-${timestamp}.xlsx`
         : `filtered-users-${timestamp}.xlsx`;
       XLSX.writeFile(workbook, filename);
-      toast.success(t("admin.export.successXLSX", { count: dataToExport.length }));
+      toast.success(
+        t("admin.export.successXLSX", { count: dataToExport.length })
+      );
     } catch (error) {
       console.error("Export error:", error);
       toast.error(t("admin.export.error"));
@@ -500,8 +511,12 @@ const UserManagementTable = () => {
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.userDetails.userSerial")}</label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">{user.userSerial || t("admin.NA")}</p>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.userSerial")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              {user.userSerial || t("admin.NA")}
+            </p>
           </div>
           {user.government && (
             <div>
@@ -548,7 +563,11 @@ const UserManagementTable = () => {
               {t("admin.userDetails.purchases")}
             </label>
             <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
-              <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+              <span
+                className={`badge ${
+                  user.numberOfPurchases > 0 ? "badge-primary" : "badge-ghost"
+                }`}
+              >
                 {user.numberOfPurchases || 0}
               </span>
               {user.numberOfPurchases > 5 && (
@@ -844,9 +863,7 @@ const UserManagementTable = () => {
                             dir={isRTL ? "rtl" : "ltr"}
                           >
                             {user.preferredContactTime.from && (
-                              <div
-                                className="col-span-4 flex items-center gap-1"
-                              >
+                              <div className="col-span-4 flex items-center gap-1">
                                 <span className="font-semibold whitespace-nowrap">
                                   {t("admin.editUser.from")}:
                                 </span>{" "}
@@ -1296,6 +1313,7 @@ const UserManagementTable = () => {
                 "status",
                 "successfulInvites",
                 "purchases",
+                "totalPaid",
                 "actions",
               ].map((header) => (
                 <th
@@ -1325,8 +1343,25 @@ const UserManagementTable = () => {
                   {user.successfulInvites || 0}
                 </td>
                 <td className="py-4 whitespace-nowrap">
-                  <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                  <span
+                    className={`badge ${
+                      user.numberOfPurchases > 0
+                        ? "badge-primary"
+                        : "badge-ghost"
+                    }`}
+                  >
                     {user.numberOfPurchases || 0}
+                  </span>
+                </td>
+                <td className="py-4 whitespace-nowrap">
+                  <span
+                    className={`badge ${
+                      user.totalPaid > 0 ? "badge-success" : "badge-ghost"
+                    } font-semibold`}
+                  >
+                    {user.totalPaid
+                      ? `${user.totalPaid} ${t("admin.currency")}`
+                      : t("admin.NA")}
                   </span>
                 </td>
                 <td className="py-4 whitespace-nowrap">
