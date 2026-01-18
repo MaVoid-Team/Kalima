@@ -1,293 +1,183 @@
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+"use client";
 
-const BenefitsSection = React.memo(({ isRTL }) => {
-  const benefits = useMemo(
-    () => [
-      {
-        id: 1,
-        number: "01",
-        title: isRTL ? "تعلم مرن" : "Flexible Learning",
-        italic: isRTL ? "أوقاتك" : "Your Schedule",
-        content: isRTL
-          ? "تعلم في أي وقت ومن أي مكان مع إمكانية الوصول الكامل إلى جميع المواد التعليمية"
-          : "Learn anytime, anywhere with full access to all educational materials",
-        gradient: "from-primary/20 to-secondary/20",
-      },
-      {
-        id: 2,
-        number: "02",
-        title: isRTL ? "معلمون خبراء" : "Expert Teachers",
-        italic: isRTL ? "متخصصين" : "Specialists",
-        content: isRTL
-          ? "فريق من المعلمين المؤهلين ذوي الخبرة في المناهج التعليمية المختلفة"
-          : "Team of qualified teachers experienced in various curricula",
-        gradient: "from-secondary/20 to-accent/20",
-      },
-      {
-        id: 3,
-        number: "03",
-        title: isRTL ? "محتوى مميز" : "Premium Content",
-        italic: isRTL ? "جودة عالية" : "High Quality",
-        content: isRTL
-          ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب التعليمية"
-          : "Carefully designed curriculum covering all student educational needs",
-        gradient: "from-accent/20 to-primary/20",
-      },
-      {
-        id: 4,
-        number: "04",
-        title: isRTL ? "متابعة مستمرة" : "Continuous Support",
-        italic: isRTL ? "رعاية" : "Care",
-        content: isRTL
-          ? "دعم فني وتعليمي متواصل لضمان أفضل تجربة تعليمية"
-          : "Continuous technical and educational support to ensure the best learning experience",
-        gradient: "from-primary/20 to-secondary/20",
-      },
-      {
-        id: 5,
-        number: "05",
-        title: isRTL ? "شهادات معتمدة" : "Certified Certificates",
-        italic: isRTL ? "اعتماد" : "Accreditation",
-        content: isRTL
-          ? "شهادات معتمدة بعد إتمام كل مرحلة تعليمية بنجاح"
-          : "Certified certificates upon successful completion of each educational stage",
-        gradient: "from-secondary/20 to-accent/20",
-      },
-      {
-        id: 6,
-        number: "06",
-        title: isRTL ? "تقييم وتطوير" : "Assessment & Development",
-        italic: isRTL ? "تحسين" : "Improvement",
-        content: isRTL
-          ? "نظام تقييم مستمر لمتابعة التطور الأكاديمي للطلاب"
-          : "Continuous assessment system to track students' academic progress",
-        gradient: "from-accent/20 to-primary/20",
-      },
-    ],
-    [isRTL]
-  );
+import React from "react";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import {
+  Clock,
+  GraduationCap,
+  BookOpen,
+  HeadphonesIcon,
+  Award,
+  TrendingUp,
+  ArrowUpRight,
+} from "lucide-react";
+
+const BenefitsSection = React.memo(() => {
+  const { i18n } = useTranslation("home");
+  const isRTL = i18n.language === "ar";
+
+  const benefits = [
+    {
+      id: "01",
+      icon: Clock,
+      title: isRTL ? "تعلم مرن" : "Flexible Learning",
+      description: isRTL
+        ? "تعلم في أي وقت ومن أي مكان مع إمكانية الوصول الكامل."
+        : "Learn anytime, anywhere with full access to all materials.",
+      accent: "primary",
+    },
+    {
+      id: "02",
+      icon: GraduationCap,
+      title: isRTL ? "معلمون خبراء" : "Expert Teachers",
+      description: isRTL
+        ? "نخبة من المعلمين المتميزين في مختلف المناهج."
+        : "Elite selection of teachers across various curricula.",
+      accent: "secondary",
+    },
+    {
+      id: "03",
+      icon: BookOpen,
+      title: isRTL ? "محتوى مميز" : "Premium Content",
+      description: isRTL
+        ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب."
+        : "Carefully designed curriculum covering all student needs.",
+      accent: "primary",
+    },
+    {
+      id: "04",
+      icon: HeadphonesIcon,
+      title: isRTL ? "متابعة مستمرة" : "Support",
+      description: isRTL
+        ? "دعم فني وتعليمي متواصل لضمان رحلة تعلم ناجحة."
+        : "Continuous technical and educational support.",
+      accent: "secondary",
+    },
+    {
+      id: "05",
+      icon: Award,
+      title: isRTL ? "شهادات معتمدة" : "Certificates",
+      description: isRTL
+        ? "شهادات معتمدة توثق إنجازاتك الأكاديمية."
+        : "Certified certificates documenting your achievements.",
+      accent: "primary",
+    },
+    {
+      id: "06",
+      icon: TrendingUp,
+      title: isRTL ? "تقييم ذكي" : "Smart Assessment",
+      description: isRTL
+        ? "نظام تقييم متطور لمتابعة تطور مستواك الأكاديمي."
+        : "Advanced system to track your academic progress.",
+      accent: "secondary",
+    },
+  ];
 
   return (
-    <div className="relative mt-32 py-20 overflow-hidden">
-      {/* Giant Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 0.02, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className={`text-[15rem] lg:text-[20rem] font-bold leading-none select-none ${
-            isRTL ? "font-[family-name:var(--font-laxr)]" : "font-[family-name:var(--font-bigx)]"
-          }`}
-          style={{
-            WebkitTextStroke: "2px currentColor",
-            color: "transparent",
-          }}
-        >
-          {isRTL ? "فوائد" : "BENEFITS"}
-        </motion.div>
-      </div>
-
-      <div className="relative z-10 px-4 sm:px-6">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 backdrop-blur-sm rounded-full border border-primary/20 mb-6">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-[family-name:var(--font-malmoom)] text-primary">
-              {isRTL ? "لماذا كلمة؟" : "Why Kalima?"}
+    <section
+      className="relative py-16 sm:py-24 lg:py-40 overflow-hidden bg-white"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Elite Gallery Header */}
+        <div className={`mb-12 sm:mb-20 lg:mb-32 ${isRTL ? "text-right" : "text-left"}`}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-3 sm:gap-4 mb-6 sm:mb-10"
+          >
+            <div className="flex -space-x-1.5 rtl:space-x-reverse">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 border-2 border-white backdrop-blur-sm shadow-sm"
+                />
+              ))}
+            </div>
+            <span className="text-[8px] sm:text-[10px] font-black tracking-[0.3em] sm:tracking-[0.4em] text-primary uppercase">
+              {isRTL ? "لماذا كلمة الفائقة؟" : "The Kalima Standard"}
             </span>
-          </div>
+          </motion.div>
 
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-4 font-[family-name:var(--font-headline)] ${isRTL ? "text-right" : "text-left"} max-w-4xl mx-auto`}>
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-black text-base-content leading-none tracking-tighter mb-6 sm:mb-10"
+          >
             {isRTL ? (
               <>
-                فوائد الانضمام إلى منصة{" "}
-                <span className="text-primary">كلمة</span>
+                نحن <span className="text-secondary italic">نصيغ</span> <br />{" "}
+                عهد التعليم الجديد
               </>
             ) : (
               <>
-                Benefits of Joining{" "}
-                <span className="text-primary">Kalima</span>
+                Crafting The <br />{" "}
+                <span className="text-secondary italic">Elite</span> Standard
               </>
             )}
-          </h2>
+          </motion.h2>
 
-          <p className={`text-lg text-base-content/70 max-w-2xl mx-auto font-[family-name:var(--font-body)] ${isRTL ? "text-right" : "text-left"}`}>
+          <p className="text-base sm:text-lg lg:text-xl text-base-content/30 font-medium max-w-2xl leading-relaxed italic">
             {isRTL
-              ? "اكتشف المزايا التي تجعل منصتنا الخيار الأمثل لرحلتك التعليمية"
-              : "Discover the advantages that make our platform the best choice for your educational journey"}
+              ? "منظومة تعليمية صُممت لتتجاوز التوقعات، حيث يلتقي عمق المعرفة مع رفاهية التجربة الرقمية."
+              : "An educational ecosystem designed to exceed expectations, where deep knowledge meets a luxurious digital experience."}
           </p>
-        </motion.div>
+        </div>
 
-        {/* Benefits Grid - Editorial Layout */}
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* First Row - 2 Large Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {benefits.slice(0, 2).map((benefit, index) => (
-              <motion.div
-                key={benefit.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="relative group"
-              >
-                {/* Gradient Glow */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} rounded-3xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity`} />
-
-                <div className="relative bg-base-100/80 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border-2 border-base-300/50 group-hover:border-primary/50 transition-colors overflow-hidden">
-                  {/* Card Number - Giant Background */}
-                  <div className="absolute top-0 right-0 opacity-5 font-[family-name:var(--font-bigx)] text-[12rem] leading-none pointer-events-none">
-                    {benefit.number}
-                  </div>
-
-                  {/* Content */}
-                  <div className={`relative z-10 ${isRTL ? "text-right" : "text-left"}`}>
-                    {/* Number Badge */}
-                    <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl mb-6 shadow-lg">
-                      <span className="text-2xl font-bold text-white font-[family-name:var(--font-bigx)]">
-                        {benefit.number}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-3xl lg:text-4xl font-bold mb-3 font-[family-name:var(--font-headline)]">
-                      {benefit.title}
-                    </h3>
-
-                    {/* Italic Subheading */}
-                    <p className="text-xl text-primary mb-4 font-[family-name:var(--font-laxr)] italic">
-                      {benefit.italic}
-                    </p>
-
-                    {/* Description */}
-                    <p className="text-base-content/70 text-lg leading-relaxed font-[family-name:var(--font-body)]">
-                      {benefit.content}
-                    </p>
-                  </div>
-
-                  {/* Decorative Circle */}
-                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Second Row - 3 Medium Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {benefits.slice(2, 5).map((benefit, index) => (
-              <motion.div
-                key={benefit.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="relative group"
-              >
-                {/* Gradient Glow */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} rounded-3xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity`} />
-
-                <div className="relative bg-base-100/80 backdrop-blur-xl rounded-3xl p-6 lg:p-8 border-2 border-base-300/50 group-hover:border-primary/50 transition-colors overflow-hidden h-full">
-                  {/* Card Number - Background */}
-                  <div className="absolute top-0 right-0 opacity-5 font-[family-name:var(--font-bigx)] text-[8rem] leading-none pointer-events-none">
-                    {benefit.number}
-                  </div>
-
-                  {/* Content */}
-                  <div className={`relative z-10 ${isRTL ? "text-right" : "text-left"}`}>
-                    {/* Number Badge */}
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl mb-4 shadow-lg">
-                      <span className="text-xl font-bold text-white font-[family-name:var(--font-bigx)]">
-                        {benefit.number}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-2xl font-bold mb-2 font-[family-name:var(--font-headline)]">
-                      {benefit.title}
-                    </h3>
-
-                    {/* Italic Subheading */}
-                    <p className="text-lg text-primary mb-3 font-[family-name:var(--font-laxr)] italic">
-                      {benefit.italic}
-                    </p>
-
-                    {/* Description */}
-                    <p className="text-base-content/70 leading-relaxed font-[family-name:var(--font-body)]">
-                      {benefit.content}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Third Row - 1 Full Width Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            viewport={{ once: true }}
-            whileHover={{ y: -8, transition: { duration: 0.3 } }}
-            className="relative group"
-          >
-            {/* Gradient Glow */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${benefits[5].gradient} rounded-3xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity`} />
-
-            <div className="relative bg-base-100/80 backdrop-blur-xl rounded-3xl p-8 lg:p-10 border-2 border-base-300/50 group-hover:border-primary/50 transition-colors overflow-hidden">
-              {/* Card Number - Giant Background */}
-              <div className="absolute top-0 right-0 opacity-5 font-[family-name:var(--font-bigx)] text-[12rem] leading-none pointer-events-none">
-                {benefits[5].number}
-              </div>
-
-              {/* Content - Horizontal Layout */}
-              <div className={`relative z-10 flex flex-col md:flex-row gap-8 items-start ${isRTL ? "md:flex-row-reverse text-right" : "text-left"}`}>
-                <div className="flex-shrink-0">
-                  {/* Number Badge */}
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-lg">
-                    <span className="text-3xl font-bold text-white font-[family-name:var(--font-bigx)]">
-                      {benefits[5].number}
-                    </span>
+        {/* The Boutique Gallery Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {benefits.map((benefit, index) => (
+            <motion.div
+              key={benefit.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.8 }}
+              className="relative group"
+            >
+              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-white border border-base-content/5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-2 overflow-hidden">
+                {/* Animated Material Icon */}
+                <div className="relative mb-8 sm:mb-10 lg:mb-14">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] bg-base-100 border border-base-content/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                    <benefit.icon
+                      className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-base-content/60 group-hover:text-primary transition-colors"
+                      strokeWidth={1}
+                    />
                   </div>
                 </div>
 
-                <div className="flex-1">
-                  {/* Title */}
-                  <h3 className="text-3xl lg:text-4xl font-bold mb-3 font-[family-name:var(--font-headline)]">
-                    {benefits[5].title}
+                <div className={isRTL ? "text-right" : "text-left"}>
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-base-content mb-3 sm:mb-4 lg:mb-6 tracking-tight group-hover:text-primary transition-colors">
+                    {benefit.title}
                   </h3>
-
-                  {/* Italic Subheading */}
-                  <p className="text-xl text-primary mb-4 font-[family-name:var(--font-laxr)] italic">
-                    {benefits[5].italic}
+                  <p className="text-sm sm:text-base text-base-content/40 font-medium leading-relaxed mb-6 sm:mb-8 lg:mb-12 group-hover:text-base-content/60 transition-colors">
+                    {benefit.description}
                   </p>
 
-                  {/* Description */}
-                  <p className="text-base-content/70 text-lg leading-relaxed font-[family-name:var(--font-body)] max-w-3xl">
-                    {benefits[5].content}
-                  </p>
+                  {/* Boutique CTA */}
+                  <div
+                    className={`flex items-center gap-3 sm:gap-4 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-secondary opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 ${
+                      isRTL ? "flex-row-reverse" : ""
+                    }`}
+                  >
+                    <span>
+                      {isRTL ? "اكتشف الفلسفة" : "Discover Philosophy"}
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                 </div>
               </div>
-
-              {/* Decorative Circles */}
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-br from-secondary/10 to-transparent rounded-full blur-3xl" />
-              <div className="absolute top-1/2 right-20 w-20 h-20 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-2xl" />
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 });
+
+BenefitsSection.displayName = "BenefitsSection";
 
 export default BenefitsSection;

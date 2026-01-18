@@ -8,7 +8,7 @@ import WelcomeSection from "./WelcomeSection";
 import BenefitsSection from "./BenefitsSection";
 import AboutSection from "./AboutSection";
 import ServicesGrid from "./ServicesGrid";
-import ExamPreparationSection from "./ExamPreparationSection";
+import { ExamPreparationSection } from "./ExamPreparationSection";
 import CoursesOverviews from "./CoursesOverview";
 import LanguageBooks from "./LanguageBooks";
 import { TeachersSection } from "./teachers-section";
@@ -26,7 +26,7 @@ const staggerContainer = (staggerChildren, delayChildren) => ({
 });
 
 const Services = () => {
-  const { t, i18n } = useTranslation("home");
+  const { i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -42,7 +42,7 @@ const Services = () => {
       { id: 6, title: "اللغة الإسبانية", image: "/Book-5.png" },
       { id: 7, title: "اللغة الصينية", image: "/Book-2.png" },
     ],
-    []
+    [],
   );
 
   const books1 = useMemo(
@@ -55,7 +55,7 @@ const Services = () => {
       { id: 6, title: "اللغة الإسبانية", image: "/Book-11.png" },
       { id: 7, title: "اللغة الصينية", image: "/Book-12.png" },
     ],
-    []
+    [],
   );
 
   const books2 = useMemo(
@@ -68,7 +68,7 @@ const Services = () => {
       { id: 6, title: "اللغة الإسبانية", image: "/Book-18.png" },
       { id: 7, title: "اللغة الصينية", image: "/Book-19.png" },
     ],
-    []
+    [],
   );
 
   // Auto-rotation effect for testimonials
@@ -86,23 +86,19 @@ const Services = () => {
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-      className="bg-gradient-to-b from-base-100 to-base-200 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden"
+      className="py-16 px-4 sm:px-6 lg:px-8 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div className="max-w-7xl mx-auto">
-        <WelcomeSection isRTL={isRTL} t={t} />
-        <BenefitsSection isRTL={isRTL} />
-        <AboutSection isRTL={isRTL} />
+      {/* WelcomeSection outside container for full-width background */}
+      <WelcomeSection />
+
+        <BenefitsSection />
+        <AboutSection />
         <AppDownloadSection />
-        <ServicesGrid isRTL={isRTL} />
-        <ExamPreparationSection isRTL={isRTL} />
-        <CoursesSection isRTL={isRTL} />
-        <TeachersSection isRTL={isRTL} />
-        <CoursesOverviews isRTL={isRTL} />
-        <LanguageBooks books={books1} isRTL={isRTL} />
-        <LanguageBooks books={books} isRTL={isRTL} />
-        <LanguageBooks books={books2} isRTL={isRTL} />
-      </div>
+        <ServicesGrid />
+        <ExamPreparationSection />
+        <CoursesSection />
+        <TeachersSection />
     </motion.section>
   );
 };
