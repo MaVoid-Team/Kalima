@@ -1,20 +1,12 @@
 export default function StepsIndicator({ currentStep, t, role }) {
   const stepLabels = {
-    student: [
-      t('steps.personalInfo'),
-      t('steps.hobbies'),
-      t('steps.review')
-    ],
+    student: [t("steps.personalInfo"), t("steps.review")],
     parent: [
-      t('steps.personalInfo'),
-      t('steps.childrenInfo'),
-      t('steps.review')
+      t("steps.personalInfo"),
+      t("steps.childrenInfo"),
+      t("steps.review"),
     ],
-    teacher: [
-      t('steps.personalInfo'),
-     "المعلومات الفرعيه",
-      t('steps.review')
-    ]
+    teacher: [t("steps.personalInfo"), "المعلومات الفرعيه", t("steps.review")],
   };
 
   return (
@@ -23,9 +15,9 @@ export default function StepsIndicator({ currentStep, t, role }) {
         {stepLabels[role].map((label, index) => {
           const stepNumber = index + 1;
           return (
-            <div 
-              key={stepNumber} 
-              className={`text-xs sm:text-lg step ${currentStep >= stepNumber ? 'step-primary' : ''}`}
+            <div
+              key={stepNumber}
+              className={`text-xs sm:text-lg step ${currentStep >= stepNumber ? "step-primary" : ""}`}
             >
               {t(`${label}`)}
             </div>
