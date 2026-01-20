@@ -10,22 +10,10 @@ import {
 } from "../../routes/market";
 import { addToCart, getUserPurchasedProducts } from "../../routes/cart";
 import { isLoggedIn, getToken } from "../../routes/auth-services";
-import {
-  ShoppingCart,
-  AlertTriangle,
-  X,
-  LogIn,
-  UserPlus,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  Package,
-  Check,
-  Sparkles,
-} from "lucide-react";
+// Note: Using getToken() for sync check, isLoggedIn() is async
+import { ShoppingCart, AlertTriangle, X, LogIn, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import KalimaLoader from "../../components/KalimaLoader";
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market");
@@ -38,7 +26,7 @@ const Market = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sections, setSections] = useState([]);
   const [subSections, setSubSections] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]); // Store all products only
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +38,7 @@ const Market = () => {
     message: "",
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [pendingProductId, setPendingProductId] = useState(null);
+  const [pendingProductId, setPendingProductId] = useState(null); // Store product ID when auth is needed
 
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null;
@@ -71,12 +59,13 @@ const Market = () => {
     }
 
     let filtered = allProducts.filter(
-      (product) => product.section?._id === activeTab,
+      (product) => product.section?._id === activeTab
     );
 
+    // Further filter by subsection if one is selected
     if (activeSubSection !== "all") {
       filtered = filtered.filter(
-        (product) => product.subSection?._id === activeSubSection,
+        (product) => product.subSection?._id === activeSubSection
       );
     }
 
@@ -86,7 +75,7 @@ const Market = () => {
   // Filter items based on search query
   const filteredItems = useMemo(() => {
     return filteredBySection.filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [filteredBySection, searchQuery]);
 
@@ -101,23 +90,26 @@ const Market = () => {
     return Math.ceil(filteredItems.length / itemsPerPage) || 1;
   }, [filteredItems.length, itemsPerPage]);
 
-  // Fetch all data initially
+  // Fetch all data initially - ONLY PRODUCTS
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        // Fetch sections
         const sectionsResponse = await getAllSections();
         if (sectionsResponse.status === "success") {
           setSections(sectionsResponse.data.sections);
         }
 
+        // Fetch subsections
         const subSectionsResponse = await getAllSubSections();
         if (subSectionsResponse.status === "success") {
           setSubSections(subSectionsResponse.data.subsections);
         }
 
+        // Fetch user's purchased products if logged in
         if (isLoggedIn()) {
           const purchasedResult = await getUserPurchasedProducts();
           if (purchasedResult.success) {
@@ -125,6 +117,7 @@ const Market = () => {
           }
         }
 
+        // Fetch ONLY products (removed books fetching)
         const productsResponse = await getAllProducts();
 
         if (productsResponse.status === "success") {
@@ -132,13 +125,13 @@ const Market = () => {
           const productsWithNewFlag = productsResponse.data.products.map(
             (product) => {
               const createdDate = new Date(product.createdAt);
-              const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24);
+              const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24); // ms → days
 
               return {
                 ...product,
-                isNew: diffInDays <= 3,
+                isNew: diffInDays <= 3, // mark as new if within 3 days
               };
-            },
+            }
           );
           setAllProducts(productsWithNewFlag);
         }
@@ -149,23 +142,22 @@ const Market = () => {
         setLoading(false);
       }
     };
-
+    // dummy comment to re-commit
     fetchInitialData();
   }, [t]);
 
   // Handle add to cart
   const handleAddToCart = async (productId, event, product) => {
-    event.stopPropagation();
+    event.stopPropagation(); // Prevent navigation to product details
 
     if (!getToken()) {
-      setPendingProductId({
-        id: productId,
-        type: product?.__t === "ECBook" ? "book" : "product",
-      });
+      // Store the product info for redirect after login
+      setPendingProductId({ id: productId, type: product?.__t === "ECBook" ? "book" : "product" });
       setShowAuthModal(true);
       return;
     }
 
+    // Check if product was already purchased
     const isPurchased = purchasedProductIds.includes(productId);
     if (isPurchased) {
       const confirmMessage = isRTL
@@ -173,7 +165,7 @@ const Market = () => {
         : "You have already purchased this product. Do you want to buy it again?";
 
       if (!window.confirm(confirmMessage)) {
-        return;
+        return; // User cancelled
       }
     }
 
@@ -182,12 +174,13 @@ const Market = () => {
       const result = await addToCart(productId);
       if (result.success) {
         toast.success(
-          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
+          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!"
         );
         const currentCount = Number(localStorage.getItem("cartCount")) || 0;
         localStorage.setItem("cartCount", currentCount + 1);
         window.dispatchEvent(new Event("cart-updated"));
       } else {
+        // Check if it's a cart type mismatch error
         if (result.error && result.error.includes("Cannot add item of type")) {
           setCartTypeError({
             show: true,
@@ -197,11 +190,12 @@ const Market = () => {
           toast.error(
             result.error ||
               t("errors.addToCartFailed") ||
-              "فشل في الإضافة إلى السلة",
+              "فشل في الإضافة إلى السلة"
           );
         }
       }
     } catch (error) {
+      // Check if it's a cart type mismatch error
       if (error.message && error.message.includes("Cannot add item of type")) {
         setCartTypeError({
           show: true,
@@ -211,7 +205,7 @@ const Market = () => {
         toast.error(
           error.message ||
             t("errors.addToCartFailed") ||
-            "فشل في الإضافة إلى السلة",
+            "فشل في الإضافة إلى السلة"
         );
       }
     } finally {
@@ -228,7 +222,7 @@ const Market = () => {
   const currentSubSections = useMemo(() => {
     if (activeTab === "all") return [];
     return subSections.filter(
-      (subSection) => subSection.section?._id === activeTab,
+      (subSection) => subSection.section?._id === activeTab
     );
   }, [activeTab, subSections]);
 
@@ -237,30 +231,44 @@ const Market = () => {
     setActiveSubSection("all");
   }, [activeTab]);
 
-  // Create categories array
+  // Create categories array with "All" option and fetched sections
   const categories = [
-    { id: "all", name: isRTL ? "الكل" : "All" },
+    { id: "all", icon: "☰" },
     ...sections.map((section) => ({
       id: section._id,
       name: section.name,
+      icon: "📚",
     })),
   ];
 
   if (loading && allProducts.length === 0) {
-    return <KalimaLoader fullScreen={false} />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-12 rounded-3xl border border-base-content/5 max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-6">
-            <X className="w-8 h-8 text-red-500" />
-          </div>
-          <h3 className="text-xl font-black text-base-content mb-2">
-            {isRTL ? "حدث خطأ" : "Error"}
-          </h3>
-          <p className="text-base-content/40">{error}</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="alert alert-error">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>
+            {t("errors.loadingError")}: {error}
+          </span>
         </div>
       </div>
     );
@@ -268,106 +276,66 @@ const Market = () => {
 
   return (
     <div
-      className={`min-h-screen bg-white ${isRTL ? "rtl" : "ltr"}`}
+      className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
-          <div className={`mb-16 ${isRTL ? "text-right" : "text-left"}`}>
-            <motion.div
-              initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`flex items-center gap-6 mb-8 ${
-                isRTL ? "flex-row-reverse" : ""
+      <div className="py-6 px-4">
+        <div className="md:max-w-7xl lg:max-w-7xl max-w-3xl mx-auto">
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <img
+              src="/bookshelf.png"
+              alt={t("hero.booksIllustration")}
+              className="h-24 w-auto"
+            />
+            <h1
+              className={`text-lg font-semibold flex-1 text-center ${
+                isRTL ? "md:text-left" : "md:text-right"
               }`}
             >
-              <div className="w-16 h-px bg-primary" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
-                {isRTL ? "متجر كلمة" : "Kalima Store"}
-              </span>
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl lg:text-6xl font-black text-base-content leading-[0.9] tracking-tighter mb-8"
-            >
-              {isRTL ? (
-                <>
-                  اكتشف <span className="text-secondary italic">منتجاتنا</span>{" "}
-                  <br /> المميزة
-                </>
-              ) : (
-                <>
-                  Discover Our <br />
-                  <span className="text-secondary italic">Products</span>
-                </>
-              )}
-            </motion.h1>
-
-            <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
               {t("hero.tagline")}
-            </p>
+            </h1>
           </div>
-
-          {/* Search Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="max-w-2xl"
-          >
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={t("search.placeholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-6 py-4 ${
-                  isRTL ? "pr-14" : "pl-14"
-                } bg-base-100 border border-base-content/10 rounded-2xl text-base-content placeholder:text-base-content/30 focus:outline-none focus:border-primary transition-colors`}
-              />
-              <Search
-                className={`absolute ${
-                  isRTL ? "right-5" : "left-5"
-                } top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/30`}
-              />
-            </div>
-          </motion.div>
         </div>
-      </section>
+      </div>
 
       {/* Category Tabs */}
-      <section className="sticky top-0 z-20 bg-white border-b border-base-content/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex overflow-x-auto scrollbar-hide gap-2 py-4">
+      <div className="bg-primary px-4 py-2">
+        <div className="md:max-w-7xl lg:max-w-7xl sm:max-w-3xl mx-auto">
+          <div className="flex flex-wrap overflow-x-auto scrollbar-hide gap-1">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-shrink-0 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ${
+                className={`flex-shrink-0 px-10 py-2 text-sm font-medium transition-colors ${
+                  isRTL ? "border-l-2" : "border-r-2"
+                } border-secondary ${
                   activeTab === category.id
-                    ? "bg-primary text-white"
-                    : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                    ? "bg-secondary/55 rounded-t-lg"
+                    : "hover:bg-primary"
                 }`}
               >
+                <span className={`${isRTL ? "ml-2" : "mr-2"}`}>
+                  {category.icon}
+                </span>
                 {category.name}
               </button>
             ))}
           </div>
+        </div>
+      </div>
 
-          {/* Subsection Tabs */}
-          {activeTab !== "all" && currentSubSections.length > 0 && (
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 py-3 border-t border-base-content/5">
+      {/* Subsection Tabs (show only when a specific section is selected) */}
+      {activeTab !== "all" && currentSubSections.length > 0 && (
+        <div className="bg-secondary/20 px-4 py-2 border-b">
+          <div className="md:max-w-7xl lg:max-w-7xl sm:max-w-3xl mx-auto">
+            <div className="flex flex-wrap overflow-x-auto scrollbar-hide gap-1">
               <button
                 onClick={() => setActiveSubSection("all")}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
+                className={`flex-shrink-0 px-6 py-1 text-sm font-medium transition-colors rounded ${
                   activeSubSection === "all"
                     ? "bg-secondary text-white"
-                    : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                    : "hover:bg-secondary/30"
                 }`}
               >
                 {t("allSubSections") || "All"}
@@ -376,321 +344,435 @@ const Market = () => {
                 <button
                   key={subSection._id}
                   onClick={() => setActiveSubSection(subSection._id)}
-                  className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
+                  className={`flex-shrink-0 px-6 py-1 text-sm font-medium transition-colors rounded ${
                     activeSubSection === subSection._id
                       ? "bg-secondary text-white"
-                      : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                      : "hover:bg-secondary/30"
                   }`}
                 >
                   {subSection.name}
                 </button>
               ))}
             </div>
-          )}
+          </div>
         </div>
-      </section>
+      )}
+
+      {/* Search Bar */}
+      <div className="px-4 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex gap-4 items-center">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder={t("search.placeholder")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`input input-bordered w-full ${
+                  isRTL ? "pr-12" : "pl-12"
+                } focus:border-primary focus:ring-primary`}
+              />
+              <div
+                className={`absolute ${
+                  isRTL ? "right-4" : "left-4"
+                } top-1/2 transform -translate-y-1/2`}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <button className="btn btn-square btn-primary bg-primary border-primary hover:bg-primary/50">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Products Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          {loading && (
-            <div className="flex justify-center mb-8">
-              <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            </div>
-          )}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {loading && (
+          <div className="flex justify-center mb-8">
+            <div className="loading loading-spinner loading-md"></div>
+          </div>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {paginatedItems.map((item, index) => {
-              const isPurchased = purchasedProductIds.includes(item._id);
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paginatedItems.map((item) => {
+            const isPurchased = purchasedProductIds.includes(item._id);
 
-              return (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group"
-                >
-                  <div className="relative bg-white rounded-3xl border border-base-content/5 overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
-                    {/* Badges */}
-                    <div className="absolute top-4 inset-x-4 flex justify-between items-start z-10">
-                      {item.isNew && !isPurchased && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-white rounded-full text-xs font-bold">
-                          <Sparkles className="w-3 h-3" />
-                          {t("product.new") || "NEW"}
-                        </div>
-                      )}
-                      {isPurchased && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white rounded-full text-xs font-bold">
-                          <Check className="w-3 h-3" />
-                          {isRTL ? "تم الشراء" : "Purchased"}
-                        </div>
-                      )}
-                      {item.discountPercentage > 0 && (
-                        <div
-                          className={`px-3 py-1.5 bg-primary text-white rounded-full text-xs font-bold ${
-                            !item.isNew && !isPurchased
-                              ? isRTL
-                                ? "mr-auto"
-                                : "ml-auto"
-                              : ""
-                          }`}
-                        >
-                          -{item.discountPercentage}%
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Image */}
-                    <div className="relative aspect-[4/3] bg-base-200 overflow-hidden">
-                      <img
-                        src={
-                          convertPathToUrl(
-                            item.thumbnail,
-                            "product_thumbnails",
-                          ) || "/placeholder.svg"
-                        }
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      <h3 className="text-lg font-black text-base-content mb-4 line-clamp-2 group-hover:text-primary transition-colors">
-                        {item.title}
-                      </h3>
-
-                      {/* Price */}
-                      <div className="flex items-center gap-3 mb-6">
-                        {item.priceAfterDiscount &&
-                        item.priceAfterDiscount < item.price ? (
-                          <>
-                            <span className="text-2xl font-black text-primary">
-                              {item.priceAfterDiscount} {t("product.currency")}
-                            </span>
-                            <span className="text-sm text-base-content/30 line-through">
-                              {item.price} {t("product.currency")}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-2xl font-black text-primary">
-                            {item.price} {t("product.currency")}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => {
-                            const itemType =
-                              item.__t === "ECBook" ? "book" : "product";
-                            navigate(
-                              `/market/product-details/${itemType}/${item._id}`,
-                            );
-                          }}
-                          className="flex-1 py-3 px-4 bg-base-content text-white rounded-xl font-bold hover:bg-primary transition-colors"
-                        >
-                          {t("product.viewDetails")}
-                        </button>
-                        <button
-                          onClick={(e) => handleAddToCart(item._id, e, item)}
-                          disabled={addingToCart[item._id]}
-                          className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-base-content/10 hover:border-primary hover:bg-primary hover:text-white transition-all"
-                        >
-                          {addingToCart[item._id] ? (
-                            <div className="w-5 h-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                          ) : (
-                            <ShoppingCart className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
+            return (
+              <div
+                key={item._id}
+                className="card bg-base-300 shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden"
+              >
+                {/* Already Purchased Badge */}
+                {isPurchased && (
+                  <div
+                    className={`absolute top-4 ${
+                      isRTL ? "left-4" : "right-4"
+                    } z-10`}
+                  >
+                    <div
+                      className={`bg-secondary text-secondary-content px-3 py-1 ${
+                        isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium flex items-center gap-1`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {isRTL
+                        ? "لقد اشتريت هذا المنتج من قبل"
+                        : "Already purchased before"}{" "}
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Empty State */}
-          {filteredItems.length === 0 && !loading && (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 rounded-3xl bg-base-200 flex items-center justify-center mx-auto mb-6">
-                <Package className="w-10 h-10 text-base-content/30" />
-              </div>
-              <h3 className="text-2xl font-black text-base-content mb-2">
-                {t("emptyState.title")}
-              </h3>
-              <p className="text-base-content/40">
-                {t("emptyState.description")}
-              </p>
-            </div>
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-16">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1 || loading}
-                  className="w-12 h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  {isRTL ? (
-                    <ChevronRight className="w-5 h-5" />
-                  ) : (
-                    <ChevronLeft className="w-5 h-5" />
-                  )}
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      disabled={loading}
-                      className={`w-12 h-12 rounded-full font-bold transition-all ${
-                        currentPage === page
-                          ? "bg-primary text-white"
-                          : "border border-base-content/10 hover:border-primary"
-                      }`}
+                )}
+                {/*comment for re-commit*/}
+                {/* Discount Badge */}
+                {item.discountPercentage > 0 && (
+                  <div
+                    className={`absolute top-4 ${
+                      isRTL ? "right-4" : "left-4"
+                    } z-10`}
+                  >
+                    <div
+                      className={`bg-primary px-3 py-1 ${
+                        isRTL ? "rounded-bl-2xl" : "rounded-br-2xl"
+                      } text-sm font-medium`}
                     >
-                      {page}
-                    </button>
-                  ),
+                      {t("product.discounts")}
+                      <br />
+                      <span className="text-lg font-bold">
+                        {item.discountPercentage}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {item.isNew && !isPurchased && (
+                  <div
+                    className={`absolute top-4 ${
+                      isRTL ? "left-4" : "right-4"
+                    } z-10`}
+                  >
+                    <div
+                      className={`bg-secondary px-3 py-1 ${
+                        isRTL ? "rounded-br-2xl" : "rounded-bl-2xl"
+                      } text-sm font-medium`}
+                    >
+                      {t("product.new") || "NEW"}
+                    </div>
+                  </div>
                 )}
 
-                <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
-                  disabled={currentPage === totalPages || loading}
-                  className="w-12 h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  {isRTL ? (
-                    <ChevronLeft className="w-5 h-5" />
-                  ) : (
-                    <ChevronRight className="w-5 h-5" />
-                  )}
-                </button>
+                <figure className="px-4 pt-4">
+                  <img
+                    src={
+                      convertPathToUrl(item.thumbnail, "product_thumbnails") ||
+                      "/placeholder.svg?height=200&width=200" ||
+                      "/placeholder.svg"
+                    }
+                    alt={item.title}
+                    className="rounded-xl w-full h-48 object-cover"
+                  />
+                </figure>
+
+                <div className="card-body items-center text-center p-6">
+                  <h2 className="card-title text-lg font-semibold mb-2">
+                    {item.title}
+                  </h2>
+
+                  <div className="flex items-center gap-2 mb-4">
+                    {item.priceAfterDiscount &&
+                    item.priceAfterDiscount < item.price ? (
+                      <>
+                        <span className="text-2xl font-bold text-primary">
+                          {item.priceAfterDiscount} {t("product.currency")}
+                        </span>
+                        <span className="text-sm line-through text-gray-500">
+                          {item.price} {t("product.currency")}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold text-primary">
+                        {item.price} {t("product.currency")}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="card-actions w-full gap-2">
+                    <button
+                      onClick={() => {
+                        // Determine type from the item data itself, not assumptions
+                        const itemType =
+                          item.__t === "ECBook" ? "book" : "product";
+                        navigate(
+                          `/market/product-details/${itemType}/${item._id}`
+                        );
+                      }}
+                      className="btn btn-primary bg-primary border-primary hover:bg-primary/50 flex-1"
+                    >
+                      {t("product.viewDetails")}
+                    </button>
+                    <button
+                      onClick={(e) => handleAddToCart(item._id, e, item)}
+                      disabled={addingToCart[item._id]}
+                      className="btn btn-outline btn-primary flex-1"
+                    >
+                      {addingToCart[item._id] ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-4 h-4" />
+                          {t("product.addToCart")}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
-      </section>
+
+        {/* Empty State */}
+        {filteredItems.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-xl font-semibold mb-2">
+              {t("emptyState.title")}
+            </h3>
+            <p className="text-gray-500">{t("emptyState.description")}</p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-12">
+            <div className="join">
+              <button
+                className="join-item btn rounded-full"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || loading}
+                title={t("pagination.previous")}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{ transform: isRTL ? "rotate(180deg)" : "none" }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`join-item btn rounded-full ${
+                      currentPage === page ? "btn-primary" : ""
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                    disabled={loading}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                className="join-item btn rounded-full"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages || loading}
+                title={t("pagination.next")}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{ transform: isRTL ? "rotate(180deg)" : "none" }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Cart Type Mismatch Modal */}
       <AnimatePresence>
         {cartTypeError.show && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             >
-              <div className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mx-auto mb-6">
-                  <AlertTriangle className="w-8 h-8 text-orange-500" />
+              {/* Header */}
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-center relative">
+                <button
+                  onClick={() => setCartTypeError({ show: false, message: "" })}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-base-content mb-4">
+                <h3 className="text-2xl font-bold text-white">
                   {isRTL ? "تنبيه!" : "Warning!"}
                 </h3>
-                <p className="text-base-content/60 mb-8">
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
                   {isRTL
-                    ? "السلة تحتوي على نوع مختلف من المنتجات. يجب أن تكون جميع المنتجات في السلة من نفس النوع."
-                    : "Your cart contains a different type of items. All items in cart must be of the same type."}
+                    ? "لا يمكن إضافة هذا المنتج للسلة"
+                    : "Cannot add this item to cart"}
                 </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() =>
-                      setCartTypeError({ show: false, message: "" })
-                    }
-                    className="flex-1 py-3 px-6 border border-base-content/10 rounded-xl font-bold hover:bg-base-100 transition-colors"
-                  >
-                    {isRTL ? "إغلاق" : "Close"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCartTypeError({ show: false, message: "" });
-                      navigate("/cart");
-                    }}
-                    className="flex-1 py-3 px-6 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors"
-                  >
-                    {isRTL ? "عرض السلة" : "View Cart"}
-                  </button>
-                </div>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "السلة تحتوي على نوع مختلف من المنتجات. يجب أن تكون جميع المنتجات في السلة من نفس النوع (كتب فقط أو منتجات فقط)."
+                    : "Your cart contains a different type of items. All items in cart must be of the same type (books only or products only)."}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setCartTypeError({ show: false, message: "" });
+                    navigate("/cart");
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  {isRTL ? "عرض السلة" : "View Cart"}
+                </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Auth Required Modal */}
+      {/* Auth Required Modal - Login or Register Choice */}
       <AnimatePresence>
         {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             >
-              <div className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <ShoppingCart className="w-8 h-8 text-primary" />
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-black text-base-content mb-4">
+                <h3 className="text-2xl font-bold text-white">
                   {isRTL ? "تسجيل الدخول مطلوب" : "Login Required"}
                 </h3>
-                <p className="text-base-content/60 mb-8">
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center">
+                <p className="text-lg text-base-content mb-3">
                   {isRTL
                     ? "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
                     : "You need to login to add items to cart"}
                 </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setShowAuthModal(false);
-                      const redirectUrl = pendingProductId
-                        ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
-                        : location.pathname + location.search;
-                      navigate(
-                        `/login?redirect=${encodeURIComponent(redirectUrl)}`,
-                      );
-                    }}
-                    className="flex-1 py-3 px-6 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <LogIn className="w-5 h-5" />
-                    {isRTL ? "تسجيل الدخول" : "Login"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAuthModal(false);
-                      const redirectUrl = pendingProductId
-                        ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
-                        : location.pathname + location.search;
-                      navigate(
-                        `/register?redirect=${encodeURIComponent(redirectUrl)}`,
-                      );
-                    }}
-                    className="flex-1 py-3 px-6 border border-base-content/10 rounded-xl font-bold hover:bg-base-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <UserPlus className="w-5 h-5" />
-                    {isRTL ? "إنشاء حساب" : "Register"}
-                  </button>
-                </div>
+                <p className="text-base-content/70">
+                  {isRTL
+                    ? "هل لديك حساب بالفعل؟ قم بتسجيل الدخول. أو أنشئ حساب جديد."
+                    : "Already have an account? Login. Or create a new account."}
+                </p>
               </div>
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-base-100 flex items-center justify-center hover:bg-base-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              {/* Footer - Two Buttons */}
+              <div className="p-4 bg-base-200 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    // Redirect to product details page after login
+                    const redirectUrl = pendingProductId
+                      ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
+                      : location.pathname + location.search;
+                    navigate(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+                  }}
+                  className="btn btn-primary flex-1"
+                >
+                  <LogIn className="w-5 h-5" />
+                  {isRTL ? "تسجيل الدخول" : "Login"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    // Redirect to product details page after register
+                    const redirectUrl = pendingProductId
+                      ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
+                      : location.pathname + location.search;
+                    navigate(`/register?redirect=${encodeURIComponent(redirectUrl)}`);
+                  }}
+                  className="btn btn-outline btn-primary flex-1"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  {isRTL ? "إنشاء حساب" : "Register"}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
