@@ -63,11 +63,7 @@
       "assistantInfo": "معلومات المساعد",
       "assignedLecturer": "المحاضر المعين",
       "title": "تفاصيل المستخدم",
-      "close": "إغلاق",
-      "purchases": "المشتريات",
-      "frequentBuyer": "مشتري متكرر",
-      "newClient": "عميل جديد",
-      "userSerial": "الرقم التسلسلي للمستخدم"
+      "close": "إغلاق"
     },
     "invites": {
       "invite": "دعوة",
@@ -91,21 +87,13 @@
       "exporting": "جاري التصدير...",
       "csvFormat": "تنسيق CSV",
       "jsonFormat": "تنسيق JSON",
-      "xlsxFormat": "تنسيق XLSX",
       "exportFiltered": "تصدير المفلتر",
       "exportCSVPage": "تصدير الصفحة (CSV)",
       "exportCSVAll": "تصدير الكل (CSV)",
       "exportJSONPage": "تصدير الصفحة (JSON)",
       "exportJSONAll": "تصدير الكل (JSON)",
       "exportXLSXPage": "تصدير الصفحة (XLSX)",
-      "exportXLSXAll": "تصدير الكل (XLSX)",
-      "csvPage": "تصدير الصفحة (CSV)",
-      "csvAll": "تصدير الكل (CSV)",
-      "jsonPage": "تصدير الصفحة (JSON)",
-      "jsonAll": "تصدير الكل (JSON)",
-      "xlsxPage": "تصدير الصفحة (XLSX)",
-      "xlsxAll": "تصدير الكل (XLSX)",
-      "successXLSX": "تم تصدير {{count}} مستخدم بنجاح (XLSX)"
+      "exportXLSXAll": "تصدير الكل (XLSX)"
     },
     "errors": {
       "fetchLecturers": "فشل في جلب المحاضرين",
@@ -202,7 +190,8 @@
       "phone": "رقم الهاتف",
       "name": "الاسم",
       "successfulInvites": "الدعوات الناجحة",
-      "purchases": "المشتريات"
+      "purchases": "المشتريات",
+      "totalPaid": "إجمالي المدفوع"
     },
 
     "pagination": {
@@ -412,6 +401,7 @@
     "administrationZone": "المنطقة الإدارية",
     "sequenceId": "الرقم التسلسلي",
     "purchases": "المشتريات",
+    "totalPaid": "إجمالي المدفوع",
     "joinedDate": "تاريخ الانضمام"
   },
 
