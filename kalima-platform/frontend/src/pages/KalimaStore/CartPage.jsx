@@ -689,7 +689,7 @@ const CartPage = () => {
 
       {/* Main Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-12">
           {/* Cart Items - Left Side */}
           <div className="lg:col-span-3 space-y-5">
             {/* Section Header */}
@@ -736,7 +736,7 @@ const CartPage = () => {
                       type: "spring",
                       stiffness: 100,
                     }}
-                    className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
+                    className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
                   >
                     <div className="relative flex gap-5">
                       {/* Remove Button */}
@@ -842,7 +842,7 @@ const CartPage = () => {
                   </h2>
                 </div>
 
-                <div className="p-6 space-y-6">
+                <div className="p-4 sm:p-6 space-y-6">
                   {/* Coupon Section */}
                   <div className="relative">
                     <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
@@ -951,7 +951,7 @@ const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100 space-y-5"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-4 sm:p-6 border border-gray-100 space-y-5"
               >
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
@@ -1261,7 +1261,7 @@ const CartPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-gradient-to-br from-[#AF0D0E]/5 via-white to-[#FF5C28]/5 rounded-2xl p-6 border border-[#AF0D0E]/10 space-y-4"
+                  className="bg-gradient-to-br from-[#AF0D0E]/5 via-white to-[#FF5C28]/5 rounded-2xl p-4 sm:p-6 border border-[#AF0D0E]/10 space-y-4"
                 >
                   <h3 className="text-lg font-bold text-gray-900 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
@@ -1322,7 +1322,7 @@ const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-6 border border-gray-100"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-4 sm:p-6 border border-gray-100"
               >
                 <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-gray-400" />
