@@ -115,7 +115,9 @@ export const AppDownloadSection = React.memo(() => {
                 className="flex flex-wrap gap-4 pt-4"
               >
                 <a
-                  href="#"
+                  href="https://play.google.com/store/apps/details?id=com.kalimaplatform.mavoid"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-base-content text-white rounded-2xl font-bold hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Download className="w-5 h-5" />
