@@ -576,13 +576,8 @@ export const createPaymentMethod = async (data) => {
     }
 
     const response = await axios.post(
-<<<<<<<<< Temporary merge branch 1
-      `${API_URL}/ec/payment-methods`,
-      data,
-=========
       `${API_URL}/api/v1/ec/payment-methods`,
       formData,
->>>>>>>>> Temporary merge branch 2
       {
         withCredentials: true,
         headers: {
@@ -639,13 +634,8 @@ export const updatePaymentMethod = async (id, updateData) => {
     }
 
     const response = await axios.patch(
-<<<<<<<<< Temporary merge branch 1
-      `${API_URL}/ec/payment-methods/${id}`,
-      updateData,
-=========
       `${API_URL}/api/v1/ec/payment-methods/${id}`,
       formData,
->>>>>>>>> Temporary merge branch 2
       {
         withCredentials: true,
         headers: {
