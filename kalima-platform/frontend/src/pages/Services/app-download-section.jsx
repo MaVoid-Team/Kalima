@@ -66,6 +66,51 @@ export function AppDownloadSection() {
                 {t("appDownload.content2") || "on your mobile to learn"}{" "}
                 <span className="text-primary">{t("appDownload.everywhere") || "everywhere"}</span>
               </p>
+<<<<<<< HEAD
+=======
+
+              {/* Feature Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 pt-8">
+                {features.map((feat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-12">
+                        <feat.icon className="w-6 h-6" strokeWidth={1} />
+                      </div>
+                      <h4 className="text-xl font-black text-base-content uppercase tracking-tight">
+                        {feat.title}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-base-content/40 font-medium leading-loose group-hover:text-base-content/60 transition-colors">
+                      {isRTL ? feat.arDesc : feat.enDesc}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Download Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-wrap gap-4 pt-4"
+              >
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-base-content text-white rounded-2xl font-bold hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>{isRTL ? "تحميل التطبيق" : "Download App"}</span>
+                </a>
+              </motion.div>
+>>>>>>> parent of 48a1690 (add Kalima Store product details, purchase flow, order management, and services page with app download section.)
             </div>
 
             {/* QR Code Section */}

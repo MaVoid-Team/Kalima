@@ -90,6 +90,7 @@ const Services = () => {
         <BenefitsSection isRTL={isRTL} />
         <AboutSection isRTL={isRTL} />
         <AppDownloadSection />
+<<<<<<< HEAD
         <ServicesGrid isRTL={isRTL} />
         <ExamPreparationSection isRTL={isRTL} />
         <CoursesSection isRTL={isRTL} />
@@ -99,6 +100,12 @@ const Services = () => {
         <LanguageBooks books={books} isRTL={isRTL} />
         <LanguageBooks books={books2} isRTL={isRTL} />
       </div>
+=======
+        <ServicesGrid />
+        <ExamPreparationSection />
+        <CoursesSection />
+        <TeachersSection />
+>>>>>>> parent of 48a1690 (add Kalima Store product details, purchase flow, order management, and services page with app download section.)
     </motion.section>
   );
 };
