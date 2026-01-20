@@ -10,6 +10,7 @@ import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
 import Overlay from "./pages/KalimaStore/Components/overlay";
+import Footer from "./components/footer";
 
 // Lazy load components
 const AuditLog = lazy(
@@ -21,7 +22,6 @@ const AdminDashboard = lazy(
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 const LecturesPage = lazy(() => import("./pages/lectures"));
 const TeacherLogin = lazy(() => import("./pages/Login/login"));
-const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
 const RegisterStudent = lazy(
   () => import("./pages/signup/StudentRegistration"),
