@@ -1,34 +1,40 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=IBM+Plex+Sans+Arabic:wght@100..700&display=swap");
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --color-base-100: #ffffff;
-    --color-base-200: #fcfcfc;
-    --color-base-300: #f8f8f8;
-    --color-base-content: #1a1a1a;
+@plugin "daisyui" {
+  themes: all;
+}
 
-    /* The Signature Kalima Red */
-    --color-primary: #af0d0e;
-    --color-primary-content: #ffffff;
+@plugin "daisyui/theme" {
+  name: "kalima";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
 
-    /* The Editorial Gold */
-    --color-secondary: #c5a059;
-    --color-secondary-content: #ffffff;
+  /* Kalima Masterpiece Theme - "Silk, Onyx & Crimson" */
+  --color-base-100: #ffffff;
+  --color-base-200: #fcfcfc;
+  --color-base-300: #f8f8f8;
+  --color-base-content: #1a1a1a;
 
-    /* The Museum Amber */
-    --color-accent: #eab308;
-    --color-accent-content: #ffffff;
+  /* The Signature Kalima Red */
+  --color-primary: #af0d0e;
+  --color-primary-content: #ffffff;
 
-    --color-neutral: #1a1a1a;
-    --color-neutral-content: #ffffff;
+  /* The Editorial Gold */
+  --color-secondary: #c5a059;
+  --color-secondary-content: #ffffff;
 
-    --radius-selector: 1rem;
-    --radius-field: 1rem;
-    --radius-box: 2.5rem;
-  }
+  /* The Museum Amber */
+  --color-accent: #eab308;
+  --color-accent-content: #ffffff;
+
+  --color-neutral: #1a1a1a;
+  --color-neutral-content: #ffffff;
+
+  --radius-selector: 1rem;
+  --radius-field: 1rem;
+  --radius-box: 2.5rem;
 }
 
 :root {
