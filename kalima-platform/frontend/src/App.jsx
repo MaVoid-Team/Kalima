@@ -12,67 +12,67 @@ import { useTranslation } from "react-i18next";
 import Overlay from "./pages/KalimaStore/Components/overlay";
 
 // Lazy load components
-const AuditLog = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/auditLog")
+const AuditLog = lazy(
+  () => import("./pages/User Dashboard/Admin dashboard/auditLog"),
 );
-const AdminDashboard = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/home/adminDashboard")
+const AdminDashboard = lazy(
+  () => import("./pages/User Dashboard/Admin dashboard/home/adminDashboard"),
 );
 const CourseDetails = lazy(() => import("./pages/CourseDetails"));
 const LecturesPage = lazy(() => import("./pages/lectures"));
 const TeacherLogin = lazy(() => import("./pages/Login/login"));
 const Footer = lazy(() => import("./components/footer"));
 const CoursesPage = lazy(() => import("./pages/courses"));
-const RegisterStudent = lazy(() =>
-  import("./pages/signup/StudentRegistration")
+const RegisterStudent = lazy(
+  () => import("./pages/signup/StudentRegistration"),
 );
 const Teachers = lazy(() => import("./pages/Teachers"));
-const TeacherDetails = lazy(() =>
-  import("./pages/teacher details/Teacher-details")
+const TeacherDetails = lazy(
+  () => import("./pages/teacher details/Teacher-details"),
 );
 const PromoCodes = lazy(() => import("./pages/User Dashboard/promoCodes"));
 const SettingsPage = lazy(() => import("./pages/Settings/SettingsPage"));
 const Services = lazy(() => import("./pages/Services/Services"));
-const DashboardPage = lazy(() =>
-  import("./pages/Lecturer Dashboard/LecturerDashboard")
+const DashboardPage = lazy(
+  () => import("./pages/Lecturer Dashboard/LecturerDashboard"),
 );
-const ContainersPage = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/ContainerPage")
+const ContainersPage = lazy(
+  () => import("./pages/User Dashboard/Lecture Page/ContainerPage"),
 );
-const ContainerDetails = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/ContainerDetails")
+const ContainerDetails = lazy(
+  () => import("./pages/User Dashboard/Lecture Page/ContainerDetails"),
 );
-const LectureDisplay = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/LectureDisplay")
+const LectureDisplay = lazy(
+  () => import("./pages/User Dashboard/Lecture Page/LectureDisplay"),
 );
-const AssistantPage = lazy(() =>
-  import("./pages/User Dashboard/assistantPage/assistantPage")
+const AssistantPage = lazy(
+  () => import("./pages/User Dashboard/assistantPage/assistantPage"),
 );
-const CoursesDashboard = lazy(() =>
-  import("./pages/CoursesDashboard/CoursesDashboard")
+const CoursesDashboard = lazy(
+  () => import("./pages/CoursesDashboard/CoursesDashboard"),
 );
-const CenterDashboard = lazy(() =>
-  import("./pages/CenterDashboard/CenterDashboard")
+const CenterDashboard = lazy(
+  () => import("./pages/CenterDashboard/CenterDashboard"),
 );
 const PackagesPage = lazy(() => import("./pages/Packages Page/packagesPage"));
-const PackageDetails = lazy(() =>
-  import("./pages/Packages Page/packageDetails")
+const PackageDetails = lazy(
+  () => import("./pages/Packages Page/packageDetails"),
 );
 const CoursesForm = lazy(() => import("./pages/CoursesForm/CoursesForm"));
 const ForgotPassword = lazy(() => import("./pages/Login/ForgetPassword"));
 const VerifyOtp = lazy(() => import("./pages/Login/VerifyOTP"));
 const ResetPassword = lazy(() => import("./pages/Login/ResetPasswordPage"));
-const LessonDetailsSection = lazy(() =>
-  import("./pages/CenterDashboard/LessonDetails")
+const LessonDetailsSection = lazy(
+  () => import("./pages/CenterDashboard/LessonDetails"),
 );
-const AdminCreate = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/AddNewStuff")
+const AdminCreate = lazy(
+  () => import("./pages/User Dashboard/Admin dashboard/AddNewStuff"),
 );
-const MyLecturesPage = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/LecturesPage")
+const MyLecturesPage = lazy(
+  () => import("./pages/User Dashboard/Lecture Page/LecturesPage"),
 );
-const DetailedLectureView = lazy(() =>
-  import("./pages/User Dashboard/Lecture Page/DetailedLectureViewing")
+const DetailedLectureView = lazy(
+  () => import("./pages/User Dashboard/Lecture Page/DetailedLectureViewing"),
 );
 const PrivacyPolicy = lazy(() => import("./pages/privacyPolicy"));
 const Market = lazy(() => import("./pages/KalimaStore/Market"));
@@ -80,15 +80,15 @@ const ProductDetails = lazy(() => import("./pages/KalimaStore/ProductDetails"));
 const CartPage = lazy(() => import("./pages/KalimaStore/CartPage"));
 const DirectCheckout = lazy(() => import("./pages/KalimaStore/DirectCheckout"));
 const MyOrders = lazy(() => import("./pages/KalimaStore/MyOrders"));
-const AdminPanel = lazy(() =>
-  import("./pages/KalimaStore/AdminPanel/AdminPanel")
+const AdminPanel = lazy(
+  () => import("./pages/KalimaStore/AdminPanel/AdminPanel"),
 );
-const SignedLecturers = lazy(() =>
-  import("./pages/User Dashboard/Admin dashboard/signed-lecturers")
+const SignedLecturers = lazy(
+  () => import("./pages/User Dashboard/Admin dashboard/signed-lecturers"),
 );
 const StoreAnalytics = lazy(() => import("./pages/KalimaStore/storeAnalytics"));
-const ConfirmedOrdersReport = lazy(() =>
-  import("./pages/KalimaStore/ConfirmedOrdersReport")
+const ConfirmedOrdersReport = lazy(
+  () => import("./pages/KalimaStore/ConfirmedOrdersReport"),
 );
 
 function App() {
@@ -163,7 +163,7 @@ function App() {
             }`}
             style={{
               transform: sidebarOpen
-                ? `translateX(${isRTL ? "-13rem" : "13rem"})`
+                ? `translateX(${isRTL ? "-16rem" : "16rem"})`
                 : "translateX(0)",
             }}
             onClick={toggleSidebar}
@@ -181,8 +181,8 @@ function App() {
         className={`transition-all duration-300 ${
           showSidebar && sidebarOpen
             ? isRTL
-              ? "md:mr-52"
-              : "md:ml-52"
+              ? "md:mr-64"
+              : "md:ml-64"
             : "ml-0"
         }`}
       >
@@ -349,12 +349,7 @@ function App() {
         </Suspense>
       </div>
       {/* Only show footer on public routes */}
-      {!showSidebar && (
-        <footer className="bg-base-200 p-4">
-          {" "}
-          <Footer />{" "}
-        </footer>
-      )}{" "}
+      {!showSidebar && <Footer />}
       <Overlay />
     </div>
   );
