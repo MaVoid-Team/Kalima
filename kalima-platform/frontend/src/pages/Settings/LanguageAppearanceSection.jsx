@@ -7,6 +7,7 @@ function LanguageAppearanceSection() {
   const { t, i18n } = useTranslation("settings");
   const [isLangOpen, setIsLangOpen] = useState(false);
   const isRTL = i18n.language === "ar";
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const savedLang = localStorage.getItem("lng") || "ar";
