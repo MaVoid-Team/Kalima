@@ -15,6 +15,68 @@ import {
   Sparkles,
 } from "lucide-react";
 
+// Optimized Animated Counter - only runs when in view
+const AnimatedCounter = memo(({ value, duration = 2 }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!isInView || hasAnimated.current) return;
+    hasAnimated.current = true;
+
+    const numericValue = parseInt(value.replace(/,/g, ""));
+    const startTime = performance.now();
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / (duration * 1000), 1);
+
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(numericValue * easeOutQuart));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [isInView, value, duration]);
+
+  return <span ref={ref}>{count.toLocaleString()}</span>;
+});
+
+AnimatedCounter.displayName = "AnimatedCounter";
+
+// Clean Stat Card Component
+const StatCard = memo(({ stat, index }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ delay: index * 0.1, duration: 0.5 }}
+    className="flex items-center gap-2 sm:gap-3 bg-white rounded-xl sm:rounded-2xl px-3 sm:px-5 py-3 sm:py-4 border border-gray-100 shadow-sm"
+  >
+    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center bg-gray-50 flex-shrink-0">
+      <stat.icon
+        className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`}
+        strokeWidth={2}
+      />
+    </div>
+    <div className="min-w-0">
+      <h3 className="text-lg sm:text-2xl font-bold text-gray-900">
+        +<AnimatedCounter value={stat.value} />
+      </h3>
+      <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">
+        {stat.label}
+      </p>
+    </div>
+  </motion.div>
+));
+
+StatCard.displayName = "StatCard";
+
 const WelcomeSection = memo(() => {
   const { i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
@@ -59,6 +121,37 @@ const WelcomeSection = memo(() => {
     navigate("/teachers");
   }, [navigate]);
 
+  // Memoized data with brand colors
+  const stats = useMemo(
+    () => [
+      {
+        id: 1,
+        value: "5,200",
+        label: isRTL ? "طالب مسجل" : "Students",
+        icon: Users,
+        color: "text-[#AF0D0E]",
+        bg: "bg-gradient-to-br from-red-50 to-red-100/50",
+      },
+      {
+        id: 2,
+        value: "150",
+        label: isRTL ? "معلم متميز" : "Teachers",
+        icon: GraduationCap,
+        color: "text-[#FF5C28]",
+        bg: "bg-gradient-to-br from-orange-50 to-orange-100/50",
+      },
+      {
+        id: 3,
+        value: "500",
+        label: isRTL ? "دورة تعليمية" : "Courses",
+        icon: BookOpen,
+        color: "text-[#AF0D0E]",
+        bg: "bg-gradient-to-br from-red-50 to-orange-50",
+      },
+    ],
+    [isRTL],
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -74,7 +167,6 @@ const WelcomeSection = memo(() => {
           opacity: [0.3, 0.5, 0.3],
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        style={{ willChange: "transform, opacity" }}
       />
       <motion.div
         animate={{
@@ -88,7 +180,6 @@ const WelcomeSection = memo(() => {
           delay: 2,
         }}
         className="absolute bottom-0 left-0 w-[500px] h-[500px]  rounded-full blur-[100px]"
-        style={{ willChange: "transform, opacity" }}
       />
 
       {/* Subtle pattern overlay */}
@@ -120,13 +211,11 @@ const WelcomeSection = memo(() => {
                 animate={shouldReduceMotion ? {} : { rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
                 className="absolute inset-4 rounded-full border-2 border-dashed border-[#AF0D0E]/20"
-                style={{ willChange: "transform" }}
               />
               <motion.div
                 animate={shouldReduceMotion ? {} : { rotate: -360 }}
                 transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
                 className="absolute inset-12 rounded-full border border-[#FF5C28]/15"
-                style={{ willChange: "transform" }}
               />
 
               {/* Floating particles */}
@@ -134,15 +223,19 @@ const WelcomeSection = memo(() => {
                 <motion.div
                   key={i}
                   className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]"
+                  style={{
+                    top: `${20 + i * 15}%`,
+                    left: `${10 + i * 18}%`,
+                  }}
+                  animate={{
+                    y: [0, -15, 0],
+                    opacity: [0.4, 1, 0.4],
+                    scale: [0.8, 1.2, 0.8],
+                  }}
                   transition={{
                     duration: 3 + i * 0.5,
                     repeat: Infinity,
                     delay: i * 0.4,
-                  }}
-                  style={{
-                    willChange: "transform, opacity",
-                    top: `${20 + i * 15}%`,
-                    left: `${10 + i * 18}%`,
                   }}
                 />
               ))}
@@ -192,7 +285,7 @@ const WelcomeSection = memo(() => {
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-3 px-5 py-2.5  shadow-[#AF0D0E]/5"
+                className="inline-flex items-center gap-3 px-5 py-2.5 shadow-lg shadow-[#AF0D0E]/5"
               >
                 <motion.div
                   animate={{ rotate: [0, 15, -15, 0] }}
@@ -334,6 +427,33 @@ const WelcomeSection = memo(() => {
                 <span>{isRTL ? "المعلمين" : "Teachers"}</span>
               </motion.button>
             </motion.div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-xl">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className={`flex flex-col items-center justify-center bg-white rounded-2xl p-4 border border-gray-100 shadow-sm ${index === 2 ? "col-span-2 sm:col-span-1" : ""}`}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 mb-2">
+                    <stat.icon
+                      className={`w-5 h-5 ${stat.color}`}
+                      strokeWidth={2}
+                    />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    +<AnimatedCounter value={stat.value} />
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                    {stat.label}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -93,8 +93,8 @@ const Services = () => {
         <AppDownloadSection />
         <ServicesGrid />
         <ExamPreparationSection />
-        {/* <CoursesSection />
-        <TeachersSection /> */}
+        <CoursesSection />
+        <TeachersSection />
     </motion.section>
   );
 };

@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 import { Star, ChevronRight, Bookmark } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 function TeacherCard({ id, image, name, subject, grade, rating }) {
   const { t, i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -14,7 +15,8 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
       viewport={{ once: true }}
       whileHover={{ y: -8 }}
       transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-      className="group relative cursor-default"
+      onClick={() => navigate(`/teacher-details/${id}`)}
+      className="group relative cursor-pointer"
     >
       {/* Card Frame */}
       <div className="relative bg-white rounded-3xl p-4 pb-8 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-base-content/5 overflow-hidden">
@@ -58,9 +60,7 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
                 isRTL ? "flex-row-reverse" : ""
               }`}
             >
-              <div
-                className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}
-              >
+              <div className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}>
                 <span className="text-[10px] font-bold text-base-content/30 uppercase tracking-wider">
                   {isRTL ? "المادة" : "Subject"}
                 </span>
@@ -69,9 +69,7 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
                 </span>
               </div>
               <div className="h-8 w-px bg-base-content/10" />
-              <div
-                className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}
-              >
+              <div className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}>
                 <span className="text-[10px] font-bold text-base-content/30 uppercase tracking-wider">
                   {isRTL ? "المرحلة" : "Grade"}
                 </span>

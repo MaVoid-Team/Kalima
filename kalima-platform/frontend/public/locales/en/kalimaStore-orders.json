@@ -99,16 +99,7 @@
     "noAdminNotes": "No admin notes added yet",
     "close": "Close",
     "receivedBy": "Received by",
-    "confirmedBy": "Confirmed by",
-    "new": "New",
-    "newClient": "New Client",
-    "frequentBuyer": "Frequent Buyer",
-    "returnOrder": "Return Order",
-    "return": "Return",
-    "returned": "Returned",
-    "returnedBy": "Returned by",
-    "deleteNotes": "Delete Notes",
-    "totalPurchases": "Total Purchases"
+    "confirmedBy": "Confirmed by"
   },
   "alerts": {
     "orderConfirmed": "Order confirmed successfully!",
