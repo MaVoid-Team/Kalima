@@ -1,126 +1,153 @@
-"use client"
+"use client";
 
-import { useTranslation } from "react-i18next"
-import { useState, useEffect, useRef } from "react"
-import QRCode from "qrcode"
+import React from "react";
+import { motion } from "framer-motion";
+import { Smartphone, Download } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-export function AppDownloadSection() {
-  const { t, i18n } = useTranslation("home")
-  const isRTL = i18n.language === "ar"
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const appDownloadUrl = "https://play.google.com/apps/test/com.kalimatest.mavoid/8"
-  const qrCodeRef = useRef(null)
+export const AppDownloadSection = React.memo(() => {
+  const { i18n } = useTranslation("home");
+  const isRTL = i18n.language === "ar";
 
-  useEffect(() => {
-    const generateQRCode = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-
-        // Generate QR code as data URL
-        const dataUrl = await QRCode.toDataURL(appDownloadUrl, {
-          width: 300,
-          margin: 2,
-          color: {
-            dark: "#000000",
-            light: "#FFFFFF",
-          },
-        })
-
-        setQrCodeDataUrl(dataUrl)
-        setIsLoading(false)
-      } catch (err) {
-        console.error("Error generating QR code:", err)
-        setError("Failed to generate QR code")
-        setIsLoading(false)
-      }
-    }
-
-    generateQRCode()
-  }, [appDownloadUrl])
+  const features = [
+    {
+      icon: Smartphone,
+      title: isRTL ? "تعلم في أي مكان" : "Learn Anywhere",
+      arDesc: "تابع دروسك من هاتفك في أي وقت.",
+      enDesc: "Access your lessons from your phone anytime.",
+    },
+    {
+      icon: Download,
+      title: isRTL ? "محتوى للتحميل" : "Offline Content",
+      arDesc: "حمّل الدروس وشاهدها بدون إنترنت.",
+      enDesc: "Download lessons and watch offline.",
+    },
+  ];
 
   return (
-    <div className="w-full py-16 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Yellow border overlay */}
-        <div className="absolute inset-0 border-4 border-primary rounded-[3rem] -z-0"></div>
+    <section
+      className="relative py-40 bg-white overflow-hidden"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      {/* Decorative Elements */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
 
-        {/* Blue accent dots */}
-        <div className="absolute top-0 right-0 w-24 h-24 rounded-full border-4 border-dashed border-blue-500 opacity-30 -translate-y-1/4 translate-x-1/4"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full border-4 border-dashed border-blue-500 opacity-30 translate-y-1/4 -translate-x-1/4"></div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+        <div
+          className={`flex flex-col lg:flex-row items-stretch gap-24 ${
+            isRTL ? "" : "lg:flex-row-reverse"
+          }`}
+        >
+          {/* Editorial Side - The Narrative */}
+          <div className="flex-1 flex flex-col justify-center">
+            <div className={`space-y-12 ${isRTL ? "text-right" : "text-left"}`}>
+              <motion.div
+                initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className={`flex items-center gap-6 ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <div className="w-16 h-px bg-primary" />
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
+                  {isRTL ? "تطبيق كلمة" : "Kalima App"}
+                </span>
+              </motion.div>
 
-        <div className="relative z-10 py-8 md:py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
-            {/* Text Content */}
-            <div className={`text-center md:text-left md:w-1/2 ${isRTL ? "md:order-2" : "md:order-1"}`}>
-              <h2 className={`text-3xl md:text-4xl lg:text-5xl font-bold mb-4 ${isRTL ? "text-right" : "text-left"}`}>
-                <span>{t("appDownload.title") || "Download"}</span>{" "}
-                <span>{t("appDownload.now") || "Our App Now"}</span>
-              </h2>
-
-              <p className={`text-lg md:text-xl mb-6 ${isRTL ? "text-right" : "text-left"}`}>
-                {t("appDownload.content1") || "Download our app"}{" "}
-                <span className="text-primary">{t("appDownload.now") || "now"}</span>{" "}
-                {t("appDownload.content2") || "on your mobile to learn"}{" "}
-                <span className="text-primary">{t("appDownload.everywhere") || "everywhere"}</span>
-              </p>
-            </div>
-
-            {/* QR Code Section */}
-            <div className={`md:w-1/2 flex justify-center ${isRTL ? "md:order-1" : "md:order-2"}`}>
-              <div className="relative p-2 bg-white rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105">
-                {isLoading ? (
-                  <div className="h-48 w-48 md:h-64 md:w-64 flex items-center justify-center bg-gray-100">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                  </div>
-                ) : error ? (
-                  <div className="h-48 w-48 md:h-64 md:w-64 flex items-center justify-center bg-gray-100 text-red-500">
-                    <div className="text-center p-4">
-                      <p>{error}</p>
-                      <button
-                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        onClick={() => {
-                          setIsLoading(true)
-                          QRCode.toDataURL(appDownloadUrl, {
-                            width: 300,
-                            margin: 2,
-                          })
-                            .then((url) => {
-                              setQrCodeDataUrl(url)
-                              setIsLoading(false)
-                              setError(null)
-                            })
-                            .catch((err) => {
-                              setError("Failed to generate QR code")
-                              setIsLoading(false)
-                            })
-                        }}
-                      >
-                        Retry
-                      </button>
-                    </div>
-                  </div>
+              <motion.h2
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-6xl lg:text-7xl font-black text-base-content leading-[0.9] tracking-tighter"
+              >
+                {isRTL ? (
+                  <>
+                    تعلم بلا <span className="text-secondary italic">حدود</span>{" "}
+                    <br /> في راحة يدك
+                  </>
                 ) : (
-                  <div className="relative group">
-                    <img
-                      ref={qrCodeRef}
-                      src={qrCodeDataUrl || "/placeholder.svg"}
-                      alt="Download App QR Code"
-                      className="h-48 w-48 md:h-64 md:w-64 object-contain"
-                    />
-                  </div>
+                  <>
+                    Learn Without <br />{" "}
+                    <span className="text-secondary italic">Boundaries</span>
+                  </>
                 )}
+              </motion.h2>
 
-                {/* Decorative elements */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-secondary rounded-full"></div>
-                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-secondary rounded-full"></div>
+              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
+                {isRTL
+                  ? "مع تطبيق كلمة، نأخذك في رحلة تعليمية متكاملة تتخطى قيود المكان والزمان."
+                  : "With Kalima app, we take you on an integrated educational journey that transcends limits."}
+              </p>
+
+              {/* Feature Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 pt-8">
+                {features.map((feat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="group"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-12">
+                        <feat.icon className="w-6 h-6" strokeWidth={1} />
+                      </div>
+                      <h4 className="text-xl font-black text-base-content uppercase tracking-tight">
+                        {feat.title}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-base-content/40 font-medium leading-loose group-hover:text-base-content/60 transition-colors">
+                      {isRTL ? feat.arDesc : feat.enDesc}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Download Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-wrap gap-4 pt-4"
+              >
+                <a
+                  href="#"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-base-content text-white rounded-2xl font-bold hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>{isRTL ? "تحميل التطبيق" : "Download App"}</span>
+                </a>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Visual Side - The Artistic Frame */}
+          <div className="flex-1 relative min-h-[600px] lg:min-h-0">
+            <div className="relative h-full flex items-center justify-center">
+              <div className="relative w-full max-w-lg aspect-[4/5]">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
+                  whileInView={{ opacity: 1, scale: 1, rotate: 3 }}
+                  viewport={{ once: true }}
+                  className="relative h-full w-full rounded-[4rem] overflow-hidden border-[16px] border-white shadow-2xl group bg-base-200"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=1000&fit=crop&q=80"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    alt="Mobile Learning"
+                  />
+                </motion.div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  )
-}
+    </section>
+  );
+});
+
+AppDownloadSection.displayName = "AppDownloadSection";

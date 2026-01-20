@@ -305,6 +305,7 @@ const UserManagementTable = () => {
       t("admin.export.government"),
       t("admin.export.administrationZone"),
       t("admin.export.sequenceId"),
+      t("admin.export.purchases"),
       t("admin.export.joinedDate"),
     ];
     const csvContent = [
@@ -319,6 +320,7 @@ const UserManagementTable = () => {
           `"${user.government || ""}"`,
           `"${user.administrationZone || ""}"`,
           `"${user.sequencedId || ""}"`,
+          `"${user.numberOfPurchases || 0}"`,
           `"${
             user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
           }"`,
@@ -376,6 +378,7 @@ const UserManagementTable = () => {
         government: user.government || "",
         administrationZone: user.administrationZone || "",
         sequenceId: user.sequencedId || "",
+        numberOfPurchases: user.numberOfPurchases || 0,
         joinedDate: user.createdAt
           ? new Date(user.createdAt).toISOString()
           : "",
@@ -540,6 +543,26 @@ const UserManagementTable = () => {
               </p>
             </div>
           )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("admin.userDetails.purchases")}
+            </label>
+            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                {user.numberOfPurchases || 0}
+              </span>
+              {user.numberOfPurchases > 5 && (
+                <span className="ml-2 text-xs text-green-600 font-semibold">
+                  {t("admin.userDetails.frequentBuyer")}
+                </span>
+              )}
+              {user.numberOfPurchases === 0 && (
+                <span className="ml-2 text-xs text-gray-500">
+                  {t("admin.userDetails.newClient")}
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       </>
     );
@@ -1272,6 +1295,7 @@ const UserManagementTable = () => {
                 "accountType",
                 "status",
                 "successfulInvites",
+                "purchases",
                 "actions",
               ].map((header) => (
                 <th
@@ -1299,6 +1323,11 @@ const UserManagementTable = () => {
                 <td className="py-4 whitespace-nowrap">{getStatus(user)}</td>
                 <td className="py-4 whitespace-nowrap">
                   {user.successfulInvites || 0}
+                </td>
+                <td className="py-4 whitespace-nowrap">
+                  <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                    {user.numberOfPurchases || 0}
+                  </span>
                 </td>
                 <td className="py-4 whitespace-nowrap">
                   <div
