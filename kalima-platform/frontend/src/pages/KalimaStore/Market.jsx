@@ -56,13 +56,13 @@ const Market = () => {
     if (!filePath) return null;
     if (filePath.startsWith("http")) return filePath;
 
-    const normalizedPath = filePath.replace(/\\/g, "/")
-    const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1
+    const normalizedPath = filePath.replace(/\\/g, "/");
+    const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, ""); // remove /api or /api/v1
 
-    const filename = normalizedPath.split("/").pop()
-    return `${baseUrl}/uploads/${folder}/${filename}`
-  }
+    const filename = normalizedPath.split("/").pop();
+    return `${baseUrl}/uploads/${folder}/${filename}`;
+  };
 
   // Filter products based on active tab and subsection
   const filteredBySection = useMemo(() => {
@@ -538,7 +538,7 @@ const Market = () => {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1 || loading}
-                  className="w-12 h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   {isRTL ? (
                     <ChevronRight className="w-5 h-5" />
@@ -547,29 +547,82 @@ const Market = () => {
                   )}
                 </button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      disabled={loading}
-                      className={`w-12 h-12 rounded-full font-bold transition-all ${
-                        currentPage === page
-                          ? "bg-primary text-white"
-                          : "border border-base-content/10 hover:border-primary"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ),
-                )}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  {(() => {
+                    const pages = [];
+                    const maxVisiblePages = 5; // Adjust based on screen size preference
+
+                    if (totalPages <= maxVisiblePages) {
+                      for (let i = 1; i <= totalPages; i++) {
+                        pages.push(i);
+                      }
+                    } else {
+                      // Always show first page
+                      pages.push(1);
+
+                      if (currentPage > 3) {
+                        pages.push("...");
+                      }
+
+                      // Calculate start and end of visible range
+                      let start = Math.max(2, currentPage - 1);
+                      let end = Math.min(totalPages - 1, currentPage + 1);
+
+                      // Adjust if close to ends
+                      if (currentPage <= 3) {
+                        end = Math.min(totalPages - 1, 4);
+                      }
+                      if (currentPage >= totalPages - 2) {
+                        start = Math.max(2, totalPages - 3);
+                      }
+
+                      for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                      }
+
+                      if (currentPage < totalPages - 2) {
+                        pages.push("...");
+                      }
+
+                      // Always show last page
+                      pages.push(totalPages);
+                    }
+
+                    return pages.map((page, index) => {
+                      if (page === "...") {
+                        return (
+                          <span
+                            key={`ellipsis-${index}`}
+                            className="w-8 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-base-content/30"
+                          >
+                            ...
+                          </span>
+                        );
+                      }
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          disabled={loading}
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold transition-all text-sm sm:text-base ${
+                            currentPage === page
+                              ? "bg-primary text-white"
+                              : "border border-base-content/10 hover:border-primary hidden sm:block"
+                          } ${currentPage === page ? "block" : ""}`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    });
+                  })()}
+                </div>
 
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages || loading}
-                  className="w-12 h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   {isRTL ? (
                     <ChevronLeft className="w-5 h-5" />

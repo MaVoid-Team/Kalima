@@ -18,7 +18,7 @@ export default function Footer() {
 
   return (
     <footer
-      className="relative bg-gradient-to-br from-[#7f1d1d] via-[#991b1b] to-[#7f1d1d] text-white pt-20 pb-10 overflow-hidden font-sans border-t-4 border-red-500"
+      className="relative  bg-gradient-to-br from-[#7f1d1d] via-[#991b1b] to-[#7f1d1d] text-white pt-20 pb-10 overflow-hidden font-sans border-t-4 border-red-500"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Pattern Overlay */}
@@ -27,7 +27,7 @@ export default function Footer() {
       {/* Decorative Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-red-600/20 blur-[100px] rounded-full pointer-events-none" />
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 max-w-[1500px] sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
           {/* Brand Column (Span 4) */}
           <div

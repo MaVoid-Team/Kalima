@@ -40,11 +40,8 @@ const ServicesGrid = React.memo(() => {
       className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      {/* Decorative Elements */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+     
+      <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         {/* Header - Same style as About & App sections */}
         <div className={`mb-12 sm:mb-20 ${isRTL ? "text-right" : "text-left"}`}>
           <motion.div
@@ -99,7 +96,7 @@ const ServicesGrid = React.memo(() => {
               className="group"
             >
               <div
-                className={`flex items-start gap-8 p-10 rounded-3xl bg-base-100 border border-base-content/5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2 ${
+                className={`flex items-start gap-8 p-10 rounded-3xl bg-base-100 border border-base-content/5 shadow-xl transition-all duration-500 hover:-translate-y-2 ${
                   isRTL ? "flex-row-reverse text-right" : ""
                 }`}
               >

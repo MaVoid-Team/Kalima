@@ -62,95 +62,22 @@ const WelcomeSection = memo(() => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen flex items-center pt-24 pb-16 overflow-hidden"
+      className="relative w-full min-h-screen flex items-center   pb-16 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Premium Background */}
 
-      {/* Animated gradient orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        style={{ willChange: "transform, opacity" }}
-        className="transform-gpu"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.2, 0.4, 0.2],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 2,
-        }}
-        className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] transform-gpu"
-        style={{ willChange: "transform, opacity" }}
-      />
-
-      {/* Subtle pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #AF0D0E 1px, transparent 0)`,
-          backgroundSize: "40px 40px",
-        }}
-      />
-
       {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="container mx-auto px-4 max-w-[1500px] sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
           {/* Illustration Side */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full lg:w-[45%] flex justify-center relative order-1 lg:order-2 transform-gpu"
+            className="w-full lg:w-[45%] flex justify-center relative order-1 lg:order-2 "
           >
-            <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg aspect-square">
-              {/* Multi-layer glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/20 via-[#FF5C28]/15 to-transparent rounded-full blur-[60px]" />
-              <div className="absolute inset-10 bg-gradient-to-tl from-[#FF5C28]/10 to-transparent rounded-full blur-[40px]" />
-
-              {/* Animated rings */}
-              <motion.div
-                animate={shouldReduceMotion ? {} : { rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-4 rounded-full border-2 border-dashed border-[#AF0D0E]/20 transform-gpu"
-                style={{ willChange: "transform" }}
-              />
-              <motion.div
-                animate={shouldReduceMotion ? {} : { rotate: -360 }}
-                transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-12 rounded-full border border-[#FF5C28]/15 transform-gpu"
-                style={{ willChange: "transform" }}
-              />
-
-              {/* Floating particles */}
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] transform-gpu"
-                  transition={{
-                    duration: 3 + i * 0.5,
-                    repeat: Infinity,
-                    delay: i * 0.4,
-                  }}
-                  style={{
-                    willChange: "transform, opacity",
-                    top: `${20 + i * 15}%`,
-                    left: `${10 + i * 18}%`,
-                  }}
-                />
-              ))}
-
-              {/* Premium glass container */}
-              <div className="absolute inset-16 rounded-full bg-gradient-to-br from-white/90 via-white/80 to-gray-50/90 shadow-2xl border border-white/50 backdrop-blur-sm" />
-
+            <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg ">
               {/* Lottie Container */}
               <div className="relative w-full h-full p-8 flex items-center justify-center">
                 {animationData ? (
@@ -172,7 +99,7 @@ const WelcomeSection = memo(() => {
                   </motion.div>
                 ) : (
                   <div className="relative">
-                    <div className="w-14 h-14 border-4 border-gray-200 border-t-[#AF0D0E] rounded-full animate-spin" />
+                    <div className="w-14 h-14 border-4 border-gray-200 border-t-[#AF0D0E] rounded-full " />
                   </div>
                 )}
               </div>
@@ -193,18 +120,9 @@ const WelcomeSection = memo(() => {
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-3 px-5 py-2.5  shadow-[#AF0D0E]/5"
+                className="inline-flex items-center gap-3 py-2.5 shadow-[#AF0D0E]/5"
               >
-                <motion.div
-                  animate={{ rotate: [0, 15, -15, 0] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <Rocket className="w-5 h-5 text-[#AF0D0E]" />
-                </motion.div>
+                <Rocket className="w-5 h-5 text-[#AF0D0E]" />
                 <span className="text-sm font-bold bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] bg-clip-text text-transparent">
                   {isRTL
                     ? "تحلق في سماء الإبداع"
