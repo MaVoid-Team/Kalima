@@ -652,7 +652,7 @@ const Market = () => {
                     ? "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
                     : "You need to login to add items to cart"}
                 </p>
-                <div className="flex gap-3">
+                <div className="flex flex-col md:flex-row gap-3">
                   <button
                     onClick={() => {
                       setShowAuthModal(false);
