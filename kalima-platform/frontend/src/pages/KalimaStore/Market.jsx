@@ -272,7 +272,7 @@ const Market = () => {
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-12 md:py-20 overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
@@ -399,7 +399,7 @@ const Market = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
             {paginatedItems.map((item, index) => {
               const isPurchased = purchasedProductIds.includes(item._id);
 
@@ -457,7 +457,7 @@ const Market = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                       <h3 className="text-lg font-black text-base-content mb-4 line-clamp-2 group-hover:text-primary transition-colors">
                         {item.title}
                       </h3>

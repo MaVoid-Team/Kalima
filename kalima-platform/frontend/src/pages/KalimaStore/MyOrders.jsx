@@ -389,7 +389,7 @@ const MyOrders = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -622,7 +622,7 @@ const MyOrders = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
+                  className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-6">
                     {/* Order Info */}
@@ -749,7 +749,7 @@ const MyOrders = () => {
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto max-h-[70vh]">
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh]">
                 {/* Status */}
                 <div className="flex items-center gap-3 mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
                   <StatusBadge status={selectedOrder.status} />
