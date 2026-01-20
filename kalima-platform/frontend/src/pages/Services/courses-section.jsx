@@ -169,17 +169,19 @@ export const CoursesSection = React.memo(() => {
           viewport={{ once: true }}
           className="mt-20 flex justify-center"
         >
-          <button className="group inline-flex items-center gap-4 px-12 py-5 bg-white rounded-full border border-base-content/10 hover:border-primary transition-all duration-500 overflow-hidden relative cursor-default">
-            <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <span className="relative z-10 font-black text-base-content tracking-tight uppercase">
-              {t("courses.viewAll")}
-            </span>
-            <div className="relative z-10 w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500">
-              <ChevronRight
-                className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`}
-              />
-            </div>
-          </button>
+          <Link to="/courses">
+            <button className="group inline-flex items-center gap-4 px-12 py-5 bg-white rounded-full border border-base-content/10 hover:border-primary transition-all duration-500 overflow-hidden relative">
+              <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              <span className="relative z-10 font-black text-base-content tracking-tight uppercase">
+                {t("courses.viewAll")}
+              </span>
+              <div className="relative z-10 w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                <ChevronRight
+                  className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`}
+                />
+              </div>
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>

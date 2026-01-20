@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import KalimaLoader from "../../components/KalimaLoader";
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market");
@@ -71,12 +70,12 @@ const Market = () => {
     }
 
     let filtered = allProducts.filter(
-      (product) => product.section?._id === activeTab,
+      (product) => product.section?._id === activeTab
     );
 
     if (activeSubSection !== "all") {
       filtered = filtered.filter(
-        (product) => product.subSection?._id === activeSubSection,
+        (product) => product.subSection?._id === activeSubSection
       );
     }
 
@@ -86,7 +85,7 @@ const Market = () => {
   // Filter items based on search query
   const filteredItems = useMemo(() => {
     return filteredBySection.filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [filteredBySection, searchQuery]);
 
@@ -138,7 +137,7 @@ const Market = () => {
                 ...product,
                 isNew: diffInDays <= 3,
               };
-            },
+            }
           );
           setAllProducts(productsWithNewFlag);
         }
@@ -182,7 +181,7 @@ const Market = () => {
       const result = await addToCart(productId);
       if (result.success) {
         toast.success(
-          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
+          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!"
         );
         const currentCount = Number(localStorage.getItem("cartCount")) || 0;
         localStorage.setItem("cartCount", currentCount + 1);
@@ -197,7 +196,7 @@ const Market = () => {
           toast.error(
             result.error ||
               t("errors.addToCartFailed") ||
-              "فشل في الإضافة إلى السلة",
+              "فشل في الإضافة إلى السلة"
           );
         }
       }
@@ -211,7 +210,7 @@ const Market = () => {
         toast.error(
           error.message ||
             t("errors.addToCartFailed") ||
-            "فشل في الإضافة إلى السلة",
+            "فشل في الإضافة إلى السلة"
         );
       }
     } finally {
@@ -228,7 +227,7 @@ const Market = () => {
   const currentSubSections = useMemo(() => {
     if (activeTab === "all") return [];
     return subSections.filter(
-      (subSection) => subSection.section?._id === activeTab,
+      (subSection) => subSection.section?._id === activeTab
     );
   }, [activeTab, subSections]);
 
@@ -247,7 +246,18 @@ const Market = () => {
   ];
 
   if (loading && allProducts.length === 0) {
-    return <KalimaLoader fullScreen={false} />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center animate-pulse">
+            <Package className="w-8 h-8 text-primary" />
+          </div>
+          <p className="text-base-content/40 font-medium">
+            {isRTL ? "جاري التحميل..." : "Loading..."}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -448,7 +458,7 @@ const Market = () => {
                         src={
                           convertPathToUrl(
                             item.thumbnail,
-                            "product_thumbnails",
+                            "product_thumbnails"
                           ) || "/placeholder.svg"
                         }
                         alt={item.title}
@@ -488,7 +498,7 @@ const Market = () => {
                             const itemType =
                               item.__t === "ECBook" ? "book" : "product";
                             navigate(
-                              `/market/product-details/${itemType}/${item._id}`,
+                              `/market/product-details/${itemType}/${item._id}`
                             );
                           }}
                           className="flex-1 py-3 px-4 bg-base-content text-white rounded-xl font-bold hover:bg-primary transition-colors"
@@ -523,9 +533,7 @@ const Market = () => {
               <h3 className="text-2xl font-black text-base-content mb-2">
                 {t("emptyState.title")}
               </h3>
-              <p className="text-base-content/40">
-                {t("emptyState.description")}
-              </p>
+              <p className="text-base-content/40">{t("emptyState.description")}</p>
             </div>
           )}
 
@@ -561,7 +569,7 @@ const Market = () => {
                     >
                       {page}
                     </button>
-                  ),
+                  )
                 )}
 
                 <button
@@ -660,7 +668,7 @@ const Market = () => {
                         ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
                         : location.pathname + location.search;
                       navigate(
-                        `/login?redirect=${encodeURIComponent(redirectUrl)}`,
+                        `/login?redirect=${encodeURIComponent(redirectUrl)}`
                       );
                     }}
                     className="flex-1 py-3 px-6 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
@@ -675,7 +683,7 @@ const Market = () => {
                         ? `/market/product-details/${pendingProductId.type}/${pendingProductId.id}`
                         : location.pathname + location.search;
                       navigate(
-                        `/register?redirect=${encodeURIComponent(redirectUrl)}`,
+                        `/register?redirect=${encodeURIComponent(redirectUrl)}`
                       );
                     }}
                     className="flex-1 py-3 px-6 border border-base-content/10 rounded-xl font-bold hover:bg-base-100 transition-colors flex items-center justify-center gap-2"

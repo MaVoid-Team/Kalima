@@ -212,7 +212,6 @@
     "editSuccess": "User updated successfully",
     "editError": "Failed to update user",
     "NA": "N/A",
-    "currency": "EGP",
 
     "auditlog": {
       "title": "Audit Log",
@@ -323,8 +322,6 @@
         "government": "Government",
         "administrationZone": "Administration Zone",
         "sequenceId": "Sequence ID",
-        "purchases": "Purchases",
-        "totalPaid": "Total Paid",
         "joinedDate": "Joined Date"
       }
     }
