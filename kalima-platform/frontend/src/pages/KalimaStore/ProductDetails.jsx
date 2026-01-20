@@ -1,54 +1,47 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { useState, useEffect } from "react"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
-import {
-  getBookById,
-  getProductById,
-  purchaseProduct,
-  purchaseBook,
-} from "../../routes/market";
-import { validateCoupon } from "../../routes/marketCoupouns"; // Assuming this is the correct path
-import { addToCart, getUserPurchasedProducts } from "../../routes/cart";
-import { isLoggedIn, getToken } from "../../routes/auth-services";
-import { ShoppingCart, Zap, X, LogIn, UserPlus } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { getBookById, getProductById, purchaseProduct, purchaseBook } from "../../routes/market"
+import { validateCoupon } from "../../routes/marketCoupouns" // Assuming this is the correct path
+import { addToCart, getUserPurchasedProducts } from "../../routes/cart"
+import { isLoggedIn, getToken } from "../../routes/auth-services"
+import { ShoppingCart, Zap, X, LogIn, UserPlus } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Import components
-import ProductHeader from "./components/ProductHeader";
-import ProductGallery from "./components/ProductsGallery";
-import SampleDownload from "./components/SampleDownload";
-import ProductInfo from "./components/ProductInfo";
-import PaymentSection from "./components/PaymentSection";
-
-import PurchaseForm from "./components/PurchaseForm";
-import KalimaLoader from "../../components/KalimaLoader";
+import ProductHeader from "./components/ProductHeader"
+import ProductGallery from "./components/ProductsGallery"
+import SampleDownload from "./components/SampleDownload"
+import ProductInfo from "./components/ProductInfo"
+import PaymentSection from "./components/PaymentSection"
+import PurchaseForm from "./components/PurchaseForm"
 
 const ProductDetails = () => {
-  const { t, i18n } = useTranslation("kalimaStore-ProductDetails");
-  const isRTL = i18n.language === "ar";
+  const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
+  const isRTL = i18n.language === "ar"
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [purchaseLoading, setPurchaseLoading] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState(null);
-  const [addingToCart, setAddingToCart] = useState(false);
-  const [isPurchased, setIsPurchased] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [purchaseLoading, setPurchaseLoading] = useState(false)
+  const [uploadedFile, setUploadedFile] = useState(null)
+  const [addingToCart, setAddingToCart] = useState(false)
+  const [isPurchased, setIsPurchased] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   // Coupon and Price State
-  const [couponCode, setCouponCode] = useState("");
-  const [finalPrice, setFinalPrice] = useState(null);
+  const [couponCode, setCouponCode] = useState("")
+  const [finalPrice, setFinalPrice] = useState(null)
   const [couponValidation, setCouponValidation] = useState({
     isValid: false,
     message: "",
     discount: 0,
     loading: false,
-  });
+  })
 
   // Purchase form state
   const [purchaseForm, setPurchaseForm] = useState({
@@ -57,95 +50,89 @@ const ProductDetails = () => {
     numberOnBook: "",
     seriesName: "",
     notes: "",
-  });
+  })
 
-  const { id, type } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { id, type } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const getItemType = (item) => {
-    return item && item.__t === "ECBook" ? "book" : "product";
-  };
+    return item && item.__t === "ECBook" ? "book" : "product"
+  }
 
   // Helper function to get the display price (priceAfterDiscount or original price)
   const getDisplayPrice = (productData) => {
-    if (
-      productData.priceAfterDiscount &&
-      productData.priceAfterDiscount < productData.price
-    ) {
-      return productData.priceAfterDiscount;
+    if (productData.priceAfterDiscount && productData.priceAfterDiscount < productData.price) {
+      return productData.priceAfterDiscount
     }
-    return productData.price;
-  };
+    return productData.price
+  }
 
   // Fetch product/book data
   useEffect(() => {
     const fetchItemData = async () => {
       if (!id) {
-        setError(t("errors.invalidProductInfo"));
-        setLoading(false);
-        return;
+        setError(t("errors.invalidProductInfo"))
+        setLoading(false)
+        return
       }
 
       try {
-        setLoading(true);
-        setError(null);
-        let response;
+        setLoading(true)
+        setError(null)
+        let response
 
         if (type === "book") {
-          response = await getBookById(id);
+          response = await getBookById(id)
         } else {
           try {
-            response = await getProductById(id);
+            response = await getProductById(id)
           } catch (productError) {
-            console.log(
-              "Failed to fetch as product, trying as book:",
-              productError.message,
-            );
-            response = await getBookById(id);
+            console.log("Failed to fetch as product, trying as book:", productError.message)
+            response = await getBookById(id)
           }
         }
 
         if (response.status === "success") {
-          const itemData = response.data.book || response.data.product;
-          setProduct(itemData);
+          const itemData = response.data.book || response.data.product
+          setProduct(itemData)
 
           // Set initial price to the display price (priceAfterDiscount if available)
-          const initialDisplayPrice = getDisplayPrice(itemData);
-          setFinalPrice(initialDisplayPrice);
+          const initialDisplayPrice = getDisplayPrice(itemData)
+          setFinalPrice(initialDisplayPrice)
 
           // Check if user has purchased this product
           if (isLoggedIn()) {
-            const purchasedResult = await getUserPurchasedProducts();
+            const purchasedResult = await getUserPurchasedProducts()
             if (purchasedResult.success) {
-              setIsPurchased(purchasedResult.productIds.includes(id));
+              setIsPurchased(purchasedResult.productIds.includes(id))
             }
           }
         } else {
-          throw new Error(t("errors.fetchFailed"));
+          throw new Error(t("errors.fetchFailed"))
         }
       } catch (err) {
-        setError(err.message);
-        console.error(t("errors.fetchErrorLog"), err);
+        setError(err.message)
+        console.error(t("errors.fetchErrorLog"), err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchItemData();
-  }, [id, type, t]);
+    fetchItemData()
+  }, [id, type, t])
 
   // Handle add to cart
   const handleAddToCart = async () => {
     if (!getToken()) {
       // Show auth modal to let user choose login or register
-      setShowAuthModal(true);
-      return;
+      setShowAuthModal(true)
+      return
     }
 
     if (!product) {
-      toast.error(t("errors.productDataNotLoaded"));
-      return;
+      toast.error(t("errors.productDataNotLoaded"))
+      return
     }
 
     // Check if product was already purchased
@@ -153,71 +140,60 @@ const ProductDetails = () => {
       const confirmMessage = isRTL
         ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
         : "You have already purchased this product. Do you want to buy it again?";
-
+      
       if (!window.confirm(confirmMessage)) {
         return; // User cancelled
       }
     }
 
     try {
-      setAddingToCart(true);
-      const result = await addToCart(product._id);
+      setAddingToCart(true)
+      const result = await addToCart(product._id)
       if (result.success) {
-        toast.success(
-          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
-        );
+        toast.success(t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!")
         // Trigger cart count update
-        window.dispatchEvent(new Event("cart-updated"));
+        window.dispatchEvent(new Event("cart-updated"))
       } else {
-        toast.error(
-          result.error ||
-            t("errors.addToCartFailed") ||
-            "فشل في الإضافة إلى السلة",
-        );
+        toast.error(result.error || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
       }
     } catch (error) {
-      toast.error(
-        error.message ||
-          t("errors.addToCartFailed") ||
-          "فشل في الإضافة إلى السلة",
-      );
+      toast.error(error.message || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
     } finally {
-      setAddingToCart(false);
+      setAddingToCart(false)
     }
-  };
+  }
 
   const handleValidateCoupon = async () => {
     if (!couponCode.trim()) {
-      toast.warning(t("errors.noCouponCode"));
-      return;
+      toast.warning(t("errors.noCouponCode"))
+      return
     }
 
-    setCouponValidation({ ...couponValidation, loading: true, message: "" });
+    setCouponValidation({ ...couponValidation, loading: true, message: "" })
 
-    const result = await validateCoupon(couponCode);
+    const result = await validateCoupon(couponCode)
 
     // This handles both network errors and API responses with status: "fail"
     if (!result.success || result.data?.status === "fail") {
-      const errorMessage =
-        result.data?.message || result.error || t("errors.invalidCoupon");
+      const errorMessage = result.data?.message || result.error || t("errors.invalidCoupon")
 
       // Reset to display price (priceAfterDiscount if available)
-      const resetPrice = getDisplayPrice(product);
-      setFinalPrice(resetPrice);
+      const resetPrice = getDisplayPrice(product)
+      setFinalPrice(resetPrice)
 
       setCouponValidation({
         isValid: false,
         message: errorMessage,
         discount: 0,
         loading: false,
-      });
-      return;
+      })
+      return
     }
 
     // This handles a successful validation
     if (result.data?.status === "success" && result.data?.data?.isValid) {
-      const couponData = result.data.data.coupon;
-      const discountAmount = couponData.value; // Assuming 'value' is a fixed discount amount
+      const couponData = result.data.data.coupon
+      const discountAmount = couponData.value // Assuming 'value' is a fixed discount amount
 
       if (typeof discountAmount !== "number") {
         setCouponValidation({
@@ -225,139 +201,140 @@ const ProductDetails = () => {
           message: t("errors.invalidDiscountValue"),
           discount: 0,
           loading: false,
-        });
-        return;
+        })
+        return
       }
 
       // Apply discount to the base display price (price after initial discount)
-      const basePrice = getDisplayPrice(product);
-      const newPrice = basePrice - discountAmount;
+      const basePrice = getDisplayPrice(product)
+      const newPrice = basePrice - discountAmount
 
-      setFinalPrice(newPrice < 0 ? 0 : newPrice);
+      setFinalPrice(newPrice < 0 ? 0 : newPrice)
       setCouponValidation({
         isValid: true,
         message: t("success.couponApplied"),
         discount: discountAmount,
         loading: false,
-      });
+      })
     } else {
       // Fallback for any other unexpected success response format
-      const resetPrice = getDisplayPrice(product);
-      setFinalPrice(resetPrice);
+      const resetPrice = getDisplayPrice(product)
+      setFinalPrice(resetPrice)
       setCouponValidation({
         isValid: false,
         message: t("errors.invalidCoupon"),
         discount: 0,
         loading: false,
-      });
+      })
     }
-  };
+  }
 
   const handleRemoveCoupon = () => {
-    setCouponCode("");
+    setCouponCode("")
 
     // Reset to display price (priceAfterDiscount if available)
-    const resetPrice = getDisplayPrice(product);
-    setFinalPrice(resetPrice);
+    const resetPrice = getDisplayPrice(product)
+    setFinalPrice(resetPrice)
 
     setCouponValidation({
       isValid: false,
       message: "",
       discount: 0,
       loading: false,
-    });
-  };
+    })
+  }
 
   const handleSubmit = async () => {
     if (!product) {
-      toast.error(t("errors.productDataNotLoaded"));
-      return;
+      toast.error(t("errors.productDataNotLoaded"))
+      return
     }
 
-    const actualType = getItemType(product);
+    const actualType = getItemType(product)
 
     if (!uploadedFile) {
-      toast.warning(t("errors.noFileSelected"));
-      return;
+      toast.warning(t("errors.noFileSelected"))
+      return
     }
 
     if (!purchaseForm.numberTransferredFrom) {
-      toast.warning(t("errors.noTransferNumber"));
-      return;
+      toast.warning(t("errors.noTransferNumber"))
+      return
     }
 
-    if (
-      actualType === "book" &&
-      (!purchaseForm.nameOnBook ||
-        !purchaseForm.numberOnBook ||
-        !purchaseForm.seriesName)
-    ) {
-      toast.warning(t("errors.fillBookFields"));
-      return;
+    if (actualType === "book" && (!purchaseForm.nameOnBook || !purchaseForm.numberOnBook || !purchaseForm.seriesName)) {
+      toast.warning(t("errors.fillBookFields"))
+      return
     }
 
     try {
-      setPurchaseLoading(true);
+      setPurchaseLoading(true)
 
       const purchaseData = {
         productId: product._id,
         numberTransferredFrom: purchaseForm.numberTransferredFrom,
         paymentScreenShot: uploadedFile,
         notes: purchaseForm.notes || "",
-      };
+      }
 
       // Add coupon code if valid
       if (couponValidation.isValid && couponCode.trim()) {
-        purchaseData.couponCode = couponCode.trim();
+        purchaseData.couponCode = couponCode.trim()
       }
 
       // Add book-specific fields if it's a book
       if (actualType === "book") {
-        purchaseData.nameOnBook = purchaseForm.nameOnBook;
-        purchaseData.numberOnBook = purchaseForm.numberOnBook;
-        purchaseData.seriesName = purchaseForm.seriesName;
+        purchaseData.nameOnBook = purchaseForm.nameOnBook
+        purchaseData.numberOnBook = purchaseForm.numberOnBook
+        purchaseData.seriesName = purchaseForm.seriesName
       }
 
-      let response;
+      let response
       if (actualType === "book") {
-        response = await purchaseBook(purchaseData);
+        response = await purchaseBook(purchaseData)
       } else {
-        response = await purchaseProduct(purchaseData);
+        response = await purchaseProduct(purchaseData)
       }
 
       if (response.status === "success" || response.message) {
-        toast.success(t("success.purchaseSubmitted"));
+        toast.success(t("success.purchaseSubmitted"))
 
         // Reset form
-        setUploadedFile(null);
+        setUploadedFile(null)
         setPurchaseForm({
           numberTransferredFrom: "",
           nameOnBook: "",
           numberOnBook: "",
           seriesName: "",
           notes: "",
-        });
-        handleRemoveCoupon(); // Also reset coupon state
-        // dummy comment to re-commit
-        const fileInput = document.getElementById("file-upload");
-        if (fileInput) fileInput.value = "";
+        })
+        handleRemoveCoupon() // Also reset coupon state
+// dummy comment to re-commit
+        const fileInput = document.getElementById("file-upload")
+        if (fileInput) fileInput.value = ""
       } else {
-        throw new Error("Unexpected response format");
+        throw new Error("Unexpected response format")
       }
     } catch (err) {
-      console.error("💥 Error submitting purchase:", err);
-      const errorMessage =
-        err.response?.data?.message || err.message || t("errors.unknownError");
-      toast.error(t("errors.purchaseSubmissionFailed") + errorMessage);
+      console.error("💥 Error submitting purchase:", err)
+      const errorMessage = err.response?.data?.message || err.message || t("errors.unknownError")
+      toast.error(t("errors.purchaseSubmissionFailed") + errorMessage)
     } finally {
-      setPurchaseLoading(false);
+      setPurchaseLoading(false)
     }
-  };
+  }
 
-  const displayType = product ? getItemType(product) : type;
+  const displayType = product ? getItemType(product) : type
 
   if (loading) {
-    return <KalimaLoader fullScreen={false} />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg mb-4"></div>
+          <p className="text-lg">{t("loading.productDetails")}</p>
+        </div>
+      </div>
+    )
   }
 
   if (error || !product) {
@@ -374,40 +351,25 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div
-      className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
+    <div className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       <ProductHeader onBack={() => navigate(-1)} isRTL={isRTL} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card bg-base-100 shadow-xl mb-8">
           <div className="card-body p-0">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-0">
               <div className="p-8 lg:p-12">
-                <ProductGallery
-                  gallery={product.gallery}
-                  title={product.title}
-                />
+                <ProductGallery gallery={product.gallery} title={product.title} />
                 <div className="mt-8">
-                  <SampleDownload
-                    sample={product.sample}
-                    title={product.title}
-                    type={displayType}
-                    isRTL={isRTL}
-                  />
+                  <SampleDownload sample={product.sample} title={product.title} type={displayType} isRTL={isRTL} />
                 </div>
               </div>
               <div className="p-8 lg:p-12 border-l border-base-200">
-                <ProductInfo
-                  product={product}
-                  type={displayType}
-                  isRTL={isRTL}
-                />
-
+                <ProductInfo product={product} type={displayType} isRTL={isRTL} />
+                
                 {/* Already Purchased Badge */}
                 {isPurchased && (
                   <div className="alert alert-success mt-4">
@@ -439,13 +401,11 @@ const ProductDetails = () => {
                     onClick={() => {
                       if (!getToken()) {
                         // Show auth modal to let user choose login or register
-                        setShowAuthModal(true);
-                        return;
+                        setShowAuthModal(true)
+                        return
                       }
                       // Go directly to checkout
-                      navigate(
-                        `/checkout?productId=${product._id}&type=${displayType}`,
-                      );
+                      navigate(`/checkout?productId=${product._id}&type=${displayType}`)
                     }}
                     className="btn btn-primary btn-lg w-full"
                   >
@@ -468,12 +428,8 @@ const ProductDetails = () => {
                       <>
                         <ShoppingCart className="w-5 h-5" />
                         {isPurchased
-                          ? isRTL
-                            ? "أضف للسلة مجددًا"
-                            : "Add to Cart Again"
-                          : isRTL
-                            ? "أضف إلى السلة"
-                            : "Add to Cart"}
+                          ? (isRTL ? "أضف للسلة مجددًا" : "Add to Cart Again")
+                          : (t("addToCart") || "Add to Cart")}
                       </>
                     )}
                   </button>
@@ -528,11 +484,9 @@ const ProductDetails = () => {
               <div className="p-4 bg-base-200 flex gap-3">
                 <button
                   onClick={() => {
-                    setShowAuthModal(false);
-                    const currentUrl = location.pathname + location.search;
-                    navigate(
-                      `/login?redirect=${encodeURIComponent(currentUrl)}`,
-                    );
+                    setShowAuthModal(false)
+                    const currentUrl = location.pathname + location.search
+                    navigate(`/login?redirect=${encodeURIComponent(currentUrl)}`)
                   }}
                   className="btn btn-primary flex-1"
                 >
@@ -541,11 +495,9 @@ const ProductDetails = () => {
                 </button>
                 <button
                   onClick={() => {
-                    setShowAuthModal(false);
-                    const currentUrl = location.pathname + location.search;
-                    navigate(
-                      `/register?redirect=${encodeURIComponent(currentUrl)}`,
-                    );
+                    setShowAuthModal(false)
+                    const currentUrl = location.pathname + location.search
+                    navigate(`/register?redirect=${encodeURIComponent(currentUrl)}`)
                   }}
                   className="btn btn-outline btn-primary flex-1"
                 >
@@ -558,7 +510,7 @@ const ProductDetails = () => {
         )}
       </AnimatePresence>
     </div>
-  );
-};
+  )
+}
 
-export default ProductDetails;
+export default ProductDetails
