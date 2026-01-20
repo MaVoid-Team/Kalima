@@ -4,34 +4,15 @@ import { useTranslation } from "react-i18next"
 import SectionHeader from "./SectionHeader"
 
 function LanguageAppearanceSection() {
-  const { t, i18n } = useTranslation("settings")
-  const [selectedTheme, setSelectedTheme] = useState("")
-  const [isLangOpen, setIsLangOpen] = useState(false)
-  const [showThemes, setShowThemes] = useState(false)
-  const isRTL = i18n.language === 'ar'
-
-  // List of all 35 DaisyUI themes
-  const themes = [
-    "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", 
-    "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", 
-    "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", 
-    "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", 
-    "winter", "dim", "nord", "sunset"]
-
+  const { t, i18n } = useTranslation("settings");
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const isRTL = i18n.language === "ar";
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
-    const savedLang = localStorage.getItem("lng") || "ar"
-    setSelectedTheme(savedTheme)
-    i18n.changeLanguage(savedLang)
-    document.documentElement.setAttribute("data-theme", savedTheme)
-    document.documentElement.dir = savedLang === "ar" ? "rtl" : "ltr"
-  }, [i18n])
-
-  const handleThemeSelect = (themeName) => {
-    setSelectedTheme(themeName)
-    localStorage.setItem("theme", themeName)
-    document.documentElement.setAttribute("data-theme", themeName)
-  }
+    const savedLang = localStorage.getItem("lng") || "ar";
+    i18n.changeLanguage(savedLang);
+    document.documentElement.dir = savedLang === "ar" ? "rtl" : "ltr";
+    document.documentElement.removeAttribute("data-theme");
+  }, [i18n]);
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng)
