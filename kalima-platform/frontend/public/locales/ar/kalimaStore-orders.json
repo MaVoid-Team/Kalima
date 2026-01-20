@@ -98,7 +98,7 @@
     "notesPlaceholder": "أضف ملاحظات حول هذا الطلب...",
     "unsavedChanges": "لديك تغييرات غير محفوظة",
     "cancel": "إلغاء",
-    "deleteNotes" :"حذف الملاحظه",
+    "deleteNotes": "حذف الملاحظه",
     "saving": "جاري الحفظ...",
     "saveNotes": "حفظ الملاحظات",
     "edit": "تعديل",
@@ -106,7 +106,12 @@
     "noAdminNotes": "لم يتم إضافة ملاحظات مدير بعد",
     "close": "إغلاق",
     "receivedBy": "تم الاستلام بواسطة",
-    "confirmedBy": "تم التأكيد بواسطة"
+    "confirmedBy": "تم التأكيد بواسطة",
+    "new": "جديد",
+    "newClient": "عميل جديد",
+    "frequentBuyer": "مشتري متكرر",
+    "returnOrder": "إرجاع الطلب",
+    "totalPurchases": "إجمالي المشتريات"
   },
   "alerts": {
     "orderConfirmed": "تم تأكيد الطلب بنجاح!",
