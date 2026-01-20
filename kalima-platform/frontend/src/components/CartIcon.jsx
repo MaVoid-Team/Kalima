@@ -58,9 +58,10 @@ const CartIcon = () => {
     };
   }, []);
 
-  if (!isLoggedIn()) {
-    return null;
-  }
+  // No longer hiding for guests in this specific design
+  // if (!isLoggedIn()) {
+  //   return null;
+  // }
 
   return (
     <Link to="/cart" className="btn btn-ghost btn-circle relative">
@@ -78,4 +79,3 @@ const CartIcon = () => {
 };
 
 export default CartIcon;
-

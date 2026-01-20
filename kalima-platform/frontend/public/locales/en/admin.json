@@ -59,7 +59,11 @@
       "assistantInfo": "Assistant Information",
       "assignedLecturer": "Assigned Lecturer",
       "title": "User Details",
-      "close": "Close"
+      "close": "Close",
+      "purchases": "Purchases",
+      "frequentBuyer": "Frequent Buyer",
+      "newClient": "New Client",
+      "userSerial": "User Serial"
     },
     "invites": {
       "invite": "Invite",
@@ -83,13 +87,21 @@
       "exporting": "Exporting...",
       "csvFormat": "CSV Format",
       "jsonFormat": "JSON Format",
+      "xlsxFormat": "XLSX Format",
       "exportFiltered": "Export Filtered",
       "exportCSVPage": "Export Page (CSV)",
       "exportCSVAll": "Export All (CSV)",
       "exportJSONPage": "Export Page (JSON)",
       "exportJSONAll": "Export All (JSON)",
       "exportXLSXPage": "Export Page (XLSX)",
-      "exportXLSXAll": "Export All (XLSX)"
+      "exportXLSXAll": "Export All (XLSX)",
+      "csvPage": "Export Page (CSV)",
+      "csvAll": "Export All (CSV)",
+      "jsonPage": "Export Page (JSON)",
+      "jsonAll": "Export All (JSON)",
+      "xlsxPage": "Export Page (XLSX)",
+      "xlsxAll": "Export All (XLSX)",
+      "successXLSX": "Successfully exported {{count}} users (XLSX)"
     },
     "errors": {
       "fetchLecturers": "Failed to fetch lecturers",
@@ -155,7 +167,11 @@
       "phone": "Phone Number",
       "allTypes": "All Types",
       "allStatus": "All Statuses",
-      "invites": "Invites"
+      "invites": "Invites",
+      "dateFrom": "From Date",
+      "dateTo": "To Date",
+      "role": "Role",
+      "status": "Status"
     },
     "roles": {
       "student": "Student",
@@ -180,8 +196,7 @@
       "phone": "Phone",
       "name": "Name",
       "successfulInvites": "Successful Invites",
-      "purchases": "Purchases",
-      "totalPaid": "Total Paid"
+      "purchases": "Purchases"
     },
     "pagination": {
       "previous": "Previous",
@@ -399,6 +414,7 @@
     "government": "Government",
     "administrationZone": "Administration Zone",
     "sequenceId": "Sequence ID",
+    "purchases": "Purchases",
     "joinedDate": "Joined Date"
   }
 }
