@@ -349,12 +349,7 @@ function App() {
         </Suspense>
       </div>
       {/* Only show footer on public routes */}
-      {!showSidebar && (
-        <footer className="bg-base-200 p-4">
-          {" "}
-          <Footer />{" "}
-        </footer>
-      )}{" "}
+      {!showSidebar && <Footer />}
       <Overlay />
     </div>
   );
