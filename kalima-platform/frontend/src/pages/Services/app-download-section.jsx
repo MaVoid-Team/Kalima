@@ -26,14 +26,10 @@ export const AppDownloadSection = React.memo(() => {
 
   return (
     <section
-      className="relative py-40 bg-white overflow-hidden"
+      className="relative py-6 sm:py-24 lg:py-32 bg-white overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      {/* Decorative Elements */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
-      <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         <div
           className={`flex flex-col lg:flex-row items-stretch gap-24 ${
             isRTL ? "" : "lg:flex-row-reverse"

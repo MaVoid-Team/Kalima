@@ -116,12 +116,12 @@ const NavBar = () => {
         ref={navbarRef}
         className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${
           scrolled
-            ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-gray-200/50 "
-            : "bg-white/80 backdrop-blur-md"
+            ? "bg-white/95 backdrop-blur-sm shadow-lg shadow-gray-200/50 "
+            : "bg-white/80 backdrop-blur-sm"
         }`}
         dir={isAr ? "rtl" : "ltr"}
       >
-        <div className="container mx-auto px-4 lg:px-8">
+        <div className="container mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
           <div className="h-20 flex items-center justify-between">
             {/* Logo & Primary Navigation */}
             <div className="flex items-center gap-6 lg:gap-10">
