@@ -10,42 +10,18 @@ import {
   getUserDashboard,
   logoutUser,
 } from "../routes/auth-services";
-import {
-  ShoppingBag,
-  LogIn,
-  UserPlus,
-  Layout,
-  Receipt,
-  LogOut,
-  Menu,
-  X,
-  Sparkles,
-  ChevronRight,
-  Home,
-  Globe,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { FaCartPlus, FaHome, FaBook, FaChalkboardTeacher, FaBox, FaVideo } from "react-icons/fa";
+import { Layout, Receipt } from "lucide-react";
 
 const NavBar = () => {
   const { t, i18n } = useTranslation("common");
   const [menuOpen, setMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [scrolled, setScrolled] = useState(false);
   const isAr = i18n.language === "ar";
   const navbarRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const fetchUserRole = async () => {
     if (isLoggedIn()) {
       try {
@@ -70,14 +46,44 @@ const NavBar = () => {
 
   useEffect(() => {
     fetchUserRole();
-    const handleCustomAuthChange = () => fetchUserRole();
-    window.addEventListener("storage", fetchUserRole);
+
+    const handleStorageChange = () => {
+      fetchUserRole();
+    };
+
+    const handleCustomAuthChange = () => {
+      fetchUserRole();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
     window.addEventListener("user-auth-changed", handleCustomAuthChange);
+
     return () => {
-      window.removeEventListener("storage", fetchUserRole);
+      window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("user-auth-changed", handleCustomAuthChange);
     };
   }, []);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuOpen &&
+        !navbarRef.current?.contains(event.target) &&
+        !menuRef.current?.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "auto";
+  }, [menuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -94,8 +100,8 @@ const NavBar = () => {
   const getDashboardPath = (role) => {
     switch (role) {
       case "Student":
-      case "Parent":
-      case "Teacher":
+      case "Parent" :
+      case "Teacher" :
         return "/dashboard/student-dashboard/promo-codes";
       case "Lecturer":
         return "/dashboard/lecturer-dashboard";
@@ -110,405 +116,267 @@ const NavBar = () => {
     }
   };
 
+  const navItems = [
+    { key: "market", path: "/market", icon: FaCartPlus },
+  ];
+
+  const authItems = [
+    { key: "signup", path: "/register" },
+    { key: "signin", path: "/login" },
+  ];
+
   return (
-    <header
-      ref={navbarRef}
-      className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-        scrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-gray-200/50 "
-          : "bg-white/80 backdrop-blur-md"
-      }`}
+    <div
+      className="navbar top-0 left-0 right-0 z-50 bg-base-100 shadow-xl px-4 py-1 sticky"
       dir={isAr ? "rtl" : "ltr"}
     >
-
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="h-20 flex items-center justify-between">
-          {/* Logo & Primary Navigation */}
-          <div className="flex items-center gap-6 lg:gap-10">
-            {/* Premium Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
-              >
-                {/* Animated glow */}
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/30 to-[#FF5C28]/30 rounded-2xl blur-xl"
-                />
-                <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-red-500/10 transition-all duration-300">
-                  <img
-                    src="/Logo.png"
-                    alt="Logo"
-                    className="w-10 h-10 object-contain"
-                  />
-                </div>
-              </motion.div>
-              <div className="hidden sm:block">
-                <span className="text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent group-hover:from-[#AF0D0E] group-hover:to-[#FF5C28] transition-all duration-300">
-                  {t("logoText") || "كلمة"}
-                </span>
-              </div>
-            </Link>
-
-            {/* Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-2">
-              {/* Store Link */}
-              <Link
-                to="/market"
-                className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
-                <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                  <ShoppingBag className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
-                </div>
-                <span className="relative">{t("market") || "المتجر"}</span>
-              </Link>
-
-              {/* Dashboard Link */}
-              {userRole && (
-                <Link
-                  to={getDashboardPath(userRole)}
-                  className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
-                  <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                    <Layout className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
-                  </div>
-                  <span className="relative">{t("dashboard")}</span>
-                </Link>
-              )}
-            </nav>
-          </div>
-
-          {/* Action Items */}
-          <div className="hidden lg:flex items-center gap-3">
-            {userRole ? (
-              /* Logged In Actions */
-              <div className="flex items-center gap-2">
-                {["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
-                  <MonthlyCounter />
-                )}
-
-                {["Student", "Parent", "Teacher"].includes(userRole) && (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      to="/my-orders"
-                      className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-gray-50"
-                      title={isAr ? "طلباتي" : "My Orders"}
-                    >
-                      <Receipt className="w-5 h-5" />
-                      <span className="hidden xl:inline">{isAr ? "طلباتي" : "My Orders"}</span>
-                    </Link>
-                  </motion.div>
-                )}
-
-                {/* Cart Icon */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  <CartIcon />
-                </motion.div>
-
-                {/* Notifications */}
-                {userId && <NotificationCenter userId={userId} />}
-
-                {/* Divider */}
-                <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent mx-1" />
-
-                {/* Language Switcher */}
-                <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
-                  <LanguageSwitcher />
-                </div>
-
-                {/* Logout Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleLogout}
-                  className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-red-50"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>{t("logout")}</span>
-                </motion.button>
-              </div>
-            ) : (
-              /* Guest Actions */
-              <div className="flex items-center gap-3">
-                {/* Cart Icon */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  <CartIcon />
-                </motion.div>
-
-                {/* Language Switcher */}
-                <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
-                  <LanguageSwitcher />
-                </div>
-
-                {/* Divider */}
-                <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
-
-                {/* Login Link */}
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Link
-                    to="/login"
-                    className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-700 font-semibold hover:text-[#AF0D0E] hover:bg-red-50/50 transition-all duration-300"
-                  >
-                    <LogIn className="w-5 h-5 opacity-70 group-hover:opacity-100" />
-                    <span>{t("signin") || "تسجيل الدخول"}</span>
-                  </Link>
-                </motion.div>
-
-                {/* Register Button - Premium Gradient */}
-                <motion.div
-                  whileHover={{ scale: 1.03, boxShadow: "0 10px 30px rgba(175, 13, 14, 0.2)" }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    to="/register"
-                    className="group relative flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold overflow-hidden"
-                  >
-                    {/* Gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
-                    {/* Shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    {/* Content */}
-                    <UserPlus className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">{t("signup") || "التسجيل"}</span>
-                    <Sparkles className="w-4 h-4 relative z-10 opacity-70" />
-                  </Link>
-                </motion.div>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="lg:hidden flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <CartIcon />
-            </motion.div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-11 h-11 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
-              onClick={() => setMenuOpen(!menuOpen)}
+      <div ref={navbarRef} className="flex-1 flex justify-between items-center">
+        {/* Left side - Logo and navigation items */}
+        <div className="flex items-center gap-4">
+          {/* Mobile menu button */}
+          <div></div>
+          <button
+            className="btn btn-ghost lg:hidden"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <AnimatePresence mode="wait">
-                {menuOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <X className="w-6 h-6 text-gray-700" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="w-6 h-6 text-gray-700" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h7"
+              />
+            </svg>
+          </button>
+
+          {/* Logo */}
+          <Link to="/" className="btn btn-ghost px-2 rounded-2xl">
+            <img
+              src="/Kalima.png"
+              alt="Logo"
+              className="w-10 h-10 rounded-full"
+            />
+            <span className="text-xl font-bold text-primary ml-2">
+              {t("logoText")}
+            </span>
+          </Link>
+
+          {/* Desktop Navigation Items */}
+          <div className="hidden lg:flex xl:gap-4 ml-4 rounded-2xl">
+            {navItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.path}
+                icon={item.icon}
+                className={`btn btn-ghost font-medium rounded-2xl transition-colors ${item.key === "market" ? "bg-primary/70" : ""}`}
+              >
+                {t(item.key)}
+                {item.icon && <item.icon className="inline-block ml-1" />}
+              </Link>
+            ))}
+            {userRole && (
+              <Link
+                to={getDashboardPath(userRole)}
+                className="btn btn-ghost rounded-2xl"
+              >
+                {t("dashboard")}
+                <Layout className="inline-block mr-1" />
+              </Link>
+            )}
+            <LanguageSwitcher />
           </div>
+        </div>
+
+        {/* Auth buttons - Desktop */}
+        <div className="flex-none hidden lg:flex items-center gap-2 ml-4">
+          {/* Monthly Counter for employees */}
+          {userRole && ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
+            <MonthlyCounter />
+          )}
+          <CartIcon />
+          {/* My Orders link for customers only (Student, Parent, Teacher) */}
+          {userRole && ["Student", "Parent", "Teacher"].includes(userRole) && (
+            <Link
+              to="/my-orders"
+              className="btn btn-ghost btn-sm rounded-2xl gap-1"
+              title={isAr ? "طلباتي" : "My Orders"}
+            >
+              <Receipt className="w-4 h-4" />
+              <span className="hidden xl:inline">{isAr ? "طلباتي" : "My Orders"}</span>
+            </Link>
+          )}
+          {userId && <NotificationCenter userId={userId} />}
+          {userRole ? (
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline rounded-2xl"
+            >
+              {t("logout")}
+            </button>
+          ) : (
+            authItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`btn ${
+                  item.key === "signup" ? "btn-primary" : "btn-outline"
+                } rounded-2xl`}
+              >
+                {t(item.key)}
+              </Link>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Premium Mobile Drawer */}
-      <AnimatePresence>
-        {menuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[110]">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-              onClick={() => setMenuOpen(false)}
-            />
+      {/* Mobile menu - Drawer style */}
+      {menuOpen && (
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setMenuOpen(false)}
+          ></div>
 
-            {/* Drawer */}
-            <motion.div
-              initial={{ x: isAr ? 320 : -320, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: isAr ? 320 : -320, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`absolute top-0 bottom-0 w-[85%] max-w-[320px] bg-white shadow-2xl ${
-                isAr ? "right-0" : "left-0"
-              }`}
-            >
-              {/* Drawer Header */}
-              <div className="relative p-6 border-b border-gray-100">
-                {/* Gradient accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
-
-                <div className="flex items-center justify-between">
-                  <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-lg border border-gray-100 flex items-center justify-center">
-                      <img src="/Logo.png" alt="Logo" className="w-9 h-9" />
-                    </div>
-                    <span className="text-xl font-black text-gray-900">{t("logoText") || "كلمة"}</span>
-                  </Link>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setMenuOpen(false)}
-                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          {/* Drawer */}
+          <div
+            ref={menuRef}
+            className={`lg:hidden w-1/2 sm:w-1/3 fixed ${
+              isAr ? "right-0" : "left-0"
+            } top-0 h-full bg-base-100 z-50 overflow-y-auto transition-transform duration-300 ease-in-out`}
+            dir={isAr ? "rtl" : "ltr"}
+          >
+            <div className="p-4 space-y-4 h-full">
+              {/* Mobile menu header */}
+              <div className="flex items-center justify-around mb-6">
+                <Link
+                  to="/"
+                  className="flex items-center gap-2"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <img
+                    src="/Kalima.png"
+                    alt="Logo"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <span className="text-xl font-bold text-primary">
+                    {t("logoText")}
+                  </span>
+                </Link>
+                <button
+                  className="btn btn-ghost btn-sm btn-circle"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
-                  </motion.button>
-                </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
               </div>
 
-              {/* Drawer Content */}
-              <div className="p-6 space-y-6 overflow-y-auto h-[calc(100%-180px)]">
-                {/* Navigation Links */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-3">
-                    {isAr ? "التنقل" : "Navigation"}
-                  </p>
+              {/* Mobile menu items */}
+              <ul className="menu menu-lg p-0 [&_li>*]:rounded-lg">
+                {navItems.map((item) => (
+                  <li key={item.key}>
+                    <Link to={item.path} onClick={() => setMenuOpen(false)}>
+                      {t(item.key)}
+                    </Link>
+                  </li>
+                ))}
 
-                  <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
+                {userRole && (
+                  <li>
                     <Link
-                      to="/"
-                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
+                      to={getDashboardPath(userRole)}
                       onClick={() => setMenuOpen(false)}
                     >
-                      <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center">
-                        <Home className="w-5 h-5 text-gray-500" />
-                      </div>
-                      <span>{isAr ? "الرئيسية" : "Home"}</span>
-                      <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
+                      {t("dashboard")}
                     </Link>
-                  </motion.div>
+                  </li>
+                )}
+              </ul>
 
-                  <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      to="/market"
-                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
-                        <ShoppingBag className="w-5 h-5 text-[#AF0D0E]" />
-                      </div>
-                      <span>{t("market") || "المتجر"}</span>
-                      <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
-                    </Link>
-                  </motion.div>
+              <div className="divider"></div>
 
-                  {userRole && (
-                    <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
-                      <Link
-                        to={getDashboardPath(userRole)}
-                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
-                          <Layout className="w-5 h-5 text-[#AF0D0E]" />
-                        </div>
-                        <span>{t("dashboard")}</span>
-                        <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
-                      </Link>
-                    </motion.div>
-                  )}
-
-                  {["Student", "Parent", "Teacher"].includes(userRole) && (
-                    <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
-                      <Link
-                        to="/my-orders"
-                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-gray-500" />
-                        </div>
-                        <span>{isAr ? "طلباتي" : "My Orders"}</span>
-                        <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
-                      </Link>
-                    </motion.div>
-                  )}
+              <div className="flex flex-col gap-2">
+                <div className="mb-4">
+                  <LanguageSwitcher />
                 </div>
 
-                {/* Settings Section */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-3">
-                    {isAr ? "الإعدادات" : "Settings"}
-                  </p>
-
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50">
-                    <div className="w-11 h-11 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-gray-500" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-700">{isAr ? "اللغة" : "Language"}</p>
-                      <LanguageSwitcher />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Drawer Footer */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-white">
-                {userRole ? (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-red-50 to-orange-50 text-[#AF0D0E] font-bold hover:from-red-100 hover:to-orange-100 transition-all"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <span>{t("logout")}</span>
-                  </motion.button>
-                ) : (
-                  <div className="space-y-3">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Link
-                        to="/register"
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold shadow-lg shadow-red-500/20"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <UserPlus className="w-5 h-5" />
-                        <span>{t("signup") || "التسجيل"}</span>
-                        <Sparkles className="w-4 h-4 opacity-70" />
-                      </Link>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Link
-                        to="/login"
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-gray-200 text-gray-700 font-bold hover:border-[#AF0D0E]/30 hover:text-[#AF0D0E] transition-all"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <LogIn className="w-5 h-5" />
-                        <span>{t("signin") || "تسجيل الدخول"}</span>
-                      </Link>
-                    </motion.div>
+                {/* Monthly Counter for employees - Mobile */}
+                {userRole && ["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
+                  <div className="flex py-2 items-center gap-2">
+                    <MonthlyCounter />
                   </div>
                 )}
+
+                <div className="flex py-2 items-center gap-2">
+                  <CartIcon />
+                  <span>{t("cart") || "Cart"}</span>
+                </div>
+
+                {/* My Orders link - Mobile (customers only) */}
+                {userRole && ["Student", "Parent", "Teacher"].includes(userRole) && (
+                  <Link
+                    to="/my-orders"
+                    className="flex py-2 items-center gap-2"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Receipt className="w-5 h-5" />
+                    <span>{isAr ? "طلباتي" : "My Orders"}</span>
+                  </Link>
+                )}
+
+                {userId && (
+                  <div className="flex py-2">
+                    <NotificationCenter userId={userId} />
+                    <span className="ml-2">{t("notifications")}</span>
+                  </div>
+                )}
+
+                {userRole ? (
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-outline w-full justify-start"
+                  >
+                    {t("logout")}
+                  </button>
+                ) : (
+                  authItems.map((item) => (
+                    <Link
+                      key={item.key}
+                      to={item.path}
+                      className={`btn ${
+                        item.key === "signup" ? "btn-primary" : "btn-outline"
+                      } w-full justify-start`}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {t(item.key)}
+                    </Link>
+                  ))
+                )}
               </div>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
-    </header>
+        </>
+      )}
+    </div>
   );
 };
 
