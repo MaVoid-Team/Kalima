@@ -5,7 +5,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Toaster } from "sonner";
 import NavBar from "./components/navbar";
-import { LoadingSpinner } from "./components/LoadingSpinner";
+import KalimaLoader from "./components/KalimaLoader";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
@@ -114,6 +114,13 @@ function App() {
   //   };
   // }, []);
 
+  // Clean up old theme data from localStorage (one-time migration)
+  useEffect(() => {
+    localStorage.removeItem("theme");
+    localStorage.removeItem("data-theme");
+    document.documentElement.removeAttribute("data-theme");
+  }, []);
+
   useEffect(() => {
     const isDashboardRoute = location.pathname.startsWith("/dashboard/");
     setShowSidebar(isDashboardRoute);
@@ -186,7 +193,7 @@ function App() {
             : "ml-0"
         }`}
       >
-        <Suspense fallback={<LoadingSpinner fullScreen />}>
+        <Suspense fallback={<KalimaLoader fullScreen={true} />}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Services />} />

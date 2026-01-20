@@ -75,6 +75,7 @@ const WelcomeSection = memo(() => {
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         style={{ willChange: "transform, opacity" }}
+        className="transform-gpu"
       />
       <motion.div
         animate={{
@@ -87,7 +88,7 @@ const WelcomeSection = memo(() => {
           ease: "easeInOut",
           delay: 2,
         }}
-        className="absolute bottom-0 left-0 w-[500px] h-[500px]  rounded-full blur-[100px]"
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] transform-gpu"
         style={{ willChange: "transform, opacity" }}
       />
 
@@ -108,7 +109,7 @@ const WelcomeSection = memo(() => {
             initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full lg:w-[45%] flex justify-center relative order-1 lg:order-2"
+            className="w-full lg:w-[45%] flex justify-center relative order-1 lg:order-2 transform-gpu"
           >
             <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg aspect-square">
               {/* Multi-layer glow effect */}
@@ -119,13 +120,13 @@ const WelcomeSection = memo(() => {
               <motion.div
                 animate={shouldReduceMotion ? {} : { rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-4 rounded-full border-2 border-dashed border-[#AF0D0E]/20"
+                className="absolute inset-4 rounded-full border-2 border-dashed border-[#AF0D0E]/20 transform-gpu"
                 style={{ willChange: "transform" }}
               />
               <motion.div
                 animate={shouldReduceMotion ? {} : { rotate: -360 }}
                 transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-12 rounded-full border border-[#FF5C28]/15"
+                className="absolute inset-12 rounded-full border border-[#FF5C28]/15 transform-gpu"
                 style={{ willChange: "transform" }}
               />
 
@@ -133,7 +134,7 @@ const WelcomeSection = memo(() => {
               {[...Array(5)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]"
+                  className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] transform-gpu"
                   transition={{
                     duration: 3 + i * 0.5,
                     repeat: Infinity,
