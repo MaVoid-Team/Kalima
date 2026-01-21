@@ -18,7 +18,7 @@ const Lesson = require("../models/lessonModel");
 const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
 const ECPurchase = require("../models/ec.purchaseModel");
-const ECCartPurchase = require("../models/ec.cartpurchaseModel");
+const ECCartPurchase = require("../models/ec.cartPurchaseModel");
 
 
 // Helper function to enrich audit logs with readable resource data
