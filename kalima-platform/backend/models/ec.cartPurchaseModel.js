@@ -182,5 +182,5 @@ cartPurchaseSchema.pre("save", function (next) {
   next();
 });
 
-const ECCartPurchase = mongoose.model("ECCartPurchase", cartPurchaseSchema);
+const ECCartPurchase = mongoose.models.ECCartPurchase || mongoose.model("ECCartPurchase", cartPurchaseSchema);
 module.exports = ECCartPurchase;

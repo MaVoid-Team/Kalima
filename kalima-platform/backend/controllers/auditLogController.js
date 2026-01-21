@@ -18,6 +18,8 @@ const Lesson = require("../models/lessonModel");
 const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
 const ECPurchase = require("../models/ec.purchaseModel");
+const ECCartPurchase = require("../models/ec.cartpurchaseModel");
+
 
 // Helper function to enrich audit logs with readable resource data
 const enrichAuditLogs = async (logs) => {
@@ -214,6 +216,25 @@ const enrichAuditLogs = async (logs) => {
             }
             break;
 
+          case "ec.cartpurchase":
+
+            const ecCartPurchase = await ECCartPurchase.findById(resourceId)
+              .populate("createdBy", "name email")
+              .populate("confirmedBy", "name email")
+              .lean();
+            if (ecCartPurchase) {
+              enrichedLog.resource.details = {
+                purchaseSerial: ecCartPurchase.purchaseSerial,
+                userName: ecCartPurchase.userName,
+                subtotal: ecCartPurchase.subtotal,
+                total: ecCartPurchase.total,
+                confirmed: ecCartPurchase.confirmed,
+                confirmedBy: ecCartPurchase.confirmedBy?.name || null,
+                createdBy: ecCartPurchase.createdBy?.name || "Unknown"
+              };
+            }
+            break;
+
           default:
             // No additional details for unhandled resource types
             break;
@@ -269,8 +290,9 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
   // Validate resource type
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
+    "assistant", "admin", "lecturer", "package",
+    "lesson", "timetable", "center-lesson", "ec.section",
+    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
@@ -332,8 +354,9 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   // Validate resource type
   const validResourceTypes = [
     "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package", "lesson",
-    "timetable", "center-lesson", "ec.section", "ec.product", "ec.purchase"
+    "assistant", "admin", "lecturer", "package",
+    "lesson", "timetable", "center-lesson", "ec.section",
+    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
