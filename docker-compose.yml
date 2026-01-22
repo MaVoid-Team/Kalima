@@ -1,7 +1,7 @@
 services:
   frontend:
     build: 
-      context: ./frontend
+      context: ./kalima-platform/frontend
       dockerfile: Dockerfile
     ports:
       - "8081:80"
@@ -16,7 +16,7 @@ services:
 
   backend:
     build: 
-      context: ./backend
+      context: ./kalima-platform/backend
       dockerfile: Dockerfile
     ports:
       - "5033:5000"
