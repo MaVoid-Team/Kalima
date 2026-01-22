@@ -76,28 +76,26 @@ export default function StudentRegistration() {
     setApiError(null);
   }, [currentStep]);
 
-useEffect(() => {
-  if (formData.role !== "teacher" || currentStep !== 2) {
-    setIsAnyTeacherFieldFilled(false);
-    return;
-  }
+  useEffect(() => {
+    if (formData.role !== "teacher" || currentStep !== 2) {
+      setIsAnyTeacherFieldFilled(false);
+      return;
+    }
 
-  const hasData =
-    formData.teachesAtType?.trim() ||
-    formData.school?.trim() ||
-    formData.phoneNumber2?.trim() ||
-    (Array.isArray(formData.centers) &&
-      formData.centers.some((c) => c?.trim())) ||
-    (Array.isArray(formData.level) && formData.level.length > 0) ||
-    (Array.isArray(formData.socialMedia) &&
-      formData.socialMedia.some(
-        (s) => s.platform?.trim() || s.account?.trim()
-      ));
+    const hasData =
+      formData.teachesAtType?.trim() ||
+      formData.school?.trim() ||
+      formData.phoneNumber2?.trim() ||
+      (Array.isArray(formData.centers) &&
+        formData.centers.some((c) => c?.trim())) ||
+      (Array.isArray(formData.level) && formData.level.length > 0) ||
+      (Array.isArray(formData.socialMedia) &&
+        formData.socialMedia.some(
+          (s) => s.platform?.trim() || s.account?.trim(),
+        ));
 
-  setIsAnyTeacherFieldFilled(Boolean(hasData));
-}, [formData, currentStep]);
-
-
+    setIsAnyTeacherFieldFilled(Boolean(hasData));
+  }, [formData, currentStep]);
 
   const getStepErrors = (step) => {
     const errors = {};
@@ -125,7 +123,7 @@ useEffect(() => {
       } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = "passwordsMismatch";
       }
-     
+
       if (!formData.gender) errors.gender = "required";
       if (!formData.government) errors.government = "required";
       if (!formData.administrationZone) errors.administrationZone = "required";
@@ -423,7 +421,7 @@ useEffect(() => {
               data.append(`socialMedia[${index}][platform]`, social.platform);
               data.append(
                 `socialMedia[${index}][account]`,
-                social.account.trim()
+                social.account.trim(),
               );
             });
           break;
@@ -497,7 +495,7 @@ useEffect(() => {
 
       console.error(
         "Full error response:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       setApiError(errorMessage);
       setErrors(fieldErrors);
@@ -555,6 +553,7 @@ useEffect(() => {
                   t={t}
                   errors={errors}
                   role={role}
+                  gradeLevels={gradeLevels}
                 />
               );
             case 2:
@@ -583,6 +582,7 @@ useEffect(() => {
                   t={t}
                   errors={errors}
                   role={role}
+                  gradeLevels={gradeLevels}
                 />
               );
             case 2:
@@ -747,7 +747,7 @@ useEffect(() => {
                                 {t(`validation.${message}`)}
                               </span>
                             </li>
-                          )
+                          ),
                       )}
                     </ul>
                     <div className="flex items-center justify-center mt-4">

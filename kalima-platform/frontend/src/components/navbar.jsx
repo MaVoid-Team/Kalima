@@ -51,8 +51,14 @@ const NavBar = () => {
       try {
         const result = await getUserDashboard();
         if (result.success) {
-          setUserRole(result.data.data.userInfo.role);
-          setUserId(result.data.data.userInfo.id);
+          // Handle different response structures
+          const userInfo =
+            result.data?.data?.userInfo ||
+            result.data?.userInfo ||
+            result.data ||
+            {};
+          setUserRole(userInfo.role || null);
+          setUserId(userInfo.id || null);
         } else {
           setUserRole(null);
           setUserId(null);
@@ -120,7 +126,6 @@ const NavBar = () => {
       }`}
       dir={isAr ? "rtl" : "ltr"}
     >
-
       <div className="container mx-auto px-4 lg:px-8">
         <div className="h-20 flex items-center justify-between">
           {/* Logo & Primary Navigation */}
@@ -138,7 +143,11 @@ const NavBar = () => {
                     scale: [1, 1.2, 1],
                     opacity: [0.3, 0.5, 0.3],
                   }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                   className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/30 to-[#FF5C28]/30 rounded-2xl blur-xl"
                 />
                 <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-red-500/10 transition-all duration-300">
@@ -191,19 +200,24 @@ const NavBar = () => {
             {userRole ? (
               /* Logged In Actions */
               <div className="flex items-center gap-2">
-                {["Admin", "SubAdmin", "Moderator", "Assistant"].includes(userRole) && (
-                  <MonthlyCounter />
-                )}
+                {["Admin", "SubAdmin", "Moderator", "Assistant"].includes(
+                  userRole,
+                ) && <MonthlyCounter />}
 
                 {["Student", "Parent", "Teacher"].includes(userRole) && (
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <Link
                       to="/my-orders"
                       className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-gray-50"
                       title={isAr ? "طلباتي" : "My Orders"}
                     >
                       <Receipt className="w-5 h-5" />
-                      <span className="hidden xl:inline">{isAr ? "طلباتي" : "My Orders"}</span>
+                      <span className="hidden xl:inline">
+                        {isAr ? "طلباتي" : "My Orders"}
+                      </span>
                     </Link>
                   </motion.div>
                 )}
@@ -260,7 +274,10 @@ const NavBar = () => {
                 <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
 
                 {/* Login Link */}
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Link
                     to="/login"
                     className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-700 font-semibold hover:text-[#AF0D0E] hover:bg-red-50/50 transition-all duration-300"
@@ -272,7 +289,10 @@ const NavBar = () => {
 
                 {/* Register Button - Premium Gradient */}
                 <motion.div
-                  whileHover={{ scale: 1.03, boxShadow: "0 10px 30px rgba(175, 13, 14, 0.2)" }}
+                  whileHover={{
+                    scale: 1.03,
+                    boxShadow: "0 10px 30px rgba(175, 13, 14, 0.2)",
+                  }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Link
@@ -285,7 +305,9 @@ const NavBar = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                     {/* Content */}
                     <UserPlus className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">{t("signup") || "التسجيل"}</span>
+                    <span className="relative z-10">
+                      {t("signup") || "التسجيل"}
+                    </span>
                     <Sparkles className="w-4 h-4 relative z-10 opacity-70" />
                   </Link>
                 </motion.div>
@@ -362,11 +384,17 @@ const NavBar = () => {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
 
                 <div className="flex items-center justify-between">
-                  <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3">
+                  <Link
+                    to="/"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3"
+                  >
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-lg border border-gray-100 flex items-center justify-center">
                       <img src="/Logo.png" alt="Logo" className="w-9 h-9" />
                     </div>
-                    <span className="text-xl font-black text-gray-900">{t("logoText") || "كلمة"}</span>
+                    <span className="text-xl font-black text-gray-900">
+                      {t("logoText") || "كلمة"}
+                    </span>
                   </Link>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -387,7 +415,10 @@ const NavBar = () => {
                     {isAr ? "التنقل" : "Navigation"}
                   </p>
 
-                  <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div
+                    whileHover={{ x: isAr ? -5 : 5 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <Link
                       to="/"
                       className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
@@ -397,11 +428,16 @@ const NavBar = () => {
                         <Home className="w-5 h-5 text-gray-500" />
                       </div>
                       <span>{isAr ? "الرئيسية" : "Home"}</span>
-                      <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
+                      <ChevronRight
+                        className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                      />
                     </Link>
                   </motion.div>
 
-                  <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
+                  <motion.div
+                    whileHover={{ x: isAr ? -5 : 5 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
                     <Link
                       to="/market"
                       className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
@@ -411,12 +447,17 @@ const NavBar = () => {
                         <ShoppingBag className="w-5 h-5 text-[#AF0D0E]" />
                       </div>
                       <span>{t("market") || "المتجر"}</span>
-                      <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
+                      <ChevronRight
+                        className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                      />
                     </Link>
                   </motion.div>
 
                   {userRole && (
-                    <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ x: isAr ? -5 : 5 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Link
                         to={getDashboardPath(userRole)}
                         className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
@@ -426,13 +467,18 @@ const NavBar = () => {
                           <Layout className="w-5 h-5 text-[#AF0D0E]" />
                         </div>
                         <span>{t("dashboard")}</span>
-                        <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
+                        <ChevronRight
+                          className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                        />
                       </Link>
                     </motion.div>
                   )}
 
                   {["Student", "Parent", "Teacher"].includes(userRole) && (
-                    <motion.div whileHover={{ x: isAr ? -5 : 5 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ x: isAr ? -5 : 5 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Link
                         to="/my-orders"
                         className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
@@ -442,7 +488,9 @@ const NavBar = () => {
                           <Receipt className="w-5 h-5 text-gray-500" />
                         </div>
                         <span>{isAr ? "طلباتي" : "My Orders"}</span>
-                        <ChevronRight className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`} />
+                        <ChevronRight
+                          className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                        />
                       </Link>
                     </motion.div>
                   )}
@@ -459,7 +507,9 @@ const NavBar = () => {
                       <Globe className="w-5 h-5 text-gray-500" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-700">{isAr ? "اللغة" : "Language"}</p>
+                      <p className="text-sm font-semibold text-gray-700">
+                        {isAr ? "اللغة" : "Language"}
+                      </p>
                       <LanguageSwitcher />
                     </div>
                   </div>
@@ -480,7 +530,10 @@ const NavBar = () => {
                   </motion.button>
                 ) : (
                   <div className="space-y-3">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Link
                         to="/register"
                         className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold shadow-lg shadow-red-500/20"
@@ -491,7 +544,10 @@ const NavBar = () => {
                         <Sparkles className="w-4 h-4 opacity-70" />
                       </Link>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
                       <Link
                         to="/login"
                         className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-gray-200 text-gray-700 font-bold hover:border-[#AF0D0E]/30 hover:text-[#AF0D0E] transition-all"
