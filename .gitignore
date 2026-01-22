@@ -50,8 +50,7 @@ frontend/.cache/
 .dynamodb/
 
 # Config files
-.env
-.env.*
+#.env.*
 .pnpm-debug.log*
 .lock-wscript
 .eslintcache
