@@ -117,242 +117,247 @@ const NavBar = () => {
   };
 
   return (
-    <header
-      ref={navbarRef}
-      className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-        scrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-gray-200/50 "
-          : "bg-white/80 backdrop-blur-md"
-      }`}
-      dir={isAr ? "rtl" : "ltr"}
-    >
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="h-20 flex items-center justify-between">
-          {/* Logo & Primary Navigation */}
-          <div className="flex items-center gap-6 lg:gap-10">
-            {/* Premium Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative"
-              >
-                {/* Animated glow */}
+    <>
+      <header
+        ref={navbarRef}
+        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+          scrolled
+            ? "bg-white/95 backdrop-blur-sm shadow-lg shadow-gray-200/50 "
+            : "bg-white/80 backdrop-blur-sm"
+        }`}
+        dir={isAr ? "rtl" : "ltr"}
+      >
+        <div className="container mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
+          <div className="h-20 flex items-center justify-between">
+            {/* Logo & Primary Navigation */}
+            <div className="flex items-center gap-6 lg:gap-10">
+              {/* Premium Logo */}
+              <Link to="/" className="flex items-center gap-3 group">
                 <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/30 to-[#FF5C28]/30 rounded-2xl blur-xl"
-                />
-                <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-red-500/10 transition-all duration-300">
-                  <img
-                    src="/Logo.png"
-                    alt="Logo"
-                    className="w-10 h-10 object-contain"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative"
+                >
+                  {/* Animated glow */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.3, 0.5, 0.3],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/30 to-[#FF5C28]/30 rounded-2xl blur-xl"
                   />
+                  <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-red-500/10 transition-all duration-300">
+                    <img
+                      src="/Logo.png"
+                      alt="Logo"
+                      className="w-10 h-10 object-contain"
+                    />
+                  </div>
+                </motion.div>
+                <div className="hidden sm:block">
+                  <span className="text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent group-hover:from-[#AF0D0E] group-hover:to-[#FF5C28] transition-all duration-300">
+                    {t("logoText") || "كلمة"}
+                  </span>
                 </div>
-              </motion.div>
-              <div className="hidden sm:block">
-                <span className="text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent group-hover:from-[#AF0D0E] group-hover:to-[#FF5C28] transition-all duration-300">
-                  {t("logoText") || "كلمة"}
-                </span>
-              </div>
-            </Link>
-
-            {/* Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-2">
-              {/* Store Link */}
-              <Link
-                to="/market"
-                className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
-                <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                  <ShoppingBag className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
-                </div>
-                <span className="relative">{t("market") || "المتجر"}</span>
               </Link>
 
-              {/* Dashboard Link */}
-              {userRole && (
+              {/* Navigation Links */}
+              <nav className="hidden lg:flex items-center gap-2">
+                {/* Store Link */}
                 <Link
-                  to={getDashboardPath(userRole)}
+                  to="/market"
                   className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
                   <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                    <Layout className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
+                    <ShoppingBag className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
                   </div>
-                  <span className="relative">{t("dashboard")}</span>
+                  <span className="relative">{t("market") || "المتجر"}</span>
                 </Link>
-              )}
-            </nav>
-          </div>
 
-          {/* Action Items */}
-          <div className="hidden lg:flex items-center gap-3">
-            {userRole ? (
-              /* Logged In Actions */
-              <div className="flex items-center gap-2">
-                {["Admin", "SubAdmin", "Moderator", "Assistant"].includes(
-                  userRole,
-                ) && <MonthlyCounter />}
+                {/* Dashboard Link */}
+                {userRole && (
+                  <Link
+                    to={getDashboardPath(userRole)}
+                    className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
+                    <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
+                      <Layout className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
+                    </div>
+                    <span className="relative">{t("dashboard")}</span>
+                  </Link>
+                )}
+              </nav>
+            </div>
 
-                {["Student", "Parent", "Teacher"].includes(userRole) && (
+            {/* Action Items */}
+            <div className="hidden lg:flex items-center gap-3">
+              {userRole ? (
+                /* Logged In Actions */
+                <div className="flex items-center gap-2">
+                  {["Admin", "SubAdmin", "Moderator", "Assistant"].includes(
+                    userRole,
+                  ) && <MonthlyCounter />}
+
+                  {["Student", "Parent", "Teacher"].includes(userRole) && (
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Link
+                        to="/my-orders"
+                        className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-gray-50"
+                        title={isAr ? "طلباتي" : "My Orders"}
+                      >
+                        <Receipt className="w-5 h-5" />
+                        <span className="hidden xl:inline">
+                          {isAr ? "طلباتي" : "My Orders"}
+                        </span>
+                      </Link>
+                    </motion.div>
+                  )}
+
+                  {/* Cart Icon */}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
+                    <CartIcon />
+                  </motion.div>
+
+                  {/* Notifications */}
+                  {userId && <NotificationCenter userId={userId} />}
+
+                  {/* Divider */}
+                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent mx-1" />
+
+                  {/* Language Switcher */}
+                  <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                    <LanguageSwitcher />
+                  </div>
+
+                  {/* Logout Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleLogout}
+                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-red-50"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>{t("logout")}</span>
+                  </motion.button>
+                </div>
+              ) : (
+                /* Guest Actions */
+                <div className="flex items-center gap-3">
+                  {/* Cart Icon */}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                  >
+                    <CartIcon />
+                  </motion.div>
+
+                  {/* Language Switcher */}
+                  <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                    <LanguageSwitcher />
+                  </div>
+
+                  {/* Divider */}
+                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
+
+                  {/* Login Link */}
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <Link
-                      to="/my-orders"
-                      className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-gray-50"
-                      title={isAr ? "طلباتي" : "My Orders"}
+                      to="/login"
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-700 font-semibold hover:text-[#AF0D0E] hover:bg-red-50/50 transition-all duration-300"
                     >
-                      <Receipt className="w-5 h-5" />
-                      <span className="hidden xl:inline">
-                        {isAr ? "طلباتي" : "My Orders"}
-                      </span>
+                      <LogIn className="w-5 h-5 opacity-70 group-hover:opacity-100" />
+                      <span>{t("signin") || "تسجيل الدخول"}</span>
                     </Link>
                   </motion.div>
-                )}
 
-                {/* Cart Icon */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  <CartIcon />
-                </motion.div>
-
-                {/* Notifications */}
-                {userId && <NotificationCenter userId={userId} />}
-
-                {/* Divider */}
-                <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent mx-1" />
-
-                {/* Language Switcher */}
-                <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
-                  <LanguageSwitcher />
-                </div>
-
-                {/* Logout Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleLogout}
-                  className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-red-50"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>{t("logout")}</span>
-                </motion.button>
-              </div>
-            ) : (
-              /* Guest Actions */
-              <div className="flex items-center gap-3">
-                {/* Cart Icon */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                  <CartIcon />
-                </motion.div>
-
-                {/* Language Switcher */}
-                <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
-                  <LanguageSwitcher />
-                </div>
-
-                {/* Divider */}
-                <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
-
-                {/* Login Link */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    to="/login"
-                    className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-700 font-semibold hover:text-[#AF0D0E] hover:bg-red-50/50 transition-all duration-300"
-                  >
-                    <LogIn className="w-5 h-5 opacity-70 group-hover:opacity-100" />
-                    <span>{t("signin") || "تسجيل الدخول"}</span>
-                  </Link>
-                </motion.div>
-
-                {/* Register Button - Premium Gradient */}
-                <motion.div
-                  whileHover={{
-                    scale: 1.03,
-                    boxShadow: "0 10px 30px rgba(175, 13, 14, 0.2)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    to="/register"
-                    className="group relative flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold overflow-hidden"
-                  >
-                    {/* Gradient background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
-                    {/* Shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                    {/* Content */}
-                    <UserPlus className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">
-                      {t("signup") || "التسجيل"}
-                    </span>
-                    <Sparkles className="w-4 h-4 relative z-10 opacity-70" />
-                  </Link>
-                </motion.div>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="lg:hidden flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <CartIcon />
-            </motion.div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative w-11 h-11 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <AnimatePresence mode="wait">
-                {menuOpen ? (
+                  {/* Register Button - Premium Gradient */}
                   <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
+                    whileHover={{
+                      scale: 1.03,
+                      boxShadow: "0 10px 30px rgba(175, 13, 14, 0.2)",
+                    }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <X className="w-6 h-6 text-gray-700" />
+                    <Link
+                      to="/register"
+                      className="group relative flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold overflow-hidden"
+                    >
+                      {/* Gradient background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
+                      {/* Shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                      {/* Content */}
+                      <UserPlus className="w-5 h-5 relative z-10" />
+                      <span className="relative z-10">
+                        {t("signup") || "التسجيل"}
+                      </span>
+                      <Sparkles className="w-4 h-4 relative z-10 opacity-70" />
+                    </Link>
                   </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Menu className="w-6 h-6 text-gray-700" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <div className="lg:hidden flex items-center gap-3">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <CartIcon />
+              </motion.div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative w-11 h-11 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <AnimatePresence mode="wait">
+                  {menuOpen ? (
+                    <motion.div
+                      key="close"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <X className="w-6 h-6 text-gray-700" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="menu"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Menu className="w-6 h-6 text-gray-700" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Premium Mobile Drawer */}
       <AnimatePresence>
@@ -364,7 +369,7 @@ const NavBar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/50"
               onClick={() => setMenuOpen(false)}
             />
 
@@ -377,6 +382,7 @@ const NavBar = () => {
               className={`absolute top-0 bottom-0 w-[85%] max-w-[320px] bg-white shadow-2xl ${
                 isAr ? "right-0" : "left-0"
               }`}
+              dir={isAr ? "rtl" : "ltr"}
             >
               {/* Drawer Header */}
               <div className="relative p-6 border-b border-gray-100">
@@ -507,9 +513,6 @@ const NavBar = () => {
                       <Globe className="w-5 h-5 text-gray-500" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-700">
-                        {isAr ? "اللغة" : "Language"}
-                      </p>
                       <LanguageSwitcher />
                     </div>
                   </div>
@@ -564,7 +567,7 @@ const NavBar = () => {
           </div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 };
 

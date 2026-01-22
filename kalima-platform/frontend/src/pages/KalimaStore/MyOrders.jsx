@@ -274,7 +274,7 @@ const MyOrders = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -473,7 +473,7 @@ const MyOrders = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: index * 0.05 }}
-                  className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
+                  className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
                 >
                   <div className="card-body p-4 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -597,14 +597,15 @@ const MyOrders = () => {
                 </button>
               </div>
 
-              {/* Status */}
-              <div className="flex items-center gap-3 mb-6">
-                <StatusBadge status={selectedOrder.status} />
-                <TypeBadge type={getOrderType(selectedOrder)} />
-                <span className="text-sm text-base-content/60">
-                  {formatDate(selectedOrder.createdAt)}
-                </span>
-              </div>
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh]">
+                {/* Status */}
+                <div className="flex items-center gap-3 mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                  <StatusBadge status={selectedOrder.status} />
+                  <TypeBadge type={getOrderType(selectedOrder)} />
+                  <span className="text-sm font-medium text-gray-500 ml-auto">
+                    {formatDate(selectedOrder.createdAt)}
+                  </span>
+                </div>
 
               {/* Products */}
               <div className="mb-6">

@@ -100,11 +100,14 @@ const logout = catchAsync(async (req, res, next) => {
 // Middleware to verify user roles
 const verifyRoles = (...allowedRoles) => {
   return async (req, res, next) => {
+    if (!req.user) {
+      return next(new AppError("Unauthorized", 401));
+    }
     const Role = req.user.role?.toLowerCase();
     if (!Role) {
       return next(new AppError("Unauthorized", 401));
     }
-// comment
+    // comment
     const rolesArray = allowedRoles.map((role) => role.toLowerCase());
     if (!rolesArray.includes(Role)) {
       return next(

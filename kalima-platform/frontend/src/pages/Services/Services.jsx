@@ -67,14 +67,7 @@ const Services = () => {
     [],
   );
 
-  // Auto-rotation effect for testimonials
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % 3); // Assuming 3 testimonials
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+
 
   return (
     <motion.section
