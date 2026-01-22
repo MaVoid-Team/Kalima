@@ -21,8 +21,6 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    args:
-      VITE_API_URL: ${VITE_API_URL}
     ports:
       - "5033:5000"
     environment:
