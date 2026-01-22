@@ -1,10 +1,10 @@
 services:
   frontend:
     build: 
-      context: ./kalima-platform/frontend
+      context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8081:80"
+      - "8088:80"
     environment:
       - VITE_API_URL=/api/v1
     volumes:
@@ -16,28 +16,27 @@ services:
 
   backend:
     build: 
-      context: ./kalima-platform/backend
+      context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5037:5000"
+      - "5033:5000"
     environment:
       - NODE_ENV=development
-      - RESEND_API_KEY=${RESEND_API_KEY} 
-      - EMAIL_FROM=${EMAIL_FROM}
       - DATABASE_URI=${DATABASE_URI}
       - PORT=${PORT}
       - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET} 
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_KEY=${CLOUDINARY_KEY}
+      - CLOUDINARY_SECRET=${CLOUDINARY_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - PAYMENT_SS_RETENTION_DAYS=30
     networks:
       - app-network
     volumes:
       - uploads:/app/public/uploads
-      - signatures:/app/public/signatures
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  uploads:
-  signatures:
