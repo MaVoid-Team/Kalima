@@ -1,8 +1,9 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
+"use client"
+
+import { useTranslation } from "react-i18next"
 
 const ProductHeader = ({ onBack, isRTL }) => {
-  const { t } = useTranslation("kalimaStore-ProductDetails");
+  const { t } = useTranslation("kalimaStore-ProductDetails")
 
   return (
     <div className="py-6 px-4">
@@ -21,11 +22,11 @@ const ProductHeader = ({ onBack, isRTL }) => {
             {t("navigation.back")}
           </button>
           <h1 className="text-2xl font-bold">{t("header.purchaseDetails")}</h1>
-          <div className="w-24"></div>
+          <div className="w-24"></div> {/* Spacer for centering */}
         </div>
       </div>
     </div>
-  );
-};
-
-export default ProductHeader;
+  )
+}
+// dummy comment to re-commit
+export default ProductHeader
