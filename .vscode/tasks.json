@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Frontend: build (Linux-safe via Docker)",
+      "type": "shell",
+      "command": "docker build -t kalima-frontend-test ./kalima-platform/frontend",
+      "problemMatcher": []
+    }
+  ]
+}
