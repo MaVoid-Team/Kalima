@@ -9,7 +9,7 @@ import { LoadingSpinner } from "./components/LoadingSpinner";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
-import Overlay from "./pages/KalimaStore/Components/overlay";
+import Overlay from "./pages/KalimaStore/components/overlay";
 
 // Lazy load components
 const AuditLog = lazy(() =>
