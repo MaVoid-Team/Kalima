@@ -11,7 +11,8 @@ const CartIcon = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchCartCount = async () => {
-    if (!isLoggedIn()) {
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
       setItemCount(0);
       setLoading(false);
       return;
