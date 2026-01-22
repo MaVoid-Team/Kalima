@@ -13,10 +13,6 @@ RUN npm install --force
 # Copy all frontend files
 COPY . . 
 
-# Build-time env for Vite
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
-
 # Build the app
 RUN npm run build 
  
