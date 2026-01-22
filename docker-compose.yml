@@ -5,9 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:80"
-      - "4445:443"
     environment:
-      - VITE_API_URL=${BACKEND_URL}
+      - VITE_API_URL=/api/v1
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
