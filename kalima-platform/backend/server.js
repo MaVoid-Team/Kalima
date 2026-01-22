@@ -67,7 +67,7 @@ const ecCartRoutes = require("./routes/ec.cartRoutes");
 const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
 const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
 const ecPaymentMethodRoutes = require("./routes/paymentMethodRoutes");
-
+const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes.js");
 
 connectDB();
 
@@ -148,7 +148,7 @@ app.use("/api/v1/ec/cart-items", ecCartItemRoutes);
 app.use("/api/v1/ec/carts", ecCartRoutes);
 app.use("/api/v1/ec/cart-purchases", ecCartPurchaseRoutes);
 app.use("/api/v1/ec/payment-methods", ecPaymentMethodRoutes);
-
+app.use("/api/v1/whatsapp-numbers", whatsAppNumberRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -283,6 +283,8 @@ mongoose.connection.once("open", () => {
 
   // Make io accessible in routes
   app.set("io", io);
+
+  require("./utils/maintenance").start();
 
   httpServer.listen(PORT, () => {
     console.log(`Server active and listening on port ${PORT}.`);

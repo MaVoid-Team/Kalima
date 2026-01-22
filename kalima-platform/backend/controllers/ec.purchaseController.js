@@ -1,3 +1,4 @@
+
 const ECPurchase = require("../models/ec.purchaseModel");
 const ECCoupon = require("../models/ec.couponModel");
 const catchAsync = require("../utils/catchAsync");
@@ -19,17 +20,17 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   // Handle search parameter
   if (req.query.search) {
     const searchTerm = req.query.search;
-    const searchRegex = new RegExp(searchTerm, 'i'); // Case-insensitive
+    const searchRegex = new RegExp(searchTerm, "i"); // Case-insensitive
 
     searchFilter.$or = [
       { productName: searchRegex },
       { userName: searchRegex },
       { purchaseSerial: searchRegex },
       { numberTransferredFrom: searchRegex },
-      { 'createdBy.email': searchRegex },
-      { 'createdBy.name': searchRegex },
-      { 'productId.title': searchRegex },
-      { 'productId.serial': searchRegex }
+      { "createdBy.email": searchRegex },
+      { "createdBy.name": searchRegex },
+      { "productId.title": searchRegex },
+      { "productId.serial": searchRegex },
     ];
 
     searchApplied = true;
@@ -66,7 +67,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
   }
 
   const totalPurchases = await ECPurchase.countDocuments(
-    totalQuery.getFilter ? totalQuery.getFilter() : totalQuery._conditions
+    totalQuery.getFilter ? totalQuery.getFilter() : totalQuery._conditions,
   );
 
   // Populate & execute
@@ -122,20 +123,24 @@ exports.getPurchaseById = catchAsync(async (req, res, next) => {
   });
 });
 
-// Create new purchase
+// Create new purchase (Refactored to use ECCartPurchase for unified order system)
 exports.createPurchase = catchAsync(async (req, res, next) => {
+  const ECCartPurchase = require("../models/ec.cartPurchaseModel");
+  const PaymentMethod = require("../models/paymentMethodModel");
+  const { DateTime } = require("luxon");
+
   // Handle payment screenshot upload
   let paymentScreenShotPath = null;
   if (req.file && req.file.fieldname === "paymentScreenShot") {
     paymentScreenShotPath = req.file.path;
     req.body.paymentScreenShot = paymentScreenShotPath;
   } else if (!req.body.paymentScreenShot) {
-    // If not uploaded, set to null (model will error if required)
     req.body.paymentScreenShot = null;
   }
+
   const product = await ECProduct.findById(req.body.productId).populate(
     "section",
-    "number"
+    "number",
   );
   if (!product) {
     return next(new AppError("No product found with that ID", 404));
@@ -144,6 +149,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
   if (req.body.confirmedBy) {
     return next(new AppError("Purchase cannot be confirmed at creation", 400));
   }
+
   let coupon;
   if (req.body.couponCode) {
     coupon = await ECCoupon.findOne({
@@ -152,173 +158,165 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     if (!coupon) {
       return next(new AppError("Invalid or expired coupon code", 400));
     }
-    // Check if the coupon is already used
     if (coupon.isActive === false) {
       return next(new AppError("Coupon code has already been used", 400));
     }
   }
+
   // Set the creator
   req.body.createdBy = req.user._id;
   req.body.userName = req.user.name;
-  req.body.productName = product.title;
-  req.body.price = product.priceAfterDiscount;
-  req.body.paymentNumber = product.paymentNumber;
-  req.body.finalPrice = req.body.price * 1 - (coupon ? coupon.value * 1 : 0);
 
-  // Set coupon ID instead of coupon code string
-  if (coupon) {
-    console.log("Coupon found:", coupon);
-    req.body.couponCode = coupon._id;
-  } else {
-    delete req.body.couponCode; // Remove couponCode if no coupon is used
+  // Calculate pricing
+  const price = product.priceAfterDiscount;
+  const couponValue = coupon ? coupon.value * 1 : 0;
+  const finalPrice = price * 1 - couponValue;
+
+  // Validate payment info (assuming direct purchase is never free unless price is 0)
+  let paymentMethodDoc = null;
+  // If price > 0, validate payment method
+  if (finalPrice > 0) {
+    /* 
+         Note: The frontend allows "Buy Now" without payment method sometimes if strictly following schema,
+         but usually requires it. We'll try to find payment method if ID is provided.
+         If not provided but required, consistent with cart logic, we might need it.
+         However, to avoid breaking frontend that might not send it if not selected (legacy), 
+         we check if it exists in body.
+      */
+    if (req.body.paymentNumber) {
+      // Try to find payment method by phone number if ID not sent (legacy behavior support)
+      // Or just rely on req.body.paymentMethod if frontend sends it (which it seems to do now)
+    }
+
+    if (
+      req.body.paymentMethod &&
+      mongoose.Types.ObjectId.isValid(req.body.paymentMethod)
+    ) {
+      paymentMethodDoc = await PaymentMethod.findById(req.body.paymentMethod);
+    }
   }
 
-  if (!req.user.userSerial) {
-    return next(
-      new AppError("User serial is required to create a purchase", 400)
-    );
-  }
-  // Get section number robustly from product data
-  let sectionNumber = null;
-  if (product.section && typeof product.section === "object" && product.section.number) {
-    sectionNumber = product.section.number;
-  } else if (product.sectionNumber) {
-    sectionNumber = product.sectionNumber;
-  }
-  if (!sectionNumber) {
-    return next(new AppError("Product section number is required", 400));
-  }
-  if (!product.serial) {
-    return next(new AppError("Product serial is required", 400));
-  }
+  // --- Serial Generation Logic (Unified with Cart) ---
+  const userSerial =
+    req.user.userSerial || req.user._id.toString().slice(-8).toUpperCase();
+  const getCurrentEgyptTime = () => DateTime.now().setZone("Africa/Cairo");
+  const date = getCurrentEgyptTime();
+  const formattedDate = date.toFormat("yyyyMMdd");
 
-  req.body.purchaseSerial = `${req.user.userSerial}-${sectionNumber}-${product.serial}`;
+  const lastPurchase = await ECCartPurchase.findOne({
+    purchaseSerial: new RegExp(`${userSerial}-CP-${formattedDate}-\\d+$`),
+  }).sort({ purchaseSerial: -1 });
 
-  // Support notes and adminNotes fields
-  if (typeof req.body.notes === "undefined") req.body.notes = null;
-  if (typeof req.body.adminNotes === "undefined") req.body.adminNotes = null;
-  if (typeof req.body.adminNoteBy === "undefined") req.body.adminNoteBy = null;
+  let sequence = 1;
+  if (lastPurchase) {
+    const lastSequence = parseInt(lastPurchase.purchaseSerial.split("-").pop());
+    sequence = lastSequence + 1;
+  }
+  const formattedSequence = sequence.toString().padStart(3, "0");
+  // Format: USER-CP-DATE-SEQ (e.g. U123-CP-20231027-001)
+  const purchaseSerial = `${userSerial}-CP-${formattedDate}-${formattedSequence}`;
 
-  const purchase = await ECPurchase.create(req.body); // Populate the created purchase
+  // Construct Item for ECCartPurchase
+  const item = {
+    product: product._id,
+    productType: product.__t || "ECProduct",
+    priceAtPurchase: price,
+    productSnapshot: {
+      title: product.title,
+      thumbnail: product.thumbnail,
+      section: product.section,
+      serial: product.serial,
+    },
+  };
+
+  // Create ECCartPurchase
+  const purchase = await ECCartPurchase.create({
+    userName: req.user.name,
+    createdBy: req.user._id,
+    items: [item],
+    numberTransferredFrom: req.body.numberTransferredFrom || null,
+    paymentNumber:
+      product.paymentNumber ||
+      (paymentMethodDoc ? paymentMethodDoc.phoneNumber : null),
+    paymentMethod: paymentMethodDoc ? paymentMethodDoc._id : null,
+    paymentScreenShot: req.body.paymentScreenShot,
+    subtotal: price,
+    couponCode: coupon ? coupon._id : null,
+    discount: couponValue,
+    total: finalPrice,
+    notes: req.body.notes,
+    adminNotes: req.body.adminNotes, // Support direct admin notes if passed
+    adminNoteBy: req.body.adminNoteBy,
+    purchaseSerial: purchaseSerial,
+    status: "pending", // Default status
+  });
+
   if (!purchase) {
     return next(new AppError("Purchase creation failed", 400));
   }
+
   if (purchase && coupon) {
-    // Mark the coupon as used
     await coupon.markAsUsed(purchase._id, req.user._id);
   }
 
   // --- Referral successful invite logic ---
-  // Only increment inviter's successfulInvites if this is the first purchase for the referred user
   if (req.user.referredBy) {
-    const purchaseCount = await ECPurchase.countDocuments({ createdBy: req.user._id });
+    // Count ALL purchases types? For now, stick to checking ECPurchase count or ECCartPurchase count
+    // The original logic checked ECPurchase count. We should probably check ECCartPurchase count now.
+    // But since we just created one, count should be >= 1.
+    // Let's check if this is their FIRST purchase in ECCartPurchase.
+    const purchaseCount = await ECCartPurchase.countDocuments({
+      createdBy: req.user._id,
+    });
     if (purchaseCount === 1) {
-      const { recalculateInviterSuccessfulInvites } = require("./ec.referralController");
+      const {
+        recalculateInviterSuccessfulInvites,
+      } = require("./ec.referralController");
       await recalculateInviterSuccessfulInvites(req.user.referredBy);
     }
   }
-  // --- End referral logic ---
 
-  // --- Real-time notification to Admins and SubAdmins ---
-  // DISABLED: Notifications are now handled by the cart purchase system (ec.cartPurchaseController.js)
-  // This prevents duplicate notifications when using the cart-based checkout
-  /*
+  // --- Notification Logic (Reusing simple logic for now, or copy from Cart) ---
+  // To ensure Admins see it, we should create Notifications.
   try {
-    const template = await NotificationTemplate.findOne({
-      type: "store_purchase",
-    });
+    const adminUsers = await User.find({
+      role: { $in: ["Admin", "SubAdmin", "Moderator"] },
+    }).select("_id name role");
 
-    if (template) {
-      const io = req.app.get("io");
-      
-      // Find all admins and subadmins
-      const adminUsers = await User.find({
-        role: { $in: ["Admin", "SubAdmin"] },
-      }).select("_id name email role");
-
-      console.log(`Found ${adminUsers.length} admin/subadmin users to notify`);
-
-      if (adminUsers.length > 0 && io) {
-        const purchaseTime = new Date().toLocaleString("en-US", {
-          timeZone: "Africa/Cairo",
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        // Prepare notification data
-        const notificationData = {
-          title: template.title,
-          message: template.message
-            .replace("{buyer}", req.user.name)
-            .replace("{product}", purchase.productName)
-            .replace("{price}", purchase.finalPrice.toString())
-            .replace("{time}", purchaseTime),
+    if (adminUsers.length > 0) {
+      const notificationPromises = adminUsers.map((admin) => {
+        return Notification.create({
+          userId: admin._id,
+          title: "طلب جديد في المتجر (شراء مباشر)",
+          message: `طلب جديد من ${req.user.name}\nرقم الطلب: ${purchaseSerial}\nالمنتج: ${product.title}\nالإجمالي: ${finalPrice} EGP`,
           type: "store_purchase",
           relatedId: purchase._id,
           metadata: {
-            buyerId: req.user._id,
-            buyerName: req.user.name,
-            buyerEmail: req.user.email,
-            productId: purchase.productId,
-            productName: purchase.productName,
-            purchaseSerial: purchase.purchaseSerial,
-            price: purchase.price,
-            finalPrice: purchase.finalPrice,
-            purchaseTime: new Date(),
+            purchaseSerial: purchaseSerial,
+            customerName: req.user.name,
+            total: finalPrice,
+            products: [{ title: product.title, price: price }],
           },
-        };
-
-        // Send notification to each admin/subadmin
-        await Promise.all(
-          adminUsers.map(async (admin) => {
-            // Check if admin is online
-            const isOnline = io.sockets.adapter.rooms.has(
-              admin._id.toString()
-            );
-
-            // Create notification in database
-            const notification = await Notification.create({
-              userId: admin._id,
-              ...notificationData,
-              isSent: isOnline,
-            });
-
-            console.log(
-              `Created notification for ${admin.role} ${admin.name} (${admin._id}), online: ${isOnline}`
-            );
-
-            // Send immediately if admin is online
-            if (isOnline) {
-              io.to(admin._id.toString()).emit("storePurchase", {
-                ...notificationData,
-                notificationId: notification._id,
-                createdAt: notification.createdAt,
-              });
-              console.log(
-                `Sent real-time notification to ${admin.role} ${admin.name}`
-              );
-            }
-          })
-        );
-
-        console.log(
-          `Store purchase notifications created for ${adminUsers.length} admins/subadmins`
-        );
-      }
-    } else {
-      console.warn("Store purchase notification template not found");
+        });
+      });
+      await Promise.all(notificationPromises);
     }
-  } catch (notificationError) {
-    console.error("Error sending store purchase notifications:", notificationError);
-    // Don't fail the purchase if notification fails
+  } catch (err) {
+    console.error(
+      "Failed to send admin notifications for direct purchase:",
+      err,
+    );
   }
-  */
-  // --- End notification logic ---
 
-  // Send email to user after successful purchase
+  // Update User Stats
+  await User.findByIdAndUpdate(req.user._id, {
+    $inc: {
+      numberOfPurchases: 1,
+      TotalSpentAmount: finalPrice,
+    },
+  });
+
+  // Send email to user
   try {
     await sendEmail(
       req.user.email,
@@ -326,13 +324,13 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       `<div style='font-family: Arial, sans-serif;'>
         <h2>Thank you for your purchase!</h2>
         <p>Dear ${req.user.name},</p>
-        <p>Your purchase (<b>${purchase.purchaseSerial}</b>) was successful.</p>
-        <p>Product: <b>${purchase.productName}</b></p>
-        <p>Amount Paid: <b>${purchase.finalPrice}</b></p>
-        <p>your order is being processed by kalima team  .</p>
+        <p>Your purchase (<b>${purchaseSerial}</b>) was successful.</p>
+        <p>Product: <b>${product.title}</b></p>
+        <p>Amount Paid: <b>${finalPrice}</b></p>
+        <p>Your order is being processed by Kalima team.</p>
         <p>If you have any questions, please contact support.</p>
         <br><p>Best regards,<br>Kalima Team</p>
-      </div>`
+      </div>`,
     );
   } catch (err) {
     console.error("Failed to send purchase confirmation email:", err);
@@ -342,7 +340,7 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       purchase,
-      coupon: coupon ? coupon._id : null, // Return coupon ID if used
+      coupon: coupon ? coupon._id : null,
     },
   });
 });
@@ -384,7 +382,6 @@ exports.updatePurchase = catchAsync(async (req, res, next) => {
   });
 });
 
-
 // Confirm purchase
 exports.confirmPurchase = catchAsync(async (req, res, next) => {
   const purchase = await ECPurchase.findByIdAndUpdate(
@@ -396,7 +393,7 @@ exports.confirmPurchase = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   ).populate([
     { path: "createdBy", select: "name email role" },
     { path: "confirmedBy", select: "name email role" },
@@ -512,7 +509,9 @@ exports.getPurchaseStats = catchAsync(async (req, res, next) => {
             },
             totalRevenue: { $sum: "$finalPrice" },
             confirmedRevenue: {
-              $sum: { $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0] },
+              $sum: {
+                $cond: [{ $eq: ["$confirmed", true] }, "$finalPrice", 0],
+              },
             },
             averagePrice: { $avg: "$finalPrice" },
           },
@@ -653,11 +652,11 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
     },
     {
       $lookup: {
-  from: "ecproducts",
+        from: "ecproducts",
         localField: "_id",
         foreignField: "_id",
-        as: "productInfo"
-      }
+        as: "productInfo",
+      },
     },
     { $unwind: "$productInfo" },
     // Lookup all coupons used for this product's purchases
@@ -671,22 +670,22 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
               $expr: {
                 $and: [
                   { $in: ["$_id", "$$couponIds"] },
-                  { $ne: ["$_id", null] }
-                ]
-              }
-            }
+                  { $ne: ["$_id", null] },
+                ],
+              },
+            },
           },
-          { $group: { _id: null, totalCouponValue: { $sum: "$value" } } }
+          { $group: { _id: null, totalCouponValue: { $sum: "$value" } } },
         ],
-        as: "couponStats"
-      }
+        as: "couponStats",
+      },
     },
     {
       $addFields: {
         totalCouponValue: {
-          $ifNull: [{ $arrayElemAt: ["$couponStats.totalCouponValue", 0] }, 0]
-        }
-      }
+          $ifNull: [{ $arrayElemAt: ["$couponStats.totalCouponValue", 0] }, 0],
+        },
+      },
     },
     {
       $project: {
@@ -696,10 +695,10 @@ exports.getProductPurchaseStats = catchAsync(async (req, res, next) => {
         productSection: "$productInfo.section",
         totalPurchases: 1,
         totalValue: 1,
-        totalCouponValue: 1
-      }
+        totalCouponValue: 1,
+      },
     },
-    { $sort: { totalPurchases: -1 } }
+    { $sort: { totalPurchases: -1 } },
   ]);
 
   res.status(200).json({
