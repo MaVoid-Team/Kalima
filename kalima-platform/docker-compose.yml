@@ -40,3 +40,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  uploads:
