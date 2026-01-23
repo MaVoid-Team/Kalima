@@ -7,7 +7,6 @@ const createAuditLogEntry = async (req, res, originalRes) => {
 
   // Determine action based on HTTP method
   const methodToAction = {
-    GET: "read",
     POST: "create",
     PUT: "update",
     PATCH: "update",

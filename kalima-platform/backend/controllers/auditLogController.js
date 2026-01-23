@@ -277,6 +277,12 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     results: enrichedLogs.length,
+    ppagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    },
     data: {
       logs: enrichedLogs
     }
