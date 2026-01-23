@@ -827,7 +827,7 @@ const MyOrders = () => {
             ></div>
           </div>
         )}
-      </AnimatePresence>fi
+      </AnimatePresence>
     </div>
   );
 };
