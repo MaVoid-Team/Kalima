@@ -5,19 +5,21 @@ const createAuditLogEntry = async (req, res, originalRes) => {
   // Skip audit logging if no user information
   if (!req.user) return;
 
+  // Skip audit logging for GET requests (read operations are not logged)
+  if (req.method === "GET") return;
+
   // Determine action based on HTTP method
   const methodToAction = {
-    GET: "read",
     POST: "create",
     PUT: "update",
     PATCH: "update",
     DELETE: "delete"
   };
-  
+
   // Extract resource type from URL path
   const pathSegments = req.originalUrl.split("/");
   let resourceType = "";
-  
+
   // Determine resource type using a more readable approach
   const resourceIdentifiers = [
     { keywords: ["center", "centers"], type: "center" },
@@ -35,32 +37,32 @@ const createAuditLogEntry = async (req, res, originalRes) => {
     { keywords: ["products"], type: "ec.product" },
     { keywords: ["purchases"], type: "ec.purchase" }
   ];
-  
+
   // Find matching resource type - special handling for e-commerce routes
   for (const resource of resourceIdentifiers) {
     // Special check for e-commerce routes
     if (resource.type.startsWith("ec.") && pathSegments.includes("ec")) {
-      if (resource.keywords.some(keyword => pathSegments.some(segment => 
+      if (resource.keywords.some(keyword => pathSegments.some(segment =>
         segment.toLowerCase() === keyword.toLowerCase()))) {
         resourceType = resource.type;
         break;
       }
     }
     // Regular check for other routes
-    else if (!resource.type.startsWith("ec.") && resource.keywords.some(keyword => pathSegments.some(segment => 
+    else if (!resource.type.startsWith("ec.") && resource.keywords.some(keyword => pathSegments.some(segment =>
       segment.toLowerCase() === keyword.toLowerCase()))) {
       resourceType = resource.type;
       break;
     }
   }
-  
+
   // Skip logging if resource type not recognized
   if (!resourceType) return;
-  
+
   // Extract resource ID from URL params
   let resourceId = null;
   let resourceName = null;
-  
+
   // Use switch case for param ID extraction
   switch (true) {
     case !!req.params.id:
@@ -76,17 +78,17 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       resourceId = req.params.lessonId;
       break;
   }
-  
+
   // Handle special case for "my-containers" which isn't a valid ObjectId
   if (resourceId === "my-containers") {
     resourceId = null; // Set to null since it's not a valid ObjectId
     resourceName = "User's Containers"; // Provide a descriptive name instead
   }
-  
+
   // Handle special case for center operations
   let specialAction = null;
   let specialResource = null;
-  
+
   // Special case for e-commerce purchase operations
   if (resourceType === "ec.purchase") {
     // Check for purchase confirmation
@@ -109,7 +111,7 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       };
     }
   }
-  
+
   // Special case for center-related endpoints
   if (resourceType === "center") {
     // Check for lesson-related operations in the center context
@@ -130,7 +132,6 @@ const createAuditLogEntry = async (req, res, originalRes) => {
         };
       }
     } else if (pathSegments.includes("timetable")) {
-      specialAction = "read";
       specialResource = {
         type: "timetable",
         id: req.params.centerId,
@@ -138,10 +139,10 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       };
     }
   }
-  
+
   // Extract resource details from response if available
   const resData = originalRes?._body?.data;
-  
+
   // Handle different response structures for different endpoints
   if (resData && !specialResource) {
     // Special case for packages which have a different structure
@@ -209,12 +210,12 @@ const createAuditLogEntry = async (req, res, originalRes) => {
         resourceType = "center-lesson";
       }
     }
-    
+
     // For direct data without specific property naming
     if (!resourceId && !resourceName && typeof resData === 'object') {
       // Check if the response data itself is the resource (common in some controllers)
       if (resData._id || resData.id) {
-        resourceId = resourceId || resData._id || resData.id; 
+        resourceId = resourceId || resData._id || resData.id;
         resourceName = resData.name;
       } else if (Array.isArray(resData)) {
         // Handle array responses
@@ -222,36 +223,35 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       }
     }
   }
-  
+
   // Additional extraction from request body for create/update operations
   if ((req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') && !resourceName) {
     resourceName = req.body.name || req.body.title;
   }
-  
+
   // Special case for DELETE operations
   const isDeleteOperation = req.method === 'DELETE';
-  
+
   // Determine if the request was successful based on status code
   // For DELETE operations, we only check the status code, not the resource ID
   const statusCode = originalRes?.statusCode || 500;
   const isSuccess = statusCode >= 200 && statusCode < 400 && (
     isDeleteOperation || // DELETE operations are successful if status code is in 2xx range
-    methodToAction[req.method] === 'read' || 
-    resourceId || 
+    resourceId ||
     (resData && (resData.results > 0 || resData.message || resData.package || resData.packages || resData.lesson || resData.timetable || resData.attendance || resData.totalRevenue !== undefined || resData.breakdown || resData.section || resData.product || resData.purchase))
   );
-  
+
   // Use special resource and action if defined
   const finalResource = specialResource || {
     type: resourceType,
     id: resourceId,
-    name: resourceName || (isSuccess 
+    name: resourceName || (isSuccess
       ? (isDeleteOperation ? "Resource deleted successfully" : undefined)
       : "Operation failed")
   };
-  
+
   const finalAction = specialAction || methodToAction[req.method];
-  
+
   // Create the audit log
   await AuditLog.create({
     user: {
@@ -269,14 +269,14 @@ const createAuditLogEntry = async (req, res, originalRes) => {
 const auditLogger = (req, res, next) => {
   // Store the original send function
   const originalSend = res.send;
-  
+
   // Override the send function to capture response data before sending
-  res.send = function(body) {
+  res.send = function (body) {
     try {
       // Store response for audit logging
       res._body = typeof body === 'string' ? JSON.parse(body) : body;
       res.statusCode = res.statusCode || 200;
-      
+
       // Create audit log entry - wrapped in try/catch instead of using Promise.catch()
       try {
         createAuditLogEntry(req, res, res);
@@ -286,11 +286,11 @@ const auditLogger = (req, res, next) => {
     } catch (err) {
       console.error('Error processing response body:', err);
     }
-    
+
     // Call the original send function
     return originalSend.apply(res, arguments);
   };
-  
+
   next();
 };
 
