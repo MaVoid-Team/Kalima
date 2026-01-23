@@ -77,12 +77,10 @@ h6 {
 /* Premium Layout Utilities */
 .section-divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(175, 13, 14, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(175, 13, 14, 0.1),
+      transparent);
 }
 
 .perspective-1000 {
@@ -93,13 +91,16 @@ h6 {
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: white;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #f0f0f0;
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #af0d0e;
 }
@@ -125,10 +126,12 @@ html {
 
 /* Animations */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-20px);
   }
@@ -138,13 +141,27 @@ html {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Brand Colors & Gradients */
+/* Brand Colors & Gradients - Using Theme Variables */
 :root {
-  --brand-red: #af0d0e;
+  --brand-red: var(--color-primary);
   --brand-orange: #ff5c28;
   --brand-yellow: #facc15;
-  --brand-gradient: linear-gradient(135deg, #af0d0e 0%, #ff5c28 100%);
-  --brand-gradient-warm: linear-gradient(135deg, #ff5c28 0%, #facc15 100%);
+}
+
+/* Semantic Gradient Utilities */
+.gradient-brand {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #ff5c28 100%);
+}
+
+.gradient-brand-horizontal {
+  background: linear-gradient(90deg, var(--color-primary) 0%, #ff5c28 100%);
+}
+
+.text-gradient-brand {
+  background: linear-gradient(90deg, var(--color-primary) 0%, #d4342c 50%, #ff5c28 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Glass Navbar */
@@ -160,9 +177,11 @@ html {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -178,6 +197,7 @@ html {
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -189,6 +209,7 @@ html {
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(-100%);
@@ -197,9 +218,12 @@ html {
 
 /* Pulse Glow Effect */
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(175, 13, 14, 0.3);
   }
+
   50% {
     box-shadow: 0 0 40px rgba(175, 13, 14, 0.5);
   }

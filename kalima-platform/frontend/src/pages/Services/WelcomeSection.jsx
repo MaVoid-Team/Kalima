@@ -99,7 +99,7 @@ const WelcomeSection = memo(() => {
                   </motion.div>
                 ) : (
                   <div className="relative">
-                    <div className="w-14 h-14 border-4 border-gray-200 border-t-[#AF0D0E] rounded-full " />
+                    <div className="w-14 h-14 border-4 border-base-content/20 border-t-primary rounded-full " />
                   </div>
                 )}
               </div>
@@ -108,9 +108,8 @@ const WelcomeSection = memo(() => {
 
           {/* Content Side */}
           <div
-            className={`w-full lg:w-[55%] flex flex-col space-y-5 sm:space-y-6 lg:space-y-7 order-2 lg:order-1 items-start ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`w-full lg:w-[55%] flex flex-col space-y-5 sm:space-y-6 lg:space-y-7 order-2 lg:order-1 items-start ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             {/* Premium Badge */}
             <motion.div
@@ -120,15 +119,15 @@ const WelcomeSection = memo(() => {
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-3 py-2.5 shadow-[#AF0D0E]/5"
+                className="inline-flex items-center gap-3 py-2.5 shadow-primary/5"
               >
-                <Rocket className="w-5 h-5 text-[#AF0D0E]" />
-                <span className="text-sm font-bold bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] bg-clip-text text-transparent">
+                <Rocket className="w-5 h-5 text-primary" />
+                <span className="text-sm font-bold text-gradient-brand">
                   {isRTL
                     ? "تحلق في سماء الإبداع"
                     : "Soar in the Sky of Creativity"}
                 </span>
-                <Sparkles className="w-4 h-4 text-[#FF5C28]" />
+                <Sparkles className="w-4 h-4 text-accent" />
               </motion.div>
             </motion.div>
 
@@ -138,12 +137,12 @@ const WelcomeSection = memo(() => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-gray-900 leading-[1.1] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-base-content leading-[1.1] tracking-tight">
                 {isRTL ? (
                   <>
                     <span>منصة </span>
                     <span className="relative inline-block">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#D4342C] to-[#FF5C28]">
+                      <span className="text-gradient-brand">
                         كلمة
                       </span>
                       {/* Underline decoration */}
@@ -151,7 +150,7 @@ const WelcomeSection = memo(() => {
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] rounded-full origin-right"
+                        className="absolute -bottom-1 left-0 right-0 h-1 gradient-brand-horizontal rounded-full origin-right"
                       />
                     </span>
                     <span> التعليمية</span>
@@ -159,14 +158,14 @@ const WelcomeSection = memo(() => {
                 ) : (
                   <>
                     <span className="relative inline-block">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#D4342C] to-[#FF5C28]">
+                      <span className="text-gradient-brand">
                         Kalima
                       </span>
                       <motion.span
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] rounded-full origin-left"
+                        className="absolute -bottom-1 left-0 right-0 h-1 gradient-brand-horizontal rounded-full origin-left"
                       />
                     </span>
                     <span> Learning Platform</span>
@@ -180,7 +179,7 @@ const WelcomeSection = memo(() => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl font-medium mb-8"
+              className="text-base sm:text-lg text-base-content/60 leading-relaxed max-w-xl font-medium mb-8"
             >
               {isRTL
                 ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
@@ -202,14 +201,12 @@ const WelcomeSection = memo(() => {
                       ? "ابحث عن دورة، معلم، أو مادة..."
                       : "Search for courses, teachers..."
                   }
-                  className={`w-full h-12 sm:h-14 ${
-                    isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
-                  } bg-white border-2 border-gray-100 rounded-2xl shadow-sm focus:outline-none focus:border-red-500/30 focus:ring-4 focus:ring-red-500/10 transition-all text-sm sm:text-base`}
+                  className={`w-full h-12 sm:h-14 ${isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
+                    } bg-base-100 border-2 border-base-content/10 rounded-2xl shadow-sm focus:outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all text-sm sm:text-base`}
                 />
                 <button
-                  className={`absolute top-1.5 bottom-1.5 ${
-                    isRTL ? "left-1.5" : "right-1.5"
-                  } px-4 sm:px-6 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold rounded-xl shadow-lg shadow-red-500/20 hover:shadow-red-500/30 hover:scale-105 transition-all text-sm`}
+                  className={`absolute top-1.5 bottom-1.5 ${isRTL ? "left-1.5" : "right-1.5"
+                    } px-4 sm:px-6 gradient-brand text-primary-content font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all text-sm`}
                 >
                   {isRTL ? "بحث" : "Search"}
                 </button>
@@ -230,7 +227,7 @@ const WelcomeSection = memo(() => {
                 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleNavigateCourses}
-                className="group px-7 py-4 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white rounded-2xl font-bold text-base flex items-center gap-3 shadow-xl shadow-red-500/20 transition-all duration-300"
+                className="group px-7 py-4 gradient-brand text-primary-content rounded-2xl font-bold text-base flex items-center gap-3 shadow-xl shadow-primary/20 transition-all duration-300"
               >
                 <BookOpen className="w-5 h-5" strokeWidth={2.5} />
                 <span>{isRTL ? "تصفح الكورسات" : "Browse Courses"}</span>
@@ -243,11 +240,11 @@ const WelcomeSection = memo(() => {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleNavigateTeachers}
-                className="group px-7 py-4 bg-white text-gray-900 hover:text-[#AF0D0E] rounded-2xl font-bold text-base flex items-center gap-3 border-2 border-gray-100 hover:border-[#AF0D0E]/20 shadow-lg shadow-gray-200/50 hover:shadow-red-500/10 transition-all duration-300"
+                className="group px-7 py-4 bg-base-100 text-base-content hover:text-primary rounded-2xl font-bold text-base flex items-center gap-3 border-2 border-base-content/10 hover:border-primary/20 shadow-lg shadow-base-content/10 hover:shadow-primary/10 transition-all duration-300"
               >
-                <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-[#AF0D0E]/10 flex items-center justify-center transition-colors duration-300">
+                <div className="w-6 h-6 rounded-full bg-base-200 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
                   <Play
-                    className={`w-3.5 h-3.5 fill-current text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300 ${!isRTL && "rotate-180"}`}
+                    className={`w-3.5 h-3.5 fill-current text-base-content/50 group-hover:text-primary transition-colors duration-300 ${!isRTL && "rotate-180"}`}
                   />
                 </div>
                 <span>{isRTL ? "المعلمين" : "Teachers"}</span>
