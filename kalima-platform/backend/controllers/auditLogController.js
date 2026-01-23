@@ -278,6 +278,20 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
   // Create a base query (do not filter by user.role at DB level)
   const query = AuditLog.find();
 
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   // Apply query features (filtering, sorting, pagination)
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -351,6 +365,20 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
   // Create a base query filtered by resource type
   const query = AuditLog.find({ "resource.type": resourceType });
 
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   // Apply query features
   const features = new QueryFeatures(query, req.query)
     .filter()
@@ -405,6 +433,21 @@ exports.getUserAuditLogsByEmail = catchAsync(async (req, res, next) => {
 
   // Query logs by userId
   const query = AuditLog.find({ "user.userId": user._id });
+
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
@@ -465,6 +508,20 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
     "resource.type": resourceType,
     "resource.id": resourceId
   });
+
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
 
   // Apply query features
   const features = new QueryFeatures(query, req.query)
