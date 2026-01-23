@@ -8,6 +8,7 @@ const { sendEmail } = require("../utils/emailVerification/emailService");
 const { DateTime } = require("luxon");
 const Notification = require("../models/notification");
 const User = require("../models/userModel");
+const { emitBellNotification } = require("../utils/bellNotification");
 const mongoose = require("mongoose");
 
 // Function to get current time in Egypt timezone
@@ -332,6 +333,24 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     );
     // Don't fail the purchase if notifications fail
   }
+
+  // --- Emit bell sound notification to admins via Socket.io ---
+  try {
+    const io = req.app.get("io");
+    if (io) {
+      await emitBellNotification(io, {
+        purchaseId: purchase._id,
+        purchaseSerial: purchaseSerial,
+        customerName: req.user.name,
+        customerEmail: req.user.email,
+        total: cart.total,
+        itemCount: cart.items.length,
+      });
+    }
+  } catch (err) {
+    console.error("Failed to emit bell notification:", err);
+  }
+
   // Update user statistics: increment purchase count and total spent
   let updatedUser = await User.findById(req.user._id);
 
@@ -950,19 +969,19 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
 exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
   const startDate = req.query.startDate
     ? DateTime.fromISO(req.query.startDate)
-        .setZone("Africa/Cairo")
-        .startOf("day")
-        .toJSDate()
+      .setZone("Africa/Cairo")
+      .startOf("day")
+      .toJSDate()
     : DateTime.fromJSDate(DEFAULT_STATS_START_DATE)
-        .setZone("Africa/Cairo")
-        .startOf("day")
-        .toJSDate();
+      .setZone("Africa/Cairo")
+      .startOf("day")
+      .toJSDate();
 
   const endDate = req.query.endDate
     ? DateTime.fromISO(req.query.endDate)
-        .setZone("Africa/Cairo")
-        .endOf("day")
-        .toJSDate()
+      .setZone("Africa/Cairo")
+      .endOf("day")
+      .toJSDate()
     : getCurrentEgyptTime().endOf("day").toJSDate();
 
   // Get purchases within date range
@@ -1820,17 +1839,17 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
       const avgResponseMinutes =
         stat.responseTimesMinutes.length > 0
           ? Math.round(
-              stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
-                stat.responseTimesMinutes.length,
-            )
+            stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
+            stat.responseTimesMinutes.length,
+          )
           : 0;
 
       const avgConfirmationMinutes =
         stat.confirmationTimesMinutes.length > 0
           ? Math.round(
-              stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
-                stat.confirmationTimesMinutes.length,
-            )
+            stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
+            stat.confirmationTimesMinutes.length,
+          )
           : 0;
 
       // Format minutes to "Xh Ym" format

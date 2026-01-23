@@ -161,6 +161,7 @@ mongoose.connection.once("open", () => {
       methods: ["GET", "POST"],
       credentials: true,
     },
+    path: "/socket.io",
     pingTimeout: 60000, // Increase ping timeout for better connection stability
   });
 
