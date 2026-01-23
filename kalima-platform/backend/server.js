@@ -67,7 +67,7 @@ const ecCartRoutes = require("./routes/ec.cartRoutes");
 const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
 const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
 const ecPaymentMethodRoutes = require("./routes/paymentMethodRoutes");
-const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes.js");
+const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes");
 
 connectDB();
 
