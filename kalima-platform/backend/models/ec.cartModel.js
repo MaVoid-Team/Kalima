@@ -134,6 +134,7 @@ cartSchema.methods.addItem = async function (productId) {
       serial: product.serial,
       originalPrice: product.price,
       priceAfterDiscount: product.priceAfterDiscount,
+      paymentNumber: product.paymentNumber,
     },
   });
   this.items.push(cartItem._id);
@@ -236,30 +237,7 @@ cartSchema.methods.convertToPurchases = async function (checkoutData) {
       throw new Error("Missing required book details");
     }
 
-    for (const item of bookItems) {
-      const purchase = await ECBookPurchase.create({
-        userName: this.user.name,
-        productName: item.productSnapshot.title,
-        productId: item.product,
-        price: item.priceAtAdd,
-        finalPrice: item.finalPrice,
-        numberTransferredFrom: checkoutData.numberTransferredFrom,
-        paymentNumber: item.productSnapshot.paymentNumber,
-        purchaseSerial: `${this.user.userSerial}-${item.productSnapshot.section.number}-${item.productSnapshot.serial}`,
-        createdBy: this.user._id,
-        paymentScreenShot: checkoutData.paymentScreenShot,
-        nameOnBook: checkoutData.nameOnBook,
-        numberOnBook: checkoutData.numberOnBook,
-        seriesName: checkoutData.seriesName,
-        couponCode: this.couponCode,
-      });
-      purchases.push(purchase);
-    }
-  }
-
-  // Process regular product purchases
-  for (const item of productItems) {
-    const purchase = await ECPurchase.create({
+    const bookPurchasesData = bookItems.map((item) => ({
       userName: this.user.name,
       productName: item.productSnapshot.title,
       productId: item.product,
@@ -270,9 +248,40 @@ cartSchema.methods.convertToPurchases = async function (checkoutData) {
       purchaseSerial: `${this.user.userSerial}-${item.productSnapshot.section.number}-${item.productSnapshot.serial}`,
       createdBy: this.user._id,
       paymentScreenShot: checkoutData.paymentScreenShot,
+      nameOnBook: checkoutData.nameOnBook,
+      numberOnBook: checkoutData.numberOnBook,
+      seriesName: checkoutData.seriesName,
       couponCode: this.couponCode,
-    });
-    purchases.push(purchase);
+    }));
+
+    if (bookPurchasesData.length > 0) {
+      const createdBookPurchases = await ECBookPurchase.insertMany(
+        bookPurchasesData
+      );
+      purchases.push(...createdBookPurchases);
+    }
+  }
+
+  // Process regular product purchases
+  const productPurchasesData = productItems.map((item) => ({
+    userName: this.user.name,
+    productName: item.productSnapshot.title,
+    productId: item.product,
+    price: item.priceAtAdd,
+    finalPrice: item.finalPrice,
+    numberTransferredFrom: checkoutData.numberTransferredFrom,
+    paymentNumber: item.productSnapshot.paymentNumber,
+    purchaseSerial: `${this.user.userSerial}-${item.productSnapshot.section.number}-${item.productSnapshot.serial}`,
+    createdBy: this.user._id,
+    paymentScreenShot: checkoutData.paymentScreenShot,
+    couponCode: this.couponCode,
+  }));
+
+  if (productPurchasesData.length > 0) {
+    const createdProductPurchases = await ECPurchase.insertMany(
+      productPurchasesData
+    );
+    purchases.push(...createdProductPurchases);
   }
 
   return purchases;

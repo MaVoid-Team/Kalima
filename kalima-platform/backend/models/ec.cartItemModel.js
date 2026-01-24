@@ -47,6 +47,7 @@ const cartItemSchema = new mongoose.Schema(
         required: true,
       },
       priceAfterDiscount: Number,
+      paymentNumber: String,
     },
   },
   {
