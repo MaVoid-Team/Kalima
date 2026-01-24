@@ -13,12 +13,25 @@ exports.getAllSubSections = catchAsync(async (req, res, next) => {
     .exec();
 
   // Manually fetch products for each subsection
-  const subsectionsWithProducts = await Promise.all(
-    subsections.map(async (subsection) => {
-      const products = await Product.find({ subSection: subsection._id });
-      return { ...subsection, products };
-    })
-  );
+  const subsectionIds = subsections.map((sub) => sub._id);
+  const allProducts = await Product.find({ subSection: { $in: subsectionIds } });
+
+  const productsBySubsection = {};
+  subsectionIds.forEach((id) => {
+    productsBySubsection[id.toString()] = [];
+  });
+
+  allProducts.forEach((product) => {
+    const subId = product.subSection.toString();
+    if (productsBySubsection[subId]) {
+      productsBySubsection[subId].push(product);
+    }
+  });
+
+  const subsectionsWithProducts = subsections.map((subsection) => ({
+    ...subsection,
+    products: productsBySubsection[subsection._id.toString()] || [],
+  }));
 
   res.status(200).json({
     status: "success",
@@ -58,12 +71,25 @@ exports.getSubsectionsBySection = catchAsync(async (req, res, next) => {
     .exec();
 
   // Fetch products for each subsection
-  const subsectionsWithProducts = await Promise.all(
-    subsections.map(async (subsection) => {
-      const products = await Product.find({ subSection: subsection._id });
-      return { ...subsection, products };
-    })
-  );
+  const subsectionIds = subsections.map((sub) => sub._id);
+  const allProducts = await Product.find({ subSection: { $in: subsectionIds } });
+
+  const productsBySubsection = {};
+  subsectionIds.forEach((id) => {
+    productsBySubsection[id.toString()] = [];
+  });
+
+  allProducts.forEach((product) => {
+    const subId = product.subSection.toString();
+    if (productsBySubsection[subId]) {
+      productsBySubsection[subId].push(product);
+    }
+  });
+
+  const subsectionsWithProducts = subsections.map((subsection) => ({
+    ...subsection,
+    products: productsBySubsection[subsection._id.toString()] || [],
+  }));
 
   res.status(200).json({
     status: "success",
