@@ -91,7 +91,7 @@ export const getBookById = async (bookId) => {
 export const getProductById = async (productId) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/v1/ec/products/${productId}`,
+      `${API_URL}/ec/products/${productId}`,
       {
         withCredentials: true,
         headers: {

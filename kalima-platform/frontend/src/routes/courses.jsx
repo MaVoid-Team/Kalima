@@ -9,7 +9,7 @@ export const getAllSubjects = async () => {
     if (!isLoggedIn()) {
       throw new Error("Not authenticated");
     }
-    const response = await axios.get(`${API_URL}/api/v1/subjects/`, {
+    const response = await axios.get(`${API_URL}/subjects/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
