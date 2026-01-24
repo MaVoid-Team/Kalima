@@ -142,15 +142,27 @@ exports.getECReferralStatsByUser = async (req, res, next) => {
 
 // Helper: Recalculate successfulInvites for a single inviter
 exports.recalculateInviterSuccessfulInvites = async (inviterId) => {
-    // Find all users referred by this inviter
-    const referredUsers = await User.find({ referredBy: inviterId }, '_id');
-    let inviteCount = 0;
-    for (const user of referredUsers) {
-        const purchaseCount = await ECPurchase.countDocuments({ createdBy: user._id });
-        if (purchaseCount > 0) inviteCount++;
-    }
+    // Optimized: Use aggregation to count purchases for referred users in one query
+    const result = await User.aggregate([
+        { $match: { referredBy: new mongoose.Types.ObjectId(inviterId) } },
+        {
+            $lookup: {
+                from: ECPurchase.collection.name,
+                localField: "_id",
+                foreignField: "createdBy",
+                as: "purchases"
+            }
+        },
+        { $match: { "purchases.0": { $exists: true } } },
+        { $count: "inviteCount" }
+    ]);
+
+    const inviteCount = result.length > 0 ? result[0].inviteCount : 0;
+
     // Find inviter's role
     const inviter = await User.findById(inviterId);
+    if (!inviter) return;
+
     let Model;
     switch (inviter.role) {
         case "Student": Model = Student; break;
