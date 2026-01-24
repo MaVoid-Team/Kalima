@@ -12,13 +12,27 @@ exports.getAllSubSections = catchAsync(async (req, res, next) => {
     .lean()
     .exec();
 
-  // Manually fetch products for each subsection
-  const subsectionsWithProducts = await Promise.all(
-    subsections.map(async (subsection) => {
-      const products = await Product.find({ subSection: subsection._id });
-      return { ...subsection, products };
-    })
-  );
+  // Fetch all products for the retrieved subsections in one query
+  const subsectionIds = subsections.map((s) => s._id);
+  const allProducts = await Product.find({ subSection: { $in: subsectionIds } }).lean();
+
+  // Group products by subsection ID for efficient mapping
+  const productsBySubsection = {};
+  for (const product of allProducts) {
+    const subId = String(product.subSection);
+    if (!productsBySubsection[subId]) {
+      productsBySubsection[subId] = [];
+    }
+    productsBySubsection[subId].push(product);
+  }
+
+  // Map products back to subsections
+  const subsectionsWithProducts = subsections.map((subsection) => {
+    return {
+      ...subsection,
+      products: productsBySubsection[String(subsection._id)] || [],
+    };
+  });
 
   res.status(200).json({
     status: "success",
@@ -57,13 +71,27 @@ exports.getSubsectionsBySection = catchAsync(async (req, res, next) => {
     .lean()
     .exec();
 
-  // Fetch products for each subsection
-  const subsectionsWithProducts = await Promise.all(
-    subsections.map(async (subsection) => {
-      const products = await Product.find({ subSection: subsection._id });
-      return { ...subsection, products };
-    })
-  );
+  // Fetch all products for the retrieved subsections in one query
+  const subsectionIds = subsections.map((s) => s._id);
+  const allProducts = await Product.find({ subSection: { $in: subsectionIds } }).lean();
+
+  // Group products by subsection ID for efficient mapping
+  const productsBySubsection = {};
+  for (const product of allProducts) {
+    const subId = String(product.subSection);
+    if (!productsBySubsection[subId]) {
+      productsBySubsection[subId] = [];
+    }
+    productsBySubsection[subId].push(product);
+  }
+
+  // Map products back to subsections
+  const subsectionsWithProducts = subsections.map((subsection) => {
+    return {
+      ...subsection,
+      products: productsBySubsection[String(subsection._id)] || [],
+    };
+  });
 
   res.status(200).json({
     status: "success",
