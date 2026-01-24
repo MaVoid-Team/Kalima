@@ -70,47 +70,92 @@ exports.getHomeworkHierarchy = catchAsync(async (req, res, next) => {
   
   const lecturerId = assistant.assignedLecturer;
   
-  // Find all top-level containers created by this lecturer
-  const topLevelContainers = await Container.find({ 
-    createdBy: lecturerId,
-    parent: null,
-    kind: { $ne: 'Lecture' } // Exclude lectures from top level query
+  // 1. Fetch all containers created by the lecturer
+  const allContainers = await Container.find({
+    createdBy: lecturerId
   }).lean();
+
+  // 2. Fetch all top-level lectures
+  const topLevelLectures = await Lecture.find({
+    createdBy: lecturerId,
+    parent: null
+  }).lean();
+
+  // 3. Identify all lecture IDs (from containers with kind='Lecture' and top-level lectures)
+  const lectureContainerIds = allContainers
+    .filter(c => c.kind === 'Lecture')
+    .map(c => c._id);
   
-  // Function to recursively get container hierarchy with homework counts
-  const getContainerWithChildren = async (container) => {
-    // Get all child containers
-    const children = await Container.find({ 
-      parent: container._id 
-    }).lean();
+  const topLevelLectureIds = topLevelLectures.map(l => l._id);
+  const allLectureIds = [...lectureContainerIds, ...topLevelLectureIds];
+
+  // 4. Aggregate attachment counts for all these lectures
+  const attachmentCounts = await Attachment.aggregate([
+    {
+      $match: {
+        lectureId: { $in: allLectureIds },
+        type: 'homeworks',
+        studentId: { $ne: null }
+      }
+    },
+    {
+      $group: {
+        _id: '$lectureId',
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  // Create a map for easy lookup: lectureId -> count
+  const countMap = {};
+  attachmentCounts.forEach(item => {
+    countMap[item._id.toString()] = item.count;
+  });
+
+  // 5. Build the container hierarchy in memory
+  // First, group containers by parent ID
+  const containersByParent = {};
+  const topLevelContainerList = [];
+
+  allContainers.forEach(container => {
+    if (container.parent) {
+      const parentId = container.parent.toString();
+      if (!containersByParent[parentId]) {
+        containersByParent[parentId] = [];
+      }
+      containersByParent[parentId].push(container);
+    } else if (container.kind !== 'Lecture') {
+      // Top level container
+      topLevelContainerList.push(container);
+    }
+  });
+
+  // Function to recursively build tree and calculate counts
+  const buildTree = (container) => {
+    const children = containersByParent[container._id.toString()] || [];
     
-    // Process each child (container or lecture)
-    const processedChildren = await Promise.all(children.map(async (child) => {
+    // Process children
+    const processedChildren = children.map(child => {
       if (child.kind === 'Lecture') {
-        // For lectures, count homework submissions
-        const submissionCount = await Attachment.countDocuments({
-          lectureId: child._id,
-          type: 'homeworks',
-          studentId: { $ne: null }
-        });
-        
+        // It's a lecture container
+        const count = countMap[child._id.toString()] || 0;
         return {
           ...child,
-          hasSubmissions: submissionCount > 0,
-          submissionCount
+          hasSubmissions: count > 0,
+          submissionCount: count
         };
       } else {
-        // For containers, process recursively
-        return await getContainerWithChildren(child);
+        // It's a folder container, recurse
+        return buildTree(child);
       }
-    }));
-    
-    // Calculate total submission count for this container and all its children
+    });
+
+    // Calculate total count for this container
     const totalSubmissionCount = processedChildren.reduce(
       (sum, child) => sum + (child.submissionCount || 0), 
       0
     );
-    
+
     return {
       ...container,
       children: processedChildren,
@@ -118,33 +163,19 @@ exports.getHomeworkHierarchy = catchAsync(async (req, res, next) => {
       submissionCount: totalSubmissionCount
     };
   };
-  
-  // Process all top level containers
-  const hierarchy = await Promise.all(
-    topLevelContainers.map(container => getContainerWithChildren(container))
-  );
-  
-  // Also get top-level lectures (not in any container)
-  const topLevelLectures = await Lecture.find({ 
-    createdBy: lecturerId,
-    parent: null
-  }).lean();
-  
-  const processedTopLevelLectures = await Promise.all(
-    topLevelLectures.map(async (lecture) => {
-      const submissionCount = await Attachment.countDocuments({
-        lectureId: lecture._id,
-        type: 'homeworks',
-        studentId: { $ne: null }
-      });
-      
-      return {
-        ...lecture,
-        hasSubmissions: submissionCount > 0,
-        submissionCount
-      };
-    })
-  );
+
+  // Build hierarchy for top level containers
+  const hierarchy = topLevelContainerList.map(container => buildTree(container));
+
+  // Process top level lectures
+  const processedTopLevelLectures = topLevelLectures.map(lecture => {
+    const count = countMap[lecture._id.toString()] || 0;
+    return {
+      ...lecture,
+      hasSubmissions: count > 0,
+      submissionCount: count
+    };
+  });
   
   res.status(200).json({
     status: 'success',
