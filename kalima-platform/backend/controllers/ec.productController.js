@@ -142,8 +142,12 @@ exports.updateProduct = async (req, res) => {
             if (file.size > 150 * 1024 * 1024) {
                 return res.status(400).json({ message: "Sample file size must be <= 150MB" });
             }
-            if (existingProduct.sample && fs.existsSync(existingProduct.sample)) {
-                fs.unlinkSync(existingProduct.sample);
+            if (existingProduct.sample) {
+                try {
+                    await fs.promises.unlink(existingProduct.sample);
+                } catch (err) {
+                    if (err.code !== 'ENOENT') throw err;
+                }
             }
             updateData.sample = file.path;
         }
@@ -158,8 +162,12 @@ exports.updateProduct = async (req, res) => {
             if (file.size > 5 * 1024 * 1024) {
                 return res.status(400).json({ message: "Thumbnail file size must be <= 5MB" });
             }
-            if (existingProduct.thumbnail && fs.existsSync(existingProduct.thumbnail)) {
-                fs.unlinkSync(existingProduct.thumbnail);
+            if (existingProduct.thumbnail) {
+                try {
+                    await fs.promises.unlink(existingProduct.thumbnail);
+                } catch (err) {
+                    if (err.code !== 'ENOENT') throw err;
+                }
             }
             updateData.thumbnail = file.path;
         }
@@ -176,11 +184,13 @@ exports.updateProduct = async (req, res) => {
                 }
             }
             if (existingProduct.gallery?.length > 0) {
-                existingProduct.gallery.forEach((imagePath) => {
-                    if (fs.existsSync(imagePath)) {
-                        fs.unlinkSync(imagePath);
+                await Promise.all(existingProduct.gallery.map(async (imagePath) => {
+                    try {
+                        await fs.promises.unlink(imagePath);
+                    } catch (err) {
+                        if (err.code !== 'ENOENT') throw err;
                     }
-                });
+                }));
             }
             updateData.gallery = req.files.gallery.map((file) => file.path);
         } else if (updateData.gallery) {
@@ -213,8 +223,12 @@ exports.deleteProduct = async (req, res) => {
         const product = await ECProduct.findByIdAndDelete(req.params.id);
         if (!product) return res.status(404).json({ message: "Product not found" });
         // Optionally delete the sample file
-        if (product.sample && fs.existsSync(product.sample)) {
-            fs.unlinkSync(product.sample);
+        if (product.sample) {
+            try {
+                await fs.promises.unlink(product.sample);
+            } catch (err) {
+                if (err.code !== 'ENOENT') throw err;
+            }
         }
         res.status(200).json({
             status: "success",
