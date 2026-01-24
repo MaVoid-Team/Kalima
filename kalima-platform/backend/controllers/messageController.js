@@ -2,6 +2,7 @@
 const Parent = require("../models/parentModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const pLimit = require('p-limit');
 
 // Mock WhatsApp service (replace with actual WhatsApp API integration)
 const whatsappService = {
@@ -29,9 +30,10 @@ exports.sendBulkMessages = catchAsync(async (req, res, next) => {
     return next(new AppError("No parents found for the specified students", 404));
   }
 
-  
+  const limit = pLimit(50); // Limit concurrency to 50
+
   const results = await Promise.all(
-    parents.map(async parent => {
+    parents.map(parent => limit(async () => {
       try {
         // Personalize message - you can add more variables here
         const personalizedMessage = message
@@ -55,7 +57,7 @@ exports.sendBulkMessages = catchAsync(async (req, res, next) => {
           error: error.message
         };
       }
-    })
+    }))
   );
 
   res.status(200).json({
