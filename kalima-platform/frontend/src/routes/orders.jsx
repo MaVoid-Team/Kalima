@@ -1,9 +1,9 @@
-import axios from "axios"
-import { getToken } from "./auth-services"
+import axios from "axios";
+import { getToken } from "./auth-services";
 
 // Function to check if user is logged in
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 const isLoggedIn = () => {
   return !!getToken();
 };
@@ -11,7 +11,7 @@ const isLoggedIn = () => {
 export const getAllProductPurchases = async (queryParams = {}) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
     const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/all`, {
       params: {
@@ -39,13 +39,12 @@ export const getAllProductPurchases = async (queryParams = {}) => {
       error: `Failed to fetch cart purchases: ${error.message}`,
     };
   }
-}
-
+};
 
 export const receiveProductPurchase = async (purchaseId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     const response = await axios.patch(
@@ -55,9 +54,9 @@ export const receiveProductPurchase = async (purchaseId) => {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return {
@@ -75,7 +74,7 @@ export const receiveProductPurchase = async (purchaseId) => {
 export const confirmProductPurchase = async (purchaseId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     const response = await axios.patch(
@@ -85,9 +84,9 @@ export const confirmProductPurchase = async (purchaseId) => {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return {
@@ -104,7 +103,7 @@ export const confirmProductPurchase = async (purchaseId) => {
 export const ReturnProductPurchase = async (purchaseId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     const response = await axios.patch(
@@ -114,9 +113,9 @@ export const ReturnProductPurchase = async (purchaseId) => {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     return {
@@ -126,7 +125,7 @@ export const ReturnProductPurchase = async (purchaseId) => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to confirm purchase: ${error.message}`,
+      error: `Failed to return purchase: ${error.message}`,
     };
   }
 };
@@ -138,19 +137,22 @@ export const confirmBookPurchase = async (purchaseId) => {
 export const getAllStats = async (endDate = null, startDate = null) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
-    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/statistics`, {
-      params: {
-        endDate,
-        startDate,
+    const response = await axios.get(
+      `${API_URL}/ec/cart-purchases/admin/statistics`,
+      {
+        params: {
+          endDate,
+          startDate,
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
       },
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
+    );
 
     return {
       success: true,
@@ -167,13 +169,13 @@ export const getAllStats = async (endDate = null, startDate = null) => {
 export const getProductStats = async (endDate = null) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     let url = `${API_URL}/ec/cart-purchases/admin/product-statistics`;
 
     if (endDate) {
-      url = `${API_URL}/ec/cart-purchases/admin/product-statistics?endDate=${endDate}`
+      url = `${API_URL}/ec/cart-purchases/admin/product-statistics?endDate=${endDate}`;
     }
 
     const response = await axios.get(url, {
@@ -198,15 +200,18 @@ export const getProductStats = async (endDate = null) => {
 export const getResponseTimeStats = async () => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
-    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/response-time`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
+    const response = await axios.get(
+      `${API_URL}/ec/cart-purchases/admin/response-time`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
       },
-    });
+    );
 
     return {
       success: true,
@@ -223,11 +228,14 @@ export const getResponseTimeStats = async () => {
 export const updatePurchase = async (purchaseId, updateData) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
 
     // If only adminNotes are being updated, use the dedicated admin-note endpoint
-    if (Object.keys(updateData).length === 1 && updateData.adminNotes !== undefined) {
+    if (
+      Object.keys(updateData).length === 1 &&
+      updateData.adminNotes !== undefined
+    ) {
       const response = await axios.patch(
         `${API_URL}/ec/cart-purchases/${purchaseId}/admin-note`,
         { adminNotes: updateData.adminNotes },
@@ -235,9 +243,9 @@ export const updatePurchase = async (purchaseId, updateData) => {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       return {
@@ -247,13 +255,17 @@ export const updatePurchase = async (purchaseId, updateData) => {
     }
 
     // Fallback for other updates
-    const response = await axios.patch(`${API_URL}/ec/purchases/${purchaseId}`, updateData, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-        'Content-Type': 'application/json',
+    const response = await axios.patch(
+      `${API_URL}/ec/purchases/${purchaseId}`,
+      updateData,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     return {
       success: true,
@@ -271,14 +283,17 @@ export const updatePurchase = async (purchaseId, updateData) => {
 export const deleteProductPurchase = async (purchaseId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    const response = await axios.delete(`${API_URL}/ec/cart-purchases/${purchaseId}`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
+    const response = await axios.delete(
+      `${API_URL}/ec/cart-purchases/${purchaseId}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
       },
-    });
+    );
     return {
       success: true,
       data: response.data,
@@ -295,41 +310,46 @@ export const deleteProductPurchase = async (purchaseId) => {
 export const deleteItemFromPurchase = async (purchaseId, itemId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error("Not authenticated")
+      throw new Error("Not authenticated");
     }
     const response = await axios.delete(
-      `${API_URL}/api/v1/ec/cart-purchases/delete/${purchaseId}/item/${itemId}`,
+      `${API_URL}/ec/cart-purchases/delete/${purchaseId}/item/${itemId}`,
       {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
-      }
-    )
+      },
+    );
     return {
       success: true,
       data: response.data,
-    }
+    };
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || `Failed to delete item from purchase: ${error.message}`,
-    }
+      error:
+        error.response?.data?.message ||
+        `Failed to delete item from purchase: ${error.message}`,
+    };
   }
-}
+};
 
 // Delete a book purchase
 export const deleteBookPurchase = async (purchaseId) => {
   try {
     if (!isLoggedIn()) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    const response = await axios.delete(`${API_URL}/ec/book-purchases/${purchaseId}`, {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
+    const response = await axios.delete(
+      `${API_URL}/ec/book-purchases/${purchaseId}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
       },
-    });
+    );
     return {
       success: true,
       data: response.data,

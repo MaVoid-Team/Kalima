@@ -17,8 +17,6 @@ router.route("/")
 
 router.route("/:id")
     .get(
-        verifyJWT,
-        authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
         whatsAppNumberController.getWhatsAppNumberById
     )
     .put(

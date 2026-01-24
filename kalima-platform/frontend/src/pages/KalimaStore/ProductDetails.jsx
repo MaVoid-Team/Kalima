@@ -13,12 +13,15 @@ import { ShoppingCart, Zap, X, LogIn, UserPlus } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 // Import components
-import ProductHeader from "./components/ProductHeader"
-import ProductGallery from "./components/ProductsGallery"
-import SampleDownload from "./components/SampleDownload"
-import ProductInfo from "./components/ProductInfo"
-import PaymentSection from "./components/PaymentSection"
-import PurchaseForm from "./components/PurchaseForm"
+import ProductHeader from "./components/ProductHeader";
+import ProductGallery from "./components/ProductsGallery";
+import SampleDownload from "./components/SampleDownload";
+import ProductInfo from "./components/ProductInfo";
+import PaymentSection from "./components/PaymentSection";
+
+import PurchaseForm from "./components/PurchaseForm";
+import KalimaLoader from "../../components/KalimaLoader";
+import { trackViewContent, trackAddToCart } from "../../hooks/useMetaPixel";
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
@@ -98,8 +101,18 @@ const ProductDetails = () => {
           setProduct(itemData)
 
           // Set initial price to the display price (priceAfterDiscount if available)
-          const initialDisplayPrice = getDisplayPrice(itemData)
-          setFinalPrice(initialDisplayPrice)
+          const initialDisplayPrice = getDisplayPrice(itemData);
+          setFinalPrice(initialDisplayPrice);
+
+          // Track ViewContent event for Meta Pixel
+          trackViewContent({
+            contentName: itemData.title,
+            contentCategory: itemData.section?.name || 'Products',
+            contentIds: [itemData._id],
+            contentType: itemData.__t === 'ECBook' ? 'book' : 'product',
+            value: initialDisplayPrice,
+            currency: 'EGP',
+          });
 
           // Check if user has purchased this product
           if (isLoggedIn()) {
@@ -140,7 +153,7 @@ const ProductDetails = () => {
       const confirmMessage = isRTL
         ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
         : "You have already purchased this product. Do you want to buy it again?";
-      
+
       if (!window.confirm(confirmMessage)) {
         return; // User cancelled
       }
@@ -150,14 +163,33 @@ const ProductDetails = () => {
       setAddingToCart(true)
       const result = await addToCart(product._id)
       if (result.success) {
-        toast.success(t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!")
+        // Track AddToCart event for Meta Pixel
+        trackAddToCart({
+          contentName: product.title,
+          contentIds: [product._id],
+          contentType: product.__t === 'ECBook' ? 'book' : 'product',
+          value: getDisplayPrice(product),
+          currency: 'EGP',
+        });
+
+        toast.success(
+          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
+        );
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"))
       } else {
-        toast.error(result.error || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
+        toast.error(
+          result.error ||
+          t("errors.addToCartFailed") ||
+          "فشل في الإضافة إلى السلة",
+        );
       }
     } catch (error) {
-      toast.error(error.message || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
+      toast.error(
+        error.message ||
+        t("errors.addToCartFailed") ||
+        "فشل في الإضافة إلى السلة",
+      );
     } finally {
       setAddingToCart(false)
     }
@@ -309,7 +341,7 @@ const ProductDetails = () => {
           notes: "",
         })
         handleRemoveCoupon() // Also reset coupon state
-// dummy comment to re-commit
+        // dummy comment to re-commit
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
       } else {
@@ -369,7 +401,7 @@ const ProductDetails = () => {
               </div>
               <div className="p-8 lg:p-12 border-l border-base-200">
                 <ProductInfo product={product} type={displayType} isRTL={isRTL} />
-                
+
                 {/* Already Purchased Badge */}
                 {isPurchased && (
                   <div className="alert alert-success mt-4">
