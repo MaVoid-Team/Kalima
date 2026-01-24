@@ -22,6 +22,7 @@ import {
 import { getBookById, getProductById, getAllPaymentMethods, purchaseProduct, purchaseBook } from "../../routes/market";
 import { validateCoupon } from "../../routes/marketCoupouns";
 import { getToken } from "../../routes/auth-services";
+import { trackInitiateCheckout, trackPurchase } from "../../hooks/useMetaPixel";
 
 const DirectCheckout = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -142,6 +143,14 @@ const DirectCheckout = () => {
           const productData = response.data.book || response.data.product;
           setProduct(productData);
           setFinalPrice(getDisplayPrice(productData));
+
+          // Track InitiateCheckout event for Meta Pixel (direct checkout flow)
+          trackInitiateCheckout({
+            contentIds: [productData._id],
+            value: getDisplayPrice(productData),
+            numItems: 1,
+            currency: 'EGP',
+          });
         } else {
           throw new Error(isRTL ? "فشل في تحميل المنتج" : "Failed to load product");
         }
@@ -345,7 +354,7 @@ const DirectCheckout = () => {
     if (checkoutCooldown > 0) {
       toast.error(
         t("errors.checkoutCooldown", { seconds: checkoutCooldown }) ||
-          `يرجى الانتظار ${checkoutCooldown} ثانية قبل إتمام الشراء مرة أخرى.`
+        `يرجى الانتظار ${checkoutCooldown} ثانية قبل إتمام الشراء مرة أخرى.`
       );
       return;
     }
@@ -383,6 +392,14 @@ const DirectCheckout = () => {
       }
 
       if (response.status === "success" || response.message) {
+        // Track Purchase event for Meta Pixel
+        trackPurchase({
+          contentIds: [product._id],
+          value: finalPrice || getDisplayPrice(product),
+          numItems: 1,
+          currency: 'EGP',
+        });
+
         // Set cooldown
         const cooldownSeconds = 30;
         const expiryTime = Date.now() + cooldownSeconds * 1000;
@@ -650,11 +667,10 @@ const DirectCheckout = () => {
                     <div className="relative">
                       <div
                         data-payment-trigger-checkout
-                        className={`flex items-center justify-between h-12 px-4 border rounded-lg cursor-pointer transition-all ${
-                          validationErrors.paymentMethod
+                        className={`flex items-center justify-between h-12 px-4 border rounded-lg cursor-pointer transition-all ${validationErrors.paymentMethod
                             ? "border-error"
                             : "border-base-300 hover:border-primary"
-                        } bg-base-100`}
+                          } bg-base-100`}
                         onClick={() => {
                           const dropdown = document.getElementById("payment-dropdown-checkout");
                           if (dropdown) dropdown.classList.toggle("hidden");
@@ -694,9 +710,8 @@ const DirectCheckout = () => {
                         {paymentMethods.map((method) => (
                           <div
                             key={method._id}
-                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-primary/10 ${
-                              checkoutData.paymentMethod === method._id ? "bg-primary/20" : ""
-                            }`}
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-primary/10 ${checkoutData.paymentMethod === method._id ? "bg-primary/20" : ""
+                              }`}
                             onClick={() => {
                               setCheckoutData({ ...checkoutData, paymentMethod: method._id });
                               clearFieldError("paymentMethod");

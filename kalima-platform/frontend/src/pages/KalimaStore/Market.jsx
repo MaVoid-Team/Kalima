@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import KalimaLoader from "../../components/KalimaLoader";
+import { trackAddToCart } from "../../hooks/useMetaPixel";
 
 const Market = () => {
   const { t, i18n } = useTranslation("kalimaStore-Market");
@@ -180,6 +182,15 @@ const Market = () => {
       setAddingToCart({ ...addingToCart, [productId]: true });
       const result = await addToCart(productId);
       if (result.success) {
+        // Track AddToCart event for Meta Pixel
+        trackAddToCart({
+          contentName: product?.title || 'Product',
+          contentIds: [productId],
+          contentType: product?.__t === 'ECBook' ? 'book' : 'product',
+          value: product?.priceAfterDiscount || product?.price || 0,
+          currency: 'EGP',
+        });
+
         toast.success(
           t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!"
         );
@@ -195,8 +206,8 @@ const Market = () => {
         } else {
           toast.error(
             result.error ||
-              t("errors.addToCartFailed") ||
-              "فشل في الإضافة إلى السلة"
+            t("errors.addToCartFailed") ||
+            "فشل في الإضافة إلى السلة",
           );
         }
       }
@@ -209,8 +220,8 @@ const Market = () => {
       } else {
         toast.error(
           error.message ||
-            t("errors.addToCartFailed") ||
-            "فشل في الإضافة إلى السلة"
+          t("errors.addToCartFailed") ||
+          "فشل في الإضافة إلى السلة",
         );
       }
     } finally {
@@ -290,9 +301,8 @@ const Market = () => {
             <motion.div
               initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`flex items-center gap-6 mb-8 ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-6 mb-8 ${isRTL ? "flex-row-reverse" : ""
+                }`}
             >
               <div className="w-16 h-px bg-primary" />
               <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
@@ -336,14 +346,12 @@ const Market = () => {
                 placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full px-6 py-4 ${
-                  isRTL ? "pr-14" : "pl-14"
-                } bg-base-100 border border-base-content/10 rounded-2xl text-base-content placeholder:text-base-content/30 focus:outline-none focus:border-primary transition-colors`}
+                className={`w-full px-6 py-4 ${isRTL ? "pr-14" : "pl-14"
+                  } bg-base-100 border border-base-content/10 rounded-2xl text-base-content placeholder:text-base-content/30 focus:outline-none focus:border-primary transition-colors`}
               />
               <Search
-                className={`absolute ${
-                  isRTL ? "right-5" : "left-5"
-                } top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/30`}
+                className={`absolute ${isRTL ? "right-5" : "left-5"
+                  } top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/30`}
               />
             </div>
           </motion.div>
@@ -358,11 +366,10 @@ const Market = () => {
               <button
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
-                className={`flex-shrink-0 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ${
-                  activeTab === category.id
-                    ? "bg-primary text-white"
-                    : "bg-base-100 text-base-content/60 hover:bg-base-200"
-                }`}
+                className={`flex-shrink-0 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === category.id
+                  ? "bg-primary text-white"
+                  : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                  }`}
               >
                 {category.name}
               </button>
@@ -374,11 +381,10 @@ const Market = () => {
             <div className="flex overflow-x-auto scrollbar-hide gap-2 py-3 border-t border-base-content/5">
               <button
                 onClick={() => setActiveSubSection("all")}
-                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
-                  activeSubSection === "all"
-                    ? "bg-secondary text-white"
-                    : "bg-base-100 text-base-content/60 hover:bg-base-200"
-                }`}
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${activeSubSection === "all"
+                  ? "bg-secondary text-white"
+                  : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                  }`}
               >
                 {t("allSubSections") || "All"}
               </button>
@@ -386,11 +392,10 @@ const Market = () => {
                 <button
                   key={subSection._id}
                   onClick={() => setActiveSubSection(subSection._id)}
-                  className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
-                    activeSubSection === subSection._id
-                      ? "bg-secondary text-white"
-                      : "bg-base-100 text-base-content/60 hover:bg-base-200"
-                  }`}
+                  className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${activeSubSection === subSection._id
+                    ? "bg-secondary text-white"
+                    : "bg-base-100 text-base-content/60 hover:bg-base-200"
+                    }`}
                 >
                   {subSection.name}
                 </button>
@@ -439,13 +444,12 @@ const Market = () => {
                       )}
                       {item.discountPercentage > 0 && (
                         <div
-                          className={`px-3 py-1.5 bg-primary text-white rounded-full text-xs font-bold ${
-                            !item.isNew && !isPurchased
-                              ? isRTL
-                                ? "mr-auto"
-                                : "ml-auto"
-                              : ""
-                          }`}
+                          className={`px-3 py-1.5 bg-primary text-white rounded-full text-xs font-bold ${!item.isNew && !isPurchased
+                            ? isRTL
+                              ? "mr-auto"
+                              : "ml-auto"
+                            : ""
+                            }`}
                         >
                           -{item.discountPercentage}%
                         </div>
@@ -475,7 +479,7 @@ const Market = () => {
                       {/* Price */}
                       <div className="flex items-center gap-3 mb-6">
                         {item.priceAfterDiscount &&
-                        item.priceAfterDiscount < item.price ? (
+                          item.priceAfterDiscount < item.price ? (
                           <>
                             <span className="text-2xl font-black text-primary">
                               {item.priceAfterDiscount} {t("product.currency")}
@@ -612,11 +616,10 @@ const Market = () => {
                           key={page}
                           onClick={() => setCurrentPage(page)}
                           disabled={loading}
-                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold transition-all text-sm sm:text-base ${
-                            currentPage === page
-                              ? "bg-primary text-white"
-                              : "border border-base-content/10 hover:border-primary hidden sm:block"
-                          } ${currentPage === page ? "block" : ""}`}
+                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold transition-all text-sm sm:text-base ${currentPage === page
+                            ? "bg-primary text-white"
+                            : "border border-base-content/10 hover:border-primary hidden sm:block"
+                            } ${currentPage === page ? "block" : ""}`}
                         >
                           {page}
                         </button>

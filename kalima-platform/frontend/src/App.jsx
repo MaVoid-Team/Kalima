@@ -161,13 +161,10 @@ function App() {
           {/* Unified Toggle Button for all devices */}
           <button
             id="sidebar-toggle"
-            className={`fixed top-20 ${
-              isRTL ? "right-0" : "left-0"
-            } z-40 bg-primary text-base-content p-2 ${
-              isRTL ? "rounded-r-md" : "rounded-l-md"
-            } shadow-md transition-transform duration-300 ease-in-out ${
-              sidebarOpen ? "md:block" : "block"
-            }`}
+            className={`fixed top-20 ${isRTL ? "right-0" : "left-0"
+              } z-40 bg-primary text-base-content p-2 ${isRTL ? "rounded-r-md" : "rounded-l-md"
+              } shadow-md transition-transform duration-300 ease-in-out ${sidebarOpen ? "md:block" : "block"
+              }`}
             style={{
               transform: sidebarOpen
                 ? `translateX(${isRTL ? "-16rem" : "16rem"})`
@@ -185,13 +182,12 @@ function App() {
         </>
       )}
       <div
-        className={`transition-all duration-300 ${
-          showSidebar && sidebarOpen
+        className={`transition-all duration-300 ${showSidebar && sidebarOpen
             ? isRTL
               ? "md:mr-64"
               : "md:ml-64"
             : "ml-0"
-        }`}
+          }`}
       >
         <Suspense fallback={<KalimaLoader fullScreen={true} />}>
           <Routes>

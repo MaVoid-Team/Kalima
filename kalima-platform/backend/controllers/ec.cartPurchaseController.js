@@ -8,6 +8,7 @@ const { sendEmail } = require("../utils/emailVerification/emailService");
 const { DateTime } = require("luxon");
 const Notification = require("../models/notification");
 const User = require("../models/userModel");
+const { emitBellNotification } = require("../utils/bellNotification");
 const mongoose = require("mongoose");
 
 // Function to get current time in Egypt timezone
@@ -37,8 +38,8 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         `Please wait ${remainingSeconds} seconds before making another purchase`,
-        429
-      )
+        429,
+      ),
     );
   }
 
@@ -69,8 +70,8 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Book details are required \n name on book \n number on book \n series name",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -86,31 +87,33 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "Payment Screenshot and Number Transferred From are required",
-          400
-        )
+          400,
+        ),
       );
     }
+
     if (!req.body.paymentMethod) {
       return next(new AppError("Payment Method is required", 400));
     }
-    // Validate that paymentMethod is a valid ObjectId
-    if (!mongoose.Types.ObjectId.isValid(req.body.paymentMethod)) {
-      return next(new AppError("Invalid Payment Method ID format", 400));
-    }
-    // Fetch the payment method and validate it's active
+
     paymentMethodDoc = await PaymentMethod.findById(req.body.paymentMethod);
     if (!paymentMethodDoc) {
-      return next(new AppError("Payment method not found", 404));
-    }
-    if (!paymentMethodDoc.status) {
-      return next(new AppError("Selected payment method is inactive", 400));
+      return next(new AppError("Invalid Payment Method Selected", 400));
     }
     if (paymentMethodDoc.phoneNumber === req.body.numberTransferredFrom) {
       return next(
         new AppError(
           "Please enter the number that you used to pay not the number of the payment method",
-          400
-        )
+          400,
+        ),
+      );
+    }
+    if (paymentMethodDoc.phoneNumber === req.body.numberTransferredFrom) {
+      return next(
+        new AppError(
+          "Please enter the number that you used to pay not the number of the payment method",
+          400,
+        ),
       );
     }
   }
@@ -140,9 +143,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
   const paymentScreenShot =
     cart.total > 0 && paymentFile ? paymentFile.path : null;
   const numberTransferredFrom =
-    cart.total > 0
-      ? (req.body.numberTransferredFrom || "").replace(/\s/g, "")
-      : null;
+    cart.total > 0 ? req.body.numberTransferredFrom : null;
 
   // Prepare watermark file path
   const watermarkFile =
@@ -241,7 +242,7 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
             <p>If you have any questions, please contact our support team.</p>
             <br>
             <p>Best regards,<br><b>Kalima Team</b></p>
-            </div>`
+            </div>`,
     );
   } catch (err) {
     console.error("Failed to send purchase confirmation email:", err);
@@ -268,25 +269,23 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
     }).select("_id name role");
 
     const timestamp = new Date().toISOString();
-    const requestId = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
+    const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.log(
       `[CART PURCHASE NOTIFICATION ${requestId}] Found ${adminUsers.length} admin users:`,
-      adminUsers.map((u) => `${u.name} (${u.role})`)
+      adminUsers.map((u) => `${u.name} (${u.role})`),
     );
     console.log(
-      `[CART PURCHASE NOTIFICATION ${requestId}] Purchase ID: ${purchase._id}, Serial: ${purchaseSerial}`
+      `[CART PURCHASE NOTIFICATION ${requestId}] Purchase ID: ${purchase._id}, Serial: ${purchaseSerial}`,
     );
     console.log(
-      `[CART PURCHASE NOTIFICATION ${requestId}] Timestamp: ${timestamp}`
+      `[CART PURCHASE NOTIFICATION ${requestId}] Timestamp: ${timestamp}`,
     );
 
     if (adminUsers && adminUsers.length > 0) {
       // Create notification for each admin user
       const notificationPromises = adminUsers.map((admin) => {
         console.log(
-          `[CART PURCHASE NOTIFICATION ${requestId}] Creating notification for ${admin.name} (${admin.role}, ID: ${admin._id})`
+          `[CART PURCHASE NOTIFICATION ${requestId}] Creating notification for ${admin.name} (${admin.role}, ID: ${admin._id})`,
         );
         return Notification.create({
           userId: admin._id,
@@ -315,27 +314,43 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
 
       const createdNotifications = await Promise.all(notificationPromises);
       console.log(
-        `[CART PURCHASE NOTIFICATION ${requestId}] Successfully created ${createdNotifications.length} notifications for purchase ${purchaseSerial}`
+        `[CART PURCHASE NOTIFICATION ${requestId}] Successfully created ${createdNotifications.length} notifications for purchase ${purchaseSerial}`,
       );
       createdNotifications.forEach((notif, index) => {
         console.log(
-          `[CART PURCHASE NOTIFICATION ${requestId}]   - Notification ${
-            index + 1
-          }: ID=${notif._id}, User=${notif.userId}, Title=${notif.title}`
+          `[CART PURCHASE NOTIFICATION ${requestId}]   - Notification ${index + 1}: ID=${notif._id}, User=${notif.userId}, Title=${notif.title}`,
         );
       });
     } else {
       console.log(
-        `[CART PURCHASE NOTIFICATION ${requestId}] No admin users found to notify`
+        `[CART PURCHASE NOTIFICATION ${requestId}] No admin users found to notify`,
       );
     }
   } catch (err) {
     console.error(
       `[CART PURCHASE NOTIFICATION ${requestId}] Failed to send admin notifications:`,
-      err
+      err,
     );
     // Don't fail the purchase if notifications fail
   }
+
+  // --- Emit bell sound notification to admins via Socket.io ---
+  try {
+    const io = req.app.get("io");
+    if (io) {
+      await emitBellNotification(io, {
+        purchaseId: purchase._id,
+        purchaseSerial: purchaseSerial,
+        customerName: req.user.name,
+        customerEmail: req.user.email,
+        total: cart.total,
+        itemCount: cart.items.length,
+      });
+    }
+  } catch (err) {
+    console.error("Failed to emit bell notification:", err);
+  }
+
   // Update user statistics: increment purchase count and total spent
   let updatedUser = await User.findById(req.user._id);
 
@@ -356,13 +371,10 @@ exports.createCartPurchase = catchAsync(async (req, res, next) => {
           TotalSpentAmount: cart.total,
         },
       },
-      { new: true }
+      { new: true },
     );
   }
 
-  console.log(
-    `[Purchase Created] User ${req.user._id}: numberOfPurchases=${updatedUser.numberOfPurchases}, TotalSpentAmount=${updatedUser.TotalSpentAmount}`
-  );
   await cart.clear();
   // Return the created purchase
   res.status(201).json({
@@ -379,9 +391,13 @@ exports.getCartPurchases = catchAsync(async (req, res, next) => {
   })
     .sort("-createdAt")
     .populate("couponCode")
-    .populate({ path: "paymentMethod", select: "name", strictPopulate: false })
+    .populate({
+      path: "paymentMethod",
+      select: "name",
+      strictPopulate: false,
+    })
     .select(
-      "-confirmedBy -adminNoteBy -receivedBy -returnedBy -returnedAt -confirmedAt -adminNotes -receivedAt -userName -createdBy"
+      "-confirmedBy -adminNoteBy -receivedBy -returnedBy -returnedAt -confirmedAt -adminNotes -receivedAt -userName -createdBy",
     );
 
   res.status(200).json({
@@ -439,7 +455,7 @@ exports.receivePurchase = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   res.status(200).json({
@@ -461,8 +477,8 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Purchase must be received or in returned status before it can be confirmed",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -477,7 +493,7 @@ exports.confirmCartPurchase = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   // Auto-calculate and update monthly count
@@ -512,19 +528,13 @@ exports.returnCartPurchase = catchAsync(async (req, res, next) => {
   if (!purchase) {
     return next(new AppError("Purchase not found", 404));
   }
-  if (purchase.status !== "confirmed") {
-    return next(new AppError("Only confirmed purchases can be returned", 400));
+  if (purchase.status !== "confirmed" && purchase.status !== "received") {
+    return next(
+      new AppError("Only confirmed or received purchases can be returned", 400),
+    );
   }
   if (purchase.status === "returned") {
     return next(new AppError("Purchase is already returned", 400));
-  }
-  if (purchase.confirmedBy.toString() !== req.user._id.toString()) {
-    return next(
-      new AppError(
-        "Only the user who confirmed the purchase can return it",
-        403
-      )
-    );
   }
 
   const now = getCurrentEgyptTime().toJSDate();
@@ -538,7 +548,7 @@ exports.returnCartPurchase = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
   res.status(200).json({
     status: "success",
@@ -584,7 +594,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
     // Escape special regex characters then create case-insensitive regex
     const searchRegex = new RegExp(
       searchTermString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-      "i"
+      "i",
     );
 
     // Fast-path: if the search term is a 24-char hex string, treat it as an ObjectId and return that purchase directly
@@ -594,8 +604,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         const found = await ECCartPurchase.findById(searchTermString)
           .populate({
             path: "createdBy",
-            select:
-              "name email role phoneNumber TotalSpentAmount numberOfPurchases",
+            select: "name email role phoneNumber",
           })
           .populate({ path: "confirmedBy", select: "name" })
           .populate({ path: "receivedBy", select: "name" })
@@ -733,8 +742,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
         const doc = await ECCartPurchase.findById(id)
           .populate({
             path: "createdBy",
-            select:
-              "name email role phoneNumber TotalSpentAmount numberOfPurchases",
+            select: "name email role phoneNumber",
           })
           .populate({ path: "confirmedBy", select: "name" })
           .populate({ path: "receivedBy", select: "name" })
@@ -767,10 +775,7 @@ exports.getAllPurchases = catchAsync(async (req, res, next) => {
 
   // No search — simple find with base filters
   const purchases = await ECCartPurchase.find(baseMatch)
-    .populate({
-      path: "createdBy",
-      select: "name email role phoneNumber TotalSpentAmount numberOfPurchases",
-    })
+    .populate({ path: "createdBy", select: "name email role phoneNumber" })
     .populate({ path: "confirmedBy", select: "name" })
     .populate({ path: "receivedBy", select: "name" })
     .populate({ path: "returnedBy", select: "name" })
@@ -812,7 +817,7 @@ exports.addAdminNote = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .populate("createdBy", "name email")
     .populate("confirmedBy", "name email")
@@ -964,19 +969,19 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
 exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
   const startDate = req.query.startDate
     ? DateTime.fromISO(req.query.startDate)
-        .setZone("Africa/Cairo")
-        .startOf("day")
-        .toJSDate()
+      .setZone("Africa/Cairo")
+      .startOf("day")
+      .toJSDate()
     : DateTime.fromJSDate(DEFAULT_STATS_START_DATE)
-        .setZone("Africa/Cairo")
-        .startOf("day")
-        .toJSDate();
+      .setZone("Africa/Cairo")
+      .startOf("day")
+      .toJSDate();
 
   const endDate = req.query.endDate
     ? DateTime.fromISO(req.query.endDate)
-        .setZone("Africa/Cairo")
-        .endOf("day")
-        .toJSDate()
+      .setZone("Africa/Cairo")
+      .endOf("day")
+      .toJSDate()
     : getCurrentEgyptTime().endOf("day").toJSDate();
 
   // Get purchases within date range
@@ -1039,7 +1044,7 @@ exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
     // Full days in between
     const fullDays = Math.max(
       0,
-      Math.floor((end - start) / (1000 * 60 * 60 * 24)) - 1
+      Math.floor((end - start) / (1000 * 60 * 60 * 24)) - 1,
     );
     totalMinutes += fullDays * BUSINESS_HOURS_PER_DAY * 60;
 
@@ -1060,20 +1065,20 @@ exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
     if (purchase.receivedAt) {
       const receiveMinutes = calculateBusinessMinutes(
         purchase.createdAt,
-        purchase.receivedAt
+        purchase.receivedAt,
       );
       receiveStats.push(receiveMinutes);
 
       if (purchase.confirmedAt) {
         const confirmMinutes = calculateBusinessMinutes(
           purchase.receivedAt,
-          purchase.confirmedAt
+          purchase.confirmedAt,
         );
         confirmStats.push(confirmMinutes);
 
         const totalMinutes = calculateBusinessMinutes(
           purchase.createdAt,
-          purchase.confirmedAt
+          purchase.confirmedAt,
         );
         totalStats.push(totalMinutes);
       }
@@ -1188,10 +1193,10 @@ exports.deletePurchase = catchAsync(async (req, res, next) => {
         TotalSpentAmount: -purchase.total,
       },
     },
-    { new: true }
+    { new: true },
   );
   console.log(
-    `[Purchase Deleted] User ${purchase.createdBy}: numberOfPurchases=${updatedUserAfterDelete.numberOfPurchases}, TotalSpentAmount=${updatedUserAfterDelete.TotalSpentAmount}`
+    `[Purchase Deleted] User ${purchase.createdBy}: numberOfPurchases=${updatedUserAfterDelete.numberOfPurchases}, TotalSpentAmount=${updatedUserAfterDelete.TotalSpentAmount}`,
   );
 
   // Delete the purchase
@@ -1215,15 +1220,15 @@ exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
   const itemToDelete = purchase.items.id(itemId);
   if (!itemToDelete) {
     return next(
-      new AppError("No item found with that ID in the purchase", 404)
+      new AppError("No item found with that ID in the purchase", 404),
     );
   }
   if (purchase.items.length === 1) {
     return next(
       new AppError(
         "Cannot remove the last item from the purchase. Delete the entire purchase instead.",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -1238,10 +1243,10 @@ exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
         TotalSpentAmount: -deletedItemPrice,
       },
     },
-    { new: true }
+    { new: true },
   );
   console.log(
-    `[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`
+    `[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`,
   );
 
   // Remove the item from the purchase
@@ -1284,7 +1289,7 @@ exports.getMonthlyConfirmedPurchasesCount = catchAsync(
 
     // Get user
     const user = await User.findById(req.user._id).select(
-      "monthlyConfirmedCount lastConfirmedCountUpdate"
+      "monthlyConfirmedCount lastConfirmedCountUpdate",
     );
 
     // Determine if we need to recalculate
@@ -1297,7 +1302,7 @@ exports.getMonthlyConfirmedPurchasesCount = catchAsync(
     } else {
       // Check if we're in a different month
       const lastUpdate = DateTime.fromJSDate(
-        user.lastConfirmedCountUpdate
+        user.lastConfirmedCountUpdate,
       ).setZone("Africa/Cairo");
       const lastUpdateMonth = lastUpdate.startOf("month").toJSDate();
       if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
@@ -1330,7 +1335,137 @@ exports.getMonthlyConfirmedPurchasesCount = catchAsync(
         month: now.toFormat("MMMM yyyy"),
       },
     });
+  },
+);
+
+exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
+  const purchaseId = req.params.purchaseId;
+  const itemId = req.params.itemId;
+  const purchase = await ECCartPurchase.findById(purchaseId);
+  if (!purchase) {
+    return next(new AppError("No purchase found with that ID", 404));
   }
+
+  // Find the item to get its price before deletion
+  const itemToDelete = purchase.items.id(itemId);
+  if (!itemToDelete) {
+    return next(
+      new AppError("No item found with that ID in the purchase", 404),
+    );
+  }
+  if (purchase.items.length === 1) {
+    return next(
+      new AppError(
+        "Cannot remove the last item from the purchase. Delete the entire purchase instead.",
+        400,
+      ),
+    );
+  }
+
+  // Get the price of the item being deleted
+  const deletedItemPrice = itemToDelete.priceAtPurchase || 0;
+
+  // Update user's total spent amount by removing only the deleted item's price
+  const updatedUserAfterItemDelete = await User.findByIdAndUpdate(
+    purchase.createdBy,
+    {
+      $inc: {
+        TotalSpentAmount: -deletedItemPrice,
+      },
+    },
+    { new: true },
+  );
+  console.log(
+    `[Item Deleted from Purchase] User ${purchase.createdBy}: TotalSpentAmount=${updatedUserAfterItemDelete.TotalSpentAmount}, Item Price Removed=${deletedItemPrice}`,
+  );
+
+  // Remove the item from the purchase
+  purchase.items.id(itemId).deleteOne();
+
+  // Recalculate subtotal based on remaining items
+  const newSubtotal = purchase.items.reduce((sum, item) => {
+    return sum + (item.priceAtPurchase || 0);
+  }, 0);
+
+  // Update purchase totals
+  purchase.subtotal = newSubtotal;
+
+  // Recalculate total (subtotal - discount)
+  purchase.total = Math.max(0, newSubtotal - (purchase.discount || 0));
+
+  // If no items left, clear the coupon as well
+  if (purchase.items.length === 0) {
+    purchase.couponCode = null;
+    purchase.discount = 0;
+    purchase.total = 0;
+  }
+
+  await purchase.save();
+  res.status(200).json({
+    status: "success",
+    message: "Item removed from purchase successfully",
+    data: {
+      purchase,
+    },
+  });
+});
+
+exports.getMonthlyConfirmedPurchasesCount = catchAsync(
+  async (req, res, next) => {
+    // Get current month in Egypt timezone
+    const now = getCurrentEgyptTime();
+    const monthStart = now.startOf("month").toJSDate();
+    const monthEnd = now.endOf("month").toJSDate();
+
+    // Get user
+    const user = await User.findById(req.user._id).select(
+      "monthlyConfirmedCount lastConfirmedCountUpdate",
+    );
+
+    // Determine if we need to recalculate
+    let count = user?.monthlyConfirmedCount || 0;
+    let needsRecalculation = false;
+
+    if (!user?.lastConfirmedCountUpdate) {
+      // First time or never updated - recalculate
+      needsRecalculation = true;
+    } else {
+      // Check if we're in a different month
+      const lastUpdate = DateTime.fromJSDate(
+        user.lastConfirmedCountUpdate,
+      ).setZone("Africa/Cairo");
+      const lastUpdateMonth = lastUpdate.startOf("month").toJSDate();
+      if (lastUpdateMonth.getTime() !== monthStart.getTime()) {
+        needsRecalculation = true;
+      }
+    }
+
+    // Recalculate if needed
+    if (needsRecalculation) {
+      count = await ECCartPurchase.countDocuments({
+        confirmedBy: req.user._id,
+        status: "confirmed",
+        confirmedAt: {
+          $gte: monthStart,
+          $lte: monthEnd,
+        },
+      });
+
+      // Update the stored count
+      await User.findByIdAndUpdate(req.user._id, {
+        monthlyConfirmedCount: count,
+        lastConfirmedCountUpdate: new Date(),
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        confirmedPurchasesCount: count,
+        month: now.toFormat("MMMM yyyy"),
+      },
+    });
+  },
 );
 
 // Product-level purchase statistics
@@ -1415,12 +1550,10 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
 
       // Create DateTime in Egypt timezone, then convert to UTC
       const dt = DateTime.fromISO(
-        `${dateStr}T${String(hour24).padStart(2, "0")}:${String(
-          minutes
-        ).padStart(2, "0")}:00`,
+        `${dateStr}T${String(hour24).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`,
         {
           zone: "Africa/Cairo",
-        }
+        },
       );
 
       return dt.toJSDate(); // Returns UTC equivalent
@@ -1501,7 +1634,7 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
     // Full days in between
     const fullDays = Math.max(
       0,
-      Math.floor((end - start) / (1000 * 60 * 60 * 24)) - 1
+      Math.floor((end - start) / (1000 * 60 * 60 * 24)) - 1,
     );
     totalMinutes += fullDays * BUSINESS_HOURS_PER_DAY * 60;
 
@@ -1625,7 +1758,7 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
       if (purchase.confirmedBy) {
         const responseMinutes = calculateBusinessMinutes(
           purchase.createdAt,
-          purchase.receivedAt
+          purchase.receivedAt,
         );
         staffStats[receiverId].responseTimesMinutes.push(responseMinutes);
       }
@@ -1664,7 +1797,7 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
       if (purchase.receivedAt && purchase.confirmedAt) {
         const confirmMinutes = calculateBusinessMinutes(
           purchase.receivedAt,
-          purchase.confirmedAt
+          purchase.confirmedAt,
         );
         staffStats[confirmerId].confirmationTimesMinutes.push(confirmMinutes);
       }
@@ -1706,17 +1839,17 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
       const avgResponseMinutes =
         stat.responseTimesMinutes.length > 0
           ? Math.round(
-              stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
-                stat.responseTimesMinutes.length
-            )
+            stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
+            stat.responseTimesMinutes.length,
+          )
           : 0;
 
       const avgConfirmationMinutes =
         stat.confirmationTimesMinutes.length > 0
           ? Math.round(
-              stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
-                stat.confirmationTimesMinutes.length
-            )
+            stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
+            stat.confirmationTimesMinutes.length,
+          )
           : 0;
 
       // Format minutes to "Xh Ym" format
@@ -1744,30 +1877,32 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
         b.totalReceivedOrders +
         b.totalConfirmedOrders +
         b.totalReturnedOrders -
-        (a.totalReceivedOrders + a.totalConfirmedOrders + a.totalReturnedOrders)
+        (a.totalReceivedOrders +
+          a.totalConfirmedOrders +
+          a.totalReturnedOrders),
     );
 
   // Calculate platform-wide totals from staff report (ensures consistency across orders handled by multiple staff)
   const platformTotals = {
     totalReceivedOrders: staffReportArray.reduce(
       (sum, staff) => sum + staff.totalReceivedOrders,
-      0
+      0,
     ),
     totalConfirmedOrders: staffReportArray.reduce(
       (sum, staff) => sum + staff.totalConfirmedOrders,
-      0
+      0,
     ),
     totalConfirmedItems: staffReportArray.reduce(
       (sum, staff) => sum + staff.totalConfirmedItems,
-      0
+      0,
     ),
     totalReturnedOrders: staffReportArray.reduce(
       (sum, staff) => sum + staff.totalReturnedOrders,
-      0
+      0,
     ),
     totalReturnedItems: staffReportArray.reduce(
       (sum, staff) => sum + staff.totalReturnedItems,
-      0
+      0,
     ),
     totalStaff: staffReportArray.length,
   };
