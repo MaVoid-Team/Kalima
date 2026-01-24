@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import CenterSelector from "./CenterSelector";
@@ -63,73 +63,44 @@ const CenterDashboard = () => {
     fetchCenters();
   }, [t]);
 
+  const fetchDataByType = useCallback(async (type, setter, errorKey) => {
+    if (!selectedCenter) return;
+
+    setLoading(prev => ({ ...prev, [errorKey]: true }));
+    try {
+      const response = await getCenterDataByType(selectedCenter._id, type);
+      if (response.status === "success") {
+        setter(response.data);
+        setError(prev => ({ ...prev, [errorKey]: null }));
+      } else {
+        const capitalizedKey = errorKey.charAt(0).toUpperCase() + errorKey.slice(1);
+        throw new Error(response.message || t(`errors.fetch${capitalizedKey}Failed`));
+      }
+    } catch (err) {
+      console.error(`Error fetching ${type}:`, err);
+      setError(prev => ({ ...prev, [errorKey]: err.message }));
+      setter([]); // Clear data on error
+    } finally {
+      setLoading(prev => ({ ...prev, [errorKey]: false }));
+    }
+  }, [selectedCenter, t]);
+
   // Fetch center data when a center is selected
   useEffect(() => {
     if (!selectedCenter) return;
 
-    const fetchCenterData = async () => {
-      // Reset data and loading/error states for the new center
-      setLecturers([]);
-      setStudents([]);
-      setLessons([]);
-      setLoading(prev => ({ ...prev, lecturers: true, students: true, lessons: true }));
-      setError(prev => ({ ...prev, lecturers: null, students: null, lessons: null }));
+    // Reset data and loading/error states for the new center
+    setLecturers([]);
+    setStudents([]);
+    setLessons([]);
+    setLoading(prev => ({ ...prev, lecturers: true, students: true, lessons: true }));
+    setError(prev => ({ ...prev, lecturers: null, students: null, lessons: null }));
 
+    fetchDataByType("lecturers", setLecturers, "lecturers");
+    fetchDataByType("students", setStudents, "students");
+    fetchDataByType("lessons", setLessons, "lessons");
 
-      // Fetch lecturers
-      try {
-        const lecturersResponse = await getCenterDataByType(selectedCenter._id, "lecturers");
-        if (lecturersResponse.status === "success") {
-          setLecturers(lecturersResponse.data);
-          setError(prev => ({ ...prev, lecturers: null }));
-        } else {
-          throw new Error(lecturersResponse.message || t('errors.fetchLecturersFailed'));
-        }
-      } catch (err) {
-        console.error("Error fetching lecturers:", err);
-        setError(prev => ({ ...prev, lecturers: err.message }));
-        setLecturers([]); // Clear lecturers on error
-      } finally {
-        setLoading(prev => ({ ...prev, lecturers: false }));
-      }
-
-      // Fetch students
-      try {
-        const studentsResponse = await getCenterDataByType(selectedCenter._id, "students");
-        if (studentsResponse.status === "success") {
-          setStudents(studentsResponse.data);
-          setError(prev => ({ ...prev, students: null }));
-        } else {
-          throw new Error(studentsResponse.message || t('errors.fetchStudentsFailed'));
-        }
-      } catch (err) {
-        console.error("Error fetching students:", err);
-        setError(prev => ({ ...prev, students: err.message }));
-        setStudents([]); // Clear students on error
-      } finally {
-        setLoading(prev => ({ ...prev, students: false }));
-      }
-
-      // Fetch lessons
-      try {
-        const lessonsResponse = await getCenterDataByType(selectedCenter._id, "lessons");
-        if (lessonsResponse.status === "success") {
-          setLessons(lessonsResponse.data);
-          setError(prev => ({ ...prev, lessons: null }));
-        } else {
-          throw new Error(lessonsResponse.message || t('errors.fetchLessonsFailed'));
-        }
-      } catch (err) {
-        console.error("Error fetching lessons:", err);
-        setError(prev => ({ ...prev, lessons: err.message }));
-        setLessons([]); // Clear lessons on error
-      } finally {
-        setLoading(prev => ({ ...prev, lessons: false }));
-      }
-    };
-
-    fetchCenterData();
-  }, [selectedCenter, t]); // Depend on selectedCenter and t
+  }, [selectedCenter, fetchDataByType]);
 
   const handleCenterChange = (center) => {
     setSelectedCenter(center);
@@ -142,26 +113,7 @@ const CenterDashboard = () => {
   const handleCourseAdded = () => {
     // Refresh lessons data after a new course is added
     if (selectedCenter) {
-      const fetchLessons = async () => {
-        try {
-          setLoading(prev => ({ ...prev, lessons: true }));
-          const lessonsResponse = await getCenterDataByType(selectedCenter._id, "lessons");
-          if (lessonsResponse.status === "success") {
-            setLessons(lessonsResponse.data);
-            setError(prev => ({ ...prev, lessons: null }));
-          } else {
-            throw new Error(lessonsResponse.message || t('errors.fetchLessonsFailed'));
-          }
-        } catch (err) {
-          console.error("Error fetching lessons after adding course:", err);
-          setError(prev => ({ ...prev, lessons: err.message }));
-          setLessons([]); // Clear lessons on error
-        } finally {
-          setLoading(prev => ({ ...prev, lessons: false }));
-        }
-      };
-
-      fetchLessons();
+      fetchDataByType("lessons", setLessons, "lessons");
     }
   };
 
