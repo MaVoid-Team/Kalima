@@ -94,11 +94,10 @@ const updateUser = catchAsync(async (req, res, next) => {
   const { name, email, address, password, children, subjectNotify } = req.body;
 
   /*
-  BUG -->> that means any user can update any user
-  To fix it -->> Onlyy authenticated current user has permission to update his self
-  userId = req.user._id 
-  */
-  const userId = req.params.userId;
+   * Fixed security vulnerability: Only authenticated current user has permission to update themselves.
+   * Previously used req.params.userId which allowed unauthorized updates.
+   */
+  const userId = req.user._id;
 
   // If password is provided, hash it and allow update
   let hashedPassword = null;
