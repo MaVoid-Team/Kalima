@@ -14,7 +14,7 @@ const getAuthHeader = () => {
  */
 export const getAllGovernments = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/governments`, {
+    const response = await axios.get(`${API_URL}/governments`, {
       headers: getAuthHeader(),
       withCredentials: true,
     });
@@ -46,7 +46,7 @@ export const getGovernmentZones = async (governmentName) => {
 
   try {
     const response = await axios.get(
-      `${API_URL}/api/v1/governments/${encodeURIComponent(governmentName)}/zones`,
+      `${API_URL}/governments/${encodeURIComponent(governmentName)}/zones`,
       {
         headers: getAuthHeader(),
         withCredentials: true,
