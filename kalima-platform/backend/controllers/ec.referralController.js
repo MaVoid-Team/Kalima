@@ -56,10 +56,13 @@ exports.recalculateAllSuccessfulInvites = async (req, res, next) => {
         // Map: inviterId => Set of inviteeIds who made a purchase
         const inviterToInvitees = {};
 
+        const referredUserIds = referredUsers.map(user => user._id);
+        const purchasingUserIds = await ECPurchase.distinct('createdBy', { createdBy: { $in: referredUserIds } });
+        // Convert to Set of strings for fast lookup
+        const purchasingUserIdSet = new Set(purchasingUserIds.map(id => id.toString()));
+
         for (const user of referredUsers) {
-            // Check if this user made at least one e-commerce purchase
-            const purchaseCount = await ECPurchase.countDocuments({ createdBy: user._id });
-            if (purchaseCount > 0) {
+            if (purchasingUserIdSet.has(user._id.toString())) {
                 const inviterId = user.referredBy.toString();
                 if (!inviterToInvitees[inviterId]) inviterToInvitees[inviterId] = new Set();
                 inviterToInvitees[inviterId].add(user._id.toString());
