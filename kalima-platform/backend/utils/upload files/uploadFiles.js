@@ -148,7 +148,7 @@ const withCompressionAndCleanup = (multerMiddleware, compressOptions = {}) => {
             const filename = `${Date.now()}-${req.file.fieldname}.webp`;
             const filepath = path.join(dest, filename);
 
-            fs.writeFileSync(filepath, compressed);
+            await fs.promises.writeFile(filepath, compressed);
             req.file.path = filepath;
             req.file.filename = filename;
 
@@ -189,7 +189,7 @@ const withCompressionAndCleanup = (multerMiddleware, compressOptions = {}) => {
                 const filename = `${Date.now()}-${fieldName}.webp`;
                 const filepath = path.join(dest, filename);
 
-                fs.writeFileSync(filepath, compressed);
+                await fs.promises.writeFile(filepath, compressed);
                 file.path = filepath;
                 file.filename = filename;
 
