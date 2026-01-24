@@ -36,9 +36,9 @@ import {
   ArrowRight,
   ArrowLeft,
   Gift,
+  Package,
 } from "lucide-react";
 import { getAllPaymentMethods } from "../../routes/market";
-import KalimaLoader from "../../components/KalimaLoader";
 import { trackInitiateCheckout, trackPurchase } from "../../hooks/useMetaPixel";
 
 const CartPage = () => {
