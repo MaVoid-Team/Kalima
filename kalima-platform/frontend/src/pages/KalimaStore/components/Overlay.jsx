@@ -37,7 +37,7 @@ export default function Overlay() {
       console.error("Failed to fetch cart count:", err);
     }
   };
-
+  //
   useEffect(() => {
     fetchCartCount();
     const handleCartUpdate = () => fetchCartCount();
@@ -54,15 +54,15 @@ export default function Overlay() {
     if (cartCount > 0) {
       const messages = isRTL
         ? [
-            "🛒 لديك منتجات في سلتك!",
-            "⏰ أكمل عملية الشراء الآن!",
-            "💸 لا تفوّت الفرصة! ادفع الآن!",
-          ]
+          "🛒 لديك منتجات في سلتك!",
+          "⏰ أكمل عملية الشراء الآن!",
+          "💸 لا تفوّت الفرصة! ادفع الآن!",
+        ]
         : [
-            "🛒 You have items in your cart!",
-            "⏰ Complete your purchase now!",
-            "💸 Don’t miss out — pay today!",
-          ];
+          "🛒 You have items in your cart!",
+          "⏰ Complete your purchase now!",
+          "💸 Don’t miss out — pay today!",
+        ];
 
       const interval = setInterval(() => {
         const random = messages[Math.floor(Math.random() * messages.length)];
@@ -143,9 +143,8 @@ export default function Overlay() {
               {/* ❌ Close Button */}
               <button
                 onClick={() => setShowOverlay(false)}
-                className={`absolute top-4 ${
-                  isRTL ? "left-4" : "right-4"
-                } text-gray-400 hover:text-gray-700 transition-all duration-200`}
+                className={`absolute top-4 ${isRTL ? "left-4" : "right-4"
+                  } text-gray-400 hover:text-gray-700 transition-all duration-200`}
               >
                 <X
                   size={30}
