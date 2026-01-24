@@ -133,6 +133,10 @@ const updateUser = catchAsync(async (req, res, next) => {
   */
   const childrenById = [];
   if (!!children) {
+    if (Array.isArray(children) && children.length === 0) {
+      return next(new AppError("Children array cannot be empty", 400));
+    }
+
     for (let id of children) {
       // Check if the id is a valid MongoDB ObjectId
       const isMongoId = mongoose.Types.ObjectId.isValid(id);
