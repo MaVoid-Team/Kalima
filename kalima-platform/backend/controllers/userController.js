@@ -156,13 +156,18 @@ const updateUser = catchAsync(async (req, res, next) => {
         }
       }
     }
-    req.body.children = childrenById;
+
+    // Merge existing children with new ones
+    const existingChildren = foundUser.children ? foundUser.children.map(id => id.toString()) : [];
+    const newChildrenIds = childrenById.map(id => id.toString());
+    const mergedChildren = [...new Set([...existingChildren, ...newChildrenIds])];
+
+    req.body.children = mergedChildren;
   }
   const updatedUser = {
     name,
     email,
     address,
-    children: childrenById,
     role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
