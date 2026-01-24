@@ -9,7 +9,7 @@ import KalimaLoader from "./components/KalimaLoader";
 import { isMobile } from "./utils/isMobile";
 import UnifiedSidebar from "./components/UnifiedSidebar";
 import { useTranslation } from "react-i18next";
-import Overlay from "./pages/KalimaStore/components/Overlay";
+import Overlay from "./pages/KalimaStore/components/overlay";
 import Footer from "./components/footer";
 
 // Lazy load components
