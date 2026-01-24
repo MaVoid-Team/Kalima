@@ -267,7 +267,6 @@ const AdminPanel = () => {
     try {
       setActionLoading(true);
 
-      // 🐛 DEBUG: Log the data being sent to createBook
       const dataToSend = {
         title: bookForm.title,
         serial: bookForm.serial,
