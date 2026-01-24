@@ -185,34 +185,6 @@ const WelcomeSection = memo(() => {
                 ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
                 : "A comprehensive educational platform providing the best teachers and courses from elementary to high school."}
             </motion.p>
-
-            {/* Search Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="w-full max-w-xl"
-            >
-              <div className="relative w-full max-w-md mb-8">
-                <input
-                  type="text"
-                  placeholder={
-                    isRTL
-                      ? "ابحث عن دورة، معلم، أو مادة..."
-                      : "Search for courses, teachers..."
-                  }
-                  className={`w-full h-12 sm:h-14 ${isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
-                    } bg-base-100 border-2 border-base-content/10 rounded-2xl shadow-sm focus:outline-none focus:border-primary/30 focus:ring-4 focus:ring-primary/10 transition-all text-sm sm:text-base`}
-                />
-                <button
-                  className={`absolute top-1.5 bottom-1.5 ${isRTL ? "left-1.5" : "right-1.5"
-                    } px-4 sm:px-6 gradient-brand text-primary-content font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all text-sm`}
-                >
-                  {isRTL ? "بحث" : "Search"}
-                </button>
-              </div>
-            </motion.div>
-
             {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
