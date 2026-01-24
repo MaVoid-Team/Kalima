@@ -26,22 +26,41 @@ exports.getLecturesWithHomework = catchAsync(async (req, res, next) => {
     .populate('level', 'name')
     .lean();
   
-  // For each lecture, check if it has any homework submissions
-  const lecturesWithSubmissions = await Promise.all(
-    lectures.map(async (lecture) => {
-      const submissionCount = await Attachment.countDocuments({
-        lectureId: lecture._id,
+  // Get all lecture IDs
+  const lectureIds = lectures.map(lecture => lecture._id);
+
+  // Aggregate homework submission counts for all lectures at once
+  const submissionCounts = await Attachment.aggregate([
+    {
+      $match: {
+        lectureId: { $in: lectureIds },
         type: 'homeworks',
         studentId: { $ne: null }
-      });
-      
-      return {
-        ...lecture,
-        hasSubmissions: submissionCount > 0,
-        submissionCount
-      };
-    })
-  );
+      }
+    },
+    {
+      $group: {
+        _id: "$lectureId",
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  // Create a map for quick lookup
+  const countMap = {};
+  submissionCounts.forEach(item => {
+    countMap[item._id.toString()] = item.count;
+  });
+
+  // Map counts back to lectures
+  const lecturesWithSubmissions = lectures.map(lecture => {
+    const submissionCount = countMap[lecture._id.toString()] || 0;
+    return {
+      ...lecture,
+      hasSubmissions: submissionCount > 0,
+      submissionCount
+    };
+  });
   
   // Filter out lectures with no submissions if requested
   const filteredLectures = req.query.onlyWithSubmissions === 'true' 
