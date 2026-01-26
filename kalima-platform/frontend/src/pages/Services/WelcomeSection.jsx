@@ -15,6 +15,94 @@ import {
   Sparkles,
 } from "lucide-react";
 
+const ActionButton = memo(
+  ({ label, onClick, variant, icon: Icon, hasArrow, isRTL }) => {
+    const isPrimary = variant === "primary";
+
+    return (
+      <motion.button
+        whileHover={{
+          scale: 1.03,
+          boxShadow: isPrimary ? "0 20px 40px rgba(175, 13, 14, 0.25)" : "none",
+        }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onClick}
+        className={`group px-7 py-4 rounded-2xl font-bold text-base flex items-center gap-3 transition-all duration-300 ${
+          isPrimary
+            ? "bg-gradient-kalima text-white shadow-xl shadow-red-500/20"
+            : "bg-white text-gray-900 hover:text-primary border-2 border-gray-100 hover:border-primary/20"
+        }`}
+      >
+        {isPrimary ? (
+          <Icon className="w-5 h-5" strokeWidth={2.5} />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
+            <Icon className="w-3.5 h-3.5 fill-current text-gray-500 group-hover:text-primary transition-colors duration-300" />
+          </div>
+        )}
+        <span>{label}</span>
+        {hasArrow && (
+          <ArrowLeft
+            className={`w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 ${
+              !isRTL && "rotate-180"
+            }`}
+          />
+        )}
+      </motion.button>
+    );
+  },
+);
+
+ActionButton.displayName = "ActionButton";
+
+const HeroDescription = memo(({ isRTL }) => (
+  <motion.p
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.4, duration: 0.6 }}
+    className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl font-medium mb-8"
+  >
+    {isRTL
+      ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
+      : "A comprehensive educational platform providing the best teachers and courses from elementary to high school."}
+  </motion.p>
+));
+HeroDescription.displayName = "HeroDescription";
+
+const HeroSearch = memo(({ isRTL, searchQuery, onSearchChange, onSearch }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.5, duration: 0.6 }}
+    className="w-full max-w-xl"
+  >
+    <div className="relative w-full max-w-md mb-8">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder={
+          isRTL
+            ? "ابحث عن دورة، معلم، أو مادة..."
+            : "Search for courses, teachers..."
+        }
+        className={`w-full h-12 sm:h-14 ${
+          isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
+        } bg-white border-2 border-gray-100 rounded-2xl shadow-sm focus:outline-none focus:border-red-500/30 focus:ring-4 focus:ring-red-500/10 transition-all text-sm sm:text-base`}
+      />
+      <button
+        onClick={onSearch}
+        className={`absolute top-1.5 bottom-1.5 ${
+          isRTL ? "left-1.5" : "right-1.5"
+        } px-4 sm:px-6 bg-gradient-kalima text-white font-bold rounded-xl shadow-lg shadow-red-500/20  text-sm`}
+      >
+        {isRTL ? "بحث" : "Search"}
+      </button>
+    </div>
+  </motion.div>
+));
+HeroSearch.displayName = "HeroSearch";
+
 const WelcomeSection = memo(() => {
   const { i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
@@ -62,7 +150,7 @@ const WelcomeSection = memo(() => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen flex items-center   pb-16 overflow-hidden"
+      className="relative w-full min-h-screen flex items-center pb-16 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Premium Background */}
@@ -99,7 +187,9 @@ const WelcomeSection = memo(() => {
                   </motion.div>
                 ) : (
                   <div className="relative">
-                    <div className="w-14 h-14 border-4 border-gray-200 border-t-[#AF0D0E] rounded-full " />
+                    <div className="relative">
+                      <div className="w-14 h-14 border-4 border-gray-200 border-t-[#AF0D0E] rounded-full " />
+                    </div>
                   </div>
                 )}
               </div>
@@ -120,15 +210,14 @@ const WelcomeSection = memo(() => {
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="inline-flex items-center gap-3 py-2.5 shadow-[#AF0D0E]/5"
+                className="inline-flex items-center gap-3 py-2.5 shadow-kalima-red"
               >
                 <Rocket className="w-5 h-5 text-[#AF0D0E]" />
-                <span className="text-sm font-bold bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] bg-clip-text text-transparent">
+                <span className="text-sm font-bold text-gradient-kalima">
                   {isRTL
                     ? "تحلق في سماء الإبداع"
                     : "Soar in the Sky of Creativity"}
                 </span>
-                <Sparkles className="w-4 h-4 text-[#FF5C28]" />
               </motion.div>
             </motion.div>
 
@@ -143,30 +232,19 @@ const WelcomeSection = memo(() => {
                   <>
                     <span>منصة </span>
                     <span className="relative inline-block">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#D4342C] to-[#FF5C28]">
-                        كلمة
-                      </span>
-                      {/* Underline decoration */}
-                      <motion.span
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ delay: 0.8, duration: 0.6 }}
-                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] rounded-full origin-right"
-                      />
+                      <span className="text-gradient-kalima">كلمة</span>
                     </span>
                     <span> التعليمية</span>
                   </>
                 ) : (
                   <>
                     <span className="relative inline-block">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#D4342C] to-[#FF5C28]">
-                        Kalima
-                      </span>
+                      <span className="text-gradient-kalima">Kalima</span>
                       <motion.span
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] rounded-full origin-left"
+                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-kalima rounded-full origin-left"
                       />
                     </span>
                     <span> Learning Platform</span>
@@ -176,45 +254,15 @@ const WelcomeSection = memo(() => {
             </motion.div>
 
             {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl font-medium mb-8"
-            >
-              {isRTL
-                ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
-                : "A comprehensive educational platform providing the best teachers and courses from elementary to high school."}
-            </motion.p>
+            <HeroDescription isRTL={isRTL} />
 
             {/* Search Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="w-full max-w-xl"
-            >
-              <div className="relative w-full max-w-md mb-8">
-                <input
-                  type="text"
-                  placeholder={
-                    isRTL
-                      ? "ابحث عن دورة، معلم، أو مادة..."
-                      : "Search for courses, teachers..."
-                  }
-                  className={`w-full h-12 sm:h-14 ${
-                    isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
-                  } bg-white border-2 border-gray-100 rounded-2xl shadow-sm focus:outline-none focus:border-red-500/30 focus:ring-4 focus:ring-red-500/10 transition-all text-sm sm:text-base`}
-                />
-                <button
-                  className={`absolute top-1.5 bottom-1.5 ${
-                    isRTL ? "left-1.5" : "right-1.5"
-                  } px-4 sm:px-6 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold rounded-xl shadow-lg shadow-red-500/20 hover:shadow-red-500/30 hover:scale-105 transition-all text-sm`}
-                >
-                  {isRTL ? "بحث" : "Search"}
-                </button>
-              </div>
-            </motion.div>
+            <HeroSearch
+              isRTL={isRTL}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              onSearch={handleSearch}
+            />
 
             {/* CTA Buttons */}
             <motion.div
@@ -223,35 +271,25 @@ const WelcomeSection = memo(() => {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="flex flex-wrap items-center gap-4"
             >
-              <motion.button
-                whileHover={{
-                  scale: 1.03,
-                  boxShadow: "0 20px 40px rgba(175, 13, 14, 0.25)",
-                }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleNavigateCourses}
-                className="group px-7 py-4 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white rounded-2xl font-bold text-base flex items-center gap-3 shadow-xl shadow-red-500/20 transition-all duration-300"
-              >
-                <BookOpen className="w-5 h-5" strokeWidth={2.5} />
-                <span>{isRTL ? "تصفح الكورسات" : "Browse Courses"}</span>
-                <ArrowLeft
-                  className={`w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 ${!isRTL && "rotate-180"}`}
-                />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleNavigateTeachers}
-                className="group px-7 py-4 bg-white text-gray-900 hover:text-[#AF0D0E] rounded-2xl font-bold text-base flex items-center gap-3 border-2 border-gray-100 hover:border-[#AF0D0E]/20 shadow-lg shadow-gray-200/50 hover:shadow-red-500/10 transition-all duration-300"
-              >
-                <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-[#AF0D0E]/10 flex items-center justify-center transition-colors duration-300">
-                  <Play
-                    className={`w-3.5 h-3.5 fill-current text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300 ${!isRTL && "rotate-180"}`}
-                  />
-                </div>
-                <span>{isRTL ? "المعلمين" : "Teachers"}</span>
-              </motion.button>
+              {[
+                {
+                  id: "courses",
+                  label: isRTL ? "تصفح الكورسات" : "Browse Courses",
+                  onClick: handleNavigateCourses,
+                  icon: BookOpen,
+                  variant: "primary",
+                  hasArrow: true,
+                },
+                {
+                  id: "teachers",
+                  label: isRTL ? "المعلمين" : "Teachers",
+                  onClick: handleNavigateTeachers,
+                  icon: Play,
+                  variant: "secondary",
+                },
+              ].map((action) => (
+                <ActionButton key={action.id} {...action} isRTL={isRTL} />
+              ))}
             </motion.div>
           </div>
         </div>

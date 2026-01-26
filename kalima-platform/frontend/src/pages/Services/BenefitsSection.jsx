@@ -140,7 +140,7 @@ const BenefitsSection = React.memo(() => {
               transition={{ delay: index * 0.1, duration: 0.8 }}
               className="relative group"
             >
-              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-white border border-base-content/5 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-2 overflow-hidden">
+              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-white border border-base-content/5 shadow-xl transition-all duration-500 hover:shadow-2xl hover-shadow-primary hover:-translate-y-2 overflow-hidden">
                 {/* Animated Material Icon */}
                 <div className="relative mb-8 sm:mb-10 lg:mb-14">
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] bg-base-100 border border-base-content/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">

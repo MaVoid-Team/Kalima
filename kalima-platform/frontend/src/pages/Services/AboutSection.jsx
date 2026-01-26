@@ -71,7 +71,7 @@ const AboutSection = React.memo(() => {
                 )}
               </motion.h2>
 
-              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
+              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-quote-primary">
                 {isRTL
                   ? "نحن هنا لنضع بين يديك تجربة تعليمية لا تُنسى، تمزج بين الابتكار والاحترافية والذكاء الإصطناعي."
                   : "We provide an unforgettable educational experience, blending innovation, professionalism, and AI."}

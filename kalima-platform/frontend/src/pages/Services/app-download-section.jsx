@@ -71,7 +71,7 @@ export const AppDownloadSection = React.memo(() => {
                 )}
               </motion.h2>
 
-              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
+              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-quote-primary">
                 {isRTL
                   ? "مع تطبيق كلمة، نأخذك في رحلة تعليمية متكاملة تتخطى قيود المكان والزمان."
                   : "With Kalima app, we take you on an integrated educational journey that transcends limits."}
