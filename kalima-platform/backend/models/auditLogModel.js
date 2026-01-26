@@ -19,7 +19,7 @@ const auditLogSchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ["create", "read", "update", "delete"],
+      enum: ["create", "update", "delete"],
       required: true
     },
     resource: {
@@ -29,7 +29,7 @@ const auditLogSchema = new mongoose.Schema(
         enum: [
           "center", "code", "container", "moderator", "subAdmin",
           "assistant", "admin", "lecturer", "package",
-          "lesson", "timetable", "center-lesson", "ec.section",
+          "lesson", "timetable", "center-lesson", "ec.section", "ec.subSection",
           "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
         ]
       },

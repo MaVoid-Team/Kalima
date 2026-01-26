@@ -67,7 +67,7 @@ const ecCartRoutes = require("./routes/ec.cartRoutes");
 const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
 const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
 const ecPaymentMethodRoutes = require("./routes/paymentMethodRoutes");
-const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes.js");
+const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes");
 
 connectDB();
 
@@ -137,7 +137,7 @@ app.use("/api/v1/notifications", notificationRoutes);
 // Mount the new e-commerce product and book routes
 app.use("/api/v1/ec/sections", auditLogger, ecSectionRouter);
 app.use("/api/v1/ec/products", auditLogger, ecProductRouter);
-app.use("/api/v1/ec/books", ecBookRouter);
+app.use("/api/v1/ec/books", auditLogger, ecBookRouter);
 app.use("/api/v1/ec/purchases", auditLogger, ecPurchaseRouter);
 app.use("/api/v1/ec/book-purchases", ecBookPurchaseRouter);
 app.use("/api/v1/ec/coupons", ecCouponRouter);
@@ -146,9 +146,9 @@ app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 // cartitem routes are now handled in ec.cartRoutes.js
 app.use("/api/v1/ec/cart-items", ecCartItemRoutes);
 app.use("/api/v1/ec/carts", ecCartRoutes);
-app.use("/api/v1/ec/cart-purchases", ecCartPurchaseRoutes);
-app.use("/api/v1/ec/payment-methods", ecPaymentMethodRoutes);
-app.use("/api/v1/whatsapp-numbers", whatsAppNumberRoutes);
+app.use("/api/v1/ec/cart-purchases", auditLogger, ecCartPurchaseRoutes);
+app.use("/api/v1/ec/payment-methods", auditLogger, ecPaymentMethodRoutes);
+app.use("/api/v1/whatsapp-numbers", auditLogger, whatsAppNumberRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -161,6 +161,7 @@ mongoose.connection.once("open", () => {
       methods: ["GET", "POST"],
       credentials: true,
     },
+    path: "/socket.io",
     pingTimeout: 60000, // Increase ping timeout for better connection stability
   });
 

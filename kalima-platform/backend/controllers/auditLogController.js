@@ -19,6 +19,8 @@ const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
 const ECPurchase = require("../models/ec.purchaseModel");
 const ECCartPurchase = require("../models/ec.cartPurchaseModel");
+const paymentMethod = require("../models/paymentMethodModel");
+const WhatsAppNumber = require("../models/whatsAppNumberModel");
 
 
 // Helper function to enrich audit logs with readable resource data
@@ -235,6 +237,26 @@ const enrichAuditLogs = async (logs) => {
             }
             break;
 
+          case "PaymentMethod":
+            const paymentMethodDoc = await paymentMethod.findById(resourceId).lean();
+            if (paymentMethodDoc) {
+              enrichedLog.resource.details = {
+                name: paymentMethodDoc.name,
+                description: paymentMethodDoc.description,
+                isActive: paymentMethodDoc.isActive
+              };
+            }
+
+          case "whatsAppNumber":
+            const whatsAppNumberDoc = await WhatsAppNumber.findById(resourceId).lean();
+            if (whatsAppNumberDoc) {
+              enrichedLog.resource.details = {
+                number: whatsAppNumberDoc.number,
+                isActive: whatsAppNumberDoc.isActive
+              };
+            }
+            break;
+
           default:
             // No additional details for unhandled resource types
             break;
@@ -256,11 +278,35 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
   // Create a base query (do not filter by user.role at DB level)
   const query = AuditLog.find();
 
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   // Apply query features (filtering, sorting, pagination)
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
+
+  // Apply default sort by timestamp descending if not specified
+  if (!req.query.sort) {
+    features.query.sort({ timestamp: -1 });
+  }
+
+  // Get total count for pagination info
+  const totalQuery = AuditLog.find();
+  new QueryFeatures(totalQuery, req.query).filter();
+  const total = await totalQuery.countDocuments();
 
   // Execute the query
   let logs = await features.query;
@@ -273,10 +319,21 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
     enrichedLogs = enrichedLogs.filter(log => log.user && log.user.role === req.query.role);
   }
 
+  // Extract pagination info from query
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 10;
+  const pages = Math.ceil(total / limit);
+
   // Send the response
   res.status(200).json({
     status: 'success',
     results: enrichedLogs.length,
+    pagination: {
+      total,
+      page,
+      pages,
+      limit,
+    },
     data: {
       logs: enrichedLogs
     }
@@ -292,15 +349,35 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
     "center", "code", "container", "moderator", "subAdmin",
     "assistant", "admin", "lecturer", "package",
     "lesson", "timetable", "center-lesson", "ec.section",
-    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
+    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level",
+    "whatsAppNumber", "PaymentMethod"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
     return next(new AppError(`Invalid resource type: ${resourceType}`, 400));
   }
 
+  // Get total count for pagination info
+  const totalQuery = AuditLog.find({ "resource.type": resourceType });
+  new QueryFeatures(totalQuery, req.query).filter();
+  const total = await totalQuery.countDocuments();
+
   // Create a base query filtered by resource type
   const query = AuditLog.find({ "resource.type": resourceType });
+
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
 
   // Apply query features
   const features = new QueryFeatures(query, req.query)
@@ -308,16 +385,32 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
     .sort()
     .paginate();
 
+  // Apply default sort by timestamp descending if not specified
+  if (!req.query.sort) {
+    features.query.sort({ timestamp: -1 });
+  }
+
   // Execute the query
   const logs = await features.query;
 
   // Enrich logs with readable data
   const enrichedLogs = await enrichAuditLogs(logs);
 
+  // Extract pagination info from query
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 10;
+  const pages = Math.ceil(total / limit);
+
   // Send the response
   res.status(200).json({
     status: 'success',
     results: enrichedLogs.length,
+    pagination: {
+      total,
+      page,
+      pages,
+      limit,
+    },
     data: {
       logs: enrichedLogs
     }
@@ -332,17 +425,56 @@ exports.getUserAuditLogsByEmail = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError("User with this email not found", 404));
   }
+
+  // Get total count for pagination info
+  const totalQuery = AuditLog.find({ "user.userId": user._id });
+  new QueryFeatures(totalQuery, req.query).filter();
+  const total = await totalQuery.countDocuments();
+
   // Query logs by userId
   const query = AuditLog.find({ "user.userId": user._id });
+
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
+
+  // Apply default sort by timestamp descending if not specified
+  if (!req.query.sort) {
+    features.query.sort({ timestamp: -1 });
+  }
+
   const logs = await features.query;
   const enrichedLogs = await enrichAuditLogs(logs);
+
+  // Extract pagination info from query
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 10;
+  const pages = Math.ceil(total / limit);
+
   res.status(200).json({
     status: 'success',
     results: enrichedLogs.length,
+    pagination: {
+      total,
+      page,
+      pages,
+      limit,
+    },
     data: { logs: enrichedLogs }
   });
 });
@@ -356,12 +488,20 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
     "center", "code", "container", "moderator", "subAdmin",
     "assistant", "admin", "lecturer", "package",
     "lesson", "timetable", "center-lesson", "ec.section",
-    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
+    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level", "whatsAppNumber", "PaymentMethod"
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
     return next(new AppError(`Invalid resource type: ${resourceType}`, 400));
   }
+
+  // Get total count for pagination info
+  const totalQuery = AuditLog.find({
+    "resource.type": resourceType,
+    "resource.id": resourceId
+  });
+  new QueryFeatures(totalQuery, req.query).filter();
+  const total = await totalQuery.countDocuments();
 
   // Create a query to find logs for the specific resource
   const query = AuditLog.find({
@@ -369,11 +509,30 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
     "resource.id": resourceId
   });
 
+  // Apply date filtering if provided
+  if (req.query.startDate || req.query.endDate) {
+    const dateFilter = {};
+    if (req.query.startDate) {
+      dateFilter.$gte = new Date(req.query.startDate);
+    }
+    if (req.query.endDate) {
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999); // Set to end of day
+      dateFilter.$lte = endDate;
+    }
+    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+  }
+
   // Apply query features
   const features = new QueryFeatures(query, req.query)
     .filter()
     .sort()
     .paginate();
+
+  // Apply default sort by timestamp descending if not specified
+  if (!req.query.sort) {
+    features.query.sort({ timestamp: -1 });
+  }
 
   // Execute the query
   const logs = await features.query;
@@ -381,10 +540,21 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   // Enrich logs with readable data
   const enrichedLogs = await enrichAuditLogs(logs);
 
+  // Extract pagination info from query
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 10;
+  const pages = Math.ceil(total / limit);
+
   // Send the response
   res.status(200).json({
     status: 'success',
     results: enrichedLogs.length,
+    pagination: {
+      total,
+      page,
+      pages,
+      limit,
+    },
     data: {
       logs: enrichedLogs
     }
