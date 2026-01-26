@@ -40,13 +40,14 @@ import {
 } from "lucide-react";
 import { getAllPaymentMethods } from "../../routes/market";
 import KalimaLoader from "../../components/KalimaLoader";
+import { trackInitiateCheckout, trackPurchase } from "../../hooks/useMetaPixel";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
-    
+
 
   const handleCopy = () => {
     const phoneNumber = getPaymentPhoneNumber();
@@ -119,6 +120,17 @@ const CartPage = () => {
               item.productType === "ECBook" || item.product?.__t === "ECBook",
           );
           setRequiresBookDetails(hasBooks);
+
+          // Track InitiateCheckout event for Meta Pixel
+          if (items.length > 0) {
+            const contentIds = items.map(item => item.product?._id || item._id).filter(Boolean);
+            trackInitiateCheckout({
+              contentIds,
+              value: cartData.total || cartData.subtotal || 0,
+              numItems: items.length,
+              currency: 'EGP',
+            });
+          }
         } else {
           setRequiresBookDetails(false);
         }
@@ -387,7 +399,7 @@ const CartPage = () => {
     if (checkoutCooldown > 0) {
       toast.error(
         t("errors.checkoutCooldown", { seconds: checkoutCooldown }) ||
-          `يرجى الانتظار ${checkoutCooldown} ثانية`,
+        `يرجى الانتظار ${checkoutCooldown} ثانية`,
       );
       return;
     }
@@ -402,6 +414,16 @@ const CartPage = () => {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
+        // Track Purchase event for Meta Pixel
+        const items = cart?.itemsWithDetails || cart?.items || [];
+        const contentIds = items.map(item => item.product?._id || item._id).filter(Boolean);
+        trackPurchase({
+          contentIds,
+          value: cart?.total || cart?.subtotal || 0,
+          numItems: items.length,
+          currency: 'EGP',
+        });
+
         const cooldownSeconds = 30;
         localStorage.setItem(
           "checkoutCooldownExpiry",
@@ -429,8 +451,8 @@ const CartPage = () => {
     } catch (err) {
       toast.error(
         err.response?.data?.message ||
-          err.message ||
-          t("errors.checkoutFailed"),
+        err.message ||
+        t("errors.checkoutFailed"),
       );
     } finally {
       setCheckoutLoading(false);
@@ -784,21 +806,20 @@ const CartPage = () => {
                           )}
                           {/* Item Type Badge */}
                           <div
-                            className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${
-                              item.productType === "ECBook" ||
+                            className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${item.productType === "ECBook" ||
                               item.product?.__t === "ECBook"
-                                ? "bg-blue-50 text-blue-600 border border-blue-100"
-                                : "bg-orange-50 text-orange-600 border border-orange-100"
-                            }`}
+                              ? "bg-blue-50 text-blue-600 border border-blue-100"
+                              : "bg-orange-50 text-orange-600 border border-orange-100"
+                              }`}
                           >
                             {item.productType === "ECBook" ||
-                            item.product?.__t === "ECBook" ? (
+                              item.product?.__t === "ECBook" ? (
                               <BookOpen className="w-3.5 h-3.5" />
                             ) : (
                               <Package className="w-3.5 h-3.5" />
                             )}
                             {item.productType === "ECBook" ||
-                            item.product?.__t === "ECBook"
+                              item.product?.__t === "ECBook"
                               ? t("type.book")
                               : t("type.product")}
                           </div>
@@ -857,11 +878,10 @@ const CartPage = () => {
                           placeholder={
                             isRTL ? "أدخل الكود هنا" : "Enter code here"
                           }
-                          className={`w-full h-12 px-4 bg-gray-50 border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${
-                            couponValidation.isValid
-                              ? "border-emerald-400 bg-emerald-50"
-                              : "border-gray-200 focus:border-[#AF0D0E]"
-                          }`}
+                          className={`w-full h-12 px-4 bg-gray-50 border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${couponValidation.isValid
+                            ? "border-emerald-400 bg-emerald-50"
+                            : "border-gray-200 focus:border-[#AF0D0E]"
+                            }`}
                           value={couponCode}
                           onChange={(e) =>
                             setCouponCode(e.target.value.toUpperCase())
@@ -972,30 +992,29 @@ const CartPage = () => {
                       onClick={() =>
                         setShowPaymentDropdown(!showPaymentDropdown)
                       }
-                      className={`w-full h-14 px-4 flex items-center justify-between bg-gray-50 border-2 rounded-2xl transition-all ${
-                        validationErrors.paymentMethod
-                          ? "border-red-300 bg-red-50"
-                          : showPaymentDropdown
-                            ? "border-[#AF0D0E] ring-4 ring-[#AF0D0E]/10"
-                            : "border-gray-200 hover:border-gray-300"
-                      }`}
+                      className={`w-full h-14 px-4 flex items-center justify-between bg-gray-50 border-2 rounded-2xl transition-all ${validationErrors.paymentMethod
+                        ? "border-red-300 bg-red-50"
+                        : showPaymentDropdown
+                          ? "border-[#AF0D0E] ring-4 ring-[#AF0D0E]/10"
+                          : "border-gray-200 hover:border-gray-300"
+                        }`}
                     >
                       {checkoutData.paymentMethod ? (
                         <div className="flex items-center gap-3">
                           {paymentMethods.find(
                             (pm) => pm._id === checkoutData.paymentMethod,
                           )?.paymentMethodImg && (
-                            <img
-                              src={convertPathToUrl(
-                                paymentMethods.find(
-                                  (pm) => pm._id === checkoutData.paymentMethod,
-                                )?.paymentMethodImg,
-                                "payment_methods",
-                              )}
-                              alt=""
-                              className="w-10 h-10 object-contain rounded-xl bg-white p-1 border border-gray-100"
-                            />
-                          )}
+                              <img
+                                src={convertPathToUrl(
+                                  paymentMethods.find(
+                                    (pm) => pm._id === checkoutData.paymentMethod,
+                                  )?.paymentMethodImg,
+                                  "payment_methods",
+                                )}
+                                alt=""
+                                className="w-10 h-10 object-contain rounded-xl bg-white p-1 border border-gray-100"
+                              />
+                            )}
                           <span className="font-semibold text-gray-700">
                             {
                               paymentMethods.find(
@@ -1034,11 +1053,10 @@ const CartPage = () => {
                                 clearFieldError("paymentMethod");
                                 setShowPaymentDropdown(false);
                               }}
-                              className={`w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors ${
-                                checkoutData.paymentMethod === method._id
-                                  ? "bg-red-50"
-                                  : ""
-                              }`}
+                              className={`w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors ${checkoutData.paymentMethod === method._id
+                                ? "bg-red-50"
+                                : ""
+                                }`}
                             >
                               {method.paymentMethodImg && (
                                 <img
@@ -1114,11 +1132,10 @@ const CartPage = () => {
                             ? "أدخل الرقم (11 رقم)"
                             : "Enter number (11 digits)"
                         }
-                        className={`w-full h-14 px-4 bg-gray-50 border-2 rounded-2xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${
-                          validationErrors.numberTransferredFrom
-                            ? "border-red-300 bg-red-50"
-                            : "border-gray-200 focus:border-[#AF0D0E]"
-                        }`}
+                        className={`w-full h-14 px-4 bg-gray-50 border-2 rounded-2xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${validationErrors.numberTransferredFrom
+                          ? "border-red-300 bg-red-50"
+                          : "border-gray-200 focus:border-[#AF0D0E]"
+                          }`}
                         value={checkoutData.numberTransferredFrom}
                         onChange={(e) => {
                           const value = e.target.value
@@ -1163,13 +1180,12 @@ const CartPage = () => {
                         <span className="text-[#AF0D0E]">*</span>
                       </label>
                       <label
-                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-                          validationErrors.paymentScreenShot
-                            ? "border-red-300 bg-red-50"
-                            : checkoutData.paymentScreenShot
-                              ? "border-emerald-400 bg-emerald-50"
-                              : "border-gray-200 hover:border-[#AF0D0E] hover:bg-red-50/30"
-                        }`}
+                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${validationErrors.paymentScreenShot
+                          ? "border-red-300 bg-red-50"
+                          : checkoutData.paymentScreenShot
+                            ? "border-emerald-400 bg-emerald-50"
+                            : "border-gray-200 hover:border-[#AF0D0E] hover:bg-red-50/30"
+                          }`}
                       >
                         <input
                           type="file"
@@ -1229,11 +1245,10 @@ const CartPage = () => {
                     </span>
                   </div>
                   <label
-                    className={`flex items-center justify-center w-full h-16 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-                      checkoutData.watermark
-                        ? "border-violet-400 bg-violet-50"
-                        : "border-gray-200 hover:border-violet-400 hover:bg-violet-50/30"
-                    }`}
+                    className={`flex items-center justify-center w-full h-16 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${checkoutData.watermark
+                      ? "border-violet-400 bg-violet-50"
+                      : "border-gray-200 hover:border-violet-400 hover:bg-violet-50/30"
+                      }`}
                   >
                     <input
                       type="file"
@@ -1290,11 +1305,10 @@ const CartPage = () => {
                       </label>
                       <input
                         type="text"
-                        className={`w-full h-12 px-4 bg-white border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${
-                          validationErrors[field.key]
-                            ? "border-red-300"
-                            : "border-gray-200 focus:border-[#AF0D0E]"
-                        }`}
+                        className={`w-full h-12 px-4 bg-white border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${validationErrors[field.key]
+                          ? "border-red-300"
+                          : "border-gray-200 focus:border-[#AF0D0E]"
+                          }`}
                         value={checkoutData[field.key]}
                         onChange={(e) => {
                           const value =

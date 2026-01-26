@@ -153,10 +153,10 @@ const withCompressionAndCleanup = (multerMiddleware, compressOptions = {}) => {
             req.file.filename = filename;
 
             const compressionRatio = ((1 - compressed.length / req.file.buffer.length) * 100).toFixed(2);
-            console.log("✓ Compressed image saved:", filepath);
-            console.log("   Original size:", req.file.buffer.length, "bytes");
-            console.log("   Compressed size:", compressed.length, "bytes");
-            console.log("   Compression ratio:", compressionRatio + "%");
+            // console.log("✓ Compressed image saved:", filepath);
+            // console.log("   Original size:", req.file.buffer.length, "bytes");
+            // console.log("   Compressed size:", compressed.length, "bytes");
+            // console.log("   Compression ratio:", compressionRatio + "%");
           }
         }
 

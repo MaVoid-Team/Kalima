@@ -25,6 +25,7 @@ import PaymentSection from "./components/PaymentSection";
 
 import PurchaseForm from "./components/PurchaseForm";
 import KalimaLoader from "../../components/KalimaLoader";
+import { trackViewContent, trackAddToCart } from "../../hooks/useMetaPixel";
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails");
@@ -113,6 +114,16 @@ const ProductDetails = () => {
           const initialDisplayPrice = getDisplayPrice(itemData);
           setFinalPrice(initialDisplayPrice);
 
+          // Track ViewContent event for Meta Pixel
+          trackViewContent({
+            contentName: itemData.title,
+            contentCategory: itemData.section?.name || 'Products',
+            contentIds: [itemData._id],
+            contentType: itemData.__t === 'ECBook' ? 'book' : 'product',
+            value: initialDisplayPrice,
+            currency: 'EGP',
+          });
+
           // Check if user has purchased this product
           if (isLoggedIn()) {
             const purchasedResult = await getUserPurchasedProducts();
@@ -162,6 +173,15 @@ const ProductDetails = () => {
       setAddingToCart(true);
       const result = await addToCart(product._id);
       if (result.success) {
+        // Track AddToCart event for Meta Pixel
+        trackAddToCart({
+          contentName: product.title,
+          contentIds: [product._id],
+          contentType: product.__t === 'ECBook' ? 'book' : 'product',
+          value: getDisplayPrice(product),
+          currency: 'EGP',
+        });
+
         toast.success(
           t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
         );
@@ -170,15 +190,15 @@ const ProductDetails = () => {
       } else {
         toast.error(
           result.error ||
-            t("errors.addToCartFailed") ||
-            "فشل في الإضافة إلى السلة",
+          t("errors.addToCartFailed") ||
+          "فشل في الإضافة إلى السلة",
         );
       }
     } catch (error) {
       toast.error(
         error.message ||
-          t("errors.addToCartFailed") ||
-          "فشل في الإضافة إلى السلة",
+        t("errors.addToCartFailed") ||
+        "فشل في الإضافة إلى السلة",
       );
     } finally {
       setAddingToCart(false);

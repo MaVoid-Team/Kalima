@@ -38,6 +38,21 @@
 }
 
 :root {
+  /* Theme Colors - mirrored from DaisyUI theme for CSS utilities */
+  --color-primary: #af0d0e;
+  --color-primary-content: #ffffff;
+  --color-secondary: #c5a059;
+  --color-secondary-content: #ffffff;
+  --color-accent: #eab308;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1a1a1a;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #ffffff;
+  --color-base-200: #fcfcfc;
+  --color-base-300: #f8f8f8;
+  --color-base-content: #1a1a1a;
+
+  /* Font Families */
   --font-sans: "IBM Plex Sans Arabic", "Outfit", system-ui, sans-serif;
   --font-serif: "Outfit", "IBM Plex Sans Arabic", serif;
 
@@ -77,12 +92,10 @@ h6 {
 /* Premium Layout Utilities */
 .section-divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(175, 13, 14, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(175, 13, 14, 0.1),
+      transparent);
 }
 
 .perspective-1000 {
@@ -93,13 +106,16 @@ h6 {
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: white;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #f0f0f0;
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #af0d0e;
 }
@@ -125,10 +141,12 @@ html {
 
 /* Animations */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-20px);
   }
@@ -138,13 +156,27 @@ html {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Brand Colors & Gradients */
+/* Brand Colors & Gradients - Using Theme Variables */
 :root {
-  --brand-red: #af0d0e;
+  --brand-red: var(--color-primary);
   --brand-orange: #ff5c28;
   --brand-yellow: #facc15;
-  --brand-gradient: linear-gradient(135deg, #af0d0e 0%, #ff5c28 100%);
-  --brand-gradient-warm: linear-gradient(135deg, #ff5c28 0%, #facc15 100%);
+}
+
+/* Semantic Gradient Utilities */
+.gradient-brand {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #ff5c28 100%);
+}
+
+.gradient-brand-horizontal {
+  background: linear-gradient(90deg, var(--color-primary) 0%, #ff5c28 100%);
+}
+
+.text-gradient-brand {
+  background: linear-gradient(90deg, var(--color-primary) 0%, #d4342c 50%, #ff5c28 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Glass Navbar */
@@ -160,9 +192,11 @@ html {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -178,6 +212,7 @@ html {
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -189,6 +224,7 @@ html {
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(-100%);
@@ -197,10 +233,12 @@ html {
 
 /* Pulse Glow Effect */
 @keyframes pulseGlow {
+
   0%,
   100% {
     box-shadow: 0 0 20px rgba(175, 13, 14, 0.3);
   }
+
   50% {
     box-shadow: 0 0 40px rgba(175, 13, 14, 0.5);
   }
@@ -208,35 +246,4 @@ html {
 
 .animate-pulse-glow {
   animation: pulseGlow 3s ease-in-out infinite;
-}
-
-/* Kalima Custom Utilities */
-@layer utilities {
-  .text-gradient-kalima {
-    @apply text-transparent bg-clip-text bg-gradient-to-r from-[#AF0D0E] via-[#D4342C] to-[#FF5C28];
-  }
-
-  .bg-gradient-kalima {
-    @apply bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28];
-  }
-
-  .shadow-kalima-red {
-    @apply shadow-[#AF0D0E]/5;
-  }
-
-  .hover-shadow-kalima {
-    box-shadow: 0 20px 40px rgba(175, 13, 14, 0.25);
-  }
-
-  .shadow-card-soft {
-    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.03);
-  }
-
-  .hover-shadow-primary {
-    @apply hover:shadow-primary/5;
-  }
-
-  .border-quote-primary {
-    @apply border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0;
-  }
 }
