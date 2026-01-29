@@ -244,7 +244,7 @@ const ProductsManagement = memo(({
             onChange={handleSearchChange}
             className={`input input-bordered w-full ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
           />
-          <button className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm`}>
+          <button className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn-ghost btn-sm`}>
             🔍
           </button>
         </div>
@@ -253,7 +253,7 @@ const ProductsManagement = memo(({
 
       {/* Export Buttons */}
       <div className="dropdown dropdown-end mb-4">
-        <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+        <div tabIndex={0} role="button" className="btn-outline btn-primary" disabled={isExporting}>
           {isExporting ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
@@ -317,7 +317,7 @@ const ProductsManagement = memo(({
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button
-                          className="btn btn-ghost btn-sm"
+                          className="btn-ghost btn-sm"
                           onClick={() => onEditProduct?.(product)}
                           disabled={actionLoading}
                           title={t("productsManagement.table.edit") || "Edit"}
@@ -325,7 +325,7 @@ const ProductsManagement = memo(({
                           <FaPencilAlt />
                         </button>
                         <button
-                          className="btn btn-ghost btn-sm"
+                          className="btn-ghost btn-sm"
                           onClick={() => onDeleteProduct?.(product)}
                           disabled={actionLoading}
                           title={t("productsManagement.table.delete") || "Delete"}

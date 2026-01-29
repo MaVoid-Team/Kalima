@@ -341,7 +341,7 @@ export default function LecturesPage() {
     return (
       <div className="flex justify-center mt-8">
         <button
-          className="btn btn-outline btn-sm mx-1"
+          className="btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -351,7 +351,7 @@ export default function LecturesPage() {
           {t("pagination.page")} {currentPage} {t("pagination.of")} {totalPages}
         </span>
         <button
-          className="btn btn-outline btn-sm mx-1"
+          className="btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
@@ -428,7 +428,7 @@ export default function LecturesPage() {
 
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-start">
-            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
+            <button className="btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               {t("filters.reset")}
             </button>
             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -474,7 +474,7 @@ export default function LecturesPage() {
             <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
               <p className="text-lg">{t("noLectures")}</p>
               {(selectedStage || selectedGrade || selectedSubject || selectedStatus) && (
-                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
+                <button className="btn-outline btn-sm mt-4" onClick={resetFilters}>
                   {t("filters.reset")}
                 </button>
               )}

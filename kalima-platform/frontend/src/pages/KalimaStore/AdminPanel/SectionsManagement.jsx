@@ -51,7 +51,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
             onChange={(e) => setSearchText(e.target.value)}
             className="input input-bordered w-full pl-4 pr-12"
           />
-          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm">
+          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-ghost btn-sm">
             🔍
           </button>
         </div>
@@ -83,7 +83,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onEditSection?.(section)}
                         disabled={actionLoading}
                         title={t("sectionsManagement.table.edit")}
@@ -91,7 +91,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                         ✏️
                       </button>
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onDeleteSection?.(section)}
                         disabled={actionLoading}
                         title={t("sectionsManagement.table.delete")}

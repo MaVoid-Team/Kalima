@@ -152,7 +152,7 @@ export default function Teachers() {
         <div className="container mx-auto px-4 py-4" dir={isRTL ? 'ltr' : 'rtl'}>
           <div className="flex justify-end mb-4">
             <button
-              className="btn btn-outline btn-sm rounded-md mx-2"
+              className="btn-outline btn-sm rounded-md mx-2"
               onClick={resetFilters}
             >
               {t('buttons.resetFilters')}
@@ -224,7 +224,7 @@ export default function Teachers() {
               <p className="text-lg">{t('noTeachers')}</p>
               {(searchTerm || selectedSubject || selectedStage) && (
                 <button
-                  className="btn btn-outline btn-sm mt-4"
+                  className="btn-outline btn-sm mt-4"
                   onClick={resetFilters}
                 >
                   {t('buttons.resetFilters')}

@@ -1066,7 +1066,7 @@ const LectureDisplay = () => {
       <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
         <button
           onClick={() => navigate(-1)}
-          className="btn btn-outline btn-primary mb-4"
+          className="btn-outline btn-primary mb-4"
         >
           {t("back")}
         </button>
@@ -1201,7 +1201,7 @@ const LectureDisplay = () => {
     <div className="container mx-auto p-4" dir={isRTL ? "rtl" : "ltr"}>
       <button
         onClick={() => navigate(-1)}
-        className="btn btn-outline btn-primary mb-4"
+        className="btn-outline btn-primary mb-4"
       >
         {t("back")}
       </button>
@@ -1985,7 +1985,7 @@ const LectureDisplay = () => {
                 "You haven't completed 50% of this lecture yet. Are you sure you want to leave?"}
             </p>
             <div className="flex justify-end gap-2">
-              <button onClick={handleCancelNavigation} className="btn btn-outline">
+              <button onClick={handleCancelNavigation} className="btn-outline">
                 {t("stayOnPage") || "Stay on page"}
               </button>
               <button onClick={handleConfirmNavigation} className="btn btn-primary">

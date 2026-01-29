@@ -467,7 +467,7 @@ export default function AdminCreate() {
                   )}
                 </div>
               ))}
-              <button type="button" className="btn btn-outline btn-sm mt-2" onClick={addPoint}>
+              <button type="button" className="btn-outline btn-sm mt-2" onClick={addPoint}>
                 {t("forms.package.addPoints")}
               </button>
             </div>

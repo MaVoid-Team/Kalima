@@ -594,7 +594,7 @@ const MyLecturesPage = () => {
                 <h3 className="text-xl font-bold">{t("lecturesPage.editLecture", "Edit Lecture")}</h3>
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="btn btn-ghost btn-sm btn-circle"
+                  className="btn-ghost btn-sm btn-circle"
                 >
                   ✕
                 </button>
@@ -723,7 +723,7 @@ const MyLecturesPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowEditModal(false)}
-                    className="btn btn-ghost"
+                    className="btn-ghost"
                   >
                     {t("lecturesPage.buttons.cancel", "Cancel")}
                   </button>
@@ -810,7 +810,7 @@ const MyLecturesPage = () => {
                           to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
                             }/${lecture.id}`}
                         >
-                          <button className="btn btn-ghost btn-sm">{t("lecturesPage.buttons.details")}</button>
+                          <button className="btn-ghost btn-sm">{t("lecturesPage.buttons.details")}</button>
                         </Link>
                         {userRole === "Lecturer" && (
                           <button

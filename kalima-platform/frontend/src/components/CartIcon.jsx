@@ -67,7 +67,7 @@ const CartIcon = () => {
   return (
     <Link
       to="/cart"
-      className="btn btn-ghost btn-circle relative overflow-visible"
+      className="btn-ghost btn-circle relative overflow-visible"
     >
       <ShoppingCart className="w-6 h-6" />
       {itemCount > 0 && (

@@ -153,7 +153,7 @@ const PaymentMethodsManagement = ({
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   type="button"
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={closeEdit}
                 >
                   {t("common.cancel") || "Cancel"}
@@ -225,7 +225,7 @@ const PaymentMethodsManagement = ({
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => openEdit(method)}
                         disabled={actionLoading}
                       >
@@ -233,7 +233,7 @@ const PaymentMethodsManagement = ({
                       </button>
 
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => handleToggleStatus(method)}
                         disabled={actionLoading}
                       >
@@ -241,7 +241,7 @@ const PaymentMethodsManagement = ({
                       </button>
 
                       <button
-                        className="btn btn-ghost btn-sm text-error"
+                        className="btn-ghost btn-sm text-error"
                         onClick={() => onDelete(method)}
                         disabled={actionLoading}
                       >

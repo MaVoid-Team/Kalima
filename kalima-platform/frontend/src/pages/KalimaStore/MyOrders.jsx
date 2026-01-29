@@ -360,7 +360,7 @@ const MyOrders = () => {
               whileHover={{ scale: 1.03, x: isRTL ? 5 : -5 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/market")}
-              className="btn btn-ghost btn-lg gap-3 bg-base-100 hover:bg-base-200 border-2 border-base-200 hover:border-primary/40 shadow-lg shadow-base-200/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 overflow-hidden h-auto py-3.5 px-6 rounded-2xl"
+              className="btn-ghost btn-lg gap-3 bg-base-100 hover:bg-base-200 border-2 border-base-200 hover:border-primary/40 shadow-lg shadow-base-200/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 overflow-hidden h-auto py-3.5 px-6 rounded-2xl"
             >
               {/* Hover gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

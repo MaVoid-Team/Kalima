@@ -184,7 +184,7 @@ const ContainerDetailsPage = () => {
           <p className="text-base-content/70 mb-6">{error}</p>
           <Link
             to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
-            className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
+            className="btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
           >
             <FiArrowLeft /> {t('containerDetails.buttons.backToDashboard')}
           </Link>
@@ -264,7 +264,7 @@ const ContainerDetailsPage = () => {
                           ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                           : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                       }
-                      className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
+                      className="btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
                     >
                       {t('containerDetails.buttons.viewDetails')} →
                     </Link>

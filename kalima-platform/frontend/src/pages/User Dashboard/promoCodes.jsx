@@ -539,13 +539,13 @@ const PromoCodes = () => {
                       {transaction.isRedemption ? (
                         <button
                           onClick={() => copyToClipboard(transaction.code)}
-                          className="btn btn-ghost btn-sm"
+                          className="btn-ghost btn-sm"
                           title={t("copy")}
                         >
                           <Copy className="w-4 h-4" />
                         </button>
                       ) : (
-                        <button className="btn btn-ghost btn-sm" title={t("details")}>
+                        <button className="btn-ghost btn-sm" title={t("details")}>
                           <Info className="w-4 h-4" />
                         </button>
                       )}
@@ -1045,7 +1045,7 @@ const PromoCodes = () => {
                       setRedeemCode("")
                       document.getElementById("redeem_modal").showModal()
                     }}
-                    className="btn btn-outline btn-primary"
+                    className="btn-outline btn-primary"
                     disabled={selectedChild !== null}
                   >
                     <Ticket className="w-4 h-4 mr-2" />
@@ -1204,7 +1204,7 @@ const PromoCodes = () => {
               <p className="text-sm mb-3">{t("scanner.instructions")}</p>
               <div className="flex justify-center gap-3 mt-4">
                 <button
-                  className="btn btn-outline btn-sm"
+                  className="btn-outline btn-sm"
                   onClick={() => {
                     if (scannerRef.current) {
                       stopScanner()

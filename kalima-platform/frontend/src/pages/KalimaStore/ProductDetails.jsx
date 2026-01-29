@@ -448,7 +448,7 @@ const ProductDetails = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={addingToCart}
-                    className="btn btn-outline btn-lg w-full"
+                    className="btn-outline btn-lg w-full"
                   >
                     {addingToCart ? (
                       <>
@@ -485,7 +485,7 @@ const ProductDetails = () => {
               <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
                 <button
                   onClick={() => setShowAuthModal(false)}
-                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-primary-content/80 hover:text-primary-content hover:bg-base-100/20"
+                  className="absolute top-3 right-3 btn-ghost btn-sm btn-circle text-primary-content/80 hover:text-primary-content hover:bg-base-100/20"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -530,7 +530,7 @@ const ProductDetails = () => {
                     const currentUrl = location.pathname + location.search
                     navigate(`/register?redirect=${encodeURIComponent(currentUrl)}`)
                   }}
-                  className="btn btn-outline btn-primary flex-1"
+                  className="btn-outline btn-primary flex-1"
                 >
                   <UserPlus className="w-5 h-5" />
                   {isRTL ? "إنشاء حساب" : "Register"}

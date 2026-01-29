@@ -335,14 +335,14 @@ const PromoCodesTable = () => {
             )}
 
             <div className="flex justify-between items-center mt-4 sm:w-1/2 mx-auto gap-2">
-              <button className="btn btn-outline" onClick={handlePreviousPage} disabled={state.currentPage === 1}>
+              <button className="btn-outline" onClick={handlePreviousPage} disabled={state.currentPage === 1}>
                 {t("pagination.previous")}
               </button>
               <span>
                 {t("pagination.page")} {state.currentPage} {t("pagination.of")} {state.totalPages}
               </span>
               <button
-                className="btn btn-outline"
+                className="btn-outline"
                 onClick={handleNextPage}
                 disabled={state.currentPage >= state.totalPages}
               >
@@ -362,7 +362,7 @@ const PromoCodesTable = () => {
             <p className="font-mono bg-base-200 p-2 rounded my-2">{codeToDelete}</p>
             <div className="modal-action">
               <button
-                className="btn btn-outline"
+                className="btn btn-primary"
                 onClick={() => {
                   setShowDeleteConfirm(false)
                   setCodeToDelete(null)
@@ -395,7 +395,7 @@ const PromoCodesTable = () => {
             </div>
 
             <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowBulkDeleteConfirm(false)} disabled={isDeleting}>
+              <button className="btn-outline" onClick={() => setShowBulkDeleteConfirm(false)} disabled={isDeleting}>
                 {t("actions.cancel")}
               </button>
               <button className="btn btn-error" onClick={handleBulkDelete} disabled={isDeleting}>

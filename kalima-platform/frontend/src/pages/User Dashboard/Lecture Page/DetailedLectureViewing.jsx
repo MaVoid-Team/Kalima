@@ -465,7 +465,7 @@ const DetailedLectureView = () => {
           <FiX className="w-6 h-6" />
           <span>{t('errorGeneric')}</span>
         </div>
-        <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
+        <button onClick={() => navigate(-1)} className="btn-outline mt-4">
           <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
           {t('back')}
         </button>
@@ -480,7 +480,7 @@ const DetailedLectureView = () => {
         <div className="alert alert-warning">
           <span>{t('lectureNotFound')}</span>
         </div>
-        <button onClick={() => navigate(-1)} className="btn btn-outline mt-4">
+        <button onClick={() => navigate(-1)} className="btn-outline mt-4">
           <FiArrowLeft className={isRTL ? "ml-2" : "mr-2"} />
           {t('back')}
         </button>
@@ -530,7 +530,7 @@ const DetailedLectureView = () => {
               </div>
             )}
             <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
+              <button className="btn-outline" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
                 {t('cancel')}
               </button>
               <button className="btn btn-error" onClick={handleDeleteLecture} disabled={deleteLoading}>
@@ -636,7 +636,7 @@ const DetailedLectureView = () => {
             </div>
 
             <div className="modal-action">
-              <button className="btn btn-outline" onClick={() => setShowSubmissionModal(false)}>
+              <button className="btn-outline" onClick={() => setShowSubmissionModal(false)}>
                 {t('close')}
               </button>
               <a
@@ -862,14 +862,14 @@ const DetailedLectureView = () => {
                                 </a>
                                 <div className="flex gap-1">
                                   <button
-                                    className="btn btn-ghost btn-sm"
+                                    className="btn-ghost btn-sm"
                                     onClick={() => handleViewSubmission(submission)}
                                   >
                                     <FiEye className="w-4 h-4" />
                                   </button>
                                   {hasAdminPrivileges && (
                                     <button
-                                      className="btn btn-ghost btn-sm"
+                                      className="btn-ghost btn-sm"
                                       onClick={() => handleOpenFeedback(submission)}
                                     >
                                       <FiMessageSquare className="w-4 h-4" />
@@ -899,7 +899,7 @@ const DetailedLectureView = () => {
               {/* Upload Homework Button (for students) */}
               {userRole === "Student" && (
                 <div className="mt-4">
-                  <button className="btn btn-outline btn-primary">
+                  <button className="btn-outline btn-primary">
                     <FiUpload className={isRTL ? "ml-2" : "mr-2"} />
                     {t('uploadHomework')}
                   </button>
@@ -1062,7 +1062,7 @@ const DetailedLectureView = () => {
 
               <div className="modal-action">
                 <button
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={() => setShowFeedbackModal(false)}
                   disabled={isSubmittingFeedback}
                 >

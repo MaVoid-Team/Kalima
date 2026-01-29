@@ -234,7 +234,7 @@ const PackagesPage = () => {
           </div>
 
           <button
-            className="btn btn-outline"
+            className="btn-outline"
             onClick={() => {
               setPriceFilter("")
               setTeacherFilter("")
@@ -333,7 +333,7 @@ const PackagesPage = () => {
 
                     <div className="flex gap-2">
                       <button
-                        className="btn btn-outline btn-sm"
+                        className="btn-outline btn-sm"
                         onClick={() => navigate(`/package-details/${pkg._id}`, { state: { package: pkg } })}
                       >
                         {t("common.details")}
@@ -442,7 +442,7 @@ const PackagesPage = () => {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button className="btn btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
+              <button className="btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
                 {t("common.cancel")}
               </button>
               <button className="btn btn-primary" onClick={confirmPurchase} disabled={purchaseLoading}>

@@ -112,7 +112,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex justify-end gap-2">
                 <button
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", message: "" })}
                 >
                   {t('admin.whatsappModal.cancel')}

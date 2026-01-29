@@ -1003,7 +1003,7 @@ const UserManagementTable = () => {
           <div
             tabIndex={0}
             role="button"
-            className="btn btn-outline btn-primary"
+            className="btn-outline btn-primary"
             disabled={isExporting}
           >
             {isExporting ? (
@@ -1240,7 +1240,7 @@ const UserManagementTable = () => {
               {t("admin.userManagement.createUser")}
             </button>
 
-            <button className="btn btn-ghost" onClick={fetchUsers}>
+            <button className="btn-ghost" onClick={fetchUsers}>
               <FaSync />
             </button>
 
@@ -1480,7 +1480,7 @@ const UserManagementTable = () => {
             {renderUserDetails(userDetailsModal.user)}
             <div className="modal-action">
               <button
-                className="btn btn-ghost"
+                className="btn-ghost"
                 onClick={() =>
                   setUserDetailsModal({ isOpen: false, user: null })
                 }
@@ -1507,7 +1507,7 @@ const UserManagementTable = () => {
             ></textarea>
             <div className="modal-action">
               <button
-                className="btn btn-ghost"
+                className="btn-ghost"
                 onClick={() =>
                   setWhatsappModal({
                     isOpen: false,
