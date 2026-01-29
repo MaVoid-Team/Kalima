@@ -289,7 +289,7 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Mobile overlay */}
       {isOpen && isMobile && (
         <div
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+          className="md:hidden fixed inset-0 bg-neutral/50 z-40 transition-opacity duration-300"
           onClick={toggleSidebar}
         />
       )}
@@ -297,15 +297,13 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Sidebar */}
       <div
         id="user-sidebar"
-        className={`fixed top-20 bottom-0 ${
-          isRTL ? "right-0 border-l" : "left-0 border-r"
-        } w-64 bg-base-100 border-base-300 shadow-xl z-50 transition-transform duration-300 ease-in-out ${
-          isOpen
+        className={`fixed top-20 bottom-0 ${isRTL ? "right-0 border-l" : "left-0 border-r"
+          } w-64 bg-base-100 border-base-300 shadow-xl z-50 transition-transform duration-300 ease-in-out ${isOpen
             ? "translate-x-0"
             : isRTL
               ? "translate-x-full"
               : "-translate-x-full"
-        }`}
+          }`}
         dir={isRTL ? "rtl" : "ltr"}
       >
         <div className="p-4 border-b border-base-300 flex items-center justify-between">
@@ -375,11 +373,10 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
               <React.Fragment key={item.id}>
                 <Link
                   to={item.path}
-                  className={`flex items-center justify-between py-3 px-4 hover:bg-base-200 transition-colors ${
-                    location.pathname === item.path
+                  className={`flex items-center justify-between py-3 px-4 hover:bg-base-200 transition-colors ${location.pathname === item.path
                       ? `text-primary ${isRTL ? "border-r-4" : "border-l-4"} border-primary bg-primary/20 bg-opacity-10`
                       : "text-base-content"
-                  }`}
+                    }`}
                   onClick={(e) => {
                     if (item.onClick) {
                       e.preventDefault();
@@ -413,11 +410,9 @@ const UnifiedSidebar = ({ isOpen, toggleSidebar }) => {
       {/* Desktop Toggle Button */}
       <button
         id="sidebar-toggle"
-        className={`hidden md:flex fixed top-20 ${
-          isRTL ? "right-0" : "left-0"
-        } z-40 bg-primary text-primary-content p-2 ${
-          isRTL ? "rounded-r-md" : "rounded-l-md"
-        } shadow-md transition-transform duration-300 ease-in-out`}
+        className={`hidden md:flex fixed top-20 ${isRTL ? "right-0" : "left-0"
+          } z-40 bg-primary text-primary-content p-2 ${isRTL ? "rounded-r-md" : "rounded-l-md"
+          } shadow-md transition-transform duration-300 ease-in-out`}
         style={{
           transform: isOpen
             ? `translateX(${isRTL ? "-16rem" : "16rem"})` // Adjusted to match sidebar width

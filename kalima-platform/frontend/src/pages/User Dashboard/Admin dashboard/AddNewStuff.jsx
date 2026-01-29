@@ -24,7 +24,7 @@ export default function AdminCreate() {
   const [activeForm, setActiveForm] = useState("subject") // 'subject', 'package', or 'level'
 
   // Subject form state
-  const [subjectData, setSubjectData] = useState({ name: ""})
+  const [subjectData, setSubjectData] = useState({ name: "" })
 
   // Package form state
   const [packageData, setPackageData] = useState({
@@ -122,7 +122,7 @@ export default function AdminCreate() {
       const response = await createSubject(subjectData)
       if (response.success) {
         setSuccess(t("success.subjectCreated"))
-        setSubjectData({ name: ""})
+        setSubjectData({ name: "" })
         const updatedSubjects = await getAllSubjects()
         if (updatedSubjects.success) {
           setSubjects(updatedSubjects.data)
@@ -363,7 +363,7 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{subject.name}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-base-content/60">
                         {new Date(subject.createdAt).toLocaleDateString(i18n.language)}
                       </div>
                       <div>
@@ -486,18 +486,18 @@ export default function AdminCreate() {
                   <div key={pkg._id} className="card bg-base-100 shadow-md p-4">
                     <div className="card-body">
                       <h3 className="card-title">{pkg.name}</h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-base-content/60">
                         {t("forms.package.priceLabel")}: ${pkg.price}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-base-content/60">
                         {t("forms.package.typeLabel")}: {t(`forms.package.${pkg.type}`)}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-base-content/60">
                         {t("common.created")}: {new Date(pkg.createdAt).toLocaleDateString(i18n.language)}
                       </p>
                       <div className="mt-2">
                         <h4 className="text-sm font-medium">{t("forms.package.pointsDistribution")}:</h4>
-                        <ul className="list-disc list-inside text-sm text-gray-600">
+                        <ul className="list-disc list-inside text-sm text-base-content/60">
                           {pkg.points.map((point, index) => (
                             <li key={index}>
                               {point.lecturer?.name}: {point.points} {t("forms.package.pointsUnit")}
@@ -560,7 +560,7 @@ export default function AdminCreate() {
                       className="grid grid-cols-3 gap-4 p-4 border-b border-base-200 hover:bg-base-200/50 transition-colors"
                     >
                       <div className="text-sm font-medium">{level.name}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-base-content/60">
                         {new Date(level.createdAt).toLocaleDateString(i18n.language)}
                       </div>
                       <div>

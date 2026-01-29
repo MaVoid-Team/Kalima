@@ -37,7 +37,7 @@ const ServicesGrid = React.memo(() => {
 
   return (
     <section
-      className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-40 bg-base-100 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
@@ -47,9 +47,8 @@ const ServicesGrid = React.memo(() => {
             initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className={`flex items-center gap-6 mb-10 ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
+            className={`flex items-center gap-6 mb-10 ${isRTL ? "flex-row-reverse" : ""
+              }`}
           >
             <div className="w-16 h-px bg-primary" />
             <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
@@ -95,13 +94,12 @@ const ServicesGrid = React.memo(() => {
               className="group"
             >
               <div
-                className={`flex items-start gap-8 p-10 rounded-3xl bg-base-100 border border-base-content/5 shadow-xl transition-all duration-500 hover:-translate-y-2 ${
-                  isRTL ? "flex-row-reverse text-right" : ""
-                }`}
+                className={`flex items-start gap-8 p-10 rounded-3xl bg-base-100 border border-base-content/5 shadow-xl transition-all duration-500 hover:-translate-y-2 ${isRTL ? "flex-row-reverse text-right" : ""
+                  }`}
               >
                 {/* Icon */}
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-12">
+                  <div className="w-16 h-16 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-all duration-500 transform group-hover:-rotate-12">
                     <service.icon className="w-8 h-8" strokeWidth={1} />
                   </div>
                 </div>

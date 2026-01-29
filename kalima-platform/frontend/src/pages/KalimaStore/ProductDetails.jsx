@@ -474,7 +474,7 @@ const ProductDetails = () => {
       {/* Auth Required Modal - Login or Register Choice */}
       <AnimatePresence>
         {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -485,14 +485,14 @@ const ProductDetails = () => {
               <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
                 <button
                   onClick={() => setShowAuthModal(false)}
-                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-primary-content/80 hover:text-primary-content hover:bg-base-100/20"
                 >
                   <X className="w-5 h-5" />
                 </button>
-                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <ShoppingCart className="w-10 h-10 text-white" />
+                <div className="w-20 h-20 mx-auto bg-base-100/20 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-10 h-10 text-primary-content" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-primary-content">
                   {isRTL ? "تسجيل الدخول مطلوب" : "Login Required"}
                 </h3>
               </div>

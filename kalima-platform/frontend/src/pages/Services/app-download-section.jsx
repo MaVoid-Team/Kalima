@@ -26,14 +26,13 @@ export const AppDownloadSection = React.memo(() => {
 
   return (
     <section
-      className="relative py-6 sm:py-24 lg:py-32 bg-white overflow-hidden"
+      className="relative py-6 sm:py-24 lg:py-32 bg-base-100 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         <div
-          className={`flex flex-col lg:flex-row items-stretch gap-24 ${
-            isRTL ? "" : "lg:flex-row-reverse"
-          }`}
+          className={`flex flex-col lg:flex-row items-stretch gap-24 ${isRTL ? "" : "lg:flex-row-reverse"
+            }`}
         >
           {/* Editorial Side - The Narrative */}
           <div className="flex-1 flex flex-col justify-center">
@@ -42,9 +41,8 @@ export const AppDownloadSection = React.memo(() => {
                 initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className={`flex items-center gap-6 ${
-                  isRTL ? "flex-row-reverse" : ""
-                }`}
+                className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""
+                  }`}
               >
                 <div className="w-16 h-px bg-primary" />
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
@@ -89,7 +87,7 @@ export const AppDownloadSection = React.memo(() => {
                     className="group"
                   >
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-12">
+                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-all duration-500 transform group-hover:-rotate-12">
                         <feat.icon className="w-6 h-6" strokeWidth={1} />
                       </div>
                       <h4 className="text-xl font-black text-base-content uppercase tracking-tight">
@@ -111,8 +109,10 @@ export const AppDownloadSection = React.memo(() => {
                 className="flex flex-wrap gap-4 pt-4"
               >
                 <a
-                  href="#"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-base-content text-white rounded-2xl font-bold hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+                  href="https://play.google.com/store/apps/details?id=com.kalimaplatform.mavoid"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-base-content text-base-100 rounded-2xl font-bold hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <Download className="w-5 h-5" />
                   <span>{isRTL ? "تحميل التطبيق" : "Download App"}</span>
@@ -129,7 +129,7 @@ export const AppDownloadSection = React.memo(() => {
                   initial={{ opacity: 0, scale: 0.9, rotate: 3 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: 3 }}
                   viewport={{ once: true }}
-                  className="relative h-full w-full rounded-[4rem] overflow-hidden border-[16px] border-white shadow-2xl group bg-base-200"
+                  className="relative h-full w-full rounded-[4rem] overflow-hidden border-[16px] border-base-100 shadow-2xl group bg-base-200"
                 >
                   <img
                     src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=1000&fit=crop&q=80"

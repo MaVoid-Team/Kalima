@@ -82,7 +82,7 @@ export const CoursesSection = React.memo(() => {
 
   return (
     <section
-      className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-40 bg-base-100 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Decorative Elements */}
@@ -96,9 +96,8 @@ export const CoursesSection = React.memo(() => {
             initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className={`flex items-center gap-6 mb-10 ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
+            className={`flex items-center gap-6 mb-10 ${isRTL ? "flex-row-reverse" : ""
+              }`}
           >
             <div className="w-16 h-px bg-primary" />
             <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
@@ -148,7 +147,7 @@ export const CoursesSection = React.memo(() => {
           <div className="text-center py-20 border border-dashed border-base-content/10 rounded-3xl">
             <p className="text-base-content/40 mb-8">{error}</p>
             <button
-              className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-lg hover:shadow-xl transition-shadow"
+              className="px-10 py-4 bg-primary text-primary-content rounded-2xl font-black shadow-lg hover:shadow-xl transition-shadow"
               onClick={fetchCourses}
             >
               {t("courses.errors.retry")}
@@ -169,19 +168,17 @@ export const CoursesSection = React.memo(() => {
           viewport={{ once: true }}
           className="mt-20 flex justify-center"
         >
-          <Link to="/courses">
-            <button className="group inline-flex items-center gap-4 px-12 py-5 bg-white rounded-full border border-base-content/10 hover:border-primary transition-all duration-500 overflow-hidden relative">
-              <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-              <span className="relative z-10 font-black text-base-content tracking-tight uppercase">
-                {t("courses.viewAll")}
-              </span>
-              <div className="relative z-10 w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                <ChevronRight
-                  className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`}
-                />
-              </div>
-            </button>
-          </Link>
+          <button className="group inline-flex items-center gap-4 px-12 py-5 bg-base-100 rounded-full border border-base-content/10 hover:border-primary transition-all duration-500 overflow-hidden relative cursor-default">
+            <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            <span className="relative z-10 font-black text-base-content tracking-tight uppercase">
+              {t("courses.viewAll")}
+            </span>
+            <div className="relative z-10 w-10 h-10 rounded-full bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-all duration-500">
+              <ChevronRight
+                className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`}
+              />
+            </div>
+          </button>
         </motion.div>
       </div>
     </section>

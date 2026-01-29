@@ -15,7 +15,7 @@ const ProductInfo = ({ product, type, isRTL }) => {
   }
 
   const actualType = getActualType()
-// dummy comment to re-commit
+  // dummy comment to re-commit
   const getItemCategory = () => {
     if (actualType === "book" && product.subject) {
       return product.subject.name || product.subject
@@ -41,12 +41,31 @@ const ProductInfo = ({ product, type, isRTL }) => {
     <div className="space-y-8">
       {/* Product Title */}
       <div>
-        <h1 className="text-3xl font-bold mb-4">{product.title}</h1>
+        <h1 className="text-4xl font-black mb-4 text-base-content tracking-tight leading-tight">
+          {product.title}
+        </h1>
         <div className="flex flex-wrap gap-2">
-          <div className={`badge ${actualType === "book" ? "badge-success" : "badge-info"}`}>
-            {actualType === "book" ? `📚 ${t("product.types.book")}` : `📦 ${t("product.types.product")}`}
+          <div
+            className={`px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest border flex items-center gap-2 ${actualType === "book"
+              ? "bg-success/10 text-success border-success/20"
+              : "bg-info/10 text-info border-info/20"
+              }`}
+          >
+            {actualType === "book" ? (
+              <>
+                <BookOpen className="w-3.5 h-3.5" />
+                {t("product.types.book")}
+              </>
+            ) : (
+              <>
+                <Package className="w-3.5 h-3.5" />
+                {t("product.types.product")}
+              </>
+            )}
           </div>
-          <div className="badge badge-outline">{getItemCategory()}</div>
+          <div className="px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-widest bg-base-200 text-base-content/60 border border-base-300">
+            {getItemCategory()}
+          </div>
         </div>
       </div>
 
@@ -54,10 +73,15 @@ const ProductInfo = ({ product, type, isRTL }) => {
       <div className="space-y-4">
 
         {product.description && (
-          <div className="card bg-base-200">
-            <div className="card-body p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-base-100 border border-base-200 rounded-2xl p-6 hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -67,17 +91,27 @@ const ProductInfo = ({ product, type, isRTL }) => {
                 </svg>
                 <span className="font-semibold">{t("product.description")}</span>
               </div>
-              <p className="leading-relaxed">{product.description}</p>
+              <span className="font-bold text-base-content uppercase tracking-wide text-xs">
+                {t("product.description")}
+              </span>
             </div>
+            <p className="leading-relaxed text-base-content/70 text-sm font-medium">
+              {product.description}
+            </p>
           </div>
         )}
 
         {/* Subject info for books */}
         {actualType === "book" && product.subject && (
-          <div className="card bg-base-200">
-            <div className="card-body p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-base-100 border border-base-200 rounded-2xl p-6 hover:shadow-md hover:border-primary/20 transition-all duration-300">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -87,25 +121,39 @@ const ProductInfo = ({ product, type, isRTL }) => {
                 </svg>
                 <span className="font-semibold">{t("product.subject")}</span>
               </div>
-              <p className="text-lg">{product.subject.name}</p>
+              <span className="font-bold text-base-content uppercase tracking-wide text-xs">
+                {t("product.subject")}
+              </span>
             </div>
+            <p className="text-lg font-bold text-base-content/80">
+              {product.subject.name}
+            </p>
           </div>
         )}
       </div>
 
-      {/* Pricing Section */}
-      <div className="card bg-primary text-primary-content">
-        <div className="card-body">
+      {/* Pricing Section - Crimson Gradient */}
+      <div className="relative overflow-hidden rounded-[2rem] shadow-xl shadow-primary/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary" />
+        {/* Pattern Overlay */}
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+
+        <div className="relative p-8 text-primary-content">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm opacity-90 mb-1">{t("product.price")}</p>
-              <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold">
-                  {getDisplayPrice()} {t("product.currency")}
+              <p className="text-xs font-bold text-primary-content/80 uppercase tracking-widest mb-2">
+                {t("product.price")}
+              </p>
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl font-black tracking-tight">
+                  {getDisplayPrice()}
+                  <span className="text-2xl ml-1 font-bold opacity-90">
+                    {t("product.currency")}
+                  </span>
                 </span>
                 {hasDiscount() && (
-                  <span className="text-lg line-through opacity-70">
-                    {product.price} {t("product.currency")}
+                  <span className="text-lg line-through text-primary-content/60 font-medium">
+                    {product.price}
                   </span>
                 )}
               </div>
@@ -113,9 +161,14 @@ const ProductInfo = ({ product, type, isRTL }) => {
 
             {hasDiscount() && (
               <div className="text-right">
-                <div className="badge badge-error badge-lg font-bold">{product.discountPercentage}% {t("product.off")}</div>
-                <p className="text-sm opacity-90 mt-1">
-                  {t("product.save", { amount: (product.price - getDisplayPrice()).toFixed(2), currency: t("product.currency") })}
+                <div className="inline-flex px-3 py-1 bg-base-100/20 backdrop-blur-md rounded-lg border border-base-100/20 text-primary-content font-bold mb-2">
+                  {product.discountPercentage}% {t("product.off")}
+                </div>
+                <p className="text-xs text-primary-content/80 font-medium">
+                  {t("product.save", {
+                    amount: (product.price - getDisplayPrice()).toFixed(2),
+                    currency: t("product.currency"),
+                  })}
                 </p>
               </div>
             )}

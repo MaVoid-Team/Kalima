@@ -379,15 +379,14 @@ const Orders = () => {
     const productList =
       order.items && order.items.length > 0
         ? order.items
-            .map((item, index) => {
-              const price = item.priceAtPurchase || 0;
-              const priceText =
-                price > 0 ? `${price.toFixed(2)} جنيه` : "مجاني";
-              return `${index + 1}. ${
-                item.productSnapshot?.title || "منتج"
+          .map((item, index) => {
+            const price = item.priceAtPurchase || 0;
+            const priceText =
+              price > 0 ? `${price.toFixed(2)} جنيه` : "مجاني";
+            return `${index + 1}. ${item.productSnapshot?.title || "منتج"
               } - ${priceText}`;
-            })
-            .join("\n")
+          })
+          .join("\n")
         : "لا توجد منتجات";
 
     // Calculate totals
@@ -401,10 +400,8 @@ const Orders = () => {
 
     // Build complete message with product list
     const message = encodeURIComponent(
-      `أهلاً بك أ/ ${
-        order.userName
-      } 👋\n\nتم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.\n\n*رقم الطلب:* ${
-        order.purchaseSerial || order._id
+      `أهلاً بك أ/ ${order.userName
+      } 👋\n\nتم استلام طلبك بنجاح، وجارٍ تجهيزه الآن.\n\n*رقم الطلب:* ${order.purchaseSerial || order._id
       }\n\n*المنتجات:*\n${productList}${discountText}\n*الإجمالي: ${totalText}*\n\nلو عندك أي استفسار بخصوص الطلب، تقدر تتواصل معانا في أي وقت على نفس الرقم.\n\nنتمنى تعجبك تجربتك معانا، ومبسوطين إنك اخترتنا! 💙\n\nمع تحيات فريق عمل\nمنصة كلمة`
     );
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
@@ -705,11 +702,11 @@ const Orders = () => {
 
   const groupedItems = selectedOrder?.items
     ? selectedOrder.items.reduce((acc, item) => {
-        const title = item.productSnapshot?.title || item.productName;
-        if (!acc[title]) acc[title] = [];
-        acc[title].push(item);
-        return acc;
-      }, {})
+      const title = item.productSnapshot?.title || item.productName;
+      if (!acc[title]) acc[title] = [];
+      acc[title].push(item);
+      return acc;
+    }, {})
     : {};
 
   const handleExport = async (type, scope) => {
@@ -737,8 +734,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-              ? t("table.received")
-              : t("table.pending"),
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -785,8 +782,8 @@ const Orders = () => {
             o.status === "confirmed"
               ? t("table.confirmed")
               : o.status === "received"
-              ? t("table.received")
-              : t("table.pending"),
+                ? t("table.received")
+                : t("table.pending"),
           adminNotes: o.adminNotes || "",
           date: o.createdAt || "",
         }));
@@ -811,11 +808,11 @@ const Orders = () => {
             ...rest,
             items: items
               ? items.map(({ product, ...itemProps }) => ({
-                  // Optionally clean up item.product if it's too verbose
-                  ...itemProps,
-                  productName:
-                    product?.title || itemProps.productName || "Unknown", // Ensure product name is present
-                }))
+                // Optionally clean up item.product if it's too verbose
+                ...itemProps,
+                productName:
+                  product?.title || itemProps.productName || "Unknown", // Ensure product name is present
+              }))
               : [],
           };
         });
@@ -836,7 +833,7 @@ const Orders = () => {
       console.error("Error exporting orders:", err);
       toast.error(
         (t("alerts.exportFailed") || "فشل في التصدير") +
-          (err?.message ? `: ${err.message}` : "")
+        (err?.message ? `: ${err.message}` : "")
       );
     } finally {
       setExporting(false);
@@ -908,10 +905,10 @@ const Orders = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <div className="card bg-blue-600 text-white shadow-lg">
+        <div className="card bg-info text-info-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 📦
               </div>
               <div>
@@ -924,10 +921,10 @@ const Orders = () => {
           </div>
         </div>
 
-        <div className="card bg-green-600 text-white shadow-lg">
+        <div className="card bg-success text-success-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 ✅
               </div>
               <div>
@@ -940,10 +937,10 @@ const Orders = () => {
           </div>
         </div>
 
-        <div className="card bg-orange-600 text-white shadow-lg">
+        <div className="card bg-warning text-warning-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 ⏳
               </div>
               <div>
@@ -956,10 +953,10 @@ const Orders = () => {
           </div>
         </div>
 
-        <div className="card bg-purple-600 text-white shadow-lg">
+        <div className="card bg-primary text-primary-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 📚
               </div>
               <div>
@@ -972,10 +969,10 @@ const Orders = () => {
           </div>
         </div>
 
-        <div className="card bg-teal-600 text-white shadow-lg">
+        <div className="card bg-secondary text-secondary-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 🛍️
               </div>
               <div>
@@ -1243,17 +1240,17 @@ const Orders = () => {
                 <tr>
                   <td colSpan="12" className="text-center py-8">
                     <div className="loading loading-spinner loading-lg"></div>
-                    <p className="mt-2 text-gray-500">{t("loading")}</p>
+                    <p className="mt-2 text-base-content/60">{t("loading")}</p>
                   </td>
                 </tr>
               ) : memoizedOrders.length === 0 ? (
                 <tr>
                   <td colSpan="12" className="text-center py-8">
-                    <p className="text-gray-500">
+                    <p className="text-base-content/60">
                       {searchQuery ||
-                      statusFilter !== "all" ||
-                      typeFilter !== "all" ||
-                      selectedDate
+                        statusFilter !== "all" ||
+                        typeFilter !== "all" ||
+                        selectedDate
                         ? t("noOrdersFound")
                         : t("noOrdersAvailable")}
                     </p>
@@ -1290,13 +1287,13 @@ const Orders = () => {
                             )}
                           {(!order.createdBy?.numberOfPurchases ||
                             order.createdBy?.numberOfPurchases === 0) && (
-                            <span
-                              className="badge badge-ghost badge-xs"
-                              title={t("table.newClient")}
-                            >
-                              {t("table.new")}
-                            </span>
-                          )}
+                              <span
+                                className="badge badge-ghost badge-xs"
+                                title={t("table.newClient")}
+                              >
+                                {t("table.new")}
+                              </span>
+                            )}
                         </div>
                         <div className="text-xs opacity-50">
                           {order.createdBy?.email}
@@ -1316,7 +1313,7 @@ const Orders = () => {
                     {/* Display cart total */}
                     <td className="text-center font-bold">
                       {order.couponCode != null ? (
-                        <span className="text-green-500">
+                        <span className="text-success">
                           {order.couponCode.value ||
                             order.discountAmount ||
                             t("table.couponApplied")}
@@ -1333,7 +1330,7 @@ const Orders = () => {
                             : order.paymentMethod}
                         </span>
                       ) : (
-                        <span className="text-gray-400">
+                        <span className="text-base-content/40">
                           {t("table.notAvailable")}
                         </span>
                       )}
@@ -1402,7 +1399,7 @@ const Orders = () => {
                           className="tooltip tooltip-left"
                           data-tip={order.adminNotes}
                         >
-                          <div className="flex items-center gap-1 text-blue-600 cursor-help">
+                          <div className="flex items-center gap-1 text-info cursor-help">
                             <MessageSquare className="w-4 h-4" />
                             <span className="text-xs truncate">
                               {order.notesPreview}
@@ -1410,7 +1407,7 @@ const Orders = () => {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-xs">
+                        <span className="text-base-content/40 text-xs">
                           {t("table.noNotes")}
                         </span>
                       )}
@@ -1433,9 +1430,8 @@ const Orders = () => {
                         </button>
                         {/* Notes */}
                         <button
-                          className={`btn btn-ghost btn-sm relative ${
-                            order.adminNotes ? "text-blue-600" : "text-gray-400"
-                          }`}
+                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-info" : "text-base-content/40"
+                            }`}
                           onClick={() => openNotesModal(order)}
                           title={
                             order.adminNotes
@@ -1445,7 +1441,7 @@ const Orders = () => {
                         >
                           <Notebook className="w-4 h-4" />
                           {order.adminNotes && (
-                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-info rounded-full"></span>
                           )}
                         </button>
                         {/* Payment Screenshot */}
@@ -1464,7 +1460,7 @@ const Orders = () => {
                         )}
                         {order.watermark && (
                           <button
-                            className="btn btn-ghost btn-sm text-purple-600"
+                            className="btn btn-ghost btn-sm text-secondary"
                             onClick={() =>
                               handleViewPaymentScreenshot(order.watermark)
                             }
@@ -1478,16 +1474,16 @@ const Orders = () => {
                         {(order.numberTransferredFrom ||
                           order.bankTransferFrom ||
                           (order.total || calculateCartTotal(order)) === 0) && (
-                          <button
-                            className="btn btn-ghost btn-sm text-green-600 hover:bg-green-50"
-                            onClick={() => handleWhatsAppContact(order)}
-                            title={t("table.contactWhatsApp")}
-                          >
-                            <FaWhatsapp />
-                          </button>
-                        )}
+                            <button
+                              className="btn btn-ghost btn-sm text-success hover:bg-success/10"
+                              onClick={() => handleWhatsAppContact(order)}
+                              title={t("table.contactWhatsApp")}
+                            >
+                              <FaWhatsapp />
+                            </button>
+                          )}
                         <button
-                          className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                          className="btn btn-ghost btn-sm text-error hover:bg-error/10"
                           onClick={() => handleDeleteOrder(order)}
                           title={t("table.deleteOrder")}
                         >
@@ -1497,11 +1493,10 @@ const Orders = () => {
                         {order.status !== "confirmed" &&
                           order.status !== "returned" && (
                             <button
-                              className={`btn btn-sm ${
-                                order.status === "pending"
-                                  ? "btn-error"
-                                  : "btn-success"
-                              }`}
+                              className={`btn btn-sm ${order.status === "pending"
+                                ? "btn-error"
+                                : "btn-success"
+                                }`}
                               onClick={() => handleConfirmOrder(order)}
                               disabled={confirmLoading[order._id]}
                               title={
@@ -1525,7 +1520,7 @@ const Orders = () => {
                         {/* Return / Re-confirm loop */}
                         {order.status === "confirmed" && (
                           <button
-                            className="btn btn-warning btn-sm hover:bg-yellow-500"
+                            className="btn btn-warning btn-sm hover:bg-warning-focus"
                             onClick={() => handleReturnOrder(order)}
                             disabled={confirmLoading[order._id]}
                             title={t("table.returnOrder")}
@@ -1542,7 +1537,7 @@ const Orders = () => {
                         )}
                         {order.status === "returned" && (
                           <button
-                            className="btn btn-success btn-sm hover:bg-green-600"
+                            className="btn btn-success btn-sm hover:bg-success-focus"
                             onClick={() => handleReConfirmOrder(order)}
                             disabled={confirmLoading[order._id]}
                             title={t("table.reconfirmOrder")}
@@ -1572,7 +1567,7 @@ const Orders = () => {
             <h3 className="text-xl font-semibold mb-2">
               {t("table.noOrdersFound")}
             </h3>
-            <p className="text-gray-500">{t("table.tryAdjustingSearch")}</p>
+            <p className="text-base-content/60">{t("table.tryAdjustingSearch")}</p>
           </div>
         )}
       </div>
@@ -1616,9 +1611,8 @@ const Orders = () => {
               return (
                 <button
                   key={pageToShow}
-                  className={`join-item btn ${
-                    currentPage === pageToShow ? "btn-primary" : ""
-                  }`}
+                  className={`join-item btn ${currentPage === pageToShow ? "btn-primary" : ""
+                    }`}
                   onClick={() => handlePageChange(pageToShow)}
                   disabled={loading}
                 >
@@ -1647,7 +1641,7 @@ const Orders = () => {
               </svg>
             </button>
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-base-content/60">
             {t("table.page")} {currentPage} {t("table.of")} {totalPages} (
             {totalPurchases} {t("table.totalOrders")})
           </div>
@@ -1789,27 +1783,26 @@ const Orders = () => {
                   <p className="mt-2">
                     <strong>{t("table.totalPurchases")}:</strong>{" "}
                     <span
-                      className={`badge ${
-                        selectedOrder.createdBy?.numberOfPurchases > 5
-                          ? "badge-success"
-                          : selectedOrder.createdBy?.numberOfPurchases > 0
+                      className={`badge ${selectedOrder.createdBy?.numberOfPurchases > 5
+                        ? "badge-success"
+                        : selectedOrder.createdBy?.numberOfPurchases > 0
                           ? "badge-primary"
                           : "badge-ghost"
-                      }`}
+                        }`}
                     >
                       {selectedOrder.createdBy?.numberOfPurchases || 0}
                     </span>
                     {selectedOrder.createdBy?.numberOfPurchases > 5 && (
-                      <span className="ml-2 text-xs text-green-600 font-semibold">
+                      <span className="ml-2 text-xs text-success font-semibold">
                         🌟 {t("table.frequentBuyer")}
                       </span>
                     )}
                     {(!selectedOrder.createdBy?.numberOfPurchases ||
                       selectedOrder.createdBy?.numberOfPurchases === 0) && (
-                      <span className="ml-2 text-xs text-gray-500">
-                        {t("table.newClient")}
-                      </span>
-                    )}
+                        <span className="ml-2 text-xs text-base-content/50">
+                          {t("table.newClient")}
+                        </span>
+                      )}
                   </p>
                 </div>
               </div>
@@ -1824,7 +1817,7 @@ const Orders = () => {
                   {selectedOrder.notes ? (
                     <p className="whitespace-pre-wrap">{selectedOrder.notes}</p>
                   ) : (
-                    <p className="text-gray-500 italic">
+                    <p className="text-base-content/50 italic">
                       لا توجد ملاحظات من العميل
                     </p>
                   )}
@@ -1890,7 +1883,7 @@ const Orders = () => {
                             {/* Delete button - only show if more than 1 item */}
                             {selectedOrder.items.length > 1 && (
                               <button
-                                className="btn btn-ghost btn-xs text-error hover:bg-error hover:text-white"
+                                className="btn btn-ghost btn-xs text-error hover:bg-error hover:text-error-content"
                                 onClick={() => handleDeleteItem(item._id)}
                                 disabled={deletingItemId === item._id}
                                 title={t("table.deleteItem")}
@@ -2024,7 +2017,7 @@ const Orders = () => {
                       {selectedOrder.adminNotes
                         ? t("table.editNotes") || (isRTL ? "تعديل" : "Edit")
                         : t("table.addNotes") ||
-                          (isRTL ? "إضافة ملاحظة" : "Add Note")}
+                        (isRTL ? "إضافة ملاحظة" : "Add Note")}
                     </button>
                   )}
                 </label>
@@ -2053,9 +2046,8 @@ const Orders = () => {
                         {t("table.cancel") || (isRTL ? "إلغاء" : "Cancel")}
                       </button>
                       <button
-                        className={`btn btn-primary btn-sm gap-1 ${
-                          detailsNotes.hasChanges ? "" : "btn-disabled"
-                        }`}
+                        className={`btn btn-primary btn-sm gap-1 ${detailsNotes.hasChanges ? "" : "btn-disabled"
+                          }`}
                         onClick={saveDetailsNotes}
                         disabled={
                           detailsNotes.loading || !detailsNotes.hasChanges
@@ -2087,7 +2079,7 @@ const Orders = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-gray-500 italic">
+                      <p className="text-base-content/50 italic">
                         {t("table.noAdminNotes")}
                       </p>
                     )}

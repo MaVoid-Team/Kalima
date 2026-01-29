@@ -274,22 +274,22 @@ const DetailedLectureView = () => {
   // Handle submitting feedback
   const handleSubmitFeedback = async () => {
     if (!currentSubmission) return
-    
+
     setIsSubmittingFeedback(true)
     setFeedbackError(null)
-    
+
     try {
       // Here you'll need to implement the actual API call to save the feedback
       // For now, we'll just update the local state
-      const updatedSubmissions = studentSubmissions.map(sub => 
-        sub._id === currentSubmission._id 
+      const updatedSubmissions = studentSubmissions.map(sub =>
+        sub._id === currentSubmission._id
           ? { ...sub, rating, comment, feedbackDate: new Date().toISOString() }
           : sub
       )
-      
+
       setStudentSubmissions(updatedSubmissions)
       setShowFeedbackModal(false)
-      
+
       // Show success message
       toast.success(t("feedbackSubmittedSuccess") || "تم إرسال التقييم بنجاح")
     } catch (error) {
@@ -586,22 +586,22 @@ const DetailedLectureView = () => {
                 </div>
               ) : viewingSubmission.fileType.includes("pdf") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="w-full h-full bg-base-100 rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
                       <FiFileText className="w-16 h-16 mx-auto text-primary mb-4" />
                       <p className="font-medium mb-2">{t('pdfFile')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                      {t('downloadToView')}
+                        {t('downloadToView')}
                       </p>
                     </div>
                   </div>
                 </div>
               ) : viewingSubmission.fileType.includes("word") || viewingSubmission.fileType.includes("document") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="w-full h-full bg-base-100 rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
-                      <FiFileText className="w-16 h-16 mx-auto text-blue-600 mb-4" />
-                     <p className="font-medium mb-2">{t('wordDoc')}</p>
+                      <FiFileText className="w-16 h-16 mx-auto text-info mb-4" />
+                      <p className="font-medium mb-2">{t('wordDoc')}</p>
                       <p className="text-sm opacity-70 mb-4">
                         {t('downloadToView')}
                       </p>
@@ -610,21 +610,21 @@ const DetailedLectureView = () => {
                 </div>
               ) : viewingSubmission.fileType.includes("sheet") || viewingSubmission.fileType.includes("excel") ? (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="w-full h-full bg-base-100 rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
-                      <FiFileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
+                      <FiFileText className="w-16 h-16 mx-auto text-success mb-4" />
                       <p className="font-medium mb-2">{t('excelSheet')}</p>
                       <p className="text-sm opacity-70 mb-4">
-                       {t('downloadToView')}
+                        {t('downloadToView')}
                       </p>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="w-full h-full p-4">
-                  <div className="w-full h-full bg-white rounded shadow-inner flex items-center justify-center">
+                  <div className="w-full h-full bg-base-100 rounded shadow-inner flex items-center justify-center">
                     <div className="text-center p-8">
-                      <FiFile className="w-16 h-16 mx-auto text-gray-600 mb-4" />
+                      <FiFile className="w-16 h-16 mx-auto text-base-content/60 mb-4" />
                       <p className="font-medium mb-2">{t('fileNotSupported')}</p>
                       <p className="text-sm opacity-70 mb-4">
                         {t('downloadToView')}
@@ -689,11 +689,11 @@ const DetailedLectureView = () => {
                     <table className="table w-full">
                       <thead>
                         <tr>
-                        <th>{t('student')}</th>
-                        <th>{t('remainingViews')}</th>
-                        <th>{t('lastAccess')}</th>
-                        <th>{t('actions')}</th>
-                      </tr>
+                          <th>{t('student')}</th>
+                          <th>{t('remainingViews')}</th>
+                          <th>{t('lastAccess')}</th>
+                          <th>{t('actions')}</th>
+                        </tr>
                       </thead>
                       <tbody>
                         {studentLectureAccesses.map((access) => (
@@ -778,7 +778,7 @@ const DetailedLectureView = () => {
               ) : (
                 <div className="alert alert-info">
                   <FiInfo className="w-5 h-5" />
-                <span>{t('noAccess')}</span>
+                  <span>{t('noAccess')}</span>
                 </div>
               )}
             </div>
@@ -835,11 +835,11 @@ const DetailedLectureView = () => {
                             <td>
                               <div className="rating rating-sm">
                                 {[1, 2, 3, 4, 5].map((star) => (
-                                  <input 
+                                  <input
                                     key={star}
-                                    type="radio" 
-                                    name={`rating-${submission._id}`} 
-                                    className="mask mask-star-2 bg-primary" 
+                                    type="radio"
+                                    name={`rating-${submission._id}`}
+                                    className="mask mask-star-2 bg-primary"
                                     checked={submission.rating === star}
                                     readOnly
                                   />
@@ -861,14 +861,14 @@ const DetailedLectureView = () => {
                                   <FiEye className={isRTL ? "ml-1" : "mr-1"} /> {t('view')}
                                 </a>
                                 <div className="flex gap-1">
-                                  <button 
-                                    className="btn btn-ghost btn-sm" 
+                                  <button
+                                    className="btn btn-ghost btn-sm"
                                     onClick={() => handleViewSubmission(submission)}
                                   >
                                     <FiEye className="w-4 h-4" />
                                   </button>
                                   {hasAdminPrivileges && (
-                                    <button 
+                                    <button
                                       className="btn btn-ghost btn-sm"
                                       onClick={() => handleOpenFeedback(submission)}
                                     >
@@ -909,7 +909,7 @@ const DetailedLectureView = () => {
           )}
 
           {/* Attachments */}
-           <div className="mb-6">
+          <div className="mb-6">
             <h2 className="text-xl font-semibold mb-3">{t('attachments')}</h2>
             {renderAttachments(attachments.booklets, 'booklets', FiBook)}
             {renderAttachments(attachments.pdfsandimages, 'filesImages', FiFileText)}
@@ -930,18 +930,18 @@ const DetailedLectureView = () => {
 
         {/* Sidebar - Lecture Details */}
         <div className="lg:col-span-1">
-        <div className="bg-base-200 rounded-lg p-4 sticky top-4">
-          <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
-          <ul className="space-y-4">
-            <li className="flex items-center gap-3">
-              <div className="bg-base-300 p-2 rounded-lg">
-                <FiDollarSign className="text-primary" />
-              </div>
-              <div>
-                <span className="text-sm text-base-content/70">{t('price')}</span>
-                <p className="font-medium">{lecture.price} {t('points')}</p>
-              </div>
-            </li>
+          <div className="bg-base-200 rounded-lg p-4 sticky top-4">
+            <h2 className="text-xl font-semibold mb-4">{t('lectureDetails')}</h2>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-3">
+                <div className="bg-base-300 p-2 rounded-lg">
+                  <FiDollarSign className="text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm text-base-content/70">{t('price')}</span>
+                  <p className="font-medium">{lecture.price} {t('points')}</p>
+                </div>
+              </li>
 
               {/* Created By */}
               <li className="flex items-center gap-3">
@@ -949,7 +949,7 @@ const DetailedLectureView = () => {
                   <FiUser className="text-primary" />
                 </div>
                 <div>
-                   <span className="text-sm text-base-content/70">{t('lecturer')}</span>
+                  <span className="text-sm text-base-content/70">{t('lecturer')}</span>
                   <p className="font-medium">{lecture.createdBy?.name || t('unknown')}</p>
                 </div>
               </li>
@@ -971,7 +971,7 @@ const DetailedLectureView = () => {
                   <FiLayers className="text-primary" />
                 </div>
                 <div>
-                <span className="text-sm text-base-content/70">{t('level')}</span>
+                  <span className="text-sm text-base-content/70">{t('level')}</span>
                   <p className="font-medium">{getLevelName()}</p>
                 </div>
               </li>
@@ -982,7 +982,7 @@ const DetailedLectureView = () => {
                   <FiEye className="text-primary" />
                 </div>
                 <div>
-                   <span className="text-sm text-base-content/70">{t('viewsCount')}</span>
+                  <span className="text-sm text-base-content/70">{t('viewsCount')}</span>
                   <p className="font-medium">{lecture.numberOfViews || 0}</p>
                 </div>
               </li>
@@ -1012,7 +1012,7 @@ const DetailedLectureView = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Feedback Modal */}
       {showFeedbackModal && currentSubmission && (
         <div className="modal modal-open">
@@ -1021,7 +1021,7 @@ const DetailedLectureView = () => {
               <FiMessageSquare className="text-primary" />
               {t('provideFeedback')}
             </h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="label">
@@ -1029,46 +1029,46 @@ const DetailedLectureView = () => {
                 </label>
                 <div className="rating rating-lg">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <input 
+                    <input
                       key={star}
-                      type="radio" 
-                      name="rating" 
-                      className="mask mask-star-2 bg-primary" 
+                      type="radio"
+                      name="rating"
+                      className="mask mask-star-2 bg-primary"
                       checked={rating === star}
                       onChange={() => setRating(star)}
                     />
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <label className="label">
                   <span className="label-text">{t('comment')}</span>
                 </label>
-                <textarea 
+                <textarea
                   className="textarea textarea-bordered w-full h-32"
                   placeholder={t('enterYourFeedback')}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                 ></textarea>
               </div>
-              
+
               {feedbackError && (
                 <div className="alert alert-error">
                   <FiX className="w-5 h-5" />
                   <span>{feedbackError}</span>
                 </div>
               )}
-              
+
               <div className="modal-action">
-                <button 
+                <button
                   className="btn btn-ghost"
                   onClick={() => setShowFeedbackModal(false)}
                   disabled={isSubmittingFeedback}
                 >
                   {t('cancel')}
                 </button>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={handleSubmitFeedback}
                   disabled={isSubmittingFeedback}

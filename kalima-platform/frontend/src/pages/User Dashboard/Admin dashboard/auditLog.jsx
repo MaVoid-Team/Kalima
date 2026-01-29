@@ -208,15 +208,15 @@ const AuditLog = () => {
 
       // Create worksheet
       const worksheet = XLSX.utils.json_to_sheet(exportData)
-      
+
       // Create workbook
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Audit Logs')
-      
+
       // Generate file name with current date
       const timestamp = new Date().toISOString().split('T')[0]
       const filename = exportAll ? `audit-logs-all-${timestamp}.xlsx` : `audit-logs-filtered-${timestamp}.xlsx`
-      
+
       // Save the file
       XLSX.writeFile(workbook, filename)
 
@@ -403,26 +403,26 @@ const AuditLog = () => {
       case "delete":
         return (
           <div className="badge badge-error badge-sm p-3">
-            <FiX className="h-4 w-4 text-white" />
+            <FiX className="h-4 w-4 text-error-content" />
           </div>
         )
       case "update":
       case "edit":
         return (
           <div className="badge badge-warning badge-sm p-3">
-            <FiEdit className="h-4 w-4 text-white" />
+            <FiEdit className="h-4 w-4 text-warning-content" />
           </div>
         )
       case "read":
         return (
           <div className="badge badge-neutral badge-sm p-3">
-            <FiFileText className="h-4 w-4 text-white" />
+            <FiFileText className="h-4 w-4 text-neutral-content" />
           </div>
         )
       default:
         return (
           <div className="badge badge-info badge-sm p-3">
-            <FiRotateCw className="h-4 w-4 text-white" />
+            <FiRotateCw className="h-4 w-4 text-info-content" />
           </div>
         )
     }
@@ -434,7 +434,7 @@ const AuditLog = () => {
       case "success":
         return <FaCheckCircle className="h-5 w-5 text-success" />
       case "pending":
-        return <FaHourglassHalf className="h-5 w-5 text-amber-700" />
+        return <FaHourglassHalf className="h-5 w-5 text-warning" />
       case "failed":
         return <FaExclamationTriangle className="h-5 w-5 text-warning" />
       default:
@@ -448,7 +448,7 @@ const AuditLog = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold">{t("admin.auditlog.title")}</h1>
-          <p className="text-gray-600 mt-2">{t("admin.auditlog.subtitle")}</p>
+          <p className="text-base-content/60 mt-2">{t("admin.auditlog.subtitle")}</p>
         </div>
 
         {/* Export Dropdown */}

@@ -186,7 +186,7 @@ const ProductsManagement = memo(({
   const PaginationControls = useMemo(() => (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-base-content/60">
           {t("pagination.showing") || "Showing"} {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredItems.length)} {t("pagination.of") || "of"} {filteredItems.length}
         </span>
         <select
@@ -198,7 +198,7 @@ const ProductsManagement = memo(({
           <option value={10}>10</option>
           <option value={15}>15</option>
         </select>
-        <span className="text-sm text-gray-600">{t("pagination.perPage") || "per page"}</span>
+        <span className="text-sm text-base-content/60">{t("pagination.perPage") || "per page"}</span>
       </div>
 
       <div className="join">
@@ -344,13 +344,13 @@ const ProductsManagement = memo(({
         {/* Empty state */}
         {filteredItems.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-gray-500">
+            <p className="text-base-content/50">
               {searchTerm
                 ? t("productsManagement.noProducts") || "No products found"
                 : t("productsManagement.noProductsAvailable") || "No products available"}
             </p>
             {searchTerm && (
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm text-base-content/40 mt-2">
                 {t("productsManagement.tryDifferentSearch") || "Try a different search term"}
               </p>
             )}

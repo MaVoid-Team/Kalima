@@ -15,13 +15,13 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
 
   // Add product counts
   const sectionsWithCounts = filteredSections.map(section => {
-    const sectionProducts = products.filter(product => 
+    const sectionProducts = products.filter(product =>
       product && product.section && (product.section._id === section._id || product.section === section._id)
     )
-    const sectionBooks = books.filter(book => 
+    const sectionBooks = books.filter(book =>
       book && book.section === section._id
     )
-    
+
     return {
       ...section,
       productCount: sectionProducts.length + sectionBooks.length
@@ -58,7 +58,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
       </div>
 
       {/* Debug Info */}
-      <div className="text-center mb-4 text-sm text-gray-500">
+      <div className="text-center mb-4 text-sm text-base-content/50">
         {t("sectionsManagement.totalSections")}: {sections.length} | {t("sectionsManagement.filtered")}: {sectionsWithCounts.length} | {t("sectionsManagement.search")}: "{searchText}"
       </div>
 
@@ -109,11 +109,11 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
         {/* Empty State */}
         {sectionsWithCounts.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-gray-500">
+            <p className="text-base-content/50">
               {sections.length === 0 ? t("sectionsManagement.noSectionsAvailable") : t("sectionsManagement.noSections")}
             </p>
             {searchText && (
-              <p className="text-sm text-gray-400 mt-2">{t("sectionsManagement.tryDifferentSearch")}</p>
+              <p className="text-sm text-base-content/40 mt-2">{t("sectionsManagement.tryDifferentSearch")}</p>
             )}
           </div>
         )}

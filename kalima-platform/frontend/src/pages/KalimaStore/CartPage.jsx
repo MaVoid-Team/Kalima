@@ -473,21 +473,21 @@ const CartPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
         {/* Background matching landing page */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-base-200 via-base-100 to-secondary/5" />
 
         {/* Animated gradient orbs */}
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#AF0D0E]/10 via-[#FF5C28]/10 to-transparent rounded-full blur-[100px]"
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px]"
         />
 
         {/* Dot pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #AF0D0E 1px, transparent 0)`,
-            backgroundSize: '40px 40px',
+            backgroundImage: `radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
           }}
         />
 
@@ -496,16 +496,20 @@ const CartPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md relative z-10"
         >
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center mx-auto mb-8 border border-red-200">
-            <AlertCircle className="w-12 h-12 text-[#AF0D0E]" />
+          <div className="w-24 h-24 rounded-3xl bg-error/10 flex items-center justify-center mx-auto mb-8 border border-error/20">
+            <AlertCircle className="w-12 h-12 text-error" />
           </div>
-          <h3 className="text-3xl font-black text-gray-900 mb-4">{isRTL ? "حدث خطأ!" : "Oops!"}</h3>
-          <p className="text-gray-600 mb-10 text-lg">{t("errors.fetchCartFailed") || "Failed to load cart"}</p>
+          <h3 className="text-3xl font-black text-base-content mb-4">
+            {isRTL ? "حدث خطأ!" : "Oops!"}
+          </h3>
+          <p className="text-base-content/60 mb-10 text-lg">
+            {t("errors.fetchCartFailed") || "Failed to load cart"}
+          </p>
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/market")}
-            className="px-8 py-4 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold rounded-2xl shadow-xl shadow-red-500/25 hover:shadow-red-500/40 transition-all duration-300"
+            className="btn btn-primary btn-lg rounded-2xl shadow-xl shadow-primary/25"
           >
             {t("backToMarket") || "Back to Market"}
           </motion.button>
@@ -519,26 +523,31 @@ const CartPage = () => {
     return (
       <div className={`min-h-screen relative overflow-hidden ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
         {/* Background matching landing page */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-base-200 via-base-100 to-secondary/5" />
 
         {/* Animated gradient orbs */}
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#AF0D0E]/10 via-[#FF5C28]/10 to-transparent rounded-full blur-[100px]"
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px]"
         />
         <motion.div
           animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-[#FF5C28]/10 via-[#AF0D0E]/5 to-transparent rounded-full blur-[100px]"
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-secondary/10 via-primary/5 to-transparent rounded-full blur-[100px]"
         />
 
         {/* Dot pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, #AF0D0E 1px, transparent 0)`,
-            backgroundSize: '40px 40px',
+            backgroundImage: `radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
           }}
         />
 
@@ -551,31 +560,40 @@ const CartPage = () => {
             <div className="relative inline-block mb-10">
               <motion.div
                 animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="w-40 h-40 rounded-[2.5rem] bg-white/80 backdrop-blur-sm flex items-center justify-center border border-gray-200 shadow-xl"
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="w-40 h-40 rounded-[2.5rem] bg-base-100/80 backdrop-blur-sm flex items-center justify-center border border-base-200 shadow-xl"
               >
-                <ShoppingCart className="w-20 h-20 text-gray-300" />
+                <ShoppingCart className="w-20 h-20 text-base-content/30" />
               </motion.div>
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-[#AF0D0E] to-[#FF5C28] flex items-center justify-center shadow-xl shadow-red-500/40"
+                className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-xl shadow-primary/40"
               >
-                <Gift className="w-8 h-8 text-white" />
+                <Gift className="w-8 h-8 text-primary-content" />
               </motion.div>
             </div>
-            <h2 className="text-4xl font-black text-gray-900 mb-5">
+            <h2 className="text-4xl font-black text-base-content mb-5">
               {isRTL ? "سلتك فارغة" : "Your Cart is Empty"}
             </h2>
-            <p className="text-gray-600 mb-12 text-xl max-w-sm mx-auto">
-              {isRTL ? "اكتشف منتجاتنا المميزة وابدأ التسوق الآن!" : "Discover our amazing products and start shopping!"}
+            <p className="text-base-content/60 mb-12 text-xl max-w-sm mx-auto">
+              {isRTL
+                ? "اكتشف منتجاتنا المميزة وابدأ التسوق الآن!"
+                : "Discover our amazing products and start shopping!"}
             </p>
             <motion.button
-              whileHover={{ scale: 1.03, boxShadow: "0 20px 40px rgba(175, 13, 14, 0.25)" }}
+              whileHover={{
+                scale: 1.03,
+                boxShadow: "0 20px 40px rgba(var(--color-primary), 0.25)",
+              }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/market")}
-              className="group px-10 py-5 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold text-lg rounded-2xl shadow-xl shadow-red-500/25 transition-all duration-300 flex items-center gap-3 mx-auto"
+              className="group btn btn-primary btn-lg rounded-2xl shadow-xl shadow-primary/25 flex items-center gap-3 mx-auto h-auto py-4"
             >
               <ShoppingBag className="w-6 h-6" />
               {isRTL ? "تصفح المتجر" : "Browse Store"}
@@ -590,26 +608,31 @@ const CartPage = () => {
   return (
     <div className={`min-h-screen relative overflow-hidden ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
       {/* Background matching landing page */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30" />
+      <div className="absolute inset-0 bg-base-100" />
 
       {/* Animated gradient orbs */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#AF0D0E]/10 via-[#FF5C28]/10 to-transparent rounded-full blur-[100px] pointer-events-none"
+        className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px] pointer-events-none"
       />
       <motion.div
         animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-[#FF5C28]/10 via-[#AF0D0E]/5 to-transparent rounded-full blur-[100px] pointer-events-none"
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-secondary/10 via-primary/5 to-transparent rounded-full blur-[100px] pointer-events-none"
       />
 
       {/* Dot pattern */}
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #AF0D0E 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(var(--color-primary)) 1px, transparent 0)`,
+          backgroundSize: "40px 40px",
         }}
       />
 
@@ -622,24 +645,25 @@ const CartPage = () => {
               <div className="relative">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#AF0D0E] to-[#FF5C28] flex items-center justify-center shadow-xl shadow-red-500/30"
+                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-xl shadow-primary/30"
                 >
-                  <ShoppingCart className="w-8 h-8 text-white" />
+                  <ShoppingCart className="w-8 h-8 text-primary-content" />
                 </motion.div>
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white"
+                  className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-accent flex items-center justify-center text-accent-content text-sm font-bold shadow-lg ring-2 ring-base-100"
                 >
                   {cartItems.length}
                 </motion.div>
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-black text-base-content">
                   {isRTL ? "سلة التسوق" : "Shopping Cart"}
                 </h1>
-                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
-                  {cartItems.length} {isRTL ? "منتج في سلتك" : "item(s) in your cart"}
+                <p className="text-sm text-base-content/50 mt-1 flex items-center gap-1.5">
+                  {cartItems.length}{" "}
+                  {isRTL ? "منتج في سلتك" : "item(s) in your cart"}
                 </p>
               </div>
             </div>
@@ -649,19 +673,21 @@ const CartPage = () => {
               whileHover={{ scale: 1.03, x: isRTL ? 5 : -5 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/market")}
-              className="group relative flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 rounded-2xl font-bold text-gray-700 border-2 border-gray-200 hover:border-[#AF0D0E]/40 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:shadow-[#AF0D0E]/10 transition-all duration-300 overflow-hidden"
+              className="btn btn-ghost btn-lg gap-3 bg-base-100 hover:bg-base-200 border-2 border-base-200 hover:border-primary/40 shadow-lg shadow-base-200/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 overflow-hidden h-auto py-3.5 px-6 rounded-2xl"
             >
               {/* Hover gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/5 to-[#FF5C28]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               <div className="relative flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                  <ShoppingBag className="w-5 h-5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
+                <div className="w-10 h-10 rounded-xl bg-base-200 group-hover:bg-gradient-to-br group-hover:from-primary/10 group-hover:to-secondary/10 flex items-center justify-center transition-all duration-300">
+                  <ShoppingBag className="w-5 h-5 text-base-content/60 group-hover:text-primary transition-colors duration-300" />
                 </div>
-                <span className="text-gray-700 group-hover:text-[#AF0D0E] transition-colors duration-300">
+                <span className="text-base-content/80 group-hover:text-primary transition-colors duration-300">
                   {isRTL ? "متابعة التسوق" : "Continue Shopping"}
                 </span>
-                <ArrowIcon className={`w-5 h-5 text-gray-400 group-hover:text-[#AF0D0E] transition-all duration-300 ${isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`} />
+                <ArrowIcon
+                  className={`w-5 h-5 text-base-content/40 group-hover:text-primary transition-all duration-300 ${isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`}
+                />
               </div>
             </motion.button>
           </div>
@@ -675,14 +701,14 @@ const CartPage = () => {
           <div className="lg:col-span-3 space-y-5">
             {/* Section Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <div className="w-1 h-5 bg-gradient-to-b from-[#AF0D0E] to-[#FF5C28] rounded-full" />
+              <h2 className="text-lg font-bold text-base-content flex items-center gap-2">
+                <div className="w-1 h-5 bg-gradient-to-b from-primary to-secondary rounded-full" />
                 {isRTL ? "منتجاتك" : "Your Items"}
               </h2>
               <button
                 onClick={handleClearCart}
                 disabled={actionLoading.clear}
-                className="flex items-center gap-2 px-4 py-2 text-[#AF0D0E] hover:bg-red-50 rounded-xl font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-primary/5 rounded-xl font-medium text-sm transition-colors"
               >
                 {actionLoading.clear ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 {isRTL ? "إفراغ السلة" : "Clear All"}
@@ -708,14 +734,14 @@ const CartPage = () => {
                       type: "spring",
                       stiffness: 100,
                     }}
-                    className="group relative bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-xl border border-gray-100 hover:border-[#AF0D0E]/20 transition-all duration-300"
+                    className="group relative bg-base-100/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-xl border border-base-200 hover:border-primary/20 transition-all duration-300"
                   >
                     <div className="relative flex gap-5">
                       {/* Remove Button */}
                       <button
                         onClick={() => handleRemoveItem(itemId)}
                         disabled={actionLoading[itemId]}
-                        className={`absolute top-3 ${isRTL ? "left-3" : "right-3"} w-10 h-10 rounded-xl bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-[#AF0D0E] flex items-center justify-center transition-all duration-200 z-10`}
+                        className={`absolute top-3 ${isRTL ? "left-3" : "right-3"} w-10 h-10 rounded-xl bg-base-200 hover:bg-primary/10 text-base-content/40 hover:text-primary flex items-center justify-center transition-all duration-200 z-10`}
                       >
                         {actionLoading[itemId] ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
@@ -726,7 +752,7 @@ const CartPage = () => {
 
                       {/* Image */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 shadow-inner">
+                        <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-base-200 to-base-300 shadow-inner">
                           <img
                             src={convertPathToUrl(productSnapshot?.thumbnail, "product_thumbnails") || "/placeholder.svg"}
                             alt={productSnapshot?.title || "Product"}
@@ -738,11 +764,13 @@ const CartPage = () => {
                       {/* Info */}
                       <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                         <div>
-                          <h3 className="font-bold text-gray-900 text-lg leading-tight mb-2 line-clamp-2 group-hover:text-[#AF0D0E] transition-colors">
-                            {productSnapshot?.title || itemData?.title || "Product"}
+                          <h3 className="font-bold text-base-content text-lg leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                            {productSnapshot?.title ||
+                              itemData?.title ||
+                              "Product"}
                           </h3>
                           {productSnapshot?.description && (
-                            <p className="text-sm text-gray-500 line-clamp-1 hidden sm:block">
+                            <p className="text-sm text-base-content/50 line-clamp-1 hidden sm:block">
                               {productSnapshot.description}
                             </p>
                           )}
@@ -750,8 +778,8 @@ const CartPage = () => {
                           <div
                             className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${item.productType === "ECBook" ||
                               item.product?.__t === "ECBook"
-                              ? "bg-blue-50 text-blue-600 border border-blue-100"
-                              : "bg-orange-50 text-orange-600 border border-orange-100"
+                              ? "bg-info/10 text-info border border-info/20"
+                              : "bg-warning/10 text-warning border border-warning/20"
                               }`}
                           >
                             {item.productType === "ECBook" ||
@@ -767,11 +795,14 @@ const CartPage = () => {
                           </div>
                         </div>
                         <div className="flex items-end gap-3 mt-3">
-                          <span className="text-2xl font-black bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] bg-clip-text text-transparent">
-                            {price} <span className="text-base font-bold">{t("currency") || "EGP"}</span>
+                          <span className="text-2xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            {price}{" "}
+                            <span className="text-base font-bold">
+                              {t("currency") || "EGP"}
+                            </span>
                           </span>
                           {originalPrice > price && (
-                            <span className="text-sm text-gray-400 line-through mb-1">
+                            <span className="text-sm text-base-content/40 line-through mb-1">
                               {originalPrice} {t("currency") || "EGP"}
                             </span>
                           )}
@@ -792,13 +823,13 @@ const CartPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100"
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 overflow-hidden border border-base-200"
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] px-6 py-5">
-                  <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                      <ShoppingBag className="w-5 h-5 text-white" />
+                <div className="bg-gradient-to-r from-primary to-secondary px-6 py-5">
+                  <h2 className="text-xl font-bold text-primary-content flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-base-100/20 backdrop-blur flex items-center justify-center">
+                      <ShoppingBag className="w-5 h-5 text-primary-content" />
                     </div>
                     {isRTL ? "ملخص الطلب" : "Order Summary"}
                   </h2>
@@ -807,8 +838,8 @@ const CartPage = () => {
                 <div className="p-4 sm:p-6 space-y-6">
                   {/* Coupon Section */}
                   <div className="relative">
-                    <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-                      <Percent className="w-4 h-4 text-[#FF5C28]" />
+                    <label className="text-sm font-semibold text-base-content mb-3 block flex items-center gap-2">
+                      <Percent className="w-4 h-4 text-warning" />
                       {isRTL ? "كود الخصم" : "Discount Code"}
                     </label>
                     <div className="flex gap-2">
@@ -818,22 +849,22 @@ const CartPage = () => {
                           placeholder={
                             isRTL ? "أدخل الكود هنا" : "Enter code here"
                           }
-                          className={`w-full h-12 px-4 bg-gray-50 border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${couponValidation.isValid
-                            ? "border-emerald-400 bg-emerald-50"
-                            : "border-gray-200 focus:border-[#AF0D0E]"
+                          className={`w-full h-12 px-4 bg-base-200 border-2 rounded-xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${couponValidation.isValid
+                            ? "border-success bg-success/5"
+                            : "border-base-200 focus:border-primary"
                             }`}
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                           disabled={couponValidation.isValid || couponValidation.loading}
                         />
                         {couponValidation.isValid && (
-                          <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+                          <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-success" />
                         )}
                       </div>
                       {couponValidation.isValid ? (
                         <button
                           onClick={handleRemoveCoupon}
-                          className="w-12 h-12 rounded-xl bg-red-100 text-[#AF0D0E] flex items-center justify-center hover:bg-red-200 transition-colors"
+                          className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -841,7 +872,7 @@ const CartPage = () => {
                         <button
                           onClick={handleApplyCoupon}
                           disabled={couponValidation.loading || !couponCode}
-                          className="px-5 h-12 rounded-xl bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-red-500/25 transition-all"
+                          className="px-5 h-12 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-content font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-primary/25 transition-all"
                         >
                           {couponValidation.loading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -855,7 +886,7 @@ const CartPage = () => {
                       <motion.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`text-sm mt-2 font-medium ${couponValidation.isValid ? "text-emerald-600" : "text-[#AF0D0E]"}`}
+                        className={`text-sm mt-2 font-medium ${couponValidation.isValid ? "text-success" : "text-error"}`}
                       >
                         {couponValidation.message}
                       </motion.p>
@@ -863,11 +894,11 @@ const CartPage = () => {
                   </div>
 
                   {/* Divider */}
-                  <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-base-200 to-transparent" />
 
                   {/* Price Breakdown */}
                   <div className="space-y-4">
-                    <div className="flex justify-between items-center text-gray-600">
+                    <div className="flex justify-between items-center text-base-content/70">
                       <span>{isRTL ? "المجموع الفرعي" : "Subtotal"}</span>
                       <span className="font-semibold">{cart.subtotal} {t("currency") || "EGP"}</span>
                     </div>
@@ -875,7 +906,7 @@ const CartPage = () => {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="flex justify-between items-center text-emerald-600"
+                        className="flex justify-between items-center text-success"
                       >
                         <span className="flex items-center gap-2">
                           <Gift className="w-4 h-4" />
@@ -884,10 +915,12 @@ const CartPage = () => {
                         <span className="font-semibold">-{cart.discount} {t("currency") || "EGP"}</span>
                       </motion.div>
                     )}
-                    <div className="h-px bg-gray-200" />
+                    <div className="h-px bg-base-200" />
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-gray-900">{isRTL ? "الإجمالي" : "Total"}</span>
-                      <span className="text-2xl font-black bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] bg-clip-text text-transparent">
+                      <span className="text-lg font-bold text-base-content">
+                        {isRTL ? "الإجمالي" : "Total"}
+                      </span>
+                      <span className="text-2xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                         {cart.total} {t("currency") || "EGP"}
                       </span>
                     </div>
@@ -900,30 +933,31 @@ const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-4 sm:p-6 border border-gray-100 space-y-5"
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 p-4 sm:p-6 border border-base-200 space-y-5"
               >
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-[#AF0D0E]" />
+                <h3 className="text-lg font-bold text-base-content flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-base-200 to-base-100 flex items-center justify-center">
+                    <CreditCard className="w-5 h-5 text-primary" />
                   </div>
                   {isRTL ? "تفاصيل الدفع" : "Payment Details"}
                 </h3>
 
                 {/* Payment Method Dropdown */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    {isRTL ? "طريقة الدفع" : "Payment Method"} <span className="text-[#AF0D0E]">*</span>
+                  <label className="text-sm font-semibold text-base-content mb-2 block">
+                    {isRTL ? "طريقة الدفع" : "Payment Method"}{" "}
+                    <span className="text-primary">*</span>
                   </label>
                   <div className="relative" data-payment-dropdown>
                     <button
                       onClick={() =>
                         setShowPaymentDropdown(!showPaymentDropdown)
                       }
-                      className={`w-full h-14 px-4 flex items-center justify-between bg-gray-50 border-2 rounded-2xl transition-all ${validationErrors.paymentMethod
-                        ? "border-red-300 bg-red-50"
+                      className={`w-full h-14 px-4 flex items-center justify-between bg-base-200 border-2 rounded-2xl transition-all ${validationErrors.paymentMethod
+                        ? "border-error bg-error/10"
                         : showPaymentDropdown
-                          ? "border-[#AF0D0E] ring-4 ring-[#AF0D0E]/10"
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-primary ring-4 ring-primary/10"
+                          : "border-base-200 hover:border-base-300"
                         }`}
                     >
                       {checkoutData.paymentMethod ? (
@@ -939,17 +973,25 @@ const CartPage = () => {
                                   "payment_methods",
                                 )}
                                 alt=""
-                                className="w-10 h-10 object-contain rounded-xl bg-white p-1 border border-gray-100"
+                                className="w-10 h-10 object-contain rounded-xl bg-base-100 p-1 border border-base-200"
                               />
                             )}
-                          <span className="font-semibold text-gray-700">
-                            {paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.name}
+                          <span className="font-semibold text-base-content">
+                            {
+                              paymentMethods.find(
+                                (pm) => pm._id === checkoutData.paymentMethod,
+                              )?.name
+                            }
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-400">{isRTL ? "اختر طريقة الدفع" : "Select payment method"}</span>
+                        <span className="text-base-content/40">
+                          {isRTL ? "اختر طريقة الدفع" : "Select payment method"}
+                        </span>
                       )}
-                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showPaymentDropdown ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 text-base-content/40 transition-transform duration-200 ${showPaymentDropdown ? "rotate-180" : ""}`}
+                      />
                     </button>
 
                     <AnimatePresence>
@@ -959,7 +1001,7 @@ const CartPage = () => {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden"
+                          className="absolute z-50 w-full mt-2 bg-base-100 border border-base-200 rounded-2xl shadow-2xl overflow-hidden"
                         >
                           {paymentMethods.map((method) => (
                             <button
@@ -969,8 +1011,8 @@ const CartPage = () => {
                                 clearFieldError("paymentMethod");
                                 setShowPaymentDropdown(false);
                               }}
-                              className={`w-full flex items-center gap-4 px-4 py-4 hover:bg-gray-50 transition-colors ${checkoutData.paymentMethod === method._id
-                                ? "bg-red-50"
+                              className={`w-full flex items-center gap-4 px-4 py-4 hover:bg-base-200 transition-colors ${checkoutData.paymentMethod === method._id
+                                ? "bg-base-200"
                                 : ""
                                 }`}
                             >
@@ -978,13 +1020,15 @@ const CartPage = () => {
                                 <img
                                   src={convertPathToUrl(method.paymentMethodImg, "payment_methods")}
                                   alt=""
-                                  className="w-12 h-12 object-contain rounded-xl bg-white p-1 border border-gray-100"
+                                  className="w-12 h-12 object-contain rounded-xl bg-base-100 p-1 border border-base-200"
                                 />
                               )}
-                              <span className="font-semibold flex-1 text-left rtl:text-right text-gray-700">{method.name}</span>
+                              <span className="font-semibold flex-1 text-left rtl:text-right text-base-content">
+                                {method.name}
+                              </span>
                               {checkoutData.paymentMethod === method._id && (
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] flex items-center justify-center">
-                                  <Check className="w-4 h-4 text-white" />
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                                  <Check className="w-4 h-4 text-primary-content" />
                                 </div>
                               )}
                             </button>
@@ -994,7 +1038,9 @@ const CartPage = () => {
                     </AnimatePresence>
                   </div>
                   {validationErrors.paymentMethod && (
-                    <p className="text-[#AF0D0E] text-sm mt-2 font-medium">{validationErrors.paymentMethod}</p>
+                    <p className="text-error text-sm mt-2 font-medium">
+                      {validationErrors.paymentMethod}
+                    </p>
                   )}
                 </div>
 
@@ -1003,20 +1049,22 @@ const CartPage = () => {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-200/50"
+                    className="bg-gradient-to-r from-warning/5 to-warning/10 rounded-2xl p-5 border border-warning/20"
                   >
-                    <p className="text-sm text-amber-800 font-medium text-center mb-3">
-                      {isRTL ? `حوّل على رقم ${getPaymentMethodLabel()}` : `Transfer to ${getPaymentMethodLabel()} number`}
+                    <p className="text-sm text-warning-content font-medium text-center mb-3">
+                      {isRTL
+                        ? `حوّل على رقم ${getPaymentMethodLabel()}`
+                        : `Transfer to ${getPaymentMethodLabel()} number`}
                     </p>
                     <button
                       onClick={handleCopy}
-                      className="w-full flex items-center justify-center gap-3 px-5 py-4 bg-white rounded-xl font-bold text-xl text-slate-800 hover:bg-slate-50 border border-amber-200 transition-colors"
+                      className="w-full flex items-center justify-center gap-3 px-5 py-4 bg-base-100 rounded-xl font-bold text-xl text-base-content hover:bg-base-200 border border-warning/30 transition-colors"
                     >
                       <span dir="ltr">{getPaymentPhoneNumber()}</span>
                       {copied ? (
-                        <Check className="w-5 h-5 text-emerald-500" />
+                        <Check className="w-5 h-5 text-success" />
                       ) : (
-                        <Copy className="w-5 h-5 text-slate-400" />
+                        <Copy className="w-5 h-5 text-base-content/40" />
                       )}
                     </button>
                   </motion.div>
@@ -1026,8 +1074,9 @@ const CartPage = () => {
                 {cart.total > 0 && (
                   <>
                     <div>
-                      <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                        {isRTL ? "رقم المحول منه" : "Transfer Number"} <span className="text-[#AF0D0E]">*</span>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {isRTL ? "رقم المحول منه" : "Transfer Number"}{" "}
+                        <span className="text-error">*</span>
                       </label>
                       <input
                         type="text"
@@ -1038,9 +1087,9 @@ const CartPage = () => {
                             ? "أدخل الرقم (11 رقم)"
                             : "Enter number (11 digits)"
                         }
-                        className={`w-full h-14 px-4 bg-gray-50 border-2 rounded-2xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${validationErrors.numberTransferredFrom
-                          ? "border-red-300 bg-red-50"
-                          : "border-gray-200 focus:border-[#AF0D0E]"
+                        className={`w-full h-14 px-4 bg-base-200 border-2 rounded-2xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${validationErrors.numberTransferredFrom
+                          ? "border-error bg-error/10"
+                          : "border-base-200 focus:border-primary"
                           }`}
                         value={checkoutData.numberTransferredFrom}
                         onChange={(e) => {
@@ -1062,21 +1111,24 @@ const CartPage = () => {
                         }}
                       />
                       {validationErrors.numberTransferredFrom && (
-                        <p className="text-[#AF0D0E] text-sm mt-2 font-medium">{validationErrors.numberTransferredFrom}</p>
+                        <p className="text-error text-sm mt-2 font-medium">
+                          {validationErrors.numberTransferredFrom}
+                        </p>
                       )}
                     </div>
 
                     {/* Payment Screenshot Upload */}
                     <div>
-                      <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                        {isRTL ? "صورة إيصال الدفع" : "Payment Screenshot"} <span className="text-[#AF0D0E]">*</span>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {isRTL ? "صورة إيصال الدفع" : "Payment Screenshot"}{" "}
+                        <span className="text-error">*</span>
                       </label>
                       <label
                         className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${validationErrors.paymentScreenShot
-                          ? "border-red-300 bg-red-50"
+                          ? "border-error bg-error/10"
                           : checkoutData.paymentScreenShot
-                            ? "border-emerald-400 bg-emerald-50"
-                            : "border-gray-200 hover:border-[#AF0D0E] hover:bg-red-50/30"
+                            ? "border-success bg-success/10"
+                            : "border-base-200 hover:border-primary hover:bg-primary/5"
                           }`}
                       >
                         <input
@@ -1091,24 +1143,30 @@ const CartPage = () => {
                             animate={{ scale: 1, opacity: 1 }}
                             className="text-center"
                           >
-                            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
-                              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                            <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-2">
+                              <CheckCircle2 className="w-6 h-6 text-success" />
                             </div>
-                            <span className="text-sm text-emerald-600 font-semibold truncate max-w-[200px] block">
+                            <span className="text-sm text-success font-semibold truncate max-w-[200px] block">
                               {checkoutData.paymentScreenShot.name}
                             </span>
                           </motion.div>
                         ) : (
                           <div className="text-center">
-                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-2">
-                              <Upload className="w-6 h-6 text-gray-400" />
+                            <div className="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-2">
+                              <Upload className="w-6 h-6 text-base-content/40" />
                             </div>
-                            <span className="text-sm text-gray-500 font-medium">{isRTL ? "اضغط لرفع الصورة" : "Click to upload image"}</span>
+                            <span className="text-sm text-base-content/50 font-medium">
+                              {isRTL
+                                ? "اضغط لرفع الصورة"
+                                : "Click to upload image"}
+                            </span>
                           </div>
                         )}
                       </label>
                       {validationErrors.paymentScreenShot && (
-                        <p className="text-[#AF0D0E] text-sm mt-2 font-medium">{validationErrors.paymentScreenShot}</p>
+                        <p className="text-error text-sm mt-2 font-medium">
+                          {validationErrors.paymentScreenShot}
+                        </p>
                       )}
                     </div>
                   </>
@@ -1116,20 +1174,24 @@ const CartPage = () => {
 
                 {/* Watermark Upload */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                  <label className="text-sm font-semibold text-base-content mb-2 block">
                     {isRTL ? "العلامة المائية" : "Watermark"}{" "}
-                    <span className="text-gray-400 font-normal">({isRTL ? "اختياري" : "Optional"})</span>
+                    <span className="text-base-content/40 font-normal">
+                      ({isRTL ? "اختياري" : "Optional"})
+                    </span>
                   </label>
-                  <div className="bg-blue-50 rounded-xl p-3 mb-3 flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-xs text-blue-700">
-                      {isRTL ? "العلامة المائية قد تسبب مشاكل في الطباعة" : "Watermark may cause printing issues"}
+                  <div className="bg-info/10 rounded-xl p-3 mb-3 flex items-start gap-2">
+                    <Info className="w-4 h-4 text-info mt-0.5 flex-shrink-0" />
+                    <span className="text-xs text-info-content/70">
+                      {isRTL
+                        ? "العلامة المائية قد تسبب مشاكل في الطباعة"
+                        : "Watermark may cause printing issues"}
                     </span>
                   </div>
                   <label
                     className={`flex items-center justify-center w-full h-16 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${checkoutData.watermark
-                      ? "border-violet-400 bg-violet-50"
-                      : "border-gray-200 hover:border-violet-400 hover:bg-violet-50/30"
+                      ? "border-secondary bg-secondary/10"
+                      : "border-base-200 hover:border-secondary hover:bg-secondary/5"
                       }`}
                   >
                     <input
@@ -1139,12 +1201,12 @@ const CartPage = () => {
                       onChange={handleWatermarkChange}
                     />
                     {checkoutData.watermark ? (
-                      <span className="text-sm text-violet-600 font-semibold flex items-center gap-2">
+                      <span className="text-sm text-secondary font-semibold flex items-center gap-2">
                         <Check className="w-4 h-4" />
                         {checkoutData.watermark.name}
                       </span>
                     ) : (
-                      <span className="text-sm text-gray-400 font-medium flex items-center gap-2">
+                      <span className="text-sm text-base-content/40 font-medium flex items-center gap-2">
                         <ImageIcon className="w-4 h-4" />
                         {isRTL ? "رفع علامة مائية" : "Upload watermark"}
                       </span>
@@ -1159,11 +1221,11 @@ const CartPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-gradient-to-br from-[#AF0D0E]/5 via-white to-[#FF5C28]/5 rounded-2xl p-4 sm:p-6 border border-[#AF0D0E]/10 space-y-4"
+                  className="bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 rounded-2xl p-4 sm:p-6 border border-primary/10 space-y-4"
                 >
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-[#AF0D0E]" />
+                  <h3 className="text-lg font-bold text-base-content flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-primary" />
                     </div>
                     {isRTL ? "بيانات الكتاب" : "Book Details"}
                   </h3>
@@ -1173,12 +1235,14 @@ const CartPage = () => {
                     { key: "seriesName", label: isRTL ? "اسم السلسلة" : "Series Name" },
                   ].map((field) => (
                     <div key={field.key}>
-                      <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {field.label}
+                      </label>
                       <input
                         type="text"
-                        className={`w-full h-12 px-4 bg-white border-2 rounded-xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 transition-all ${validationErrors[field.key]
-                          ? "border-red-300"
-                          : "border-gray-200 focus:border-[#AF0D0E]"
+                        className={`w-full h-12 px-4 bg-base-100 border-2 rounded-xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${validationErrors[field.key]
+                          ? "border-error/50"
+                          : "border-base-200 focus:border-primary"
                           }`}
                         value={checkoutData[field.key]}
                         onChange={(e) => {
@@ -1188,7 +1252,9 @@ const CartPage = () => {
                         }}
                       />
                       {validationErrors[field.key] && (
-                        <p className="text-[#AF0D0E] text-xs mt-1 font-medium">{validationErrors[field.key]}</p>
+                        <p className="text-error text-xs mt-1 font-medium">
+                          {validationErrors[field.key]}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -1200,15 +1266,19 @@ const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-gray-200/50 p-4 sm:p-6 border border-gray-100"
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 p-4 sm:p-6 border border-base-200"
               >
-                <label className="text-sm font-semibold text-gray-700 mb-3 block flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-gray-400" />
+                <label className="text-sm font-semibold text-base-content mb-3 block flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-base-content/40" />
                   {isRTL ? "ملاحظات" : "Notes"}
                 </label>
                 <textarea
-                  placeholder={isRTL ? "ملاحظات إضافية (اختياري)" : "Additional notes (optional)"}
-                  className="w-full h-24 px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-2xl font-medium placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#AF0D0E]/20 focus:border-[#AF0D0E] transition-all resize-none"
+                  placeholder={
+                    isRTL
+                      ? "ملاحظات إضافية (اختياري)"
+                      : "Additional notes (optional)"
+                  }
+                  className="w-full h-24 px-4 py-3 bg-base-100 border-2 border-base-200 rounded-2xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                   value={checkoutData.notes}
                   onChange={(e) => setCheckoutData({ ...checkoutData, notes: e.target.value })}
                 />
@@ -1220,7 +1290,7 @@ const CartPage = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleCheckout}
                 disabled={checkoutLoading || checkoutCooldown > 0}
-                className="w-full py-5 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold text-lg rounded-2xl shadow-xl shadow-red-500/25 hover:shadow-red-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-red-500/25 transition-all flex items-center justify-center gap-3"
+                className="w-full py-5 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold text-lg rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-primary/25 transition-all flex items-center justify-center gap-3"
               >
                 {checkoutLoading ? (
                   <>
@@ -1239,8 +1309,10 @@ const CartPage = () => {
               </motion.button>
 
               {checkoutCooldown > 0 && (
-                <p className="text-center text-sm text-gray-500 font-medium">
-                  {isRTL ? `يرجى الانتظار ${checkoutCooldown} ثانية قبل المحاولة مرة أخرى` : `Please wait ${checkoutCooldown} seconds before trying again`}
+                <p className="text-center text-sm text-base-content/50 font-medium">
+                  {isRTL
+                    ? `يرجى الانتظار ${checkoutCooldown} ثانية قبل المحاولة مرة أخرى`
+                    : `Please wait ${checkoutCooldown} seconds before trying again`}
                 </p>
               )}
             </div>
@@ -1251,25 +1323,29 @@ const CartPage = () => {
       {/* No Payment Modal */}
       <AnimatePresence>
         {showNoPaymentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-md p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
             >
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mx-auto mb-6">
-                <AlertCircle className="w-10 h-10 text-amber-500" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-warning/20 to-error/20 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-warning" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3">{isRTL ? "عذراً!" : "Sorry!"}</h3>
-              <p className="text-gray-600 mb-8">
-                {isRTL ? "المنصة متوقفة عن استقبال الطلبات حالياً" : "Platform is not accepting orders at the moment"}
+              <h3 className="text-2xl font-black text-base-content mb-3">
+                {isRTL ? "عذراً!" : "Sorry!"}
+              </h3>
+              <p className="text-base-content/60 mb-8">
+                {isRTL
+                  ? "المنصة متوقفة عن استقبال الطلبات حالياً"
+                  : "Platform is not accepting orders at the moment"}
               </p>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate("/market")}
-                className="w-full py-4 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold rounded-2xl shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all"
+                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
               >
                 {isRTL ? "العودة للمتجر" : "Back to Store"}
               </motion.button>
@@ -1281,26 +1357,34 @@ const CartPage = () => {
       {/* Wrong Number Modal */}
       <AnimatePresence>
         {showWrongTransferNumberModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-md p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
             >
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-100 to-rose-100 flex items-center justify-center mx-auto mb-6">
-                <AlertCircle className="w-10 h-10 text-[#AF0D0E]" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-error/20 to-error/10 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-error" />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-3">{isRTL ? "انتبه!" : "Attention!"}</h3>
-              <p className="text-gray-700 font-medium mb-2">{isRTL ? "هذا ليس رقم التحويل!" : "This is not the transfer number!"}</p>
-              <p className="text-gray-500 text-sm mb-8">
-                {isRTL ? "رقم التحويل هو الرقم الذي حولت منه، وليس الرقم الذي حولت إليه." : "Transfer number is the number you transferred FROM, not the one you transferred TO."}
+              <h3 className="text-2xl font-black text-base-content mb-3">
+                {isRTL ? "انتبه!" : "Attention!"}
+              </h3>
+              <p className="text-base-content font-medium mb-2">
+                {isRTL
+                  ? "هذا ليس رقم التحويل!"
+                  : "This is not the transfer number!"}
+              </p>
+              <p className="text-base-content/50 text-sm mb-8">
+                {isRTL
+                  ? "رقم التحويل هو الرقم الذي حولت منه، وليس الرقم الذي حولت إليه."
+                  : "Transfer number is the number you transferred FROM, not the one you transferred TO."}
               </p>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowWrongTransferNumberModal(false)}
-                className="w-full py-4 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold rounded-2xl shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transition-all"
+                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
               >
                 {isRTL ? "فهمت" : "I Understand"}
               </motion.button>
@@ -1308,7 +1392,7 @@ const CartPage = () => {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </div >
   );
 };
 

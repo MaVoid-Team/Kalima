@@ -31,10 +31,10 @@ export const LectureCard = ({
     <div className="card bg-base-100 shadow-xl overflow-hidden h-full">
       <figure className="relative h-48">
         <img src={thumbnail} alt={title} className="w-full h-full object-cover" />
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-neutral/60 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full p-4">
-          <h2 className="text-white font-bold text-xl">{title}</h2>
-          <p className="text-white/80 text-sm">{subject}</p>
+          <h2 className="text-neutral-content font-bold text-xl">{title}</h2>
+          <p className="text-neutral-content/80 text-sm">{subject}</p>
         </div>
       </figure>
       <div className="card-body p-4">
@@ -78,7 +78,7 @@ export const LectureCard = ({
             {showTeacherPoints && price > 0 && (
               <div className="flex items-center ml-2 text-xs">
                 <Wallet className="w-3 h-3 mr-1" />
-                <span className={hasEnoughPoints ? "text-green-600" : "text-red-600"}>
+                <span className={hasEnoughPoints ? "text-success" : "text-error"}>
                   {t("available : ")} {userPoints}
                 </span>
               </div>

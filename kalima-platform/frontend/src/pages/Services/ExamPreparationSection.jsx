@@ -38,14 +38,13 @@ export const ExamPreparationSection = React.memo(() => {
 
   return (
     <section
-      className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-40 bg-base-100 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         <div
-          className={`flex flex-col lg:flex-row items-stretch gap-12 lg:gap-24 ${
-            isRTL ? "lg:flex-row-reverse" : ""
-          }`}
+          className={`flex flex-col lg:flex-row items-stretch gap-12 lg:gap-24 ${isRTL ? "lg:flex-row-reverse" : ""
+            }`}
         >
           {/* Editorial Side - The Narrative */}
           <div className="flex-1 flex flex-col justify-center">
@@ -54,9 +53,8 @@ export const ExamPreparationSection = React.memo(() => {
                 initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className={`flex items-center gap-6 ${
-                  isRTL ? "flex-row-reverse" : ""
-                }`}
+                className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""
+                  }`}
               >
                 <div className="w-16 h-px bg-primary" />
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.6em]">
@@ -103,7 +101,7 @@ export const ExamPreparationSection = React.memo(() => {
                     <div
                       className={`flex items-center gap-4 mb-4 ${isRTL ? "flex-row-reverse" : ""}`}
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 transform group-hover:-rotate-12">
+                      <div className="w-12 h-12 rounded-2xl bg-base-200 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-all duration-500 transform group-hover:-rotate-12">
                         <feat.icon className="w-6 h-6" strokeWidth={1} />
                       </div>
                       <h4 className="text-xl font-black text-base-content uppercase tracking-tight">
@@ -128,7 +126,7 @@ export const ExamPreparationSection = React.memo(() => {
                   initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
                   whileInView={{ opacity: 1, scale: 1, rotate: -3 }}
                   viewport={{ once: true }}
-                  className="relative w-full rounded-[2rem] sm:rounded-[4rem] overflow-hidden border-[8px] sm:border-[16px] border-white shadow-2xl bg-base-100 p-6 sm:p-12"
+                  className="relative w-full rounded-[2rem] sm:rounded-[4rem] overflow-hidden border-[8px] sm:border-[16px] border-base-100 shadow-2xl bg-base-100 p-6 sm:p-12"
                 >
                   {/* Header */}
                   <div

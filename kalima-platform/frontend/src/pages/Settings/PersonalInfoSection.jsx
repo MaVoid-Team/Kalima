@@ -60,7 +60,7 @@ function PersonalInfoSection() {
       if (!allowedTypes.includes(file.type)) {
         toast.error(
           t("validation.invalidImageType") ||
-            "Please select a valid image file (JPEG, PNG, GIF)"
+          "Please select a valid image file (JPEG, PNG, GIF)"
         );
         return;
       }
@@ -352,9 +352,8 @@ function PersonalInfoSection() {
       <div className="card bg-base-100 shadow-sm">
         <div className="card-body">
           <h3
-            className={`text-lg font-semibold mb-4 ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`text-lg font-semibold mb-4 ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             {personalInfo.subtitle}
           </h3>
@@ -400,15 +399,14 @@ function PersonalInfoSection() {
             {/* Upload controls when file is selected */}
             {formData.profilePic && (
               <div className="mt-4 flex flex-col items-center gap-2">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-base-content/60">
                   {t("personalInfo.selectedFile") || "Selected:"}{" "}
                   {formData.profilePic.name}
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className={`btn btn-primary btn-sm ${
-                      profilePicUploading ? "loading" : ""
-                    }`}
+                    className={`btn btn-primary btn-sm ${profilePicUploading ? "loading" : ""
+                      }`}
                     onClick={handleProfilePicUpload}
                     disabled={profilePicUploading}
                   >
@@ -442,7 +440,7 @@ function PersonalInfoSection() {
 
             {/* Upload hint for users without profile picture */}
             {!hasProfilePic && !formData.profilePic && (
-              <div className="mt-2 text-sm text-gray-500 text-center">
+              <div className="mt-2 text-sm text-base-content/50 text-center">
                 {t("personalInfo.noProfilePicHint") ||
                   "Click the camera icon to upload a profile picture"}
               </div>
@@ -465,18 +463,16 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div
-              className={`flex gap-4 ${
-                isRTL ? "flex-row" : "flex-row-reverse"
-              }`}
+              className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"
+                }`}
             >
               {isEditing.fullName ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${
-                      updateStatus.loading && updateStatus.field === "fullName"
+                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "fullName"
                         ? "loading"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleSave("fullName")}
                     disabled={updateStatus.loading}
                   >
@@ -508,9 +504,8 @@ function PersonalInfoSection() {
                 }
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.fullName}
-                className={`input input-bordered w-full ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"
+                  }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.fullName}
               />
@@ -536,19 +531,17 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div
-              className={`flex gap-4 ${
-                isRTL ? "flex-row" : "flex-row-reverse"
-              }`}
+              className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"
+                }`}
             >
               {isEditing.phoneNumber ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${
-                      updateStatus.loading &&
-                      updateStatus.field === "phoneNumber"
+                    className={`btn btn-sm btn-primary ${updateStatus.loading &&
+                        updateStatus.field === "phoneNumber"
                         ? "loading"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleSave("phoneNumber")}
                     disabled={updateStatus.loading}
                   >
@@ -583,9 +576,8 @@ function PersonalInfoSection() {
                 }
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.phoneNumber}
-                className={`input input-bordered w-full ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"
+                  }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.phoneNumber}
               />
@@ -611,18 +603,16 @@ function PersonalInfoSection() {
               </span>
             </label>
             <div
-              className={`flex gap-4 ${
-                isRTL ? "flex-row" : "flex-row-reverse"
-              }`}
+              className={`flex gap-4 ${isRTL ? "flex-row" : "flex-row-reverse"
+                }`}
             >
               {isEditing.email ? (
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
-                    className={`btn btn-sm btn-primary ${
-                      updateStatus.loading && updateStatus.field === "email"
+                    className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "email"
                         ? "loading"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleSave("email")}
                     disabled={updateStatus.loading || !!emailError}
                   >
@@ -652,13 +642,11 @@ function PersonalInfoSection() {
                 value={isEditing.email ? formData.email : userData?.email || ""}
                 onChange={handleInputChange}
                 placeholder={personalInfo.placeholders.email}
-                className={`input input-bordered w-full ${
-                  isRTL ? "text-right" : "text-left"
-                } ${
-                  emailError && isEditing.email
+                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"
+                  } ${emailError && isEditing.email
                     ? "input-error animate-shake"
                     : ""
-                }`}
+                  }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly={!isEditing.email}
               />
@@ -682,53 +670,53 @@ function PersonalInfoSection() {
           {(userData?.preferredContactTime?.from ||
             userData?.preferredContactTime?.to ||
             userData?.preferredContactTime?.note) && (
-            <div className="form-control mb-4">
-              <label className={`label justify-end mb-1`}>
-                <span className="label-text font-semibold mb-1 text-primary">
-                  {t("personalInfo.preferredContactTime.title")}
-                </span>
-              </label>
-              <div
-                className={`bg-base-200/50 p-4 rounded-lg border border-base-300`}
-              >
+              <div className="form-control mb-4">
+                <label className={`label justify-end mb-1`}>
+                  <span className="label-text font-semibold mb-1 text-primary">
+                    {t("personalInfo.preferredContactTime.title")}
+                  </span>
+                </label>
                 <div
-                  className="grid grid-cols-2 gap-4"
-                  dir={isRTL ? "rtl" : "ltr"}
+                  className={`bg-base-200/50 p-4 rounded-lg border border-base-300`}
                 >
-                  {userData.preferredContactTime.from && (
-                    <div>
-                      <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
-                        {t("personalInfo.preferredContactTime.from")}
-                      </span>
-                      <div className="font-medium inline-block text-base-content">
-                        {userData.preferredContactTime.from}
+                  <div
+                    className="grid grid-cols-2 gap-4"
+                    dir={isRTL ? "rtl" : "ltr"}
+                  >
+                    {userData.preferredContactTime.from && (
+                      <div>
+                        <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
+                          {t("personalInfo.preferredContactTime.from")}
+                        </span>
+                        <div className="font-medium inline-block text-base-content">
+                          {userData.preferredContactTime.from}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {userData.preferredContactTime.to && (
-                    <div>
+                    )}
+                    {userData.preferredContactTime.to && (
+                      <div>
+                        <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
+                          {t("personalInfo.preferredContactTime.to")}
+                        </span>
+                        <div className="font-medium inline-block text-base-content">
+                          {userData.preferredContactTime.to}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {userData.preferredContactTime.note && (
+                    <div className="mt-3 pt-3 border-t border-base-content/10">
                       <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
-                        {t("personalInfo.preferredContactTime.to")}
+                        {t("personalInfo.preferredContactTime.note")}
                       </span>
-                      <div className="font-medium inline-block text-base-content">
-                        {userData.preferredContactTime.to}
+                      <div className="text-sm italic opacity-80">
+                        {userData.preferredContactTime.note}
                       </div>
                     </div>
                   )}
                 </div>
-                {userData.preferredContactTime.note && (
-                  <div className="mt-3 pt-3 border-t border-base-content/10">
-                    <span className="font-semibold block text-xs opacity-70 mb-1 uppercase tracking-wider">
-                      {t("personalInfo.preferredContactTime.note")}
-                    </span>
-                    <div className="text-sm italic opacity-80">
-                      {userData.preferredContactTime.note}
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
-          )}
+            )}
 
           {/* Student-specific fields */}
           {userData?.role === "Student" && userData?.level && (
@@ -741,9 +729,8 @@ function PersonalInfoSection() {
               <input
                 type="text"
                 value={userData.level.name || ""}
-                className={`input input-bordered w-full ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
+                className={`input input-bordered w-full ${isRTL ? "text-right" : "text-left"
+                  }`}
                 dir={isRTL ? "rtl" : "ltr"}
                 readOnly
               />
