@@ -618,7 +618,6 @@ export default function StudentRegistration() {
       className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans bg-base-200"
       dir={i18n.language === "ar" ? "rtl" : "ltr"}
     >
-      <OrbitalBackground />
 
       {showRoleModal && (
         <RoleSelectionModal
@@ -773,5 +772,6 @@ export default function StudentRegistration() {
           </div>
         </div>
       </div>
-      );
+    </div>
+  );
 }

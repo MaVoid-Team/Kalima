@@ -1,15 +1,16 @@
-import { useState, useEffect, memo, useRef, useCallback } from "react";
+import { useState, useEffect, memo, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Lottie from "lottie-react";
 import {
-  Search,
   BookOpen,
   Play,
   ArrowLeft,
   Rocket,
   Sparkles,
+  Users,
+  GraduationCap,
 } from "lucide-react";
 
 
@@ -259,9 +260,6 @@ const WelcomeSection = memo(() => {
                       strokeWidth={2}
                     />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">
-                    +<AnimatedCounter value={stat.value} />
-                  </h3>
                   <p className="text-xs text-gray-500 font-medium whitespace-nowrap">
                     {stat.label}
                   </p>

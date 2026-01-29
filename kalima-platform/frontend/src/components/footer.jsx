@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Facebook, Instagram, Twitter, Linkedin, Music2, Youtube } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Music2, Youtube, Phone } from 'lucide-react';
 import { Link } from "react-router-dom";
 
 export default function Footer() {
