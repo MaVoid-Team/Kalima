@@ -283,7 +283,7 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
               </button>
 
               {result && (
-                <button onClick={resetScanner} className="btn btn-outline">
+                <button onClick={resetScanner} className="btn-outline">
                   {translations.resetButton || "Reset"}
                 </button>
               )}

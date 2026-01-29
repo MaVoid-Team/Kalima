@@ -414,7 +414,7 @@ function PersonalInfoSection() {
                     {t("personalInfo.uploadButton") || "Upload"}
                   </button>
                   <button
-                    className="btn btn-outline btn-sm"
+                    className="btn-outline btn-sm"
                     onClick={cancelProfilePicUpload}
                     disabled={profilePicUploading}
                   >
@@ -470,8 +470,8 @@ function PersonalInfoSection() {
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
                     className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "fullName"
-                        ? "loading"
-                        : ""
+                      ? "loading"
+                      : ""
                       }`}
                     onClick={() => handleSave("fullName")}
                     disabled={updateStatus.loading}
@@ -538,9 +538,9 @@ function PersonalInfoSection() {
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
                     className={`btn btn-sm btn-primary ${updateStatus.loading &&
-                        updateStatus.field === "phoneNumber"
-                        ? "loading"
-                        : ""
+                      updateStatus.field === "phoneNumber"
+                      ? "loading"
+                      : ""
                       }`}
                     onClick={() => handleSave("phoneNumber")}
                     disabled={updateStatus.loading}
@@ -610,8 +610,8 @@ function PersonalInfoSection() {
                 <div className={`flex gap-2 ${isRTL ? "" : "order-last"}`}>
                   <button
                     className={`btn btn-sm btn-primary ${updateStatus.loading && updateStatus.field === "email"
-                        ? "loading"
-                        : ""
+                      ? "loading"
+                      : ""
                       }`}
                     onClick={() => handleSave("email")}
                     disabled={updateStatus.loading || !!emailError}

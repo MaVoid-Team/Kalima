@@ -560,7 +560,7 @@ const LectureCreationModal = ({
           )}
 
           <div className="modal-action">
-            <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={creationLoading}>
+            <button type="button" className="btn-ghost" onClick={handleClose} disabled={creationLoading}>
               {t("buttons.cancel")}
             </button>
             <button type="submit" className="btn btn-primary" disabled={creationLoading}>

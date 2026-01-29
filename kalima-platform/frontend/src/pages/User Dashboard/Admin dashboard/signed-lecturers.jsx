@@ -101,7 +101,7 @@ const SignedLecturers = () => {
   const exportToXLSX = (exportAll = false) => {
     try {
       setIsExporting(true)
-      
+
       // Prepare data for export
       const data = exportAll ? state.lecturers : state.filteredLecturers
       const exportData = data.map(lecturer => ({
@@ -117,18 +117,18 @@ const SignedLecturers = () => {
 
       // Create worksheet
       const worksheet = XLSX.utils.json_to_sheet(exportData)
-      
+
       // Create workbook
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Lecturers')
-      
+
       // Generate file name with current date
       const timestamp = new Date().toISOString().split('T')[0]
       const filename = `lecturers_${timestamp}.xlsx`
-      
+
       // Save the file
       XLSX.writeFile(workbook, filename)
-      
+
     } catch (error) {
       console.error('Export error:', error)
       toast.error(t("errors.exportFailed") || "فشل في تصدير البيانات")
@@ -293,7 +293,7 @@ const SignedLecturers = () => {
                 {state.filteredLecturers.length} {t("lecturers.total") || "Total"}
               </div>
               <div className="dropdown dropdown-end mb-4">
-                <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+                <div tabIndex={0} role="button" className="btn-outline btn-primary" disabled={isExporting}>
                   {isExporting ? (
                     <>
                       <span className="loading loading-spinner loading-sm"></span>
@@ -320,9 +320,9 @@ const SignedLecturers = () => {
                   <li><button onClick={() => exportToXLSX(true)} disabled={isExporting || state.lecturers.length === 0}>{t('actions.exportXLSXAll') || 'Export All (XLSX)'}</button></li>
                 </ul>
               </div>
-              <button 
-                onClick={fetchLecturers} 
-                className="btn btn-outline btn-sm" 
+              <button
+                onClick={fetchLecturers}
+                className="btn-outline btn-sm"
                 disabled={state.isLoading}
               >
                 {state.isLoading ? (
@@ -396,7 +396,7 @@ const SignedLecturers = () => {
                 ))}
               </select>
 
-              <button className="btn btn-outline btn-sm" onClick={clearFilters}>
+              <button className="btn-outline btn-sm" onClick={clearFilters}>
                 {t("filters.clear") || "Clear"}
               </button>
             </div>
@@ -503,7 +503,7 @@ const SignedLecturers = () => {
                           <div className="flex gap-1">
                             <button
                               onClick={() => copyToClipboard(lecturer.email)}
-                              className="btn btn-ghost btn-xs"
+                              className="btn-ghost btn-xs"
                               title={t("actions.copyEmail") || "Copy Email"}
                             >
                               <svg
@@ -523,7 +523,7 @@ const SignedLecturers = () => {
                             </button>
                             <button
                               onClick={() => copyToClipboard(lecturer.phoneNumber)}
-                              className="btn btn-ghost btn-xs"
+                              className="btn-ghost btn-xs"
                               title={t("actions.copyPhone") || "Copy Phone"}
                             >
                               <FaPhone className="w-3 h-3" />
@@ -564,7 +564,7 @@ const SignedLecturers = () => {
                           <span className="truncate">{lecturer.email || "N/A"}</span>
                           <button
                             onClick={() => copyToClipboard(lecturer.email)}
-                            className="btn btn-ghost btn-xs ml-auto"
+                            className="btn-ghost btn-xs ml-auto"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -588,7 +588,7 @@ const SignedLecturers = () => {
                           <span>{lecturer.phoneNumber || "N/A"}</span>
                           <button
                             onClick={() => copyToClipboard(lecturer.phoneNumber)}
-                            className="btn btn-ghost btn-xs ml-auto"
+                            className="btn-ghost btn-xs ml-auto"
                           >
                             <FaPhone className="w-3 h-3" />
                           </button>
@@ -623,11 +623,11 @@ const SignedLecturers = () => {
                     <p className="text-sm opacity-70 max-w-md">
                       {searchTerm || Object.values(filters).some((f) => f)
                         ? t("lecturers.noLecturersFiltered") ||
-                          "No lecturers match your current filters. Try adjusting your search or filters."
+                        "No lecturers match your current filters. Try adjusting your search or filters."
                         : t("lecturers.noLecturersYet") || "No lecturers have signed up yet. Check back later."}
                     </p>
                     {(searchTerm || Object.values(filters).some((f) => f)) && (
-                      <button className="btn btn-outline btn-sm mt-4" onClick={clearFilters}>
+                      <button className="btn-outline btn-sm mt-4" onClick={clearFilters}>
                         {t("filters.clearAll") || "Clear All Filters"}
                       </button>
                     )}

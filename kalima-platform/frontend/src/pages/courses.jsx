@@ -434,7 +434,7 @@ export default function CoursesPage() {
 
         <div className="container mx-auto px-4 py-4">
           <div className={`flex justify-start`}>
-            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
+            <button className="btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               {t("filters.reset")}
             </button>
             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -489,7 +489,7 @@ export default function CoursesPage() {
                 selectedCourseType ||
                 selectedCourseStatus ||
                 selectedPrice) && (
-                  <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
+                  <button className="btn-outline btn-sm mt-4" onClick={resetFilters}>
                     {t("filters.reset")}
                   </button>
                 )}

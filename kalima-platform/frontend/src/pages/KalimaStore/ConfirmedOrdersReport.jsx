@@ -405,7 +405,7 @@ const ConfirmedOrdersReport = () => {
                 {/* Clear */}
                 <div className="w-full flex items-end">
                   <button
-                    className="btn btn-ghost w-full"
+                    className="btn-ghost w-full"
                     onClick={() => {
                       setStartDate("");
                       setStartTime("");
@@ -568,7 +568,7 @@ const ConfirmedOrdersReport = () => {
             {/* Clear */}
             <div className="w-full flex items-end">
               <button
-                className="btn btn-ghost w-full"
+                className="btn-ghost w-full"
                 onClick={() => {
                   setAccountsStartDate("");
                   setAccountsEndDate("");

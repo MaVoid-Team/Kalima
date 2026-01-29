@@ -427,7 +427,7 @@ const CreateCoupons = () => {
                 </div>
               )}
 
-              <button className="btn btn-ghost btn-xs ml-2" onClick={clearFilters}>
+              <button className="btn-ghost btn-xs ml-2" onClick={clearFilters}>
                 {t("clearFilters")}
               </button>
             </div>
@@ -511,7 +511,7 @@ const CreateCoupons = () => {
                       <div className="flex items-center justify-center gap-2">
                         <code className="bg-base-200 px-2 py-1 rounded font-mono text-sm">{coupon.couponCode}</code>
                         <button
-                          className="btn btn-ghost btn-xs"
+                          className="btn-ghost btn-xs"
                           onClick={() => handleCopyCouponCode(coupon.couponCode)}
                           title={t("copyCode")}
                         >
@@ -550,7 +550,7 @@ const CreateCoupons = () => {
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button
-                          className="btn btn-ghost btn-sm"
+                          className="btn-ghost btn-sm"
                           onClick={() => {
                             setSelectedCoupon(coupon)
                             setShowDetailsModal(true)
@@ -756,7 +756,7 @@ const CreateCoupons = () => {
                   <div className="flex items-center gap-2">
                     <code className="bg-base-200 px-3 py-2 rounded font-mono">{selectedCoupon.couponCode}</code>
                     <button
-                      className="btn btn-ghost btn-sm"
+                      className="btn-ghost btn-sm"
                       onClick={() => handleCopyCouponCode(selectedCoupon.couponCode)}
                     >
                       <Copy className="w-4 h-4" />

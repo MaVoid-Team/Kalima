@@ -183,7 +183,7 @@ const PurchaseForm = ({
                       accept="image/*"
                       onChange={handleFileChange}
                     />
-                    <label htmlFor="file-upload" className="btn btn-outline cursor-pointer">
+                    <label htmlFor="file-upload" className="btn-outline cursor-pointer">
                       {t("purchaseForm.chooseFile")}
                     </label>
                   </div>
@@ -212,7 +212,7 @@ const PurchaseForm = ({
                 </button>
               ) : (
                 <button
-                  className="btn btn-outline join-item"
+                  className="btn-outline join-item"
                   onClick={onValidateCoupon}
                   disabled={couponValidation.loading || !couponCode}
                 >

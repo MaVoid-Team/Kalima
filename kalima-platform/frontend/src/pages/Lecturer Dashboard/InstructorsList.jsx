@@ -302,7 +302,7 @@ export default function InstructorsList() {
             <h3 className="font-bold text-lg">{t("confirmDeletion")}</h3>
             <p className="py-4">{t("areYouSureDelete")}</p>
             <div className="modal-action">
-              <button onClick={() => setShowDeleteModal(false)} className="btn btn-ghost" disabled={isDeleting}>
+              <button onClick={() => setShowDeleteModal(false)} className="btn-ghost" disabled={isDeleting}>
                 {t("cancel")}
               </button>
               <button onClick={handleDelete} className="btn btn-error" disabled={isDeleting}>
@@ -419,7 +419,7 @@ export default function InstructorsList() {
               </div>
 
               <div className="modal-action">
-                <button type="button" onClick={closeModal} className="btn btn-ghost" disabled={isSubmitting}>
+                <button type="button" onClick={closeModal} className="btn-ghost" disabled={isSubmitting}>
                   {t("cancel")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={isSubmitting}>

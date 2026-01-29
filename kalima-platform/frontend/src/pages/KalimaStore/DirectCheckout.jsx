@@ -492,7 +492,7 @@ const DirectCheckout = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate(-1)}
-          className="btn btn-ghost gap-2 mb-6"
+          className="btn-ghost gap-2 mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           {isRTL ? "رجوع" : "Back"}
@@ -559,7 +559,7 @@ const DirectCheckout = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleRemoveCoupon}
-                      className="btn btn-ghost btn-square"
+                      className="btn-ghost btn-square"
                     >
                       <X className="w-5 h-5 text-error" />
                     </motion.button>

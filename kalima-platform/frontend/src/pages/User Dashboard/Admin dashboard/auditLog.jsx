@@ -453,7 +453,7 @@ const AuditLog = () => {
 
         {/* Export Dropdown */}
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+          <div tabIndex={0} role="button" className="btn-outline btn-primary" disabled={isExporting}>
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
@@ -561,7 +561,7 @@ const AuditLog = () => {
 
         {/* Role Filter */}
         {/* <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+          <label tabIndex={1} className="btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.role || t("admin.auditlog.filters.role")}</span>
           </label>
@@ -579,7 +579,7 @@ const AuditLog = () => {
 
         {/* Action Filter */}
         <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+          <label tabIndex={2} className="btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.action || t("admin.auditlog.filters.action")}</span>
           </label>
@@ -717,14 +717,14 @@ const AuditLog = () => {
         <div className="flex justify-center mt-8">
           <div className="btn-group">
             <button
-              className="btn btn-outline"
+              className="btn-outline"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
             >
               {t("admin.auditlog.pagination.previous")}
             </button>
-            <button className="btn btn-outline">{page}</button>
-            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
+            <button className="btn-outline">{page}</button>
+            <button className="btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
               {t("admin.auditlog.pagination.next")}
             </button>
           </div>

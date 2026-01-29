@@ -131,7 +131,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           </h2>
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-circle"
+            className="btn-ghost btn-sm btn-circle"
             onClick={onClose}
           >
             <X className="w-5 h-5" />

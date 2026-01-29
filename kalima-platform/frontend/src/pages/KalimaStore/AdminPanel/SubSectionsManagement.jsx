@@ -82,7 +82,7 @@ const SubSectionsManagement = ({
             onChange={(e) => setSearchText(e.target.value)}
             className="input input-bordered w-full pl-4 pr-12"
           />
-          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm">
+          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-ghost btn-sm">
             🔍
           </button>
         </div>
@@ -143,7 +143,7 @@ const SubSectionsManagement = ({
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onEditSubSection?.(subSection)}
                         disabled={actionLoading}
                         title={t("subSectionsManagement.table.edit") || "Edit"}
@@ -151,7 +151,7 @@ const SubSectionsManagement = ({
                         ✏️
                       </button>
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onDeleteSubSection?.(subSection)}
                         disabled={actionLoading}
                         title={t("subSectionsManagement.table.delete") || "Delete"}

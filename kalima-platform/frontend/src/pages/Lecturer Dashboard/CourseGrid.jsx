@@ -375,7 +375,7 @@ export default function CourseGrid() {
           <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-base-100 border-b p-4 flex justify-between items-center">
               <h3 className="text-xl font-bold">{t("editCourse")}</h3>
-              <button onClick={() => setShowEditModal(false)} className="btn btn-ghost btn-sm btn-circle">
+              <button onClick={() => setShowEditModal(false)} className="btn-ghost btn-sm btn-circle">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -512,7 +512,7 @@ export default function CourseGrid() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-ghost">
+                <button type="button" onClick={() => setShowEditModal(false)} className="btn-ghost">
                   {t("cancel")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={loading}>

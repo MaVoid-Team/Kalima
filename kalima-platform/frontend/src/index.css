@@ -29,6 +29,19 @@
   --color-accent: #eab308;
   --color-accent-content: #ffffff;
 
+  /* State Colors */
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+
   --color-neutral: #1a1a1a;
   --color-neutral-content: #ffffff;
 
@@ -37,43 +50,11 @@
   --radius-box: 2.5rem;
 }
 
-:root {
-  /* Theme Colors - mirrored from DaisyUI theme for CSS utilities */
-  --color-primary: #af0d0e;
-  --color-primary-content: #ffffff;
-  --color-secondary: #ff5c28;
-  --color-secondary-content: #ffffff;
-  --color-accent: #eab308;
-  --color-accent-content: #ffffff;
-  --color-neutral: #1a1a1a;
-  --color-neutral-content: #ffffff;
-  --color-base-100: #ffffff;
-  --color-base-200: #fcfcfc;
-  --color-base-300: #f8f8f8;
-  --color-base-content: #1a1a1a;
-
-  /* Font Families */
-  --font-sans: "IBM Plex Sans Arabic", "Outfit", system-ui, sans-serif;
-  --font-serif: "Outfit", "IBM Plex Sans Arabic", serif;
-
-  /* Boutique Font Mappings for Masterpiece Sections */
-  --font-headline: "IBM Plex Sans Arabic", sans-serif;
-  --font-body: "IBM Plex Sans Arabic", sans-serif;
-  --font-boutique: "Outfit", sans-serif;
-
-  /* Placeholder for potential custom fonts requested */
-  --font-shakhabeet: "Outfit", sans-serif;
-  --font-laxr: "Outfit", sans-serif;
-  --font-bigx: "Outfit", sans-serif;
-  --font-malmoom: "IBM Plex Sans Arabic", sans-serif;
-  --font-handicrafts: "IBM Plex Sans Arabic", sans-serif;
-}
-
 body {
   font-family: var(--font-sans);
   font-optical-sizing: auto;
-  background-color: #ffffff;
-  color: #1a1a1a;
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
   -webkit-font-smoothing: antialiased;
 }
 

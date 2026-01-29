@@ -157,7 +157,7 @@ const PackageDetails = () => {
     <div className="container mx-auto px-4 py-8"
       dir={isRTL ? "rtl" : "ltr"}>
       {/* Back Button */}
-      <button className="btn btn-ghost mb-6 gap-2" onClick={() => navigate("/packages")}>
+      <button className="btn-ghost mb-6 gap-2" onClick={() => navigate("/packages")}>
         <ArrowLeft className="w-4 h-4" />
         {t("common.backToPackages")}
       </button>
@@ -411,7 +411,7 @@ const PackageDetails = () => {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button className="btn btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
+              <button className="btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
                 {t("common.cancel")}
               </button>
               <button className="btn btn-primary" onClick={confirmPurchase} disabled={purchaseLoading}>

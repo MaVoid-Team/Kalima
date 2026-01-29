@@ -1000,7 +1000,7 @@ const Orders = () => {
               />
               {searchQuery && (
                 <button
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-ghost btn-sm"
                   onClick={() => setSearchQuery("")}
                   title="Clear search"
                 >
@@ -1067,7 +1067,7 @@ const Orders = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-outline btn-primary"
+                className="btn-outline btn-primary"
                 disabled={exporting}
               >
                 {exporting ? (
@@ -1149,7 +1149,7 @@ const Orders = () => {
             </div>
 
             {hasActiveFilters && (
-              <button className="btn btn-ghost" onClick={clearFilters}>
+              <button className="btn-ghost" onClick={clearFilters}>
                 <X className="w-4 h-4" />
                 {t("clearFilters")}
               </button>
@@ -1422,7 +1422,7 @@ const Orders = () => {
                       <div className="flex justify-center gap-2">
                         {/* View */}
                         <button
-                          className="btn btn-ghost btn-sm"
+                          className="btn-ghost btn-sm"
                           onClick={() => handleViewDetails(order)}
                           title={t("table.viewDetails")}
                         >
@@ -1430,7 +1430,7 @@ const Orders = () => {
                         </button>
                         {/* Notes */}
                         <button
-                          className={`btn btn-ghost btn-sm relative ${order.adminNotes ? "text-info" : "text-base-content/40"
+                          className={`btn-ghost btn-sm relative ${order.adminNotes ? "text-info" : "text-base-content/40"
                             }`}
                           onClick={() => openNotesModal(order)}
                           title={
@@ -1447,7 +1447,7 @@ const Orders = () => {
                         {/* Payment Screenshot */}
                         {order.paymentScreenShot && (
                           <button
-                            className="btn btn-ghost btn-sm"
+                            className="btn-ghost btn-sm"
                             onClick={() =>
                               handleViewPaymentScreenshot(
                                 order.paymentScreenShot
@@ -1460,7 +1460,7 @@ const Orders = () => {
                         )}
                         {order.watermark && (
                           <button
-                            className="btn btn-ghost btn-sm text-secondary"
+                            className="btn-ghost btn-sm text-secondary"
                             onClick={() =>
                               handleViewPaymentScreenshot(order.watermark)
                             }
@@ -1475,7 +1475,7 @@ const Orders = () => {
                           order.bankTransferFrom ||
                           (order.total || calculateCartTotal(order)) === 0) && (
                             <button
-                              className="btn btn-ghost btn-sm text-success hover:bg-success/10"
+                              className="btn-ghost btn-sm text-success hover:bg-success/10"
                               onClick={() => handleWhatsAppContact(order)}
                               title={t("table.contactWhatsApp")}
                             >
@@ -1483,7 +1483,7 @@ const Orders = () => {
                             </button>
                           )}
                         <button
-                          className="btn btn-ghost btn-sm text-error hover:bg-error/10"
+                          className="btn-ghost btn-sm text-error hover:bg-error/10"
                           onClick={() => handleDeleteOrder(order)}
                           title={t("table.deleteOrder")}
                         >
@@ -1883,7 +1883,7 @@ const Orders = () => {
                             {/* Delete button - only show if more than 1 item */}
                             {selectedOrder.items.length > 1 && (
                               <button
-                                className="btn btn-ghost btn-xs text-error hover:bg-error hover:text-error-content"
+                                className="btn-ghost btn-xs text-error hover:bg-error hover:text-error-content"
                                 onClick={() => handleDeleteItem(item._id)}
                                 disabled={deletingItemId === item._id}
                                 title={t("table.deleteItem")}
@@ -2010,7 +2010,7 @@ const Orders = () => {
                   </span>
                   {!detailsNotes.isEditing && (
                     <button
-                      className="btn btn-ghost btn-xs gap-1"
+                      className="btn-ghost btn-xs gap-1"
                       onClick={startEditingDetailsNotes}
                     >
                       <Edit3 className="w-3 h-3" />
@@ -2038,7 +2038,7 @@ const Orders = () => {
                     />
                     <div className="flex gap-2 justify-end">
                       <button
-                        className="btn btn-ghost btn-sm gap-1"
+                        className="btn-ghost btn-sm gap-1"
                         onClick={cancelEditingDetailsNotes}
                         disabled={detailsNotes.loading}
                       >

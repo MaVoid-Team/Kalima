@@ -817,7 +817,7 @@ const StoreAnalytics = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {hasActiveFilters && (
-                <button className="btn btn-ghost btn-sm" onClick={clearFilters}>
+                <button className="btn-ghost btn-sm" onClick={clearFilters}>
                   <X className="w-4 h-4" />
                   {t("clearFilters")}
                 </button>
@@ -827,7 +827,7 @@ const StoreAnalytics = () => {
                 <div
                   tabIndex={0}
                   role="button"
-                  className="btn btn-outline btn-primary"
+                  className="btn-outline btn-primary"
                   disabled={exporting}
                 >
                   {exporting ? (
@@ -1653,14 +1653,14 @@ const StoreAnalytics = () => {
                       <td className="text-center">
                         <div className="flex justify-center gap-2">
                           <button
-                            className="btn btn-ghost btn-sm"
+                            className="btn-ghost btn-sm"
                             onClick={() => openEditPaymentMethod(method)}
                             disabled={actionLoading}
                           >
                             ✏️
                           </button>
                           <button
-                            className="btn btn-ghost btn-sm"
+                            className="btn-ghost btn-sm"
                             onClick={() =>
                               handleTogglePaymentMethodStatus(method)
                             }
@@ -1669,7 +1669,7 @@ const StoreAnalytics = () => {
                             🔄
                           </button>
                           <button
-                            className="btn btn-ghost btn-sm text-error"
+                            className="btn-ghost btn-sm text-error"
                             onClick={() => handleDeletePaymentMethod(method)}
                             disabled={actionLoading}
                           >
@@ -1695,7 +1695,7 @@ const StoreAnalytics = () => {
                 {isRTL ? "تعديل طريقة الدفع" : "Edit Payment Method"}
               </h3>
               <button
-                className="btn btn-ghost btn-sm btn-circle"
+                className="btn-ghost btn-sm btn-circle"
                 onClick={closeEditPaymentMethod}
               >
                 <X className="w-4 h-4" />
@@ -1780,7 +1780,7 @@ const StoreAnalytics = () => {
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   type="button"
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={closeEditPaymentMethod}
                 >
                   {isRTL ? "إلغاء" : "Cancel"}
