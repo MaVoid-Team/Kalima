@@ -15,67 +15,89 @@ import {
   Sparkles,
 } from "lucide-react";
 
-// Optimized Animated Counter - only runs when in view
-const AnimatedCounter = memo(({ value, duration = 2 }) => {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const hasAnimated = useRef(false);
+const ActionButton = memo(
+  ({ label, onClick, variant, icon: Icon, hasArrow, isRTL }) => {
+    const isPrimary = variant === "primary";
 
-  useEffect(() => {
-    if (!isInView || hasAnimated.current) return;
-    hasAnimated.current = true;
+    return (
+      <motion.button
+        whileHover={{
+          scale: 1.03,
+          boxShadow: isPrimary ? "0 20px 40px rgba(175, 13, 14, 0.25)" : "none",
+        }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onClick}
+        className={`group px-7 py-4 rounded-2xl font-bold text-base flex items-center gap-3 transition-all duration-300 ${isPrimary
+            ? "bg-gradient-kalima text-white shadow-xl shadow-red-500/20"
+            : "bg-white text-gray-900 hover:text-primary border-2 border-gray-100 hover:border-primary/20"
+          }`}
+      >
+        {isPrimary ? (
+          <Icon className="w-5 h-5" strokeWidth={2.5} />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
+            <Icon className="w-3.5 h-3.5 fill-current text-gray-500 group-hover:text-primary transition-colors duration-300" />
+          </div>
+        )}
+        <span>{label}</span>
+        {hasArrow && (
+          <ArrowLeft
+            className={`w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 ${!isRTL && "rotate-180"
+              }`}
+          />
+        )}
+      </motion.button>
+    );
+  },
+);
 
-    const numericValue = parseInt(value.replace(/,/g, ""));
-    const startTime = performance.now();
+ActionButton.displayName = "ActionButton";
 
-    const animate = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / (duration * 1000), 1);
+const HeroDescription = memo(({ isRTL }) => (
+  <motion.p
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.4, duration: 0.6 }}
+    className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl font-medium mb-8"
+  >
+    {isRTL
+      ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
+      : "A comprehensive educational platform providing the best teachers and courses from elementary to high school."}
+  </motion.p>
+));
+HeroDescription.displayName = "HeroDescription";
 
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      setCount(Math.floor(numericValue * easeOutQuart));
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [isInView, value, duration]);
-
-  return <span ref={ref}>{count.toLocaleString()}</span>;
-});
-
-AnimatedCounter.displayName = "AnimatedCounter";
-
-// Clean Stat Card Component
-const StatCard = memo(({ stat, index }) => (
+const HeroSearch = memo(({ isRTL, searchQuery, onSearchChange, onSearch }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ delay: index * 0.1, duration: 0.5 }}
-    className="flex items-center gap-2 sm:gap-3 bg-white rounded-xl sm:rounded-2xl px-3 sm:px-5 py-3 sm:py-4 border border-gray-100 shadow-sm"
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.5, duration: 0.6 }}
+    className="w-full max-w-xl"
   >
-    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center bg-gray-50 flex-shrink-0">
-      <stat.icon
-        className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.color}`}
-        strokeWidth={2}
+    <div className="relative w-full max-w-md mb-8">
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder={
+          isRTL
+            ? "ابحث عن دورة، معلم، أو مادة..."
+            : "Search for courses, teachers..."
+        }
+        className={`w-full h-12 sm:h-14 ${isRTL ? "pr-6 pl-24" : "pl-6 pr-24"
+          } bg-white border-2 border-gray-100 rounded-2xl shadow-sm focus:outline-none focus:border-red-500/30 focus:ring-4 focus:ring-red-500/10 transition-all text-sm sm:text-base`}
       />
-    </div>
-    <div className="min-w-0">
-      <h3 className="text-lg sm:text-2xl font-bold text-gray-900">
-        +<AnimatedCounter value={stat.value} />
-      </h3>
-      <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">
-        {stat.label}
-      </p>
+      <button
+        onClick={onSearch}
+        className={`absolute top-1.5 bottom-1.5 ${isRTL ? "left-1.5" : "right-1.5"
+          } px-4 sm:px-6 bg-gradient-kalima text-white font-bold rounded-xl shadow-lg shadow-red-500/20  text-sm`}
+      >
+        {isRTL ? "بحث" : "Search"}
+      </button>
     </div>
   </motion.div>
 ));
-
-StatCard.displayName = "StatCard";
+HeroSearch.displayName = "HeroSearch";
 
 const WelcomeSection = memo(() => {
   const { i18n } = useTranslation("home");
@@ -155,7 +177,7 @@ const WelcomeSection = memo(() => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen flex items-center   pb-16 overflow-hidden"
+      className="relative w-full min-h-screen flex items-center pb-16 overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Premium Background */}
