@@ -41,7 +41,6 @@ export const ExamPreparationSection = React.memo(() => {
       className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
-     
       <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         <div
           className={`flex flex-col lg:flex-row items-stretch gap-12 lg:gap-24 ${
@@ -84,7 +83,7 @@ export const ExamPreparationSection = React.memo(() => {
                 )}
               </motion.h2>
 
-              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
+              <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-xl italic border-quote-primary">
                 {isRTL
                   ? "نظام تحضير شامل يضمن لك التفوق والثقة في مواجهة أي امتحان."
                   : "A comprehensive preparation system ensuring excellence and confidence for any exam."}

@@ -58,7 +58,7 @@ const LanguageCourseCard = React.memo(
                     key={i}
                     className={`w-3 h-3 ${
                       i < rating
-                        ? "fill-amber-400 text-amber-400"
+                        ? "fill-accent text-accent"
                         : "text-base-content/10"
                     }`}
                   />
@@ -83,7 +83,7 @@ const LanguageCourseCard = React.memo(
         </div>
       </motion.div>
     );
-  }
+  },
 );
 
 LanguageCourseCard.displayName = "LanguageCourseCard";

@@ -40,7 +40,6 @@ const ServicesGrid = React.memo(() => {
       className="relative py-16 sm:py-24 lg:py-40 bg-white overflow-hidden"
       dir={isRTL ? "rtl" : "ltr"}
     >
-     
       <div className="relative z-10 max-w-[1500px] mx-auto px-6 lg:px-12">
         {/* Header - Same style as About & App sections */}
         <div className={`mb-12 sm:mb-20 ${isRTL ? "text-right" : "text-left"}`}>
@@ -77,7 +76,7 @@ const ServicesGrid = React.memo(() => {
             )}
           </motion.h2>
 
-          <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-2xl italic border-l-4 border-primary/20 pl-8 rtl:border-l-0 rtl:border-r-4 rtl:pr-8 rtl:pl-0">
+          <p className="text-lg text-base-content/30 font-medium leading-relaxed max-w-2xl italic border-quote-primary">
             {isRTL
               ? "نحن نضع معايير جديدة للتعليم الرقمي، حيث الجودة هي الأساس."
               : "Setting new benchmarks in digital education where quality is our foundational pulse."}
