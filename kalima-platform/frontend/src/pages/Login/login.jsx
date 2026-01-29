@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import WaveBackground from "./WaveBackground";
 import { loginUser, getUserDashboard } from "../../routes/auth-services";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
 import { getAccessToken } from "../../utils/useLocalStroage";
 const TeacherLogin = () => {
   const navigate = useNavigate();
@@ -129,7 +130,7 @@ const TeacherLogin = () => {
       className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans bg-base-200"
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <OrbitalBackground />
+      <WaveBackground />
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -254,84 +255,83 @@ const TeacherLogin = () => {
                   {t("forgotPassword", "Forgot password?")}
                 </Link>
               </label>
-          </div>
 
-          {error && (
-            <div className="alert alert-error text-error-content p-3 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              {error && (
+                <div className="alert alert-error text-error-content p-3 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md">
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className={`btn btn-primary w-full h-14 rounded-2xl text-lg font-bold tracking-wide shadow-xl shadow-primary/30 hover:shadow-primary/40 text-primary-content ${loading ? "loading" : ""
+                  }`}
+                disabled={loading}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              {error}
-            </div>
-          )}
+                {/* Sheen Effect */}
+                <div className="absolute inset-0 bg-base-100/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 rounded-2xl" />
 
-          <button
-            type="submit"
-            className={`btn btn-primary w-full h-14 rounded-2xl text-lg font-bold tracking-wide shadow-xl shadow-primary/30 hover:shadow-primary/40 text-primary-content ${loading ? "loading" : ""
-              }`}
-            disabled={loading}
-          >
-            {/* Sheen Effect */}
-            <div className="absolute inset-0 bg-base-100/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 rounded-2xl" />
-
-            {loading ? (
-              t("loggingIn", "Logging in...")
-            ) : (
-              <span className="flex items-center justify-center gap-3 relative z-10">
-                {t("login", "Sign In")}
-                {!isRTL ? (
-                  <ArrowRight
-                    size={20}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
+                {loading ? (
+                  t("loggingIn", "Logging in...")
                 ) : (
-                  <ArrowLeft
-                    size={20}
-                    className="group-hover:-translate-x-1 transition-transform"
-                  />
+                  <span className="flex items-center justify-center gap-3 relative z-10">
+                    {t("login", "Sign In")}
+                    {!isRTL ? (
+                      <ArrowRight
+                        size={20}
+                        className="group-hover:translate-x-1 transition-transform"
+                      />
+                    ) : (
+                      <ArrowLeft
+                        size={20}
+                        className="group-hover:-translate-x-1 transition-transform"
+                      />
+                    )}
+                  </span>
                 )}
-              </span>
-            )}
-          </button>
+              </button>
 
-          <div className="mt-8 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-base-200"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-base-100 px-2 text-base-content/40 font-bold tracking-wider">
-                {t("or", "OR")}
-              </span>
-            </div>
-          </div>
+              <div className="mt-8 relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-base-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-base-100 px-2 text-base-content/40 font-bold tracking-wider">
+                    {t("or", "OR")}
+                  </span>
+                </div>
+              </div>
 
-          <div className="mt-2 text-center">
-            <p className="text-base-content/60 text-sm font-medium">
-              {t("needAccount", "New to Kalima?")}{" "}
-              <Link
-                to={
-                  redirectTo
-                    ? `/register?redirect=${encodeURIComponent(redirectTo)}`
-                    : "/register"
-                }
-                className="text-primary font-black hover:text-primary-focus hover:underline transition-colors decoration-2 underline-offset-4"
-              >
-                {t("register", "Create Account")}
-              </Link>
-            </p>
+              <div className="mt-2 text-center">
+                <p className="text-base-content/60 text-sm font-medium">
+                  {t("needAccount", "New to Kalima?")}{" "}
+                  <Link
+                    to={
+                      redirectTo
+                        ? `/register?redirect=${encodeURIComponent(redirectTo)}`
+                        : "/register"
+                    }
+                    className="text-primary font-black hover:text-primary-focus hover:underline transition-colors decoration-2 underline-offset-4"
+                  >
+                    {t("register", "Create Account")}
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
-        </form>
-    </div>
         </div >
       </motion.div >
     </div >

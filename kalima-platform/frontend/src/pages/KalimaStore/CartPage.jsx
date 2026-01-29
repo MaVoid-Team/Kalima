@@ -838,7 +838,7 @@ const CartPage = () => {
                 <div className="p-4 sm:p-6 space-y-6">
                   {/* Coupon Section */}
                   <div className="relative">
-                    <label className="text-sm font-semibold text-base-content mb-3 block flex items-center gap-2">
+                    <label className="text-sm font-semibold text-base-content mb-3 block items-center gap-2">
                       <Percent className="w-4 h-4 text-warning" />
                       {isRTL ? "كود الخصم" : "Discount Code"}
                     </label>
@@ -1268,7 +1268,7 @@ const CartPage = () => {
                 transition={{ delay: 0.3 }}
                 className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 p-4 sm:p-6 border border-base-200"
               >
-                <label className="text-sm font-semibold text-base-content mb-3 block flex items-center gap-2">
+                <label className="text-sm font-semibold text-base-content mb-3 block items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-base-content/40" />
                   {isRTL ? "ملاحظات" : "Notes"}
                 </label>
