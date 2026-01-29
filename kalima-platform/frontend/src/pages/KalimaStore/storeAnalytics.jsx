@@ -973,10 +973,10 @@ const StoreAnalytics = () => {
       {/* Overview Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
         {/* Total Purchases */}
-        <div className="card bg-blue-600 text-white shadow-lg">
+        <div className="card bg-info text-info-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <ShoppingCart className="w-5 h-5" />
               </div>
               <div>
@@ -992,10 +992,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Confirmed Purchases */}
-        <div className="card bg-green-600 text-white shadow-lg">
+        <div className="card bg-success text-success-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
@@ -1011,10 +1011,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Pending Purchases */}
-        <div className="card bg-orange-600 text-white shadow-lg">
+        <div className="card bg-warning text-warning-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
@@ -1030,10 +1030,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Total Revenue */}
-        <div className="card bg-emerald-600 text-white shadow-lg">
+        <div className="card bg-secondary text-secondary-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
@@ -1051,10 +1051,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Confirmed Revenue */}
-        <div className="card bg-teal-600 text-white shadow-lg">
+        <div className="card bg-accent text-accent-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <div>
@@ -1072,12 +1072,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Average Price */}
-        <div className="card bg-indigo-600 text-white shadow-lg">
+        <div className="card bg-neutral text-neutral-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                📊
-              </div>
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">📊</div>
               <div>
                 <h3 className="text-sm font-medium opacity-90">
                   {t("stats.averagePrice")}
@@ -1096,10 +1094,10 @@ const StoreAnalytics = () => {
       {/* Performance Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
         {/* Top Performing Product */}
-        <div className="card bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
+        <div className="card bg-gradient-to-r from-primary to-primary-focus text-primary-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Award className="w-5 h-5" />
               </div>
               <div className="flex-1">
@@ -1114,9 +1112,8 @@ const StoreAnalytics = () => {
                 <p className="text-xs opacity-75">
                   {productStatsLoading
                     ? ""
-                    : `${
-                        performanceMetrics.topProduct?.totalPurchases || 0
-                      } purchases`}
+                    : `${performanceMetrics.topProduct?.totalPurchases || 0
+                    } purchases`}
                 </p>
               </div>
             </div>
@@ -1124,10 +1121,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Total Products */}
-        <div className="card bg-gradient-to-r from-cyan-600 to-cyan-700 text-white shadow-lg">
+        <div className="card bg-gradient-to-r from-info to-info-content text-info-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Package className="w-5 h-5" />
               </div>
               <div>
@@ -1145,10 +1142,10 @@ const StoreAnalytics = () => {
         </div>
 
         {/* Average per Product */}
-        <div className="card bg-gradient-to-r from-pink-600 to-pink-700 text-white shadow-lg">
+        <div className="card bg-gradient-to-r from-secondary to-secondary-focus text-secondary-content shadow-lg">
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Target className="w-5 h-5" />
               </div>
               <div>
@@ -1320,12 +1317,8 @@ const StoreAnalytics = () => {
                   <tr>
                     <td colSpan="6" className="text-center py-8">
                       <div className="text-6xl mb-4">📊</div>
-                      <h3 className="text-xl font-semibold mb-2">
-                        {t("table.noData")}
-                      </h3>
-                      <p className="text-gray-500">
-                        {t("table.tryAdjustingFilters")}
-                      </p>
+                      <h3 className="text-xl font-semibold mb-2">{t('table.noData')}</h3>
+                      <p className="text-base-content/50">{t('table.tryAdjustingFilters')}</p>
                     </td>
                   </tr>
                 ) : (
@@ -1348,9 +1341,7 @@ const StoreAnalytics = () => {
                       <tr key={product.productId} className="hover">
                         <td className="text-center">
                           <div className="flex items-center justify-center">
-                            {index === 0 && (
-                              <Award className="w-4 h-4 text-yellow-500 mr-1" />
-                            )}
+                            {index === 0 && <Award className="w-4 h-4 text-warning mr-1" />}
                             <span className="font-bold">{index + 1}</span>
                           </div>
                         </td>
@@ -1481,9 +1472,8 @@ const StoreAnalytics = () => {
                   </label>
                   <input
                     type="text"
-                    className={`input input-bordered w-full ${
-                      paymentErrors.name ? "input-error" : ""
-                    }`}
+                    className={`input input-bordered w-full ${paymentErrors.name ? "input-error" : ""
+                      }`}
                     value={paymentMethodForm.name}
                     onChange={(e) =>
                       setPaymentMethodForm((prev) => ({
@@ -1510,9 +1500,8 @@ const StoreAnalytics = () => {
                   </label>
                   <input
                     type="text"
-                    className={`input input-bordered w-full ${
-                      paymentErrors.phoneNumber ? "input-error" : ""
-                    }`}
+                    className={`input input-bordered w-full ${paymentErrors.phoneNumber ? "input-error" : ""
+                      }`}
                     value={paymentMethodForm.phoneNumber}
                     onChange={(e) =>
                       setPaymentMethodForm((prev) => ({
@@ -1540,9 +1529,8 @@ const StoreAnalytics = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  className={`file-input file-input-bordered w-full ${
-                    paymentErrors.paymentMethodImg ? "file-input-error" : ""
-                  }`}
+                  className={`file-input file-input-bordered w-full ${paymentErrors.paymentMethodImg ? 'file-input-error' : ''
+                    }`}
                   onChange={handleImageChange}
                 />
                 {paymentErrors.paymentMethodImg && (
@@ -1609,10 +1597,8 @@ const StoreAnalytics = () => {
               <tbody>
                 {paymentMethods.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-8 text-gray-500">
-                      {isRTL
-                        ? "لا توجد طرق دفع متاحة"
-                        : "No payment methods available"}
+                    <td colSpan="6" className="text-center py-8 text-base-content/50">
+                      {isRTL ? 'لا توجد طرق دفع متاحة' : 'No payment methods available'}
                     </td>
                   </tr>
                 ) : (
@@ -1645,24 +1631,23 @@ const StoreAnalytics = () => {
                       </td>
                       <td className="text-center">
                         <span
-                          className={`badge ${
-                            method.status ? "badge-success" : "badge-error"
-                          }`}
+                          className={`badge ${method.status ? "badge-success" : "badge-error"
+                            }`}
                         >
                           {method.status
                             ? isRTL
                               ? "مفعل"
                               : "Active"
                             : isRTL
-                            ? "معطل"
-                            : "Disabled"}
+                              ? "معطل"
+                              : "Disabled"}
                         </span>
                       </td>
                       <td className="text-center">
                         {method.createdAt
                           ? new Date(method.createdAt).toLocaleDateString(
-                              isRTL ? "ar-EG" : "en-US"
-                            )
+                            isRTL ? "ar-EG" : "en-US"
+                          )
                           : "-"}
                       </td>
                       <td className="text-center">
@@ -1703,7 +1688,7 @@ const StoreAnalytics = () => {
 
       {/* Edit Payment Method Modal */}
       {openEditPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/40">
           <div className="bg-base-100 w-full max-w-md rounded-xl p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold">
@@ -1725,9 +1710,8 @@ const StoreAnalytics = () => {
                   </span>
                 </label>
                 <input
-                  className={`input input-bordered w-full ${
-                    paymentErrors.name ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered w-full ${paymentErrors.name ? "input-error" : ""
+                    }`}
                   value={paymentMethodForm.name}
                   onChange={(e) =>
                     setPaymentMethodForm((p) => ({
@@ -1751,9 +1735,8 @@ const StoreAnalytics = () => {
                   </span>
                 </label>
                 <input
-                  className={`input input-bordered w-full ${
-                    paymentErrors.phoneNumber ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered w-full ${paymentErrors.phoneNumber ? "input-error" : ""
+                    }`}
                   value={paymentMethodForm.phoneNumber}
                   onChange={(e) =>
                     setPaymentMethodForm((p) => ({

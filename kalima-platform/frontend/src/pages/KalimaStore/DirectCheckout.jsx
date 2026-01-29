@@ -433,7 +433,7 @@ const DirectCheckout = () => {
           className="text-center"
         >
           <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg">
-            <Loader2 className="w-8 h-8 animate-spin text-white" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary-content" />
           </div>
           <p className="text-xl font-semibold">{isRTL ? "جاري التحميل..." : "Loading..."}</p>
         </motion.div>
@@ -474,7 +474,7 @@ const DirectCheckout = () => {
             className="inline-flex items-center gap-3 mb-4"
           >
             <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg">
-              <Receipt className="w-7 h-7 text-white" />
+              <Receipt className="w-7 h-7 text-primary-content" />
             </div>
           </motion.div>
           <h1 className="text-3xl font-bold mb-2">
@@ -668,8 +668,8 @@ const DirectCheckout = () => {
                       <div
                         data-payment-trigger-checkout
                         className={`flex items-center justify-between h-12 px-4 border rounded-lg cursor-pointer transition-all ${validationErrors.paymentMethod
-                            ? "border-error"
-                            : "border-base-300 hover:border-primary"
+                          ? "border-error"
+                          : "border-base-300 hover:border-primary"
                           } bg-base-100`}
                         onClick={() => {
                           const dropdown = document.getElementById("payment-dropdown-checkout");
@@ -723,7 +723,7 @@ const DirectCheckout = () => {
                               <img
                                 src={convertPathToUrl(method.paymentMethodImg, "payment_methods")}
                                 alt={method.name}
-                                className="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm"
+                                className="w-10 h-10 object-contain rounded-lg bg-base-100 p-1 shadow-sm border border-base-200"
                               />
                             )}
                             <div className="flex-1">
@@ -752,7 +752,7 @@ const DirectCheckout = () => {
                         dir="rtl"
                       >
                         <div className="bg-gradient-to-r from-primary to-secondary p-3">
-                          <p className="font-bold text-center text-white">
+                          <p className="font-bold text-center text-primary-content">
                             برجاء دفع المبلغ على رقم {getPaymentMethodLabel()}
                           </p>
                         </div>
@@ -773,7 +773,7 @@ const DirectCheckout = () => {
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   exit={{ opacity: 0, scale: 0.8 }}
-                                  className="absolute -top-12 left-1/2 -translate-x-1/2 bg-success text-white text-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-2"
+                                  className="absolute -top-12 left-1/2 -translate-x-1/2 bg-success text-success-content px-4 py-2 rounded-full shadow-lg flex items-center gap-2"
                                 >
                                   <CheckCircle2 className="w-4 h-4" />
                                   <span>{isRTL ? "تم النسخ" : "Copied"}</span>
@@ -883,14 +883,14 @@ const DirectCheckout = () => {
                     {/* Header */}
                     <div className="bg-gradient-to-r from-secondary via-secondary/90 to-primary p-4">
                       <div className="flex items-center justify-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                          <BookOpen className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-base-100/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                          <BookOpen className="w-5 h-5 text-primary-content" />
                         </div>
                         <div>
-                          <h3 className="font-bold text-lg text-white">
+                          <h3 className="font-bold text-lg text-primary-content">
                             {t("bookDetails") || "Book Details"}
                           </h3>
-                          <p className="text-white/70 text-xs">
+                          <p className="text-primary-content/70 text-xs">
                             {isRTL ? "أدخل بيانات الكتاب" : "Enter book information"}
                           </p>
                         </div>
@@ -1152,18 +1152,18 @@ const DirectCheckout = () => {
       {/* No Payment Methods Modal */}
       <AnimatePresence>
         {showNoPaymentModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             >
-              <div className="bg-gradient-to-r from-warning to-orange-500 p-8 text-center">
-                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <AlertCircle className="w-10 h-10 text-white" />
+              <div className="bg-gradient-to-r from-warning to-secondary p-8 text-center">
+                <div className="w-20 h-20 mx-auto bg-base-100/20 rounded-full flex items-center justify-center mb-4">
+                  <AlertCircle className="w-10 h-10 text-warning-content" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-warning-content">
                   {isRTL ? "عذراً!" : "Sorry!"}
                 </h3>
               </div>
@@ -1187,18 +1187,18 @@ const DirectCheckout = () => {
       {/* Wrong Transfer Number Modal */}
       <AnimatePresence>
         {showWrongTransferNumberModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
             >
-              <div className="bg-gradient-to-r from-error to-red-500 p-8 text-center">
-                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
-                  <AlertCircle className="w-10 h-10 text-white" />
+              <div className="bg-gradient-to-r from-error to-primary p-8 text-center">
+                <div className="w-20 h-20 mx-auto bg-base-100/20 rounded-full flex items-center justify-center mb-4">
+                  <AlertCircle className="w-10 h-10 text-error-content" />
                 </div>
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-2xl font-bold text-error-content">
                   {isRTL ? "خطأ!" : "Error!"}
                 </h3>
               </div>

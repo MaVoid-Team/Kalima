@@ -76,7 +76,7 @@ const BenefitsSection = React.memo(() => {
 
   return (
     <section
-      className="relative py-16 sm:py-16 lg:py-40 overflow-hidden bg-white"
+      className="relative py-16 sm:py-16 lg:py-40 overflow-hidden bg-base-100"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
@@ -94,7 +94,7 @@ const BenefitsSection = React.memo(() => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 border-2 border-white shadow-sm"
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 border-2 border-base-100 shadow-sm"
                 />
               ))}
             </div>
@@ -140,7 +140,7 @@ const BenefitsSection = React.memo(() => {
               transition={{ delay: index * 0.1, duration: 0.8 }}
               className="relative group"
             >
-              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-white border border-base-content/5 shadow-xl transition-all duration-500 hover:shadow-2xl hover-shadow-primary hover:-translate-y-2 overflow-hidden">
+              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-base-100 border border-base-content/5 shadow-xl transition-all duration-500 hover:shadow-2xl hover-shadow-primary hover:-translate-y-2 overflow-hidden">
                 {/* Animated Material Icon */}
                 <div className="relative mb-8 sm:mb-10 lg:mb-14">
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] bg-base-100 border border-base-content/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
@@ -161,9 +161,8 @@ const BenefitsSection = React.memo(() => {
 
                   {/* Boutique CTA */}
                   <div
-                    className={`flex items-center gap-3 sm:gap-4 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-secondary opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 ${
-                      isRTL ? "flex-row-reverse" : ""
-                    }`}
+                    className={`flex items-center gap-3 sm:gap-4 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-secondary opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 ${isRTL ? "flex-row-reverse" : ""
+                      }`}
                   >
                     <span>
                       {isRTL ? "اكتشف الفلسفة" : "Discover Philosophy"}

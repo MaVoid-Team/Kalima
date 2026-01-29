@@ -11,17 +11,17 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
   const { t } = useTranslation("kalimaStore-ProductDetails")
 
   const convertPathToUrl = (filePath) => {
-  if (!filePath) return null
-  if (filePath.startsWith("http")) return filePath
+    if (!filePath) return null
+    if (filePath.startsWith("http")) return filePath
 
-  const normalizedPath = filePath.replace(/\\/g, "/")
+    const normalizedPath = filePath.replace(/\\/g, "/")
 
-  // Force base URL to not include /api or /api/v1
-  const API_URL = import.meta.env.VITE_API_URL
-  const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "")
+    // Force base URL to not include /api or /api/v1
+    const API_URL = import.meta.env.VITE_API_URL
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "")
 
-  return `${baseUrl}/${normalizedPath}`
-}
+    return `${baseUrl}/${normalizedPath}`
+  }
   // dummy comment to re-commit
   const galleryImages = (gallery || [])
     .map((img, index) => ({
@@ -99,10 +99,10 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />
                 {/* Zoom overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                <div className="absolute inset-0 bg-base-content/0 group-hover:bg-base-content/20 transition-colors flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-white/90 rounded-full p-3">
-                      <ZoomIn className="w-6 h-6 text-gray-800" />
+                    <div className="bg-base-100/90 rounded-full p-3">
+                      <ZoomIn className="w-6 h-6 text-base-content" />
                     </div>
                   </div>
                 </div>
@@ -143,22 +143,22 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
 
       {/* Full Screen Modal */}
       {showModal && (
-        <div 
+        <div
           className="modal modal-open"
           onKeyDown={handleKeyDown}
           tabIndex={0}
         >
-          <div className="modal-box max-w-none w-full h-full max-h-none p-0 bg-black/95">
+          <div className="modal-box max-w-none w-full h-full max-h-none p-0 bg-neutral/95 text-neutral-content">
             {/* Modal Header */}
-            <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 bg-gradient-to-b from-black/50 to-transparent">
-              <div className="text-white">
+            <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 bg-gradient-to-b from-neutral/50 to-transparent">
+              <div className="text-neutral-content">
                 <h3 className="text-lg font-semibold">{title}</h3>
                 <p className="text-sm opacity-75">
                   {modalImageIndex + 1} of {galleryImages.length}
                 </p>
               </div>
-              <button 
-                className="btn btn-circle btn-ghost text-white hover:bg-white/20"
+              <button
+                className="btn btn-circle btn-ghost text-neutral-content hover:bg-neutral-content/20"
                 onClick={closeModal}
               >
                 <X className="w-6 h-6" />
@@ -179,13 +179,13 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
             {galleryImages.length > 1 && (
               <>
                 <button
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 btn btn-circle btn-ghost text-white hover:bg-white/20"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 btn btn-circle btn-ghost text-neutral-content hover:bg-neutral-content/20"
                   onClick={prevImage}
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 btn btn-circle btn-ghost text-white hover:bg-white/20"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 btn btn-circle btn-ghost text-neutral-content hover:bg-neutral-content/20"
                   onClick={nextImage}
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -195,13 +195,13 @@ const ProductGallery = ({ gallery = [], title, onImageClick }) => {
 
             {/* Thumbnail Strip */}
             {galleryImages.length > 1 && (
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent">
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-neutral/50 to-transparent">
                 <div className="flex gap-2 justify-center overflow-x-auto">
                   {galleryImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setModalImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${modalImageIndex === index ? "border-white" : "border-white/30 hover:border-white/60"
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${modalImageIndex === index ? "border-primary" : "border-neutral-content/30 hover:border-neutral-content/60"
                         }`}
                     >
                       <img

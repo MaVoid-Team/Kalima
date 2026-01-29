@@ -330,14 +330,13 @@ const CreateCoupons = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {/* Total Coupons */}
         <div
-          className={`card bg-blue-600 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all ${
-            statusFilter === "all" ? "ring-4 ring-blue-300" : ""
-          }`}
+          className={`card bg-info text-info-content shadow-lg cursor-pointer hover:shadow-xl transition-all ${statusFilter === "all" ? "ring-4 ring-info/50" : ""
+            }`}
           onClick={() => setStatusFilter("all")}
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Ticket className="w-5 h-5" />
               </div>
               <div>
@@ -350,14 +349,13 @@ const CreateCoupons = () => {
 
         {/* Active Coupons */}
         <div
-          className={`card bg-green-600 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all ${
-            statusFilter === "active" ? "ring-4 ring-green-300" : ""
-          }`}
+          className={`card bg-success text-success-content shadow-lg cursor-pointer hover:shadow-xl transition-all ${statusFilter === "active" ? "ring-4 ring-success/50" : ""
+            }`}
           onClick={() => setStatusFilter("active")}
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div>
@@ -370,14 +368,13 @@ const CreateCoupons = () => {
 
         {/* Used Coupons */}
         <div
-          className={`card bg-orange-600 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all ${
-            statusFilter === "used" ? "ring-4 ring-orange-300" : ""
-          }`}
+          className={`card bg-warning text-warning-content shadow-lg cursor-pointer hover:shadow-xl transition-all ${statusFilter === "used" ? "ring-4 ring-warning/50" : ""
+            }`}
           onClick={() => setStatusFilter("used")}
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <XCircle className="w-5 h-5" />
               </div>
               <div>
@@ -390,14 +387,13 @@ const CreateCoupons = () => {
 
         {/* Expired Coupons */}
         <div
-          className={`card bg-red-600 text-white shadow-lg cursor-pointer hover:shadow-xl transition-all ${
-            statusFilter === "expired" ? "ring-4 ring-red-300" : ""
-          }`}
+          className={`card bg-error text-error-content shadow-lg cursor-pointer hover:shadow-xl transition-all ${statusFilter === "expired" ? "ring-4 ring-error/50" : ""
+            }`}
           onClick={() => setStatusFilter("expired")}
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
@@ -446,7 +442,7 @@ const CreateCoupons = () => {
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
               {/* Search */}
               <div className="relative flex-1 min-w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-base-content/40" />
                 <input
                   type="text"
                   placeholder={t("searchPlaceholder")}
@@ -505,7 +501,7 @@ const CreateCoupons = () => {
                   <td colSpan="7" className="text-center py-8">
                     <div className="text-6xl mb-4">🎫</div>
                     <h3 className="text-xl font-semibold mb-2">{t("table.noCoupons")}</h3>
-                    <p className="text-gray-500">{t("table.tryAdjustingFilters")}</p>
+                    <p className="text-base-content/50">{t("table.tryAdjustingFilters")}</p>
                   </td>
                 </tr>
               ) : (
@@ -544,11 +540,11 @@ const CreateCoupons = () => {
                     <td className="text-center">
                       {coupon.usedBy ? (
                         <div className="flex items-center justify-center gap-1">
-                          <User className="w-4 h-4 text-orange-600" />
+                          <User className="w-4 h-4 text-warning" />
                           <span className="text-sm">Used by <span className="font-bold">{coupon.usedBy.name}</span></span>
                         </div>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-base-content/40">-</span>
                       )}
                     </td>
                     <td className="text-center">
@@ -640,7 +636,7 @@ const CreateCoupons = () => {
             </button>
           </div>
 
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-base-content/60">
             {t("pagination.showing")}{" "}
             {Math.min((currentPage - 1) * itemsPerPage + 1, filteredCoupons.length)} -{" "}
             {Math.min(currentPage * itemsPerPage, filteredCoupons.length)} {t("pagination.of")}{" "}

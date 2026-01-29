@@ -120,11 +120,10 @@ const NavBar = () => {
     <>
       <header
         ref={navbarRef}
-        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-sm shadow-lg shadow-gray-200/50 "
-            : "bg-white/80 backdrop-blur-sm"
-        }`}
+        className={`sticky top-0 left-0 right-0 z-[100] transition-all duration-500 ${scrolled
+          ? "bg-base-100/95 backdrop-blur-sm shadow-lg shadow-base-200/50 "
+          : "bg-base-100/80 backdrop-blur-sm"
+          }`}
         dir={isAr ? "rtl" : "ltr"}
       >
         <div className="container mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
@@ -149,9 +148,9 @@ const NavBar = () => {
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                    className="absolute inset-0 bg-gradient-to-br from-[#AF0D0E]/30 to-[#FF5C28]/30 rounded-2xl blur-xl"
+                    className="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-2xl blur-xl"
                   />
-                  <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-red-500/10 transition-all duration-300">
+                  <div className="relative w-12 h-12 rounded-2xl  flex items-center justify-center overflow-hidden group-hover:shadow-xl group-hover:shadow-primary/10 transition-all duration-300">
                     <img
                       src="/Logo.png"
                       alt="Logo"
@@ -160,7 +159,7 @@ const NavBar = () => {
                   </div>
                 </motion.div>
                 <div className="hidden sm:block">
-                  <span className="text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent group-hover:from-[#AF0D0E] group-hover:to-[#FF5C28] transition-all duration-300">
+                  <span className="text-2xl font-black bg-gradient-to-r from-base-content via-base-content/80 to-base-content bg-clip-text text-transparent group-hover:from-primary group-hover:to-secondary transition-all duration-300">
                     {t("logoText") || "كلمة"}
                   </span>
                 </div>
@@ -171,11 +170,11 @@ const NavBar = () => {
                 {/* Store Link */}
                 <Link
                   to="/market"
-                  className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
+                  className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-base-content/70 hover:text-primary transition-all duration-300"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
-                  <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                    <ShoppingBag className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 rounded-xl transition-all duration-300" />
+                  <div className="relative w-9 h-9 rounded-xl bg-base-200 group-hover:bg-gradient-to-br group-hover:from-primary/10 group-hover:to-secondary/10 flex items-center justify-center transition-all duration-300">
+                    <ShoppingBag className="w-4.5 h-4.5 text-base-content/60 group-hover:text-primary transition-colors duration-300" />
                   </div>
                   <span className="relative">{t("market") || "المتجر"}</span>
                 </Link>
@@ -184,11 +183,11 @@ const NavBar = () => {
                 {userRole && (
                   <Link
                     to={getDashboardPath(userRole)}
-                    className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-gray-600 hover:text-[#AF0D0E] transition-all duration-300"
+                    className="group relative flex items-center gap-2.5 px-4 py-2.5 rounded-xl font-semibold text-base-content/70 hover:text-primary transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E]/0 to-[#FF5C28]/0 group-hover:from-[#AF0D0E]/5 group-hover:to-[#FF5C28]/5 rounded-xl transition-all duration-300" />
-                    <div className="relative w-9 h-9 rounded-xl bg-gray-100 group-hover:bg-gradient-to-br group-hover:from-[#AF0D0E]/10 group-hover:to-[#FF5C28]/10 flex items-center justify-center transition-all duration-300">
-                      <Layout className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#AF0D0E] transition-colors duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:to-secondary/5 rounded-xl transition-all duration-300" />
+                    <div className="relative w-9 h-9 rounded-xl bg-base-200 group-hover:bg-gradient-to-br group-hover:from-primary/10 group-hover:to-secondary/10 flex items-center justify-center transition-all duration-300">
+                      <Layout className="w-4.5 h-4.5 text-base-content/60 group-hover:text-primary transition-colors duration-300" />
                     </div>
                     <span className="relative">{t("dashboard")}</span>
                   </Link>
@@ -212,7 +211,7 @@ const NavBar = () => {
                     >
                       <Link
                         to="/my-orders"
-                        className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-gray-50"
+                        className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-base-content/70 hover:text-primary font-medium transition-all duration-300 hover:bg-base-200"
                         title={isAr ? "طلباتي" : "My Orders"}
                       >
                         <Receipt className="w-5 h-5" />
@@ -227,7 +226,7 @@ const NavBar = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="relative p-2 rounded-xl hover:bg-base-200 transition-colors cursor-pointer"
                   >
                     <CartIcon />
                   </motion.div>
@@ -236,10 +235,10 @@ const NavBar = () => {
                   {userId && <NotificationCenter userId={userId} />}
 
                   {/* Divider */}
-                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent mx-1" />
+                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-base-300 to-transparent mx-1" />
 
                   {/* Language Switcher */}
-                  <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                  <div className="p-1 px-2 bg-base-200 rounded-xl border border-base-300 hover:border-base-CONTENT/20 transition-colors">
                     <LanguageSwitcher />
                   </div>
 
@@ -248,7 +247,7 @@ const NavBar = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleLogout}
-                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-gray-600 hover:text-[#AF0D0E] font-medium transition-all duration-300 hover:bg-red-50"
+                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl text-base-content/70 hover:text-primary font-medium transition-all duration-300 hover:bg-error/10"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>{t("logout")}</span>
@@ -261,18 +260,18 @@ const NavBar = () => {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+                    className="relative p-2 rounded-xl hover:bg-base-200 transition-colors cursor-pointer"
                   >
                     <CartIcon />
                   </motion.div>
 
                   {/* Language Switcher */}
-                  <div className="p-1 px-2 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors">
+                  <div className="p-1 px-2 bg-base-200 rounded-xl border border-base-300 hover:border-base-content/20 transition-colors">
                     <LanguageSwitcher />
                   </div>
 
                   {/* Divider */}
-                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
+                  <div className="w-px h-8 bg-gradient-to-b from-transparent via-base-300 to-transparent" />
 
                   {/* Login Link */}
                   <motion.div
@@ -281,7 +280,7 @@ const NavBar = () => {
                   >
                     <Link
                       to="/login"
-                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-700 font-semibold hover:text-[#AF0D0E] hover:bg-red-50/50 transition-all duration-300"
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-base-content font-semibold hover:text-primary hover:bg-primary/5 transition-all duration-300"
                     >
                       <LogIn className="w-5 h-5 opacity-70 group-hover:opacity-100" />
                       <span>{t("signin") || "تسجيل الدخول"}</span>
@@ -298,10 +297,10 @@ const NavBar = () => {
                   >
                     <Link
                       to="/register"
-                      className="group relative flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold overflow-hidden"
+                      className="group relative flex items-center gap-2 px-6 py-3 rounded-xl text-primary-content font-bold overflow-hidden"
                     >
                       {/* Gradient background */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary" />
                       {/* Shine effect */}
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                       {/* Content */}
@@ -327,7 +326,7 @@ const NavBar = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative w-11 h-11 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
+                className="relative w-11 h-11 rounded-xl bg-base-200 hover:bg-base-300 flex items-center justify-center transition-colors"
                 onClick={() => setMenuOpen(!menuOpen)}
               >
                 <AnimatePresence mode="wait">
@@ -339,7 +338,7 @@ const NavBar = () => {
                       exit={{ rotate: 90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <X className="w-6 h-6 text-gray-700" />
+                      <X className="w-6 h-6 text-base-content" />
                     </motion.div>
                   ) : (
                     <motion.div
@@ -349,7 +348,7 @@ const NavBar = () => {
                       exit={{ rotate: -90, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Menu className="w-6 h-6 text-gray-700" />
+                      <Menu className="w-6 h-6 text-base-content" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -369,7 +368,7 @@ const NavBar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 bg-black/50"
+              className="absolute inset-0 bg-neutral/50"
               onClick={() => setMenuOpen(false)}
             />
 
@@ -379,15 +378,14 @@ const NavBar = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: isAr ? 320 : -320, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`absolute top-0 bottom-0 w-[85%] max-w-[320px] bg-white shadow-2xl ${
-                isAr ? "right-0" : "left-0"
-              }`}
+              className={`absolute top-0 bottom-0 w-[85%] max-w-[320px] bg-base-100 shadow-2xl ${isAr ? "right-0" : "left-0"
+                }`}
               dir={isAr ? "rtl" : "ltr"}
             >
               {/* Drawer Header */}
-              <div className="relative p-6 border-b border-gray-100">
+              <div className="relative p-6 border-b border-base-200">
                 {/* Gradient accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary" />
 
                 <div className="flex items-center justify-between">
                   <Link
@@ -395,10 +393,10 @@ const NavBar = () => {
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-3"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-50 to-white shadow-lg border border-gray-100 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-base-200 to-base-100 shadow-lg border border-base-200 flex items-center justify-center">
                       <img src="/Logo.png" alt="Logo" className="w-9 h-9" />
                     </div>
-                    <span className="text-xl font-black text-gray-900">
+                    <span className="text-xl font-black text-base-content">
                       {t("logoText") || "كلمة"}
                     </span>
                   </Link>
@@ -406,9 +404,9 @@ const NavBar = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setMenuOpen(false)}
-                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                    className="w-10 h-10 rounded-xl bg-base-200 hover:bg-base-300 flex items-center justify-center transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-base-content/60" />
                   </motion.button>
                 </div>
               </div>
@@ -417,7 +415,7 @@ const NavBar = () => {
               <div className="p-6 space-y-6 overflow-y-auto h-[calc(100%-180px)]">
                 {/* Navigation Links */}
                 <div className="space-y-2">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-3">
+                  <p className="text-xs font-bold text-base-content/40 uppercase tracking-wider px-2 mb-3">
                     {isAr ? "التنقل" : "Navigation"}
                   </p>
 
@@ -427,15 +425,15 @@ const NavBar = () => {
                   >
                     <Link
                       to="/"
-                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
+                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-base-200 hover:to-transparent font-semibold text-base-content hover:text-primary transition-all"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center">
-                        <Home className="w-5 h-5 text-gray-500" />
+                      <div className="w-11 h-11 rounded-xl bg-base-200 flex items-center justify-center">
+                        <Home className="w-5 h-5 text-base-content/50" />
                       </div>
                       <span>{isAr ? "الرئيسية" : "Home"}</span>
                       <ChevronRight
-                        className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                        className={`w-5 h-5 text-base-content/30 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
                       />
                     </Link>
                   </motion.div>
@@ -446,15 +444,15 @@ const NavBar = () => {
                   >
                     <Link
                       to="/market"
-                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
+                      className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent font-semibold text-base-content hover:text-primary transition-all"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
-                        <ShoppingBag className="w-5 h-5 text-[#AF0D0E]" />
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                        <ShoppingBag className="w-5 h-5 text-primary" />
                       </div>
                       <span>{t("market") || "المتجر"}</span>
                       <ChevronRight
-                        className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                        className={`w-5 h-5 text-base-content/30 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
                       />
                     </Link>
                   </motion.div>
@@ -466,15 +464,15 @@ const NavBar = () => {
                     >
                       <Link
                         to={getDashboardPath(userRole)}
-                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent font-semibold text-gray-700 hover:text-[#AF0D0E] transition-all"
+                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent font-semibold text-base-content hover:text-primary transition-all"
                         onClick={() => setMenuOpen(false)}
                       >
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#AF0D0E]/10 to-[#FF5C28]/10 flex items-center justify-center">
-                          <Layout className="w-5 h-5 text-[#AF0D0E]" />
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                          <Layout className="w-5 h-5 text-primary" />
                         </div>
                         <span>{t("dashboard")}</span>
                         <ChevronRight
-                          className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                          className={`w-5 h-5 text-base-content/30 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
                         />
                       </Link>
                     </motion.div>
@@ -487,15 +485,15 @@ const NavBar = () => {
                     >
                       <Link
                         to="/my-orders"
-                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent font-semibold text-gray-700 hover:text-gray-900 transition-all"
+                        className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-base-200 hover:to-transparent font-semibold text-base-content hover:text-primary transition-all"
                         onClick={() => setMenuOpen(false)}
                       >
-                        <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-gray-500" />
+                        <div className="w-11 h-11 rounded-xl bg-base-200 flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-base-content/50" />
                         </div>
                         <span>{isAr ? "طلباتي" : "My Orders"}</span>
                         <ChevronRight
-                          className={`w-5 h-5 text-gray-300 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
+                          className={`w-5 h-5 text-base-content/30 ${isAr ? "mr-auto rotate-180" : "ml-auto"}`}
                         />
                       </Link>
                     </motion.div>
@@ -504,13 +502,13 @@ const NavBar = () => {
 
                 {/* Settings Section */}
                 <div className="space-y-2">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-2 mb-3">
+                  <p className="text-xs font-bold text-base-content/40 uppercase tracking-wider px-2 mb-3">
                     {isAr ? "الإعدادات" : "Settings"}
                   </p>
 
-                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50">
-                    <div className="w-11 h-11 rounded-xl bg-white border border-gray-200 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-gray-500" />
+                  <div className="flex items-center gap-4 p-4 rounded-2xl bg-base-200">
+                    <div className="w-11 h-11 rounded-xl bg-base-100 border border-base-content/10 flex items-center justify-center">
+                      <Globe className="w-5 h-5 text-base-content/50" />
                     </div>
                     <div className="flex-1">
                       <LanguageSwitcher />
@@ -520,13 +518,13 @@ const NavBar = () => {
               </div>
 
               {/* Drawer Footer */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-white">
+              <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-base-200 bg-base-100">
                 {userRole ? (
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-red-50 to-orange-50 text-[#AF0D0E] font-bold hover:from-red-100 hover:to-orange-100 transition-all"
+                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-primary/10 to-secondary/10 text-primary font-bold hover:from-primary/20 hover:to-secondary/20 transition-all"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>{t("logout")}</span>
@@ -539,7 +537,7 @@ const NavBar = () => {
                     >
                       <Link
                         to="/register"
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28] text-white font-bold shadow-lg shadow-red-500/20"
+                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-primary-content font-bold shadow-lg shadow-primary/20"
                         onClick={() => setMenuOpen(false)}
                       >
                         <UserPlus className="w-5 h-5" />
@@ -553,7 +551,7 @@ const NavBar = () => {
                     >
                       <Link
                         to="/login"
-                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-gray-200 text-gray-700 font-bold hover:border-[#AF0D0E]/30 hover:text-[#AF0D0E] transition-all"
+                        className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-base-200 text-base-content font-bold hover:border-primary/30 hover:text-primary transition-all"
                         onClick={() => setMenuOpen(false)}
                       >
                         <LogIn className="w-5 h-5" />

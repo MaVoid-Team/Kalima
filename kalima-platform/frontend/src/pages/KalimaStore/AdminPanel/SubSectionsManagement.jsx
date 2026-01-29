@@ -2,15 +2,15 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-const SubSectionsManagement = ({ 
-  subSections = [], 
+const SubSectionsManagement = ({
+  subSections = [],
   sections = [],
-  products = [], 
-  books = [], 
-  onEditSubSection, 
-  onDeleteSubSection, 
-  actionLoading = false, 
-  isRTL = false 
+  products = [],
+  books = [],
+  onEditSubSection,
+  onDeleteSubSection,
+  actionLoading = false,
+  isRTL = false
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
   const [searchText, setSearchText] = useState("")
@@ -19,33 +19,33 @@ const SubSectionsManagement = ({
   // Simple filtering
   const filteredSubSections = subSections.filter(subSection => {
     if (!subSection) return false
-    
+
     // Text search filter
     if (searchText.trim()) {
       if (!subSection.name || !subSection.name.toLowerCase().includes(searchText.toLowerCase())) {
         return false
       }
     }
-    
+
     // Section filter
     if (sectionFilter !== "all") {
       if (!subSection.section || subSection.section._id !== sectionFilter) {
         return false
       }
     }
-    
+
     return true
   })
 
   // Add product counts
   const subSectionsWithCounts = filteredSubSections.map(subSection => {
-    const subSectionProducts = products.filter(product => 
+    const subSectionProducts = products.filter(product =>
       product && product.subSection && (product.subSection._id === subSection._id || product.subSection === subSection._id)
     )
-    const subSectionBooks = books.filter(book => 
+    const subSectionBooks = books.filter(book =>
       book && book.subSection === subSection._id
     )
-    
+
     return {
       ...subSection,
       productCount: subSectionProducts.length + subSectionBooks.length
@@ -105,9 +105,9 @@ const SubSectionsManagement = ({
       </div>
 
       {/* Debug Info */}
-      <div className="text-center mb-4 text-sm text-gray-500">
-        {t("subSectionsManagement.totalSubSections") || "Total SubSections"}: {subSections.length} | 
-        {t("subSectionsManagement.filtered") || "Filtered"}: {subSectionsWithCounts.length} | 
+      <div className="text-center mb-4 text-sm text-base-content/50">
+        {t("subSectionsManagement.totalSubSections") || "Total SubSections"}: {subSections.length} |
+        {t("subSectionsManagement.filtered") || "Filtered"}: {subSectionsWithCounts.length} |
         {t("subSectionsManagement.search") || "Search"}: "{searchText}"
       </div>
 
@@ -135,7 +135,7 @@ const SubSectionsManagement = ({
                   </td>
                   <td className="text-center">{subSection.productCount || 0}</td>
                   <td className="text-center">
-                    {subSection.createdAt 
+                    {subSection.createdAt
                       ? new Date(subSection.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')
                       : t("nA")
                     }
@@ -169,14 +169,14 @@ const SubSectionsManagement = ({
         {/* Empty State */}
         {subSectionsWithCounts.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-gray-500">
-              {subSections.length === 0 
+            <p className="text-base-content/50">
+              {subSections.length === 0
                 ? (t("subSectionsManagement.noSubSectionsAvailable") || "No subsections available")
                 : (t("subSectionsManagement.noSubSections") || "No subsections found")
               }
             </p>
             {searchText && (
-              <p className="text-sm text-gray-400 mt-2">
+              <p className="text-sm text-base-content/40 mt-2">
                 {t("subSectionsManagement.tryDifferentSearch") || "Try a different search term"}
               </p>
             )}

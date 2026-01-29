@@ -273,10 +273,10 @@ const Market = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
         <div className="text-center p-12 rounded-3xl border border-base-content/5 max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-6">
-            <X className="w-8 h-8 text-red-500" />
+          <div className="w-16 h-16 rounded-2xl bg-error/10 flex items-center justify-center mx-auto mb-6">
+            <X className="w-8 h-8 text-error" />
           </div>
           <h3 className="text-xl font-black text-base-content mb-2">
             {isRTL ? "حدث خطأ" : "Error"}
@@ -289,11 +289,11 @@ const Market = () => {
 
   return (
     <div
-      className={`min-h-screen bg-white ${isRTL ? "rtl" : "ltr"}`}
+      className={`min-h-screen bg-base-100 ${isRTL ? "rtl" : "ltr"}`}
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Hero Section */}
-      <section className="relative py-12 md:py-20 overflow-hidden">
+      <section className="relative py-12 md:py-20 overflow-hidden bg-base-100">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-base-content/10 to-transparent" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
@@ -359,7 +359,7 @@ const Market = () => {
       </section>
 
       {/* Category Tabs */}
-      <section className="sticky top-0 z-20 bg-white border-b border-base-content/5">
+      <section className="sticky top-0 z-20 bg-base-100/95 backdrop-blur-sm border-b border-base-content/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="flex overflow-x-auto scrollbar-hide gap-2 py-4">
             {categories.map((category) => (
@@ -367,7 +367,7 @@ const Market = () => {
                 key={category.id}
                 onClick={() => setActiveTab(category.id)}
                 className={`flex-shrink-0 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === category.id
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-content"
                   : "bg-base-100 text-base-content/60 hover:bg-base-200"
                   }`}
               >
@@ -382,7 +382,7 @@ const Market = () => {
               <button
                 onClick={() => setActiveSubSection("all")}
                 className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${activeSubSection === "all"
-                  ? "bg-secondary text-white"
+                  ? "bg-secondary text-secondary-content"
                   : "bg-base-100 text-base-content/60 hover:bg-base-200"
                   }`}
               >
@@ -393,7 +393,7 @@ const Market = () => {
                   key={subSection._id}
                   onClick={() => setActiveSubSection(subSection._id)}
                   className={`flex-shrink-0 px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 ${activeSubSection === subSection._id
-                    ? "bg-secondary text-white"
+                    ? "bg-secondary text-secondary-content"
                     : "bg-base-100 text-base-content/60 hover:bg-base-200"
                     }`}
                 >
@@ -427,24 +427,24 @@ const Market = () => {
                   transition={{ delay: index * 0.1 }}
                   className="group"
                 >
-                  <div className="relative bg-white rounded-3xl border border-base-content/5 overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
+                  <div className="card bg-base-100 border border-base-content/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] hover:shadow-xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
                     {/* Badges */}
                     <div className="absolute top-4 inset-x-4 flex justify-between items-start z-10">
                       {item.isNew && !isPurchased && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-white rounded-full text-xs font-bold">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-secondary text-secondary-content rounded-full text-xs font-bold">
                           <Sparkles className="w-3 h-3" />
                           {t("product.new") || "NEW"}
                         </div>
                       )}
                       {isPurchased && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white rounded-full text-xs font-bold">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-success text-success-content rounded-full text-xs font-bold">
                           <Check className="w-3 h-3" />
                           {isRTL ? "تم الشراء" : "Purchased"}
                         </div>
                       )}
                       {item.discountPercentage > 0 && (
                         <div
-                          className={`px-3 py-1.5 bg-primary text-white rounded-full text-xs font-bold ${!item.isNew && !isPurchased
+                          className={`px-3 py-1.5 bg-primary text-primary-content rounded-full text-xs font-bold ${!item.isNew && !isPurchased
                             ? isRTL
                               ? "mr-auto"
                               : "ml-auto"
@@ -505,14 +505,14 @@ const Market = () => {
                               `/market/product-details/${itemType}/${item._id}`
                             );
                           }}
-                          className="flex-1 py-3 px-4 bg-base-content text-white rounded-xl font-bold hover:bg-primary transition-colors"
+                          className="flex-1 btn btn-neutral rounded-xl font-bold hover:btn-primary transition-colors h-auto py-3 px-4"
                         >
                           {t("product.viewDetails")}
                         </button>
                         <button
                           onClick={(e) => handleAddToCart(item._id, e, item)}
                           disabled={addingToCart[item._id]}
-                          className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-base-content/10 hover:border-primary hover:bg-primary hover:text-white transition-all"
+                          className="btn btn-square w-12 h-12 rounded-xl border-2 border-base-content/10 hover:border-primary hover:bg-primary hover:text-primary-content transition-all bg-transparent text-base-content"
                         >
                           {addingToCart[item._id] ? (
                             <div className="w-5 h-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
@@ -550,7 +550,7 @@ const Market = () => {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1 || loading}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-primary-content disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   {isRTL ? (
                     <ChevronRight className="w-5 h-5" />
@@ -617,7 +617,7 @@ const Market = () => {
                           onClick={() => setCurrentPage(page)}
                           disabled={loading}
                           className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold transition-all text-sm sm:text-base ${currentPage === page
-                            ? "bg-primary text-white"
+                            ? "bg-primary text-primary-content"
                             : "border border-base-content/10 hover:border-primary hidden sm:block"
                             } ${currentPage === page ? "block" : ""}`}
                         >
@@ -633,7 +633,7 @@ const Market = () => {
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages || loading}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-base-content/10 flex items-center justify-center hover:border-primary hover:bg-primary hover:text-primary-content disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   {isRTL ? (
                     <ChevronLeft className="w-5 h-5" />
@@ -650,16 +650,16 @@ const Market = () => {
       {/* Cart Type Mismatch Modal */}
       <AnimatePresence>
         {cartTypeError.show && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+              className="bg-base-100 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
             >
               <div className="p-8 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center mx-auto mb-6">
-                  <AlertTriangle className="w-8 h-8 text-orange-500" />
+                <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center mx-auto mb-6">
+                  <AlertTriangle className="w-8 h-8 text-warning" />
                 </div>
                 <h3 className="text-2xl font-black text-base-content mb-4">
                   {isRTL ? "تنبيه!" : "Warning!"}
@@ -683,7 +683,7 @@ const Market = () => {
                       setCartTypeError({ show: false, message: "" });
                       navigate("/cart");
                     }}
-                    className="flex-1 py-3 px-6 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors"
+                    className="flex-1 py-3 px-6 bg-primary text-primary-content rounded-xl font-bold hover:bg-primary/90 transition-colors"
                   >
                     {isRTL ? "عرض السلة" : "View Cart"}
                   </button>
@@ -697,12 +697,12 @@ const Market = () => {
       {/* Auth Required Modal */}
       <AnimatePresence>
         {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+              className="bg-base-100 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
             >
               <div className="p-8 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -727,7 +727,7 @@ const Market = () => {
                         `/login?redirect=${encodeURIComponent(redirectUrl)}`
                       );
                     }}
-                    className="flex-1 py-3 px-6 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 py-3 px-6 bg-primary text-primary-content rounded-xl font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     <LogIn className="w-5 h-5" />
                     {isRTL ? "تسجيل الدخول" : "Login"}

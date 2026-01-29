@@ -9,10 +9,6 @@ import BenefitsSection from "./BenefitsSection";
 import AboutSection from "./AboutSection";
 import ServicesGrid from "./ServicesGrid";
 import { ExamPreparationSection } from "./ExamPreparationSection";
-import CoursesOverviews from "./CoursesOverview";
-import LanguageBooks from "./LanguageBooks";
-import { TeachersSection } from "./teachers-section";
-import { CoursesSection } from "./courses-section";
 
 // Utility functions
 const staggerContainer = (staggerChildren, delayChildren) => ({
@@ -81,13 +77,11 @@ const Services = () => {
       {/* WelcomeSection outside container for full-width background */}
       <WelcomeSection />
 
-        <BenefitsSection />
-        <AboutSection />
-        <AppDownloadSection />
-        <ServicesGrid />
-        <ExamPreparationSection />
-        <CoursesSection />
-        <TeachersSection />
+      <BenefitsSection />
+      <AboutSection />
+      <AppDownloadSection />
+      <ServicesGrid />
+      <ExamPreparationSection />
     </motion.section>
   );
 };

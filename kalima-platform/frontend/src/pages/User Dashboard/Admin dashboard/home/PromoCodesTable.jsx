@@ -331,7 +331,7 @@ const PromoCodesTable = () => {
             </div>
 
             {paginatedCodes.length === 0 && !state.isLoading && (
-              <div className="text-center py-4">{t("promoCodes.noCodes")}</div>
+              <div className="text-center py-4 text-base-content/70">{t("promoCodes.noCodes")}</div>
             )}
 
             <div className="flex justify-between items-center mt-4 sm:w-1/2 mx-auto gap-2">
@@ -355,7 +355,7 @@ const PromoCodesTable = () => {
 
       {/* Single Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50">
           <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
             <h3 className="font-bold text-lg mb-4">{t("modals.confirmDelete")}</h3>
             <p>{t("modals.deleteCodeConfirm")}</p>
@@ -381,7 +381,7 @@ const PromoCodesTable = () => {
 
       {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50">
           <div className="bg-base-100 p-6 rounded-lg shadow-xl max-w-md w-full">
             <h3 className="font-bold text-lg mb-4">{t("modals.confirmBulkDelete")}</h3>
             <p>{t("modals.bulkDeleteConfirm", { count: selectedCodes.length })}</p>

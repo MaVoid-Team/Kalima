@@ -10,7 +10,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
   const { t, i18n } = useTranslation("centerDashboard");
   const isRTL = i18n.language === "ar";
   const dir = isRTL ? "rtl" : "ltr";
-  
+
   const [formData, setFormData] = useState({
     subject: "",
     lecturer: "",
@@ -45,7 +45,7 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
       } finally {
         setDataLoading(prev => ({ ...prev, levels: false }));
       }
-      
+
       // Fetch subjects
       try {
         setDataLoading(prev => ({ ...prev, subjects: true }));
@@ -123,15 +123,15 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" dir={dir}>
+    <div className="fixed inset-0 bg-neutral/50 z-50 flex items-center justify-center p-4" dir={dir}>
       <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-base-100 p-4 border-b border-base-200 flex justify-between items-center">
           <h2 className="text-xl font-bold">
             {t('addCourseForm.title')}
           </h2>
-          <button 
-            type="button" 
-            className="btn btn-ghost btn-sm btn-circle" 
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-circle"
             onClick={onClose}
           >
             <X className="w-5 h-5" />
@@ -267,8 +267,8 @@ const AddCourseForm = ({ isOpen, onClose, selectedCenter, lecturers, onCourseAdd
           </div>
 
           {/* Submit Button */}
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary w-full"
             disabled={loading}
           >

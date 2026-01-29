@@ -21,11 +21,11 @@
   --color-primary: #af0d0e;
   --color-primary-content: #ffffff;
 
-  /* The Editorial Gold */
-  --color-secondary: #c5a059;
+  /* The Brand Orange (Secondary) */
+  --color-secondary: #ff5c28;
   --color-secondary-content: #ffffff;
 
-  /* The Museum Amber */
+  /* The Museum Amber (Accent) */
   --color-accent: #eab308;
   --color-accent-content: #ffffff;
 
@@ -41,7 +41,7 @@
   /* Theme Colors - mirrored from DaisyUI theme for CSS utilities */
   --color-primary: #af0d0e;
   --color-primary-content: #ffffff;
-  --color-secondary: #c5a059;
+  --color-secondary: #ff5c28;
   --color-secondary-content: #ffffff;
   --color-accent: #eab308;
   --color-accent-content: #ffffff;
@@ -117,7 +117,7 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #af0d0e;
+  background: var(--color-primary);
 }
 
 /* Glassmorphism Styles */
@@ -130,7 +130,7 @@ h6 {
 
 /* Selection */
 ::selection {
-  background: #af0d0e;
+  background: var(--color-primary);
   color: white;
 }
 

@@ -71,7 +71,7 @@ const CartIcon = () => {
     >
       <ShoppingCart className="w-6 h-6" />
       {itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[#AF0D0E] px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+        <span className="absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold text-error-content shadow-sm ring-2 ring-base-100">
           {itemCount > 99 ? "99+" : itemCount}
         </span>
       )}

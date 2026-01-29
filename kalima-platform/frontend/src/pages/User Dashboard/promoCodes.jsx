@@ -507,9 +507,8 @@ const PromoCodes = () => {
                   </td>
                   <td className="hidden md:table-cell">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        transaction.isRedemption ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs ${transaction.isRedemption ? "badge badge-success" : "badge badge-info"
+                        }`}
                     >
                       {transaction.type}
                     </span>
@@ -517,17 +516,17 @@ const PromoCodes = () => {
                   <td className="font-medium">
                     <div className="flex items-center gap-1">
                       {transaction.isRedemption ? (
-                        <span className="text-green-600">+{transaction.amount}</span>
+                        <span className="text-success">+{transaction.amount}</span>
                       ) : (
-                        <span className="text-red-600">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
+                        <span className="text-error">{transaction.amount === 0 ? 0 : `-${transaction.amount}`}</span>
                       )}
                       <span className="md:hidden text-xs opacity-70">
                         {transaction.isRedemption ? (
-                          <span className="bg-green-100 text-green-800 px-1 rounded text-[10px]">
+                          <span className="badge badge-success text-xs px-1 rounded">
                             {t("transactions.types.codeRedemption")}
                           </span>
                         ) : (
-                          <span className="bg-blue-100 text-blue-800 px-1 rounded text-[10px]">
+                          <span className="badge badge-info text-xs px-1 rounded">
                             {t("transactions.types.coursePurchase")}
                           </span>
                         )}

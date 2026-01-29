@@ -49,7 +49,7 @@ export const CourseCard = ({
       dir={isRTL ? "rtl" : "ltr"}
     >
       {/* The Gallery Frame */}
-      <div className="relative bg-white rounded-[2.5rem] p-4 flex flex-col h-full transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] group-hover:shadow-[0_22px_70px_rgba(0,0,0,0.1)] border border-base-content/5 group-hover:border-primary/30 overflow-hidden">
+      <div className="relative bg-base-100 rounded-[2.5rem] p-4 flex flex-col h-full transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] group-hover:shadow-[0_22px_70px_rgba(0,0,0,0.1)] border border-base-content/5 group-hover:border-primary/30 overflow-hidden">
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-1" />
 
@@ -65,11 +65,10 @@ export const CourseCard = ({
           {/* Status Badge */}
           <div className={`absolute top-4 ${isRTL ? "right-4" : "left-4"}`}>
             <div
-              className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest backdrop-blur-md border border-white/20 shadow-lg ${
-                status === "مجاني" || status === "free"
-                  ? "bg-emerald-500/80 text-white"
-                  : "bg-white/30 text-white"
-              }`}
+              className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest backdrop-blur-md border border-base-content/20 shadow-lg ${status === "مجاني" || status === "free"
+                ? "bg-success/80 text-success-content"
+                : "bg-neutral/30 text-neutral-content"
+                }`}
             >
               {statusText}
             </div>
@@ -77,7 +76,7 @@ export const CourseCard = ({
 
           {/* Action Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-2xl scale-0 group-hover:scale-100 transition-transform duration-500 delay-100">
+            <div className="w-12 h-12 rounded-full bg-base-100 flex items-center justify-center shadow-2xl scale-0 group-hover:scale-100 transition-transform duration-500 delay-100">
               <ArrowUpRight className="w-5 h-5 text-base-content" />
             </div>
           </div>
@@ -87,9 +86,8 @@ export const CourseCard = ({
         <div className="mt-8 px-4 flex-1 flex flex-col">
           <div className="space-y-4 flex-1">
             <div
-              className={`flex items-center gap-3 ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""
+                }`}
             >
               <div className="w-2 h-2 rounded-full bg-primary" />
               <span className="text-[10px] font-black text-primary/60 uppercase tracking-[0.3em]">
@@ -103,9 +101,8 @@ export const CourseCard = ({
 
             {/* Teacher Row */}
             <div
-              className={`flex items-center gap-3 pt-2 ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-3 pt-2 ${isRTL ? "flex-row-reverse" : ""
+                }`}
             >
               <div className="w-8 h-8 rounded-lg bg-base-200 flex items-center justify-center text-[10px] font-black opacity-30">
                 {teacher?.[0]}
@@ -123,14 +120,12 @@ export const CourseCard = ({
 
           {/* Footer Card */}
           <div
-            className={`mt-8 pt-6 border-t border-base-content/5 flex items-center justify-between ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
+            className={`mt-8 pt-6 border-t border-base-content/5 flex items-center justify-between ${isRTL ? "flex-row-reverse" : ""
+              }`}
           >
             <div
-              className={`flex items-center gap-6 ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""
+                }`}
             >
               <div className="flex flex-col items-center">
                 <span className="text-[9px] font-bold text-base-content/30 uppercase tracking-widest">
@@ -149,7 +144,7 @@ export const CourseCard = ({
                   {isRTL ? "التقييم" : "Rating"}
                 </span>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  <Star className="w-3 h-3 fill-accent text-accent" />
                   <span className="text-xs font-black text-base-content">
                     5.0
                   </span>

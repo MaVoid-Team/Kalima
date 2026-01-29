@@ -19,7 +19,7 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
       className="group relative cursor-pointer"
     >
       {/* Card Frame */}
-      <div className="relative bg-white rounded-3xl p-4 pb-8 transition-all duration-500 shadow-[0_4px_30px_rgba(0,0,0,0.03)] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-base-content/5 overflow-hidden">
+      <div className="card bg-base-100 p-4 pb-8 transition-all duration-500 shadow-sm hover:shadow-xl border border-base-content/5 overflow-hidden">
         {/* Image Container */}
         <div className="relative overflow-hidden rounded-2xl aspect-[4/5] bg-base-200">
           <img
@@ -30,13 +30,13 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
 
           {/* Top Indicators */}
           <div className="absolute top-4 inset-x-4 flex justify-between items-start z-10">
-            <button className="w-10 h-10 rounded-xl backdrop-blur-md bg-white/20 border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-base-content transition-all">
+            <button className="w-10 h-10 rounded-xl backdrop-blur-md bg-base-100/20 border border-base-100/20 flex items-center justify-center text-base-content hover:bg-base-100 hover:text-base-content transition-all">
               <Bookmark className="w-5 h-5" />
             </button>
-            <div className="backdrop-blur-md bg-black/30 border border-white/20 px-3 py-1.5 rounded-xl">
+            <div className="backdrop-blur-md bg-neutral/60 border border-base-100/20 px-3 py-1.5 rounded-xl">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-black text-white">{rating}</span>
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-xs font-black text-neutral-content">{rating}</span>
+                <Star className="w-3.5 h-3.5 fill-accent text-accent" />
               </div>
             </div>
           </div>
@@ -51,14 +51,12 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
 
           {/* Stats Bar */}
           <div
-            className={`flex items-center justify-between pt-4 border-t border-base-content/5 ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
+            className={`flex items-center justify-between pt-4 border-t border-base-content/5 ${isRTL ? "flex-row-reverse" : ""
+              }`}
           >
             <div
-              className={`flex items-center gap-4 ${
-                isRTL ? "flex-row-reverse" : ""
-              }`}
+              className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse" : ""
+                }`}
             >
               <div className={`flex flex-col ${isRTL ? "items-end" : "items-start"}`}>
                 <span className="text-[10px] font-bold text-base-content/30 uppercase tracking-wider">
@@ -80,7 +78,7 @@ function TeacherCard({ id, image, name, subject, grade, rating }) {
             </div>
 
             {/* Action Button */}
-            <div className="w-10 h-10 rounded-full border border-base-content/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all duration-500">
+            <div className="w-10 h-10 rounded-full border border-base-content/10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-primary-content transition-all duration-500">
               <ChevronRight
                 className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`}
               />

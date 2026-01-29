@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const KalimaLoader = ({ text, fullScreen = true }) => {
   const containerClass = fullScreen
-    ? "fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex items-center justify-center overflow-hidden"
+    ? "fixed inset-0 z-[9999] bg-base-100/80 backdrop-blur-md flex items-center justify-center overflow-hidden"
     : "w-full h-full min-h-screen flex items-center justify-center overflow-hidden";
 
   return (
@@ -11,7 +11,7 @@ const KalimaLoader = ({ text, fullScreen = true }) => {
         {/* Loader Container */}
         <div className="relative w-48 h-48 flex items-center justify-center">
           {/* Soft Glow Background */}
-          <div className="absolute inset-4 rounded-full blur-[20px] opacity-20 bg-gradient-to-tr from-[#AF0D0E] to-[#FF5C28]" />
+          <div className="absolute inset-4 rounded-full blur-[20px] opacity-20 bg-gradient-to-tr from-primary to-secondary" />
 
           {/* The Elegant Gradient Ring (Luxury) */}
           <motion.div
@@ -21,7 +21,7 @@ const KalimaLoader = ({ text, fullScreen = true }) => {
             style={{
               padding: "4px",
               background:
-                "conic-gradient(from 0deg, transparent 0%, #FF5C28 40%, #AF0D0E 100%)",
+                "conic-gradient(from 0deg, transparent 0%, rgba(var(--color-secondary)) 40%, rgba(var(--color-primary)) 100%)",
               mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
               maskComposite: "exclude",
               WebkitMask:
@@ -39,7 +39,7 @@ const KalimaLoader = ({ text, fullScreen = true }) => {
             <img
               src="/Logo.png"
               alt="Loading..."
-              className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(175,13,14,0.15)]"
+              className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(var(--color-primary),0.15)]"
             />
           </motion.div>
         </div>
@@ -52,7 +52,7 @@ const KalimaLoader = ({ text, fullScreen = true }) => {
             transition={{ delay: 0.2 }}
             className="mt-6 flex flex-col items-center"
           >
-            <h3 className="text-base font-bold text-gray-800 tracking-wider uppercase">
+            <h3 className="text-base font-bold text-base-content tracking-wider uppercase">
               {text}
             </h3>
             <div className="flex gap-1.5 mt-2">
@@ -68,7 +68,7 @@ const KalimaLoader = ({ text, fullScreen = true }) => {
                     repeat: Infinity,
                     delay: i * 0.15,
                   }}
-                  className="w-1.5 h-1.5 rounded-full bg-[#AF0D0E]"
+                  className="w-1.5 h-1.5 rounded-full bg-primary"
                 />
               ))}
             </div>
