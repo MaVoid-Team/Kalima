@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Function to get all containers
 export const getAllContainers = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/containers`, {
+    const response = await axios.get(`${API_URL}/api/v1/containers`, {
       params: queryParams, // Pass query parameters like limit and type
       withCredentials: true,
       headers: {
@@ -22,7 +22,7 @@ export const getAllContainers = async (queryParams = {}) => {
 
 export const getAllLecturesPublic = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/lectures/public`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures/public`, {
       params: queryParams,
       withCredentials: true,
       auth: `Bearer ${getToken()}`,
@@ -37,7 +37,7 @@ export const getAllLecturesPublic = async (queryParams = {}) => {
 // Function to get all containers
 export const getAllContainersPublic = async () => {
   try {
-    const response = await axios.get(`${API_URL}/containers/public`, {
+    const response = await axios.get(`${API_URL}/api/v1/containers/public`, {
       withCredentials: true,
 
     })
@@ -50,7 +50,7 @@ export const getAllContainersPublic = async () => {
 //Function to purchase a container
 export const purchaseContainer = async (containerId) => {
   try {
-    const response = await axios.post(`${API_URL}/purchases/container`, 
+    const response = await axios.post(`${API_URL}/api/v1/purchases/container`, 
       { containerId }, // Send containerId in the request body
       {
         withCredentials: true,
@@ -74,7 +74,7 @@ export const getContainerById = async (containerId) => {
     }
 
     const response = await axios.get(
-      `${API_URL}/containers/${containerId}`,
+      `${API_URL}/api/v1/containers/${containerId}`,
       {
         withCredentials: true,
         headers: {
@@ -106,7 +106,7 @@ export const getLectureAttachments = async (lectureId) => {
       };
     }
 
-    const response = await axios.get(`${API_URL}/lectures/attachments/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures/attachments/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -137,7 +137,7 @@ export const deleteLecture = async (lectureId) => {
       }
     }
 
-    const response = await axios.delete(`${API_URL}/lectures/${lectureId}`, {
+    const response = await axios.delete(`${API_URL}/api/v1/lectures/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -168,7 +168,7 @@ export const downloadAttachmentById = async (attachmentId) => {
       throw new Error("Authentication required");
     }
 
-    const response = await axios.get(`${API_URL}/lectures/attachment/${attachmentId}/file`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures/attachment/${attachmentId}/file`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -200,7 +200,7 @@ export const createLecture = async (lectureData) => {
   try {
     const isFormData = lectureData instanceof FormData
 
-    const response = await axios.post(`${API_URL}/lectures`, lectureData, {
+    const response = await axios.post(`${API_URL}/api/v1/lectures`, lectureData, {
       withCredentials: true,
       headers: {
         "Content-Type": isFormData ? "multipart/form-data" : "application/json",
@@ -225,7 +225,7 @@ export const updateLectureById = async (lectureId, lectureData) => {
   try {
     const isFormData = lectureData instanceof FormData
 
-    const response = await axios.patch(`${API_URL}/lectures/${lectureId}`, lectureData, {
+    const response = await axios.patch(`${API_URL}/api/v1/lectures/${lectureId}`, lectureData, {
       withCredentials: true,
       headers: {
         "Content-Type": isFormData ? "multipart/form-data" : "application/json",
@@ -247,7 +247,7 @@ export const updateLectureById = async (lectureId, lectureData) => {
 
 export const createContainer = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/containers`, formData, {
+    const response = await axios.post(`${API_URL}/api/v1/containers`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -261,7 +261,7 @@ export const createContainer = async (formData) => {
 
 export const getMyContainers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/containers/my-containers`, {
+    const response = await axios.get(`${API_URL}/api/v1/containers/my-containers`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -281,7 +281,7 @@ export const getMyContainers = async () => {
 // Function to get all lectures
 export const getAllLectures = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/lectures`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -296,7 +296,7 @@ export const getAllLectures = async (queryParams = {}) => {
 
 export const getContainersByLecturerId = async (lecturerId) => {
   try {
-    const response = await axios.get(`${API_URL}/containers/lecturer/${lecturerId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/containers/lecturer/${lecturerId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -344,7 +344,7 @@ export const getLecturesByContainerId = async (containerId) => {
 // Function to get a lecture by ID
 export const getLectureById = async (lectureId) => {
   try {
-    const response = await axios.get(`${API_URL}/lectures/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/lectures/${lectureId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -362,7 +362,7 @@ export const getLectureById = async (lectureId) => {
 // Function to update a container by ID
 export const updateContainerById = async (containerId, formData) => {
   try {
-    const response = await axios.patch(`${API_URL}/containers/${containerId}`, formData, {
+    const response = await axios.patch(`${API_URL}/api/v1/containers/${containerId}`, formData, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
         'Content-Type': 'multipart/form-data',
@@ -380,7 +380,7 @@ export const updateContainerById = async (containerId, formData) => {
 // Function to delete a container by ID
 export const deleteContainerById = async (containerId) => {
   try {
-    const response = await axios.delete(`${API_URL}/containers/${containerId}`, {
+    const response = await axios.delete(`${API_URL}/api/v1/containers/${containerId}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -406,7 +406,7 @@ export const createLectureAttachment = async (lectureId, attachmentData, isFormD
     }
 
     const response = await axios.post(
-      `${API_URL}/lectures/attachments/${lectureId}`,
+      `${API_URL}/api/v1/lectures/attachments/${lectureId}`,
       formData,
       {
         withCredentials: true,

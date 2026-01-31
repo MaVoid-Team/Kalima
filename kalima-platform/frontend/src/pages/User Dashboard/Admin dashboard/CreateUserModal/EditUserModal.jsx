@@ -146,8 +146,9 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
     <div className="modal modal-open">
       <div className="modal-box" dir={isRTL ? "rtl" : "ltr"}>
         <h3
-          className={`font-bold text-lg mb-4 ${isRTL ? "text-right" : "text-left"
-            }`}
+          className={`font-bold text-lg mb-4 ${
+            isRTL ? "text-right" : "text-left"
+          }`}
         >
           {t("admin.editUser.title", { name: user?.name })}
         </h3>
@@ -219,14 +220,16 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`input input-bordered w-full ${isRTL ? "pl-10" : "pr-10"
-                  }`}
+                className={`input input-bordered w-full ${
+                  isRTL ? "pl-10" : "pr-10"
+                }`}
                 placeholder={t("admin.editUser.passwordPlaceholder")}
               />
               <button
                 type="button"
-                className={`absolute inset-y-0 ${isRTL ? "left-3" : "right-3"
-                  } flex items-center cursor-pointer opacity-70 hover:opacity-100`}
+                className={`absolute inset-y-0 ${
+                  isRTL ? "left-3" : "right-3"
+                } flex items-center cursor-pointer opacity-70 hover:opacity-100`}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
@@ -285,7 +288,7 @@ const EditUserModal = ({ isOpen, onClose, user, onUserUpdated }) => {
           </div>
 
           <div className="modal-action">
-            <button type="button" className="btn-ghost" onClick={onClose}>
+            <button type="button" className="btn btn-ghost" onClick={onClose}>
               {t("admin.editUser.cancel")}
             </button>
             <button

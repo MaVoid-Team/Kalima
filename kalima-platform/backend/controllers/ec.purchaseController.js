@@ -10,7 +10,6 @@ const { sendEmail } = require("../utils/emailVerification/emailService");
 const Notification = require("../models/notification");
 const NotificationTemplate = require("../models/notificationTemplateModel");
 const User = require("../models/userModel");
-const { emitBellNotification } = require("../utils/bellNotification");
 
 // Get all purchases
 exports.getAllPurchases = catchAsync(async (req, res, next) => {
@@ -307,23 +306,6 @@ exports.createPurchase = catchAsync(async (req, res, next) => {
       "Failed to send admin notifications for direct purchase:",
       err,
     );
-  }
-
-  // --- Emit bell sound notification to admins via Socket.io ---
-  try {
-    const io = req.app.get("io");
-    if (io) {
-      await emitBellNotification(io, {
-        purchaseId: purchase._id,
-        purchaseSerial: purchaseSerial,
-        customerName: req.user.name,
-        customerEmail: req.user.email,
-        total: finalPrice,
-        itemCount: 1,
-      });
-    }
-  } catch (err) {
-    console.error("Failed to emit bell notification:", err);
   }
 
   // Update User Stats

@@ -49,20 +49,20 @@ const ContactForm = () => {
           {t('contactForm.level')}
         </label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            placeholder={t('contactForm.placeholders.level')}
-            className="input input-bordered w-full"
+          <input 
+            type="text" 
+            placeholder={t('contactForm.placeholders.level')} 
+            className="input input-bordered w-full" 
           />
-          <input
-            type="text"
-            placeholder={t('contactForm.placeholders.subLevel')}
-            className="input input-bordered w-full"
+          <input 
+            type="text" 
+            placeholder={t('contactForm.placeholders.subLevel')} 
+            className="input input-bordered w-full" 
           />
-          <input
-            type="text"
-            placeholder={t('contactForm.placeholders.details')}
-            className="input input-bordered w-full"
+          <input 
+            type="text" 
+            placeholder={t('contactForm.placeholders.details')} 
+            className="input input-bordered w-full" 
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ const ContactForm = () => {
       </div>
 
       <div className="flex justify-between items-center">
-        <button className="btn-outline">{t('contactForm.buttons.cancel')}</button>
+        <button className="btn btn-outline">{t('contactForm.buttons.cancel')}</button>
         <button className="btn btn-primary">{t('contactForm.buttons.submit')}</button>
       </div>
     </div>

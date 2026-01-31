@@ -175,16 +175,16 @@ const ContainerDetailsPage = () => {
     )
   }
 
-  if (error) {
+   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="max-w-md text-center">
-          <div className="text-error text-4xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-semibold text-base-content mb-2">{t('containerDetails.error.title')}</h2>
-          <p className="text-base-content/70 mb-6">{error}</p>
+          <div className="text-red-500 text-4xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">{t('containerDetails.error.title')}</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
           <Link
             to={userRole === "Lecturer" ? "/dashboard/lecturer-dashboard" : "/dashboard/student-dashboard/promo-codes"}
-            className="btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
+            className="btn btn-outline px-6 py-2 rounded-full flex items-center gap-2 mx-auto"
           >
             <FiArrowLeft /> {t('containerDetails.buttons.backToDashboard')}
           </Link>
@@ -199,14 +199,14 @@ const ContainerDetailsPage = () => {
     childType === "lecture" ? "Lecture" : `${childType?.charAt(0).toUpperCase() + childType?.slice(1)}`
   const isLectureCreation = childType === "lecture"
 
-  return (
+    return (
     <div className="min-h-screen p-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-base-content/70 hover:text-primary transition-colors"
+            className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
           >
             <span className="text-lg">←</span>
             <span className="font-medium">{t('containerDetails.buttons.backToDashboard')}</span>
@@ -264,7 +264,7 @@ const ContainerDetailsPage = () => {
                           ? `/dashboard/lecturer-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                           : `/dashboard/student-dashboard/${childType === "lecture" ? "lecture-display" : "container-details"}/${child._id}`
                       }
-                      className="btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
+                      className="btn btn-ghost btn-sm text-primary hover:bg-primary/10 rounded-full"
                     >
                       {t('containerDetails.buttons.viewDetails')} →
                     </Link>

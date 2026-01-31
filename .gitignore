@@ -49,7 +49,6 @@ frontend/.cache/
 .fusebox/
 .dynamodb/
 
-uploads/
 # Config files
 #.env.*
 .pnpm-debug.log*

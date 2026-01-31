@@ -46,10 +46,10 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
           <ReviewItem label={t("form.gender")} value={t(`gender.${formData.gender}`)} />
           <ReviewItem label={t("form.phoneNumber")} value={formData.phoneNumber} />
           <ReviewItem label={t("form.government") || "Government"} value={formData.government || "-"} />
-          <ReviewItem
-            label={t("form.administrationZone") || "Administration Zone"}
-            value={formData.administrationZone || "-"}
-          />
+              <ReviewItem
+                label={t("form.administrationZone") || "Administration Zone"}
+                value={formData.administrationZone || "-"}
+              />
           {formData.role === "student" && (
             <>
               <ReviewItem label={t("form.grade")} value={getLevelName(formData.level)} />
@@ -92,7 +92,7 @@ export default function Step4({ formData, t, hobbiesList, gradeLevels }) {
 
           {formData.role === "parent" && <ReviewItem label={t("form.children")} value={formData.children.join(", ")} />}
         </div>
-        <p className="font-bold mt-10">by signing up, you agree to our <span className="underline link link-primary"><Link to={"/privacy-policy"}>privacy Policy</Link></span></p>
+                  <p className="font-bold mt-10">by signing up, you agree to our <span className="underline text-blue-600"><Link to={"/privacy-policy"}>privacy Policy</Link></span></p>
       </div>
     </div>
   )

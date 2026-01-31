@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import WaveBackground from "./WaveBackground";
 import { loginUser, getUserDashboard } from "../../routes/auth-services";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { getAccessToken } from "../../utils/useLocalStroage";
 const TeacherLogin = () => {
   const navigate = useNavigate();
@@ -127,214 +126,147 @@ const TeacherLogin = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans bg-base-200"
+      className="min-h-screen flex flex-col md:flex-row items-center justify-center relative overflow-hidden bg-base-100"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <WaveBackground />
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md p-4"
-      >
-        {/* CRIMSON CAP CARD */}
-        <div className="card bg-base-100 shadow-[0_30px_60px_-15px_rgba(var(--color-primary),0.2)] overflow-hidden border border-base-200">
-          {/* The Crimson Header (Distinctive "White on Red") */}
-          <div className="bg-gradient-to-br from-primary to-secondary p-8 pb-8 relative text-primary-content">
-            {/* Abstract Pattern overlay */}
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+      {/* Right side - Login Form */}
+      <div className="w-full md:w-1/2 p-6 flex justify-center items-center z-0">
+        <div className="bg-base-100 shadow-xl rounded-lg p-6 w-full max-w-md">
+          <h1 className="text-3xl font-bold text-center mb-2">
+            {t("loginNow", "Login Now!")}
+          </h1>
+          <p className="text-center text-base-600 mb-6">
+            {/* {t('loginWelcome', 'Welcome! Sign in to access your teacher dashboard and resources')} */}
+          </p>
 
-            <div className="flex justify-between items-start relative z-10">
-              <div>
-                <h1 className="text-3xl font-black mb-1 drop-shadow-md">
-                  {t("loginNow", "Welcome Back")}
-                </h1>
-                <p className="font-medium text-primary-content/80 text-sm">
-                  {isRTL
-                    ? "سجل دخولك إلى المنصة التعليمية"
-                    : "Sign in to your account"}
-                </p>
-              </div>
-              <img
-                src="/Logo.png"
-                alt="Kalima"
-                className="h-12 w-auto brightness-0 invert opacity-80"
-              />
-            </div>
+          {/* Tabs */}
+          <div className="tabs tabs-border mb-6">
+            <button
+              className={`tab ${activeTab === "email_tab" ? "tab-active" : ""}`}
+              onClick={() => setActiveTab("email_tab")}
+            >
+              {t("emailTab", "Email")}
+            </button>
+            <button
+              className={`tab ${activeTab === "phone_tab" ? "tab-active" : ""}`}
+              onClick={() => setActiveTab("phone_tab")}
+            >
+              {t("phoneTab", "Phone")}
+            </button>
           </div>
 
-          {/* The Body (Seamless flow) */}
-          <div className="p-8 pt-6 relative z-10 bg-base-100">
-            {/* Tabs */}
-            <div className="tabs tabs-boxed bg-base-200 p-1 rounded-xl mb-6 border border-base-300">
-              <button
-                className={`tab flex-1 rounded-lg transition-all duration-200 font-bold text-sm h-10 ${activeTab === "email_tab"
-                  ? "bg-base-100 text-primary shadow-sm"
-                  : "text-base-content/60 hover:text-base-content"
-                  }`}
-                onClick={() => setActiveTab("email_tab")}
-              >
-                {t("emailTab", "Email")}
-              </button>
-              <button
-                className={`tab flex-1 rounded-lg transition-all duration-200 font-bold text-sm h-10 ${activeTab === "phone_tab"
-                  ? "bg-base-100 text-primary shadow-sm"
-                  : "text-base-content/60 hover:text-base-content"
-                  }`}
-                onClick={() => setActiveTab("phone_tab")}
-              >
-                {t("phoneTab", "Phone")}
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {activeTab === "email_tab" ? (
-                <div className="form-control">
-                  <label className="text-xs font-bold text-base-content uppercase tracking-wide mb-1.5 ml-1">
+          <form onSubmit={handleSubmit} dir={isRTL ? "rtl" : "ltr"}>
+            {activeTab === "email_tab" ? (
+              <div className="form-control mb-4">
+                <label className="label">
+                  <span className="label-text mb-2">
                     {t("emailLabel", "Email Address")}
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="input input-bordered input-primary w-full h-14 rounded-2xl bg-base-200 focus:bg-base-100 font-bold text-base-content"
-                    placeholder="name@example.com"
-                    required
-                  />
-                </div>
-              ) : (
-                <div className="form-control">
-                  <label className="text-xs font-bold text-base-content uppercase tracking-wide mb-1.5 ml-1">
-                    {t("phoneLabel", "Phone Number")}
-                  </label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    className="input input-bordered input-primary w-full h-14 rounded-2xl bg-base-200 focus:bg-base-100 font-bold text-base-content"
-                    placeholder="01xxxxxxxxx"
-                    required
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="text-xs font-bold text-base-content uppercase tracking-wide mb-1.5 ml-1 block">
-                  {t("passwordLabel", "Password")}
+                  </span>
                 </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className={`input input-bordered input-primary w-full h-14 rounded-2xl bg-base-200 focus:bg-base-100 font-bold text-base-content ${isRTL ? "pr-5 pl-12" : "pl-5 pr-12"
-                      }`}
-                    placeholder="••••••••"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-4" : "right-4"
-                      } text-base-content/40 hover:text-error transition-colors bg-transparent border-none p-0 cursor-pointer flex items-center justify-center`}
-                    onClick={() => setShowPassword((prev) => !prev)}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="youremail@example.com"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+            ) : (
+              <div className="form-control mb-4">
+                <label className="label">
+                  <span className="label-text mb-2">
+                    {t("phoneLabel", "Phone Number")}
+                  </span>
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                  placeholder="01234567890"
+                  className="input input-bordered w-full"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="form-control mb-6">
+              <label className="label">
+                <span className="label-text mb-2">
+                  {t("passwordLabel", "Password")}
+                </span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="••••••••"
+                  className={`input input-bordered w-full ${
+                    isRTL ? "pr-12" : "pl-12"
+                  }`}
+                  required
+                />
+                <button
+                  type="button"
+                  className={`absolute top-1/2 ${
+                    isRTL ? "right-3" : "left-3"
+                  } -translate-y-1/2 z-10 text-gray-500`}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
 
               <label className="label">
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-bold text-primary hover:text-primary-focus transition-colors"
+                  className="label-text-alt link link-hover text-primary mt-2"
                 >
                   {t("forgotPassword", "Forgot password?")}
                 </Link>
               </label>
+            </div>
 
-              {error && (
-                <div className="alert alert-error text-error-content p-3 rounded-lg flex items-center gap-2 text-sm font-bold shadow-md">
-                  <svg
-                    className="w-4 h-4 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className={`btn btn-primary w-full h-14 rounded-2xl text-lg font-bold tracking-wide shadow-xl shadow-primary/30 hover:shadow-primary/40 text-primary-content ${loading ? "loading" : ""
-                  }`}
-                disabled={loading}
-              >
-                {/* Sheen Effect */}
-                <div className="absolute inset-0 bg-base-100/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 rounded-2xl" />
-
-                {loading ? (
-                  t("loggingIn", "Logging in...")
-                ) : (
-                  <span className="flex items-center justify-center gap-3 relative z-10">
-                    {t("login", "Sign In")}
-                    {!isRTL ? (
-                      <ArrowRight
-                        size={20}
-                        className="group-hover:translate-x-1 transition-transform"
-                      />
-                    ) : (
-                      <ArrowLeft
-                        size={20}
-                        className="group-hover:-translate-x-1 transition-transform"
-                      />
-                    )}
-                  </span>
-                )}
-              </button>
-
-              <div className="mt-8 relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-base-200"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-base-100 px-2 text-base-content/40 font-bold tracking-wider">
-                    {t("or", "OR")}
-                  </span>
-                </div>
+            {error && (
+              <div className="alert alert-error mb-4">
+                <span>{error}</span>
               </div>
+            )}
 
-              <div className="mt-2 text-center">
-                <p className="text-base-content/60 text-sm font-medium">
-                  {t("needAccount", "New to Kalima?")}{" "}
-                  <Link
-                    to={
-                      redirectTo
-                        ? `/register?redirect=${encodeURIComponent(redirectTo)}`
-                        : "/register"
-                    }
-                    className="text-primary font-black hover:text-primary-focus hover:underline transition-colors decoration-2 underline-offset-4"
-                  >
-                    {t("register", "Create Account")}
-                  </Link>
-                </p>
-              </div>
-            </form>
-          </div>
-        </div >
-      </motion.div >
-    </div >
+            <button
+              type="submit"
+              className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
+              disabled={loading}
+            >
+              {loading ? t("loggingIn", "Logging in...") : t("login", "Login")}
+            </button>
+
+            <div className="text-center mt-4">
+              <p>
+                {t("needAccount", "Don't have an account?")}{" "}
+                <Link
+                  to={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : "/register"}
+                  className="link link-primary"
+                >
+                  {t("register", "Register here")}
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* <div className="w-full md:w-1/2 z-10">
+        <TeacherReviews />
+      </div> */}
+    </div>
   );
 };
 

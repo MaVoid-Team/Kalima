@@ -247,7 +247,7 @@ const AssistantPage = () => {
                     </span>
                   )}
                   {lecture.requiresExam && (
-                    <span className="flex items-center gap-1 text-info">
+                    <span className="flex items-center gap-1 text-blue-600">
                       <FileCheck className="w-3 h-3 flex-shrink-0" />
                       {t("lectures.hasExam")}
                     </span>
@@ -270,7 +270,7 @@ const AssistantPage = () => {
           ))}
           {paginatedLectures.length === 0 && (
             <div className="col-span-full text-center py-8">
-              <BookOpen className="w-12 h-12 mx-auto text-base-content/30 mb-2" />
+              <BookOpen className="w-12 h-12 mx-auto text-gray-400 mb-2" />
               <p>{t("lectures.notFound")}</p>
             </div>
           )}
@@ -390,12 +390,12 @@ const AssistantPage = () => {
                   </td>
                   <td>
                     {submission.passed ? (
-                      <span className="flex items-center text-success">
+                      <span className="flex items-center text-green-600">
                         <CheckCircle className="w-4 h-4 mr-1" />
                         {t("common.passed")}
                       </span>
                     ) : (
-                      <span className="flex items-center text-error">
+                      <span className="flex items-center text-red-600">
                         <XCircle className="w-4 h-4 mr-1" />
                         {t("common.failed")}
                       </span>
@@ -464,12 +464,12 @@ const AssistantPage = () => {
                   </td>
                   <td>
                     {submission.passed ? (
-                      <span className="flex items-center text-success">
+                      <span className="flex items-center text-green-600">
                         <CheckCircle className="w-4 h-4 mr-1" />
                         {t("common.passed")}
                       </span>
                     ) : (
-                      <span className="flex items-center text-error">
+                      <span className="flex items-center text-red-600">
                         <XCircle className="w-4 h-4 mr-1" />
                         {t("common.failed")}
                       </span>
@@ -501,32 +501,32 @@ const AssistantPage = () => {
       {
         title: t("stats.totalLectures"),
         value: dashboardData.stats.totalLectures,
-        icon: <BookOpen className="w-6 h-6 text-info" />,
-        color: "bg-info/10",
+        icon: <BookOpen className="w-6 h-6 text-blue-500" />,
+        color: "bg-blue-100",
       },
       {
         title: t("stats.lectureViews"),
         value: dashboardData.stats.lectureViews,
-        icon: <Eye className="w-6 h-6 text-success" />,
-        color: "bg-success/10",
+        icon: <Eye className="w-6 h-6 text-green-500" />,
+        color: "bg-green-100",
       },
       {
         title: t("stats.examSubmissions"),
         value: dashboardData.stats.totalStudentExamSubmissions,
-        icon: <FileCheck className="w-6 h-6 text-secondary" />,
-        color: "bg-secondary/10",
+        icon: <FileCheck className="w-6 h-6 text-purple-500" />,
+        color: "bg-purple-100",
       },
       {
         title: t("stats.homeworkSubmissions"),
         value: dashboardData.stats.totalStudentHomeworkSubmissions,
-        icon: <FileText className="w-6 h-6 text-warning" />,
-        color: "bg-warning/10",
+        icon: <FileText className="w-6 h-6 text-orange-500" />,
+        color: "bg-orange-100",
       },
       {
         title: t("stats.attachments"),
         value: dashboardData.stats.totalAttachments,
-        icon: <Paperclip className="w-6 h-6 text-error" />,
-        color: "bg-error/10",
+        icon: <Paperclip className="w-6 h-6 text-red-500" />,
+        color: "bg-red-100",
       },
     ]
 

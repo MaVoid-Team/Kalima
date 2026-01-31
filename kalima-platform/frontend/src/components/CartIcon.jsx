@@ -11,8 +11,7 @@ const CartIcon = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchCartCount = async () => {
-    const loggedIn = await isLoggedIn();
-    if (!loggedIn) {
+    if (!isLoggedIn()) {
       setItemCount(0);
       setLoading(false);
       return;
@@ -59,19 +58,15 @@ const CartIcon = () => {
     };
   }, []);
 
-  // No longer hiding for guests in this specific design
-  // if (!isLoggedIn()) {
-  //   return null;
-  // }
+  if (!isLoggedIn()) {
+    return null;
+  }
 
   return (
-    <Link
-      to="/cart"
-      className="btn-ghost btn-circle relative overflow-visible"
-    >
+    <Link to="/cart" className="btn btn-ghost btn-circle relative">
       <ShoppingCart className="w-6 h-6" />
       {itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-error px-1 text-[10px] font-bold text-error-content shadow-sm ring-2 ring-base-100">
+        <span className="absolute -top-1 -right-1 badge badge-primary badge-sm">
           {itemCount > 99 ? "99+" : itemCount}
         </span>
       )}
@@ -83,3 +78,4 @@ const CartIcon = () => {
 };
 
 export default CartIcon;
+

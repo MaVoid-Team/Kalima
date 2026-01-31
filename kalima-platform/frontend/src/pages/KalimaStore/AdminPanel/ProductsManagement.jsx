@@ -102,18 +102,6 @@ const ProductsManagement = memo(({
     setCurrentPage(1) // Reset to first page when searching
   }, [])
 
-  const convertPathToUrl = (filePath) => {
-    if (!filePath) return null;
-    if (filePath.startsWith("http")) return filePath;
-
-    const normalizedPath = filePath.replace(/\\/g, "/");
-
-    // Remove `/api` or `/api/v1` from the end of the API base URL
-    const API_URL = import.meta.env.VITE_API_URL;
-    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
-
-    return `${baseUrl}/${normalizedPath}`;
-  };
   const handleExport = (type, scope) => {
     setIsExporting(true)
     try {
@@ -186,7 +174,7 @@ const ProductsManagement = memo(({
   const PaginationControls = useMemo(() => (
     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-base-content/60">
+        <span className="text-sm text-gray-600">
           {t("pagination.showing") || "Showing"} {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredItems.length)} {t("pagination.of") || "of"} {filteredItems.length}
         </span>
         <select
@@ -198,7 +186,7 @@ const ProductsManagement = memo(({
           <option value={10}>10</option>
           <option value={15}>15</option>
         </select>
-        <span className="text-sm text-base-content/60">{t("pagination.perPage") || "per page"}</span>
+        <span className="text-sm text-gray-600">{t("pagination.perPage") || "per page"}</span>
       </div>
 
       <div className="join">
@@ -244,7 +232,7 @@ const ProductsManagement = memo(({
             onChange={handleSearchChange}
             className={`input input-bordered w-full ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
           />
-          <button className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn-ghost btn-sm`}>
+          <button className={`absolute ${isRTL ? "left-2" : "right-2"} top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm`}>
             🔍
           </button>
         </div>
@@ -253,7 +241,7 @@ const ProductsManagement = memo(({
 
       {/* Export Buttons */}
       <div className="dropdown dropdown-end mb-4">
-        <div tabIndex={0} role="button" className="btn-outline btn-primary" disabled={isExporting}>
+        <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
           {isExporting ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
@@ -317,7 +305,7 @@ const ProductsManagement = memo(({
                     <td className="text-center">
                       <div className="flex justify-center gap-2">
                         <button
-                          className="btn-ghost btn-sm"
+                          className="btn btn-ghost btn-sm"
                           onClick={() => onEditProduct?.(product)}
                           disabled={actionLoading}
                           title={t("productsManagement.table.edit") || "Edit"}
@@ -325,7 +313,7 @@ const ProductsManagement = memo(({
                           <FaPencilAlt />
                         </button>
                         <button
-                          className="btn-ghost btn-sm"
+                          className="btn btn-ghost btn-sm"
                           onClick={() => onDeleteProduct?.(product)}
                           disabled={actionLoading}
                           title={t("productsManagement.table.delete") || "Delete"}
@@ -344,13 +332,13 @@ const ProductsManagement = memo(({
         {/* Empty state */}
         {filteredItems.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-base-content/50">
+            <p className="text-gray-500">
               {searchTerm
                 ? t("productsManagement.noProducts") || "No products found"
                 : t("productsManagement.noProductsAvailable") || "No products available"}
             </p>
             {searchTerm && (
-              <p className="text-sm text-base-content/40 mt-2">
+              <p className="text-sm text-gray-400 mt-2">
                 {t("productsManagement.tryDifferentSearch") || "Try a different search term"}
               </p>
             )}

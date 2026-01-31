@@ -26,15 +26,12 @@ const NotificationCenter = ({ userId }) => {
 
     setIsLoading(true)
     try {
-      const token = getToken();
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/notifications/unsent`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const token = getToken()
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/notifications/unsent`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (response.data.status === "success" && response.data.data.length > 0) {
         setNotifications((prev) => {
@@ -98,12 +95,12 @@ const NotificationCenter = ({ userId }) => {
           isNewNotification = true
           return [notification, ...prev]
         })
-
+        
         // Only increment counter if it's a new notification
         if (isNewNotification) {
           setUnreadCount((prev) => prev + 1)
         }
-
+        
         // Show browser notification for store purchases (for admins/subadmins)
         if (isNewNotification && eventType === "storePurchase" && "Notification" in window) {
           if (Notification.permission === "granted") {
@@ -175,8 +172,7 @@ const NotificationCenter = ({ userId }) => {
     try {
       const token = getToken()
       axios.patch(
-        `${import.meta.env.VITE_API_URL
-        }/notifications/${notificationId}/read`,
+        `${import.meta.env.VITE_API_URL}/api/v1/notifications/${notificationId}/read`,
         {},
         {
           headers: {
@@ -215,7 +211,7 @@ const NotificationCenter = ({ userId }) => {
               <h3 className="font-semibold">{t("title")}</h3>
               {!socketConnected && (
                 <span
-                  className={`${isRTL ? "mr-2" : "ml-2"} w-2 h-2 rounded-full bg-error`}
+                  className={`${isRTL ? "mr-2" : "ml-2"} w-2 h-2 rounded-full bg-red-500`}
                   title={t("status.disconnected")}
                 ></span>
               )}
@@ -238,12 +234,12 @@ const NotificationCenter = ({ userId }) => {
           {isLoading && (
             <div className="p-4 text-center">
               <span className="loading loading-spinner loading-sm"></span>
-              <p className="mt-2 text-sm text-base-content/60">{t("status.loading")}</p>
+              <p className="mt-2 text-sm text-gray-500">{t("status.loading")}</p>
             </div>
           )}
 
           {!isLoading && notifications.length === 0 ? (
-            <div className="p-4 text-center text-base-content/50">
+            <div className="p-4 text-center text-gray-500">
               <div className="text-4xl mb-2">🔔</div>
               <p>{t("emptyState.title")}</p>
               <p className="text-xs mt-1">{t("emptyState.description")}</p>
@@ -253,15 +249,16 @@ const NotificationCenter = ({ userId }) => {
               {notifications.map((notification, idx) => (
                 <div
                   key={notification.notificationId || idx}
-                  className={`p-3 border-b hover:bg-base-200 cursor-pointer transition-colors ${!notification.read ? "bg-base-200" : ""
-                    }`}
+                  className={`p-3 border-b hover:bg-base-200 cursor-pointer transition-colors ${
+                    !notification.read ? "bg-base-200" : ""
+                  }`}
                   onClick={() => handleMarkAsRead(notification.notificationId)}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="font-medium text-sm">{notification.title}</div>
-                      <div className="text-sm text-base-content/70 mt-1">{notification.message}</div>
-                      <div className="text-xs text-base-content/50 mt-2">
+                      <div className="text-sm text-gray-600 mt-1">{notification.message}</div>
+                      <div className="text-xs text-gray-500 mt-2">
                         {new Date(notification.createdAt || new Date()).toLocaleString(isRTL ? "ar-EG" : "en-US")}
                       </div>
                     </div>
@@ -273,7 +270,7 @@ const NotificationCenter = ({ userId }) => {
           )}
 
           {notifications.length > 0 && (
-            <div className="p-3 border-t bg-base-200/50">
+            <div className="p-3 border-t bg-base-50">
               <button
                 className="text-xs text-primary hover:text-primary-focus w-full text-center"
                 onClick={() => {

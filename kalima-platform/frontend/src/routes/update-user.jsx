@@ -10,7 +10,7 @@ export const updateCurrentUser = async (updateData) => {
     const isFormData = updateData instanceof FormData
 
     const response = await axios.patch(
-      `${API_URL}/users/me/update`,
+      `${API_URL}/api/v1/users/me/update`,
       updateData,
       {
         headers: {
@@ -43,7 +43,7 @@ export const updateCurrentUser = async (updateData) => {
 export const updateUserPassword = async (passwordData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/users/update/password`,
+      `${API_URL}/api/v1/users/update/password`,
       passwordData,
       {
         headers: {
@@ -52,19 +52,12 @@ export const updateUserPassword = async (passwordData) => {
         },
       }
     );
-    
-    
-    const userInfo = userDataResponse.data.data.userInfo;
-    const userId = userInfo.id;
-    
-    // Include the role in the update data to prevent the "invalid or missing role" error
-    const updatedData = {
-      ...updateData,
-      role: userInfo.role  // Always include the current role
+
+    return { 
+      success: true, 
+      data: response.data 
     };
-    
-    // Call the updateUser function with the retrieved ID and the updated data that includes the role
-    return updateUser(userId, updatedData);
+
   } catch (error) {
     return {
       success: false,
@@ -78,7 +71,7 @@ export const updateUserPassword = async (passwordData) => {
 export const updateUser = async (userId, updateData) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/users/${userId}`,
+      `${API_URL}/api/v1/users/${userId}`,
       updateData,
       {
         headers: {

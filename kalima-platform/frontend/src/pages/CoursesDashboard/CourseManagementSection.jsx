@@ -88,8 +88,9 @@ export default function CourseManagementSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/coursesform')}
-              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${isRTL ? 'mr-auto' : 'ml-auto'
-                }`}
+              className={`flex items-center gap-1 md:gap-2 text-primary px-3 py-1 md:px-4 md:py-2 rounded-full text-sm md:text-base shadow-sm hover:shadow-md transition-all border border-primary ${
+                isRTL ? 'mr-auto' : 'ml-auto'
+              }`}
             >
               <Plus className="w-4 h-4 md:w-5 md:h-5" />
               <span>{t("courseManagement.createButton")}</span>
@@ -123,27 +124,27 @@ export default function CourseManagementSection() {
               {courses.slice(0, 9).map((course) => (
                 <motion.div
                   key={course.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  whileHover={{ y: -5 }}
-                  className="bg-base-100 rounded-xl shadow-sm hover:shadow-md overflow-hidden border border-base-200/50 transition-all duration-300"
-                >
-                  <Link href={`/courses/${course.id}`} passHref>
-                    <div className="relative">
-                      <CourseCard
-                        {...course}
-                        durationText={course.durationText}
-                      />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    whileHover={{ y: -5 }}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-md overflow-hidden border border-base-200/50 transition-all duration-300"
+                    >
+                    <Link href={`/courses/${course.id}`} passHref>
+                      <div className="relative">
+                        <CourseCard
+                          {...course}
+                          durationText={course.durationText}
+                        />
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }

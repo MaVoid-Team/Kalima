@@ -1,3 +1,4 @@
+"use client"
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate, useLocation } from "react-router-dom"
@@ -12,15 +13,12 @@ import { ShoppingCart, Zap, X, LogIn, UserPlus } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 // Import components
-import ProductHeader from "./components/ProductHeader";
-import ProductGallery from "./components/ProductsGallery";
-import SampleDownload from "./components/SampleDownload";
-import ProductInfo from "./components/ProductInfo";
-import PaymentSection from "./components/PaymentSection";
-
-import PurchaseForm from "./components/PurchaseForm";
-import KalimaLoader from "../../components/KalimaLoader";
-import { trackViewContent, trackAddToCart } from "../../hooks/useMetaPixel";
+import ProductHeader from "./components/ProductHeader"
+import ProductGallery from "./components/ProductsGallery"
+import SampleDownload from "./components/SampleDownload"
+import ProductInfo from "./components/ProductInfo"
+import PaymentSection from "./components/PaymentSection"
+import PurchaseForm from "./components/PurchaseForm"
 
 const ProductDetails = () => {
   const { t, i18n } = useTranslation("kalimaStore-ProductDetails")
@@ -100,18 +98,8 @@ const ProductDetails = () => {
           setProduct(itemData)
 
           // Set initial price to the display price (priceAfterDiscount if available)
-          const initialDisplayPrice = getDisplayPrice(itemData);
-          setFinalPrice(initialDisplayPrice);
-
-          // Track ViewContent event for Meta Pixel
-          trackViewContent({
-            contentName: itemData.title,
-            contentCategory: itemData.section?.name || 'Products',
-            contentIds: [itemData._id],
-            contentType: itemData.__t === 'ECBook' ? 'book' : 'product',
-            value: initialDisplayPrice,
-            currency: 'EGP',
-          });
+          const initialDisplayPrice = getDisplayPrice(itemData)
+          setFinalPrice(initialDisplayPrice)
 
           // Check if user has purchased this product
           if (isLoggedIn()) {
@@ -152,7 +140,7 @@ const ProductDetails = () => {
       const confirmMessage = isRTL
         ? "لقد قمت بشراء هذا المنتج من قبل. هل تريد شراءه مرة أخرى؟"
         : "You have already purchased this product. Do you want to buy it again?";
-
+      
       if (!window.confirm(confirmMessage)) {
         return; // User cancelled
       }
@@ -162,33 +150,14 @@ const ProductDetails = () => {
       setAddingToCart(true)
       const result = await addToCart(product._id)
       if (result.success) {
-        // Track AddToCart event for Meta Pixel
-        trackAddToCart({
-          contentName: product.title,
-          contentIds: [product._id],
-          contentType: product.__t === 'ECBook' ? 'book' : 'product',
-          value: getDisplayPrice(product),
-          currency: 'EGP',
-        });
-
-        toast.success(
-          t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!",
-        );
+        toast.success(t("success.addedToCart") || "تمت الإضافة إلى السلة بنجاح!")
         // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"))
       } else {
-        toast.error(
-          result.error ||
-          t("errors.addToCartFailed") ||
-          "فشل في الإضافة إلى السلة",
-        );
+        toast.error(result.error || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
       }
     } catch (error) {
-      toast.error(
-        error.message ||
-        t("errors.addToCartFailed") ||
-        "فشل في الإضافة إلى السلة",
-      );
+      toast.error(error.message || t("errors.addToCartFailed") || "فشل في الإضافة إلى السلة")
     } finally {
       setAddingToCart(false)
     }
@@ -340,7 +309,7 @@ const ProductDetails = () => {
           notes: "",
         })
         handleRemoveCoupon() // Also reset coupon state
-        // dummy comment to re-commit
+// dummy comment to re-commit
         const fileInput = document.getElementById("file-upload")
         if (fileInput) fileInput.value = ""
       } else {
@@ -400,7 +369,7 @@ const ProductDetails = () => {
               </div>
               <div className="p-8 lg:p-12 border-l border-base-200">
                 <ProductInfo product={product} type={displayType} isRTL={isRTL} />
-
+                
                 {/* Already Purchased Badge */}
                 {isPurchased && (
                   <div className="alert alert-success mt-4">
@@ -448,7 +417,7 @@ const ProductDetails = () => {
                   <button
                     onClick={handleAddToCart}
                     disabled={addingToCart}
-                    className="btn-outline btn-lg w-full"
+                    className="btn btn-outline btn-lg w-full"
                   >
                     {addingToCart ? (
                       <>
@@ -474,7 +443,7 @@ const ProductDetails = () => {
       {/* Auth Required Modal - Login or Register Choice */}
       <AnimatePresence>
         {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -485,14 +454,14 @@ const ProductDetails = () => {
               <div className="bg-gradient-to-r from-primary to-secondary p-6 text-center relative">
                 <button
                   onClick={() => setShowAuthModal(false)}
-                  className="absolute top-3 right-3 btn-ghost btn-sm btn-circle text-primary-content/80 hover:text-primary-content hover:bg-base-100/20"
+                  className="absolute top-3 right-3 btn btn-ghost btn-sm btn-circle text-white/80 hover:text-white hover:bg-white/20"
                 >
                   <X className="w-5 h-5" />
                 </button>
-                <div className="w-20 h-20 mx-auto bg-base-100/20 rounded-full flex items-center justify-center mb-4">
-                  <ShoppingCart className="w-10 h-10 text-primary-content" />
+                <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
+                  <ShoppingCart className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-primary-content">
+                <h3 className="text-2xl font-bold text-white">
                   {isRTL ? "تسجيل الدخول مطلوب" : "Login Required"}
                 </h3>
               </div>
@@ -530,7 +499,7 @@ const ProductDetails = () => {
                     const currentUrl = location.pathname + location.search
                     navigate(`/register?redirect=${encodeURIComponent(currentUrl)}`)
                   }}
-                  className="btn-outline btn-primary flex-1"
+                  className="btn btn-outline btn-primary flex-1"
                 >
                   <UserPlus className="w-5 h-5" />
                   {isRTL ? "إنشاء حساب" : "Register"}

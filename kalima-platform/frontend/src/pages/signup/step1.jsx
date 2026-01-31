@@ -20,7 +20,7 @@ export default function Step1({
   const [administrationZones, setAdministrationZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { t, i18n } = useTranslation("register");
+  const { t,i18n } = useTranslation("register");
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -28,17 +28,11 @@ export default function Step1({
 
   useEffect(() => {
     const fetchSubjects = async () => {
-      try {
-        const response = await getAllSubjects();
-        if (response.success) {
-          setSubjects(response.data || []);
-        } else {
-          console.error("Failed to fetch subjects:", response.error);
-          setSubjects([]);
-        }
-      } catch (error) {
-        console.error("Error fetching subjects:", error);
-        setSubjects([]);
+      const response = await getAllSubjects();
+      if (response.success) {
+        setSubjects(response.data);
+      } else {
+        console.error(response.error);
       }
     };
 
@@ -337,15 +331,11 @@ export default function Step1({
                 required
               >
                 <option value="">{t("form.selectSubject")}</option>
-                {Array.isArray(subjects) &&
-                  subjects.map((subject) => (
-                    <option
-                      key={subject.id || Math.random()}
-                      value={subject.id}
-                    >
-                      {subject.name ? t(`${subject.name}`) : ""}
-                    </option>
-                  ))}
+                {subjects.map((subject) => (
+                  <option key={subject.id} value={subject.id}>
+                    {t(`${subject.name}`)}
+                  </option>
+                ))}
               </select>
               {errors.subject && (
                 <span className="text-error text-sm mt-1">
@@ -376,15 +366,11 @@ export default function Step1({
             <option value="">
               {t("form.selectGovernment") || "Select Government"}
             </option>
-            {Array.isArray(governments) &&
-              governments.map((government) => (
-                <option
-                  key={government._id || Math.random()}
-                  value={government.name}
-                >
-                  {government.name}
-                </option>
-              ))}
+            {governments.map((government) => (
+              <option key={government._id} value={government.name}>
+                {government.name}
+              </option>
+            ))}
           </select>
           {errors.government && (
             <span className="absolute bottom-0  text-error text-sm mt-1">
@@ -418,12 +404,11 @@ export default function Step1({
                 : t("form.selectAdministrationZone") ||
                   "Select Administration Zone"}
             </option>
-            {Array.isArray(administrationZones) &&
-              administrationZones.map((zone) => (
-                <option key={zone || Math.random()} value={zone}>
-                  {zone}
-                </option>
-              ))}
+            {administrationZones.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
           </select>
           {errors.administrationZone && (
             <span className="absolute bottom-0  text-error text-sm mt-1">

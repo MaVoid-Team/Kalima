@@ -14,7 +14,7 @@ const EnhancedProgressBar = ({
   showCancel = true,
 }) => {
   const { t } = useTranslation("kalimaStore-admin")
-
+  
   if (!isVisible) return null
 
   const getStepStatus = (stepIndex) => {
@@ -40,7 +40,7 @@ const EnhancedProgressBar = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-base-100 rounded-lg shadow-xl max-w-lg w-full p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -76,26 +76,28 @@ const EnhancedProgressBar = ({
             return (
               <div
                 key={index}
-                className={`flex items-center space-x-3 p-3 rounded-lg transition-all ${status === "active"
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-all ${
+                  status === "active"
                     ? "bg-primary/10 border border-primary/20"
                     : status === "completed"
                       ? "bg-success/10"
                       : status === "error"
                         ? "bg-error/10 border border-error/20"
                         : "bg-base-200/50"
-                  }`}
+                }`}
               >
                 {getStepIcon(index)}
                 <div className="flex-1">
                   <p
-                    className={`font-medium ${status === "completed"
+                    className={`font-medium ${
+                      status === "completed"
                         ? "text-success"
                         : status === "error"
                           ? "text-error"
                           : status === "active"
                             ? "text-primary"
                             : "text-base-content/60"
-                      }`}
+                    }`}
                   >
                     {step.title}
                   </p>
