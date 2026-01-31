@@ -9,25 +9,37 @@ import {
   removeFromCart,
   clearCart,
   applyCouponToCart,
-  getCheckoutPreview,
   createCartPurchase,
 } from "../../routes/cart";
 import { validateCoupon } from "../../routes/marketCoupouns";
 import { getUserFromToken } from "../../routes/auth-services";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
   Trash2,
   X,
-  Check,
   Loader2,
   AlertCircle,
   ShoppingBag,
   CheckCircle2,
-  ShoppingCartIcon,
-  CircleCheckBigIcon,
+  Check,
+  ChevronDown,
+  Copy,
+  CreditCard,
+  Upload,
+  Sparkles,
+  Image as ImageIcon,
+  BookOpen,
+  MessageSquare,
+  Percent,
+  Info,
+  ArrowRight,
+  ArrowLeft,
+  Gift,
+  Package,
 } from "lucide-react";
 import { getAllPaymentMethods } from "../../routes/market";
+import { trackInitiateCheckout, trackPurchase } from "../../hooks/useMetaPixel";
 
 const CartPage = () => {
   const { t, i18n } = useTranslation("kalimaStore-Cart");
@@ -35,14 +47,14 @@ const CartPage = () => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
+
   const handleCopy = () => {
     const phoneNumber = getPaymentPhoneNumber();
     navigator.clipboard.writeText(phoneNumber);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    toast.success(isRTL ? "تم نسخ الرقم" : "Number copied!");
+    setTimeout(() => setCopied(false), 2000);
   };
-
-  // Get payment method label
 
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,75 +79,61 @@ const CartPage = () => {
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
-
   const [requiresBookDetails, setRequiresBookDetails] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({
-    numberTransferredFrom: "",
-    paymentScreenShot: "",
-    paymentMethod: "",
-    nameOnBook: "",
-    numberOnBook: "",
-    seriesName: "",
-  });
+  const [validationErrors, setValidationErrors] = useState({});
   const [checkoutCooldown, setCheckoutCooldown] = useState(0);
   const [cooldownTimer, setCooldownTimer] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [showNoPaymentModal, setShowNoPaymentModal] = useState(false);
   const [paymentMethodsLoaded, setPaymentMethodsLoaded] = useState(false);
   const [showWrongTransferNumberModal, setShowWrongTransferNumberModal] = useState(false);
+  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
 
   const getPaymentMethodLabel = () => {
-    const method = paymentMethods.find(
-      (pm) => pm._id === checkoutData.paymentMethod
-    );
+    const method = paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod);
     return method?.name || "";
   };
 
   const getPaymentPhoneNumber = () => {
-    const method = paymentMethods.find(
-      (pm) => pm._id === checkoutData.paymentMethod
-    );
+    const method = paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod);
     return method?.phoneNumber || "";
   };
 
-  // Fetch cart data
   const fetchCart = async () => {
     try {
       setLoading(true);
       setError(null);
       const result = await getCart();
       if (result.success) {
-        // Handle response: {"status":"success","data":{"cart":null,"itemCount":0}}
         const cartData = result.data?.data?.cart || null;
-        const itemCount = result.data?.data?.itemCount || 0;
-
         setCart(cartData);
-
-        // Check if cart has books (only if cart exists)
         if (cartData) {
-          // The items might be in itemsWithDetails or items (need to populate)
           const items = cartData.itemsWithDetails || cartData.items || [];
           const hasBooks = items.some(
-            (item) =>
-              item.productType === "ECBook" || item.product?.__t === "ECBook"
+            (item) => item.productType === "ECBook" || item.product?.__t === "ECBook"
           );
           setRequiresBookDetails(hasBooks);
+
+          // Track InitiateCheckout event for Meta Pixel
+          if (items.length > 0) {
+            const contentIds = items.map(item => item.product?._id || item._id).filter(Boolean);
+            trackInitiateCheckout({
+              contentIds,
+              value: cartData.total || cartData.subtotal || 0,
+              numItems: items.length,
+              currency: 'EGP',
+            });
+          }
         } else {
-          // No cart, reset book details requirement
           setRequiresBookDetails(false);
         }
       } else {
-        const errorMessage =
-          result.error || t("errors.fetchCartFailed") || "Failed to load cart";
-        setError(errorMessage);
+        setError(result.error || t("errors.fetchCartFailed"));
         toast.error(t("errors.fetchCartFailed") || "فشل في تحميل السلة");
       }
     } catch (err) {
-      const errorMessage =
-        err.message || t("errors.fetchCartFailed") || "Failed to load cart";
-      setError(errorMessage);
+      setError(err.message || t("errors.fetchCartFailed"));
       toast.error(t("errors.fetchCartFailed") || "فشل في تحميل السلة");
-      console.error("Error fetching cart:", err);
     } finally {
       setLoading(false);
     }
@@ -145,7 +143,6 @@ const CartPage = () => {
     const fetchPaymentMethods = async () => {
       try {
         const res = await getAllPaymentMethods();
-
         if (res?.status === "success") {
           const activeMethods = res.data.paymentMethods.filter((pm) => pm.status);
           setPaymentMethods(activeMethods);
@@ -158,176 +155,106 @@ const CartPage = () => {
           setShowNoPaymentModal(true);
         }
       } catch (err) {
-        console.error("Failed to fetch payment methods", err);
         setPaymentMethodsLoaded(true);
         setShowNoPaymentModal(true);
       }
     };
-
     fetchPaymentMethods();
   }, []);
 
   useEffect(() => {
     fetchCart();
-    // Get user role
     const user = getUserFromToken();
-    console.log("CartPage - Full User Object:", user); // Debug log
-    if (user && user.role) {
+    if (user?.role) {
       setUserRole(user.role);
-      console.log("CartPage - User Role Set To:", user.role); // Debug log
-      console.log("CartPage - Is Teacher?", user.role === "Teacher");
-      console.log("CartPage - Is Lecturer?", user.role === "Lecturer");
-    } else {
-      console.log("CartPage - No user or no role found");
     }
   }, []);
 
-  // Cooldown timer effect
   useEffect(() => {
     if (checkoutCooldown > 0) {
-      const timer = setTimeout(() => {
-        setCheckoutCooldown(checkoutCooldown - 1);
-      }, 1000);
+      const timer = setTimeout(() => setCheckoutCooldown(checkoutCooldown - 1), 1000);
       setCooldownTimer(timer);
       return () => clearTimeout(timer);
-    } else {
-      if (cooldownTimer) {
-        clearTimeout(cooldownTimer);
-        setCooldownTimer(null);
-      }
     }
   }, [checkoutCooldown]);
 
-  // Close payment dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const dropdown = document.getElementById("payment-dropdown-cart");
-      const trigger = event.target.closest("[data-payment-trigger]");
-      if (dropdown && !dropdown.contains(event.target) && !trigger) {
-        dropdown.classList.add("hidden");
+      if (!event.target.closest("[data-payment-dropdown]")) {
+        setShowPaymentDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Load cooldown from localStorage on mount
   useEffect(() => {
     const savedCooldown = localStorage.getItem("checkoutCooldownExpiry");
     if (savedCooldown) {
       const expiryTime = parseInt(savedCooldown);
       const now = Date.now();
       if (expiryTime > now) {
-        const remainingSeconds = Math.ceil((expiryTime - now) / 1000);
-        setCheckoutCooldown(remainingSeconds);
+        setCheckoutCooldown(Math.ceil((expiryTime - now) / 1000));
       } else {
         localStorage.removeItem("checkoutCooldownExpiry");
       }
     }
-
-    // Cleanup on unmount
-    return () => {
-      if (cooldownTimer) {
-        clearTimeout(cooldownTimer);
-      }
-    };
+    return () => cooldownTimer && clearTimeout(cooldownTimer);
   }, []);
 
-  // Handle remove item
   const handleRemoveItem = async (itemId) => {
     try {
       setActionLoading({ ...actionLoading, [itemId]: true });
       const result = await removeFromCart(itemId);
       if (result.success) {
         await fetchCart();
-        // Trigger cart count update
         window.dispatchEvent(new Event("cart-updated"));
         toast.success(t("success.itemRemoved") || "تم حذف العنصر من السلة");
       } else {
-        toast.error(
-          result.error ||
-            t("errors.removeItemFailed") ||
-            "فشل في حذف العنصر"
-        );
+        toast.error(result.error || t("errors.removeItemFailed"));
       }
     } catch (err) {
-      toast.error(
-        err.message || t("errors.removeItemFailed") || "فشل في حذف العنصر"
-      );
+      toast.error(err.message || t("errors.removeItemFailed"));
     } finally {
       setActionLoading({ ...actionLoading, [itemId]: false });
     }
   };
 
-  // Handle clear cart
   const handleClearCart = async () => {
-    if (
-      !confirm(
-        t("confirmClearCart") || "هل أنت متأكد من إفراغ السلة؟"
-      )
-    ) {
-      return;
-    }
+    if (!confirm(t("confirmClearCart") || "هل أنت متأكد من إفراغ السلة؟")) return;
     try {
       setActionLoading({ ...actionLoading, clear: true });
       const result = await clearCart();
       if (result.success) {
         setCart(null);
         setCouponCode("");
-        setCouponValidation({
-          isValid: false,
-          message: "",
-          discount: 0,
-          loading: false,
-        });
-        // Trigger cart count update
+        setCouponValidation({ isValid: false, message: "", discount: 0, loading: false });
         window.dispatchEvent(new Event("cart-updated"));
         toast.success(t("success.cartCleared") || "تم إفراغ السلة بنجاح");
       } else {
-        toast.error(
-          result.error || t("errors.clearCartFailed") || "فشل في إفراغ السلة"
-        );
+        toast.error(result.error || t("errors.clearCartFailed"));
       }
     } catch (err) {
-      toast.error(
-        err.message || t("errors.clearCartFailed") || "فشل في إفراغ السلة"
-      );
+      toast.error(err.message || t("errors.clearCartFailed"));
     } finally {
       setActionLoading({ ...actionLoading, clear: false });
     }
   };
 
-  // Handle coupon validation and application
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       toast.error(t("errors.noCouponCode") || "يرجى إدخال كود الخصم");
       return;
     }
-
     setCouponValidation({ ...couponValidation, loading: true, message: "" });
-
     try {
-      // First validate the coupon
       const validationResult = await validateCoupon(couponCode);
-      if (
-        !validationResult.success ||
-        validationResult.data?.status === "fail"
-      ) {
-        const errorMessage =
-          validationResult.data?.message ||
-          validationResult.error ||
-          t("errors.invalidCoupon");
-        setCouponValidation({
-          isValid: false,
-          message: errorMessage,
-          discount: 0,
-          loading: false,
-        });
+      if (!validationResult.success || validationResult.data?.status === "fail") {
+        const errorMessage = validationResult.data?.message || validationResult.error || t("errors.invalidCoupon");
+        setCouponValidation({ isValid: false, message: errorMessage, discount: 0, loading: false });
         toast.error(errorMessage);
         return;
       }
-
-      // If valid, apply to cart
       const applyResult = await applyCouponToCart(couponCode);
       if (applyResult.success) {
         setCouponValidation({
@@ -336,125 +263,75 @@ const CartPage = () => {
           discount: validationResult.data?.data?.coupon?.value || 0,
           loading: false,
         });
-        await fetchCart(); // Refresh cart to show updated totals
-        // Trigger cart count update (in case cart state changed)
+        await fetchCart();
         window.dispatchEvent(new Event("cart-updated"));
-        toast.success(
-          t("success.couponApplied") || "تم تطبيق الكوبون بنجاح"
-        );
+        toast.success(t("success.couponApplied") || "تم تطبيق الكوبون بنجاح");
       } else {
-        const errorMessage =
-          applyResult.error ||
-          t("errors.applyCouponFailed") ||
-          "فشل في تطبيق الكوبون";
-        setCouponValidation({
-          isValid: false,
-          message: errorMessage,
-          discount: 0,
-          loading: false,
-        });
-        toast.error(errorMessage);
+        setCouponValidation({ isValid: false, message: applyResult.error, discount: 0, loading: false });
+        toast.error(applyResult.error);
       }
     } catch (err) {
-      const errorMessage =
-        err.message ||
-        t("errors.applyCouponFailed") ||
-        "فشل في تطبيق الكوبون";
-      setCouponValidation({
-        isValid: false,
-        message: errorMessage,
-        discount: 0,
-        loading: false,
-      });
-      toast.error(errorMessage);
+      setCouponValidation({ isValid: false, message: err.message, discount: 0, loading: false });
+      toast.error(err.message);
     }
   };
 
-  // Handle remove coupon
   const handleRemoveCoupon = async () => {
     setCouponCode("");
-    setCouponValidation({
-      isValid: false,
-      message: "",
-      discount: 0,
-      loading: false,
-    });
-    // Re-fetch cart to remove coupon
+    setCouponValidation({ isValid: false, message: "", discount: 0, loading: false });
     await fetchCart();
   };
 
-  // Handle file upload
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setCheckoutData({
-        ...checkoutData,
-        paymentScreenShot: e.target.files[0],
-      });
+    if (e.target.files?.[0]) {
+      setCheckoutData({ ...checkoutData, paymentScreenShot: e.target.files[0] });
+      clearFieldError("paymentScreenShot");
     }
   };
 
-  // Handle watermark upload
   const handleWatermarkChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setCheckoutData({
-        ...checkoutData,
-        watermark: e.target.files[0],
-      });
+    if (e.target.files?.[0]) {
+      setCheckoutData({ ...checkoutData, watermark: e.target.files[0] });
     }
   };
 
-  // Clear validation errors for a specific field
   const clearFieldError = (fieldName) => {
-    setValidationErrors((prev) => ({
-      ...prev,
-      [fieldName]: "",
-    }));
+    setValidationErrors((prev) => ({ ...prev, [fieldName]: "" }));
   };
 
-  // Validate checkout form
   const validateCheckoutForm = () => {
     const errors = {};
     let isValid = true;
 
-    // Only validate payment fields if cart total > 0
     if (cart.total > 0) {
       if (!checkoutData.numberTransferredFrom.trim()) {
-        errors.numberTransferredFrom =
-          t("errors.noTransferNumber") || "يرجى إدخال رقم التحويل";
+        errors.numberTransferredFrom = t("errors.noTransferNumber") || "يرجى إدخال رقم التحويل";
         isValid = false;
       } else if (checkoutData.numberTransferredFrom.trim().length !== 11) {
-        errors.numberTransferredFrom =
-          t("errors.invalidTransferNumberLength") || "رقم التحويل يجب أن يتكون من 11 رقم";
+        errors.numberTransferredFrom = t("errors.invalidTransferNumberLength") || "رقم التحويل يجب أن يتكون من 11 رقم";
         isValid = false;
       }
-
       if (!checkoutData.paymentScreenShot) {
-        errors.paymentScreenShot =
-          t("errors.noFileSelected") || "يرجى رفع صورة الدفع";
+        errors.paymentScreenShot = t("errors.noFileSelected") || "يرجى رفع صورة الدفع";
         isValid = false;
       }
-
       if (!checkoutData.paymentMethod) {
-        errors.paymentMethod =
-          t("errors.paymentMethodRequired") || "Payment method is required";
+        errors.paymentMethod = t("errors.paymentMethodRequired") || "Payment method is required";
         isValid = false;
       }
     }
 
     if (requiresBookDetails) {
       if (!checkoutData.nameOnBook.trim()) {
-        errors.nameOnBook =
-          t("errors.nameOnBookRequired") || "Name on book is required";
+        errors.nameOnBook = t("errors.nameOnBookRequired") || "Name on book is required";
         isValid = false;
       }
       if (!checkoutData.numberOnBook.trim()) {
-        errors.numberOnBook =
-          t("errors.numberOnBookRequired") || "Number on book is required";
+        errors.numberOnBook = t("errors.numberOnBookRequired") || "Number on book is required";
         isValid = false;
       }
       if (!checkoutData.seriesName.trim()) {
-        errors.seriesName =
-          t("errors.seriesNameRequired") || "Series name is required";
+        errors.seriesName = t("errors.seriesNameRequired") || "Series name is required";
         isValid = false;
       }
     }
@@ -463,50 +340,38 @@ const CartPage = () => {
     return isValid;
   };
 
-  // Handle checkout
   const handleCheckout = async () => {
-    // Check cooldown
     if (checkoutCooldown > 0) {
       toast.error(
         t("errors.checkoutCooldown", { seconds: checkoutCooldown }) ||
-          `يرجى الانتظار ${checkoutCooldown} ثانية قبل إتمام الشراء مرة أخرى.`
+        `يرجى الانتظار ${checkoutCooldown} ثانية`,
       );
       return;
     }
-
-    // Clear previous validation errors
-    setValidationErrors({
-      numberTransferredFrom: "",
-      paymentScreenShot: "",
-      nameOnBook: "",
-      numberOnBook: "",
-      seriesName: "",
-    });
-
-    // Validate form
+    setValidationErrors({});
     if (!validateCheckoutForm()) {
-      toast.error(
-        t("errors.validationFailed") || "يرجى ملء جميع الحقول المطلوبة"
-      );
+      toast.error(t("errors.validationFailed") || "يرجى ملء جميع الحقول المطلوبة");
       return;
     }
-
     try {
       setCheckoutLoading(true);
       const result = await createCartPurchase(checkoutData);
       if (result.success) {
-        // Set 30-second cooldown
-        const cooldownSeconds = 30;
-        const expiryTime = Date.now() + cooldownSeconds * 1000;
-        localStorage.setItem("checkoutCooldownExpiry", expiryTime.toString());
-        setCheckoutCooldown(cooldownSeconds);
+        // Track Purchase event for Meta Pixel
+        const items = cart?.itemsWithDetails || cart?.items || [];
+        const contentIds = items.map(item => item.product?._id || item._id).filter(Boolean);
+        trackPurchase({
+          contentIds,
+          value: cart?.total || cart?.subtotal || 0,
+          numItems: items.length,
+          currency: 'EGP',
+        });
 
-        toast.success(
-          t("success.purchaseSubmitted") || "تم تقديم الطلب بنجاح!"
-        );
-        // Trigger cart count update
+        const cooldownSeconds = 30;
+        localStorage.setItem("checkoutCooldownExpiry", (Date.now() + cooldownSeconds * 1000).toString());
+        setCheckoutCooldown(cooldownSeconds);
+        toast.success(t("success.purchaseSubmitted") || "تم تقديم الطلب بنجاح!");
         window.dispatchEvent(new Event("cart-updated"));
-        // Reset form and redirect
         setCheckoutData({
           numberTransferredFrom: "",
           paymentScreenShot: null,
@@ -517,1077 +382,1017 @@ const CartPage = () => {
           numberOnBook: "",
           seriesName: "",
         });
-        setValidationErrors({
-          numberTransferredFrom: "",
-          paymentScreenShot: "",
-          paymentMethod: "",
-          nameOnBook: "",
-          numberOnBook: "",
-          seriesName: "",
-        });
-        // Small delay before redirect to show success message
-        setTimeout(() => {
-          navigate("/my-orders");
-        }, 1000);
+        setTimeout(() => navigate("/my-orders"), 1000);
       } else {
-        const errorMessage =
-          result.error ||
-          t("errors.checkoutFailed") ||
-          "فشل في تقديم الطلب. حاول مرة أخرى.";
-        toast.error(errorMessage);
+        toast.error(result.error || t("errors.checkoutFailed"));
       }
     } catch (err) {
-      const errorMessage =
+      toast.error(
         err.response?.data?.message ||
         err.message ||
-        t("errors.checkoutFailed") ||
-        "حدث خطأ. حاول مرة أخرى.";
-      toast.error(errorMessage);
+        t("errors.checkoutFailed"),
+      );
     } finally {
       setCheckoutLoading(false);
     }
   };
 
-  // Convert path to URL
   const convertPathToUrl = (filePath, folder = "product_thumbnails") => {
     if (!filePath) return null;
     if (filePath.startsWith("http")) return filePath;
     const normalizedPath = filePath.replace(/\\/g, "/");
     const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
-    const baseUrl = API_URL.replace(/\/$/, "");
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "");
     const filename = normalizedPath.split("/").pop();
     return `${baseUrl}/uploads/${folder}/${filename}`;
   };
 
+  const cartItems = cart?.itemsWithDetails || cart?.items || [];
+
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-lg">{t("loading") || "Loading cart..."}</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Background matching landing page */}
+        <div className="absolute inset-0" />
+
+        {/* Animated gradient orbs */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-[#AF0D0E]/10 via-[#FF5C28]/10 to-transparent rounded-full blur-[100px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-[#FF5C28]/10 via-[#AF0D0E]/5 to-transparent rounded-full blur-[100px]"
+        />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center relative z-10"
+        >
+          <div className="relative">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#AF0D0E] to-[#FF5C28] flex items-center justify-center shadow-2xl shadow-red-500/30">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <ShoppingCart className="w-10 h-10 text-white" />
+              </motion.div>
+            </div>
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg"
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+            </motion.div>
+          </div>
+          <p className="mt-8 text-lg font-semibold text-gray-700">{isRTL ? "جاري تحميل سلتك..." : "Loading your cart..."}</p>
+          <div className="flex justify-center gap-1.5 mt-4">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1 }}
+                className="w-2 h-2 rounded-full bg-gradient-to-r from-[#AF0D0E] to-[#FF5C28]"
+              />
+            ))}
+          </div>
+        </motion.div>
       </div>
     );
   }
 
+  // Error State
   if (error && !cart) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="card bg-base-100 shadow-xl max-w-md w-full">
-          <div className="card-body text-center">
-            <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
-            <h3 className="text-xl font-bold mb-2">
-              {t("errors.title") || "Error"}
-            </h3>
-            <p className="mb-6">
-              {t("errors.fetchCartFailed") ||
-                "Failed to load your cart. Please Log In First."}
-            </p>
-            <button
-              onClick={() => navigate("/market")}
-              className="btn btn-primary"
-            >
-              {t("backToMarket") || "Back to Market"}
-            </button>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+        {/* Background matching landing page */}
+        <div className="absolute inset-0 bg-gradient-to-br from-base-200 via-base-100 to-secondary/5" />
+
+        {/* Animated gradient orbs */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px]"
+        />
+
+        {/* Dot pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md relative z-10"
+        >
+          <div className="w-24 h-24 rounded-3xl bg-error/10 flex items-center justify-center mx-auto mb-8 border border-error/20">
+            <AlertCircle className="w-12 h-12 text-error" />
           </div>
-        </div>
+          <h3 className="text-3xl font-black text-base-content mb-4">
+            {isRTL ? "حدث خطأ!" : "Oops!"}
+          </h3>
+          <p className="text-base-content/60 mb-10 text-lg">
+            {t("errors.fetchCartFailed") || "Failed to load cart"}
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate("/market")}
+            className="btn btn-primary btn-lg rounded-2xl shadow-xl shadow-primary/25"
+          >
+            {t("backToMarket") || "Back to Market"}
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
-  // Empty cart
-  const cartItems = cart?.itemsWithDetails || cart?.items || [];
+  // Empty Cart
   if (!cart || cartItems.length === 0) {
     return (
-      <div
-        className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
-        dir={isRTL ? "rtl" : "ltr"}
-      >
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body text-center py-16">
-              <ShoppingCart className="w-24 h-24 mx-auto mb-6 text-gray-400" />
-              <h2 className="text-3xl font-bold mb-4">
-                {t("emptyCart.title") || "Your cart is empty"}
-              </h2>
-              <p className="text-gray-500 mb-8">
-                {t("emptyCart.description") ||
-                  "Start shopping to add items to your cart"}
-              </p>
-              <button
-                onClick={() => navigate("/market")}
-                className="btn btn-primary btn-lg"
+      <div className={`min-h-screen relative overflow-hidden ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+        {/* Background matching landing page */}
+        <div className="absolute inset-0 bg-gradient-to-br from-base-200 via-base-100 to-secondary/5" />
+
+        {/* Animated gradient orbs */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-secondary/10 via-primary/5 to-transparent rounded-full blur-[100px]"
+        />
+
+        {/* Dot pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, var(--color-primary) 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        <div className="max-w-2xl mx-auto px-4 py-24 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="relative inline-block mb-10">
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="w-40 h-40 rounded-[2.5rem] bg-base-100/80 backdrop-blur-sm flex items-center justify-center border border-base-200 shadow-xl"
               >
-                {t("emptyCart.shopNow") || "Shop Now"}
-              </button>
+                <ShoppingCart className="w-20 h-20 text-base-content/30" />
+              </motion.div>
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                className="absolute -top-4 -right-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-xl shadow-primary/40"
+              >
+                <Gift className="w-8 h-8 text-primary-content" />
+              </motion.div>
             </div>
-          </div>
+            <h2 className="text-4xl font-black text-base-content mb-5">
+              {isRTL ? "سلتك فارغة" : "Your Cart is Empty"}
+            </h2>
+            <p className="text-base-content/60 mb-12 text-xl max-w-sm mx-auto">
+              {isRTL
+                ? "اكتشف منتجاتنا المميزة وابدأ التسوق الآن!"
+                : "Discover our amazing products and start shopping!"}
+            </p>
+            <motion.button
+              whileHover={{
+                scale: 1.03,
+                boxShadow: "0 20px 40px rgba(var(--color-primary), 0.25)",
+              }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/market")}
+              className="group btn btn-primary btn-lg rounded-2xl shadow-xl shadow-primary/25 flex items-center gap-3 mx-auto h-auto py-4"
+            >
+              <ShoppingBag className="w-6 h-6" />
+              {isRTL ? "تصفح المتجر" : "Browse Store"}
+              <ArrowIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className={`min-h-screen ${isRTL ? "rtl" : "ltr"}`}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="text-3xl font-bold text-center sm:text-left"
-          >
-            {t("title") || "Shopping Cart"}
-          </motion.h1>
+    <div className={`min-h-screen relative overflow-hidden ${isRTL ? "rtl" : "ltr"}`} dir={isRTL ? "rtl" : "ltr"}>
+      {/* Background matching landing page */}
+      <div className="absolute inset-0 bg-base-100" />
 
-          <motion.button
-            whileHover={{ scale: 1.07 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate("/market")}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative group overflow-hidden h-12 px-4 w-fit sm:w-auto rounded-xl
-             font-semibold text-[15px] tracking-wide flex items-center justify-center gap-2
-             text-white shadow-[0_4px_20px_rgba(255,180,0,0.3)]
-             active:scale-95 transition-all duration-300 border border-yellow-400/50  "
-            style={{
-              background:
-                "linear-gradient(270deg, #FFD95A, #F9B208, #F7C948, #E0A400, #FFD95A)",
-              backgroundSize: "400% 400%",
-              animation: "goldFlow 6s ease infinite",
-            }}
-          >
-            {/* Text + Icon */}
-            <motion.span
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="flex items-center justify-center gap-2 z-10"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {t("continueShopping") || "Continue Shopping"}
-            </motion.span>
+      {/* Animated gradient orbs */}
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent rounded-full blur-[100px] pointer-events-none"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2,
+        }}
+        className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-secondary/10 via-primary/5 to-transparent rounded-full blur-[100px] pointer-events-none"
+      />
 
-            {/* Triple Arrows */}
-            <div className="flex items-center justify-center z-10">
-              {[0, 1, 2].map((index) => (
-                <motion.span
-                  key={index}
-                  animate={{ x: [0, -5, 0], opacity: [1, 0.7, 1] }}
-                  transition={{
-                    duration: 1.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: index * 0.15, // slight offset for flowing motion
-                  }}
+      {/* Dot pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(var(--color-primary)) 1px, transparent 0)`,
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      {/* Header */}
+      <div className="relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+            {/* Title Section */}
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-xl shadow-primary/30"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`w-4 h-4 text-white ${
-                      index === 0
-                        ? "opacity-100"
-                        : index === 1
-                        ? "opacity-80"
-                        : "opacity-60"
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </motion.span>
-              ))}
+                  <ShoppingCart className="w-8 h-8 text-primary-content" />
+                </motion.div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-accent flex items-center justify-center text-accent-content text-sm font-bold shadow-lg ring-2 ring-base-100"
+                >
+                  {cartItems.length}
+                </motion.div>
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-black text-base-content">
+                  {isRTL ? "سلة التسوق" : "Shopping Cart"}
+                </h1>
+                <p className="text-sm text-base-content/50 mt-1 flex items-center gap-1.5">
+                  {cartItems.length}{" "}
+                  {isRTL ? "منتج في سلتك" : "item(s) in your cart"}
+                </p>
+              </div>
             </div>
 
-            {/* Shine Effect */}
-            <span
-              className="absolute inset-0 opacity-0 group-hover:opacity-100
-             bg-gradient-to-r from-transparent via-white/30 to-transparent
-             transition-opacity duration-700"
-              style={{
-                animation: "shineMove 2.5s linear infinite",
-                pointerEvents: "none",
-                mixBlendMode: "screen",
-              }}
-            ></span>
+            {/* Continue Shopping Button */}
+            <motion.button
+              whileHover={{ scale: 1.03, x: isRTL ? 5 : -5 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/market")}
+              className="btn-ghost btn-lg gap-3 bg-base-100 hover:bg-base-200 border-2 border-base-200 hover:border-primary/40 shadow-lg shadow-base-200/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 overflow-hidden h-auto py-3.5 px-6 rounded-2xl"
+            >
+              {/* Hover gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-            <style jsx global>{`
-              @keyframes goldFlow {
-                0% {
-                  background-position: 0% 50%;
-                }
-                50% {
-                  background-position: 100% 50%;
-                }
-                100% {
-                  background-position: 0% 50%;
-                }
-              }
-              @keyframes shineMove {
-                0% {
-                  transform: translateX(-100%);
-                }
-                100% {
-                  transform: translateX(100%);
-                }
-              }
-            `}</style>
-          </motion.button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Cart Items */}
-            {cartItems.map((item) => {
-              // Handle both populated and unpopulated items
-              const itemData = item.product || item;
-              const productSnapshot = item.productSnapshot || itemData;
-              const itemId = item._id;
-              const productType =
-                item.productType ||
-                (itemData?.__t === "ECBook" ? "ECBook" : "ECProduct");
-
-              return (
-                <div key={itemId} className="card bg-base-100 shadow-lg">
-                  <div className="card-body">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      {/* Product Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={
-                            convertPathToUrl(
-                              productSnapshot?.thumbnail,
-                              "product_thumbnails"
-                            ) || "/placeholder.svg"
-                          }
-                          alt={productSnapshot?.title || "Product"}
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="flex-grow">
-                        <h3 className="text-xl font-bold mb-2">
-                          {productSnapshot?.title ||
-                            itemData?.title ||
-                            "Product"}
-                        </h3>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="badge badge-secondary">
-                            {productType === "ECBook"
-                              ? t("type.book") || "Book"
-                              : t("type.product") || "Product"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 mb-4">
-                          <span className="text-2xl font-bold text-primary">
-                            {item.finalPrice ||
-                              item.priceAtAdd ||
-                              productSnapshot?.priceAfterDiscount ||
-                              productSnapshot?.price}{" "}
-                            {t("currency") || "EGP"}
-                          </span>
-                          {(productSnapshot?.originalPrice ||
-                            productSnapshot?.price) &&
-                            (productSnapshot?.originalPrice ||
-                              productSnapshot?.price) >
-                              (item.finalPrice ||
-                                item.priceAtAdd ||
-                                productSnapshot?.priceAfterDiscount ||
-                                productSnapshot?.price) && (
-                              <span className="text-lg line-through text-gray-500">
-                                {productSnapshot.originalPrice ||
-                                  productSnapshot.price}{" "}
-                                {t("currency") || "EGP"}
-                              </span>
-                            )}
-                        </div>
-                      </div>
-
-                      {/* Remove Button */}
-                      <div className="flex items-start">
-                        <button
-                          onClick={() => handleRemoveItem(itemId)}
-                          disabled={actionLoading[itemId]}
-                          className="btn btn-ghost btn-sm text-error"
-                        >
-                          {actionLoading[itemId] ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+              <div className="relative flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-base-200 group-hover:bg-gradient-to-br group-hover:from-primary/10 group-hover:to-secondary/10 flex items-center justify-center transition-all duration-300">
+                  <ShoppingBag className="w-5 h-5 text-base-content/60 group-hover:text-primary transition-colors duration-300" />
                 </div>
-              );
-            })}
+                <span className="text-base-content/80 group-hover:text-primary transition-colors duration-300">
+                  {isRTL ? "متابعة التسوق" : "Continue Shopping"}
+                </span>
+                <ArrowIcon
+                  className={`w-5 h-5 text-base-content/40 group-hover:text-primary transition-all duration-300 ${isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1"}`}
+                />
+              </div>
+            </motion.button>
+          </div>
+        </div>
+      </div>
 
-            {/* Clear Cart Button */}
-            <div className="flex justify-end">
+      {/* Main Content */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-12">
+          {/* Cart Items - Left Side */}
+          <div className="lg:col-span-3 space-y-5">
+            {/* Section Header */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-base-content flex items-center gap-2">
+                <div className="w-1 h-5 bg-gradient-to-b from-primary to-secondary rounded-full" />
+                {isRTL ? "منتجاتك" : "Your Items"}
+              </h2>
               <button
                 onClick={handleClearCart}
                 disabled={actionLoading.clear}
-                className="btn btn-error btn-outline"
+                className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-primary/5 rounded-xl font-medium text-sm transition-colors"
               >
-                {actionLoading.clear ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4" />
-                    {t("clearCart") || "Clear Cart"}
-                  </>
-                )}
+                {actionLoading.clear ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                {isRTL ? "إفراغ السلة" : "Clear All"}
               </button>
             </div>
+
+            {/* Cart Items List */}
+            <div className="space-y-4">
+              {cartItems.map((item, index) => {
+                const itemData = item.product || item;
+                const productSnapshot = item.productSnapshot || itemData;
+                const itemId = item._id;
+                const price = item.finalPrice || item.priceAtAdd || productSnapshot?.priceAfterDiscount || productSnapshot?.price;
+                const originalPrice = productSnapshot?.originalPrice || productSnapshot?.price;
+
+                return (
+                  <motion.div
+                    key={itemId}
+                    initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      delay: index * 0.08,
+                      type: "spring",
+                      stiffness: 100,
+                    }}
+                    className="group relative bg-base-100/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-xl border border-base-200 hover:border-primary/20 transition-all duration-300"
+                  >
+                    <div className="relative flex gap-5">
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => handleRemoveItem(itemId)}
+                        disabled={actionLoading[itemId]}
+                        className={`absolute top-3 ${isRTL ? "left-3" : "right-3"} w-10 h-10 rounded-xl bg-base-200 hover:bg-primary/10 text-base-content/40 hover:text-primary flex items-center justify-center transition-all duration-200 z-10`}
+                      >
+                        {actionLoading[itemId] ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-5 h-5" />
+                        )}
+                      </button>
+
+                      {/* Image */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-base-200 to-base-300 shadow-inner">
+                          <img
+                            src={convertPathToUrl(productSnapshot?.thumbnail, "product_thumbnails") || "/placeholder.svg"}
+                            alt={productSnapshot?.title || "Product"}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+                        <div>
+                          <h3 className="font-bold text-base-content text-lg leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                            {productSnapshot?.title ||
+                              itemData?.title ||
+                              "Product"}
+                          </h3>
+                          {productSnapshot?.description && (
+                            <p className="text-sm text-base-content/50 line-clamp-1 hidden sm:block">
+                              {productSnapshot.description}
+                            </p>
+                          )}
+                          {/* Item Type Badge */}
+                          <div
+                            className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${item.productType === "ECBook" ||
+                              item.product?.__t === "ECBook"
+                              ? "bg-info/10 text-info border border-info/20"
+                              : "bg-warning/10 text-warning border border-warning/20"
+                              }`}
+                          >
+                            {item.productType === "ECBook" ||
+                              item.product?.__t === "ECBook" ? (
+                              <BookOpen className="w-3.5 h-3.5" />
+                            ) : (
+                              <Package className="w-3.5 h-3.5" />
+                            )}
+                            {item.productType === "ECBook" ||
+                              item.product?.__t === "ECBook"
+                              ? t("type.book")
+                              : t("type.product")}
+                          </div>
+                        </div>
+                        <div className="flex items-end gap-3 mt-3">
+                          <span className="text-2xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            {price}{" "}
+                            <span className="text-base font-bold">
+                              {t("currency") || "EGP"}
+                            </span>
+                          </span>
+                          {originalPrice > price && (
+                            <span className="text-sm text-base-content/40 line-through mb-1">
+                              {originalPrice} {t("currency") || "EGP"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
           </div>
 
-          {/* Right Column - Summary & Checkout */}
-          <div className="space-y-6">
-            <div className="card bg-base-100 shadow-lg sticky top-4">
-              <div className="card-body">
-                <h2 className="text-2xl font-bold mb-4">
-                  {t("orderSummary") || "Order Summary"}
-                </h2>
-                {/* Coupon Section */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="form-control mb-8 space-y-3"
-                >
-                  <label className="label mb-1">
-                    <span className="label-text font-semibold text-base text-white mb-1 dark:text-gray-200">
-                      {t("couponCode") || "Coupon Code"}
-                    </span>
-                  </label>
+          {/* Checkout Panel - Right Side */}
+          <div className="lg:col-span-2">
+            <div className="sticky top-28 space-y-5">
+              {/* Order Summary Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 overflow-hidden border border-base-200"
+              >
+                {/* Card Header */}
+                <div className="bg-gradient-to-r from-primary to-secondary px-6 py-5">
+                  <h2 className="text-xl font-bold text-primary-content flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-base-100/20 backdrop-blur flex items-center justify-center">
+                      <ShoppingBag className="w-5 h-5 text-primary-content" />
+                    </div>
+                    {isRTL ? "ملخص الطلب" : "Order Summary"}
+                  </h2>
+                </div>
 
-                  {/* Input + Buttons Container */}
-                  <div
-                    className="flex w-full items-center bg-base-100 border border-base-300 rounded-lg overflow-hidden 
-               shadow-sm hover:shadow-md transition-all duration-300 "
-                  >
-                    {/* Input Field */}
-                    <input
-                      type="text"
-                      placeholder={t("enterCoupon") || "Enter coupon"}
-                      className="flex-grow h-12 px-4 text-base bg-transparent outline-none 
-                 placeholder:text-gray-400 disabled:opacity-60"
-                      value={couponCode}
-                      onChange={(e) =>
-                        setCouponCode(e.target.value.toUpperCase())
-                      }
-                      disabled={
-                        couponValidation.isValid || couponValidation.loading
-                      }
-                    />
-
-                    {/* Buttons */}
-                    {couponValidation.isValid ? (
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleRemoveCoupon}
-                        className="btn btn-ghost h-12 px-5 rounded-none sm:rounded-r-xl 
-                   focus:outline-none focus:ring-0 active:scale-95 transition-all duration-200"
-                      >
-                        <X className="w-5 h-5 text-error" />
-                      </motion.button>
-                    ) : (
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleApplyCoupon}
-                        disabled={couponValidation.loading || !couponCode}
-                        className="btn btn-primary h-12 px-6 rounded-none sm:rounded-r-sm
-                   text-white font-medium text-base tracking-wide 
-                   focus:outline-none focus:ring-0 transition-all duration-200
-                   disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {couponValidation.loading ? (
-                          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-                        ) : (
-                          <span>{t("apply") || "Apply"}</span>
+                <div className="p-4 sm:p-6 space-y-6">
+                  {/* Coupon Section */}
+                  <div className="relative">
+                    <label className="text-sm font-semibold text-base-content mb-3 block items-center gap-2">
+                      <Percent className="w-4 h-4 text-warning" />
+                      {isRTL ? "كود الخصم" : "Discount Code"}
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          placeholder={
+                            isRTL ? "أدخل الكود هنا" : "Enter code here"
+                          }
+                          className={`w-full h-12 px-4 bg-base-200 border-2 rounded-xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${couponValidation.isValid
+                            ? "border-success bg-success/5"
+                            : "border-base-200 focus:border-primary"
+                            }`}
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          disabled={couponValidation.isValid || couponValidation.loading}
+                        />
+                        {couponValidation.isValid && (
+                          <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-success" />
                         )}
-                      </motion.button>
-                    )}
-                  </div>
-
-                  {/* Coupon Message */}
-                  {couponValidation.message && (
-                    <motion.label
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="label mt-1"
-                    >
-                      <span
-                        className={`label-text-alt text-sm font-medium ${
-                          couponValidation.isValid
-                            ? "text-green-600"
-                            : "text-error"
-                        }`}
+                      </div>
+                      {couponValidation.isValid ? (
+                        <button
+                          onClick={handleRemoveCoupon}
+                          className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleApplyCoupon}
+                          disabled={couponValidation.loading || !couponCode}
+                          className="px-5 h-12 rounded-xl bg-gradient-to-r from-primary to-secondary text-primary-content font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-primary/25 transition-all"
+                        >
+                          {couponValidation.loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            isRTL ? "تطبيق" : "Apply"
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    {couponValidation.message && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`text-sm mt-2 font-medium ${couponValidation.isValid ? "text-success" : "text-error"}`}
                       >
                         {couponValidation.message}
-                      </span>
-                    </motion.label>
-                  )}
-                </motion.div>
-
-                {/* Price Breakdown */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-4 mb-6 p-5 rounded-2xl bg-gradient-to-br from-base-200/40 to-base-100/60 
-             shadow-inner border border-base-300 backdrop-blur-sm"
-                >
-                  {/* Subtotal */}
-                  <div className="flex justify-between items-center text-sm md:text-base">
-                    <span className="text-gray-400 font-medium">
-                      {t("subtotal") || "Subtotal"}
-                    </span>
-                    <span className="font-semibold text-gray-100">
-                      {cart.subtotal} {t("currency") || "EGP"}
-                    </span>
+                      </motion.p>
+                    )}
                   </div>
-
-                  {/* Discount */}
-                  {cart.discount > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="flex justify-between text-success font-medium"
-                    >
-                      <span>{t("discount") || "Discount"}</span>
-                      <span>
-                        -{cart.discount} {t("currency") || "EGP"}
-                      </span>
-                    </motion.div>
-                  )}
 
                   {/* Divider */}
-                  <div className="border-t border-base-300 my-2"></div>
+                  <div className="h-px bg-gradient-to-r from-transparent via-base-200 to-transparent" />
 
-                  {/* Total */}
-                  <div className="flex items-center justify-between text-xl md:text-2xl font-bold tracking-wide">
-                    <span className="text-gray-200">
-                      {t("total") || "Total"}
-                    </span>
-                    <span className="text-primary drop-shadow-sm">
-                      {cart.total} {t("currency") || "EGP"}
-                    </span>
-                  </div>
-                </motion.div>
-
-                {/* Custom Payment Method Selector with Images - Outside the overflow container */}
-                <div className="relative mb-4">
-                  <label className="label">
-                    <span className="label-text font-semibold">
-                      {t("selectPaymentMethod") || "Payment Method"} <span className="text-error">*</span>
-                    </span>
-                  </label>
-                  <div
-                    data-payment-trigger
-                    className={`flex items-center justify-between h-12 px-4 border rounded-lg cursor-pointer transition-all ${
-                      validationErrors.paymentMethod
-                        ? "border-error"
-                        : "border-base-300 hover:border-primary"
-                    } bg-base-100`}
-                    onClick={() => {
-                      const dropdown = document.getElementById("payment-dropdown-cart");
-                      if (dropdown) dropdown.classList.toggle("hidden");
-                    }}
-                  >
-                    {checkoutData.paymentMethod ? (
-                      <div className="flex items-center gap-3">
-                        {paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.paymentMethodImg && (
-                          <img
-                            src={convertPathToUrl(
-                              paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.paymentMethodImg,
-                              "payment_methods"
-                            )}
-                            alt=""
-                            className="w-8 h-8 object-contain rounded"
-                          />
-                        )}
-                        <span className="font-medium">
-                          {paymentMethods.find((pm) => pm._id === checkoutData.paymentMethod)?.name}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-base-content/50">
-                        {t("selectPaymentMethod") || "Select payment method"}
-                      </span>
-                    )}
-                    <svg className="w-4 h-4 text-base-content/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-
-                  {/* Dropdown Options */}
-                  <div
-                    id="payment-dropdown-cart"
-                    className="hidden absolute z-[999] w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-xl max-h-60 overflow-y-auto"
-                  >
-                    {paymentMethods.map((method) => (
-                      <div
-                        key={method._id}
-                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-primary/10 ${
-                          checkoutData.paymentMethod === method._id ? "bg-primary/20" : ""
-                        }`}
-                        onClick={() => {
-                          setCheckoutData({
-                            ...checkoutData,
-                            paymentMethod: method._id,
-                          });
-                          clearFieldError("paymentMethod");
-                          const dropdown = document.getElementById("payment-dropdown-cart");
-                          if (dropdown) dropdown.classList.add("hidden");
-                        }}
+                  {/* Price Breakdown */}
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center text-base-content/70">
+                      <span>{isRTL ? "المجموع الفرعي" : "Subtotal"}</span>
+                      <span className="font-semibold">{cart.subtotal} {t("currency") || "EGP"}</span>
+                    </div>
+                    {cart.discount > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="flex justify-between items-center text-success"
                       >
-                        {method.paymentMethodImg && (
-                          <img
-                            src={convertPathToUrl(method.paymentMethodImg, "payment_methods")}
-                            alt={method.name}
-                            className="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm"
-                          />
-                        )}
-                        <div className="flex-1">
-                          <span className="font-medium">{method.name}</span>
+                        <span className="flex items-center gap-2">
+                          <Gift className="w-4 h-4" />
+                          {isRTL ? "الخصم" : "Discount"}
+                        </span>
+                        <span className="font-semibold">-{cart.discount} {t("currency") || "EGP"}</span>
+                      </motion.div>
+                    )}
+                    <div className="h-px bg-base-200" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-base-content">
+                        {isRTL ? "الإجمالي" : "Total"}
+                      </span>
+                      <span className="text-2xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        {cart.total} {t("currency") || "EGP"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Payment Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 p-4 sm:p-6 border border-base-200 space-y-5"
+              >
+                <h3 className="text-lg font-bold text-base-content flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-base-200 to-base-100 flex items-center justify-center">
+                    <CreditCard className="w-5 h-5 text-primary" />
+                  </div>
+                  {isRTL ? "تفاصيل الدفع" : "Payment Details"}
+                </h3>
+
+                {/* Payment Method Dropdown */}
+                <div>
+                  <label className="text-sm font-semibold text-base-content mb-2 block">
+                    {isRTL ? "طريقة الدفع" : "Payment Method"}{" "}
+                    <span className="text-primary">*</span>
+                  </label>
+                  <div className="relative" data-payment-dropdown>
+                    <button
+                      onClick={() =>
+                        setShowPaymentDropdown(!showPaymentDropdown)
+                      }
+                      className={`w-full h-14 px-4 flex items-center justify-between bg-base-200 border-2 rounded-2xl transition-all ${validationErrors.paymentMethod
+                        ? "border-error bg-error/10"
+                        : showPaymentDropdown
+                          ? "border-primary ring-4 ring-primary/10"
+                          : "border-base-200 hover:border-base-300"
+                        }`}
+                    >
+                      {checkoutData.paymentMethod ? (
+                        <div className="flex items-center gap-3">
+                          {paymentMethods.find(
+                            (pm) => pm._id === checkoutData.paymentMethod,
+                          )?.paymentMethodImg && (
+                              <img
+                                src={convertPathToUrl(
+                                  paymentMethods.find(
+                                    (pm) => pm._id === checkoutData.paymentMethod,
+                                  )?.paymentMethodImg,
+                                  "payment_methods",
+                                )}
+                                alt=""
+                                className="w-10 h-10 object-contain rounded-xl bg-base-100 p-1 border border-base-200"
+                              />
+                            )}
+                          <span className="font-semibold text-base-content">
+                            {
+                              paymentMethods.find(
+                                (pm) => pm._id === checkoutData.paymentMethod,
+                              )?.name
+                            }
+                          </span>
                         </div>
-                        {checkoutData.paymentMethod === method._id && (
-                          <CheckCircle2 className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                    ))}
+                      ) : (
+                        <span className="text-base-content/40">
+                          {isRTL ? "اختر طريقة الدفع" : "Select payment method"}
+                        </span>
+                      )}
+                      <ChevronDown
+                        className={`w-5 h-5 text-base-content/40 transition-transform duration-200 ${showPaymentDropdown ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {showPaymentDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute z-50 w-full mt-2 bg-base-100 border border-base-200 rounded-2xl shadow-2xl overflow-hidden"
+                        >
+                          {paymentMethods.map((method) => (
+                            <button
+                              key={method._id}
+                              onClick={() => {
+                                setCheckoutData({ ...checkoutData, paymentMethod: method._id });
+                                clearFieldError("paymentMethod");
+                                setShowPaymentDropdown(false);
+                              }}
+                              className={`w-full flex items-center gap-4 px-4 py-4 hover:bg-base-200 transition-colors ${checkoutData.paymentMethod === method._id
+                                ? "bg-base-200"
+                                : ""
+                                }`}
+                            >
+                              {method.paymentMethodImg && (
+                                <img
+                                  src={convertPathToUrl(method.paymentMethodImg, "payment_methods")}
+                                  alt=""
+                                  className="w-12 h-12 object-contain rounded-xl bg-base-100 p-1 border border-base-200"
+                                />
+                              )}
+                              <span className="font-semibold flex-1 text-left rtl:text-right text-base-content">
+                                {method.name}
+                              </span>
+                              {checkoutData.paymentMethod === method._id && (
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                                  <Check className="w-4 h-4 text-primary-content" />
+                                </div>
+                              )}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                   {validationErrors.paymentMethod && (
-                    <span className="text-error text-sm mt-1">{validationErrors.paymentMethod}</span>
+                    <p className="text-error text-sm mt-2 font-medium">
+                      {validationErrors.paymentMethod}
+                    </p>
                   )}
                 </div>
 
-                {/* Payment Phone Number Display */}
+                {/* Payment Phone Number */}
                 {cart.total > 0 && checkoutData.paymentMethod && (
-                    <div
-                      dir="rtl"
-                      className="flex flex-col items-center justify-center text-center space-y-3 mt-2"
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="bg-gradient-to-r from-warning/5 to-warning/10 rounded-2xl p-5 border border-warning/20"
+                  >
+                    <p className="text-sm text-warning-content font-medium text-center mb-3">
+                      {isRTL
+                        ? `حوّل على رقم ${getPaymentMethodLabel()}`
+                        : `Transfer to ${getPaymentMethodLabel()} number`}
+                    </p>
+                    <button
+                      onClick={handleCopy}
+                      className="w-full flex items-center justify-center gap-3 px-5 py-4 bg-base-100 rounded-xl font-bold text-xl text-base-content hover:bg-base-200 border border-warning/30 transition-colors"
                     >
-                      <p className="text-base md:text-lg font-semibold text-gray-100">
-                        برجاء دفع المبلغ على رقم {getPaymentMethodLabel()}:
-                      </p>
-
-                      {/* Payment Number */}
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={handleCopy}
-                        className="relative inline-flex items-center justify-center gap-2
-                   bg-gradient-to-br from-[#f8e3a1] via-[#f1c05a] to-[#dca52f]
-                   text-[#3a2500] font-bold px-6 py-3 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.25)]
-                   cursor-pointer select-none transition-all duration-300
-                   hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)] active:scale-95"
-                      >
-                        <span
-                          dir="ltr"
-                          className="select-all text-white tracking-wide"
-                        >
-                          {getPaymentPhoneNumber()}
-                        </span>
-
-                        {/* Copy Tooltip */}
-                        <motion.span
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{
-                            opacity: copied ? 1 : 0,
-                            y: copied ? 0 : 5,
-                          }}
-                          transition={{ duration: 0.3 }}
-                          className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2
-                     bg-white text-green-700 text-sm font-semibold px-3 py-1 rounded-lg shadow-lg
-                     border border-green-200 whitespace-nowrap"
-                        >
-                          تم النسخ
-                          <span
-                            className="absolute top-full left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45 
-                           bg-white border-r border-b border-green-200"
-                          />
-                        </motion.span>
-                      </motion.div>
-
-                      <p className="text-xs text-gray-400 mt-1">
-                        (اضغط على الرقم لنسخه تلقائيًا)
-                      </p>
-                    </div>
+                      <span dir="ltr">{getPaymentPhoneNumber()}</span>
+                      {copied ? (
+                        <Check className="w-5 h-5 text-success" />
+                      ) : (
+                        <Copy className="w-5 h-5 text-base-content/40" />
+                      )}
+                    </button>
+                  </motion.div>
                 )}
 
-                {/* Checkout Form */}
-                <div className="space-y-6">
-                  {[
-                    // Only show payment fields if cart total > 0
-                    ...(cart.total > 0
-                      ? [
-                          {
-                            key: "transferNumber",
-                            label: (
-                              <>
-                                {t("transferNumber") || "Transfer Number"}
-                                <span className="text-error ml-0.5">*</span>
-                              </>
-                            ),
-                            input: (
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                pattern="[0-9]*"
-                                maxLength={11}
-                                placeholder={
-                                  t("enterTransferNumber") ||
-                                  "Enter transfer number"
-                                }
-                                className={`input outline-none focus:outline-none input-bordered h-12 w-full ${
-                                  validationErrors.numberTransferredFrom
-                                    ? "input-error"
-                                    : ""
-                                }`}
-                                value={checkoutData.numberTransferredFrom}
-                                onChange={(e) => {
-                                  const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
-                                  setCheckoutData({
-                                    ...checkoutData,
-                                    numberTransferredFrom: value,
-                                  });
-                                  // Real-time validation
-                                  if (value.length > 0 && value.length !== 11) {
-                                    setValidationErrors((prev) => ({
-                                      ...prev,
-                                      numberTransferredFrom:
-                                        t("errors.invalidTransferNumberLength") ||
-                                        `رقم التحويل يجب أن يتكون من 11 رقم (${value.length}/11)`,
-                                    }));
-                                  } else {
-                                    clearFieldError("numberTransferredFrom");
-                                  }
-                                }}
-                                onBlur={(e) => {
-                                  const value = e.target.value.trim();
-                                  const paymentPhone = getPaymentPhoneNumber();
-                                  if (value && paymentPhone && value === paymentPhone) {
-                                    setShowWrongTransferNumberModal(true);
-                                    setCheckoutData({
-                                      ...checkoutData,
-                                      numberTransferredFrom: "",
-                                    });
-                                  }
-                                  // Validate length on blur
-                                  if (value.length > 0 && value.length !== 11) {
-                                    setValidationErrors((prev) => ({
-                                      ...prev,
-                                      numberTransferredFrom:
-                                        t("errors.invalidTransferNumberLength") ||
-                                        "رقم التحويل يجب أن يتكون من 11 رقم",
-                                    }));
-                                  }
-                                }}
-                              />
-                            ),
-                            error: validationErrors.numberTransferredFrom,
-                          },
-                          {
-                            key: "paymentScreenshot",
-                            label: (
-                              <>
-                                {t("paymentScreenshot") || "Payment Screenshot"}
-                                <span className="text-error ml-1">*</span>
-                              </>
-                            ),
-                            input: (
-                              <input
-                                type="file"
-                                accept="image/*,.pdf"
-                                className={`file-input file-input-bordered focus:outline-none h-12 w-full ${
-                                  validationErrors.paymentScreenShot
-                                    ? "file-input-error"
-                                    : ""
-                                }`}
-                                onChange={(e) => {
-                                  handleFileChange(e);
-                                  clearFieldError("paymentScreenShot");
-                                }}
-                              />
-                            ),
-                            extra: checkoutData.paymentScreenShot &&
-                              !validationErrors.paymentScreenShot && (
-                                <label className="label mt-1">
-                                  <span className="label-text-alt text-success">
-                                    {t("fileSelected") || "File selected"}:{" "}
-                                    {checkoutData.paymentScreenShot.name}
-                                  </span>
-                                </label>
-                              ),
-                            error: validationErrors.paymentScreenShot,
-                          },
-                        ]
-                      : []),
-                    // Watermark upload (available for all users)
-                    {
-                      key: "watermark",
-                      label: (
-                        <>
-                          {t("watermark") || "Watermark"} (
-                          {t("optional") || "Optional"})
-                        </>
-                      ),
-                      helper: (
-                        <div className="alert alert-info mb-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="stroke-current shrink-0 h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span className="text-sm">
-                            {t("watermarkHelper") ||
-                              "A watermark can be applied, but please note that it may cause printing problems."}
-                          </span>
-                        </div>
-                      ),
-                      input: (
+                {/* Transfer Number Input */}
+                {cart.total > 0 && (
+                  <>
+                    <div>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {isRTL ? "رقم المحول منه" : "Transfer Number"}{" "}
+                        <span className="text-error">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={11}
+                        placeholder={
+                          isRTL
+                            ? "أدخل الرقم (11 رقم)"
+                            : "Enter number (11 digits)"
+                        }
+                        className={`w-full h-14 px-4 bg-base-200 border-2 rounded-2xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${validationErrors.numberTransferredFrom
+                          ? "border-error bg-error/10"
+                          : "border-base-200 focus:border-primary"
+                          }`}
+                        value={checkoutData.numberTransferredFrom}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
+                          setCheckoutData({ ...checkoutData, numberTransferredFrom: value });
+                          if (value.length > 0 && value.length !== 11) {
+                            setValidationErrors((prev) => ({ ...prev, numberTransferredFrom: `${value.length}/11` }));
+                          } else {
+                            clearFieldError("numberTransferredFrom");
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const value = e.target.value.trim();
+                          const paymentPhone = getPaymentPhoneNumber();
+                          if (value && paymentPhone && value === paymentPhone) {
+                            setShowWrongTransferNumberModal(true);
+                            setCheckoutData({ ...checkoutData, numberTransferredFrom: "" });
+                          }
+                        }}
+                      />
+                      {validationErrors.numberTransferredFrom && (
+                        <p className="text-error text-sm mt-2 font-medium">
+                          {validationErrors.numberTransferredFrom}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Payment Screenshot Upload */}
+                    <div>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {isRTL ? "صورة إيصال الدفع" : "Payment Screenshot"}{" "}
+                        <span className="text-error">*</span>
+                      </label>
+                      <label
+                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${validationErrors.paymentScreenShot
+                          ? "border-error bg-error/10"
+                          : checkoutData.paymentScreenShot
+                            ? "border-success bg-success/10"
+                            : "border-base-200 hover:border-primary hover:bg-primary/5"
+                          }`}
+                      >
                         <input
                           type="file"
-                          accept="image/png,image/jpeg,image/jpg"
-                          className="file-input file-input-bordered focus:outline-none h-12 w-full"
-                          onChange={handleWatermarkChange}
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          onChange={handleFileChange}
                         />
-                      ),
-                      extra: checkoutData.watermark && (
-                        <label className="label mt-1">
-                          <span className="label-text-alt text-success">
-                            {t("fileSelected") || "File selected"}:{" "}
-                            {checkoutData.watermark.name}
-                          </span>
-                        </label>
-                      ),
-                    },
-                  ].map((field, index) => (
-                    <motion.div
-                      key={field.key}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: index * 0.1 }}
-                      className="form-control space-y-2"
-                    >
-                      {field.helper}
-                      <label className="label mb-2 font-semibold">
-                        <span className="label-text">{field.label}</span>
-                      </label>
-                      {field.input}
-                      {field.error && (
-                        <label className="label">
-                          <span className="label-text-alt text-error">
-                            {field.error}
-                          </span>
-                        </label>
-                      )}
-                      {field.extra}
-                    </motion.div>
-                  ))}
-
-                  {/* Book Details */}
-                  {requiresBookDetails && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="card bg-info text-info-content"
-                    >
-                      <div className="card-body p-4 space-y-3">
-                        <h3 className="font-bold mb-2">
-                          {t("bookDetails") || "Book Details"}
-                        </h3>
-
-                        {[
-                          {
-                            key: "nameOnBook",
-                            label: t("nameOnBook") || "Name on book",
-                          },
-                          {
-                            key: "numberOnBook",
-                            label: t("numberOnBook") || "Number on book",
-                          },
-                          {
-                            key: "seriesName",
-                            label: t("seriesName") || "Series name",
-                          },
-                        ].map((field, index) => (
+                        {checkoutData.paymentScreenShot ? (
                           <motion.div
-                            key={field.key}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: index * 0.1 }}
-                            className="space-y-1"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="text-center"
                           >
-                            <label className="label font-medium">
-                              <span className="label-text text-base-content">
-                                {field.label}
-                              </span>
-                            </label>
-
-                            <input
-                              type="text"
-                              className={`input input-bordered bg-base-100 text-base-content h-12 w-full ${
-                                validationErrors[field.key] ? "input-error" : ""
-                              }`}
-                              value={checkoutData[field.key]}
-                              onChange={(e) => {
-                                const value =
-                                  field.key === "numberOnBook"
-                                    ? e.target.value.replace(/\D/g, "")
-                                    : e.target.value;
-
-                                setCheckoutData({
-                                  ...checkoutData,
-                                  [field.key]: value,
-                                });
-                                clearFieldError(field.key);
-                              }}
-                            />
-
-                            {/* Error message */}
-                            {validationErrors[field.key] && (
-                              <label className="label">
-                                <span className="label-text-alt text-error">
-                                  {validationErrors[field.key]}
-                                </span>
-                              </label>
-                            )}
+                            <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-2">
+                              <CheckCircle2 className="w-6 h-6 text-success" />
+                            </div>
+                            <span className="text-sm text-success font-semibold truncate max-w-[200px] block">
+                              {checkoutData.paymentScreenShot.name}
+                            </span>
                           </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
+                        ) : (
+                          <div className="text-center">
+                            <div className="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-2">
+                              <Upload className="w-6 h-6 text-base-content/40" />
+                            </div>
+                            <span className="text-sm text-base-content/50 font-medium">
+                              {isRTL
+                                ? "اضغط لرفع الصورة"
+                                : "Click to upload image"}
+                            </span>
+                          </div>
+                        )}
+                      </label>
+                      {validationErrors.paymentScreenShot && (
+                        <p className="text-error text-sm mt-2 font-medium">
+                          {validationErrors.paymentScreenShot}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
 
-                  {/* Notes */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="form-control space-y-2"
+                {/* Watermark Upload */}
+                <div>
+                  <label className="text-sm font-semibold text-base-content mb-2 block">
+                    {isRTL ? "العلامة المائية" : "Watermark"}{" "}
+                    <span className="text-base-content/40 font-normal">
+                      ({isRTL ? "اختياري" : "Optional"})
+                    </span>
+                  </label>
+                  <div className="bg-info/10 rounded-xl p-3 mb-3 flex items-start gap-2">
+                    <Info className="w-4 h-4 text-info mt-0.5 flex-shrink-0" />
+                    <span className="text-xs text-info-content/70">
+                      {isRTL
+                        ? "العلامة المائية قد تسبب مشاكل في الطباعة"
+                        : "Watermark may cause printing issues"}
+                    </span>
+                  </div>
+                  <label
+                    className={`flex items-center justify-center w-full h-16 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${checkoutData.watermark
+                      ? "border-secondary bg-secondary/10"
+                      : "border-base-200 hover:border-secondary hover:bg-secondary/5"
+                      }`}
                   >
-                    <label className="label mb-2 font-semibold">
-                      <span className="label-text">
-                        {t("notes") || "Notes"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg"
+                      className="hidden"
+                      onChange={handleWatermarkChange}
+                    />
+                    {checkoutData.watermark ? (
+                      <span className="text-sm text-secondary font-semibold flex items-center gap-2">
+                        <Check className="w-4 h-4" />
+                        {checkoutData.watermark.name}
                       </span>
-                    </label>
-                    <textarea
-                      placeholder={t("optionalNotes") || "Optional notes"}
-                      className="textarea focus:outline-none textarea-bordered w-full h-28 resize-none"
-                      value={checkoutData.notes}
-                      onChange={(e) =>
-                        setCheckoutData({
-                          ...checkoutData,
-                          notes: e.target.value,
-                        })
-                      }
-                    ></textarea>
-                  </motion.div>
-
-                  {/* Checkout Button */}
-                  <motion.button
-                    whileHover={{ scale: checkoutCooldown > 0 ? 1 : 1.03 }}
-                    whileTap={{ scale: checkoutCooldown > 0 ? 1 : 0.97 }}
-                    onClick={handleCheckout}
-                    disabled={checkoutLoading || checkoutCooldown > 0}
-                    className={`btn btn-lg h-12 w-full mt-4 ${
-                      checkoutCooldown > 0 ? "btn-disabled" : "btn-primary"
-                    }`}
-                  >
-                    {checkoutLoading ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {t("processing") || "Processing..."}
-                      </>
-                    ) : checkoutCooldown > 0 ? (
-                      <>
-                        <svg
-                          className="w-5 h-5 animate-spin"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {t("waitSeconds", { seconds: checkoutCooldown }) ||
-                          `Wait ${checkoutCooldown}s`}
-                      </>
                     ) : (
-                      <>
-                        <CircleCheckBigIcon className="w-5 h-5" />{" "}
-                        {t("checkout") || "Checkout"}
-                      </>
-                    )}
-                  </motion.button>
-
-                  {/* Cooldown Info Alert */}
-                  {checkoutCooldown > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="alert alert-info mt-4"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="stroke-current shrink-0 w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                      <span>
-                        {t("cooldownMessage", { seconds: checkoutCooldown }) ||
-                          `Please wait ${checkoutCooldown} seconds before making another purchase.`}
+                      <span className="text-sm text-base-content/40 font-medium flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4" />
+                        {isRTL ? "رفع علامة مائية" : "Upload watermark"}
                       </span>
-                    </motion.div>
-                  )}
+                    )}
+                  </label>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Book Details */}
+              {requiresBookDetails && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-gradient-to-br from-primary/5 via-base-100 to-secondary/5 rounded-2xl p-4 sm:p-6 border border-primary/10 space-y-4"
+                >
+                  <h3 className="text-lg font-bold text-base-content flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                    </div>
+                    {isRTL ? "بيانات الكتاب" : "Book Details"}
+                  </h3>
+                  {[
+                    { key: "nameOnBook", label: isRTL ? "الاسم على الكتاب" : "Name on Book" },
+                    { key: "numberOnBook", label: isRTL ? "الرقم على الكتاب" : "Number on Book" },
+                    { key: "seriesName", label: isRTL ? "اسم السلسلة" : "Series Name" },
+                  ].map((field) => (
+                    <div key={field.key}>
+                      <label className="text-sm font-semibold text-base-content mb-2 block">
+                        {field.label}
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full h-12 px-4 bg-base-100 border-2 rounded-xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${validationErrors[field.key]
+                          ? "border-error/50"
+                          : "border-base-200 focus:border-primary"
+                          }`}
+                        value={checkoutData[field.key]}
+                        onChange={(e) => {
+                          const value = field.key === "numberOnBook" ? e.target.value.replace(/\D/g, "") : e.target.value;
+                          setCheckoutData({ ...checkoutData, [field.key]: value });
+                          clearFieldError(field.key);
+                        }}
+                      />
+                      {validationErrors[field.key] && (
+                        <p className="text-error text-xs mt-1 font-medium">
+                          {validationErrors[field.key]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Notes Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-base-100/80 backdrop-blur-sm rounded-2xl shadow-xl shadow-base-200/50 p-4 sm:p-6 border border-base-200"
+              >
+                <label className="text-sm font-semibold text-base-content mb-3 block items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-base-content/40" />
+                  {isRTL ? "ملاحظات" : "Notes"}
+                </label>
+                <textarea
+                  placeholder={
+                    isRTL
+                      ? "ملاحظات إضافية (اختياري)"
+                      : "Additional notes (optional)"
+                  }
+                  className="w-full h-24 px-4 py-3 bg-base-100 border-2 border-base-200 rounded-2xl font-medium placeholder:text-base-content/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                  value={checkoutData.notes}
+                  onChange={(e) => setCheckoutData({ ...checkoutData, notes: e.target.value })}
+                />
+              </motion.div>
+
+              {/* Checkout Button */}
+              <motion.button
+                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px rgba(175, 13, 14, 0.25)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleCheckout}
+                disabled={checkoutLoading || checkoutCooldown > 0}
+                className="w-full py-5 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold text-lg rounded-2xl shadow-xl shadow-primary/25 hover:shadow-primary/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-primary/25 transition-all flex items-center justify-center gap-3"
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    {isRTL ? "جاري المعالجة..." : "Processing..."}
+                  </>
+                ) : checkoutCooldown > 0 ? (
+                  <>{isRTL ? `انتظر ${checkoutCooldown} ثانية` : `Wait ${checkoutCooldown}s`}</>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-6 h-6" />
+                    {isRTL ? "إتمام الطلب" : "Complete Order"}
+                    <ArrowIcon className="w-5 h-5" />
+                  </>
+                )}
+              </motion.button>
+
+              {checkoutCooldown > 0 && (
+                <p className="text-center text-sm text-base-content/50 font-medium">
+                  {isRTL
+                    ? `يرجى الانتظار ${checkoutCooldown} ثانية قبل المحاولة مرة أخرى`
+                    : `Please wait ${checkoutCooldown} seconds before trying again`}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* No Payment Methods Modal */}
-      {showNoPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-          >
-            {/* Header with gradient */}
-            <div className="bg-gradient-to-r from-warning to-orange-500 p-6 text-center">
-              <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <AlertCircle className="w-10 h-10 text-white" />
+      {/* No Payment Modal */}
+      <AnimatePresence>
+        {showNoPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-md p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-warning/20 to-error/20 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-warning" />
               </div>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="text-2xl font-black text-base-content mb-3">
                 {isRTL ? "عذراً!" : "Sorry!"}
               </h3>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 text-center">
-              <p className="text-lg text-base-content mb-2">
+              <p className="text-base-content/60 mb-8">
                 {isRTL
                   ? "المنصة متوقفة عن استقبال الطلبات حالياً"
-                  : "The platform is currently not accepting orders"}
+                  : "Platform is not accepting orders at the moment"}
               </p>
-              <p className="text-base-content/70">
-                {isRTL
-                  ? "يرجى المحاولة مرة أخرى في وقت لاحق"
-                  : "Please try again later"}
-              </p>
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-base-200">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => navigate("/market")}
-                className="btn btn-primary w-full"
+                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
               >
                 {isRTL ? "العودة للمتجر" : "Back to Store"}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+              </motion.button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
-      {/* Wrong Transfer Number Modal */}
-      {showWrongTransferNumberModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-base-100 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-          >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-error to-red-500 p-6 text-center">
-              <div className="w-20 h-20 mx-auto bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <AlertCircle className="w-10 h-10 text-white" />
+      {/* Wrong Number Modal */}
+      <AnimatePresence>
+        {showWrongTransferNumberModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/60 backdrop-blur-md p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-base-100 rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-error/20 to-error/10 flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="w-10 h-10 text-error" />
               </div>
-              <h3 className="text-2xl font-bold text-white">
-                {isRTL ? "خطأ!" : "Error!"}
+              <h3 className="text-2xl font-black text-base-content mb-3">
+                {isRTL ? "انتبه!" : "Attention!"}
               </h3>
-            </div>
-
-            {/* Content */}
-            <div className="p-6 text-center">
-              <p className="text-lg text-base-content mb-3">
+              <p className="text-base-content font-medium mb-2">
                 {isRTL
                   ? "هذا ليس رقم التحويل!"
                   : "This is not the transfer number!"}
               </p>
-              <p className="text-base-content/70 mb-2">
+              <p className="text-base-content/50 text-sm mb-8">
                 {isRTL
-                  ? "لقد أدخلت رقم المحفظة وليس رقم التحويل."
-                  : "You entered the wallet number, not the transfer number."}
+                  ? "رقم التحويل هو الرقم الذي حولت منه، وليس الرقم الذي حولت إليه."
+                  : "Transfer number is the number you transferred FROM, not the one you transferred TO."}
               </p>
-              <p className="text-base-content/70">
-                {isRTL
-                  ? "رقم التحويل هو الرقم الذي حولت منه المبلغ."
-                  : "The transfer number is the number you transferred from."}
-              </p>
-            </div>
-
-            {/* Footer */}
-            <div className="p-4 bg-base-200">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setShowWrongTransferNumberModal(false)}
-                className="btn btn-primary w-full"
+                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-primary-content font-bold rounded-2xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all"
               >
                 {isRTL ? "فهمت" : "I Understand"}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </div>
+              </motion.button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div >
   );
 };
 

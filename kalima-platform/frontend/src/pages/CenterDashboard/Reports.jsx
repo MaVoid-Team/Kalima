@@ -108,27 +108,27 @@ const Reports = ({ selectedCenter, lessonId }) => {
   // Function to generate and download the PDF report
   const generatePDF = (student, reportType, reportData) => {
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(18);
     doc.text(`Report for ${student.name}`, 10, 10);
-    
+
     // Add report type
     doc.setFontSize(14);
     doc.text(`Type: ${reportType}`, 10, 20);
-    
+
     // Add report details
     doc.setFontSize(12);
     doc.text(`Student ID: ${student._id}`, 10, 30);
     doc.text(`Notes: ${reportData.notes || 'No notes available'}`, 10, 40);
-    
+
     // Add more details based on report type
     if (reportType === 'lesson') {
       doc.text(`Lesson ID: ${reportData.lessonId || 'N/A'}`, 10, 50);
     } else if (reportType === 'month' || reportType === 'course') {
       doc.text(`Course/Month ID: ${reportData.courseOrmonthId || 'N/A'}`, 10, 50);
     }
-    
+
     // Save the PDF
     doc.save(`${student.name}_${reportType}_report.pdf`);
   };
@@ -148,7 +148,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
   };
 
   if (loading) return <div className="text-center p-8">Loading...</div>;
-  if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
+  if (error) return <div className="text-center p-8 text-error">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -156,7 +156,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
 
       {/* Student Selection Dropdown */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Select Student</label>
+        <label className="block text-sm font-medium text-base-content/70 mb-1">Select Student</label>
         <select
           className="select select-bordered w-full max-w-xs"
           value={selectedStudent?._id || ''}
@@ -173,7 +173,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
 
       {/* Report Type Selection */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Report Type</label>
+        <label className="block text-sm font-medium text-base-content/70 mb-1">Report Type</label>
         <select
           className="select select-bordered w-full max-w-xs"
           value={reportType}
@@ -208,7 +208,7 @@ const Reports = ({ selectedCenter, lessonId }) => {
 
       {/* Status Message */}
       {reportStatus && (
-        <p className={`mt-4 ${reportStatus.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>
+        <p className={`mt-4 ${reportStatus.includes('Error') ? 'text-error' : 'text-success'}`}>
           {reportStatus}
         </p>
       )}

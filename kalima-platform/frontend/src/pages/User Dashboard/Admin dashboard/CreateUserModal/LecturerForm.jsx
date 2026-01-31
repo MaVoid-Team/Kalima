@@ -66,7 +66,7 @@ const LecturerForm = ({ userData, handleChange, subjects, t }) => {
                 {getSubjectNameById(subjectId)}
                 <button
                   type="button"
-                  className="btn btn-ghost btn-xs"
+                  className="btn-ghost btn-xs"
                   onClick={() => removeSubject(subjectId)}
                 >
                   ×

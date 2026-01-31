@@ -38,7 +38,7 @@ export default function LecturesPage() {
 
     const normalizedPath = filePath.replace(/\\/g, "/")
     const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1 if present
     const filename = normalizedPath.split("/").pop()
     return `${baseUrl}/uploads/${folder}/${filename}`
   }
@@ -77,7 +77,7 @@ export default function LecturesPage() {
           .filter((id) => id)
 
         // Merge backend list with already-purchased, never reset
-  setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), ...purchasedIds.map(String)])))
+        setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), ...purchasedIds.map(String)])))
       } else {
         console.error("Failed to fetch user data:", result.error)
       }
@@ -111,11 +111,11 @@ export default function LecturesPage() {
 
   const getTeacherPoints = (teacherId) => {
     if (!pointsBalances || pointsBalances.length === 0) return 0;
-    
+
     const teacherBalance = pointsBalances.find(
       balance => balance.lecturer && balance.lecturer._id === teacherId
     );
-    
+
     return teacherBalance ? teacherBalance.points : 0;
   }
 
@@ -145,7 +145,7 @@ export default function LecturesPage() {
         toast.success(t("purchase.success"))
 
         // Optimistically add to purchased lectures
-  setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), lectureId.toString()])))
+        setPurchasedLectures((prev) => Array.from(new Set([...prev.map(String), lectureId.toString()])))
 
         // Refresh points and merge backend purchases, never reset
         fetchUserData()
@@ -165,7 +165,7 @@ export default function LecturesPage() {
   const generateLectureData = (lecturesData) => {
     console.log("Lecture from backend:", lecturesData)
     return lecturesData.map((lecture) => ({
-      
+
       id: lecture._id,
       thumbnail: convertPathToUrl(lecture.thumbnail, "product_thumbnails"),
       title: lecture.name,
@@ -181,13 +181,13 @@ export default function LecturesPage() {
       price: lecture.price || 0,
       childrenCount: lecture.attachments
         ? (lecture.attachments.booklets?.length || 0) +
-          (lecture.attachments.exams?.length || 0) +
-          (lecture.attachments.homeworks?.length || 0) +
-          (lecture.attachments.pdfsandimages?.length || 0)
+        (lecture.attachments.exams?.length || 0) +
+        (lecture.attachments.homeworks?.length || 0) +
+        (lecture.attachments.pdfsandimages?.length || 0)
         : 0,
       views: lecture.numberOfViews || 0,
       description: lecture.description || "لا يوجد وصف",
-  isPurchased: purchasedLectures.map(String).includes(lecture._id?.toString()),
+      isPurchased: purchasedLectures.map(String).includes(lecture._id?.toString()),
       teacherPoints: lecture.createdBy?._id ? getTeacherPoints(lecture.createdBy._id) : 0,
     }))
   }
@@ -304,7 +304,7 @@ export default function LecturesPage() {
   const FilterDropdown = ({ label, options, selectedValue, onSelect, isRTL }) => (
     <div className="w-full">
       <label
-        className={`block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200 ${isRTL ? "text-right" : "text-left"}`}
+        className={`block mb-2 text-sm font-medium text-base-content/70 ${isRTL ? "text-right" : "text-left"}`}
       >
         {label}
       </label>
@@ -312,7 +312,7 @@ export default function LecturesPage() {
         <select
           value={selectedValue}
           onChange={(e) => onSelect(e.target.value)}
-          className={`w-full appearance-none px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${isRTL ? "text-right" : "text-left"}`}
+          className={`w-full appearance-none px-4 py-2 pr-10 border border-base-300 rounded-xl bg-base-100 text-base-content shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ${isRTL ? "text-right" : "text-left"}`}
           dir={isRTL ? "rtl" : "ltr"}
         >
           <option value="">{t("filters.reset")}</option>
@@ -324,7 +324,7 @@ export default function LecturesPage() {
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
           <svg
-            className="w-4 h-4 text-gray-500 dark:text-gray-300"
+            className="w-4 h-4 text-base-content/50"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
@@ -341,7 +341,7 @@ export default function LecturesPage() {
     return (
       <div className="flex justify-center mt-8">
         <button
-          className="btn btn-outline btn-sm mx-1"
+          className="btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -351,7 +351,7 @@ export default function LecturesPage() {
           {t("pagination.page")} {currentPage} {t("pagination.of")} {totalPages}
         </span>
         <button
-          className="btn btn-outline btn-sm mx-1"
+          className="btn-outline btn-sm mx-1"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
@@ -389,10 +389,10 @@ export default function LecturesPage() {
                     <p className="font-medium">
                       {t("welcome")}, {userData.name}
                     </p>
-                    <p className="text-sm opacity-80">{t(`role.${userData.role.toLowerCase()}`,{ns:"common"})}</p>
+                    <p className="text-sm opacity-80">{t(`role.${userData.role.toLowerCase()}`, { ns: "common" })}</p>
                   </div>
                 </div>
-                
+
                 {/* Teacher-specific points balances */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
                   {pointsBalances && pointsBalances.length > 0 ? (
@@ -410,7 +410,7 @@ export default function LecturesPage() {
                             {balance.lecturer ? balance.lecturer.name : t("generalPoints")}
                           </span>
                         </div>
-                        <span className="bg-primary text-white px-2 py-1 rounded text-sm font-bold">
+                        <span className="bg-primary text-primary-content px-2 py-1 rounded text-sm font-bold">
                           {balance.points} {t("points")}
                         </span>
                       </div>
@@ -428,7 +428,7 @@ export default function LecturesPage() {
 
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-start">
-            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
+            <button className="btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               {t("filters.reset")}
             </button>
             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -474,7 +474,7 @@ export default function LecturesPage() {
             <div className={`text-center py-12 ${isRTL ? "text-right" : "text-left"}`}>
               <p className="text-lg">{t("noLectures")}</p>
               {(selectedStage || selectedGrade || selectedSubject || selectedStatus) && (
-                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
+                <button className="btn-outline btn-sm mt-4" onClick={resetFilters}>
                   {t("filters.reset")}
                 </button>
               )}

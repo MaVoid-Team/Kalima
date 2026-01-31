@@ -66,7 +66,7 @@ export default function LecturerRevenue() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <div className="loading loading-spinner loading-lg text-teal-600"></div>
+        <div className="loading loading-spinner loading-lg text-accent"></div>
       </div>
     )
   }
@@ -78,7 +78,7 @@ export default function LecturerRevenue() {
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
         <h3 className="text-xl font-bold">{t("revenue.errorLoadingRevenue")}</h3>
-        <p className="text-gray-500">{error}</p>
+        <p className="text-base-content/50">{error}</p>
       </div>
     )
   }
@@ -103,7 +103,7 @@ export default function LecturerRevenue() {
       {revenueData && (
         <div className="space-y-6">
           {/* Summary Card */}
-          <div className="card bg-gradient-to-r from-primary to-secondary text-white shadow-2xl p-8 rounded-xl">
+          <div className="card bg-gradient-to-r from-primary to-secondary text-primary-content shadow-2xl p-8 rounded-xl">
             <div className="flex items-center gap-6">
               <Trophy className="h-12 w-12" />
               <div>
@@ -153,7 +153,7 @@ export default function LecturerRevenue() {
 
       {revenueData && revenueData.monthlyRevenue.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-lg font-bold text-gray-500">{t("revenue.noRevenueData")}</p>
+          <p className="text-lg font-bold text-base-content/50">{t("revenue.noRevenueData")}</p>
         </div>
       )}
     </div>

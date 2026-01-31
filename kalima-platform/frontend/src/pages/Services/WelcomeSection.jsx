@@ -1,228 +1,278 @@
-import React, { useMemo } from "react";
+import { useState, useEffect, memo, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useTranslation, Trans } from "react-i18next";
+import { motion, useInView } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import Lottie from "lottie-react";
+import {
+  BookOpen,
+  Play,
+  ArrowLeft,
+  Rocket,
+  Sparkles,
+  Users,
+  GraduationCap,
+} from "lucide-react";
 
-const WelcomeSection = React.memo(() => {
-  const { t, i18n } = useTranslation("home");
+
+
+const WelcomeSection = memo(() => {
+  const { i18n } = useTranslation("home");
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
+  const [animationData, setAnimationData] = useState(null);
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  const images = useMemo(
-    () => ({
-      maleStudent: "/servicesherosection2",
-      femaleStudent: "/servicesherosection1",
-    }),
-    []
-  );
-  const titleParts = t("welcome.title").split(/({{highlight}}|{{\/highlight}})/);
-  const HighlightedText = ({ children, isRTL }) => (
-    <span className="relative inline-block text-primary">
-      {children}
-      <svg
-        className={`absolute -bottom-3 w-full ${isRTL ? "right-0" : "left-0"}`}
-        width="140"
-        height="16"
-        viewBox="0 0 140 16"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      </svg>
-    </span>
-  );
-  const fadeIn = (direction, type, delay, duration) => ({
-    hidden: {
-      x: direction === "left" ? 50 : direction === "right" ? -50 : 0,
-      y: direction === "up" ? 50 : direction === "down" ? -50 : 0,
-      opacity: 0,
-    },
-    show: {
-      x: 0,
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: type || "spring",
-        delay: delay || 0,
-        duration: duration || 1,
-        ease: "easeOut",
+  // Load Lottie animation only when section is in view
+  useEffect(() => {
+    if (!isInView) return;
+
+    let isMounted = true;
+    fetch("/STUDENT.json")
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted) setAnimationData(data);
+      })
+      .catch((err) => console.error("Failed to load Lottie:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isInView]);
+
+  const handleNavigateCourses = useCallback(() => {
+    navigate("/courses");
+  }, [navigate]);
+
+  const handleNavigateTeachers = useCallback(() => {
+    navigate("/teachers");
+  }, [navigate]);
+
+  // Memoized data with brand colors
+  const stats = useMemo(
+    () => [
+      {
+        id: 1,
+        value: "5,200",
+        label: isRTL ? "طالب مسجل" : "Students",
+        icon: Users,
+        color: "text-[#AF0D0E]",
+        bg: "bg-gradient-to-br from-red-50 to-red-100/50",
       },
-    },
-  });
+      {
+        id: 2,
+        value: "150",
+        label: isRTL ? "معلم متميز" : "Teachers",
+        icon: GraduationCap,
+        color: "text-[#FF5C28]",
+        bg: "bg-gradient-to-br from-orange-50 to-orange-100/50",
+      },
+      {
+        id: 3,
+        value: "500",
+        label: isRTL ? "دورة تعليمية" : "Courses",
+        icon: BookOpen,
+        color: "text-[#AF0D0E]",
+        bg: "bg-gradient-to-br from-red-50 to-orange-50",
+      },
+    ],
+    [isRTL],
+  );
 
   return (
-    <div
-      className={`flex flex-col lg:flex-row items-center gap-8 ${
-        isRTL ? "lg:flex-row-reverse" : ""
-      }`}
+    <section
+      ref={sectionRef}
+      className="relative w-full min-h-screen flex items-center pb-16 overflow-hidden"
+      dir={isRTL ? "rtl" : "ltr"}
     >
-      <motion.div
-        variants={fadeIn(isRTL ? "left" : "right", "tween", 0.2, 1)}
-        className="w-full lg:w-1/2 relative"
-        style={{ height: "clamp(350px, 55vw, 500px)" }}
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -left-20 -top-20 w-64 h-64 rounded-full bg-primary/10 mix-blend-multiply filter blur-xl opacity-70"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute -right-10 bottom-10 w-40 h-40 rounded-full bg-secondary/10 mix-blend-multiply filter blur-xl opacity-70"
-        />
-        <div className="relative h-full w-full z-10">
+      {/* Premium Background */}
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 max-w-[1500px] sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20">
+          {/* Illustration Side */}
           <motion.div
-            className="absolute left-8 sm:left-12 md:left-16 bottom-0 h-[70%] sm:h-[75%] md:h-[80%] w-[45%] sm:w-[40%] md:w-[35%] rounded-t-full rounded-b-full p-2 sm:p-3 md:p-4 z-0"
-            whileHover={{ y: -10 }}
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="w-full lg:w-[45%] flex justify-center relative order-1 lg:order-2 "
           >
-            <img
-              src={images.maleStudent}
-              alt={t("welcome.maleStudentAlt")}
-              className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-secondary/30"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = "servicesherosection2.png";
-              }}
-            />
+            <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-lg ">
+              {/* Lottie Container */}
+              <div className="relative w-full h-full p-8 flex items-center justify-center">
+                {animationData ? (
+                  <motion.div
+                    className="w-full h-full"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+                  >
+                    <Lottie
+                      animationData={animationData}
+                      className="w-full h-full drop-shadow-2xl"
+                      loop
+                      rendererSettings={{
+                        preserveAspectRatio: "xMidYMid slice",
+                        progressiveLoad: true,
+                      }}
+                    />
+                  </motion.div>
+                ) : (
+                  <div className="relative">
+                    <div className="w-14 h-14 border-4 border-base-content/20 border-t-primary rounded-full " />
+                  </div>
+                )}
+              </div>
+            </div>
           </motion.div>
-          <motion.div
-            className="absolute right-8 sm:right-12 md:right-16 bottom-8 sm:bottom-12 md:bottom-16 h-[85%] sm:h-[90%] md:h-[100%] w-[55%] sm:w-[50%] md:w-[45%] rounded-t-full rounded-b-full p-2 sm:p-3 md:p-4 z-10"
-            whileHover={{ y: -10 }}
+
+          {/* Content Side */}
+          <div
+            className={`w-full lg:w-[55%] flex flex-col space-y-5 sm:space-y-6 lg:space-y-7 order-2 lg:order-1 items-start ${isRTL ? "text-right" : "text-left"
+              }`}
           >
-            <img
-              src={images.femaleStudent}
-              alt={t("welcome.femaleStudentAlt")}
-              className="w-full h-full object-cover rounded-t-full rounded-b-full shadow-lg md:shadow-xl border-2 border-primary/30"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.src = "servicesherosection1.png";
-              }}
-            />
+            {/* Premium Badge */}
             <motion.div
-              className="absolute -top-5 sm:-top-6 md:-top-7 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-2xl font-bold text-primary whitespace-nowrap"
-              initial={{ y: -20 }}
-              animate={{ y: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
             >
-              {t("welcome.kalima")}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="inline-flex items-center gap-3 py-2.5 shadow-primary/5"
+              >
+                <Rocket className="w-5 h-5 text-primary" />
+                <span className="text-sm font-bold text-gradient-brand">
+                  {isRTL
+                    ? "تحلق في سماء الإبداع"
+                    : "Soar in the Sky of Creativity"}
+                </span>
+                <Sparkles className="w-4 h-4 text-accent" />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </div>
-        <motion.div
-          className="absolute top-6 sm:top-8 md:top-10 left-6 sm:left-8 md:left-10 w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 rounded-full bg-accent"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-12 sm:bottom-16 md:bottom-20 right-12 sm:right-16 md:right-20 w-5 sm:w-6 md:w-6 h-5 sm:h-6 md:h-6 rounded-full bg-error"
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-        />
-      </motion.div>
 
-      <motion.div
-        variants={fadeIn(isRTL ? "right" : "left", "tween", 0.2, 1)}
-        className="w-full lg:w-1/2 space-y-6 sm:space-y-8 px-4 sm:px-6 lg:px-0"
-      >
-        <div className="relative">
-        <motion.h1
-  initial={{ x: isRTL ? 50 : -50, opacity: 0 }}
-  animate={{ x: 0, opacity: 1 }}
-  transition={{ duration: 0.6 }}
-  className={`text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold text-base-content leading-tight ${
-    isRTL ? "text-right" : "text-left"
-  }`}
->
-  {(() => {
-    const title = t("welcome.title");
-    const parts = [];
-    const regex = /\{\{highlight\}\}(.*?)\{\{\/highlight\}\}/g;
-    let lastIndex = 0;
-    let match;
-
-    while ((match = regex.exec(title)) !== null) {
-      // Add text before the match
-      if (match.index > lastIndex) {
-        parts.push(title.substring(lastIndex, match.index));
-      }
-      // Add highlighted component
-      parts.push(
-        <HighlightedText key={match[1]} isRTL={isRTL}>
-          {match[1]}
-        </HighlightedText>
-      );
-      lastIndex = regex.lastIndex;
-    }
-    // Add remaining text after last match
-    if (lastIndex < title.length) {
-      parts.push(title.substring(lastIndex));
-    }
-
-    return parts;
-  })()}
-</motion.h1>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className={`relative ${isRTL ? "text-right" : "text-left"}`}
-        >
-          <motion.p className="text-lg sm:text-xl md:text-2xl text-base-content/80 leading-relaxed mb-6">
-            {t("welcome.description")}
-          </motion.p>
-          <div className="w-20 h-1 bg-gradient-to-r from-primary to-secondary rounded-full mb-6"></div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className={`flex flex-wrap gap-4 ${isRTL ? "justify-start" : "justify-end"}`}
-        >
-          <motion.button
-            onClick={() => navigate("/login")}
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 10px 25px -5px rgba(var(--p), 0.2)",
-            }}
-            whileTap={{ scale: 0.98 }}
-            className="btn btn-primary btn-md gap-2"
-          >
-            {t("signIn")}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            {/* Main Heading */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
             >
-              {isRTL ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-base-content leading-[1.1] tracking-tight">
+                {isRTL ? (
+                  <>
+                    <span>منصة </span>
+                    <span className="relative inline-block">
+                      <span className="text-gradient-brand">
+                        كلمة
+                      </span>
+                      {/* Underline decoration */}
+                      <motion.span
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 0.8, duration: 0.6 }}
+                        className="absolute -bottom-1 left-0 right-0 h-1 gradient-brand-horizontal rounded-full origin-right"
+                      />
+                    </span>
+                    <span> التعليمية</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="relative inline-block">
+                      <span className="text-gradient-brand">
+                        Kalima
+                      </span>
+                      <motion.span
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 0.8, duration: 0.6 }}
+                        className="absolute -bottom-1 left-0 right-0 h-1 gradient-brand-horizontal rounded-full origin-left"
+                      />
+                    </span>
+                    <span> Learning Platform</span>
+                  </>
+                )}
+              </h1>
+            </motion.div>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-base sm:text-lg text-base-content/60 leading-relaxed max-w-xl font-medium mb-8"
+            >
+              {isRTL
+                ? "منصة تعليمية متكاملة توفر لك أفضل المعلمين والدورات التعليمية من الصف الرابع الابتدائي حتى الثالث الثانوي."
+                : "A comprehensive educational platform providing the best teachers and courses from elementary to high school."}
+            </motion.p>
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="flex flex-wrap items-center gap-4"
+            >
+              <motion.button
+                whileHover={{
+                  scale: 1.03,
+                  boxShadow: "0 20px 40px rgba(175, 13, 14, 0.25)",
+                }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleNavigateCourses}
+                className="group px-7 py-4 gradient-brand text-primary-content rounded-2xl font-bold text-base flex items-center gap-3 shadow-xl shadow-primary/20 transition-all duration-300"
+              >
+                <BookOpen className="w-5 h-5" strokeWidth={2.5} />
+                <span>{isRTL ? "تصفح الكورسات" : "Browse Courses"}</span>
+                <ArrowLeft
+                  className={`w-5 h-5 group-hover:translate-x-1 transition-transform duration-300 ${!isRTL && "rotate-180"}`}
                 />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              )}
-            </svg>
-          </motion.button>
-        </motion.div>
-      </motion.div>
-    </div>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleNavigateTeachers}
+                className="group px-7 py-4 bg-base-100 text-base-content hover:text-primary rounded-2xl font-bold text-base flex items-center gap-3 border-2 border-base-content/10 hover:border-primary/20 shadow-lg shadow-base-content/10 hover:shadow-primary/10 transition-all duration-300"
+              >
+                <div className="w-6 h-6 rounded-full bg-base-200 group-hover:bg-primary/10 flex items-center justify-center transition-colors duration-300">
+                  <Play
+                    className={`w-3.5 h-3.5 fill-current text-base-content/50 group-hover:text-primary transition-colors duration-300 ${!isRTL && "rotate-180"}`}
+                  />
+                </div>
+                <span>{isRTL ? "المعلمين" : "Teachers"}</span>
+              </motion.button>
+            </motion.div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-xl">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className={`flex flex-col items-center justify-center bg-white rounded-2xl p-4 border border-gray-100 shadow-sm ${index === 2 ? "col-span-2 sm:col-span-1" : ""}`}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 mb-2">
+                    <stat.icon
+                      className={`w-5 h-5 ${stat.color}`}
+                      strokeWidth={2}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                    {stat.label}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 });
+
+WelcomeSection.displayName = "WelcomeSection";
 
 export default WelcomeSection;

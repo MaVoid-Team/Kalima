@@ -33,11 +33,11 @@ const CourseCard = memo(function CourseCard({
           loading="lazy"
         />
         {container.price > 0 ? (
-          <div className="absolute bottom-2 left-2 bg-primary text-white px-2 py-1 rounded-md text-sm font-medium">
+          <div className="absolute bottom-2 left-2 bg-primary text-primary-content px-2 py-1 rounded-md text-sm font-medium">
             {container.price} {t("currency")}
           </div>
         ) : (
-          <div className="absolute bottom-2 left-2 bg-success text-white px-2 py-1 rounded-md text-sm font-medium">
+          <div className="absolute bottom-2 left-2 bg-success text-success-content px-2 py-1 rounded-md text-sm font-medium">
             {t("free")}
           </div>
         )}
@@ -314,7 +314,7 @@ export default function CourseGrid() {
           <BookOpen className="h-12 w-12 text-primary" />
         </div>
         <h3 className="text-xl font-bold">{t("noCoursesTitle")}</h3>
-        <p className="text-lg text-gray-500 max-w-md mx-auto">{t("noCoursesDescription")}</p>
+        <p className="text-lg text-base-content/50 max-w-md mx-auto">{t("noCoursesDescription")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
           <button className="btn btn-primary mt-4">
             <Edit className="h-4 w-4" style={{ marginRight: isRTL ? 0 : "0.5rem", marginLeft: isRTL ? "0.5rem" : 0 }} />
@@ -329,7 +329,7 @@ export default function CourseGrid() {
   if (filteredContainers.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg text-gray-500">{t("noCourses")}</p>
+        <p className="text-lg text-base-content/50">{t("noCourses")}</p>
         <Link to="/dashboard/lecturer-dashboard/CoursesForm">
           <button className="btn btn-primary mt-4">{t("addNewCourse")}</button>
         </Link>
@@ -371,11 +371,11 @@ export default function CourseGrid() {
 
       {/* Edit Container Modal */}
       {showEditModal && editingContainer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50 p-4">
           <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-base-100 border-b p-4 flex justify-between items-center">
               <h3 className="text-xl font-bold">{t("editCourse")}</h3>
-              <button onClick={() => setShowEditModal(false)} className="btn btn-ghost btn-sm btn-circle">
+              <button onClick={() => setShowEditModal(false)} className="btn-ghost btn-sm btn-circle">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -512,7 +512,7 @@ export default function CourseGrid() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4">
-                <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-ghost">
+                <button type="button" onClick={() => setShowEditModal(false)} className="btn-ghost">
                   {t("cancel")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={loading}>

@@ -131,38 +131,36 @@ const ExportSection = ({
           csvContent = [
             headers.join(","),
             item.type ===
-              "book"
-                .map((item) => {
-                  if (!item) return "";
+            "book"
+              .map((item) => {
+                if (!item) return "";
 
-                  const isBook = books.some((book) => book?._id === item?._id);
-                  const finalPrice =
-                    item?.discountPercentage > 0
-                      ? formatPrice(item?.price, item?.discountPercentage)
-                      : item?.price || 0;
+                const isBook = books.some((book) => book?._id === item?._id);
+                const finalPrice =
+                  item?.discountPercentage > 0
+                    ? formatPrice(item?.price, item?.discountPercentage)
+                    : item?.price || 0;
 
-                  return [
-                    `"${item?.title || ""}"`,
-                    `"${item?.serial || ""}"`,
-                    `"${getSectionName(item?.section)}"`,
-                    `"${
-                      isBook && item?.subject
-                        ? getSubjectName(item?.subject)
-                        : "-"
-                    }"`,
-                    `"${item?.price || 0}"`,
-                    `"${item?.discountPercentage || 0}"`,
-                    `"${finalPrice}"`,
-                    `"${item?.paymentNumber || ""}"`,
-                    `"${isBook ? "Book" : "Product"}"`,
-                    `"${
-                      item?.createdAt
-                        ? new Date(item.createdAt).toLocaleDateString()
-                        : ""
-                    }"`,
-                  ].join(",");
-                })
-                .filter((row) => row !== ""),
+                return [
+                  `"${item?.title || ""}"`,
+                  `"${item?.serial || ""}"`,
+                  `"${getSectionName(item?.section)}"`,
+                  `"${isBook && item?.subject
+                    ? getSubjectName(item?.subject)
+                    : "-"
+                  }"`,
+                  `"${item?.price || 0}"`,
+                  `"${item?.discountPercentage || 0}"`,
+                  `"${finalPrice}"`,
+                  `"${item?.paymentNumber || ""}"`,
+                  `"${isBook ? "Book" : "Product"}"`,
+                  `"${item?.createdAt
+                    ? new Date(item.createdAt).toLocaleDateString()
+                    : ""
+                  }"`,
+                ].join(",");
+              })
+              .filter((row) => row !== ""),
           ].join("\n");
           break;
 
@@ -206,10 +204,9 @@ const ExportSection = ({
                 `"${section.description || ""}"`,
                 `"${section.productCount}"`,
                 `"${section.thumbnail || ""}"`,
-                `"${
-                  section.createdAt
-                    ? new Date(section.createdAt).toLocaleDateString()
-                    : ""
+                `"${section.createdAt
+                  ? new Date(section.createdAt).toLocaleDateString()
+                  : ""
                 }"`,
               ].join(",")
             ),
@@ -253,10 +250,9 @@ const ExportSection = ({
                   `"${finalPrice}"`,
                   `"${book?.description || ""}"`,
                   `"${book?.paymentNumber || ""}"`,
-                  `"${
-                    book?.createdAt
-                      ? new Date(book.createdAt).toLocaleDateString()
-                      : ""
+                  `"${book?.createdAt
+                    ? new Date(book.createdAt).toLocaleDateString()
+                    : ""
                   }"`,
                 ].join(",");
               })
@@ -528,7 +524,7 @@ const ExportSection = ({
           <div
             tabIndex={0}
             role="button"
-            className="btn btn-outline btn-primary"
+            className="btn-outline btn-primary"
             disabled={isExporting}
           >
             {isExporting ? (

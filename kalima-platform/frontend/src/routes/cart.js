@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "./auth-services";
 
-// Helper function to generate safe filename for uploads
+
 const generateSafeFilename = (file) => {
   if (!file || !file.name) return `${Date.now()}-${Math.floor(Math.random() * 9000) + 1000}`;
   try {
@@ -19,7 +19,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Get user's active cart
 export const getCart = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/carts/`, {
+    const response = await axios.get(`${API_URL}/ec/carts/`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -56,7 +56,7 @@ export const getCart = async () => {
 export const addToCart = async (productId) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/carts/add`,
+      `${API_URL}/ec/carts/add`,
       { productId },
       {
         withCredentials: true,
@@ -81,7 +81,7 @@ export const addToCart = async (productId) => {
 // Remove item from cart
 export const removeFromCart = async (itemId) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/carts/remove-item/${itemId}`, {
+    const response = await axios.delete(`${API_URL}/ec/carts/remove-item/${itemId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -102,7 +102,7 @@ export const removeFromCart = async (itemId) => {
 // Clear cart
 export const clearCart = async () => {
   try {
-    const response = await axios.delete(`${API_URL}/api/v1/ec/carts/clear`, {
+    const response = await axios.delete(`${API_URL}/ec/carts/clear`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -124,7 +124,7 @@ export const clearCart = async () => {
 export const applyCouponToCart = async (couponCode) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/ec/carts/apply-coupon`,
+      `${API_URL}/ec/carts/apply-coupon`,
       { couponCode },
       {
         withCredentials: true,
@@ -149,7 +149,7 @@ export const applyCouponToCart = async (couponCode) => {
 // Get checkout preview
 export const getCheckoutPreview = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/carts/checkout-preview`, {
+    const response = await axios.get(`${API_URL}/ec/carts/checkout-preview`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -171,12 +171,12 @@ export const getCheckoutPreview = async () => {
 export const createCartPurchase = async (purchaseData) => {
   try {
     const formData = new FormData();
-    
+
     // Only append payment fields if they exist (for paid products)
     if (purchaseData.numberTransferredFrom) {
       formData.append("numberTransferredFrom", purchaseData.numberTransferredFrom);
     }
-    
+
     if (purchaseData.paymentScreenShot) {
       const safePayment = generateSafeFilename(purchaseData.paymentScreenShot);
       formData.append("paymentScreenShot", purchaseData.paymentScreenShot, safePayment);
@@ -206,7 +206,7 @@ export const createCartPurchase = async (purchaseData) => {
       formData.append("seriesName", purchaseData.seriesName);
     }
 
-    const response = await axios.post(`${API_URL}/api/v1/ec/cart-purchases`, formData, {
+    const response = await axios.post(`${API_URL}/ec/cart-purchases`, formData, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -229,7 +229,7 @@ export const createCartPurchase = async (purchaseData) => {
 // Get cart item count
 export const getCartItemCount = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-items/count`, {
+    const response = await axios.get(`${API_URL}/ec/cart-items/count`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -250,7 +250,7 @@ export const getCartItemCount = async () => {
 
 export const getCartPurchases = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -272,13 +272,13 @@ export const getCartPurchases = async (queryParams = {}) => {
 // Get user's purchased product IDs
 export const getUserPurchasedProducts = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
     });
-    
+
     if (response.data?.status === "success" && response.data?.data?.purchases) {
       // Extract all product IDs from all purchases
       const productIds = new Set();
@@ -315,7 +315,7 @@ export const getUserPurchasedProducts = async () => {
 // Get confirmed purchases count for current month (for employee counter)
 export const getConfirmedPurchasesCount = async () => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/confirmed-count`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/confirmed-count`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -335,7 +335,7 @@ export const getConfirmedPurchasesCount = async () => {
 
 export const getAdminCartPurchases = async (queryParams = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/api/v1/ec/cart-purchases/admin/all`, {
+    const response = await axios.get(`${API_URL}/ec/cart-purchases/admin/all`, {
       params: queryParams,
       withCredentials: true,
       headers: {
@@ -354,13 +354,13 @@ export const getAdminCartPurchases = async (queryParams = {}) => {
   }
 };
 
-// Get confirmed orders report
+// getConfirmedOrdersReport
 export const getConfirmedOrdersReport = async (params = {}) => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/v1/ec/cart-purchases/admin/fullreport`,
+      `${API_URL}/ec/cart-purchases/admin/fullreport`,
       {
-        params, // ← هنا المهم
+        params,
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -375,9 +375,9 @@ export const getConfirmedOrdersReport = async (params = {}) => {
   } catch (error) {
     return {
       success: false,
-      error: `Failed to fetch confirmed orders report: ${
-        error.response?.data?.message || error.message
-      }`,
+      error: `Failed to fetch confirmed orders report: ${error.response?.data?.message || error.message
+        }`,
     };
   }
 };
+

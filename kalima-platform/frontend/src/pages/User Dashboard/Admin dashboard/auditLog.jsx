@@ -208,15 +208,15 @@ const AuditLog = () => {
 
       // Create worksheet
       const worksheet = XLSX.utils.json_to_sheet(exportData)
-      
+
       // Create workbook
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Audit Logs')
-      
+
       // Generate file name with current date
       const timestamp = new Date().toISOString().split('T')[0]
       const filename = exportAll ? `audit-logs-all-${timestamp}.xlsx` : `audit-logs-filtered-${timestamp}.xlsx`
-      
+
       // Save the file
       XLSX.writeFile(workbook, filename)
 
@@ -403,26 +403,26 @@ const AuditLog = () => {
       case "delete":
         return (
           <div className="badge badge-error badge-sm p-3">
-            <FiX className="h-4 w-4 text-white" />
+            <FiX className="h-4 w-4 text-error-content" />
           </div>
         )
       case "update":
       case "edit":
         return (
           <div className="badge badge-warning badge-sm p-3">
-            <FiEdit className="h-4 w-4 text-white" />
+            <FiEdit className="h-4 w-4 text-warning-content" />
           </div>
         )
       case "read":
         return (
           <div className="badge badge-neutral badge-sm p-3">
-            <FiFileText className="h-4 w-4 text-white" />
+            <FiFileText className="h-4 w-4 text-neutral-content" />
           </div>
         )
       default:
         return (
           <div className="badge badge-info badge-sm p-3">
-            <FiRotateCw className="h-4 w-4 text-white" />
+            <FiRotateCw className="h-4 w-4 text-info-content" />
           </div>
         )
     }
@@ -434,7 +434,7 @@ const AuditLog = () => {
       case "success":
         return <FaCheckCircle className="h-5 w-5 text-success" />
       case "pending":
-        return <FaHourglassHalf className="h-5 w-5 text-amber-700" />
+        return <FaHourglassHalf className="h-5 w-5 text-warning" />
       case "failed":
         return <FaExclamationTriangle className="h-5 w-5 text-warning" />
       default:
@@ -448,12 +448,12 @@ const AuditLog = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold">{t("admin.auditlog.title")}</h1>
-          <p className="text-gray-600 mt-2">{t("admin.auditlog.subtitle")}</p>
+          <p className="text-base-content/60 mt-2">{t("admin.auditlog.subtitle")}</p>
         </div>
 
         {/* Export Dropdown */}
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-outline btn-primary" disabled={isExporting}>
+          <div tabIndex={0} role="button" className="btn-outline btn-primary" disabled={isExporting}>
             {isExporting ? (
               <>
                 <span className="loading loading-spinner loading-sm"></span>
@@ -561,7 +561,7 @@ const AuditLog = () => {
 
         {/* Role Filter */}
         {/* <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={1} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+          <label tabIndex={1} className="btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.role || t("admin.auditlog.filters.role")}</span>
           </label>
@@ -579,7 +579,7 @@ const AuditLog = () => {
 
         {/* Action Filter */}
         <div className="dropdown dropdown-end bg-base-100">
-          <label tabIndex={2} className="btn btn-outline rounded-full min-w-[180px] flex justify-between">
+          <label tabIndex={2} className="btn-outline rounded-full min-w-[180px] flex justify-between">
             <FiChevronDown className="h-5 w-5" />
             <span>{filters.action || t("admin.auditlog.filters.action")}</span>
           </label>
@@ -717,14 +717,14 @@ const AuditLog = () => {
         <div className="flex justify-center mt-8">
           <div className="btn-group">
             <button
-              className="btn btn-outline"
+              className="btn-outline"
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
             >
               {t("admin.auditlog.pagination.previous")}
             </button>
-            <button className="btn btn-outline">{page}</button>
-            <button className="btn btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
+            <button className="btn-outline">{page}</button>
+            <button className="btn-outline" onClick={() => setPage((p) => p + 1)} disabled={logs.length < limit}>
               {t("admin.auditlog.pagination.next")}
             </button>
           </div>

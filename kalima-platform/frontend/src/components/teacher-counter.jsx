@@ -6,7 +6,7 @@ export default function TeacherCounter() {
   const isRTL = i18n.language === 'ar';
 
   return (
-    <div className={`rounded-3xl bg-primary-content w-56 md:w-full h-16 md:h-full shadow-lg px-4 py-3 flex items-center gap-3 `}
+    <div className={`rounded-4xl bg-primary w-56 md:w-full h-16 md:h-full shadow-lg px-4 py-3 flex items-center gap-3 `}
     dir={isRTL ? 'rtl' : 'ltr'}>
       
       {/* Text Content */}

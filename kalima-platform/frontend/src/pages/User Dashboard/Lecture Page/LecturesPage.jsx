@@ -49,187 +49,187 @@ const MyLecturesPage = () => {
 
     const normalizedPath = filePath.replace(/\\/g, "/")
     const API_URL = import.meta.env.VITE_API_URL || window.location.origin
-    const baseUrl = API_URL.replace(/\/$/, "")
+    const baseUrl = API_URL.replace(/\/api(\/v1)?\/?$/, "") // remove /api or /api/v1 if present
     const filename = normalizedPath.split("/").pop()
 
     return `${baseUrl}/uploads/${folder}/${filename}`
   }
 
   useEffect(() => {
- const fetchInitialData = async () => {
-  try {
-    setLoading(true);
-    setError(null);
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    // First get subjects and levels (common for all roles)
-    const subjectsRes = await getAllSubjects();
-    const levelsRes = await getAllLevels();
+        // First get subjects and levels (common for all roles)
+        const subjectsRes = await getAllSubjects();
+        const levelsRes = await getAllLevels();
 
-    if (subjectsRes.success) {
-      setSubjects(subjectsRes.data || []);
-    } else {
-      console.error("Failed to fetch subjects:", subjectsRes.error);
-      setSubjects([]);
-      setError("Failed to load subjects, but you can continue.");
-    }
+        if (subjectsRes.success) {
+          setSubjects(subjectsRes.data || []);
+        } else {
+          console.error("Failed to fetch subjects:", subjectsRes.error);
+          setSubjects([]);
+          setError("Failed to load subjects, but you can continue.");
+        }
 
-    if (levelsRes.success) {
-      setLevels(levelsRes.data || []);
-    } else {
-      console.error("Failed to fetch levels:", levelsRes.error);
-      setLevels([]);
-      setError(prev => prev ? `${prev}` : "Failed to load levels, but you can continue.");
-    }
+        if (levelsRes.success) {
+          setLevels(levelsRes.data || []);
+        } else {
+          console.error("Failed to fetch levels:", levelsRes.error);
+          setLevels([]);
+          setError(prev => prev ? `${prev}` : "Failed to load levels, but you can continue.");
+        }
 
-    // Then determine user role and fetch appropriate data
-    const userInfoResult = await getUserDashboard({ 
-      params: { fields: "userInfo", limit: 1 } 
-    });
+        // Then determine user role and fetch appropriate data
+        const userInfoResult = await getUserDashboard({
+          params: { fields: "userInfo", limit: 1 }
+        });
 
-    if (!userInfoResult.success) {
-      throw new Error("Failed to fetch user info");
-    }
+        if (!userInfoResult.success) {
+          throw new Error("Failed to fetch user info");
+        }
 
-    const userRole = userInfoResult.data.data.userInfo.role;
-    setUserRole(userRole);
-    setUserId(userInfoResult.data.data.userInfo.id);
+        const userRole = userInfoResult.data.data.userInfo.role;
+        setUserRole(userRole);
+        setUserId(userInfoResult.data.data.userInfo.id);
 
-    // Role-specific data fetching
-    if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
-      // Use getAllLectures for admin roles
-      const allLecturesResult = await getAllLectures({ limit: 200 });
-      
-      if (allLecturesResult.status === "success") {
-        const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
-          id: lecture._id,
-          name: lecture.name,
-          subject: lecture.subject,
-          level: lecture.level,
-          price: lecture.price,
-          videoLink: lecture.videoLink,
-          lecture_type: lecture.lecture_type,
-          requiresExam: lecture.requiresExam,
-          examConfig: lecture.examConfig,
-          lecturer: lecture.createdBy,
-          thumbnail: lecture.thumbnail,
-          createdAt: lecture.createdAt,
-        }));
-        setAllLectures(lecturesData);
-      } else {
-        throw new Error(allLecturesResult.message || "Failed to fetch lectures");
+        // Role-specific data fetching
+        if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
+          // Use getAllLectures for admin roles
+          const allLecturesResult = await getAllLectures({ limit: 200 });
+
+          if (allLecturesResult.status === "success") {
+            const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
+              id: lecture._id,
+              name: lecture.name,
+              subject: lecture.subject,
+              level: lecture.level,
+              price: lecture.price,
+              videoLink: lecture.videoLink,
+              lecture_type: lecture.lecture_type,
+              requiresExam: lecture.requiresExam,
+              examConfig: lecture.examConfig,
+              lecturer: lecture.createdBy,
+              thumbnail: lecture.thumbnail,
+              createdAt: lecture.createdAt,
+            }));
+            setAllLectures(lecturesData);
+          } else {
+            throw new Error(allLecturesResult.message || "Failed to fetch lectures");
+          }
+        } else if (userRole === "Lecturer") {
+          // Use getUserDashboard with specific fields for lecturers
+          const result = await getUserDashboard({
+            params: { fields: "userInfo,lectures,containers", limit: 500 },
+          });
+
+          if (result.success) {
+            const { containers, lectures } = result.data.data;
+
+            const containerLectures = containers
+              ?.filter(c => c.type === "lecture")
+              .map(lecture => ({
+                id: lecture._id,
+                name: lecture.name,
+                subject: lecture.subject,
+                level: lecture.level,
+                price: lecture.price,
+                videoLink: lecture.videoLink,
+                lecture_type: lecture.lecture_type || "Unknown",
+                requiresExam: lecture.requiresExam || false,
+                examConfig: lecture.examConfig || null,
+                lecturer: result.data.data.userInfo,
+                thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+                createdAt: lecture.createdAt || null,
+              })) || [];
+
+            const standaloneLectures = lectures?.map(lecture => ({
+              id: lecture._id,
+              name: lecture.name,
+              subject: lecture.subject,
+              level: lecture.level,
+              price: lecture.price,
+              lecture_type: lecture.lecture_type,
+              requiresExam: lecture.requiresExam || false,
+              examConfig: lecture.examConfig || null,
+              lecturer: result.data.data.userInfo,
+              thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+              createdAt: lecture.createdAt || null,
+            })) || [];
+
+            const allLecturesCombined = [...containerLectures, ...standaloneLectures];
+            setAllLectures(allLecturesCombined);
+          } else {
+            throw new Error(result.error || "Failed to fetch lecturer data");
+          }
+        } else if (userRole === "Student") {
+          // Handle student case
+          const result = await getUserDashboard({
+            params: { fields: "purchaseHistory", limit: 500 },
+          });
+
+          if (result.success) {
+            const lecturesData = result.data.data.purchaseHistory
+              ?.map(p => {
+                // If lecture field exists (lecturePurchase), use it
+                if (p.lecture) {
+                  return {
+                    id: p.lecture._id || p._id,
+                    name: p.lecture.name,
+                    price: p.points,
+                    videoLink: p.lecture.videoLink,
+                    lecture_type: p.lecture.lecture_type,
+                    purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    }),
+                    lecturer: p.lecturer,
+                    subject: p.lecture.subject,
+                    level: p.lecture.level,
+                    thumbnail: p.lecture.thumbnail,
+                  };
+                }
+                // If container is a lecture (containerPurchase), use container
+                if (p.container && p.container.type === "lecture") {
+                  return {
+                    id: p.container._id || p._id,
+                    name: p.container.name || p.description.replace("Purchased container ", "").split(" for ")[0],
+                    price: p.points,
+                    videoLink: p.container.videoLink,
+                    lecture_type: p.container.lecture_type,
+                    purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    }),
+                    lecturer: p.lecturer,
+                    subject: p.container.subject,
+                    level: p.container.level,
+                    thumbnail: p.container.thumbnail,
+                  };
+                }
+                // Otherwise, skip
+                return null;
+              })
+              .filter(Boolean) || [];
+            setAllLectures(lecturesData);
+          }
+        }
+      } catch (err) {
+        console.error("Error in fetchInitialData:", err);
+        setError(err.message || "Failed to load data, but you can continue.");
+      } finally {
+        setLoading(false);
       }
-    } else if (userRole === "Lecturer") {
-      // Use getUserDashboard with specific fields for lecturers
-      const result = await getUserDashboard({
-        params: { fields: "userInfo,lectures,containers", limit: 500 },
-      });
-
-      if (result.success) {
-        const { containers, lectures } = result.data.data;
-
-        const containerLectures = containers
-          ?.filter(c => c.type === "lecture")
-          .map(lecture => ({
-            id: lecture._id,
-            name: lecture.name,
-            subject: lecture.subject,
-            level: lecture.level,
-            price: lecture.price,
-            videoLink: lecture.videoLink,
-            lecture_type: lecture.lecture_type || "Unknown",
-            requiresExam: lecture.requiresExam || false,
-            examConfig: lecture.examConfig || null,
-            lecturer: result.data.data.userInfo,
-            thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
-            createdAt: lecture.createdAt || null,
-          })) || [];
-
-        const standaloneLectures = lectures?.map(lecture => ({
-          id: lecture._id,
-          name: lecture.name,
-          subject: lecture.subject,
-          level: lecture.level,
-          price: lecture.price,
-          lecture_type: lecture.lecture_type,
-          requiresExam: lecture.requiresExam || false,
-          examConfig: lecture.examConfig || null,
-          lecturer: result.data.data.userInfo,
-          thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
-          createdAt: lecture.createdAt || null,
-        })) || [];
-
-        const allLecturesCombined = [...containerLectures, ...standaloneLectures];
-        setAllLectures(allLecturesCombined);
-      } else {
-        throw new Error(result.error || "Failed to fetch lecturer data");
-      }
-    } else if (userRole === "Student") {
-      // Handle student case
-      const result = await getUserDashboard({
-        params: { fields: "purchaseHistory", limit: 500 },
-      });
-
-      if (result.success) {
-        const lecturesData = result.data.data.purchaseHistory
-          ?.map(p => {
-            // If lecture field exists (lecturePurchase), use it
-            if (p.lecture) {
-              return {
-                id: p.lecture._id || p._id,
-                name: p.lecture.name,
-                price: p.points,
-                videoLink: p.lecture.videoLink,
-                lecture_type: p.lecture.lecture_type,
-                purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                }),
-                lecturer: p.lecturer,
-                subject: p.lecture.subject,
-                level: p.lecture.level,
-                thumbnail: p.lecture.thumbnail,
-              };
-            }
-            // If container is a lecture (containerPurchase), use container
-            if (p.container && p.container.type === "lecture") {
-              return {
-                id: p.container._id || p._id,
-                name: p.container.name || p.description.replace("Purchased container ", "").split(" for ")[0],
-                price: p.points,
-                videoLink: p.container.videoLink,
-                lecture_type: p.container.lecture_type,
-                purchasedAt: new Date(p.purchasedAt).toLocaleString("en-gb", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                }),
-                lecturer: p.lecturer,
-                subject: p.container.subject,
-                level: p.container.level,
-                thumbnail: p.container.thumbnail,
-              };
-            }
-            // Otherwise, skip
-            return null;
-          })
-          .filter(Boolean) || [];
-        setAllLectures(lecturesData);
-      }
-    }
-  } catch (err) {
-    console.error("Error in fetchInitialData:", err);
-    setError(err.message || "Failed to load data, but you can continue.");
-  } finally {
-    setLoading(false);
-  }
-};
+    };
 
     fetchInitialData()
   }, [])
@@ -305,7 +305,7 @@ const MyLecturesPage = () => {
         setShowEditModal(false)
         setEditingLecture(null)
         await refetchLectureData()
-        
+
         setTimeout(() => {
           setSuccessMessage("")
         }, 5000)
@@ -406,45 +406,59 @@ const MyLecturesPage = () => {
   }
 
   const refetchLectureData = async () => {
-  try {
-    if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
-      const allLecturesResult = await getAllLectures({ limit: 200 });
-      
-      if (allLecturesResult.status === "success") {
-        const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
-          id: lecture._id,
-          name: lecture.name,
-          subject: lecture.subject,
-          level: lecture.level,
-          price: lecture.price,
-          videoLink: lecture.videoLink,
-          lecture_type: lecture.lecture_type,
-          requiresExam: lecture.requiresExam,
-          examConfig: lecture.examConfig,
-          lecturer: lecture.createdBy,
-          thumbnail: lecture.thumbnail,
-          createdAt: lecture.createdAt,
-        }));
-        setAllLectures(lecturesData);
-      }
-    } else if (userRole === "Lecturer") {
-      const result = await getUserDashboard({
-        params: { fields: "lectures,containers", limit: 500 },
-      });
+    try {
+      if (["Admin", "Subadmin", "Moderator"].includes(userRole)) {
+        const allLecturesResult = await getAllLectures({ limit: 200 });
 
-      if (result.success) {
-        const { containers, lectures } = result.data.data;
-
-        const containerLectures = containers
-          ?.filter(c => c.type === "lecture")
-          .map(lecture => ({
+        if (allLecturesResult.status === "success") {
+          const lecturesData = allLecturesResult.data.containers.map((lecture) => ({
             id: lecture._id,
             name: lecture.name,
             subject: lecture.subject,
             level: lecture.level,
             price: lecture.price,
             videoLink: lecture.videoLink,
-            lecture_type: lecture.lecture_type || "Unknown",
+            lecture_type: lecture.lecture_type,
+            requiresExam: lecture.requiresExam,
+            examConfig: lecture.examConfig,
+            lecturer: lecture.createdBy,
+            thumbnail: lecture.thumbnail,
+            createdAt: lecture.createdAt,
+          }));
+          setAllLectures(lecturesData);
+        }
+      } else if (userRole === "Lecturer") {
+        const result = await getUserDashboard({
+          params: { fields: "lectures,containers", limit: 500 },
+        });
+
+        if (result.success) {
+          const { containers, lectures } = result.data.data;
+
+          const containerLectures = containers
+            ?.filter(c => c.type === "lecture")
+            .map(lecture => ({
+              id: lecture._id,
+              name: lecture.name,
+              subject: lecture.subject,
+              level: lecture.level,
+              price: lecture.price,
+              videoLink: lecture.videoLink,
+              lecture_type: lecture.lecture_type || "Unknown",
+              requiresExam: lecture.requiresExam || false,
+              examConfig: lecture.examConfig || null,
+              lecturer: { id: userId, name: result.data.data.userInfo?.name },
+              thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
+              createdAt: lecture.createdAt || null,
+            })) || [];
+
+          const standaloneLectures = lectures?.map(lecture => ({
+            id: lecture._id,
+            name: lecture.name,
+            subject: lecture.subject,
+            level: lecture.level,
+            price: lecture.price,
+            lecture_type: lecture.lecture_type,
             requiresExam: lecture.requiresExam || false,
             examConfig: lecture.examConfig || null,
             lecturer: { id: userId, name: result.data.data.userInfo?.name },
@@ -452,28 +466,14 @@ const MyLecturesPage = () => {
             createdAt: lecture.createdAt || null,
           })) || [];
 
-        const standaloneLectures = lectures?.map(lecture => ({
-          id: lecture._id,
-          name: lecture.name,
-          subject: lecture.subject,
-          level: lecture.level,
-          price: lecture.price,
-          lecture_type: lecture.lecture_type,
-          requiresExam: lecture.requiresExam || false,
-          examConfig: lecture.examConfig || null,
-          lecturer: { id: userId, name: result.data.data.userInfo?.name },
-          thumbnail: lecture.thumbnail ? convertPathToUrl(lecture.thumbnail) : null,
-          createdAt: lecture.createdAt || null,
-        })) || [];
-
-        const allLecturesCombined = [...containerLectures, ...standaloneLectures];
-        setAllLectures(allLecturesCombined);
+          const allLecturesCombined = [...containerLectures, ...standaloneLectures];
+          setAllLectures(allLecturesCombined);
+        }
       }
+    } catch (error) {
+      console.error("Error refetching lecture data:", error);
     }
-  } catch (error) {
-    console.error("Error refetching lecture data:", error);
-  }
-};
+  };
 
   if (loading)
     return (
@@ -588,13 +588,13 @@ const MyLecturesPage = () => {
 
         {/* Edit Lecture Modal */}
         {showEditModal && editingLecture && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50 p-4">
             <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-base-100 border-b p-4 flex justify-between items-center">
                 <h3 className="text-xl font-bold">{t("lecturesPage.editLecture", "Edit Lecture")}</h3>
-                <button 
-                  onClick={() => setShowEditModal(false)} 
-                  className="btn btn-ghost btn-sm btn-circle"
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="btn-ghost btn-sm btn-circle"
                 >
                   ✕
                 </button>
@@ -720,16 +720,16 @@ const MyLecturesPage = () => {
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <button 
-                    type="button" 
-                    onClick={() => setShowEditModal(false)} 
-                    className="btn btn-ghost"
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="btn-ghost"
                   >
                     {t("lecturesPage.buttons.cancel", "Cancel")}
                   </button>
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary" 
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
                     disabled={creationLoading}
                   >
                     {creationLoading ? (
@@ -807,15 +807,14 @@ const MyLecturesPage = () => {
                     <td>
                       <div className="flex gap-2">
                         <Link
-                          to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${
-                            userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
-                          }/${lecture.id}`}
+                          to={`/dashboard/${userRole === "Student" ? "student" : "lecturer"}-dashboard/${userRole === "Student" ? "lecture-display" : "detailed-lecture-view"
+                            }/${lecture.id}`}
                         >
-                          <button className="btn btn-ghost btn-sm">{t("lecturesPage.buttons.details")}</button>
+                          <button className="btn-ghost btn-sm">{t("lecturesPage.buttons.details")}</button>
                         </Link>
                         {userRole === "Lecturer" && (
-                          <button 
-                            className="btn btn-primary btn-sm" 
+                          <button
+                            className="btn btn-primary btn-sm"
                             onClick={() => handleEditLecture(lecture)}
                           >
                             {t("lecturesPage.buttons.edit", "Edit")}

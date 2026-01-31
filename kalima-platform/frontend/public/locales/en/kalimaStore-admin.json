@@ -88,7 +88,7 @@
       },
       "hints": {
         "thumbnail": "Upload product thumbnail (max 5MB)",
-        "sampleFile": "Upload sample file (PDF, DOC, DOCX)",
+        "sampleFile": "Upload sample file (PDF)",
         "gallery": "Upload multiple images for the product gallery",
         "whatsAppNumber": "Enter the WhatsApp number for customer contact",
         "description": "Provide a detailed description of the product"

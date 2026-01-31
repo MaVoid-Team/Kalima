@@ -15,13 +15,13 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
 
   // Add product counts
   const sectionsWithCounts = filteredSections.map(section => {
-    const sectionProducts = products.filter(product => 
+    const sectionProducts = products.filter(product =>
       product && product.section && (product.section._id === section._id || product.section === section._id)
     )
-    const sectionBooks = books.filter(book => 
+    const sectionBooks = books.filter(book =>
       book && book.section === section._id
     )
-    
+
     return {
       ...section,
       productCount: sectionProducts.length + sectionBooks.length
@@ -51,14 +51,14 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
             onChange={(e) => setSearchText(e.target.value)}
             className="input input-bordered w-full pl-4 pr-12"
           />
-          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn btn-ghost btn-sm">
+          <button className="absolute right-2 top-1/2 transform -translate-y-1/2 btn-ghost btn-sm">
             🔍
           </button>
         </div>
       </div>
 
       {/* Debug Info */}
-      <div className="text-center mb-4 text-sm text-gray-500">
+      <div className="text-center mb-4 text-sm text-base-content/50">
         {t("sectionsManagement.totalSections")}: {sections.length} | {t("sectionsManagement.filtered")}: {sectionsWithCounts.length} | {t("sectionsManagement.search")}: "{searchText}"
       </div>
 
@@ -83,7 +83,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onEditSection?.(section)}
                         disabled={actionLoading}
                         title={t("sectionsManagement.table.edit")}
@@ -91,7 +91,7 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
                         ✏️
                       </button>
                       <button
-                        className="btn btn-ghost btn-sm"
+                        className="btn-ghost btn-sm"
                         onClick={() => onDeleteSection?.(section)}
                         disabled={actionLoading}
                         title={t("sectionsManagement.table.delete")}
@@ -109,11 +109,11 @@ const SectionsManagement = ({ sections = [], products = [], books = [], onEditSe
         {/* Empty State */}
         {sectionsWithCounts.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-gray-500">
+            <p className="text-base-content/50">
               {sections.length === 0 ? t("sectionsManagement.noSectionsAvailable") : t("sectionsManagement.noSections")}
             </p>
             {searchText && (
-              <p className="text-sm text-gray-400 mt-2">{t("sectionsManagement.tryDifferentSearch")}</p>
+              <p className="text-sm text-base-content/40 mt-2">{t("sectionsManagement.tryDifferentSearch")}</p>
             )}
           </div>
         )}

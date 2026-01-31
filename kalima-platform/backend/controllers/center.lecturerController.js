@@ -137,7 +137,7 @@ exports.deleteLecturer = catchAsync(async (req, res, next) => {
 
   const deletedLecturer = await CLecturer.findByIdAndDelete(id);
   if (!deletedLecturer) {
-    returnnext(new AppError("Lecturer not found.", 404));
+    return(next(new AppError("Lecturer not found.", 404)));
   }
   res.status(204).json({
     status: "success",

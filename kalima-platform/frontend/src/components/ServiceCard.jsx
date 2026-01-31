@@ -6,7 +6,7 @@ function ServiceCard({ icon: Icon, title, subtitle, description }) {
           <Icon className="h-8 w-8 text-primary animate-spin-y" />
         </div>
       </div>
-      <h4 className="font-bold text-lg mb-2">{title}</h4>
+      <h4 className="font-bold text-lg mb-4">{title}</h4>
       <h5 className="text-primary font-medium text-lg mb-4">{subtitle}</h5>
       <p className="text-base text-base-content/70 mb-6">{description}</p>
       <div className="w-full border-b-4 border-primary"></div>
