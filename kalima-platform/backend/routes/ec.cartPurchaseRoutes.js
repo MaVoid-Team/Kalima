@@ -43,6 +43,13 @@ router.route('/admin/fullreport')
         authController.verifyRoles("Admin"),
         cartPurchaseController.getFullOrdersReport
     );
+router.route('/User-purchase-history/').get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getUsersPurchaseHistory);
+
+router.route('/User-purchase-history/:userId').get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    cartPurchaseController.getUsersPurchaseHistoryInDetailById);
 
 router.get('/confirmed-count', authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
     cartPurchaseController.getMonthlyConfirmedPurchasesCount);
