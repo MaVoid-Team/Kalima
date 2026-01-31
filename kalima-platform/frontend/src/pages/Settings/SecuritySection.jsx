@@ -211,7 +211,7 @@ function SecuritySection() {
               placeholder={t('security.placeholders.confirmPassword')}
               dir={isRTL ? 'rtl' : 'ltr'}
             />
-            <div className={`text-xs mt-1 text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className={`text-xs mt-1 text-base-content/50 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('security.passwordRequirement')}
             </div>
           </div>
@@ -233,9 +233,9 @@ function SecuritySection() {
 
 function PasswordStrengthIndicator({ strength }) {
   const { t } = useTranslation("common");
-  const colors  = ["bg-error", "bg-warning", "bg-success"];
-  const widths  = ["w-1/3",  "w-2/3",    "w-full"];
-  const labels  = [
+  const colors = ["bg-error", "bg-warning", "bg-success"];
+  const widths = ["w-1/3", "w-2/3", "w-full"];
+  const labels = [
     t("passwordStrength.weak"),
     t("passwordStrength.medium"),
     t("passwordStrength.strong"),
@@ -243,13 +243,13 @@ function PasswordStrengthIndicator({ strength }) {
 
   return (
     <div className="mt-2" dir={t("dir")}>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-base-300 rounded-full h-2">
         <div
           className={`${colors[strength]} ${widths[strength]} h-2 rounded-full transition-all duration-300`}
         />
       </div>
 
-      <div className="text-xs mt-1 text-gray-500">
+      <div className="text-xs mt-1 text-base-content/50">
         {t("passwordStrength.label")}&nbsp;
         <span className={`font-medium ${colors[strength].replace("bg", "text")}`}>
           {labels[strength]}

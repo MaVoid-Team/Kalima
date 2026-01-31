@@ -17,7 +17,7 @@ const AdminDashboard = () => {
     message: "",
   });
 
-  const isRTL = i18n.language === 'ar'; 
+  const isRTL = i18n.language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
   const openWhatsappModal = () => {
@@ -46,9 +46,8 @@ const AdminDashboard = () => {
       formattedNumber = "2" + formattedNumber;
     }
 
-    const whatsappUrl = `https://wa.me/${formattedNumber}${
-      message ? `?text=${encodeURIComponent(message)}` : ""
-    }`;
+    const whatsappUrl = `https://wa.me/${formattedNumber}${message ? `?text=${encodeURIComponent(message)}` : ""
+      }`;
 
     window.open(whatsappUrl, "_blank");
     setWhatsappModal({ isOpen: false, phoneNumber: "", message: "" });
@@ -62,10 +61,10 @@ const AdminDashboard = () => {
         <PromoCodeGenerator />
         <PromoCodesTable />
         <UserManagementTable />
-        
+
         <div className="flex justify-center items-center pb-36 max-sm:pt-20 rounded-3xl">
-          <a target="_blank" href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0" 
-             rel="noreferrer">
+          <a target="_blank" href="https://api.whatsapp.com/send/?phone=01279614767&text&type=phone_number&app_absent=0"
+            rel="noreferrer">
             <img alt="arrow" src="/whatsApp.png" className="w-14 right-6 max-sm:w-16" />
           </a>
           <img alt="arrow" src="/AdminA.png" className="w-36" />
@@ -77,17 +76,17 @@ const AdminDashboard = () => {
 
         {/* Decorative elements */}
         <div className="relative">
-          <img alt="" src="/rDots.png" 
-               className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 animate-float-up-dottedball" />
+          <img alt="" src="/rDots.png"
+            className="absolute h-32 w-20 left-16 bottom-20 max-sm:left-0 animate-float-up-dottedball" />
         </div>
         <div className="relative">
-          <img alt="" src="/bDots.png" 
-               className="absolute h-32 w-20 right-16 bottom-44 max-sm:bottom-72 max-sm:right-0 animate-float-down-dottedball" />
+          <img alt="" src="/bDots.png"
+            className="absolute h-32 w-20 right-16 bottom-44 max-sm:bottom-72 max-sm:right-0 animate-float-down-dottedball" />
         </div>
 
         {/* WhatsApp Modal */}
         {whatsappModal.isOpen && (
-          <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-neutral/80 flex items-center justify-center z-50">
             <div className=" bg-base-300 p-6 rounded-lg shadow-lg max-w-md w-full" dir={dir}>
               <h3 className="text-xl font-bold mb-4">{t('admin.whatsappModal.title')}</h3>
               <div className="mb-4">
@@ -113,7 +112,7 @@ const AdminDashboard = () => {
               </div>
               <div className="flex justify-end gap-2">
                 <button
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={() => setWhatsappModal({ isOpen: false, phoneNumber: "", message: "" })}
                 >
                   {t('admin.whatsappModal.cancel')}

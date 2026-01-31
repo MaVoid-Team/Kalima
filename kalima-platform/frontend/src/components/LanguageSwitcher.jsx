@@ -30,7 +30,7 @@ const LanguageSwitcher = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         type="button"
-        className="btn btn-ghost gap-2"
+        className="btn-ghost gap-2"
         onClick={() => setIsOpen(!isOpen)}
       >
         {i18n.language === 'en' ? 'Language' : 'اللغه'}
@@ -42,7 +42,7 @@ const LanguageSwitcher = () => {
             <button
               type="button"
               onClick={() => changeLanguage('en')}
-              className="flex justify-between w-full hover:bg-base-200"
+              className="flex justify-between w-full hover:bg-base-300"
             >
               <span>English</span>
               <span>🇺🇸</span>
@@ -52,7 +52,7 @@ const LanguageSwitcher = () => {
             <button
               type="button"
               onClick={() => changeLanguage('ar')}
-              className="flex justify-between w-full hover:bg-base-200"
+              className="flex justify-between w-full hover:bg-base-300"
             >
               <span>العربية</span>
               <span>🇸🇦</span>

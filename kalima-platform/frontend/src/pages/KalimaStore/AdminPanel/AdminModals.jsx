@@ -184,221 +184,221 @@ const AdminModals = ({
         </div>
       )}
 
-            {/* Edit Item Modal (Product or Book) */}
-            {showEditProductModal && (
-              <div className="modal modal-open">
-                <div className="modal-box max-w-2xl">
-                  <h3 className="font-bold text-lg mb-4">
-                  {t("modals.editProduct.title") || "Edit Product"}
-                  </h3>
+      {/* Edit Item Modal (Product or Book) */}
+      {showEditProductModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <h3 className="font-bold text-lg mb-4">
+              {t("modals.editProduct.title") || "Edit Product"}
+            </h3>
 
-                  <form onSubmit={onUpdateProduct}>
-                    <div className="space-y-4 max-h-96 overflow-y-auto">
-                      {/* Title */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.title") || "Title"} *</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="input input-bordered w-full"
-                          value={productForm?.title || ""}
-                          onChange={(e) => setProductForm({ ...productForm, title: e.target.value })}
-                          required
-                        />
-                      </div>
+            <form onSubmit={onUpdateProduct}>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {/* Title */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.title") || "Title"} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    value={productForm?.title || ""}
+                    onChange={(e) => setProductForm({ ...productForm, title: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* Serial */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.serial") || "Serial"} *</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="input input-bordered w-full"
-                          value={productForm?.serial || ""}
-                          onChange={(e) => setProductForm({ ...productForm, serial: e.target.value })}
-                          required
-                        />
-                      </div>
+                {/* Serial */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.serial") || "Serial"} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    value={productForm?.serial || ""}
+                    onChange={(e) => setProductForm({ ...productForm, serial: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* Section */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.section") || "Section"} *</span>
-                        </label>
-                        <select
-                          className="select select-bordered w-full"
-                          value={productForm?.section || ""}
-                          onChange={(e) => setProductForm({ ...productForm, section: e.target.value })}
-                          required
-                        >
-                          <option value="">{t("forms.createProduct.placeholders.section") || "Select section"}</option>
-                          {(sections || []).map((s) =>
-                            s?._id && s?.name ? (
-                              <option key={s._id} value={s._id}>
-                                {s.name}
-                              </option>
-                            ) : null
-                          )}
-                        </select>
-                      </div>
+                {/* Section */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.section") || "Section"} *</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={productForm?.section || ""}
+                    onChange={(e) => setProductForm({ ...productForm, section: e.target.value })}
+                    required
+                  >
+                    <option value="">{t("forms.createProduct.placeholders.section") || "Select section"}</option>
+                    {(sections || []).map((s) =>
+                      s?._id && s?.name ? (
+                        <option key={s._id} value={s._id}>
+                          {s.name}
+                        </option>
+                      ) : null
+                    )}
+                  </select>
+                </div>
 
-                      {/* Price */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.price") || "Price"} *</span>
-                        </label>
-                        <input
-                          type="number"
-                          className="input input-bordered w-full"
-                          value={productForm?.price || ""}
-                          onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
-                          required
-                        />
-                      </div>
+                {/* Price */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.price") || "Price"} *</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="input input-bordered w-full"
+                    value={productForm?.price || ""}
+                    onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* Price After Discount (shared for both) */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.priceAfterDiscount") || "Price After Discount"}</span>
-                        </label>
-                        <input
-                          type="number"
-                          className="input input-bordered w-full"
-                          value={productForm?.priceAfterDiscount || ""}
-                          onChange={(e) => setProductForm({ ...productForm, priceAfterDiscount: e.target.value })}
-                        />
-                      </div>
+                {/* Price After Discount (shared for both) */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.priceAfterDiscount") || "Price After Discount"}</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="input input-bordered w-full"
+                    value={productForm?.priceAfterDiscount || ""}
+                    onChange={(e) => setProductForm({ ...productForm, priceAfterDiscount: e.target.value })}
+                  />
+                </div>
 
-                      {/* Book-only → Subject */}
-                      {editingProduct?.__t === "ECBook" && (
-                        <div>
-                          <label className="label">
-                            <span className="label-text font-medium">{t("forms.createBook.fields.subject") || "Subject"} *</span>
-                          </label>
-                          <select
-                            className="select select-bordered w-full"
-                            value={productForm?.subject || ""}
-                            onChange={(e) => setProductForm({ ...productForm, subject: e.target.value })}
-                            required
-                          >
-                            <option value="">{t("forms.createBook.placeholders.subject") || "Select subject"}</option>
-                            {(subjects || []).map((subj) =>
-                              subj?._id && subj?.name ? (
-                                <option key={subj._id} value={subj._id}>
-                                  {subj.name}
-                                </option>
-                              ) : null
-                            )}
-                          </select>
-                        </div>
+                {/* Book-only → Subject */}
+                {editingProduct?.__t === "ECBook" && (
+                  <div>
+                    <label className="label">
+                      <span className="label-text font-medium">{t("forms.createBook.fields.subject") || "Subject"} *</span>
+                    </label>
+                    <select
+                      className="select select-bordered w-full"
+                      value={productForm?.subject || ""}
+                      onChange={(e) => setProductForm({ ...productForm, subject: e.target.value })}
+                      required
+                    >
+                      <option value="">{t("forms.createBook.placeholders.subject") || "Select subject"}</option>
+                      {(subjects || []).map((subj) =>
+                        subj?._id && subj?.name ? (
+                          <option key={subj._id} value={subj._id}>
+                            {subj.name}
+                          </option>
+                        ) : null
                       )}
+                    </select>
+                  </div>
+                )}
 
-                      {/* Payment Number */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.paymentNumber") || "Payment Number"} *</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="input input-bordered w-full"
-                          value={productForm?.paymentNumber || ""}
-                          onChange={(e) => setProductForm({ ...productForm, paymentNumber: e.target.value })}
-                          required
-                        />
-                      </div>
+                {/* Payment Number */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.paymentNumber") || "Payment Number"} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    value={productForm?.paymentNumber || ""}
+                    onChange={(e) => setProductForm({ ...productForm, paymentNumber: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* WhatsApp Number */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.whatsAppNumber") || "WhatsApp Number"} *</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="input input-bordered w-full"
-                          value={productForm?.whatsAppNumber || ""}
-                          onChange={(e) => setProductForm({ ...productForm, whatsAppNumber: e.target.value })}
-                          required
-                        />
-                      </div>
+                {/* WhatsApp Number */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.whatsAppNumber") || "WhatsApp Number"} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    value={productForm?.whatsAppNumber || ""}
+                    onChange={(e) => setProductForm({ ...productForm, whatsAppNumber: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* Description */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.description") || "Description"} *</span>
-                        </label>
-                        <textarea
-                          className="textarea textarea-bordered w-full h-24"
-                          value={productForm?.description || ""}
-                          onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                          required
-                        />
-                      </div>
+                {/* Description */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.description") || "Description"} *</span>
+                  </label>
+                  <textarea
+                    className="textarea textarea-bordered w-full h-24"
+                    value={productForm?.description || ""}
+                    onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                    required
+                  />
+                </div>
 
-                      {/* Files */}
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.thumbnail") || "Thumbnail"}</span>
-                        </label>
-                        <input
-                          type="file"
-                          className="file-input file-input-bordered w-full"
-                          accept="image/*"
-                          onChange={(e) => onFileChange?.(e, "thumbnail")}
-                        />
-                      </div>
+                {/* Files */}
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.thumbnail") || "Thumbnail"}</span>
+                  </label>
+                  <input
+                    type="file"
+                    className="file-input file-input-bordered w-full"
+                    accept="image/*"
+                    onChange={(e) => onFileChange?.(e, "thumbnail")}
+                  />
+                </div>
 
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.sampleFile") || "Sample File"}</span>
-                        </label>
-                        <input
-                          type="file"
-                          className="file-input file-input-bordered w-full"
-                          onChange={(e) => onFileChange?.(e, "sample")}
-                        />
-                      </div>
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.sampleFile") || "Sample File"}</span>
+                  </label>
+                  <input
+                    type="file"
+                    className="file-input file-input-bordered w-full"
+                    onChange={(e) => onFileChange?.(e, "sample")}
+                  />
+                </div>
 
-                      <div>
-                        <label className="label">
-                          <span className="label-text font-medium">{t("forms.createProduct.fields.gallery") || "Gallery"}</span>
-                        </label>
-                        <input
-                          type="file"
-                          className="file-input file-input-bordered w-full"
-                          accept="image/*"
-                          multiple
-                          onChange={(e) => onFileChange?.(e, "gallery")}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="modal-action">
-                      <button
-                        type="button"
-                        className="btn"
-                        onClick={() => {
-                          setShowEditProductModal?.(false)
-                          setEditingProduct?.(null)
-                          resetProductForm()
-                        }}
-                      >
-                        {t("common.cancel") || "Cancel"}
-                      </button>
-                      <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-                        {actionLoading ? (
-                          <span className="loading loading-spinner loading-sm"></span>
-                        ) : (
-                          t("common.update") || "Update"
-                        )}
-                      </button>
-                    </div>
-                  </form>
+                <div>
+                  <label className="label">
+                    <span className="label-text font-medium">{t("forms.createProduct.fields.gallery") || "Gallery"}</span>
+                  </label>
+                  <input
+                    type="file"
+                    className="file-input file-input-bordered w-full"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => onFileChange?.(e, "gallery")}
+                  />
                 </div>
               </div>
-            )}
+
+              {/* Actions */}
+              <div className="modal-action">
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setShowEditProductModal?.(false)
+                    setEditingProduct?.(null)
+                    resetProductForm()
+                  }}
+                >
+                  {t("common.cancel") || "Cancel"}
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+                  {actionLoading ? (
+                    <span className="loading loading-spinner loading-sm"></span>
+                  ) : (
+                    t("common.update") || "Update"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
 
       {/* Delete Section Confirmation Modal */}
@@ -518,7 +518,7 @@ const AdminModals = ({
               <div className="modal-action">
                 <button
                   type="button"
-                  className="btn btn-ghost"
+                  className="btn-ghost"
                   onClick={() => {
                     setShowEditSubSectionModal?.(false)
                     resetSubSectionForm?.()
@@ -547,12 +547,12 @@ const AdminModals = ({
               {t("modals.deleteSubSection.title") || "Delete SubSection"}
             </h3>
             <p className="py-4">
-              {t("modals.deleteSubSection.message") || 
+              {t("modals.deleteSubSection.message") ||
                 `Are you sure you want to delete the subsection "${editingSubSection?.name}"? This action cannot be undone.`}
             </p>
             <div className="modal-action">
               <button
-                className="btn btn-ghost"
+                className="btn-ghost"
                 onClick={() => {
                   setShowDeleteSubSectionModal?.(false)
                   setEditingSubSection?.(null)

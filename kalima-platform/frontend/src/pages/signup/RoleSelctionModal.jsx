@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { ChevronRight, GraduationCap, Users, BookOpen, X, BookA } from "lucide-react"
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { ImMan } from "react-icons/im"
 
 // Role icons and colors mapping
@@ -53,7 +53,7 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral/50 backdrop-blur-sm">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -64,7 +64,7 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-secondary/10 rounded-full -ml-12 -mb-12"></div>
         <div className="btn btn-circle btn-sm absolute top-4 left-4">
-          <X onClick={handleNavigateBack}/>
+          <X onClick={handleNavigateBack} />
         </div>
 
         <div className="px-6 py-8">
@@ -89,10 +89,10 @@ export default function RoleSelectionModal({ onSelectRole, t }) {
                   onClick={() => onSelectRole(role)}
                   className={`relative flex items-center gap-4 p-4 rounded-xl transition-all duration-300 
                     ${hoveredRole === role ? "scale-[1.02]" : "scale-100"}
-                    ${roleConfig[role].color} ${roleConfig[role].hoverColor} text-white shadow-lg`}
+                    ${roleConfig[role].color} ${roleConfig[role].hoverColor} text-primary-content shadow-lg`}
                 >
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm">
-                    <RoleIcon className="w-6 h-6 text-white" />
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-base-100/20 backdrop-blur-sm">
+                    <RoleIcon className="w-6 h-6 text-primary-content" />
                   </div>
 
                   <div className="flex-1 ">

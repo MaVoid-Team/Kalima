@@ -1,7 +1,18 @@
 const { Resend } = require('resend');
 
-// Initialize Resend with API key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend lazily to avoid errors if API key is not set at startup
+let resend = null;
+
+const getResendClient = () => {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('Resend API key not configured');
+      return null;
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+};
 
 // Log the API key status and FROM address for debugging
 console.log('Resend API Key configured:', !!process.env.RESEND_API_KEY);
@@ -24,18 +35,23 @@ const sendEmail = async (to, subject, html) => {
   }
 
   try {
+    const resendClient = getResendClient();
+    if (!resendClient) {
+      throw new Error('Resend client could not be initialized');
+    }
+
     // Using your verified domain directly
     const fromEmail = 'Kalima Team <noreply@kalima-edu.com>';
-    
+
     console.log('Sending email from:', fromEmail);
-    
-    const data = await resend.emails.send({
+
+    const data = await resendClient.emails.send({
       from: fromEmail,
       to,
       subject,
       html,
     });
-    
+
     console.log('Email sent successfully', data);
     return data;
   } catch (error) {

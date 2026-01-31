@@ -195,7 +195,7 @@ const ConfirmedOrdersReport = () => {
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Package className="w-6 h-6" />
               </div>
               <div>
@@ -219,7 +219,7 @@ const ConfirmedOrdersReport = () => {
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-base-100/20 rounded-full flex items-center justify-center">
                 <Package className="w-6 h-6" />
               </div>
               <div>
@@ -243,7 +243,7 @@ const ConfirmedOrdersReport = () => {
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-base-100/20 rounded-full flex items-center justify-center">
                 <RotateCcw className="w-6 h-6" />
               </div>
               <div>
@@ -267,7 +267,7 @@ const ConfirmedOrdersReport = () => {
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-base-100/20 rounded-full flex items-center justify-center">
                 <RotateCcw className="w-6 h-6" />
               </div>
               <div>
@@ -291,7 +291,7 @@ const ConfirmedOrdersReport = () => {
         >
           <div className="card-body p-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-base-100/20 rounded-full flex items-center justify-center">
                 <User className="w-6 h-6" />
               </div>
               <div>
@@ -405,7 +405,7 @@ const ConfirmedOrdersReport = () => {
                 {/* Clear */}
                 <div className="w-full flex items-end">
                   <button
-                    className="btn btn-ghost w-full"
+                    className="btn-ghost w-full"
                     onClick={() => {
                       setStartDate("");
                       setStartTime("");
@@ -426,7 +426,7 @@ const ConfirmedOrdersReport = () => {
                 <tr>
                   <th className="text-center">{isRTL ? "الاسم" : "Name"}</th>
 
-                
+
                   <th className="text-center">
                     {isRTL ? "الطلبات المؤكدة" : "Confirmed Orders"}
                   </th>
@@ -466,7 +466,7 @@ const ConfirmedOrdersReport = () => {
                       </div>
                     </td>
 
-                  
+
                     {/* Confirmed Orders */}
                     <td className="text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -568,7 +568,7 @@ const ConfirmedOrdersReport = () => {
             {/* Clear */}
             <div className="w-full flex items-end">
               <button
-                className="btn btn-ghost w-full"
+                className="btn-ghost w-full"
                 onClick={() => {
                   setAccountsStartDate("");
                   setAccountsEndDate("");
@@ -585,7 +585,7 @@ const ConfirmedOrdersReport = () => {
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           ) : createdAccountsData.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-base-content/50">
               {isRTL ? "لا توجد بيانات" : "No data available"}
             </div>
           ) : (

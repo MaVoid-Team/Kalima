@@ -136,13 +136,13 @@ const UserManagementTable = () => {
       } else {
         setError(
           response.message ||
-            t("admin.invites.refreshError") ||
-            "Error calculating invites data"
+          t("admin.invites.refreshError") ||
+          "Error calculating invites data"
         );
         toast.error(
           response.message ||
-            t("admin.invites.refreshError") ||
-            "Error calculating invites data"
+          t("admin.invites.refreshError") ||
+          "Error calculating invites data"
         );
       }
     } catch (error) {
@@ -183,7 +183,7 @@ const UserManagementTable = () => {
         (!filters.status || getStatus(user) === filters.status) &&
         (filters.successfulInvites === "" ||
           (user.successfulInvites || 0) ===
-            Number.parseInt(filters.successfulInvites, 10))
+          Number.parseInt(filters.successfulInvites, 10))
     );
 
     setFilteredUsers(filtered);
@@ -321,8 +321,8 @@ const UserManagementTable = () => {
           `"${user.administrationZone || ""}"`,
           `"${user.sequencedId || ""}"`,
           `"${user.numberOfPurchases || 0}"`,
-          `"${
-            user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
+          `"${user.totalPaid || 0}"`,
+          `"${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ""
           }"`,
         ].join(",")
       ),
@@ -452,108 +452,119 @@ const UserManagementTable = () => {
       <>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.name")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {user.name || t("admin.NA")}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.email")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {user.email || t("admin.NA")}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.gender")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {user.gender || t("admin.NA")}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.phoneNumber")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {user.phoneNumber || t("admin.NA")}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.role")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {getRoleLabel(user.role)}
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.joinedDate")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
               {formatDate(user.createdAt)}
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
+              {t("admin.userDetails.userSerial")}
+            </label>
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
+              {user.userSerial || t("admin.NA")}
             </p>
           </div>
           {user.government && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-base-content/70 mb-1">
                 {t("admin.userDetails.government")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
                 {user.government}
               </p>
             </div>
           )}
           {user.administrationZone && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-base-content/70 mb-1">
                 {t("admin.userDetails.administrationZone")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
                 {user.administrationZone}
               </p>
             </div>
           )}
           {user.isEmailVerified !== undefined && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-base-content/70 mb-1">
                 {t("admin.userDetails.emailVerified")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
                 {user.isEmailVerified ? t("admin.yes") : t("admin.no")}
               </p>
             </div>
           )}
           {user.successfulInvites !== undefined && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-base-content/70 mb-1">
                 {t("admin.userDetails.successfulInvites")}
               </label>
-              <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
+              <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
                 {user.successfulInvites || 0}
               </p>
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-base-content/70 mb-1">
               {t("admin.userDetails.purchases")}
             </label>
-            <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded">
-              <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+            <p className="text-sm text-base-content bg-base-200/50 p-2 rounded">
+              <span
+                className={`badge ${user.numberOfPurchases > 0 ? "badge-primary" : "badge-ghost"
+                  }`}
+              >
                 {user.numberOfPurchases || 0}
               </span>
               {user.numberOfPurchases > 5 && (
-                <span className="ml-2 text-xs text-green-600 font-semibold">
+                <span className="ml-2 text-xs text-success font-semibold">
                   {t("admin.userDetails.frequentBuyer")}
                 </span>
               )}
               {user.numberOfPurchases === 0 && (
-                <span className="ml-2 text-xs text-gray-500">
+                <span className="ml-2 text-xs text-base-content/50">
                   {t("admin.userDetails.newClient")}
                 </span>
               )}
@@ -568,16 +579,16 @@ const UserManagementTable = () => {
         case "student":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-blue-600">
+              <h4 className="text-lg font-semibold mb-3 text-info">
                 {t("admin.userDetails.studentInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.level && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.level")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {typeof user.level === "object"
                         ? user.level.name || user.level._id
                         : user.level}
@@ -586,44 +597,44 @@ const UserManagementTable = () => {
                 )}
                 {user.sequencedId && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.sequenceId")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {user.sequencedId}
                     </p>
                   </div>
                 )}
                 {user.parentPhoneNumber && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.parentPhone")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {user.parentPhoneNumber}
                     </p>
                   </div>
                 )}
                 {user.faction && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.faction")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {user.faction}
                     </p>
                   </div>
                 )}
                 {user.hobbies && user.hobbies.length > 0 && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.hobbies")}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {user.hobbies.map((hobby, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                          className="px-2 py-1 bg-info/20 text-info font-medium text-xs rounded-full"
                         >
                           {hobby}
                         </span>
@@ -633,20 +644,20 @@ const UserManagementTable = () => {
                 )}
                 {user.generalPoints !== undefined && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.generalPoints")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {user.generalPoints || 0}
                     </p>
                   </div>
                 )}
                 {user.totalPoints !== undefined && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.totalPoints")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-blue-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-info/10 p-2 rounded">
                       {user.totalPoints || 0}
                     </p>
                   </div>
@@ -658,16 +669,16 @@ const UserManagementTable = () => {
         case "parent":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-green-600">
+              <h4 className="text-lg font-semibold mb-3 text-success">
                 {t("admin.userDetails.parentInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.children && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.children")} ({user.children.length})
                     </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-success/10 p-2 rounded">
                       {user.children.length > 0
                         ? user.children.join(", ")
                         : t("admin.userDetails.noChildren")}
@@ -676,10 +687,10 @@ const UserManagementTable = () => {
                 )}
                 {user.views !== undefined && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.views")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-green-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-success/10 p-2 rounded">
                       {user.views || 0}
                     </p>
                   </div>
@@ -689,35 +700,35 @@ const UserManagementTable = () => {
                     user.preferredContactTime.to ||
                     user.preferredContactTime.note) && (
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-base-content/70 mb-1">
                         {t("admin.editUser.preferredContactTime")}
                       </label>
-                      <div className="bg-green-50 p-3 rounded text-sm text-gray-900 border border-green-100">
+                      <div className="bg-success/10 p-3 rounded text-sm text-base-content border border-success/20">
                         {(user.preferredContactTime.from ||
                           user.preferredContactTime.to) && (
-                          <div className="grid grid-cols-8 gap-2  mb-2">
-                            {user.preferredContactTime.from && (
-                              <div>
-                                <span className="font-semibold">
-                                  {t("admin.editUser.from")}:
-                                </span>{" "}
-                                <span dir="ltr" className="inline-block">
-                                  {user.preferredContactTime.from}
-                                </span>
-                              </div>
-                            )}
-                            {user.preferredContactTime.to && (
-                              <div>
-                                <span className="font-semibold">
-                                  {t("admin.editUser.to")}:
-                                </span>{" "}
-                                <span dir="ltr" className="inline-block">
-                                  {user.preferredContactTime.to}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                            <div className="grid grid-cols-8 gap-2  mb-2">
+                              {user.preferredContactTime.from && (
+                                <div>
+                                  <span className="font-semibold">
+                                    {t("admin.editUser.from")}:
+                                  </span>{" "}
+                                  <span dir="ltr" className="inline-block">
+                                    {user.preferredContactTime.from}
+                                  </span>
+                                </div>
+                              )}
+                              {user.preferredContactTime.to && (
+                                <div>
+                                  <span className="font-semibold">
+                                    {t("admin.editUser.to")}:
+                                  </span>{" "}
+                                  <span dir="ltr" className="inline-block">
+                                    {user.preferredContactTime.to}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         {user.preferredContactTime.note && (
                           <div>
                             <span className="font-semibold">
@@ -736,16 +747,16 @@ const UserManagementTable = () => {
         case "teacher":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-purple-600">
+              <h4 className="text-lg font-semibold mb-3 text-primary">
                 {t("admin.userDetails.teacherInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.subject && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.subject")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {typeof user.subject === "object"
                         ? user.subject.name || user.subject._id
                         : user.subject}
@@ -754,10 +765,10 @@ const UserManagementTable = () => {
                 )}
                 {user.level && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.teachingLevel")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {Array.isArray(user.level)
                         ? user.level.join(", ")
                         : user.level}
@@ -766,54 +777,54 @@ const UserManagementTable = () => {
                 )}
                 {user.school && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.school")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {user.school}
                     </p>
                   </div>
                 )}
                 {user.teachesAtType && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.teachesAt")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {user.teachesAtType}
                     </p>
                   </div>
                 )}
                 {user.centers && user.centers.length > 0 && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.centers")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {user.centers.join(", ")}
                     </p>
                   </div>
                 )}
                 {user.phoneNumber2 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.secondPhone")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-purple-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-primary/10 p-2 rounded">
                       {user.phoneNumber2}
                     </p>
                   </div>
                 )}
                 {user.socialMedia && user.socialMedia.length > 0 && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.socialMedia")}
                     </label>
                     <div className="space-y-2">
                       {user.socialMedia.map((social, index) => (
                         <div
                           key={index}
-                          className="flex items-center space-x-2 bg-purple-50 p-2 rounded"
+                          className="flex items-center space-x-2 bg-primary/10 p-2 rounded"
                         >
                           <span className="font-medium">
                             {social.platform}:
@@ -829,42 +840,40 @@ const UserManagementTable = () => {
                     user.preferredContactTime.to ||
                     user.preferredContactTime.note) && (
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-base-content/70 mb-1">
                         {t("admin.editUser.preferredContactTime")}
                       </label>
-                      <div className="bg-purple-50 p-3 rounded text-sm text-gray-900 border border-purple-100">
+                      <div className="bg-primary/10 p-3 rounded text-sm text-base-content border border-primary/20">
                         {(user.preferredContactTime.from ||
                           user.preferredContactTime.to) && (
-                          <div
-                            className="grid grid-cols-8 gap-2  mb-2"
-                            dir={isRTL ? "rtl" : "ltr"}
-                          >
-                            {user.preferredContactTime.from && (
-                              <div
-                                className="col-span-4 flex items-center gap-1"
-                              >
-                                <span className="font-semibold whitespace-nowrap">
-                                  {t("admin.editUser.from")}:
-                                </span>{" "}
-                                <span dir="ltr" className="inline-block">
-                                  {user.preferredContactTime.from}
-                                </span>
-                              </div>
-                            )}
-                            {user.preferredContactTime.to && (
-                              <div className="col-span-4 flex items-center gap-1">
-                                <span className="font-semibold whitespace-nowrap">
-                                  {t("admin.editUser.to")}:
-                                </span>{" "}
-                                <span dir="ltr" className="inline-block">
-                                  {user.preferredContactTime.to}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                            <div
+                              className="grid grid-cols-8 gap-2  mb-2"
+                              dir={isRTL ? "rtl" : "ltr"}
+                            >
+                              {user.preferredContactTime.from && (
+                                <div className="col-span-4 flex items-center gap-1">
+                                  <span className="font-semibold whitespace-nowrap">
+                                    {t("admin.editUser.from")}:
+                                  </span>{" "}
+                                  <span dir="ltr" className="inline-block">
+                                    {user.preferredContactTime.from}
+                                  </span>
+                                </div>
+                              )}
+                              {user.preferredContactTime.to && (
+                                <div className="col-span-4 flex items-center gap-1">
+                                  <span className="font-semibold whitespace-nowrap">
+                                    {t("admin.editUser.to")}:
+                                  </span>{" "}
+                                  <span dir="ltr" className="inline-block">
+                                    {user.preferredContactTime.to}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         {user.preferredContactTime.note && (
-                          <div className="mt-2 pt-2 border-t border-purple-200">
+                          <div className="mt-2 pt-2 border-t border-primary/20">
                             <span className="font-semibold block mb-1">
                               {t("admin.editUser.note")}:
                             </span>
@@ -884,26 +893,26 @@ const UserManagementTable = () => {
         case "lecturers":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-indigo-600">
+              <h4 className="text-lg font-semibold mb-3 text-neutral">
                 {t("admin.userDetails.lecturerInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.bio && (
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.bio")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-neutral/10 p-2 rounded">
                       {user.bio}
                     </p>
                   </div>
                 )}
                 {user.expertise && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.expertise")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-indigo-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-neutral/10 p-2 rounded">
                       {user.expertise}
                     </p>
                   </div>
@@ -915,16 +924,16 @@ const UserManagementTable = () => {
         case "assistant":
           return (
             <div className="border-t pt-4">
-              <h4 className="text-lg font-semibold mb-3 text-orange-600">
+              <h4 className="text-lg font-semibold mb-3 text-secondary">
                 {t("admin.userDetails.assistantInfo")}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.assignedLecturer && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-base-content/70 mb-1">
                       {t("admin.userDetails.assignedLecturer")}
                     </label>
-                    <p className="text-sm text-gray-900 bg-orange-50 p-2 rounded">
+                    <p className="text-sm text-base-content bg-secondary/10 p-2 rounded">
                       {user.assignedLecturer}
                     </p>
                   </div>
@@ -979,9 +988,8 @@ const UserManagementTable = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1
-            className={`text-3xl font-bold mb-2 ${
-              isRTL ? "text-right" : "text-left"
-            }`}
+            className={`text-3xl font-bold mb-2 ${isRTL ? "text-right" : "text-left"
+              }`}
           >
             {t("admin.userManagement.title")}
           </h1>
@@ -995,7 +1003,7 @@ const UserManagementTable = () => {
           <div
             tabIndex={0}
             role="button"
-            className="btn btn-outline btn-primary"
+            className="btn-outline btn-primary"
             disabled={isExporting}
           >
             {isExporting ? (
@@ -1232,7 +1240,7 @@ const UserManagementTable = () => {
               {t("admin.userManagement.createUser")}
             </button>
 
-            <button className="btn btn-ghost" onClick={fetchUsers}>
+            <button className="btn-ghost" onClick={fetchUsers}>
               <FaSync />
             </button>
 
@@ -1321,15 +1329,29 @@ const UserManagementTable = () => {
                   {user.successfulInvites || 0}
                 </td>
                 <td className="py-4 whitespace-nowrap">
-                  <span className={`badge ${user.numberOfPurchases > 0 ? 'badge-primary' : 'badge-ghost'}`}>
+                  <span
+                    className={`badge ${user.numberOfPurchases > 0
+                      ? "badge-primary"
+                      : "badge-ghost"
+                      }`}
+                  >
                     {user.numberOfPurchases || 0}
                   </span>
                 </td>
                 <td className="py-4 whitespace-nowrap">
+                  <span
+                    className={`badge ${user.totalPaid > 0 ? "badge-success" : "badge-ghost"
+                      } font-semibold`}
+                  >
+                    {user.totalPaid
+                      ? `${user.totalPaid} ${t("admin.currency")}`
+                      : t("admin.NA")}
+                  </span>
+                </td>
+                <td className="py-4 whitespace-nowrap">
                   <div
-                    className={`flex items-center gap-2 ${
-                      isRTL ? "text-right" : "text-left"
-                    }`}
+                    className={`flex items-center gap-2 ${isRTL ? "text-right" : "text-left"
+                      }`}
                   >
                     <button
                       className="btn btn-primary btn-xs"
@@ -1398,9 +1420,9 @@ const UserManagementTable = () => {
             <p className="text-sm opacity-70 max-w-md">
               {filters.name || filters.phone || filters.role || filters.status
                 ? t("admin.noUsersFiltered") ||
-                  "No users match your current filters. Try adjusting your search criteria."
+                "No users match your current filters. Try adjusting your search criteria."
                 : t("admin.noUsersYet") ||
-                  "No users have registered yet. Check back later."}
+                "No users have registered yet. Check back later."}
             </p>
           </div>
         </div>
@@ -1458,7 +1480,7 @@ const UserManagementTable = () => {
             {renderUserDetails(userDetailsModal.user)}
             <div className="modal-action">
               <button
-                className="btn btn-ghost"
+                className="btn-ghost"
                 onClick={() =>
                   setUserDetailsModal({ isOpen: false, user: null })
                 }
@@ -1485,7 +1507,7 @@ const UserManagementTable = () => {
             ></textarea>
             <div className="modal-action">
               <button
-                className="btn btn-ghost"
+                className="btn-ghost"
                 onClick={() =>
                   setWhatsappModal({
                     isOpen: false,

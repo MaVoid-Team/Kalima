@@ -151,8 +151,8 @@ const TeacherForm = ({
   const normalizedLevels = Array.isArray(userData.level)
     ? userData.level
     : userData.level
-    ? [userData.level]
-    : [];
+      ? [userData.level]
+      : [];
 
   const [selectedLevels, setSelectedLevels] = useState(normalizedLevels);
 
@@ -161,8 +161,8 @@ const TeacherForm = ({
     const normalized = Array.isArray(userData.level)
       ? userData.level
       : userData.level
-      ? [userData.level]
-      : [];
+        ? [userData.level]
+        : [];
 
     setSelectedLevels(normalized);
   }, [userData.level]);
@@ -275,7 +275,7 @@ const TeacherForm = ({
                   {getLevelDisplayName(levelValue)}
                   <button
                     type="button"
-                    className="btn btn-ghost btn-xs"
+                    className="btn-ghost btn-xs"
                     onClick={() => removeLevel(levelValue)}
                   >
                     ×
@@ -353,7 +353,7 @@ const TeacherForm = ({
                     {center}
                     <button
                       type="button"
-                      className="btn btn-ghost btn-xs"
+                      className="btn-ghost btn-xs"
                       onClick={() => removeCenter(center)}
                     >
                       ×
@@ -439,7 +439,7 @@ const TeacherForm = ({
                   </div>
                   <button
                     type="button"
-                    className="btn btn-ghost btn-xs"
+                    className="btn-ghost btn-xs"
                     onClick={() => removeSocialMedia(index)}
                   >
                     ×

@@ -205,7 +205,7 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
           {scanning && !loading && !result && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-48 h-48 border-2 border-primary rounded-lg"></div>
-              <p className="absolute bottom-4 left-0 right-0 text-center text-white bg-black/50 py-2">
+              <p className="absolute bottom-4 left-0 right-0 text-center text-neutral-content bg-neutral/50 py-2">
                 {translations.scanningInstructions || "Align barcode in the frame..."}
               </p>
             </div>
@@ -283,7 +283,7 @@ const BarcodeScanner = ({ onScanSuccess, translations = {} }) => {
               </button>
 
               {result && (
-                <button onClick={resetScanner} className="btn btn-outline">
+                <button onClick={resetScanner} className="btn-outline">
                   {translations.resetButton || "Reset"}
                 </button>
               )}

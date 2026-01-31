@@ -10,55 +10,67 @@ const Hero = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const isRTL = i18n.language === 'ar'; 
+  const isRTL = i18n.language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
 
-      // Fetch data one at a time (sequentially)
-      const lecturerResponse = await getAllLecturers();
-      if (!lecturerResponse.success) {
-        throw new Error("Failed to fetch lecturers");
-      }
-      setLecturers(lecturerResponse.data);
+      try {
+        // Fetch lecturers
+        try {
+          const lecturerResponse = await getAllLecturers();
+          if (!lecturerResponse.success) throw new Error("Failed to fetch lecturers");
+          setLecturers(lecturerResponse.data);
+        } catch (err) {
+          console.error("Lecturer fetch error:", err);
+        }
 
-      const assistantResponse = await getAllAssistants();
-      if (!assistantResponse.success) {
-        throw new Error("Failed to fetch assistants");
-      }
-      setAssistants(assistantResponse.data);
+        // Fetch assistants
+        try {
+          const assistantResponse = await getAllAssistants();
+          if (!assistantResponse.success) throw new Error("Failed to fetch assistants");
+          setAssistants(assistantResponse.data);
+        } catch (err) {
+          console.error("Assistant fetch error:", err);
+        }
 
-      const parentResponse = await getAllParents();
-      if (!parentResponse.success) {
-        throw new Error("Failed to fetch parents");
-      }
-      setParents(parentResponse.data);
+        // Fetch parents
+        try {
+          const parentResponse = await getAllParents();
+          if (!parentResponse.success) throw new Error("Failed to fetch parents");
+          setParents(parentResponse.data);
+        } catch (err) {
+          console.error("Parent fetch error:", err);
+        }
 
-      const studentResponse = await getAllStudents();
-      if (!studentResponse.success) {
-        throw new Error("Failed to fetch students");
-      }
-      setStudents(studentResponse.data);
-      
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setError(error.message || "Failed to fetch data");
-    } finally {
-      setLoading(false);
-    }
-  };
+        // Fetch students
+        try {
+          const studentResponse = await getAllStudents();
+          if (!studentResponse.success) throw new Error("Failed to fetch students");
+          setStudents(studentResponse.data);
+        } catch (err) {
+          console.error("Student fetch error:", err);
+        }
 
-  fetchData();
-}, []);
- // Empty dependency array means this runs once on mount
+      } catch (overallError) {
+        console.error("Unexpected error in fetchData:", overallError);
+        setError("Some data failed to load. Check console for details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Empty dependency array means this runs once on mount
 
   return (
     <div className="mx-auto p-6 w-full font-[Cairo]">
-    <h1 className={`text-3xl font-bold mb-8 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
+      <h1 className={`text-3xl font-bold mb-8 ${isRTL ? 'text-right' : 'text-left'} `}>{t('admin.pageTitle')}</h1>
 
       {error && (
         <div className="alert alert-error mb-6">
@@ -68,11 +80,11 @@ const Hero = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" dir={dir}>
         {/* Students Card */}
-        <div className="card bg-[#f3e8ff] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
+        <div className="card bg-info/10 hover:bg-info/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl max-w-md border border-info/20">
           <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-purple-900">{t('admin.students')}</h2>
-              <p className="text-3xl font-bold text-purple-900">
+            <div className={`text-${isRTL ? "right" : "left"}`}>
+              <h2 className="text-2xl font-bold text-info">{t('admin.students')}</h2>
+              <p className="text-3xl font-bold text-info">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -87,11 +99,11 @@ const Hero = () => {
         </div>
 
         {/* Teachers Card */}
-        <div className="card bg-[#e8f4ff] rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all max-w-md">
+        <div className="card bg-primary/10 hover:bg-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl max-w-md border border-primary/20">
           <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-blue-700">{t('admin.teachers')}</h2>
-              <p className="text-3xl font-bold text-blue-700">
+            <div className={`text-${isRTL ? "right" : "left"}`}>
+              <h2 className="text-2xl font-bold text-primary">{t('admin.teachers')}</h2>
+              <p className="text-3xl font-bold text-primary">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -106,11 +118,11 @@ const Hero = () => {
         </div>
 
         {/* Assistants Card */}
-        <div className="card bg-[#ffece5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
+        <div className="card bg-secondary/10 hover:bg-secondary/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl max-w-md border border-secondary/20">
           <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-orange-700">{t('admin.assistants')}</h2>
-              <p className="text-3xl font-bold text-orange-700">
+            <div className={`text-${isRTL ? "right" : "left"}`}>
+              <h2 className="text-2xl font-bold text-secondary">{t('admin.assistants')}</h2>
+              <p className="text-3xl font-bold text-secondary">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (
@@ -125,11 +137,11 @@ const Hero = () => {
         </div>
 
         {/* Parents Card */}
-        <div className="card bg-[#e8fce5] shadow-lg hover:shadow-xl hover:scale-105 duration-500 transition-all rounded-2xl max-w-md">
+        <div className="card bg-success/10 hover:bg-success/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl max-w-md border border-success/20">
           <div className="card-body p-6 flex-row justify-between items-center">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-green-700">{t('admin.parents')}</h2>
-              <p className="text-3xl font-bold text-green-700">
+            <div className={`text-${isRTL ? "right" : "left"}`}>
+              <h2 className="text-2xl font-bold text-success">{t('admin.parents')}</h2>
+              <p className="text-3xl font-bold text-success">
                 {loading ? (
                   <span className="loading loading-dots loading-sm"></span>
                 ) : (

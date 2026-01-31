@@ -20,7 +20,7 @@ const PackageDetails = () => {
   const [purchaseLoading, setPurchaseLoading] = useState(false)
   // Add state for purchased status
   const [isPurchased, setIsPurchased] = useState(false)
-  const { t ,i18n} = useTranslation("packages")
+  const { t, i18n } = useTranslation("packages")
   const isRTL = i18n.language === "ar"
   // Fetch package details and user data
   useEffect(() => {
@@ -155,9 +155,9 @@ const PackageDetails = () => {
 
   return (
     <div className="container mx-auto px-4 py-8"
-    dir={isRTL ? "rtl" : "ltr"}>
+      dir={isRTL ? "rtl" : "ltr"}>
       {/* Back Button */}
-      <button className="btn btn-ghost mb-6 gap-2" onClick={() => navigate("/packages")}>
+      <button className="btn-ghost mb-6 gap-2" onClick={() => navigate("/packages")}>
         <ArrowLeft className="w-4 h-4" />
         {t("common.backToPackages")}
       </button>
@@ -243,9 +243,8 @@ const PackageDetails = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm">{t("packageDetails.afterPurchase")}:</span>
                       <span
-                        className={`font-medium ${
-                          userData.generalPoints - pkg.price < 0 ? "text-error" : "text-success"
-                        }`}
+                        className={`font-medium ${userData.generalPoints - pkg.price < 0 ? "text-error" : "text-success"
+                          }`}
                       >
                         {userData.generalPoints - pkg.price} {t("common.points")}
                       </span>
@@ -364,7 +363,7 @@ const PackageDetails = () => {
 
       {/* Purchase Confirmation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-neutral/50 flex items-center justify-center z-50">
           <div className="bg-base-100 p-6 rounded-xl max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">{t("purchaseModal.title")}</h3>
@@ -412,7 +411,7 @@ const PackageDetails = () => {
             </div>
 
             <div className="flex justify-end gap-3">
-              <button className="btn btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
+              <button className="btn-outline" onClick={() => setIsModalOpen(false)} disabled={purchaseLoading}>
                 {t("common.cancel")}
               </button>
               <button className="btn btn-primary" onClick={confirmPurchase} disabled={purchaseLoading}>

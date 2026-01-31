@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 // Components
 import CourseGrid from "./CourseGrid"
 import InstructorsList from "./InstructorsList"
@@ -71,7 +71,7 @@ export default function LecturerDashboard() {
           {/* <section className="mb-16">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">{t("featured_courses")}</h2>
-              <button className="btn btn-ghost btn-sm text-primary">{t("view_all")}</button>
+              <button className="btn-ghost btn-sm text-primary">{t("view_all")}</button>
             </div>
             <FeaturedCourses />
           </section> */}

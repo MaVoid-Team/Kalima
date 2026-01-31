@@ -97,24 +97,40 @@ const logout = catchAsync(async (req, res, next) => {
   await RefreshToken.deleteMany({ user: req.user._id });
   return res.json({ message: "Logged out successfully" });
 });
-
+// Middleware to verify user roles
 const verifyRoles = (...allowedRoles) => {
-  return async (req, res, next) => {
-    const Role = req.user.role?.toLowerCase();
-    if (!Role) {
-      return next(new AppError("Unauthorized", 401));
-    }
+  return (req, res, next) => {
+    try {
+      // Validate user exists
+      if (!req.user) {
+        return next(new AppError("Unauthorized - User not authenticated", 401));
+      }
 
-    const rolesArray = allowedRoles.map((role) => role.toLowerCase());
-    if (!rolesArray.includes(Role)) {
-      return next(
-        new AppError(
-          `Forbidden, you are a ${Role} and don't have access to this resource.`,
-          403
-        )
-      );
+      // Get and validate user role
+      const userRole = req.user.role?.toLowerCase();
+      if (!userRole) {
+        return next(new AppError("Unauthorized - User has no assigned role", 401));
+      }
+
+      // Normalize allowed roles to lowercase for comparison
+      const normalizedAllowedRoles = allowedRoles.map((role) => role.toLowerCase());
+
+      // Check if user role is in allowed roles
+      if (!normalizedAllowedRoles.includes(userRole)) {
+        return next(
+          new AppError(
+            `Access Denied - Your role '${userRole}' is not permitted for this resource. Required roles: ${allowedRoles.join(", ")}`,
+            403
+          )
+        );
+      }
+
+      // User is authorized, proceed to next middleware
+      next();
+    } catch (error) {
+      // Catch any unexpected errors
+      return next(new AppError("Authorization verification failed", 500));
     }
-    next();
   };
 };
 

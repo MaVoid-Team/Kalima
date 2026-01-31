@@ -83,36 +83,36 @@ export default function CoursesPage() {
   }, [currentPage])
 
   const fetchContainers = async () => {
-  setLoading(true);
-  setError("");
-  try {
-    // Fetch only containers with type "course" and a large limit
-    const result = await getAllContainers({
-      type: "course",
-      limit: 200,
-    });
+    setLoading(true);
+    setError("");
+    try {
+      // Fetch only containers with type "course" and a large limit
+      const result = await getAllContainers({
+        type: "course",
+        limit: 200,
+      });
 
-    if (result.status === "success") {
-      const containers = result.data.containers;
-      // Apply pagination
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = startIndex + ITEMS_PER_PAGE;
-      const paginatedContainers = containers.slice(startIndex, endIndex);
+      if (result.status === "success") {
+        const containers = result.data.containers;
+        // Apply pagination
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        const paginatedContainers = containers.slice(startIndex, endIndex);
 
-      setContainers(containers); // Store all fetched course containers
-      setFilteredContainers(paginatedContainers); // Set paginated subset
-      setTotalResults(containers.length);
-      setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE));
-    } else {
-      setError(result.error || "Failed to fetch containers");
+        setContainers(containers); // Store all fetched course containers
+        setFilteredContainers(paginatedContainers); // Set paginated subset
+        setTotalResults(containers.length);
+        setTotalPages(Math.ceil(containers.length / ITEMS_PER_PAGE));
+      } else {
+        setError(result.error || "Failed to fetch containers");
+      }
+    } catch (err) {
+      console.error("Error fetching containers:", err);
+      setError("حدث خطأ أثناء تحميل البيانات");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching containers:", err);
-    setError("حدث خطأ أثناء تحميل البيانات");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const resetFilters = useCallback(() => {
     setSelectedStage("")
@@ -434,7 +434,7 @@ export default function CoursesPage() {
 
         <div className="container mx-auto px-4 py-4">
           <div className={`flex justify-start`}>
-            <button className="btn btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
+            <button className="btn-outline btn-sm rounded-md mx-2" onClick={resetFilters}>
               {t("filters.reset")}
             </button>
             <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -489,10 +489,10 @@ export default function CoursesPage() {
                 selectedCourseType ||
                 selectedCourseStatus ||
                 selectedPrice) && (
-                <button className="btn btn-outline btn-sm mt-4" onClick={resetFilters}>
-                  {t("filters.reset")}
-                </button>
-              )}
+                  <button className="btn-outline btn-sm mt-4" onClick={resetFilters}>
+                    {t("filters.reset")}
+                  </button>
+                )}
             </div>
           ) : (
             <>
@@ -564,7 +564,7 @@ export default function CoursesPage() {
                 </div>
               )}
 
-              <div className="text-center mt-4 text-sm text-gray-600">
+              <div className="text-center mt-4 text-sm text-base-content/60">
                 {t("showing")} {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
                 {Math.min(currentPage * ITEMS_PER_PAGE, totalResults)} {t("of")} {totalResults} {t("courses")}
               </div>

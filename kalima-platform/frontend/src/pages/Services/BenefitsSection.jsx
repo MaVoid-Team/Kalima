@@ -1,204 +1,184 @@
-import React, { useMemo } from "react";
+"use client";
+
+import React from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import {
+  Clock,
+  GraduationCap,
+  BookOpen,
+  HeadphonesIcon,
+  Award,
+  TrendingUp,
+  ArrowUpRight,
+} from "lucide-react";
 
-const BenefitsSection = React.memo(({ isRTL }) => {
-  const benefits = useMemo(
-    () => [
-      {
-        id: 1,
-        number: "01",
-        title: isRTL ? "تعلم مرن" : "Flexible Learning",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "أوقاتك" : "Your Schedule",
-        content: isRTL
-          ? "تعلم في أي وقت ومن أي مكان مع إمكانية الوصول الكامل إلى جميع المواد التعليمية"
-          : "Learn anytime, anywhere with full access to all educational materials",
-      },
-      {
-        id: 2,
-        number: "02",
-        title: isRTL ? "معلمون خبراء" : "Expert Teachers",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "متخصصين" : "Specialists",
-        content: isRTL
-          ? "فريق من المعلمين المؤهلين ذوي الخبرة في المناهج التعليمية المختلفة"
-          : "Team of qualified teachers experienced in various curricula",
-      },
-      {
-        id: 3,
-        number: "03",
-        title: isRTL ? "محتوى مميز" : "Premium Content",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "جودة عالية" : "High Quality",
-        content: isRTL
-          ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب التعليمية"
-          : "Carefully designed curriculum covering all student educational needs",
-      },
-      {
-        id: 4,
-        number: "04",
-        title: isRTL ? "متابعة مستمرة" : "Continuous Support",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "رعاية" : "Care",
-        content: isRTL
-          ? "دعم فني وتعليمي متواصل لضمان أفضل تجربة تعليمية"
-          : "Continuous technical and educational support to ensure the best learning experience",
-      },
-      {
-        id: 5,
-        number: "05",
-        title: isRTL ? "شهادات معتمدة" : "Certified Certificates",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "اعتماد" : "Accreditation",
-        content: isRTL
-          ? "شهادات معتمدة بعد إتمام كل مرحلة تعليمية بنجاح"
-          : "Certified certificates upon successful completion of each educational stage",
-      },
-      {
-        id: 6,
-        number: "06",
-        title: isRTL ? "تقييم وتطوير" : "Assessment & Development",
-        prefix: isRTL ? "بـ" : "With",
-        subheader: isRTL ? "تحسين" : "Improvement",
-        content: isRTL
-          ? "نظام تقييم مستمر لمتابعة التطور الأكاديمي للطلاب"
-          : "Continuous assessment system to track students' academic progress",
-      },
-    ],
-    [isRTL]
-  );
+const BenefitsSection = React.memo(() => {
+  const { i18n } = useTranslation("home");
+  const isRTL = i18n.language === "ar";
 
-  const orderedBenefits = [
-    benefits.find(b => b.number === "01"),
-    benefits.find(b => b.number === "02"),
-    benefits.find(b => b.number === "03"),
-    benefits.find(b => b.number === "04"),
-    benefits.find(b => b.number === "05"),
-    benefits.find(b => b.number === "06"),
+  const benefits = [
+    {
+      id: "01",
+      icon: Clock,
+      title: isRTL ? "تعلم مرن" : "Flexible Learning",
+      description: isRTL
+        ? "تعلم في أي وقت ومن أي مكان مع إمكانية الوصول الكامل."
+        : "Learn anytime, anywhere with full access to all materials.",
+      accent: "primary",
+    },
+    {
+      id: "02",
+      icon: GraduationCap,
+      title: isRTL ? "معلمون خبراء" : "Expert Teachers",
+      description: isRTL
+        ? "نخبة من المعلمين المتميزين في مختلف المناهج."
+        : "Elite selection of teachers across various curricula.",
+      accent: "secondary",
+    },
+    {
+      id: "03",
+      icon: BookOpen,
+      title: isRTL ? "محتوى مميز" : "Premium Content",
+      description: isRTL
+        ? "مناهج مصممة بعناية لتغطية جميع احتياجات الطلاب."
+        : "Carefully designed curriculum covering all student needs.",
+      accent: "primary",
+    },
+    {
+      id: "04",
+      icon: HeadphonesIcon,
+      title: isRTL ? "متابعة مستمرة" : "Support",
+      description: isRTL
+        ? "دعم فني وتعليمي متواصل لضمان رحلة تعلم ناجحة."
+        : "Continuous technical and educational support.",
+      accent: "secondary",
+    },
+    {
+      id: "05",
+      icon: Award,
+      title: isRTL ? "شهادات معتمدة" : "Certificates",
+      description: isRTL
+        ? "شهادات معتمدة توثق إنجازاتك الأكاديمية."
+        : "Certified certificates documenting your achievements.",
+      accent: "primary",
+    },
+    {
+      id: "06",
+      icon: TrendingUp,
+      title: isRTL ? "تقييم ذكي" : "Smart Assessment",
+      description: isRTL
+        ? "نظام تقييم متطور لمتابعة تطور مستواك الأكاديمي."
+        : "Advanced system to track your academic progress.",
+      accent: "secondary",
+    },
   ];
 
   return (
-    <div className="mt-24 px-4 sm:px-6">
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="text-3xl md:text-4xl font-bold text-center mb-12 text-base-content"
-      >
-        {isRTL ? (
-          <>
-            فوائد الانضمام إلى منصة{" "}
-            <span className="text-primary relative inline-block">
-              كلمة
-              <svg
-                className="absolute -bottom-3 left-0 w-full"
-                width="140"
-                height="16"
-                viewBox="0 0 140 16"
-                fill="none"
-              >
-                <path
-                  d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
+    <section
+      className="relative py-16 sm:py-16 lg:py-40 overflow-hidden bg-base-100"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className="relative z-10 max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12">
+        {/* Elite Gallery Header */}
+        <div
+          className={`mb-12 sm:mb-20 lg:mb-32 ${isRTL ? "text-right" : "text-left"}`}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-3 sm:gap-4 mb-6 sm:mb-10"
+          >
+            <div className="flex -space-x-1.5 rtl:space-x-reverse">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 border-2 border-base-100 shadow-sm"
                 />
-              </svg>
+              ))}
+            </div>
+            <span className="text-[8px] sm:text-[10px] font-black tracking-[0.3em] sm:tracking-[0.4em] text-primary uppercase">
+              {isRTL ? "لماذا كلمة الفائقة؟" : "The Kalima Standard"}
             </span>
-          </>
-        ) : (
-          <>
-            Benefits of Joining{" "}
-            <span className="text-primary relative inline-block">
-              Kalima
-              <svg
-                className="absolute -bottom-3 left-0 w-full"
-                width="140"
-                height="16"
-                viewBox="0 0 140 16"
-                fill="none"
-              >
-                <path
-                  d="M0 8C20 16 40 0 60 8C80 16 100 0 120 8C140 16 140 0 140 8"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>{" "}
-            Platform
-          </>
-        )}
-      </motion.h2>
+          </motion.div>
 
-      <div className="flex flex-col gap-6 max-w-7xl mx-auto">
-        {/* First row - 01 02 03 */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {orderedBenefits.slice(0, 3).map((benefit, index) => (
-            <motion.div
-              key={benefit.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
-              viewport={{ once: true }}
-              className={`p-6 rounded-xl ${
-                index % 2 === 0
-                  ? "bg-base-100 shadow-sm border border-base-300"
-                  : "bg-primary/20 shadow-md text-white"
-              } h-full`}
-            >
-              <div className={`flex flex-col ${isRTL ? "text-right" : "text-left"}`}>
-                <span className="text-4xl font-bold mb-2 opacity-80">
-                  {benefit.number}
-                </span>
-                <h3 className="text-xl font-bold text-base-content mb-2">
-                  {benefit.title}
-                </h3>
-                <p className={`text-sm ${
-                  index % 2 === 0 ? "text-base-content/80" : "text-white/90"
-                }`}>
-                  {benefit.content}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl sm:text-5xl lg:text-6xl xl:text-[5.5rem] font-black text-base-content leading-none tracking-tighter mb-6 sm:mb-10"
+          >
+            {isRTL ? (
+              <>
+                نحن <span className="text-secondary italic">نصيغ</span> <br />{" "}
+                عهد التعليم الجديد
+              </>
+            ) : (
+              <>
+                Crafting The <br />{" "}
+                <span className="text-secondary italic">Elite</span> Standard
+              </>
+            )}
+          </motion.h2>
+
+          <p className="text-base sm:text-lg lg:text-xl text-base-content/30 font-medium max-w-2xl leading-relaxed italic">
+            {isRTL
+              ? "منظومة تعليمية صُممت لتتجاوز التوقعات، حيث يلتقي عمق المعرفة مع رفاهية التجربة الرقمية."
+              : "An educational ecosystem designed to exceed expectations, where deep knowledge meets a luxurious digital experience."}
+          </p>
         </div>
 
-        {/* Second row - 04 05 06 */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {orderedBenefits.slice(3, 6).map((benefit, index) => (
+        {/* The Boutique Gallery Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {benefits.map((benefit, index) => (
             <motion.div
               key={benefit.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * (index + 4) }}
               viewport={{ once: true }}
-              className={`p-6 rounded-xl ${
-                index % 2 === 1
-                  ? "bg-base-100 shadow-sm border border-base-300"
-                  : "bg-primary/20 shadow-md text-white"
-              } h-full`}
+              transition={{ delay: index * 0.1, duration: 0.8 }}
+              className="relative group"
             >
-              <div className={`flex flex-col ${isRTL ? "text-right" : "text-left"}`}>
-                <span className="text-4xl font-bold mb-2 opacity-80">
-                  {benefit.number}
-                </span>
-                <h3 className="text-xl font-bold text-base-content mb-2">
-                  {benefit.title}
-                </h3>
-                <p className={`text-sm ${
-                  index % 2 === 1 ? "text-base-content/80" : "text-white/90"
-                }`}>
-                  {benefit.content}
-                </p>
+              <div className="relative p-5 sm:p-6 lg:p-8 h-full rounded-2xl sm:rounded-3xl bg-base-100 border border-base-content/5 shadow-xl transition-all duration-500 hover:shadow-2xl hover-shadow-primary hover:-translate-y-2 overflow-hidden">
+                {/* Animated Material Icon */}
+                <div className="relative mb-8 sm:mb-10 lg:mb-14">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-[2rem] lg:rounded-[2.5rem] bg-base-100 border border-base-content/5 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                    <benefit.icon
+                      className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-base-content/60 group-hover:text-primary transition-colors"
+                      strokeWidth={1}
+                    />
+                  </div>
+                </div>
+
+                <div className={isRTL ? "text-right" : "text-left"}>
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-base-content mb-3 sm:mb-4 lg:mb-6 tracking-tight group-hover:text-primary transition-colors">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-base-content/40 font-medium leading-relaxed mb-6 sm:mb-8 lg:mb-12 group-hover:text-base-content/60 transition-colors">
+                    {benefit.description}
+                  </p>
+
+                  {/* Boutique CTA */}
+                  <div
+                    className={`flex items-center gap-3 sm:gap-4 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-secondary opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 ${isRTL ? "flex-row-reverse" : ""
+                      }`}
+                  >
+                    <span>
+                      {isRTL ? "اكتشف الفلسفة" : "Discover Philosophy"}
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 });
+
+BenefitsSection.displayName = "BenefitsSection";
 
 export default BenefitsSection;

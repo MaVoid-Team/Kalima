@@ -1,8 +1,12 @@
 const allowedOrigins = [
-    'capacitor://localhost',
+    'capacitor://localhost',    // iOS
+    'http://localhost',         // Android HTTP
+    'https://localhost',        // Android HTTPS 
+    'https://kalima-edu.com',
+    'https://dev.kalima-edu.com',
+    'http://localhost:3000',
     'http://localhost:5173',
     'file://',
-    'https://kalima-edu.com'
 ];
 
 module.exports = allowedOrigins;
