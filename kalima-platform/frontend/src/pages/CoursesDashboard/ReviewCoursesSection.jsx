@@ -59,8 +59,8 @@ function ReviewCoursesSection() {
   const totalPages = Math.ceil(allCourses.length / coursesPerPage);
 
   const toggleFavorite = (courseId) => {
-    setFavorites(prev => prev.includes(courseId)
-      ? prev.filter(id => id !== courseId)
+    setFavorites(prev => prev.includes(courseId) 
+      ? prev.filter(id => id !== courseId) 
       : [...prev, courseId]
     );
   };
@@ -97,10 +97,11 @@ function ReviewCoursesSection() {
         </div>
 
         {/* Responsive Courses Grid */}
-        <div className={`grid gap-4 md:gap-6 mb-8 md:mb-12 ${coursesPerPage === 1 ? "grid-cols-1" :
-            coursesPerPage === 2 ? "grid-cols-1 sm:grid-cols-2" :
-              "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-          }`}>
+        <div className={`grid gap-4 md:gap-6 mb-8 md:mb-12 ${
+          coursesPerPage === 1 ? "grid-cols-1" :
+          coursesPerPage === 2 ? "grid-cols-1 sm:grid-cols-2" :
+          "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        }`}>
           {currentCourses.map((course) => {
             const courseData = t(`reviewCourses.courses.${course.courseId}`, { returnObjects: true });
             return (
@@ -195,10 +196,11 @@ function ReviewCoursesSection() {
             <motion.button
               key={page}
               onClick={() => handlePageChange(page)}
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full font-medium text-sm sm:text-base transition-colors ${currentPage === page
-                  ? "bg-primary text-primary-content"
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full font-medium text-sm sm:text-base transition-colors ${
+                currentPage === page
+                  ? "bg-primary text-white"
                   : "hover:bg-base-200"
-                }`}
+              }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

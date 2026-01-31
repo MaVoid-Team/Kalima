@@ -24,7 +24,7 @@ const PurchaseForm = ({
 }) => {
   const [dragActive, setDragActive] = useState(false)
   const { t } = useTranslation("kalimaStore-ProductDetails")
-  // dummy comment to re-commit
+// dummy comment to re-commit
   const handleDrag = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -183,7 +183,7 @@ const PurchaseForm = ({
                       accept="image/*"
                       onChange={handleFileChange}
                     />
-                    <label htmlFor="file-upload" className="btn-outline cursor-pointer">
+                    <label htmlFor="file-upload" className="btn btn-outline cursor-pointer">
                       {t("purchaseForm.chooseFile")}
                     </label>
                   </div>
@@ -212,7 +212,7 @@ const PurchaseForm = ({
                 </button>
               ) : (
                 <button
-                  className="btn-outline join-item"
+                  className="btn btn-outline join-item"
                   onClick={onValidateCoupon}
                   disabled={couponValidation.loading || !couponCode}
                 >
@@ -245,7 +245,7 @@ const PurchaseForm = ({
               <>
                 <div className="flex justify-between text-lg">
                   <span>{t("purchaseForm.originalPrice")}</span>
-                  <span className="line-through text-base-content/60">{productPrice?.toFixed(2)}</span>
+                  <span className="line-through text-gray-500">{productPrice?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg">
                   <span>{t("purchaseForm.discountedPrice")}</span>

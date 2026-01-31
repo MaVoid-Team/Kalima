@@ -270,7 +270,7 @@ const LecturersList = ({ lecturers, isLoading, error, centerId }) => {
                             <button
                               type="button"
                               onClick={() => handleSubjectRemove(subjectId)}
-                              className="text-primary-content hover:text-primary-content/80"
+                              className="text-white hover:text-red-200"
                             >
                               ✕
                             </button>

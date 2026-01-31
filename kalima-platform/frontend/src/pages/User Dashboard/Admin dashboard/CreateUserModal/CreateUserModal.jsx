@@ -169,8 +169,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
         return t("validation.invalidPhoneNumber");
       }
     }
-    //idk
-    //no way
+
     if (userData.role === "lecturer") {
       if (!userData.subject || userData.subject.length === 0) {
         return t("validation.subjectsRequired");
@@ -261,10 +260,10 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
       ...userData,
       preferredContactTime: userData.preferredContactTime
         ? {
-          ...userData.preferredContactTime,
-          from: toAmPm(userData.preferredContactTime.from),
-          to: toAmPm(userData.preferredContactTime.to),
-        }
+            ...userData.preferredContactTime,
+            from: toAmPm(userData.preferredContactTime.from),
+            to: toAmPm(userData.preferredContactTime.to),
+          }
         : undefined,
     };
 
@@ -312,9 +311,9 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           administrationZone: data.administrationZone || undefined,
           preferredContactTime:
             data.preferredContactTime &&
-              (data.preferredContactTime.from ||
-                data.preferredContactTime.to ||
-                data.preferredContactTime.note)
+            (data.preferredContactTime.from ||
+              data.preferredContactTime.to ||
+              data.preferredContactTime.note)
               ? data.preferredContactTime
               : undefined,
         };
@@ -345,23 +344,23 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
           level: Array.isArray(data.level)
             ? data.level
             : data.level
-              ? [data.level]
-              : [],
+            ? [data.level]
+            : [],
           teachesAtType: data.teachesAtType || undefined,
           centers: Array.isArray(data.centers)
             ? data.centers
             : data.centers
-              ? [data.centers]
-              : [],
+            ? [data.centers]
+            : [],
           school: data.school || undefined,
           government: data.government || undefined,
           administrationZone: data.administrationZone || undefined,
           socialMedia: Array.isArray(data.socialMedia) ? data.socialMedia : [],
           preferredContactTime:
             data.preferredContactTime &&
-              (data.preferredContactTime.from ||
-                data.preferredContactTime.to ||
-                data.preferredContactTime.note)
+            (data.preferredContactTime.from ||
+              data.preferredContactTime.to ||
+              data.preferredContactTime.note)
               ? data.preferredContactTime
               : undefined,
         };
@@ -524,7 +523,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     <button
                       type="button"
                       onClick={() => setShowPassword((s) => !s)} /* ← toggle */
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content/70 z-10"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 z-10"
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
@@ -559,7 +558,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                       onClick={() =>
                         setShowConfirmPassword((s) => !s)
                       } /* ← toggle */
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 hover:text-base-content/70 z-10"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 z-10"
                       aria-label={
                         showConfirmPassword
                           ? "Hide confirm password"
@@ -665,7 +664,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                     {loadingZones
                       ? t("fields.loadingZones") || "Loading zones..."
                       : t("fields.selectAdministrationZone") ||
-                      "Select Administration Zone"}
+                        "Select Administration Zone"}
                   </option>
 
                   {administrationZones.map((zone, index) => (
@@ -678,7 +677,7 @@ const CreateUserModal = ({ isOpen, onClose, onCreateUser, error }) => {
                 {loadingZones && (
                   <div className="flex items-center gap-2 mt-1">
                     <span className="loading loading-spinner loading-xs"></span>
-                    <span className="text-xs text-base-content/50">
+                    <span className="text-xs text-gray-500">
                       {t("fields.loadingZones") ||
                         "Loading administration zones..."}
                     </span>

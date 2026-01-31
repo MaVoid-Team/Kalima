@@ -1,199 +1,169 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=IBM+Plex+Sans+Arabic:wght@100..700&display=swap");
 @import "tailwindcss";
-
 @plugin "daisyui" {
-  themes: false;
+  themes: all;
 }
 
 @plugin "daisyui/theme" {
-  name: "kalima";
+  name: "a7a";
   default: true;
   prefersdark: false;
-  color-scheme: "light";
-
-  /* Kalima Masterpiece Theme - "Silk, Onyx & Crimson" */
-  --color-base-100: #ffffff;
-  --color-base-200: #fcfcfc;
-  --color-base-300: #f8f8f8;
-  --color-base-content: #1a1a1a;
-
-  /* The Signature Kalima Red */
-  --color-primary: #af0d0e;
-  --color-primary-content: #ffffff;
-
-  /* The Brand Orange (Secondary) */
-  --color-secondary: #ff5c28;
-  --color-secondary-content: #ffffff;
-
-  /* The Museum Amber (Accent) */
-  --color-accent: #eab308;
-  --color-accent-content: #ffffff;
-
-  /* State Colors */
-  --color-info: oklch(74% 0.16 232.661);
-  --color-info-content: oklch(29% 0.066 243.157);
-
-  --color-success: oklch(76% 0.177 163.223);
-  --color-success-content: oklch(37% 0.077 168.94);
-
-  --color-warning: oklch(82% 0.189 84.429);
-  --color-warning-content: oklch(41% 0.112 45.904);
-
-  --color-error: oklch(71% 0.194 13.428);
-  --color-error-content: oklch(27% 0.105 12.094);
-
-  --color-neutral: #1a1a1a;
-  --color-neutral-content: #ffffff;
-
-  --radius-selector: 1rem;
-  --radius-field: 1rem;
-  --radius-box: 2.5rem;
+  color-scheme: "dark";
+  --color-base-100: oklch(14% 0 0);
+  --color-base-200: oklch(20% 0 0);
+  --color-base-300: oklch(26% 0 0);
+  --color-base-content: oklch(97% 0 0);
+  --color-primary: oklch(79% 0.184 86.047);
+  --color-primary-content: oklch(98% 0.026 102.212);
+  --color-secondary: oklch(69% 0.17 162.48);
+  --color-secondary-content: oklch(97% 0.021 166.113);
+  --color-accent: oklch(0% 0 0);
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: oklch(26% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(54% 0.245 262.881);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(62% 0.194 149.214);
+  --color-success-content: oklch(98% 0.018 155.826);
+  --color-warning: oklch(64% 0.222 41.116);
+  --color-warning-content: oklch(98% 0.016 73.684);
+  --color-error: oklch(58% 0.253 17.585);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 2rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 1;
 }
 
-body {
-  font-family: var(--font-sans);
-  font-optical-sizing: auto;
-  background-color: var(--color-base-100);
-  color: var(--color-base-content);
-  -webkit-font-smoothing: antialiased;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-sans);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-}
-
-/* Premium Layout Utilities */
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(175, 13, 14, 0.1),
-      transparent);
-}
-
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-/* Custom Scrollbar for Boutique Feel */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: white;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
-}
-
-/* Glassmorphism Styles */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-}
-
-/* Selection */
-::selection {
-  background: var(--color-primary);
-  color: white;
-}
-
-/* Smooth Navigation */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Animations */
-@keyframes float {
-
+@keyframes shake {
   0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes float-down-dottedball {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-64px);
+  }
   100% {
     transform: translateY(0);
   }
-
-  50% {
-    transform: translateY(-20px);
-  }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Brand Colors & Gradients - Using Theme Variables */
-:root {
-  --brand-red: var(--color-primary);
-  --brand-orange: #ff5c28;
-  --brand-yellow: #facc15;
-}
-
-/* Semantic Gradient Utilities */
-.gradient-brand {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #ff5c28 100%);
-}
-
-.gradient-brand-horizontal {
-  background: linear-gradient(90deg, var(--color-primary) 0%, #ff5c28 100%);
-}
-
-.text-gradient-brand {
-  background: linear-gradient(90deg, var(--color-primary) 0%, #d4342c 50%, #ff5c28 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Glass Navbar */
-.glass-navbar {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Gradient Animation */
-@keyframes gradient {
+@keyframes float-zigzag {
   0% {
-    background-position: 0% 50%;
+    transform: translateX(0);
   }
-
   50% {
-    background-position: 100% 50%;
+    transform: translateX(-64px);
   }
-
   100% {
-    background-position: 0% 50%;
+    transform: translateX(0);
+  }
+}
+@keyframes float-up-dottedball {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(64px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.animate-float-zigzag {
+  animation: float-zigzag 4s ease-in-out infinite;
+}
+.animate-float-up-dottedball {
+  animation: float-up-dottedball 4s ease-in-out infinite;
+}
+
+@keyframes float-down-dottedball {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-64px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 
-.animate-gradient {
-  animation: gradient 5s ease infinite;
+.animate-float-down-dottedball {
+  animation: float-down-dottedball 3s ease-in-out infinite;
 }
 
-/* Premium Slide Animations */
-@keyframes slideInFromRight {
+@keyframes spin-y {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.animate-spin-y {
+  animation: spin-y 3s linear infinite;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scanner-active {
+  background: transparent !important;
+}
+.aspect-w-16 {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.aspect-w-16 > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Sonner Toast Animation - Slide from left */
+[data-sonner-toaster] [data-sonner-toast] {
+  animation: slideInFromLeft 0.4s ease-out !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-removed="true"] {
+  animation: slideOutToLeft 0.3s ease-in forwards !important;
+}
+
+@keyframes slideInFromLeft {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(-100%);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
@@ -205,26 +175,9 @@ html {
     opacity: 1;
     transform: translateX(0);
   }
-
   to {
     opacity: 0;
     transform: translateX(-100%);
   }
 }
 
-/* Pulse Glow Effect */
-@keyframes pulseGlow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(175, 13, 14, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 40px rgba(175, 13, 14, 0.5);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
-}

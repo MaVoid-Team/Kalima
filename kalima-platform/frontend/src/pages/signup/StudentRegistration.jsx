@@ -76,26 +76,28 @@ export default function StudentRegistration() {
     setApiError(null);
   }, [currentStep]);
 
-  useEffect(() => {
-    if (formData.role !== "teacher" || currentStep !== 2) {
-      setIsAnyTeacherFieldFilled(false);
-      return;
-    }
+useEffect(() => {
+  if (formData.role !== "teacher" || currentStep !== 2) {
+    setIsAnyTeacherFieldFilled(false);
+    return;
+  }
 
-    const hasData =
-      formData.teachesAtType?.trim() ||
-      formData.school?.trim() ||
-      formData.phoneNumber2?.trim() ||
-      (Array.isArray(formData.centers) &&
-        formData.centers.some((c) => c?.trim())) ||
-      (Array.isArray(formData.level) && formData.level.length > 0) ||
-      (Array.isArray(formData.socialMedia) &&
-        formData.socialMedia.some(
-          (s) => s.platform?.trim() || s.account?.trim(),
-        ));
+  const hasData =
+    formData.teachesAtType?.trim() ||
+    formData.school?.trim() ||
+    formData.phoneNumber2?.trim() ||
+    (Array.isArray(formData.centers) &&
+      formData.centers.some((c) => c?.trim())) ||
+    (Array.isArray(formData.level) && formData.level.length > 0) ||
+    (Array.isArray(formData.socialMedia) &&
+      formData.socialMedia.some(
+        (s) => s.platform?.trim() || s.account?.trim()
+      ));
 
-    setIsAnyTeacherFieldFilled(Boolean(hasData));
-  }, [formData, currentStep]);
+  setIsAnyTeacherFieldFilled(Boolean(hasData));
+}, [formData, currentStep]);
+
+
 
   const getStepErrors = (step) => {
     const errors = {};
@@ -123,7 +125,7 @@ export default function StudentRegistration() {
       } else if (formData.password !== formData.confirmPassword) {
         errors.confirmPassword = "passwordsMismatch";
       }
-
+     
       if (!formData.gender) errors.gender = "required";
       if (!formData.government) errors.government = "required";
       if (!formData.administrationZone) errors.administrationZone = "required";
@@ -421,7 +423,7 @@ export default function StudentRegistration() {
               data.append(`socialMedia[${index}][platform]`, social.platform);
               data.append(
                 `socialMedia[${index}][account]`,
-                social.account.trim(),
+                social.account.trim()
               );
             });
           break;
@@ -430,7 +432,7 @@ export default function StudentRegistration() {
           throw new Error("Invalid role selected");
       }
 
-      const url = `${apiUrl}/register`;
+      const url = `${apiUrl}/api/v1/register`;
       const response = await axios.post(url, data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -495,7 +497,7 @@ export default function StudentRegistration() {
 
       console.error(
         "Full error response:",
-        error.response?.data || error.message,
+        error.response?.data || error.message
       );
       setApiError(errorMessage);
       setErrors(fieldErrors);
@@ -553,7 +555,6 @@ export default function StudentRegistration() {
                   t={t}
                   errors={errors}
                   role={role}
-                  gradeLevels={gradeLevels}
                 />
               );
             case 2:
@@ -582,7 +583,6 @@ export default function StudentRegistration() {
                   t={t}
                   errors={errors}
                   role={role}
-                  gradeLevels={gradeLevels}
                 />
               );
             case 2:
@@ -615,161 +615,174 @@ export default function StudentRegistration() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans bg-base-200"
-      dir={i18n.language === "ar" ? "rtl" : "ltr"}
+      className="flex bg-primary"
+      dir={i18n.language === "ar" ? "ltr" : "rtl"}
     >
-
-      {showRoleModal && (
-        <RoleSelectionModal
-          onSelectRole={(selectedRole) => {
-            try {
-              setRole(selectedRole);
-
-              // Reset ALL formData to avoid leftover values
-              setFormData({
-                role: selectedRole,
-                fullName: "",
-                email: "",
-                password: "",
-                confirmPassword: "",
-                phoneNumber: "",
-                phoneNumber2: "",
-                gender: "",
-                faction: "Alpha",
-                level: [],
-                hobbies: [],
-                parentPhoneNumber: "",
-                children: [""],
-                subject: "",
-                teachesAtType: "",
-                centers: [""],
-                school: "",
-                socialMedia: [{ platform: "", account: "" }],
-                government: "",
-                administrationZone: "",
-                referralSerial: null,
-                profilePic: null,
-              });
-
-              setShowRoleModal(false);
-              setRoleLocked(true);
-            } catch (error) {
-              console.error("Error selecting role:", error);
-              setApiError("Failed to select role");
-            }
-          }}
-          t={t}
+      <div className="sm:hidden absolute inset-0 overflow-hidden z-0">
+        <img
+          src="/registration-image.png"
+          alt="Background"
+          className="absolute bottom-0 right-0 object-bottom opacity-50"
         />
-      )}
+      </div>
 
-      <div className="relative z-10 w-full max-w-4xl p-4 my-8">
-        {/* UNIFIED CRIMSON CARD */}
-        <div className="bg-base-100 rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(50,20,20,0.15)] overflow-hidden border border-base-200 relative">
-          {/* Header */}
-          <div className="bg-gradient-to-br from-primary via-primary-focus to-secondary p-8 pb-8 relative text-primary-content">
-            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+      <div className="w-1/3  2xl:w-1/2 relative sm:block hidden">
+        <img
+          src="/registration-image.png"
+          alt="Background"
+          className="absolute bottom-20 object-cover object-bottom h-[500px] w-[500px]"
+        />
+      </div>
 
-            <div className="flex justify-between items-start relative z-10">
-              <div>
-                <h1 className="text-3xl font-black mb-1 drop-shadow-md">
-                  {t(`${role}Register`)}
-                </h1>
-                <p className="font-medium text-primary-content/80 text-sm">
-                  {t("createAccountDesc", "أنشئ حساباً جديداً للبدء")}
-                </p>
-              </div>
-              <img
-                src="/Logo.png"
-                alt="Kalima"
-                className="h-12 w-auto brightness-0 invert opacity-80"
-              />
-            </div>
-          </div>
+      <div
+        className={`sm:w-2/3  py-2 2xl:w-1/2 `}
+        dir={i18n.language === "ar" ? "rtl" : "ltr"}
+      >
+        <div
+          className="mx-auto bg-base-100 rounded-tr-[50px] rounded-bl-[50px] w-full p-10 relative shadow-xl"
+          style={{
+            borderTopRightRadius: i18n.language === "ar" ? 0 : "50px",
+            borderBottomRightRadius: i18n.language === "ar" ? 0 : "50px",
+            borderTopLeftRadius: i18n.language === "ar" ? "50px" : 0,
+            borderBottomLeftRadius: i18n.language === "ar" ? "50px" : 0,
+          }}
+        >
+          <h1 className="text-4xl lg:text-6xl font-bold mb-8 relative">
+            {t(`${role}Register`)}
+            <div
+              className="top-full right-0 w-64 lg:w-[400px] h-4 mt-4"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='600' height='20' viewBox='0 0 600 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M596 12.5C577.5 3.5 453 -4 354 9.5C255 23 70 16.5 4 11.5' stroke='%23F7DC6F' strokeWidth='10' strokeLinecap='round' strokeLinejoin='round'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "contain",
+                backgroundPosition: "right",
+              }}
+            />
+          </h1>
 
-          {/* Body */}
-          <div className="p-8 pt-6 relative z-10 bg-base-100">
-            {apiError && (
-              <div
-                className="alert alert-error mb-6 rounded-xl animate-fade-in"
-                dir={i18n.language === "ar" ? "rtl" : "ltr"}
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 flex-shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      />
-                    </svg>
-                    <div>
-                      <h3 className="font-bold">{t("errors.errorTitle")}</h3>
-                      <p className="text-sm">{t(apiError)}</p>
+          {showRoleModal && (
+            <RoleSelectionModal
+              onSelectRole={(selectedRole) => {
+                try {
+                  setRole(selectedRole);
+
+                  // Reset ALL formData to avoid leftover values
+                  setFormData({
+                    role: selectedRole,
+                    fullName: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: "",
+                    phoneNumber: "",
+                    phoneNumber2: "",
+                    gender: "",
+                    faction: "Alpha",
+                    level: [],
+                    hobbies: [],
+                    parentPhoneNumber: "",
+                    children: [""],
+                    subject: "",
+                    teachesAtType: "",
+                    centers: [""],
+                    school: "",
+                    socialMedia: [{ platform: "", account: "" }],
+                    government: "",
+                    administrationZone: "",
+                    referralSerial: null,
+                    profilePic: null,
+                  });
+
+                  setShowRoleModal(false);
+                  setRoleLocked(true);
+                } catch (error) {
+                  console.error("Error selecting role:", error);
+                  setApiError("Failed to select role");
+                }
+              }}
+              t={t}
+            />
+          )}
+          {apiError && (
+            <div
+              className="alert alert-error mb-4 animate-fade-in w-1/2"
+              dir={i18n.language === "ar" ? "rtl" : "ltr"}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                  <div>
+                    <h3 className="font-bold">{t("errors.errorTitle")}</h3>
+                    <p className="text-sm">{t(apiError)}</p>
+                  </div>
+                </div>
+
+                {Object.keys(errors).length > 0 && (
+                  <div className="mt-4 pl-8">
+                    <ul className="list-disc space-y-1">
+                      {Object.entries(errors).map(
+                        ([field, message]) =>
+                          typeof message === "string" && (
+                            <li
+                              key={field}
+                              className="flex gap-2 items-start"
+                              dir={i18n.language === "ar" ? "rtl" : "ltr"}
+                            >
+                              <span className="font-medium">
+                                {t(`form.${field}`)}:
+                              </span>
+                              <span className="text-opacity-80">
+                                {t(`validation.${message}`)}
+                              </span>
+                            </li>
+                          )
+                      )}
+                    </ul>
+                    <div className="flex items-center justify-center mt-4">
+                      <button
+                        className="btn btn-sm btn-ghost hover:bg-error-content/10 mx-auto"
+                        onClick={() => {
+                          setApiError(null);
+                          setErrors({});
+                        }}
+                      >
+                        {t("dismiss")}
+                      </button>
                     </div>
                   </div>
-
-                  {Object.keys(errors).length > 0 && (
-                    <div className="mt-4 pl-8">
-                      <ul className="list-disc space-y-1">
-                        {Object.entries(errors).map(
-                          ([field, message]) =>
-                            typeof message === "string" && (
-                              <li
-                                key={field}
-                                className="flex gap-2 items-start"
-                                dir={i18n.language === "ar" ? "rtl" : "ltr"}
-                              >
-                                <span className="font-medium">
-                                  {t(`form.${field}`)}:
-                                </span>
-                                <span className="text-opacity-80">
-                                  {t(`validation.${message}`)}
-                                </span>
-                              </li>
-                            ),
-                        )}
-                      </ul>
-                      <div className="flex items-center justify-center mt-4">
-                        <button
-                          className="btn btn-sm btn-ghost hover:bg-error-content/10 mx-auto"
-                          onClick={() => {
-                            setApiError(null);
-                            setErrors({});
-                          }}
-                        >
-                          {t("dismiss")}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            )}
-            {renderStepContent()}
+            </div>
+          )}
+          {renderStepContent()}
 
-            <NavigationButtons
-              currentStep={currentStep}
-              handlePrev={() => setCurrentStep((prev) => prev - 1)}
-              handleNext={handleNext}
-              t={t}
-              totalSteps={totalSteps}
-              role={formData.role}
-              isAnyTeacherFieldFilled={isAnyTeacherFieldFilled}
-            />
+          <NavigationButtons
+            currentStep={currentStep}
+            handlePrev={() => setCurrentStep((prev) => prev - 1)}
+            handleNext={handleNext}
+            t={t}
+            totalSteps={totalSteps}
+            role={formData.role}
+            isAnyTeacherFieldFilled={isAnyTeacherFieldFilled}
+          />
 
-            <StepsIndicator
-              currentStep={currentStep}
-              t={t}
-              role={formData.role}
-            />
-          </div>
+          <StepsIndicator
+            currentStep={currentStep}
+            t={t}
+            role={formData.role}
+          />
         </div>
       </div>
     </div>

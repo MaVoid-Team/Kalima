@@ -97,7 +97,7 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium truncate max-w-48">{file.name}</div>
-          <div className="text-xs text-base-content/50">({(file.size / 1024 / 1024).toFixed(2)} MB)</div>
+          <div className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</div>
         </div>
 
         {completed && (
@@ -135,10 +135,11 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-base-300 rounded-full h-2">
+      <div className="w-full bg-gray-200 rounded-full h-2">
         <div
-          className={`h-2 rounded-full transition-all duration-300 ${error ? "bg-error" : completed ? "bg-success" : "bg-primary"
-            }`}
+          className={`h-2 rounded-full transition-all duration-300 ${
+            error ? "bg-error" : completed ? "bg-success" : "bg-primary"
+          }`}
           style={{ width: `${progress}%` }}
         ></div>
       </div>
@@ -154,7 +155,7 @@ const FileUploadProgress = ({ file, onUploadComplete, onUploadError, uploadEndpo
       )}
 
       {/* File Type Validation */}
-      {file && accept !== "*/*" && <div className="mt-1 text-xs text-base-content/50">Accepted: {accept}</div>}
+      {file && accept !== "*/*" && <div className="mt-1 text-xs text-gray-500">Accepted: {accept}</div>}
     </div>
   )
 }

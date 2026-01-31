@@ -2,7 +2,6 @@ const multer = require("multer");
 const AppError = require("../appError");
 const path = require("path");
 const fs = require("fs");
-const sharp = require("sharp");
 
 // ===== Ensure upload folders exist =====
 const ensureDir = (dir) => {
@@ -19,36 +18,6 @@ const allowedImageTypes = [
   "image/gif",
   "image/jpg",
 ];
-
-// ===== Compress image helper =====
-const compressImage = async (buffer, quality = 80) => {
-  try {
-    return await sharp(buffer)
-      .withMetadata()
-      .toFormat("webp", { quality })
-      .toBuffer();
-  } catch (error) {
-    console.error("Image compression error:", error);
-    throw new AppError("Failed to compress image", 500);
-  }
-};
-
-// ===== Resize and compress image helper =====
-const resizeAndCompressImage = async (buffer, width, height, quality = 80) => {
-  try {
-    return await sharp(buffer)
-      .resize(width, height, {
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .withMetadata()
-      .toFormat("webp", { quality })
-      .toBuffer();
-  } catch (error) {
-    console.error("Image resize/compress error:", error);
-    throw new AppError("Failed to process image", 500);
-  }
-};
 const allowedDocTypes = [
   "application/pdf",
   "application/msword",
@@ -98,6 +67,7 @@ const withCleanup = (multerMiddleware) => {
           };
 
           if (req.file) deleteFile(req.file.path);
+
           if (req.files) {
             if (Array.isArray(req.files)) {
               req.files.forEach((f) => deleteFile(f.path));
@@ -114,131 +84,7 @@ const withCleanup = (multerMiddleware) => {
   };
 };
 
-// ===== Combined compression and cleanup wrapper =====
-const withCompressionAndCleanup = (multerMiddleware, compressOptions = {}) => {
-  const { quality = 80, resize = null, fieldsToCompress = [] } = compressOptions;
-
-  return (req, res, next) => {
-    multerMiddleware(req, res, async (err) => {
-      if (err) return next(err);
-
-      try {
-        // Compress single file and save to disk
-        if (req.file && req.file.buffer) {
-          const shouldCompress = fieldsToCompress.length === 0 || fieldsToCompress.includes(req.file.fieldname);
-
-          if (shouldCompress) {
-            console.log("📸 Starting compression for:", req.file.fieldname, "Original size:", req.file.buffer.length, "bytes");
-
-            const compressed = resize
-              ? await resizeAndCompressImage(req.file.buffer, resize.width, resize.height, quality)
-              : await compressImage(req.file.buffer, quality);
-
-            // Determine destination folder
-            let dest = "uploads/other/";
-            if (req.file.fieldname === "profilePic") dest = "uploads/profile_pics/";
-            else if (req.file.fieldname === "thumbnail") dest = "uploads/product_thumbnails/";
-            else if (req.file.fieldname === "gallery") dest = "uploads/product_gallery/";
-            else if (req.file.fieldname === "sample") dest = "uploads/docs/";
-            else if (req.file.fieldname === "paymentScreenShot") dest = "uploads/payment_screenshots/";
-            else if (req.file.fieldname === "watermark") dest = "uploads/watermarks/";
-            else if (req.file.fieldname === "paymentMethodImg") dest = "uploads/payment_methods/";
-
-            ensureDir(dest);
-            const filename = `${Date.now()}-${req.file.fieldname}.webp`;
-            const filepath = path.join(dest, filename);
-
-            fs.writeFileSync(filepath, compressed);
-            req.file.path = filepath;
-            req.file.filename = filename;
-
-            const compressionRatio = ((1 - compressed.length / req.file.buffer.length) * 100).toFixed(2);
-            // console.log("✓ Compressed image saved:", filepath);
-            // console.log("   Original size:", req.file.buffer.length, "bytes");
-            // console.log("   Compressed size:", compressed.length, "bytes");
-            // console.log("   Compression ratio:", compressionRatio + "%");
-          }
-        }
-
-        // Compress multiple files and save to disk (for .fields())
-        if (req.files) {
-          for (const fieldName in req.files) {
-            const shouldCompress = fieldsToCompress.length === 0 || fieldsToCompress.includes(fieldName);
-
-            for (let i = 0; i < req.files[fieldName].length; i++) {
-              const file = req.files[fieldName][i];
-
-              if (shouldCompress && file.buffer) {
-                console.log("📸 Starting compression for:", fieldName, "Original size:", file.buffer.length, "bytes");
-
-                const compressed = resize
-                  ? await resizeAndCompressImage(file.buffer, resize.width, resize.height, quality)
-                  : await compressImage(file.buffer, quality);
-
-                // Determine destination folder
-                let dest = "uploads/other/";
-                if (fieldName === "profilePic") dest = "uploads/profile_pics/";
-                else if (fieldName === "thumbnail") dest = "uploads/product_thumbnails/";
-                else if (fieldName === "gallery") dest = "uploads/product_gallery/";
-                else if (fieldName === "sample") dest = "uploads/docs/";
-                else if (fieldName === "paymentScreenShot") dest = "uploads/payment_screenshots/";
-                else if (fieldName === "watermark") dest = "uploads/watermarks/";
-                else if (fieldName === "paymentMethodImg") dest = "uploads/payment_methods/";
-
-                ensureDir(dest);
-                const filename = `${Date.now()}-${fieldName}.webp`;
-                const filepath = path.join(dest, filename);
-
-                fs.writeFileSync(filepath, compressed);
-                file.path = filepath;
-                file.filename = filename;
-
-                const compressionRatio = ((1 - compressed.length / file.buffer.length) * 100).toFixed(2);
-                console.log("✓ Compressed image saved:", filepath);
-                console.log("   Original size:", file.buffer.length, "bytes");
-                console.log("   Compressed size:", compressed.length, "bytes");
-                console.log("   Compression ratio:", compressionRatio + "%");
-              }
-            }
-          }
-        }
-
-        const oldSend = res.send;
-        res.send = function (body) {
-          if (res.statusCode >= 400) {
-            const deleteFile = (filePath) => {
-              if (filePath && fs.existsSync(filePath)) {
-                try {
-                  fs.unlinkSync(filePath);
-                  console.log("Deleted file after failed request:", filePath);
-                } catch (unlinkErr) {
-                  console.error("Failed to delete uploaded file:", unlinkErr);
-                }
-              }
-            };
-
-            if (req.file) deleteFile(req.file.path);
-            if (req.files) {
-              if (Array.isArray(req.files)) {
-                req.files.forEach((f) => deleteFile(f.path));
-              } else {
-                Object.values(req.files).flat().forEach((f) => deleteFile(f.path));
-              }
-            }
-          }
-          return oldSend.call(this, body);
-        };
-
-        next();
-      } catch (compressionError) {
-        console.error("✗ Compression error:", compressionError);
-        next(compressionError);
-      }
-    });
-  };
-};
-
-// ===== Uploaders with compression and cleanup =====
+// ===== Uploaders with cleanup =====
 const uploadSingleImageToDisk = withCleanup(
   multer({
     storage: multer.diskStorage({
@@ -281,7 +127,6 @@ const uploadMultipleImagesToDisk = withCleanup(
         const ext = file.mimetype.split("/")[1];
         cb(null, `${Date.now()}-${file.fieldname}-${Math.random().toString(36).substring(2, 8)}.${ext}`);
       },
-
     }),
     fileFilter: (req, file, cb) => {
       if (allowedImageTypes.includes(file.mimetype)) cb(null, true);
@@ -329,16 +174,21 @@ const uploadFileToDisk = withCleanup(
   }).single("file")
 );
 
-const uploadPaymentScreenshotToDisk = withCompressionAndCleanup(
+const uploadPaymentScreenshotToDisk = withCleanup(
   multer({
-    storage: multer.memoryStorage(),
+    storage: multer.diskStorage({
+      destination: dynamicDestination,
+      filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        cb(null, `${Date.now()}-paymentScreenShot.${ext}`);
+      },
+    }),
     fileFilter: (req, file, cb) => {
       if (allowedImageTypes.includes(file.mimetype)) cb(null, true);
       else cb(new AppError("Invalid file type for payment screenshot", 400), false);
     },
     limits: { fileSize: 5 * 1024 * 1024 },
-  }).single("paymentScreenShot"),
-  { quality: 75 }
+  }).single("paymentScreenShot")
 );
 
 const uplaodwatermarkToDisk = withCleanup(
@@ -358,9 +208,22 @@ const uplaodwatermarkToDisk = withCleanup(
   }).single("watermark")
 );
 
-const uploadCartPurchaseFiles = withCompressionAndCleanup(
+const uploadCartPurchaseFiles = withCleanup(
   multer({
-    storage: multer.memoryStorage(),
+    storage: multer.diskStorage({
+      destination: dynamicDestination,
+      filename: (req, file, cb) => {
+        const ext = file.mimetype.split("/")[1];
+        const timestamp = Date.now();
+        if (file.fieldname === "paymentScreenShot") {
+          cb(null, `${timestamp}-paymentScreenShot.${ext}`);
+        } else if (file.fieldname === "watermark") {
+          cb(null, `${timestamp}-watermark.${ext}`);
+        } else {
+          cb(null, `${timestamp}-${file.fieldname}.${ext}`);
+        }
+      },
+    }),
     fileFilter: (req, file, cb) => {
       if (allowedImageTypes.includes(file.mimetype)) {
         cb(null, true);
@@ -372,8 +235,7 @@ const uploadCartPurchaseFiles = withCompressionAndCleanup(
   }).fields([
     { name: "paymentScreenShot", maxCount: 1 },
     { name: "watermark", maxCount: 1 },
-  ]),
-  { quality: 1, fieldsToCompress: ["paymentScreenShot"] }
+  ])
 );
 
 const uploadProductFilesToDisk = withCleanup(

@@ -128,7 +128,7 @@ const StudentForm = ({
                 {h}
                 <button
                   type="button"
-                  className="btn-ghost btn-xs"
+                  className="btn btn-ghost btn-xs"
                   onClick={() => removeHobby(index)}
                 >
                   ×

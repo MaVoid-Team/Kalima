@@ -8,13 +8,13 @@ import { getAllSubjects } from "../../routes/courses";
 const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
   const { t, i18n } = useTranslation(['centerDashboard', 'common']);
   const isRTL = i18n.language === "ar";
-
+  
   const [filters, setFilters] = useState({
     subject: "",
     lecturer: "",
     level: ""
   });
-
+  
   const [subjects, setSubjects] = useState([]);
   const [levels, setLevels] = useState([]);
   const [mappedLessons, setMappedLessons] = useState([]);
@@ -30,7 +30,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         if (subjectsResponse.success) {
           setSubjects(subjectsResponse.data);
         }
-
+        
         const levelsResponse = await getAllLevels();
         if (levelsResponse.success) {
           setLevels(levelsResponse.data);
@@ -41,23 +41,23 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         setDataLoading(false);
       }
     };
-
+    
     fetchData();
   }, []);
 
   useEffect(() => {
     if (!lessons || dataLoading || isLoading) return;
-
+    
     const subjectMap = new Map(subjects.map(subject => [subject._id, subject.name]));
     const levelMap = new Map(levels.map(level => [level._id, level.name]));
     const lecturerMap = new Map(lecturers.map(lecturer => [lecturer._id, lecturer.name]));
-
+    
     const mapped = lessons.map((lesson, index) => {
       const startTime = new Date(lesson.startTime);
-      let endTime = lesson.duration ?
+      let endTime = lesson.duration ? 
         new Date(startTime.getTime() + lesson.duration * 60000) :
         new Date(startTime.getTime() + 60 * 60000);
-
+      
       return {
         id: lesson._id,
         subject: subjectMap.get(lesson.subject) || lesson.subject,
@@ -75,7 +75,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         },
       };
     });
-
+    
     setMappedLessons(mapped);
     setCurrentPage(1);
   }, [lessons, subjects, levels, lecturers, dataLoading, isLoading, t]);
@@ -91,8 +91,8 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
 
   const filteredLessons = mappedLessons.filter(lesson => {
     return (!filters.subject || lesson.subject === filters.subject) &&
-      (!filters.lecturer || lesson.teacher.name === filters.lecturer) &&
-      (!filters.level || lesson.teacher.group === filters.level);
+           (!filters.lecturer || lesson.teacher.name === filters.lecturer) &&
+           (!filters.level || lesson.teacher.group === filters.level);
   });
 
   const totalItems = filteredLessons.length;
@@ -113,22 +113,22 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
         <h2 className="text-xl font-bold">
           {t('courseList.title')}
         </h2>
-
+        
         <div className="flex flex-wrap gap-2">
-          <select
-            className="select select-bordered"
-            value={filters.level}
-            onChange={(e) => handleFilterChange("level", e.target.value)}
-          >
-            <option value="">{t('filters.allLevels')}</option>
-            {levels.map(level => (
-              <option key={level._id} value={level._id}>
-                {t(`gradeLevels.${level.name}`, { ns: 'common' })}
-              </option>
-            ))}
-          </select>
-
-          <select
+         <select 
+          className="select select-bordered"
+          value={filters.level}
+          onChange={(e) => handleFilterChange("level", e.target.value)}
+        >
+          <option value="">{t('filters.allLevels')}</option>
+          {levels.map(level => (
+            <option key={level._id} value={level._id}>
+              {t(`gradeLevels.${level.name}`, { ns: 'common' })}
+            </option>
+          ))}
+        </select>
+          
+          <select 
             className="select select-bordered"
             value={filters.lecturer}
             onChange={(e) => handleFilterChange("lecturer", e.target.value)}
@@ -138,8 +138,8 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
               <option key={lecturer} value={lecturer}>{lecturer}</option>
             ))}
           </select>
-
-          <button
+          
+          <button 
             className="btn btn-primary"
             onClick={onAddCourse}
           >
@@ -148,7 +148,7 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
           </button>
         </div>
       </div>
-
+      
       {isLoading || dataLoading ? (
         <div className="flex justify-center py-8">
           <div className="loading loading-spinner loading-md"></div>
@@ -172,14 +172,14 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-6 gap-2">
           <button
-            className="btn-outline btn-sm"
+            className="btn btn-outline btn-sm"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
             {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
             {t('courseList.pagination.previous')}
           </button>
-
+          
           <div className="flex gap-1">
             {Array.from({ length: totalPages }, (_, index) => index + 1).map(page => (
               <button
@@ -191,9 +191,9 @@ const CourseList = ({ lessons, isLoading, error, onAddCourse, lecturers }) => {
               </button>
             ))}
           </div>
-
+          
           <button
-            className="btn-outline btn-sm"
+            className="btn btn-outline btn-sm"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >

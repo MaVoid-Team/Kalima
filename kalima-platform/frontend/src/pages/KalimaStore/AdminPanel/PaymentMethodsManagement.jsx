@@ -65,8 +65,8 @@ const PaymentMethodsManagement = ({
 
       toast.error(
         err?.response?.data?.message ||
-        t("alerts.toggleError") ||
-        "Failed to change status"
+          t("alerts.toggleError") ||
+          "Failed to change status"
       );
     }
   };
@@ -97,7 +97,7 @@ const PaymentMethodsManagement = ({
 
       {/* ================= Edit Modal ================= */}
       {openEditPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-base-content/40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-base-100 w-full max-w-md rounded-xl p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold">
@@ -117,8 +117,9 @@ const PaymentMethodsManagement = ({
               className="space-y-4"
             >
               <input
-                className={`input input-bordered w-full ${errors.name ? "input-error" : ""
-                  }`}
+                className={`input input-bordered w-full ${
+                  errors.name ? "input-error" : ""
+                }`}
                 value={paymentMethodForm.name}
                 onChange={(e) =>
                   setPaymentMethodForm((p) => ({
@@ -134,8 +135,9 @@ const PaymentMethodsManagement = ({
               )}
 
               <input
-                className={`input input-bordered w-full ${errors.phoneNumber ? "input-error" : ""
-                  }`}
+                className={`input input-bordered w-full ${
+                  errors.phoneNumber ? "input-error" : ""
+                }`}
                 value={paymentMethodForm.phoneNumber}
                 onChange={(e) =>
                   setPaymentMethodForm((p) => ({
@@ -153,7 +155,7 @@ const PaymentMethodsManagement = ({
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   type="button"
-                  className="btn-ghost"
+                  className="btn btn-ghost"
                   onClick={closeEdit}
                 >
                   {t("common.cancel") || "Cancel"}
@@ -205,8 +207,9 @@ const PaymentMethodsManagement = ({
 
                   <td className="text-center">
                     <span
-                      className={`badge ${method.status ? "badge-success" : "badge-error"
-                        }`}
+                      className={`badge ${
+                        method.status ? "badge-success" : "badge-error"
+                      }`}
                     >
                       {method.status
                         ? t("paymentMethod.status.active")
@@ -217,15 +220,15 @@ const PaymentMethodsManagement = ({
                   <td className="text-center">
                     {method.createdAt
                       ? new Date(method.createdAt).toLocaleDateString(
-                        isRTL ? "ar-EG" : "en-US"
-                      )
+                          isRTL ? "ar-EG" : "en-US"
+                        )
                       : "-"}
                   </td>
 
                   <td className="text-center">
                     <div className="flex justify-center gap-2">
                       <button
-                        className="btn-ghost btn-sm"
+                        className="btn btn-ghost btn-sm"
                         onClick={() => openEdit(method)}
                         disabled={actionLoading}
                       >
@@ -233,7 +236,7 @@ const PaymentMethodsManagement = ({
                       </button>
 
                       <button
-                        className="btn-ghost btn-sm"
+                        className="btn btn-ghost btn-sm"
                         onClick={() => handleToggleStatus(method)}
                         disabled={actionLoading}
                       >
@@ -241,7 +244,7 @@ const PaymentMethodsManagement = ({
                       </button>
 
                       <button
-                        className="btn-ghost btn-sm text-error"
+                        className="btn btn-ghost btn-sm text-error"
                         onClick={() => onDelete(method)}
                         disabled={actionLoading}
                       >
@@ -256,7 +259,7 @@ const PaymentMethodsManagement = ({
         </div>
 
         {localMethods.length === 0 && (
-          <div className="py-8 text-center text-base-content/50">
+          <div className="py-8 text-center text-gray-500">
             {t("paymentMethod.noMethods")}
           </div>
         )}

@@ -13,7 +13,7 @@ export default function NavigationButtons({
       <button
         onClick={handlePrev}
         disabled={currentStep === 1 || isLoading}
-        className="btn-outline"
+        className="btn btn-outline"
         type="button"
       >
         {t("buttons.previous")}

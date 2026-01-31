@@ -37,7 +37,7 @@ export default function Overlay() {
       console.error("Failed to fetch cart count:", err);
     }
   };
-  //
+
   useEffect(() => {
     fetchCartCount();
     const handleCartUpdate = () => fetchCartCount();
@@ -54,15 +54,15 @@ export default function Overlay() {
     if (cartCount > 0) {
       const messages = isRTL
         ? [
-          "🛒 لديك منتجات في سلتك!",
-          "⏰ أكمل عملية الشراء الآن!",
-          "💸 لا تفوّت الفرصة! ادفع الآن!",
-        ]
+            "🛒 لديك منتجات في سلتك!",
+            "⏰ أكمل عملية الشراء الآن!",
+            "💸 لا تفوّت الفرصة! ادفع الآن!",
+          ]
         : [
-          "🛒 You have items in your cart!",
-          "⏰ Complete your purchase now!",
-          "💸 Don’t miss out — pay today!",
-        ];
+            "🛒 You have items in your cart!",
+            "⏰ Complete your purchase now!",
+            "💸 Don’t miss out — pay today!",
+          ];
 
       const interval = setInterval(() => {
         const random = messages[Math.floor(Math.random() * messages.length)];
@@ -81,9 +81,9 @@ export default function Overlay() {
       <motion.div
         onClick={() => navigate("/cart")}
         className="fixed bottom-36 w-16 h-16 rounded-full 
-          bg-gradient-to-br from-warning via-warning to-accent
-          text-warning-content flex items-center justify-center 
-          shadow-lg cursor-pointer z-[60]"
+          bg-gradient-to-br from-[#f9d67a] via-[#e3b956] to-[#d19b3c]
+          text-[#4a3000] flex items-center justify-center 
+          shadow-[0_6px_25px_rgba(0,0,0,0.3)] cursor-pointer z-[60]"
         style={{
           right: "2rem",
           left: "auto",
@@ -94,7 +94,7 @@ export default function Overlay() {
       >
         <ShoppingCart size={30} />
         {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-error text-error-content text-xs font-bold px-2 py-0.5 rounded-full">
+          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
             {cartCount}
           </span>
         )}
@@ -107,7 +107,7 @@ export default function Overlay() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-56 bg-base-100/95 text-warning-content border border-warning shadow-xl
+            className="fixed bottom-56 bg-white/95 text-[#744f00] border border-amber-400 shadow-xl
               text-sm font-semibold px-4 py-2 rounded-lg z-[55]"
             style={{
               right: "1.5rem",
@@ -137,14 +137,15 @@ export default function Overlay() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.8, y: 50, opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="relative bg-base-100/95 backdrop-blur-md rounded-3xl p-8 w-[90%] max-w-md text-center 
-              shadow-2xl border border-warning/50"
+              className="relative bg-white/95 backdrop-blur-md rounded-3xl p-8 w-[90%] max-w-md text-center 
+              shadow-2xl border border-amber-200"
             >
               {/* ❌ Close Button */}
               <button
                 onClick={() => setShowOverlay(false)}
-                className={`absolute top-4 ${isRTL ? "left-4" : "right-4"
-                  } text-base-content/40 hover:text-base-content/70 transition-all duration-200`}
+                className={`absolute top-4 ${
+                  isRTL ? "left-4" : "right-4"
+                } text-gray-400 hover:text-gray-700 transition-all duration-200`}
               >
                 <X
                   size={30}
@@ -158,20 +159,20 @@ export default function Overlay() {
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 150, damping: 10 }}
                 className="mx-auto w-20 h-20 flex items-center justify-center 
-  rounded-full bg-gradient-to-br from-warning via-warning to-accent shadow-lg"
+  rounded-full bg-gradient-to-br from-[#f9d67a] via-[#e3b956] to-[#d19b3c] shadow-lg"
               >
-                <ShoppingCart className="text-warning-content w-10 h-10" />
+                <ShoppingCart className="text-white w-10 h-10" />
               </motion.div>
 
               {/* Title */}
-              <h2 className="text-3xl font-extrabold text-warning-content mt-4 mb-2 tracking-wide">
+              <h2 className="text-3xl font-extrabold text-[#744f00] mt-4 mb-2 tracking-wide">
                 {isRTL
                   ? "🎉 تم إضافة أول منتج إلى السلة"
                   : "🎉 First product added to your cart"}
               </h2>
 
               {/* Description */}
-              <p className="text-base-content/60 mb-6 leading-relaxed text-base">
+              <p className="text-gray-600 mb-6 leading-relaxed text-base">
                 {isRTL
                   ? "يمكنك الدفع الآن أو إغلاق النافذة لإضافة المزيد من المنتجات."
                   : "You can pay now or close this window to add more products."}
@@ -182,8 +183,8 @@ export default function Overlay() {
                 onClick={() => navigate("/cart")}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full py-3 bg-gradient-to-r from-warning via-warning/90 to-warning
-                  text-warning-content font-bold text-lg rounded-xl shadow-lg hover:shadow-warning/40 
+                className="w-full py-3 bg-gradient-to-r from-[#f7d37f] via-[#e3b956] to-[#d49a3a]
+                  text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-amber-300/40 
                   transition-all duration-300"
               >
                 {isRTL ? "ادفع الآن" : "Pay Now"}

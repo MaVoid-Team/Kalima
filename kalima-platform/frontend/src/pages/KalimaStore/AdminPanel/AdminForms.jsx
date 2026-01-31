@@ -194,8 +194,8 @@ const EnhancedAdminForms = ({
       if (!currentForm?.subSection || currentForm.subSection === "") {
         toast.error(
           t("alerts.fillRequiredFields") ||
-          "Please select a subsection before creating the " +
-          formType.toLowerCase()
+            "Please select a subsection before creating the " +
+              formType.toLowerCase()
         );
         return;
       }
@@ -373,7 +373,7 @@ const EnhancedAdminForms = ({
           onChange={(e) => handleFileSelect(e, fieldName, activeTab)}
         />
 
-        <p className="text-xs mt-1 text-base-content/50">{hint}</p>
+        <p className="text-xs mt-1 text-gray-500">{hint}</p>
 
         {/* File Upload Progress */}
         {hasFile && (
@@ -452,14 +452,15 @@ const EnhancedAdminForms = ({
                       </span>
                       <span>{uploadState.progress}%</span>
                     </div>
-                    <div className="w-full bg-base-300 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className={`h-2 rounded-full transition-all duration-300 ${uploadState.error
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          uploadState.error
                             ? "bg-error"
                             : uploadState.uploaded
-                              ? "bg-success"
-                              : "bg-primary"
-                          }`}
+                            ? "bg-success"
+                            : "bg-primary"
+                        }`}
                         style={{ width: `${uploadState.progress}%` }}
                       ></div>
                     </div>
@@ -549,14 +550,15 @@ const EnhancedAdminForms = ({
                         </span>
                         <span>{uploadState.progress}%</span>
                       </div>
-                      <div className="w-full bg-base-300 rounded-full h-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full transition-all duration-300 ${uploadState.error
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            uploadState.error
                               ? "bg-error"
                               : uploadState.uploaded
-                                ? "bg-success"
-                                : "bg-primary"
-                            }`}
+                              ? "bg-success"
+                              : "bg-primary"
+                          }`}
                           style={{ width: `${uploadState.progress}%` }}
                         ></div>
                       </div>
@@ -695,7 +697,7 @@ const EnhancedAdminForms = ({
                   t("forms.createProduct.fields.thumbnail") || "Thumbnail *",
                   "image/*",
                   t("forms.createProduct.hints.thumbnail") ||
-                  "Upload thumbnail image (JPG, PNG, WebP)"
+                    "Upload thumbnail image (JPG, PNG, WebP)"
                 )}
 
                 {/* Section Field */}
@@ -747,82 +749,83 @@ const EnhancedAdminForms = ({
                 {/* SubSection Field */}
                 {((activeTab === "product" && productForm?.section) ||
                   (activeTab === "book" && bookForm?.section)) && (
-                    <div>
-                      <label className="label">
-                        <span className="label-text font-medium">
-                          {t("forms.createProduct.fields.subSection") ||
-                            "SubSection"}{" "}
-                          *
-                        </span>
-                      </label>
-                      <select
-                        className={`select select-bordered w-full ${(activeTab === "product" &&
-                            productForm?.section &&
-                            !productForm?.subSection) ||
-                            (activeTab === "book" &&
-                              bookForm?.section &&
-                              !bookForm?.subSection)
-                            ? "select-error border-error"
-                            : ""
-                          }`}
-                        value={
-                          activeTab === "product"
-                            ? productForm?.subSection || ""
-                            : bookForm?.subSection || ""
-                        }
-                        onChange={(e) => {
-                          if (activeTab === "product") {
-                            setProductForm?.({
-                              ...productForm,
-                              subSection: e.target.value,
-                            });
-                          } else {
-                            setBookForm?.({
-                              ...bookForm,
-                              subSection: e.target.value,
-                            });
-                          }
-                        }}
-                        required
-                      >
-                        <option value="">
-                          {t("forms.createProduct.placeholders.subSection") ||
-                            "Select subsection"}
-                        </option>
-                        {(subSections || [])
-                          .filter((subSection) => {
-                            const selectedSectionId =
-                              activeTab === "product"
-                                ? productForm?.section
-                                : bookForm?.section;
-                            // Handle both ObjectId and string comparisons
-                            const subSectionId =
-                              subSection?.section?._id || subSection?.section;
-                            return subSectionId === selectedSectionId;
-                          })
-                          .map((subSection) =>
-                            subSection?._id && subSection?.name ? (
-                              <option key={subSection._id} value={subSection._id}>
-                                {subSection.name}
-                              </option>
-                            ) : null
-                          )}
-                      </select>
-
-                      {/* Validation message */}
-                      {((activeTab === "product" &&
-                        productForm?.section &&
-                        !productForm?.subSection) ||
+                  <div>
+                    <label className="label">
+                      <span className="label-text font-medium">
+                        {t("forms.createProduct.fields.subSection") ||
+                          "SubSection"}{" "}
+                        *
+                      </span>
+                    </label>
+                    <select
+                      className={`select select-bordered w-full ${
+                        (activeTab === "product" &&
+                          productForm?.section &&
+                          !productForm?.subSection) ||
                         (activeTab === "book" &&
                           bookForm?.section &&
-                          !bookForm?.subSection)) && (
-                          <div className="text-error text-xs mt-1">
-                            {t("alerts.subSectionRequired") ||
-                              "Please select a subsection"}
-                          </div>
+                          !bookForm?.subSection)
+                          ? "select-error border-error"
+                          : ""
+                      }`}
+                      value={
+                        activeTab === "product"
+                          ? productForm?.subSection || ""
+                          : bookForm?.subSection || ""
+                      }
+                      onChange={(e) => {
+                        if (activeTab === "product") {
+                          setProductForm?.({
+                            ...productForm,
+                            subSection: e.target.value,
+                          });
+                        } else {
+                          setBookForm?.({
+                            ...bookForm,
+                            subSection: e.target.value,
+                          });
+                        }
+                      }}
+                      required
+                    >
+                      <option value="">
+                        {t("forms.createProduct.placeholders.subSection") ||
+                          "Select subsection"}
+                      </option>
+                      {(subSections || [])
+                        .filter((subSection) => {
+                          const selectedSectionId =
+                            activeTab === "product"
+                              ? productForm?.section
+                              : bookForm?.section;
+                          // Handle both ObjectId and string comparisons
+                          const subSectionId =
+                            subSection?.section?._id || subSection?.section;
+                          return subSectionId === selectedSectionId;
+                        })
+                        .map((subSection) =>
+                          subSection?._id && subSection?.name ? (
+                            <option key={subSection._id} value={subSection._id}>
+                              {subSection.name}
+                            </option>
+                          ) : null
                         )}
-                    </div>
-                  )}
+                    </select>
+
+                    {/* Validation message */}
+                    {((activeTab === "product" &&
+                      productForm?.section &&
+                      !productForm?.subSection) ||
+                      (activeTab === "book" &&
+                        bookForm?.section &&
+                        !bookForm?.subSection)) && (
+                      <div className="text-error text-xs mt-1">
+                        {t("alerts.subSectionRequired") ||
+                          "Please select a subsection"}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Subject field - only for books */}
                 {activeTab === "book" && (
@@ -989,7 +992,7 @@ const EnhancedAdminForms = ({
                     }}
                     required
                   />
-                  <p className="text-xs mt-1 text-base-content/50">
+                  <p className="text-xs mt-1 text-gray-500">
                     {t("forms.createProduct.hints.whatsAppNumber")}
                   </p>
                 </div>
@@ -997,10 +1000,10 @@ const EnhancedAdminForms = ({
                 {/* Sample File Upload */}
                 {renderFileUpload(
                   "sample",
-                  t("forms.createProduct.fields.sampleFile"),
+                  t("forms.createProduct.fields.sampleFile") || "Sample File",
                   ".pdf",
                   t("forms.createProduct.hints.sampleFile") ||
-                  "Upload sample file (PDF)"
+                    "Upload sample file (PDF)"
                 )}
 
                 {/* Description Field */}
@@ -1040,7 +1043,7 @@ const EnhancedAdminForms = ({
                     }}
                     required
                   />
-                  <p className="text-xs mt-1 text-base-content/50">
+                  <p className="text-xs mt-1 text-gray-500">
                     {activeTab === "product"
                       ? t("forms.createProduct.hints.description")
                       : t("forms.createBook.hints.description")}
@@ -1195,8 +1198,8 @@ const EnhancedAdminForms = ({
                                 const updatedRoles = checked
                                   ? [...(sectionForm?.allowedFor || []), role]
                                   : sectionForm?.allowedFor?.filter(
-                                    (r) => r !== role
-                                  );
+                                      (r) => r !== role
+                                    );
 
                                 setSectionForm?.((prev) => ({
                                   ...prev,
@@ -1318,13 +1321,14 @@ const EnhancedAdminForms = ({
       <EnhancedProgressBar
         isVisible={progressTracker.isVisible}
         title={t(
-          `progressSteps.creating${activeTab === "product"
-            ? "Product"
-            : activeTab === "book"
+          `progressSteps.creating${
+            activeTab === "product"
+              ? "Product"
+              : activeTab === "book"
               ? "Book"
               : activeTab === "section"
-                ? "Section"
-                : "SubSection"
+              ? "Section"
+              : "SubSection"
           }`
         )}
         steps={progressTracker.steps}

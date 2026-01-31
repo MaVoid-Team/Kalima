@@ -112,8 +112,7 @@
     "sequenceId" : "رقم التسلسل",
     "sequenceIdTooltip" : "رقم التسلسل الخاص بك",
     "parentLinkTitle" : "رابط الوالدين",
-    "parentLinkDescription" : "استخدم هذا الرابط للوصول للوالدين",
-    "userSerial" : "كود الدعوه"
+    "parentLinkDescription" : "استخدم هذا الرابط للوصول للوالدين"
   },
   "arrowAlt": "سهم بين البطاقات",
   "decorativeAlt": "زخارف نقطية",

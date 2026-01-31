@@ -17,7 +17,7 @@ const PaymentSection = ({ paymentNumber, isRTL, whatsAppNumber }) => {
       console.error(t("errors.copyFailed"), err)
     }
   }
-  // dummy comment to re-commit
+// dummy comment to re-commit
   return (
     <div className="text-center space-y-8">
       {/* Section Header */}
@@ -80,7 +80,7 @@ const PaymentSection = ({ paymentNumber, isRTL, whatsAppNumber }) => {
       <div className="card bg-base-200">
         <div className="card-body p-4">
           <div className="flex items-center gap-2 mb-2">
-            <FaWhatsapp className="w-5 h-5 text-success" />
+            <FaWhatsapp className="w-5 h-5 text-green-500" />
             <span className="font-semibold">{t("product.whatsapp")}</span>
           </div>
           <p className="font-mono text-lg">{whatsAppNumber}</p>

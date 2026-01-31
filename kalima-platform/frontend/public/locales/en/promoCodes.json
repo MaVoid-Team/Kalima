@@ -112,7 +112,6 @@
     "sequenceId" : "Sequence ID",
     "sequenceIdTooltip" : "Your sequence ID",
     "parentLinkTitle" :  "Parent Link",
-    "parentLinkDescription" : "Use this link to access your parent account",
-    "userSerial" : "Invitation Code"
+    "parentLinkDescription" : "Use this link to access your parent account"
   }
 }

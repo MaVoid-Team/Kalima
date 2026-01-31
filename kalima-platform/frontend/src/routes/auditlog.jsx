@@ -27,7 +27,8 @@ export const getAuditLogs = async (page = 1, limit = 10, filters = {}) => {
     };
 
     const token = getToken();
-    const response = await axios.get(`${API_URL}/audit-logs`, {
+
+    const response = await axios.get(`${API_URL}/api/v1/audit-logs`, {
       params,
       withCredentials: true,
       headers: {
@@ -54,7 +55,7 @@ export const getAuditLogById = async (logId) => {
       throw new Error("User not authenticated");
     }
 
-    const response = await axios.get(`${API_URL}/audit-logs/${logId}`, {
+    const response = await axios.get(`${API_URL}/api/v1/audit-logs/${logId}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,
@@ -75,7 +76,7 @@ export const getAuditLogsByEmail = async (email) => {
   try {
     if (!isLoggedIn()) throw new Error("User not authenticated");
 
-    const response = await axios.get(`${API_URL}/audit-logs/user/email/${email}`, {
+    const response = await axios.get(`${API_URL}/api/v1/audit-logs/user/email/${email}`, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${getToken()}`,

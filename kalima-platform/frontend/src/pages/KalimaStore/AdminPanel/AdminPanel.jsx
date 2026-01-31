@@ -267,6 +267,7 @@ const AdminPanel = () => {
     try {
       setActionLoading(true);
 
+      // 🐛 DEBUG: Log the data being sent to createBook
       const dataToSend = {
         title: bookForm.title,
         serial: bookForm.serial,
@@ -348,6 +349,7 @@ const AdminPanel = () => {
     try {
       setActionLoading(true);
 
+      // 🐛 DEBUG: Log the data being sent to createProduct
       const dataToSend = {
         title: productForm.title,
         serial: productForm.serial,

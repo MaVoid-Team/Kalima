@@ -214,8 +214,9 @@ export default function LessonDetailsSection() {
       {/* Display attendance result if available */}
       {attendanceResult && (
         <div
-          className={`alert ${attendanceResult.success ? "alert-success" : "alert-error"
-            } shadow-lg transition-all duration-300 ease-in-out`}
+          className={`alert ${
+            attendanceResult.success ? "alert-success" : "alert-error"
+          } shadow-lg transition-all duration-300 ease-in-out`}
         >
           <div className="flex items-center">
             {attendanceResult.success ? (
@@ -268,7 +269,7 @@ export default function LessonDetailsSection() {
                   />
                   <button
                     type="button"
-                    className="btn-outline btn-square"
+                    className="btn btn-outline btn-square"
                     onClick={() => setShowScanner(!showScanner)}
                     title={t("attendance.scanButton", "Scan ID")}
                   >
