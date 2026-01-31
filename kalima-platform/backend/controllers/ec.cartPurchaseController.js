@@ -1338,6 +1338,71 @@ exports.getMonthlyConfirmedPurchasesCount = catchAsync(
   },
 );
 
+exports.getUsersPurchaseHistory = catchAsync(async (req, res, next) => {
+  // Pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Build filter for search
+  let filter = {};
+
+  if (req.query.search) {
+    const searchTermString = String(req.query.search || "").trim();
+    // Escape special regex characters then create case-insensitive regex
+    const searchRegex = new RegExp(
+      searchTermString.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "i",
+    );
+
+    // Search by name, email, or phoneNumber
+    filter.$or = [
+      { name: searchRegex },
+      { email: searchRegex },
+      { phoneNumber: searchRegex },
+    ];
+  }
+
+  // Get total count for pagination
+  const total = await User.countDocuments(filter);
+
+  // Fetch users with pagination and search
+  const users = await User.find(filter)
+    .sort({ numberOfPurchases: -1 }) // DESC
+    .select("name email phoneNumber numberOfPurchases totalSpentAmount")
+    .skip(skip)
+    .limit(limit);
+
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    pagination: {
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    },
+    data: {
+      users,
+    },
+  });
+});
+
+exports.getUsersPurchaseHistoryInDetailById = catchAsync(async (req, res, next) => {
+  const userId = req.params.userId;
+
+  const purchases = await ECCartPurchase.find({ createdBy: userId })
+    .sort({ createdAt: -1 }) // DESC
+
+  res.status(200).json({
+    status: "success",
+    results: purchases.length,
+    data: {
+      purchases,
+    },
+  });
+});
+
 exports.deleteItemFromPurchase = catchAsync(async (req, res, next) => {
   const purchaseId = req.params.purchaseId;
   const itemId = req.params.itemId;

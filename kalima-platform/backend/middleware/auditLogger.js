@@ -9,6 +9,12 @@ const createAuditLogEntry = async (req, res, originalRes) => {
       return;
     }
 
+    // Skip audit logging for READ operations (GET)
+    if (req.method === 'GET') {
+      console.log('[AUDIT] Skipped: Read operation (GET) not logged');
+      return;
+    }
+
     // Determine action based on HTTP method
     const methodToAction = {
       POST: "create",
