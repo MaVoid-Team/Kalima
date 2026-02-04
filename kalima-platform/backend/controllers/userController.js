@@ -115,6 +115,16 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   if (!foundUser) return next(new AppError("User not found", 404));
 
+  if (
+    req.user.role !== "Admin" &&
+    req.user.role !== "SubAdmin" &&
+    req.user._id.toString() !== userId.toString()
+  ) {
+    return next(
+      new AppError("You are not authorized to update this user.", 403)
+    );
+  }
+
   /*
   BUG -->> if the array here is empty, no err occured!!!!!!,
   the for loop runs but does nothing, we sould reject it because empty array is invalid input,
@@ -131,41 +141,74 @@ const updateUser = catchAsync(async (req, res, next) => {
 
   TAKE CARE OFF -->> when fixing the above , don't allow the repeatition of ids in children array
   */
-  const childrenById = [];
-  if (!!children) {
-    for (let id of children) {
+  let childrenById = [];
+
+  if (foundUser.role === "Parent" && children) {
+    const childrenArray = Array.isArray(children) ? children : [children];
+    const resolvedIds = [];
+
+    for (let id of childrenArray) {
+      let student = null;
       // Check if the id is a valid MongoDB ObjectId
-      const isMongoId = mongoose.Types.ObjectId.isValid(id);
-      if (isMongoId) {
-        childrenById.push(id);
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        student = await Student.findById(id).select("_id parent").lean();
       } else {
         try {
-          const student = await Student.findOne({ sequencedId: id }).lean();
-          if (student) {
-            childrenById.push(student._id);
-          }
+          student = await Student.findOne({ sequencedId: id })
+            .select("_id parent")
+            .lean();
         } catch (error) {
-          if (error.name === "CastError") {
-            return next(
-              new AppError(
-                "Not all children values are valid UserId or SequenceId.",
-                400
-              )
-            );
-          }
+          // Ignore error, validation happens below
         }
       }
+
+      if (!student) {
+        return next(new AppError(`Student with ID ${id} not found.`, 404));
+      }
+
+      // Check ownership/claim
+      if (
+        req.user.role !== "Admin" &&
+        req.user.role !== "SubAdmin" &&
+        student.parent &&
+        student.parent.toString() !== userId.toString()
+      ) {
+        return next(
+          new AppError(
+            `Student with ID ${id} is already assigned to another parent.`,
+            403
+          )
+        );
+      }
+
+      resolvedIds.push(student._id.toString());
     }
+
+    // Merge with existing children
+    const existingChildren = foundUser.children
+      ? foundUser.children.map((c) => c.toString())
+      : [];
+
+    // Unique merge
+    childrenById = [...new Set([...existingChildren, ...resolvedIds])];
     req.body.children = childrenById;
+  } else if (children) {
+    // For non-parents, verify validity or remove the field to prevent bad data
+    // Since only Parents should have children, we remove it for others to be safe
+    delete req.body.children;
   }
+
   const updatedUser = {
     name,
     email,
     address,
-    children: childrenById,
     role: foundUser.role, // Explicitly preserve the original role
     ...req.body,
   };
+
+  if (foundUser.role === "Parent" && children) {
+    updatedUser.children = childrenById;
+  }
   if (hashedPassword) {
     updatedUser.password = hashedPassword;
   }
