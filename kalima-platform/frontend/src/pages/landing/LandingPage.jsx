@@ -1,6 +1,6 @@
-import WelcomeSection from "../../components/landing/WelcomeSection";
-import SubjectsSection from "../../components/landing/SubjectsSection";
-import FeaturedBooklets from "../../components/landing/FeaturedBooklets";
+import WelcomeSection from "../../components/LandingPage/WelcomeSection";
+import SubjectsSection from "../../components/LandingPage/SubjectsSection";
+import FeaturedBooklets from "../../components/LandingPage/FeaturedBooklets";
 
 export default function LandingPage() {
   return (
