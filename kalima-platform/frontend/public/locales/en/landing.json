@@ -1,13 +1,16 @@
 {
   "navbar": {
+    "brand": "Kalima",
     "courses": "Courses",
     "teachers": "Teachers",
     "services": "Services",
     "pricing": "Pricing",
     "login": "Log In",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "languageToggle": "العربية"
   },
   "footer": {
+    "brand": "Kalima Platform",
     "description": "A comprehensive educational platform providing the best resources and courses.",
     "platform": "Platform",
     "browseCourses": "Browse Courses",
@@ -68,7 +71,13 @@
     "middle": "Middle",
     "secondary": "Secondary",
     "free": "Free",
-    "currency": "EGP"
+    "currency": "EGP",
+    "courses": {
+      "arabic": "Arabic Language",
+      "physics": "Physics",
+      "math": "Mathematics",
+      "chemistry": "Chemistry"
+    }
   },
   "about": {
     "badge": "The Legacy",

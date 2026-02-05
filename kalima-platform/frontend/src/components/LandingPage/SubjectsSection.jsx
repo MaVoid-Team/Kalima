@@ -1,11 +1,7 @@
-import {
-  Languages,
-  BookText,
-  FlaskConical,
-  ArrowRight,
-  ArrowLeft,
-} from "lucide-react";
+import { Languages, BookText, FlaskConical, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const SUBJECT_IMAGES = {
@@ -18,16 +14,7 @@ const SUBJECT_IMAGES = {
 };
 
 export default function SubjectsSection() {
-  const { t, i18n } = useTranslation("landing");
-  const rtl = i18n.dir() === "rtl";
-
-  // Direction-aware styles
-  const dir = {
-    textAlign: rtl ? "text-right" : "",
-    cardText: rtl ? "text-right" : "text-left",
-    Arrow: rtl ? ArrowLeft : ArrowRight,
-    arrowHover: rtl ? "group-hover:-translate-x-1" : "group-hover:translate-x-1",
-  };
+  const { t } = useTranslation("landing");
 
   const subjects = [
     {
@@ -36,8 +23,8 @@ export default function SubjectsSection() {
       description: t("subjects.categories.languages.description"),
       image: SUBJECT_IMAGES.LANGUAGES,
       icon: Languages,
-      iconColor: "text-brand",
-      iconBg: "bg-brand-light",
+      iconColor: "text-primary",
+      iconBg: "bg-primary/10",
     },
     {
       id: "humanities",
@@ -45,8 +32,8 @@ export default function SubjectsSection() {
       description: t("subjects.categories.humanities.description"),
       image: SUBJECT_IMAGES.HUMANITIES,
       icon: BookText,
-      iconColor: "text-purple-600",
-      iconBg: "bg-purple-50",
+      iconColor: "text-secondary",
+      iconBg: "bg-secondary/10",
     },
     {
       id: "sciences",
@@ -54,8 +41,8 @@ export default function SubjectsSection() {
       description: t("subjects.categories.sciences.description"),
       image: SUBJECT_IMAGES.SCIENCES,
       icon: FlaskConical,
-      iconColor: "text-orange-600",
-      iconBg: "bg-orange-50",
+      iconColor: "text-primary",
+      iconBg: "bg-primary/10",
     },
   ];
 
@@ -64,7 +51,7 @@ export default function SubjectsSection() {
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-          <div className={`space-y-4 max-w-2xl ${dir.textAlign}`}>
+          <div className="space-y-4 max-w-2xl">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
               {t("subjects.title")}
             </h2>
@@ -72,13 +59,16 @@ export default function SubjectsSection() {
               {t("subjects.description")}
             </p>
           </div>
-          <a
-            href="#"
-            className="group inline-flex items-center text-[15px] font-bold text-brand hover:text-brand-dark transition-colors"
+          <Button
+            variant="primary"
+            size="sm"
+            className="text-primary"
+            asChild
           >
-            {t("subjects.viewAll")}
-            <dir.Arrow className={`ms-1.5 h-4 w-4 transition-transform ${dir.arrowHover}`} />
-          </a>
+            <Link to="/subjects">
+              {t("subjects.viewAll")} <span className="text-lg">&larr;</span>
+            </Link>
+          </Button>
         </div>
 
         {/* Grid */}
@@ -86,18 +76,14 @@ export default function SubjectsSection() {
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="group relative flex flex-col overflow-hidden rounded-4xl p-0 gap-0"
+              className="flex flex-col overflow-hidden rounded-4xl p-0"
             >
-              {/* Image Half */}
-              <div
-                className="h-56 w-full bg-cover bg-center"
-                style={{ backgroundImage: `url("${subject.image}")` }}
+              <img
+                src={subject.image}
+                alt={subject.title}
+                className="h-56 w-full object-cover"
               />
-
-              {/* Content Half */}
-              <CardContent
-                className={`flex flex-col p-8 pt-8 bg-white  ${dir.cardText}`}
-              >
+              <CardContent className="flex flex-col p-8">
                 <div
                   className={`mb-6 flex h-12 w-12 items-center justify-center rounded-full ${subject.iconBg}`}
                 >

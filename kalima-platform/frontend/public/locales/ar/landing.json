@@ -1,13 +1,16 @@
 {
   "navbar": {
+    "brand": "كلمة",
     "courses": "الكورسات",
     "teachers": "المعلمين",
     "services": "الخدمات",
     "pricing": "الأسعار",
     "login": "تسجيل الدخول",
-    "signup": "إنشاء حساب"
+    "signup": "إنشاء حساب",
+    "languageToggle": "English"
   },
   "footer": {
+    "brand": "منصة كلمة",
     "description": "منصة تعليمية متكاملة تقدم أفضل الموارد والدورات التعليمية.",
     "platform": "المنصة",
     "browseCourses": "تصفح الكورسات",
@@ -68,7 +71,13 @@
     "middle": "إعدادي",
     "secondary": "ثانوي",
     "free": "مجاني",
-    "currency": "ج.م"
+    "currency": "ج.م",
+    "courses": {
+      "arabic": "اللغة العربية",
+      "physics": "الفيزياء",
+      "math": "الرياضيات",
+      "chemistry": "الكيمياء"
+    }
   },
   "about": {
     "badge": "قصة التميز",
