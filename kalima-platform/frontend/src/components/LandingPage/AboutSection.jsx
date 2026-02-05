@@ -94,7 +94,7 @@ export default function AboutSection() {
                   backgroundImage: `url("${ABOUT_IMAGE_URL}")`,
                 }}
               >
-                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black/10 to-transparent" />
+                <div className="absolute inset-0 rounded-[2.5rem] bg-linear-to-t from-black/10 to-transparent" />
               </div>
             </div>
           </div>
