@@ -1,0 +1,108 @@
+{
+  "navbar": {
+    "courses": "Courses",
+    "teachers": "Teachers",
+    "services": "Services",
+    "pricing": "Pricing",
+    "login": "Log In",
+    "signup": "Sign Up"
+  },
+  "footer": {
+    "description": "A comprehensive educational platform providing the best resources and courses.",
+    "platform": "Platform",
+    "browseCourses": "Browse Courses",
+    "teachers": "Teachers",
+    "pricing": "Pricing",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "careers": "Careers",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "rights": "All rights reserved"
+  },
+  "welcome": {
+    "badge": "Soar in the Sky of Creativity",
+    "title": "",
+    "titleHighlight": "Kalima",
+    "titleEnd": "Learning Platform",
+    "description": "A comprehensive educational platform providing the best teachers and courses from elementary to high school.",
+    "searchPlaceholder": "Search for courses, teachers...",
+    "searchButton": "Search",
+    "browseCourses": "Browse Courses",
+    "teachers": "Teachers",
+    "stats": {
+      "students": "Students",
+      "teachers": "Teachers",
+      "courses": "Courses"
+    },
+    "rating": "Rating",
+    "ratingNote": "Based on student reviews",
+    "trustedBy": "Trusted by 2,000+ Educators"
+  },
+  "subjects": {
+    "title": "Explore by Subject",
+    "description": "Find specialized materials tailored to each student's needs.",
+    "viewAll": "View All Subjects",
+    "categories": {
+      "languages": {
+        "title": "Languages",
+        "description": "Arabic, English, French, German and more."
+      },
+      "humanities": {
+        "title": "Humanities",
+        "description": "History, Philosophy, Psychology, Logic and Geography."
+      },
+      "sciences": {
+        "title": "Science & Math",
+        "description": "Geology, Chemistry, Physics, Statistics and Algebra."
+      }
+    }
+  },
+  "featured": {
+    "title": "Featured Courses",
+    "description": "Top-rated educational courses getting the best reviews this month.",
+    "allLevels": "All Levels",
+    "primary": "Primary",
+    "middle": "Middle",
+    "secondary": "Secondary",
+    "free": "Free",
+    "currency": "EGP"
+  },
+  "about": {
+    "badge": "The Legacy",
+    "title": "Beyond",
+    "titleHighlight": "Boundaries",
+    "titleEnd": "of Traditional Learning",
+    "description": "We provide an unforgettable educational experience, blending innovation, professionalism, and AI.",
+    "features": {
+      "interactive": {
+        "title": "Interactive Lectures",
+        "description": "Modern educational content with latest curricula."
+      },
+      "quality": {
+        "title": "Educational Quality",
+        "description": "Ensuring the highest pedagogical standards."
+      }
+    }
+  },
+  "appDownload": {
+    "badge": "Kalima App",
+    "title": "Learn Without",
+    "titleHighlight": "Boundaries",
+    "titleEnd": "In Your Hands",
+    "description": "With Kalima app, we take you on an integrated educational journey that transcends limits.",
+    "features": {
+      "anywhere": {
+        "title": "Learn Anywhere",
+        "description": "Access your lessons from your phone anytime."
+      },
+      "offline": {
+        "title": "Offline Content",
+        "description": "Download lessons and watch offline."
+      }
+    },
+    "downloadButton": "Download App"
+  }
+}
