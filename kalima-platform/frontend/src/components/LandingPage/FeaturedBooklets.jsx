@@ -83,7 +83,7 @@ export default function FeaturedBooklets() {
           {featuredCourses.map((course) => (
             <div key={course.id} className="group flex flex-col gap-4">
               {/* Image Container */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2.5rem] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+              <div className="relative aspect-4/5 w-full overflow-hidden rounded-[2.5rem] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
                 <div
                   className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{ backgroundImage: `url("${course.image}")` }}

@@ -86,7 +86,7 @@ export default function SubjectsSection() {
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="group relative flex flex-col overflow-hidden rounded-[2rem] p-0 gap-0"
+              className="group relative flex flex-col overflow-hidden rounded-4xl p-0 gap-0"
             >
               {/* Image Half */}
               <div
