@@ -1,5 +1,6 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.png";
 
 const SOCIAL_LINKS = [
@@ -9,9 +10,9 @@ const SOCIAL_LINKS = [
   { Icon: Linkedin, href: "#", label: "LinkedIn" },
 ];
 
-const Footer = () => {
+export default function Footer() {
   const { t, i18n } = useTranslation("landing");
-  const isRTL = i18n.language === "ar";
+  const rtl = i18n.dir() === "rtl";
 
   const FOOTER_SECTIONS = [
     {
@@ -39,34 +40,32 @@ const Footer = () => {
     },
   ];
 
-  const linkClass = "hover:text-brand transition-colors";
-  const socialIconClass = "text-gray-400 hover:text-brand transition-colors";
+  const linkClass = "text-muted-foreground hover:text-brand transition-colors";
 
   return (
-    <footer className="bg-white text-gray-500 py-12 border-t border-gray-100" dir={isRTL ? "rtl" : "ltr"}>
+    <footer className="bg-background border-t border-gray-200 text-muted-foreground py-12 ">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
-          <div className={`space-y-4 ${isRTL ? "text-right" : ""}`}>
-            <div className={`flex items-center gap-2 text-text-main ${isRTL ? "flex-row-reverse justify-end" : ""}`}>
+          <div className={`space-y-4 ${rtl ? "text-right" : ""}`}>
+            <div
+              className={`flex items-center gap-2 text-foreground ${rtl ? "flex-row-reverse justify-end" : ""}`}
+            >
               <img
                 src={logo}
                 alt="Kalima Logo"
                 className="h-8 w-auto object-contain"
               />
-              <span className="text-xl font-bold tracking-tight">
-                {isRTL ? "كلمة" : "Kalima"}
-              </span>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground/80">
               {t("footer.description")}
             </p>
           </div>
 
           {/* Footer Sections */}
           {FOOTER_SECTIONS.map((section) => (
-            <div key={section.title} className={isRTL ? "text-right" : ""}>
-              <h3 className="text-text-main font-semibold mb-4">
+            <div key={section.title} className={rtl ? "text-right" : ""}>
+              <h3 className="text-foreground font-semibold mb-4">
                 {section.title}
               </h3>
               <ul className="space-y-2 text-sm">
@@ -82,26 +81,30 @@ const Footer = () => {
           ))}
         </div>
 
-        <div className={`border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 ${isRTL ? "md:flex-row-reverse" : ""}`}>
-          <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} {isRTL ? "منصة كلمة" : "Kalima Platform"}. {t("footer.rights")}.
+        <div
+          className={` pt-8 flex flex-col md:flex-row justify-between items-center gap-4 ${rtl ? "md:flex-row-reverse" : ""}`}
+        >
+          <p className="text-sm text-muted-foreground">
+            © {new Date().getFullYear()} {rtl ? "منصة كلمة" : "Kalima Platform"}
+            . {t("footer.rights")}.
           </p>
-          <div className={`flex gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+          <div className={`flex gap-4 ${rtl ? "flex-row-reverse" : ""}`}>
             {SOCIAL_LINKS.map(({ Icon, href, label }) => (
-              <a
+              <Button
                 key={label}
-                href={href}
-                className={socialIconClass}
-                aria-label={label}
+                variant="ghost"
+                size="icon"
+                asChild
+                className="h-9 w-9 hover:text-brand text-muted-foreground"
               >
-                <Icon className="h-5 w-5" />
-              </a>
+                <a href={href} aria-label={label}>
+                  <Icon className="h-5 w-5" />
+                </a>
+              </Button>
             ))}
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

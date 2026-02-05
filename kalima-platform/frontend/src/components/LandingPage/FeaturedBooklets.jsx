@@ -1,21 +1,30 @@
 import { Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Badge } from "@/components/ui/badge";
 
 const COURSE_IMAGES = {
-  ARABIC: "https://lh3.googleusercontent.com/aida-public/AB6AXuBU3631m9CH40eCOA5z6lAzTbZQq3zKWbewDlzobKgCkvitZYeyoXH9pxyOaV62Ozb31CcMfIuPbRJj1tFAI9Imq2Y9YGXSdjrV4eKtp8OrNsdNahXDlPnwoBnmjwHdpcLApdkinLngXJoQd5Q2JJMtYcGbEL86uO2JQBnTQeqetJiflGRgNDnUQwU2lfEiwZ87-uafN6ZsQc0mWVwHcqC4dWD5Fc__DnfGVNiHOSpn3CTk-sydWSk1l6vGF025CnnDhUSqsSqRWv8",
-  PHYSICS: "https://lh3.googleusercontent.com/aida-public/AB6AXuCLUfOnHbk19VX8MKPpas5g2q4WPSSCfYqELOKTmEjMpYael6wzVq0-3GDf-smeR0TjKuVPaW86KeyxRNcv4ffKMpSkMsJ27hIZ7vPPsS48agrAiOjVRjNm012Wtr5axnEnJETzWw-OwfXZHsIfqNuJnJ7kiR8Lg9GtXVFSAQstYXZODzyZb9kQCyFTR9DTEgzUvuazKDPdhkza7oWAXdLqqTmwKtiIVjHOScv5GS2nFiTe9bOJSRXzozDMYWTBAxW1gihepE-nnrY",
+  ARABIC:
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuBU3631m9CH40eCOA5z6lAzTbZQq3zKWbewDlzobKgCkvitZYeyoXH9pxyOaV62Ozb31CcMfIuPbRJj1tFAI9Imq2Y9YGXSdjrV4eKtp8OrNsdNahXDlPnwoBnmjwHdpcLApdkinLngXJoQd5Q2JJMtYcGbEL86uO2JQBnTQeqetJiflGRgNDnUQwU2lfEiwZ87-uafN6ZsQc0mWVwHcqC4dWD5Fc__DnfGVNiHOSpn3CTk-sydWSk1l6vGF025CnnDhUSqsSqRWv8",
+  PHYSICS:
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuCLUfOnHbk19VX8MKPpas5g2q4WPSSCfYqELOKTmEjMpYael6wzVq0-3GDf-smeR0TjKuVPaW86KeyxRNcv4ffKMpSkMsJ27hIZ7vPPsS48agrAiOjVRjNm012Wtr5axnEnJETzWw-OwfXZHsIfqNuJnJ7kiR8Lg9GtXVFSAQstYXZODzyZb9kQCyFTR9DTEgzUvuazKDPdhkza7oWAXdLqqTmwKtiIVjHOScv5GS2nFiTe9bOJSRXzozDMYWTBAxW1gihepE-nnrY",
   MATH: "https://lh3.googleusercontent.com/aida-public/AB6AXuDRk8gkShnAD-jEywMj6SrZ4Dld6aFVWkYnz4G9Iq6t_f27p1a9eFOhSrjWptZ0U-zpIXq_d64v67nza86yClz_8YV1BqvpHBCoPurUSXpdApWeQRpYZKOFGcEM03ZnJ9xVEr7Z5DilwUvNjXhUvskkBdLvrLBE_smF6Rag4b9sksrkYlId4ztrheuw4liL8tBwwJm6S0XBEyQBkkmh_7QxBkFDgPuejK8YBuKlHNSpCSclMA52RVmjt5lJ9iwsIs1bfiz3uK5htpQ",
-  CHEMISTRY: "https://lh3.googleusercontent.com/aida-public/AB6AXuDrAz_5catOtK1BuN2j8RHtyPphT2qrxojSqbv0RkmA9cXXuaL9vhgKRvBhfrTS3cBqLpbICuH_jOKzIGM7xzUUtCXm1LYoc_a3iflNQVQkg1qOBp_83Xvkb2fNsSrnvE6tmvYDpvdAZKz8SSCWyDk1EF2Glsby11XRKMG-p-j24DzntLSR-7ySPNMKAxHpvV6MOghG9HuGbLEENR2orrGfcJUlw2gK2LT9rSz78Ns6oxhcErAiA5shsEVk7GptiCS1EKzanTWYGMo",
+  CHEMISTRY:
+    "https://lh3.googleusercontent.com/aida-public/AB6AXuDrAz_5catOtK1BuN2j8RHtyPphT2qrxojSqbv0RkmA9cXXuaL9vhgKRvBhfrTS3cBqLpbICuH_jOKzIGM7xzUUtCXm1LYoc_a3iflNQVQkg1qOBp_83Xvkb2fNsSrnvE6tmvYDpvdAZKz8SSCWyDk1EF2Glsby11XRKMG-p-j24DzntLSR-7ySPNMKAxHpvV6MOghG9HuGbLEENR2orrGfcJUlw2gK2LT9rSz78Ns6oxhcErAiA5shsEVk7GptiCS1EKzanTWYGMo",
 };
 
-const FeaturedBooklets = () => {
+export default function FeaturedBooklets() {
   const { t, i18n } = useTranslation("landing");
-  const isRTL = i18n.language === "ar";
+  const rtl = i18n.dir() === "rtl";
+
+  // Direction-aware styles
+  const dir = {
+    textAlign: rtl ? "text-right" : "",
+  };
 
   const featuredCourses = [
     {
       id: 1,
-      title: isRTL ? "اللغة العربية" : "Arabic Language",
+      title: rtl ? "اللغة العربية" : "Arabic Language",
       grade: t("featured.secondary"),
       price: 250,
       rating: 4.9,
@@ -24,7 +33,7 @@ const FeaturedBooklets = () => {
     },
     {
       id: 2,
-      title: isRTL ? "الفيزياء" : "Physics",
+      title: rtl ? "الفيزياء" : "Physics",
       grade: t("featured.secondary"),
       price: 300,
       rating: 4.8,
@@ -33,7 +42,7 @@ const FeaturedBooklets = () => {
     },
     {
       id: 3,
-      title: isRTL ? "الرياضيات" : "Mathematics",
+      title: rtl ? "الرياضيات" : "Mathematics",
       grade: t("featured.middle"),
       price: 0,
       rating: 4.7,
@@ -42,7 +51,7 @@ const FeaturedBooklets = () => {
     },
     {
       id: 4,
-      title: isRTL ? "الكيمياء" : "Chemistry",
+      title: rtl ? "الكيمياء" : "Chemistry",
       grade: t("featured.allLevels"),
       price: 180,
       rating: 4.9,
@@ -57,14 +66,14 @@ const FeaturedBooklets = () => {
   };
 
   return (
-    <section className="w-full bg-surface-gray py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-8" dir={isRTL ? "rtl" : "ltr"}>
+    <section className="w-full bg-background py-16 md:py-24">
+      <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className={`mb-12 space-y-4 ${isRTL ? "text-right" : ""}`}>
-          <h2 className="text-4xl font-extrabold tracking-tight text-text-main sm:text-5xl">
+        <div className={`mb-12 space-y-4 ${dir.textAlign}`}>
+          <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
             {t("featured.title")}
           </h2>
-          <p className="text-lg text-text-sub font-medium">
+          <p className="text-lg text-muted-foreground font-medium">
             {t("featured.description")}
           </p>
         </div>
@@ -79,18 +88,22 @@ const FeaturedBooklets = () => {
                   className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{ backgroundImage: `url("${course.image}")` }}
                 />
-                <div className={`absolute top-4 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-text-main shadow-md ${isRTL ? "right-4" : "right-4"}`}>
+                <Badge
+                  className="absolute top-4 right-4"
+                >
                   {course.grade}
-                </div>
+                </Badge>
               </div>
 
               {/* Content */}
-              <div className={`space-y-1 px-1 ${isRTL ? "text-right" : ""}`}>
+              <div className={`space-y-1 px-1 ${dir.textAlign}`}>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-text-main line-clamp-1">
+                  <h3 className="text-lg font-bold text-foreground line-clamp-1">
                     {course.title}
                   </h3>
-                  <span className={`text-lg font-bold ${course.price === 0 ? "text-green-600" : "text-brand"}`}>
+                  <span
+                    className={`text-lg font-bold ${course.price === 0 ? "text-green-600" : "text-brand"}`}
+                  >
                     {formatPrice(course.price)}
                   </span>
                 </div>
@@ -114,6 +127,4 @@ const FeaturedBooklets = () => {
       </div>
     </section>
   );
-};
-
-export default FeaturedBooklets;
+}

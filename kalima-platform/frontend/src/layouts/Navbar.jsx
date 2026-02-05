@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Menu, X, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.png";
 
-const Navbar = () => {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation("landing");
-  const isRTL = i18n.language === "ar";
+  const rtl = i18n.dir() === "rtl";
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
@@ -22,59 +23,63 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
-      <div
-        className="container mx-auto px-4 md:px-6 h-20 flex items-center justify-between"
-        dir={isRTL ? "rtl" : "ltr"}
-      >
+    <header className="sticky top-0 z-50 w-full bg-background ">
+      <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to="/" className="flex items-center gap-3 decoration-0">
           <img
             src={logo}
             alt="Kalima Logo"
-            className="h-10 w-auto object-contain"
+            className="h-8 w-auto object-contain"
           />
-          <span className="text-2xl font-extrabold text-text-main tracking-tight">
-            {isRTL ? "كلمة" : "Kalima"}
+          <span className="text-xl font-bold text-foreground tracking-tight">
+            {rtl ? "كلمة" : "Kalima"}
           </span>
         </Link>
 
         {/* Desktop Navigation & Actions */}
-        <div className="hidden md:flex items-center gap-10">
-          <nav className="flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-8">
+          <nav className="flex items-center gap-6">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
-                className="text-[15px] font-medium text-text-sub hover:text-text-main transition-colors"
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Language Toggle */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={toggleLanguage}
-              className="p-2.5 text-text-sub hover:text-brand transition-colors rounded-full hover:bg-gray-100"
-              title={isRTL ? "English" : "العربية"}
+              className="rounded-full hover:bg-transparent hover:text-brand"
+              title={rtl ? "English" : "العربية"}
             >
               <Globe className="h-5 w-5" />
-            </button>
+            </Button>
 
-            <button className="px-6 py-2.5 text-[15px] font-bold text-text-main bg-white border border-gray-200 rounded-full transition-all cursor-pointer hover:bg-gray-50">
+            <Button
+              variant="ghost"
+              className="font-bold hover:bg-transparent hover:text-brand"
+            >
               {t("navbar.login")}
-            </button>
-            <button className="px-6 py-2.5 text-[15px] font-bold text-white bg-brand rounded-full transition-all cursor-pointer hover:bg-brand-dark">
+            </Button>
+            <Button className="rounded-full font-bold bg-brand text-white px-6">
               {t("navbar.signup")}
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-gray-600 hover:text-brand transition-colors"
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden text-muted-foreground"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? (
@@ -82,47 +87,48 @@ const Navbar = () => {
           ) : (
             <Menu className="h-6 w-6" />
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white p-4 absolute top-20 left-0 right-0 shadow-xl animate-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden border-t border-border bg-background p-4 absolute top-16 left-0 right-0 animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-4">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
-                className={`text-base font-medium text-text-sub hover:text-brand transition-colors px-2 py-1 ${isRTL ? "text-right" : ""}`}
+                className={`text-base font-medium text-foreground hover:text-primary transition-colors px-2 py-1 ${rtl ? "text-right" : ""}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <hr className="border-gray-100 my-2" />
+            <hr className="border-border my-2" />
 
             {/* Language Toggle Mobile */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-2 px-2 py-1 text-base font-medium text-text-sub hover:text-brand transition-colors"
+              className="flex items-center gap-2 px-2 py-1 text-base font-medium text-muted-foreground transition-colors"
             >
               <Globe className="h-5 w-5" />
-              <span>{isRTL ? "English" : "العربية"}</span>
+              <span>{rtl ? "English" : "العربية"}</span>
             </button>
 
             <div className="flex flex-col gap-3 mt-2">
-              <button className="w-full px-6 py-3 text-base font-bold text-text-main bg-white border border-gray-200 rounded-full hover:bg-gray-50 cursor-pointer">
+              <Button
+                variant="outline"
+                className="w-full font-bold  justify-center"
+              >
                 {t("navbar.login")}
-              </button>
-              <button className="w-full px-6 py-3 text-base font-bold text-white bg-brand rounded-full hover:bg-brand-dark shadow-md cursor-pointer">
+              </Button>
+              <Button className="w-full font-bold bg-brand text-white justify-center">
                 {t("navbar.signup")}
-              </button>
+              </Button>
             </div>
           </nav>
         </div>
       )}
     </header>
   );
-};
-
-export default Navbar;
+}
