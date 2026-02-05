@@ -154,15 +154,6 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-
-  /* Custom Brand Colors */
-  --color-brand: var(--brand);
-  --color-brand-dark: var(--brand-dark);
-  --color-brand-light: var(--brand-light);
-  --color-surface-gray: var(--surface-gray);
-  --color-text-main: var(--text-main);
-  --color-text-sub: var(--text-sub);
-  --color-star: var(--star);
 }
 
 @layer base {
