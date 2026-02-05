@@ -1,12 +1,20 @@
 import { GraduationCap, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+// Education quality theme - from SubjectsSection (Humanities)
+// Education quality theme - from SubjectsSection (Humanities)
 const ABOUT_IMAGE_URL =
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=1000&fit=crop&q=80";
+  "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=1000&fit=crop&q=80";
 
-const AboutSection = () => {
+export default function AboutSection() {
   const { t, i18n } = useTranslation("landing");
-  const isRTL = i18n.language === "ar";
+
+  // Direction-aware styles
+  const dir = {
+    textAlign: i18n.dir() === "rtl" ? "text-right" : "text-left",
+    gradient: i18n.dir() === "rtl" ? "bg-gradient-to-l" : "bg-gradient-to-r",
+    border: i18n.dir() === "rtl" ? "border-r-4 pr-6" : "border-l-4 pl-6",
+  };
 
   const features = [
     {
@@ -26,22 +34,28 @@ const AboutSection = () => {
   ];
 
   return (
-    <section className="w-full bg-white py-16 md:py-24 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-8" dir={isRTL ? "rtl" : "ltr"}>
+    <section className="w-full bg-background py-16 md:py-24 overflow-hidden">
+      <div className="container mx-auto px-4 md:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Content */}
-          <div className={`flex flex-col justify-center space-y-8 ${isRTL ? "text-right" : "text-left"}`}>
+          <div
+            className={`flex flex-col justify-center space-y-8 ${dir.textAlign}`}
+          >
             <div className="space-y-6">
-              <h2 className="text-4xl font-extrabold tracking-tight text-text-main sm:text-5xl xl:text-6xl leading-[1.1]">
+              <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
                 {t("about.title")}{" "}
-                <span className={`text-transparent bg-clip-text ${isRTL ? "bg-gradient-to-l" : "bg-gradient-to-r"} from-brand via-brand-dark to-orange-500`}>
+                <span
+                  className={`text-transparent bg-clip-text ${dir.gradient} from-brand via-brand-dark to-orange-500`}
+                >
                   {t("about.titleHighlight")}
                 </span>
                 <br />
                 {t("about.titleEnd")}
               </h2>
 
-              <p className={`max-w-[500px] text-text-sub text-lg leading-relaxed font-medium ${isRTL ? "border-r-4 border-brand/20 pr-6" : "border-l-4 border-brand/20 pl-6"}`}>
+              <p
+                className={`max-w-[500px] text-muted-foreground text-lg leading-relaxed font-medium border-brand/20 ${dir.border}`}
+              >
                 {t("about.description")}
               </p>
             </div>
@@ -51,14 +65,19 @@ const AboutSection = () => {
               {features.map((feature, index) => (
                 <div key={index} className="group">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${feature.iconBg} group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className={`h-6 w-6 ${feature.iconColor}`} strokeWidth={2} />
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl ${feature.iconBg} transition-transform duration-300`}
+                    >
+                      <feature.icon
+                        className={`h-6 w-6 ${feature.iconColor}`}
+                        strokeWidth={2}
+                      />
                     </div>
-                    <h4 className="text-lg font-bold text-text-main">
+                    <h4 className="text-lg font-bold text-foreground">
                       {feature.title}
                     </h4>
                   </div>
-                  <p className="text-base text-text-sub font-medium leading-relaxed">
+                  <p className="text-base text-muted-foreground font-medium leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -67,21 +86,20 @@ const AboutSection = () => {
           </div>
 
           {/* Image */}
-          <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none">
-            <div className="relative">
+          <div className="relative mx-auto w-full max-w-[600px] lg:max-w-none">
+            <div className="relative h-[600px] w-full">
               <div
-                className={`h-[500px] lg:h-[600px] w-full rounded-[2.5rem] bg-cover bg-center shadow-2xl transition-transform duration-700 hover:scale-[1.02] ${isRTL ? "rotate-3" : "-rotate-3"}`}
+                className="h-full w-full rounded-[2.5rem] bg-cover bg-center transition-transform duration-700"
                 style={{
                   backgroundImage: `url("${ABOUT_IMAGE_URL}")`,
                 }}
-              />
-              <div className={`absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black/10 to-transparent ${isRTL ? "rotate-3" : "-rotate-3"}`} />
+              >
+                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-t from-black/10 to-transparent" />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default AboutSection;
+}
