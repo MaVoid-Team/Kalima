@@ -213,8 +213,12 @@ exports.deleteProduct = async (req, res) => {
         const product = await ECProduct.findByIdAndDelete(req.params.id);
         if (!product) return res.status(404).json({ message: "Product not found" });
         // Optionally delete the sample file
-        if (product.sample && fs.existsSync(product.sample)) {
-            fs.unlinkSync(product.sample);
+        if (product.sample) {
+            try {
+                await fs.promises.unlink(product.sample);
+            } catch (err) {
+                if (err.code !== 'ENOENT') console.error('Error deleting file:', err);
+            }
         }
         res.status(200).json({
             status: "success",
