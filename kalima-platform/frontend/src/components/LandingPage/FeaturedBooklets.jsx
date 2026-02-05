@@ -13,18 +13,12 @@ const COURSE_IMAGES = {
 };
 
 export default function FeaturedBooklets() {
-  const { t, i18n } = useTranslation("landing");
-  const rtl = i18n.dir() === "rtl";
-
-  // Direction-aware styles
-  const dir = {
-    textAlign: rtl ? "text-right" : "",
-  };
+  const { t } = useTranslation("landing");
 
   const featuredCourses = [
     {
       id: 1,
-      title: rtl ? "اللغة العربية" : "Arabic Language",
+      title: t("featured.courses.arabic"),
       grade: t("featured.secondary"),
       price: 250,
       rating: 4.9,
@@ -33,7 +27,7 @@ export default function FeaturedBooklets() {
     },
     {
       id: 2,
-      title: rtl ? "الفيزياء" : "Physics",
+      title: t("featured.courses.physics"),
       grade: t("featured.secondary"),
       price: 300,
       rating: 4.8,
@@ -42,7 +36,7 @@ export default function FeaturedBooklets() {
     },
     {
       id: 3,
-      title: rtl ? "الرياضيات" : "Mathematics",
+      title: t("featured.courses.math"),
       grade: t("featured.middle"),
       price: 0,
       rating: 4.7,
@@ -51,7 +45,7 @@ export default function FeaturedBooklets() {
     },
     {
       id: 4,
-      title: rtl ? "الكيمياء" : "Chemistry",
+      title: t("featured.courses.chemistry"),
       grade: t("featured.allLevels"),
       price: 180,
       rating: 4.9,
@@ -69,7 +63,7 @@ export default function FeaturedBooklets() {
     <section className="w-full bg-background py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className={`mb-12 space-y-4 ${dir.textAlign}`}>
+        <div className="mb-12 space-y-4">
           <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
             {t("featured.title")}
           </h2>
@@ -81,28 +75,25 @@ export default function FeaturedBooklets() {
         {/* Grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {featuredCourses.map((course) => (
-            <div key={course.id} className="group flex flex-col gap-4">
-              {/* Image Container */}
-              <div className="relative aspect-4/5 w-full overflow-hidden rounded-[2.5rem] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
-                <div
-                  className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                  style={{ backgroundImage: `url("${course.image}")` }}
+            <div key={course.id} className="flex flex-col gap-4">
+              {/* Image */}
+              <div className="relative aspect-4/5 w-full overflow-hidden rounded-[2.5rem]">
+                <img
+                  src={course.image}
+                  alt={course.title}
+                  className="h-full w-full object-cover"
                 />
-                <Badge
-                  className="absolute top-4 right-4"
-                >
-                  {course.grade}
-                </Badge>
+                <Badge className="absolute top-4 right-4">{course.grade}</Badge>
               </div>
 
               {/* Content */}
-              <div className={`space-y-1 px-1 ${dir.textAlign}`}>
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-foreground line-clamp-1">
+              <div className="space-y-1 px-1">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-bold text-foreground line-clamp-1 flex-1">
                     {course.title}
                   </h3>
                   <span
-                    className={`text-lg font-bold ${course.price === 0 ? "text-green-600" : "text-brand"}`}
+                    className={`text-lg font-bold flex-shrink-0 ${course.price === 0 ? "text-green-600" : "text-primary"}`}
                   >
                     {formatPrice(course.price)}
                   </span>

@@ -8,7 +8,6 @@ import logo from "../assets/Logo.png";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, i18n } = useTranslation("landing");
-  const rtl = i18n.dir() === "rtl";
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
@@ -33,7 +32,7 @@ export default function Navbar() {
             className="h-8 w-auto object-contain"
           />
           <span className="text-xl font-bold text-foreground tracking-tight">
-            {rtl ? "كلمة" : "Kalima"}
+            {t("navbar.brand")}
           </span>
         </Link>
 
@@ -57,20 +56,26 @@ export default function Navbar() {
               variant="ghost"
               size="icon"
               onClick={toggleLanguage}
-              className="rounded-full hover:bg-transparent hover:text-brand"
-              title={rtl ? "English" : "العربية"}
+              className="hover:bg-transparent hover:text-primary"
+              title={t("navbar.languageToggle")}
             >
               <Globe className="h-5 w-5" />
             </Button>
 
             <Button
               variant="ghost"
-              className="font-bold hover:bg-transparent hover:text-brand"
+              className="font-bold hover:bg-transparent hover:text-primary"
+              asChild
             >
-              {t("navbar.login")}
+              <Link to="/login">{t("navbar.login")}</Link>
             </Button>
-            <Button className="rounded-full font-bold bg-brand text-white px-6">
-              {t("navbar.signup")}
+            <Button
+              variant="default"
+              size="default"
+              className="font-bold px-6"
+              asChild
+            >
+              <Link to="/signup">{t("navbar.signup")}</Link>
             </Button>
           </div>
         </div>
@@ -92,13 +97,13 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background p-4 absolute top-16 left-0 right-0 animate-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden border-t border-border bg-background p-4 absolute top-16 left-0 right-0  duration-200">
           <nav className="flex flex-col gap-4">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
-                className={`text-base font-medium text-foreground hover:text-primary transition-colors px-2 py-1 ${rtl ? "text-right" : ""}`}
+                className="text-base font-medium text-foreground hover:text-primary transition-colors px-2 py-1"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
@@ -107,23 +112,29 @@ export default function Navbar() {
             <hr className="border-border my-2" />
 
             {/* Language Toggle Mobile */}
-            <button
+            <Button
+              variant="ghost"
               onClick={toggleLanguage}
-              className="flex items-center gap-2 px-2 py-1 text-base font-medium text-muted-foreground transition-colors"
+              className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
             >
               <Globe className="h-5 w-5" />
-              <span>{rtl ? "English" : "العربية"}</span>
-            </button>
+              <span>{t("navbar.languageToggle")}</span>
+            </Button>
 
             <div className="flex flex-col gap-3 mt-2">
               <Button
                 variant="outline"
-                className="w-full font-bold  justify-center"
+                className="w-full font-bold justify-center"
+                asChild
               >
-                {t("navbar.login")}
+                <Link to="/login">{t("navbar.login")}</Link>
               </Button>
-              <Button className="w-full font-bold bg-brand text-white justify-center">
-                {t("navbar.signup")}
+              <Button
+                variant="default"
+                className="w-full font-bold justify-center"
+                asChild
+              >
+                <Link to="/signup">{t("navbar.signup")}</Link>
               </Button>
             </div>
           </nav>

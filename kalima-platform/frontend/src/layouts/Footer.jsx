@@ -11,8 +11,7 @@ const SOCIAL_LINKS = [
 ];
 
 export default function Footer() {
-  const { t, i18n } = useTranslation("landing");
-  const rtl = i18n.dir() === "rtl";
+  const { t } = useTranslation("landing");
 
   const FOOTER_SECTIONS = [
     {
@@ -40,17 +39,14 @@ export default function Footer() {
     },
   ];
 
-  const linkClass = "text-muted-foreground hover:text-brand transition-colors";
 
   return (
-    <footer className="bg-background border-t border-gray-200 text-muted-foreground py-12 ">
+    <footer className="bg-background border-t text-muted-foreground py-12">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
-          <div className={`space-y-4 ${rtl ? "text-right" : ""}`}>
-            <div
-              className={`flex items-center gap-2 text-foreground ${rtl ? "flex-row-reverse justify-end" : ""}`}
-            >
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-foreground">
               <img
                 src={logo}
                 alt="Kalima Logo"
@@ -64,14 +60,14 @@ export default function Footer() {
 
           {/* Footer Sections */}
           {FOOTER_SECTIONS.map((section) => (
-            <div key={section.title} className={rtl ? "text-right" : ""}>
+            <div key={section.title}>
               <h3 className="text-foreground font-semibold mb-4">
                 {section.title}
               </h3>
               <ul className="space-y-2 text-sm">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className={linkClass}>
+                    <a href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
                       {link.label}
                     </a>
                   </li>
@@ -81,21 +77,19 @@ export default function Footer() {
           ))}
         </div>
 
-        <div
-          className={` pt-8 flex flex-col md:flex-row justify-between items-center gap-4 ${rtl ? "md:flex-row-reverse" : ""}`}
-        >
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} {rtl ? "منصة كلمة" : "Kalima Platform"}
-            . {t("footer.rights")}.
+            © {new Date().getFullYear()} {t("footer.brand")}.{" "}
+            {t("footer.rights")}.
           </p>
-          <div className={`flex gap-4 ${rtl ? "flex-row-reverse" : ""}`}>
+          <div className="flex gap-4">
             {SOCIAL_LINKS.map(({ Icon, href, label }) => (
               <Button
                 key={label}
                 variant="ghost"
                 size="icon"
                 asChild
-                className="h-9 w-9 hover:text-brand text-muted-foreground"
+                className="h-9 w-9 hover:text-primary hover:bg-transparent text-muted-foreground"
               >
                 <a href={href} aria-label={label}>
                   <Icon className="h-5 w-5" />
