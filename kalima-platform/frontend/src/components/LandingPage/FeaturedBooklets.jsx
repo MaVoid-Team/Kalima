@@ -93,21 +93,21 @@ export default function FeaturedBooklets() {
                     {course.title}
                   </h3>
                   <span
-                    className={`text-lg font-bold flex-shrink-0 ${course.price === 0 ? "text-green-600" : "text-primary"}`}
+                    className={`text-lg font-bold shrink-0 ${course.price === 0 ? "text-success" : "text-primary"}`}
                   >
                     {formatPrice(course.price)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="flex text-star">
+                  <div className="flex text-secondary">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${i < Math.floor(course.rating) ? "fill-current" : "text-gray-200 fill-gray-200"}`}
+                        className={`h-4 w-4 ${i < Math.floor(course.rating) ? "fill-current" : "text-muted fill-muted"}`}
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium text-gray-400">
+                  <span className="text-sm font-medium text-muted-foreground">
                     ({course.reviews})
                   </span>
                 </div>

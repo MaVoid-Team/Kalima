@@ -1,9 +1,6 @@
 import { GraduationCap, Award } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const ABOUT_IMAGE_URL =
-  "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=1000&fit=crop&q=80";
-
 export default function AboutSection() {
   const { t } = useTranslation("landing");
 
@@ -28,6 +25,12 @@ export default function AboutSection() {
     <section className="w-full bg-background py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+          {/* Image */}
+          <img
+            src={'/about.png'}
+            alt={t("about.title")}
+            className="h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-[2.5rem]"
+          />
           {/* Content */}
           <div className="space-y-8">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
@@ -66,13 +69,6 @@ export default function AboutSection() {
               ))}
             </div>
           </div>
-
-          {/* Image */}
-          <img
-            src={ABOUT_IMAGE_URL}
-            alt={t("about.title")}
-            className="h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-[2.5rem]"
-          />
         </div>
       </div>
     </section>

@@ -1,9 +1,9 @@
 import { Smartphone, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-const APP_IMAGE_URL =
-  "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=800&h=1000&fit=crop&q=80";
+const APP_IMAGE_URL = "/app-download.png";
 
 export default function AppDownloadSection() {
   const { t } = useTranslation("landing");
@@ -29,15 +29,9 @@ export default function AppDownloadSection() {
     <section className="w-full bg-background py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
-          {/* Image */}
-          <img
-            src={APP_IMAGE_URL}
-            alt={t("appDownload.title")}
-            className="h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-[2.5rem] order-1 lg:order-none"
-          />
 
           {/* Content */}
-          <div className="space-y-8 order-2 lg:order-none">
+          <div className="space-y-8 order-2 lg:order-0">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
               {t("appDownload.title")}{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">
@@ -80,6 +74,12 @@ export default function AppDownloadSection() {
               {t("appDownload.downloadButton")}
             </Button>
           </div>
+          {/* Image */}
+          <img
+            src={APP_IMAGE_URL}
+            alt={t("appDownload.title")}
+            className="h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-[2.5rem] order-1 lg:order-0"
+          />
         </div>
       </div>
     </section>
