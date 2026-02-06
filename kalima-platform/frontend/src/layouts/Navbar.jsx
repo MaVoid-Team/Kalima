@@ -8,7 +8,87 @@ import CartPreview from "../components/cart/CartPreview";
 
 export default function Navbar() {
   const [cartItems] = useState([
-      ]);
+    {
+      id: 'item-1',
+      name: 'Algebra Basics Booklet',
+      description: 'A beginner-friendly algebra booklet.',
+      price: 9.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Algebra'
+    },
+    {
+      id: 'item-2',
+      name: 'English Grammar Guide',
+      description: 'Concise grammar rules and exercises.',
+      price: 7.5,
+      quantity: 2,
+      image: 'https://via.placeholder.com/150?text=Grammar'
+    },
+    {
+      id: 'item-3',
+      name: 'Physics Problem Sets',
+      description: 'Challenging problems with solutions.',
+      price: 12.0,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Physics'
+    },
+    {
+      id: 'item-4',
+      name: 'Chemistry Lab Notes',
+      description: 'Key lab techniques and safety tips.',
+      price: 8.25,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Chemistry'
+    },
+    {
+      id: 'item-5',
+      name: 'World History Timeline',
+      description: 'Important events summarized.',
+      price: 5.99,
+      quantity: 3,
+      image: 'https://via.placeholder.com/150?text=History'
+    },
+    {
+      id: 'item-6',
+      name: 'Biology Illustrated',
+      description: 'Visual guide to biological concepts.',
+      price: 11.5,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Biology'
+    },
+    {
+      id: 'item-7',
+      name: 'Geography Maps Pack',
+      description: 'High-quality printable maps.',
+      price: 6.0,
+      quantity: 2,
+      image: 'https://via.placeholder.com/150?text=Maps'
+    },
+    {
+      id: 'item-8',
+      name: 'Arabic Reading Set',
+      description: 'Beginner reading exercises in Arabic.',
+      price: 9.0,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Arabic'
+    },
+    {
+      id: 'item-9',
+      name: 'Programming Fundamentals',
+      description: 'Intro to coding concepts and exercises.',
+      price: 14.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Code'
+    },
+    {
+      id: 'item-10',
+      name: 'Exam Prep Pack',
+      description: 'Practice tests and solutions.',
+      price: 19.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Exam+Prep'
+    }
+  ]);
     
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
