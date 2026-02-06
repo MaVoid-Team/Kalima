@@ -71,7 +71,7 @@ export default function SubjectsSection() {
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="flex flex-col overflow-hidden rounded-2xl"
+              className="flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300"
             >
               <CardHeader>
                 <img
