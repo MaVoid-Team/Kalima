@@ -6,6 +6,9 @@ import { Toaster } from "sonner";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
+
 function App() {
   const { i18n } = useTranslation();
 
@@ -19,6 +22,8 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
         </Route>
       </Routes>
       <Toaster position="bottom-right" richColors />
