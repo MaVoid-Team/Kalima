@@ -11,25 +11,23 @@ const checkCartItemType = async (cartId, product) => {
 
   if (existingAnyItem) {
     const firstProductType = existingAnyItem.productType;
-    const newProductType = product.__t || "ECProduct"; // Mongoose discriminator key
+    const newProductType = product.__t || "ECProduct";
 
-    if (newProductType !== firstProductType) {
-      return next(
-        new AppError(
-          `Cannot mix types. Cart has ${firstProductType}, you tried adding ${newProductType}`,
-          400,
-        ),
-      );
-    }
+    if (newProductType !== firstProductType) return false;
   }
+
+  return true;
 };
 
-const addToCart = catchAsync(async (req, res, next) => {
-  const { productId } = req.body;
+const addItemToCart = catchAsync(async (req, res, next) => {
+  const { productId, quantity } = req.body;
+  const userId = req.user._id;
+
+  const quantityToAdd = quantity && quantity > 0 ? parseInt(quantity) : 1;
 
   const [product, cart] = await Promise.all([
-    ECProduct.findById(productId).select("_id"),
-    ECCart.findOne({ user: req.user._id, status: "active" }).select("_id"),
+    ECProduct.findById(productId),
+    ECCart.findOne({ user: userId, status: "active" }).select("_id"),
   ]);
 
   if (!product) {
@@ -39,13 +37,15 @@ const addToCart = catchAsync(async (req, res, next) => {
   let cartId = cart ? cart._id : null;
   if (!cartId) {
     const newCart = await ECCart.create({
-      user: req.user._id,
+      user: userId,
       status: "active",
     });
     cartId = newCart._id;
   }
 
-  await checkCartItemType(cartId, product);
+  if (!(await checkCartItemType(cartId, product))) {
+    return next(new AppError("Cannot mix product types in the cart", 400));
+  }
 
   let cartItem = await ECCartItem.findOne({
     cart: cartId,
@@ -55,49 +55,48 @@ const addToCart = catchAsync(async (req, res, next) => {
   const price = product.priceAfterDiscount || product.price;
 
   if (cartItem) {
-    cartItem.quantity += 1;
+    cartItem.quantity += quantityToAdd;
     cartItem.finalPrice = cartItem.priceAtAdd * cartItem.quantity;
     await cartItem.save();
 
+    // Trigger Totals
     await updateCartTotals(cartId);
 
-    res.status(200).json({
-      tatus: "success",
-      message: "Item already in cart. Quantity updated.",
+    return res.status(200).json({
+      status: "success",
+      message: "Item quantity updated",
       action: "updated",
       data: cartItem,
     });
-  } else {
-    cartItem = await ECCartItem.create({
-      cart: cartId,
-      product: productId,
-      quantity: 1,
-      productType: product.__t || "ECProduct",
-      priceAtAdd: price,
-      finalPrice: price,
-      productSnapshot: {
-        title: product.title,
-        thumbnail: product.thumbnail,
-        section: product.section,
-        serial: product.serial,
-        originalPrice: product.price,
-        priceAfterDiscount: product.priceAfterDiscount,
-      },
-    });
-
-    await ECCart.findByIdAndUpdate(cartId, { $push: { items: cartItem._id } });
-
-    await updateCartTotals(cartId);
-
-    res.status(200).json({
-      status: "success",
-      message: "Item added to cart",
-      action: "created",
-      data: cartItem,
-    });
   }
+
+  cartItem = await ECCartItem.create({
+    cart: cartId,
+    product: productId,
+    quantity: quantityToAdd,
+    productType: product.__t || "ECProduct",
+    priceAtAdd: price,
+    finalPrice: price * quantityToAdd,
+    productSnapshot: {
+      title: product.title,
+      thumbnail: product.thumbnail,
+      section: product.section,
+      serial: product.serial,
+      originalPrice: product.price,
+      priceAfterDiscount: product.priceAfterDiscount,
+    },
+  });
+
+  await ECCart.findByIdAndUpdate(cartId, { $push: { items: cartItem._id } });
+
+  await updateCartTotals(cartId);
+
+  res.status(201).json({
+    status: "success",
+    message: "Item added to cart",
+    action: "created",
+    data: cartItem,
+  });
 });
 
-module.exports = {
-  addToCart,
-};
+module.exports = addItemToCart;
