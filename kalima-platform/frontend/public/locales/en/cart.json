@@ -1,0 +1,72 @@
+{
+  "title": "Your Shopping Cart",
+  "continueShopping": "Continue Shopping",
+  "goShopping": "Go Shopping",
+  "itemsInCart": "You have {{count}} items in your cart ready for checkout.",
+  "header": {
+    "product": "Product",
+    "quantity": "Quantity",
+    "total": "Total"
+  },
+  "orderSummary": "Order Summary",
+  "subtotal": "Subtotal",
+  "shippingEstimate": "Shipping Estimate",
+  "taxEstimate": "Tax Estimate",
+  "total": "Total",
+  "promoLabel": "Promo Code",
+  "promoPlaceholder": "Enter code",
+  "apply": "Apply",
+  "proceedToCheckout": "Proceed to Checkout",
+  "secureCheckout": "Secure SSL Encrypted Checkout",
+  "needHelp": "Need help?",
+  "needHelpText": "Contact our support team for bulk orders or assistance",
+  "chatWithUs": "Chat with us",
+  "each": "{{price}} each",
+  "shipping_calculated_next": "Calculated at next step",
+
+  "empty": "Your cart is empty",
+  "previewTitle": "Shopping Cart ({{count}})",
+  "previewDescription": "View and manage items in your shopping cart",
+  "items_ready": "{{count}} items ready for checkout",
+  "empty": "Your cart is empty",
+  "emptyHint": "Add items to get started!",
+  "startTitle": "Start Shopping",
+  "startText": "Discover amazing educational products and add them to your cart",
+  "browseProducts": "Browse Products",
+  "popularCategories": "Popular categories:",
+  "categories": {
+    "textbooks": "Textbooks",
+    "schoolSupplies": "School Supplies",
+    "studyGuides": "Study Guides",
+    "digitalResources": "Digital Resources"
+  },
+  "qty": "Qty:",
+  "digital": "Digital",
+  "physical": "Physical",
+  "low": "LOW",
+  "viewFullCart": "View Full Cart & Checkout",
+  "trust": {
+    "secureCheckout": "Secure Checkout",
+    "freeShipping": "Free Shipping Over $150"
+  },
+  "removeItem": "Remove item",
+  "increaseQuantity": "Increase quantity",
+  "decreaseQuantity": "Decrease quantity",
+
+  "productTypes": {
+    "physical": "Physical Item",
+    "instant": "Instant Download"
+  },
+
+  "stock": {
+    "inStock": "In Stock",
+    "deliveredViaEmail": "Delivered via email",
+    "lowStock": "Low Stock"
+  },
+
+  "products": {
+    "p1": { "name": "Advanced Calculus Textbook", "description": "Hardcover • 4th Edition", "nameEn": "Advanced Calculus Textbook", "nameAr": "كتاب حساب متقدم", "descriptionEn": "Hardcover • 4th Edition", "descriptionAr": "غلاف مقوى • الطبعة الرابعة" },
+    "p2": { "name": "History Lesson Plan Bundle", "description": "PDF Download • Grade 9-12", "nameEn": "History Lesson Plan Bundle", "nameAr": "حزمة خطط درس التاريخ", "descriptionEn": "PDF Download • Grade 9-12", "descriptionAr": "تحميل PDF • الصف 9-12" },
+    "p3": { "name": "Premium Geometry Set", "description": "Stainless Steel • 12 Piece Kit", "nameEn": "Premium Geometry Set", "nameAr": "مجموعة هندسة مميزة", "descriptionEn": "Stainless Steel • 12 Piece Kit", "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة" }
+  }
+}
