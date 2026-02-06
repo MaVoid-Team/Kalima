@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const ECCart = require("../../models/ec.cartModel");
+const ECPurchase = require("../../models/ec.purchaseModel");
+const ECBookPurchase = require("../../models/ec.bookpurchaseModel");
 const AppError = require("../../utils/appError");
 
 const updateCartTotals = async (cartId) => {

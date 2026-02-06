@@ -1,7 +1,7 @@
 const ECCart = require("../../models/ec.cartModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-import { removeItemFromCart } from "./helper";
+const { removeItemFromCart } = require("./helper");
 
 const removeFromCart = catchAsync(async (req, res, next) => {
   const { itemId } = req.params;
