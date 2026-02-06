@@ -24,7 +24,6 @@
   "each": "{{price}} لكل واحد",
   "shipping_calculated_next": "يُحسب في الخطوة التالية",
 
-  "empty": "سلتك فارغة",
   "previewTitle": "سلة التسوق ({{count}})",
   "previewDescription": "عرض وإدارة العناصر في سلة التسوق الخاصة بك",
   "items_ready": "{{count}} عنصر جاهز للدفع",

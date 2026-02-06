@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import { ShoppingBag, Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from '../ui/sheet';
+} from '@/components/ui/sheet';
 import { useTranslation } from 'react-i18next';
 
 export default function CartPreview({ open, onOpenChange, cartItems, onViewFullCart }) {
@@ -72,6 +72,7 @@ export default function CartPreview({ open, onOpenChange, cartItems, onViewFullC
                           </span>
                         </div>
                         <button 
+                          onClick={(e)=>e.preventDefault()}
                           className="text-gray-400 hover:text-red-600 transition-colors"
                           aria-label={t('removeItem')}
                         >

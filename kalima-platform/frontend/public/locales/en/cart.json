@@ -24,7 +24,6 @@
   "each": "{{price}} each",
   "shipping_calculated_next": "Calculated at next step",
 
-  "empty": "Your cart is empty",
   "previewTitle": "Shopping Cart ({{count}})",
   "previewDescription": "View and manage items in your shopping cart",
   "items_ready": "{{count}} items ready for checkout",
