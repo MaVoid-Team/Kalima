@@ -1,6 +1,8 @@
 const ECCart = require("../../models/ec.cartModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
+const { clearCartItems } = require("./helper");
+
 const clearCart = catchAsync(async (req, res, next) => {
   const cart = await ECCart.findOne({
     user: req.user._id,

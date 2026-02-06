@@ -1,8 +1,9 @@
+const ECCart = require("../../models/ec.cartModel");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const ECProduct = require("../../models/ec.productModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");
-import { updateCartTotals } from "./helper";
+const { updateCartTotals } = require("./helper");
 
 const checkCartItemType = async (cartId, product) => {
   const existingAnyItem = await ECCartItem.findOne({ cart: cartId }).select(

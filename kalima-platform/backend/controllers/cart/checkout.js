@@ -1,12 +1,12 @@
 const ECCart = require("../../models/ec.cartModel");
 const catchAsync = require("../../utils/catchAsync");
 const mongoose = require("mongoose");
-import AppError from "../../utils/appError";
-import {
+const AppError = require("../../utils/appError");
+const {
   validateCheckoutRules,
   createPurchaseRecords,
   clearCartItems,
-} from "./helper";
+} = require("./helper");
 
 const checkout = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
