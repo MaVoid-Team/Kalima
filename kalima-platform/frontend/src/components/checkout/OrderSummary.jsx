@@ -1,12 +1,15 @@
+import { useTranslation } from "react-i18next";
 import OrderItem from "./OrderItem";
 import DiscountCode from "./DiscountCode";
 import PricingSummary from "./PricingSummary";
 import { Lock, Heart, FileText } from "lucide-react";
 
 export default function OrderSummary({ items, pricing }) {
+    const { t } = useTranslation('checkout');
+
     return (
         <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-6">Order Summary</h2>
+            <h2 className="text-lg font-semibold text-card-foreground mb-6">{t('order_summary.title')}</h2>
 
             <div className="flex flex-col gap-4 mb-6">
                 {items.map(item => (
