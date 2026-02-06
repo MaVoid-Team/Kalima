@@ -12,12 +12,13 @@ module.exports = catchAsync(async (req, res, next) => {
 
   if (!["confirmed", "received"].includes(purchase.status)) {
     return next(
-      new AppError("Only confirmed or received purchases can be returned", 400),
+      new AppError(
+        purchase.status === "returned"
+          ? "Purchase is already returned"
+          : "Only confirmed or received purchases can be returned",
+        400,
+      ),
     );
-  }
-
-  if (purchase.status === "returned") {
-    return next(new AppError("Purchase is already returned", 400));
   }
 
   const now = getCurrentEgyptTime().toJSDate();

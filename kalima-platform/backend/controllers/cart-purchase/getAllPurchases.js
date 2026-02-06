@@ -165,14 +165,11 @@ module.exports = catchAsync(async (req, res) => {
     const total = countResult.length > 0 ? countResult[0].total : 0;
 
     const resultIds = purchases.map((p) => p._id);
-    const populated = [];
-    if (resultIds.length > 0) {
-      for (const id of resultIds) {
-        const doc = await populatePurchaseQuery(ECCartPurchase.findById(id));
-        const populatedDoc = await doc;
-        if (populatedDoc) populated.push(populatedDoc);
-      }
-    }
+    const populated = resultIds.length
+      ? await populatePurchaseQuery(
+          ECCartPurchase.find({ _id: { $in: resultIds } }).sort("-createdAt"),
+        )
+      : [];
 
     return res.status(200).json({
       status: "success",

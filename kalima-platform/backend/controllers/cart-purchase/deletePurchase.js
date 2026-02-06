@@ -3,7 +3,9 @@ const ECCoupon = require("../../models/ec.couponModel");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
-const { getCurrentEgyptTime } = require("./helpers");
+const {
+  refreshMonthlyConfirmedCount,
+} = require("./services/monthlyCountService");
 
 module.exports = catchAsync(async (req, res, next) => {
   const purchase = await ECCartPurchase.findById(req.params.id);
@@ -26,24 +28,8 @@ module.exports = catchAsync(async (req, res, next) => {
   }
 
   if (purchase.status === "confirmed" && purchase.confirmedBy) {
-    const currentMonth = getCurrentEgyptTime();
-    const monthStart = currentMonth.startOf("month").toJSDate();
-    const monthEnd = currentMonth.endOf("month").toJSDate();
-
-    const monthlyCount = await ECCartPurchase.countDocuments({
-      confirmedBy: purchase.confirmedBy,
-      status: "confirmed",
-      confirmedAt: {
-        $gte: monthStart,
-        $lte: monthEnd,
-      },
-      _id: { $ne: purchase._id },
-    });
-
-    await User.findByIdAndUpdate(purchase.confirmedBy, {
-      monthlyConfirmedCount: monthlyCount,
-      lastConfirmedCountUpdate: new Date(),
-    });
+    // Delete happens next, so count will already exclude this purchase
+    await refreshMonthlyConfirmedCount(purchase.confirmedBy);
   }
 
   await User.findByIdAndUpdate(
@@ -58,6 +44,11 @@ module.exports = catchAsync(async (req, res, next) => {
   );
 
   await ECCartPurchase.findByIdAndDelete(req.params.id);
+
+  // Re-count after deletion so the cache reflects the removed purchase
+  if (purchase.status === "confirmed" && purchase.confirmedBy) {
+    await refreshMonthlyConfirmedCount(purchase.confirmedBy);
+  }
 
   res.status(200).json({
     status: "success",
