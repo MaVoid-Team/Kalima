@@ -8,12 +8,16 @@ export default function PromoBanner() {
   return (
     <section className="container py-16">
       <Card className="bg-primary text-primary-foreground border-none">
-        <CardContent className="p-12 flex items-center justify-between">
+        <CardContent className="p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <h2 className="text-4xl font-bold">{t("promo.title")}</h2>
-            <p className="text-lg opacity-90">{t("promo.description")}</p>
+            <h2 className="text-3xl md:text-4xl font-bold">
+              {t("promo.title")}
+            </h2>
+            <p className="text-base md:text-lg opacity-90">
+              {t("promo.description")}
+            </p>
           </div>
-          <Button size="lg" variant="secondary">
+          <Button size="lg" variant="secondary" className="shrink-0">
             {t("promo.cta")}
           </Button>
         </CardContent>
