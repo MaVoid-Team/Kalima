@@ -1,0 +1,119 @@
+{
+  "hero": {
+    "title": "Everything you need for your",
+    "titleHighlight": "educational journey.",
+    "subtitle": "Textbooks, notebooks, stationery, and educational resources for all academic levels.",
+    "booksIllustration": "Books Illustration",
+    "tagline": "Discover and purchase products and books from all sections.",
+    "searchPlaceholder": "Search for textbooks, templates, or stationery...",
+    "searchButton": "Search",
+    "popular": "Popular:",
+    "tags": {
+      "ipadPlanners": "iPad Planners",
+      "stemKits": "STEM Kits",
+      "math101": "Math 101",
+      "artSupplies": "Art Supplies"
+    }
+  },
+  "categories": {
+    "allSections": "All Sections",
+    "allSubSections": "All SubSections"
+  },
+  "search": {
+    "placeholder": "Search for products..."
+  },
+  "sections": {
+    "trending": {
+      "title": "Trending Now",
+      "viewAll": "View all"
+    },
+    "newArrivals": {
+      "title": "New Arrivals",
+      "viewAll": "View all"
+    },
+    "Designs": "Designs",
+    "Books": "Books",
+    "default": "Section",
+    "Courses": "Courses",
+    "Gifts": "Gifts",
+    "Printing": "Printing",
+    "Software": "Software"
+  },
+  "promo": {
+    "title": "Bulk Order Discount",
+    "description": "Get 20% off when you order supplies for your entire class.",
+    "cta": "Learn More"
+  },
+  "product": {
+    "newBadge": "NEW",
+    "discounts": "Discount",
+    "currency": "ج",
+    "viewDetails": "View Details",
+    "addToCart": "Add to Cart",
+    "purchased": "PURCHASED",
+    "new": "NEW"
+  },
+  "products": {
+    "trending": {
+      "calculus": {
+        "title": "Advanced Calculus PDF",
+        "category": "Academic Resources"
+      },
+      "pens": {
+        "title": "Ergonomic Pen Set",
+        "category": "Stationery"
+      },
+      "notebook": {
+        "title": "Graphing Notebook",
+        "category": "Supplies"
+      },
+      "lamp": {
+        "title": "Study Lamp",
+        "category": "Accessories"
+      }
+    },
+    "newArrivals": {
+      "agenda": {
+        "title": "2024 Digital Agenda",
+        "category": "Digital Templates"
+      },
+      "chemistry": {
+        "title": "Chemistry Lab Kit",
+        "category": "Science Kits"
+      },
+      "books": {
+        "title": "Literature Classics Set",
+        "category": "Books"
+      },
+      "markers": {
+        "title": "Fine Tip Markers",
+        "category": "Art Supplies"
+      }
+    }
+  },
+  "emptyState": {
+    "title": "No items found",
+    "description": "Try adjusting your search or filter criteria"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "errors": {
+    "loadingError": "Error loading data",
+    "fetchErrorLog": "Error fetching data:",
+    "addToCartFailed": "Failed to add to cart"
+  },
+  "success": {
+    "addedToCart": "Added to cart successfully!"
+  },
+  "empty": {
+    "noProducts": "No products found.",
+    "tryDifferentSearch": "Try a different search term."
+  },
+  "navigation": {
+    "goBack": "Go Back"
+  }
+}
