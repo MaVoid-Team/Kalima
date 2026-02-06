@@ -24,6 +24,7 @@ export default function CheckoutPage() {
                     <OrderSummary items={orderItems} pricing={pricingData} />
                 </aside>
             </main>
+
         </div>
     );
 }
