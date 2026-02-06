@@ -7,7 +7,8 @@
     "pricing": "Pricing",
     "login": "Log In",
     "signup": "Sign Up",
-    "languageToggle": "العربية"
+    "languageToggle": "العربية",
+    "cartToggle": "Cart"
   },
   "footer": {
     "brand": "Kalima Platform",
