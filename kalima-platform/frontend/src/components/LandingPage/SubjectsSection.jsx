@@ -2,7 +2,7 @@ import { Languages, BookText, FlaskConical, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 const SUBJECT_IMAGES = {
   LANGUAGES:
@@ -47,26 +47,21 @@ export default function SubjectsSection() {
   ];
 
   return (
-    <section className="w-full bg-background py-16 md:py-24">
+    <section className="w-full py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div className="space-y-4 max-w-2xl">
-            <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
               {t("subjects.title")}
             </h2>
-            <p className="text-lg text-muted-foreground font-medium max-w-[600px]">
+            <p className="text-lg font-medium max-w-[600px]">
               {t("subjects.description")}
             </p>
           </div>
-          <Button
-            variant="primary"
-            size="sm"
-            className="text-primary"
-            asChild
-          >
+          <Button variant="link" size="lg" asChild>
             <Link to="/subjects">
-              {t("subjects.viewAll")} <span className="text-lg">&larr;</span>
+              {t("subjects.viewAll")} <span className="text-lg">&rarr;</span>
             </Link>
           </Button>
         </div>
@@ -76,13 +71,15 @@ export default function SubjectsSection() {
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="flex flex-col overflow-hidden rounded-4xl p-0"
+              className="flex flex-col overflow-hidden rounded-2xl"
             >
-              <img
-                src={subject.image}
-                alt={subject.title}
-                className="h-56 w-full object-cover"
-              />
+              <CardHeader>
+                <img
+                  src={subject.image}
+                  alt={subject.title}
+                  className="overflow-hidden w-full h-72 object-cover rounded-2xl"
+                />
+              </CardHeader>
               <CardContent className="flex flex-col p-8">
                 <div
                   className={`mb-6 flex h-12 w-12 items-center justify-center rounded-full ${subject.iconBg}`}
