@@ -18,12 +18,13 @@ export default function Navbar() {
     { label: t("navbar.courses"), href: "/courses" },
     { label: t("navbar.teachers"), href: "/teachers" },
     { label: t("navbar.services"), href: "/services" },
+    { label: t("navbar.market"), href: "/market" },
     { label: t("navbar.pricing"), href: "/pricing" },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background ">
-      <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <div className="container md:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 decoration-0">
           <img
