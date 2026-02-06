@@ -7,7 +7,6 @@ const { sendEmail } = require("../../utils/emailVerification/emailService");
 const Notification = require("../../models/notification");
 const User = require("../../models/userModel");
 const { emitBellNotification } = require("../../utils/bellNotification");
-const { getCurrentEgyptTime } = require("./helpers");
 const CheckoutValidator = require("./services/checkoutValidator");
 const PriceCalculator = require("./services/priceCalculator");
 const {
@@ -72,7 +71,7 @@ module.exports = catchAsync(async (req, res, next) => {
   const pricingTotals = PriceCalculator.totalsFromCart(cart);
   const strategy = getStrategy(cartItems);
   const items = strategy.decorateItems(
-    PriceCalculator.buildLineItems(cartItems, req.body),
+    PriceCalculator.buildLineItems(cartItems),
     req.body,
   );
 

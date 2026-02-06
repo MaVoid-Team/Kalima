@@ -3,6 +3,30 @@ const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const catchAsync = require("../../utils/catchAsync");
 const { calculateBusinessMinutes, formatMinutes } = require("./helpers");
 
+const STAFF_ROLES = ["Admin", "SubAdmin", "Moderator"];
+
+const ensureStaffEntry = (staffStats, user) => {
+  const id = user._id.toString();
+  if (!staffStats[id]) {
+    staffStats[id] = {
+      staff: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      totalReceivedOrders: 0,
+      totalConfirmedOrders: 0,
+      totalConfirmedItems: 0,
+      totalReturnedOrders: 0,
+      totalReturnedItems: 0,
+      responseTimesMinutes: [],
+      confirmationTimesMinutes: [],
+    };
+  }
+  return id;
+};
+
 const egyptTimeToUTC = (dateStr, timeStr, period) => {
   if (!dateStr) return null;
 
@@ -158,33 +182,13 @@ module.exports = catchAsync(async (req, res) => {
   const staffStats = {};
 
   allPurchases.forEach((purchase) => {
-    if (
-      purchase.receivedBy &&
-      ["Admin", "SubAdmin", "Moderator"].includes(purchase.receivedBy.role)
-    ) {
-      const receiverId = purchase.receivedBy._id.toString();
-
-      if (!staffStats[receiverId]) {
-        staffStats[receiverId] = {
-          staff: {
-            id: purchase.receivedBy._id,
-            name: purchase.receivedBy.name,
-            email: purchase.receivedBy.email,
-            role: purchase.receivedBy.role,
-          },
-          totalReceivedOrders: 0,
-          totalConfirmedOrders: 0,
-          totalConfirmedItems: 0,
-          totalReturnedOrders: 0,
-          totalReturnedItems: 0,
-          responseTimesMinutes: [],
-          confirmationTimesMinutes: [],
-        };
-      }
-
+    // Track person who received the order
+    if (purchase.receivedBy && STAFF_ROLES.includes(purchase.receivedBy.role)) {
+      const receiverId = ensureStaffEntry(staffStats, purchase.receivedBy);
       staffStats[receiverId].totalReceivedOrders++;
 
-      if (purchase.confirmedBy) {
+      // Track response time (created → received) for every received order
+      if (purchase.receivedAt) {
         const responseMinutes = calculateBusinessMinutes(
           purchase.createdAt,
           purchase.receivedAt,
@@ -193,30 +197,9 @@ module.exports = catchAsync(async (req, res) => {
       }
     }
 
-    if (
-      purchase.confirmedBy &&
-      ["Admin", "SubAdmin", "Moderator"].includes(purchase.confirmedBy.role)
-    ) {
-      const confirmerId = purchase.confirmedBy._id.toString();
-
-      if (!staffStats[confirmerId]) {
-        staffStats[confirmerId] = {
-          staff: {
-            id: purchase.confirmedBy._id,
-            name: purchase.confirmedBy.name,
-            email: purchase.confirmedBy.email,
-            role: purchase.confirmedBy.role,
-          },
-          totalReceivedOrders: 0,
-          totalConfirmedOrders: 0,
-          totalConfirmedItems: 0,
-          totalReturnedOrders: 0,
-          totalReturnedItems: 0,
-          responseTimesMinutes: [],
-          confirmationTimesMinutes: [],
-        };
-      }
-
+    // Track person who confirmed the order
+    if (purchase.confirmedBy && STAFF_ROLES.includes(purchase.confirmedBy.role)) {
+      const confirmerId = ensureStaffEntry(staffStats, purchase.confirmedBy);
       staffStats[confirmerId].totalConfirmedOrders++;
       staffStats[confirmerId].totalConfirmedItems +=
         purchase.items?.length || 0;
@@ -230,30 +213,9 @@ module.exports = catchAsync(async (req, res) => {
       }
     }
 
-    if (
-      purchase.returnedBy &&
-      ["Admin", "SubAdmin", "Moderator"].includes(purchase.returnedBy.role)
-    ) {
-      const returnerId = purchase.returnedBy._id.toString();
-
-      if (!staffStats[returnerId]) {
-        staffStats[returnerId] = {
-          staff: {
-            id: purchase.returnedBy._id,
-            name: purchase.returnedBy.name,
-            email: purchase.returnedBy.email,
-            role: purchase.returnedBy.role,
-          },
-          totalReceivedOrders: 0,
-          totalConfirmedOrders: 0,
-          totalConfirmedItems: 0,
-          totalReturnedOrders: 0,
-          totalReturnedItems: 0,
-          responseTimesMinutes: [],
-          confirmationTimesMinutes: [],
-        };
-      }
-
+    // Track person who returned the order
+    if (purchase.returnedBy && STAFF_ROLES.includes(purchase.returnedBy.role)) {
+      const returnerId = ensureStaffEntry(staffStats, purchase.returnedBy);
       staffStats[returnerId].totalReturnedOrders++;
       staffStats[returnerId].totalReturnedItems += purchase.items?.length || 0;
     }
@@ -294,29 +256,24 @@ module.exports = catchAsync(async (req, res) => {
           a.totalReturnedOrders),
     );
 
-  const platformTotals = {
-    totalReceivedOrders: staffReportArray.reduce(
-      (sum, staff) => sum + staff.totalReceivedOrders,
-      0,
-    ),
-    totalConfirmedOrders: staffReportArray.reduce(
-      (sum, staff) => sum + staff.totalConfirmedOrders,
-      0,
-    ),
-    totalConfirmedItems: staffReportArray.reduce(
-      (sum, staff) => sum + staff.totalConfirmedItems,
-      0,
-    ),
-    totalReturnedOrders: staffReportArray.reduce(
-      (sum, staff) => sum + staff.totalReturnedOrders,
-      0,
-    ),
-    totalReturnedItems: staffReportArray.reduce(
-      (sum, staff) => sum + staff.totalReturnedItems,
-      0,
-    ),
-    totalStaff: staffReportArray.length,
-  };
+  const platformTotals = staffReportArray.reduce(
+    (totals, staff) => {
+      totals.totalReceivedOrders += staff.totalReceivedOrders;
+      totals.totalConfirmedOrders += staff.totalConfirmedOrders;
+      totals.totalConfirmedItems += staff.totalConfirmedItems;
+      totals.totalReturnedOrders += staff.totalReturnedOrders;
+      totals.totalReturnedItems += staff.totalReturnedItems;
+      return totals;
+    },
+    {
+      totalReceivedOrders: 0,
+      totalConfirmedOrders: 0,
+      totalConfirmedItems: 0,
+      totalReturnedOrders: 0,
+      totalReturnedItems: 0,
+      totalStaff: staffReportArray.length,
+    },
+  );
 
   res.status(200).json({
     status: "success",

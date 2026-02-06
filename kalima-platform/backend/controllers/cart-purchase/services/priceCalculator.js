@@ -1,14 +1,11 @@
-// Centralized price calculation to preserve behavior while isolating future changes
+// Centralized price calculation to preserve behavior while isolating future changes.
+// Product-type decoration (book fields etc.) is handled by strategies, not here.
 const PriceCalculator = {
-  buildLineItems(cartItems, body) {
+  buildLineItems(cartItems) {
     return cartItems.map((item) => ({
       product: item.product._id,
       productType: item.product.__t || "ECProduct",
       priceAtPurchase: item.priceAtAdd,
-      nameOnBook: item.product.__t === "ECBook" ? body.nameOnBook : undefined,
-      numberOnBook:
-        item.product.__t === "ECBook" ? body.numberOnBook : undefined,
-      seriesName: item.product.__t === "ECBook" ? body.seriesName : undefined,
       productSnapshot: {
         title: item.product.title,
         thumbnail: item.product.thumbnail,

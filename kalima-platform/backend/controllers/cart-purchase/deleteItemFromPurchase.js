@@ -48,12 +48,6 @@ module.exports = catchAsync(async (req, res, next) => {
   purchase.subtotal = newSubtotal;
   purchase.total = Math.max(0, newSubtotal - (purchase.discount || 0));
 
-  if (purchase.items.length === 0) {
-    purchase.couponCode = null;
-    purchase.discount = 0;
-    purchase.total = 0;
-  }
-
   await purchase.save();
   res.status(200).json({
     status: "success",
