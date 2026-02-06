@@ -23,11 +23,11 @@ export default function Navbar() {
   const toggleCartModal = () => {
     setIsCartModalOpen(!isCartModalOpen);
     setIsMenuOpen(false);
-  }
+  };
 
   const handleViewFullCart = () => {
     setIsCartModalOpen(false);
-    navigate("/cart", { state: { cartItems } }); // Pass cart items to the cart page
+    navigate("/cart", { state: { cart: cartItems } }); // Pass cart items to the cart page
   };
 
   const NAV_LINKS = [

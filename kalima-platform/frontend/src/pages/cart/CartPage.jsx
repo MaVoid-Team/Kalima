@@ -7,8 +7,8 @@ import { useLocation } from 'react-router-dom';
 export default function CartPage() {
   const { t, i18n } = useTranslation('cart');
   const location = useLocation();
-  const { cartItems } = location.state || { cartItems: [] }; // Get cart items from location state or default to empty array
-
+  const { cart } = location.state || { cart: [] }; // Get cart items from location state or default to empty array
+  const [cartItems, setCartItems] = useState(cart);
   const [promoCode, setPromoCode] = useState('');
 
   const updateQuantity = (id, newQuantity) => {
@@ -55,7 +55,7 @@ export default function CartPage() {
                 {t('emptyHint')}
               </p>
 
-              <button className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
+              <button onClick={(e)=>e.preventDefault()} className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
                 {i18n.language === 'ar' ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
                 {t('browseProducts')}
               </button>
@@ -86,7 +86,7 @@ export default function CartPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-            <button className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium">
+            <button onClick={(e)=>e.preventDefault()} className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium">
               {i18n.language === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
               {t('continueShopping')}
             </button>
