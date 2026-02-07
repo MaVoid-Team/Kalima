@@ -4,10 +4,21 @@
     "courses": "Courses",
     "teachers": "Teachers",
     "services": "Services",
+    "market": "Market",
     "pricing": "Pricing",
     "login": "Log In",
     "signup": "Sign Up",
-    "languageToggle": "العربية"
+    "languageToggle": "العربية",
+    "searchPlaceholder": "Type a command or search...",
+    "searchButtonLong": "Search website...",
+    "searchButtonShort": "Search...",
+    "noResults": "No results found.",
+    "pages": "Pages",
+    "settings": "Settings",
+    "toggleLanguageAction": "Toggle Language",
+    "shortcuts": {
+      "open": "Ctrl+K"
+    }
   },
   "footer": {
     "brand": "Kalima Platform",
@@ -42,7 +53,19 @@
     },
     "rating": "Rating",
     "ratingNote": "Based on student reviews",
-    "trustedBy": "Trusted by 2,000+ Educators"
+    "trustedBy": "Trusted by 2,000+ Educators",
+    "noResults": "No results found.",
+    "recentSearches": "Recent Searches",
+    "categories": "Categories",
+    "examples": {
+      "react": "React Course",
+      "math": "Mathematics"
+    },
+    "categoriesItems": {
+      "science": "Science",
+      "arts": "Arts",
+      "tech": "Technology"
+    }
   },
   "subjects": {
     "title": "Explore by Subject",
