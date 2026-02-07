@@ -1,8 +1,18 @@
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command"
 
 export default function HeroSection() {
   const { t } = useTranslation("market");
@@ -15,27 +25,28 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="container py-20 flex flex-col items-center text-center">
-      <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 max-w-4xl leading-[1.1]">
+    <section className="container py-8 flex flex-col items-center text-center">
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 max-w-4xl leading-[1.1]">
         {t("hero.title")}{" "}
         <span className="block mt-2">{t("hero.titleHighlight")}</span>
       </h1>
 
-      <p className="text-muted-foreground text-lg md:text-xl max-w-2xl  mb-12 font-light">
+      <p className="text-muted-foreground text-lg md:text-xl max-w-2xl  mb-4 font-light">
         {t("hero.subtitle")}
       </p>
 
-      <div className="w-full max-w-2xl relative mb-10">
-        <div className="relative flex items-center">
-          <Search className="absolute start-6 h-5 w-5 " />
-          <Input
-            className="w-full ps-14 pe-32 py-8 shadow-lg text-lg"
-            placeholder={t("hero.searchPlaceholder")}
-          />
-          <Button size="lg" className="absolute end-2 top-3 bottom-2 px-8">
-            {t("hero.searchButton")}
-          </Button>
-        </div>
+      <div className="w-full max-w-2xl mb-4">
+        <Command>
+          <div className="relative">
+            <CommandInput
+              placeholder={t("hero.searchPlaceholder")}
+            />
+          </div>
+          <CommandList className="top-full left-0 w-full bg-popover rounded-b-lg shadow-lg z-50 mt-1 hidden group-focus-within:block">
+            {/* <CommandEmpty>No results found.</CommandEmpty> */}
+            {/* Add standard suggestions or search results here */}
+          </CommandList>
+        </Command>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3">

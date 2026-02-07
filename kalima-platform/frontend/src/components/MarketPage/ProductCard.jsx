@@ -6,8 +6,8 @@ const ProductCard = ({ title, category, price, image, badge }) => {
   const { t } = useTranslation("market");
 
   return (
-    <Card className="border-none shadow-none bg-transparent ">
-      <CardContent className="p-0 relative overflow-hidden rounded-[2rem] mb-4">
+    <Card className="border-none shadow-none ">
+      <CardContent className="p-0 relative overflow-hidden rounded-4xl mb-4">
         {badge && (
           <Badge className="absolute top-4 start-4 z-10 ">
             {t(`product.${badge}`)}
