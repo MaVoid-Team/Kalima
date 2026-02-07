@@ -1,0 +1,71 @@
+{
+  "title": "عربة التسوق الخاصة بك",
+  "continueShopping": "مواصلة التسوق",
+  "goShopping": "اذهب للتسوق",
+  "itemsInCart": "لديك {{count}} عنصر في سلة التسوق جاهز للدفع.",
+  "header": {
+    "product": "المنتج",
+    "quantity": "الكمية",
+    "total": "الإجمالي"
+  },
+  "orderSummary": "ملخص الطلب",
+  "subtotal": "المجموع الفرعي",
+  "shippingEstimate": "تقدير الشحن",
+  "taxEstimate": "تقدير الضريبة",
+  "total": "الإجمالي",
+  "promoLabel": "رمز العرض",
+  "promoPlaceholder": "أدخل الرمز",
+  "apply": "تطبيق",
+  "proceedToCheckout": "المتابعة إلى الدفع",
+  "secureCheckout": "دفع مشفر SSL آمن",
+  "needHelp": "تحتاج مساعدة؟",
+  "needHelpText": "اتصل بفريق الدعم للطلبات الكبيرة أو للمساعدة",
+  "chatWithUs": "دردشة معنا",
+  "each": "{{price}} لكل واحد",
+  "shipping_calculated_next": "يُحسب في الخطوة التالية",
+
+  "previewTitle": "سلة التسوق ({{count}})",
+  "previewDescription": "عرض وإدارة العناصر في سلة التسوق الخاصة بك",
+  "items_ready": "{{count}} عنصر جاهز للدفع",
+  "empty": "سلتك فارغة",
+  "emptyHint": "أضف عناصر للبدء!",
+  "startTitle": "ابدأ التسوق",
+  "startText": "اكتشف منتجات تعليمية رائعة وأضفها إلى سلة التسوق الخاصة بك",
+  "browseProducts": "تصفح المنتجات",
+  "popularCategories": "الفئات الشائعة:",
+  "categories": {
+    "textbooks": "الكتب المدرسية",
+    "schoolSupplies": "لوازم مدرسية",
+    "studyGuides": "أدلة الدراسة",
+    "digitalResources": "الموارد الرقمية"
+  },
+  "qty": "الكمية:",
+  "digital": "رقمي",
+  "physical": "مادي",
+  "low": "منخفض",
+  "viewFullCart": "عرض سلة كاملة والدفع",
+  "trust": {
+    "secureCheckout": "دفع آمن",
+    "freeShipping": "شحن مجاني لأكثر من 150 دولار"
+  },
+  "removeItem": "إزالة العنصر",
+  "increaseQuantity": "زيادة الكمية",
+  "decreaseQuantity": "نقص الكمية",
+
+  "productTypes": {
+    "physical": "عنصر مادي",
+    "instant": "تنزيل فوري"
+  },
+
+  "stock": {
+    "inStock": "متوفر",
+    "deliveredViaEmail": "يتم التسليم عبر البريد الإلكتروني",
+    "lowStock": "كمية منخفضة"
+  },
+
+  "products": {
+    "p1": { "name": "كتاب حساب متقدم", "description": "غلاف مقوى • الطبعة الرابعة", "nameEn": "Advanced Calculus Textbook", "nameAr": "كتاب حساب متقدم", "descriptionEn": "Hardcover • 4th Edition", "descriptionAr": "غلاف مقوى • الطبعة الرابعة" },
+    "p2": { "name": "حزمة خطط درس التاريخ", "description": "تحميل PDF • الصف 9-12", "nameEn": "History Lesson Plan Bundle", "nameAr": "حزمة خطط درس التاريخ", "descriptionEn": "PDF Download • Grade 9-12", "descriptionAr": "تحميل PDF • الصف 9-12" },
+    "p3": { "name": "مجموعة هندسة مميزة", "description": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة", "nameEn": "Premium Geometry Set", "nameAr": "مجموعة هندسة مميزة", "descriptionEn": "Stainless Steel • 12 Piece Kit", "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة" }
+  }
+}
