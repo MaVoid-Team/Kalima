@@ -9,6 +9,8 @@ import { useTranslation } from "react-i18next";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import CartPage from "./pages/cart/CartPage";
+import MarketPage from "./pages/market/MarketPage";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
 
 function App() {
   const { i18n } = useTranslation();
@@ -26,6 +28,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/market" element={<MarketPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Route>
       </Routes>
       <Toaster position="bottom-right" richColors />
