@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, Search } from "lucide-react";
+import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,93 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import logo from "../assets/Logo.png";
+import CartPreview from "../components/cart/CartPreview";
 
 export default function Navbar() {
+  const [cartItems] = useState([
+    {
+      id: 'item-1',
+      name: 'Algebra Basics Booklet',
+      description: 'A beginner-friendly algebra booklet.',
+      price: 9.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Algebra'
+    },
+    {
+      id: 'item-2',
+      name: 'English Grammar Guide',
+      description: 'Concise grammar rules and exercises.',
+      price: 7.5,
+      quantity: 2,
+      image: 'https://via.placeholder.com/150?text=Grammar'
+    },
+    {
+      id: 'item-3',
+      name: 'Physics Problem Sets',
+      description: 'Challenging problems with solutions.',
+      price: 12.0,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Physics'
+    },
+    {
+      id: 'item-4',
+      name: 'Chemistry Lab Notes',
+      description: 'Key lab techniques and safety tips.',
+      price: 8.25,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Chemistry'
+    },
+    {
+      id: 'item-5',
+      name: 'World History Timeline',
+      description: 'Important events summarized.',
+      price: 5.99,
+      quantity: 3,
+      image: 'https://via.placeholder.com/150?text=History'
+    },
+    {
+      id: 'item-6',
+      name: 'Biology Illustrated',
+      description: 'Visual guide to biological concepts.',
+      price: 11.5,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Biology'
+    },
+    {
+      id: 'item-7',
+      name: 'Geography Maps Pack',
+      description: 'High-quality printable maps.',
+      price: 6.0,
+      quantity: 2,
+      image: 'https://via.placeholder.com/150?text=Maps'
+    },
+    {
+      id: 'item-8',
+      name: 'Arabic Reading Set',
+      description: 'Beginner reading exercises in Arabic.',
+      price: 9.0,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Arabic'
+    },
+    {
+      id: 'item-9',
+      name: 'Programming Fundamentals',
+      description: 'Intro to coding concepts and exercises.',
+      price: 14.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Code'
+    },
+    {
+      id: 'item-10',
+      name: 'Exam Prep Pack',
+      description: 'Practice tests and solutions.',
+      price: 19.99,
+      quantity: 1,
+      image: 'https://via.placeholder.com/150?text=Exam+Prep'
+    }
+  ]);
+
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation("landing");
@@ -37,6 +122,16 @@ export default function Navbar() {
     i18n.changeLanguage(newLang);
   };
 
+  const toggleCartModal = () => {
+    setIsCartModalOpen(!isCartModalOpen);
+    setIsMenuOpen(false);
+  };
+
+  const handleViewFullCart = () => {
+    setIsCartModalOpen(false);
+    navigate("/cart", { state: { cart: cartItems } }); // Pass cart items to the cart page
+  };
+
   const runCommand = (command) => {
     setOpen(false);
     command();
@@ -49,6 +144,7 @@ export default function Navbar() {
     { label: t("navbar.market"), href: "/market" },
     { label: t("navbar.pricing"), href: "/pricing" },
   ];
+
 
   return (
     <>
@@ -106,6 +202,20 @@ export default function Navbar() {
                 <Globe className="h-5 w-5" />
               </Button>
 
+              {/* Cart Button Desktop */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleCartModal}
+                className="relative hover:bg-transparent hover:text-primary"
+                title={t("navbar.cartToggle")}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                  {cartItems.length}
+                </span>
+              </Button>
+
               <Button
                 variant="ghost"
                 className="font-bold hover:bg-transparent hover:text-primary"
@@ -133,6 +243,21 @@ export default function Navbar() {
               className="text-muted-foreground"
             >
               <Search className="h-5 w-5" />
+            </Button>
+
+            {/* Cart Button */}
+            {/* Note that this button will take the place of login/signup buttons after logging in */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCartModal}
+              className="relative hover:bg-transparent hover:text-primary"
+              title={t("navbar.cartToggle")}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                {cartItems.length}
+              </span>
             </Button>
 
             <Button
@@ -176,10 +301,27 @@ export default function Navbar() {
                 <span>{t("navbar.languageToggle")}</span>
               </Button>
 
+              {/* Cart Button Mobile */}
+              {/* Note that this button will take the place of login/signup buttons after logging in */}
+              <Button
+                variant="ghost"
+                onClick={toggleCartModal}
+                className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <div className="flex flex-row justify-between items-center w-full">
+                  <span>{t("navbar.cartToggle")}</span>
+                  <span className={`${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                    {cartItems.length}
+                  </span>
+                </div>
+              </Button>
+
               <div className="flex flex-col gap-3 mt-2">
                 <Button
                   variant="outline"
                   className="w-full font-bold justify-center"
+                  onClick={() => setIsMenuOpen(false)}
                   asChild
                 >
                   <Link to="/login">{t("navbar.login")}</Link>
@@ -187,6 +329,7 @@ export default function Navbar() {
                 <Button
                   variant="default"
                   className="w-full font-bold justify-center"
+                  onClick={() => setIsMenuOpen(false)}
                   asChild
                 >
                   <Link to="/signup">{t("navbar.signup")}</Link>
@@ -195,7 +338,15 @@ export default function Navbar() {
             </nav>
           </div>
         )}
+
+        <CartPreview
+          open={isCartModalOpen}
+          onOpenChange={setIsCartModalOpen}
+          cartItems={cartItems}
+          onViewFullCart={handleViewFullCart}
+        />
       </header>
+
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder={t("navbar.searchPlaceholder")} />
