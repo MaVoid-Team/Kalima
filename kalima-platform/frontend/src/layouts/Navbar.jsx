@@ -98,7 +98,7 @@ export default function Navbar() {
       image: 'https://via.placeholder.com/150?text=Exam+Prep'
     }
   ]);
-    
+
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -130,6 +130,8 @@ export default function Navbar() {
   const handleViewFullCart = () => {
     setIsCartModalOpen(false);
     navigate("/cart", { state: { cart: cartItems } }); // Pass cart items to the cart page
+  };
+
   const runCommand = (command) => {
     setOpen(false);
     command();
@@ -198,6 +200,20 @@ export default function Navbar() {
                 title={t("navbar.languageToggle")}
               >
                 <Globe className="h-5 w-5" />
+              </Button>
+
+              {/* Cart Button Desktop */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleCartModal}
+                className="relative hover:bg-transparent hover:text-primary"
+                title={t("navbar.cartToggle")}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                  {cartItems.length}
+                </span>
               </Button>
 
               <Button
@@ -275,61 +291,6 @@ export default function Navbar() {
               ))}
               <hr className="border-border my-2" />
 
-            {/* Language Toggle Mobile */}
-            <Button
-              variant="ghost"
-              onClick={toggleLanguage}
-              className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
-            >
-              <Globe className="h-5 w-5" />
-              <span>{t("navbar.languageToggle")}</span>
-            </Button>
-
-            {/* Cart Button Mobile */}
-            {/* Note that this button will take the place of login/signup buttons after logging in */}
-            <Button
-              variant="ghost"
-              onClick={toggleCartModal}
-              className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              <div className="flex flex-row justify-between items-center w-full">
-                <span>{t("navbar.cartToggle")}</span>
-                <span className={`${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                  {cartItems.length}
-                </span>
-              </div>
-            </Button>
-
-            <div className="flex flex-col gap-3 mt-2">
-              <Button
-                variant="outline"
-                className="w-full font-bold justify-center"
-                onClick={() => setIsMenuOpen(false)}
-                asChild
-              >
-                <Link to="/login">{t("navbar.login")}</Link>
-              </Button>
-              <Button
-                variant="default"
-                className="w-full font-bold justify-center"
-                onClick={() => setIsMenuOpen(false)}
-                asChild
-              >
-                <Link to="/signup">{t("navbar.signup")}</Link>
-              </Button>
-            </div>
-          </nav>
-        </div>
-      )}
-
-      <CartPreview 
-        open={isCartModalOpen}
-        onOpenChange={setIsCartModalOpen}
-        cartItems={cartItems}
-        onViewFullCart={handleViewFullCart}
-      />
-    </header>
               {/* Language Toggle Mobile */}
               <Button
                 variant="ghost"
@@ -340,10 +301,27 @@ export default function Navbar() {
                 <span>{t("navbar.languageToggle")}</span>
               </Button>
 
+              {/* Cart Button Mobile */}
+              {/* Note that this button will take the place of login/signup buttons after logging in */}
+              <Button
+                variant="ghost"
+                onClick={toggleCartModal}
+                className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <div className="flex flex-row justify-between items-center w-full">
+                  <span>{t("navbar.cartToggle")}</span>
+                  <span className={`${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
+                    {cartItems.length}
+                  </span>
+                </div>
+              </Button>
+
               <div className="flex flex-col gap-3 mt-2">
                 <Button
                   variant="outline"
                   className="w-full font-bold justify-center"
+                  onClick={() => setIsMenuOpen(false)}
                   asChild
                 >
                   <Link to="/login">{t("navbar.login")}</Link>
@@ -351,6 +329,7 @@ export default function Navbar() {
                 <Button
                   variant="default"
                   className="w-full font-bold justify-center"
+                  onClick={() => setIsMenuOpen(false)}
                   asChild
                 >
                   <Link to="/signup">{t("navbar.signup")}</Link>
@@ -359,7 +338,15 @@ export default function Navbar() {
             </nav>
           </div>
         )}
+
+        <CartPreview
+          open={isCartModalOpen}
+          onOpenChange={setIsCartModalOpen}
+          cartItems={cartItems}
+          onViewFullCart={handleViewFullCart}
+        />
       </header>
+
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder={t("navbar.searchPlaceholder")} />
