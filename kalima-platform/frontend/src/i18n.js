@@ -4,25 +4,25 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 
 i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: "en",
-    supportedLngs: ["en", "ar"],
-    debug: false,
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
-    },
-    backend: {
-      loadPath: "/locales/{{lng}}/{{ns}}.json",
-    },
-    ns: ["landing", "auth", "market"],
-    defaultNS: "landing",
-    detection: {
-      order: ["queryString", "cookie", "localStorage", "navigator"],
-      caches: ["localStorage", "cookie"],
-    },
-  });
+    .use(Backend)
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+        fallbackLng: 'en',
+        supportedLngs: ['en', 'ar'],
+        debug: false,
+        interpolation: {
+            escapeValue: false, // not needed for react as it escapes by default
+        },
+        backend: {
+            loadPath: '/locales/{{lng}}/{{ns}}.json',
+        },
+        ns: ['landing', 'auth', 'checkout', 'market'],
+        defaultNS: 'landing',
+        detection: {
+            order: ['queryString', 'cookie', 'localStorage', 'navigator'],
+            caches: ['localStorage', 'cookie'],
+        }
+    });
 
 export default i18n;
