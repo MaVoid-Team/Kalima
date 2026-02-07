@@ -7,7 +7,7 @@ export default function StepIndicator({ steps, currentStep = 3 }) {
     const { t } = useTranslation('checkout');
 
     return (
-        <div className="flex justify-center items-center py-6 gap-2" dir="ltr">
+        <div className="flex justify-center items-center py-6 gap-2">
             {steps.map((step, index) => {
                 const isCompleted = step.number < currentStep;
                 const isCurrent = step.number === currentStep;
