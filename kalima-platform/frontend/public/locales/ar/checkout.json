@@ -1,0 +1,61 @@
+{
+    "header": {
+        "secure_checkout": "دفع آمن",
+        "market_name": "سوق كلمة"
+    },
+    "steps": {
+        "information": "المعلومات",
+        "shipping": "الشحن",
+        "payment": "الدفع"
+    },
+    "contact": {
+        "title": "معلومات الاتصال",
+        "login": "تسجيل الدخول",
+        "email_label": "البريد الإلكتروني",
+        "email_placeholder": "you@example.com",
+        "news_offers": "أرسل لي أخباراً وعروضاً"
+    },
+    "shipping": {
+        "title": "عنوان الشحن",
+        "country_label": "البلد / المنطقة",
+        "first_name": "الاسم الأول",
+        "last_name": "اسم العائلة",
+        "address_label": "العنوان",
+        "apartment_placeholder": "شقة، جناح، إلخ (اختياري)",
+        "city": "المدينة",
+        "state": "المحافظة / المقاطعة",
+        "zip_code": "الرمز البريدي"
+    },
+    "payment": {
+        "title": "الدفع",
+        "secure_notice": "جميع المعاملات آمنة ومشفرة.",
+        "credit_card": "بطاقة الائتمان",
+        "paypal": "باي بال",
+        "apple_pay": "أبل باي",
+        "card_number": "رقم البطاقة",
+        "card_placeholder": "0000 0000 0000 0000",
+        "expiration": "تاريخ الانتهاء (شهر/سنة)",
+        "expiration_placeholder": "شهر / سنة",
+        "security_code": "رمز الحماية",
+        "cvc_placeholder": "CVC",
+        "name_on_card": "الاسم على البطاقة"
+    },
+    "order_summary": {
+        "title": "ملخص الطلب",
+        "discount_placeholder": "كود الخصم",
+        "apply": "تطبيق",
+        "subtotal": "المجموع الفرعي",
+        "shipping": "الشحن",
+        "taxes": "الضرائب (تقديري)",
+        "total": "الإجمالي",
+        "currency": "دولار أمريكي",
+        "pay": "ادفع"
+    },
+    "footer": {
+        "return_to_cart": "العودة إلى السلة",
+        "copyright": "© 2023 سوق كلمة. جميع الحقوق محفوظة.",
+        "privacy": "سياسة الخصوصية",
+        "terms": "شروط الخدمة",
+        "refund": "سياسة الاسترداد"
+    }
+}
