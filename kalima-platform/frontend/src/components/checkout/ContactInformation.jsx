@@ -1,30 +1,39 @@
 import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ContactInformation() {
     const { t } = useTranslation('checkout');
 
     return (
-        <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-card-foreground">{t('contact.title')}</h2>
-                <a href="#" className="text-primary text-sm hover:underline">{t('contact.login')}</a>
-            </div>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                <CardTitle>{t('contact.title')}</CardTitle>
+                <a href="#" className="text-primary text-sm hover:underline font-normal">
+                    {t('contact.login')}
+                </a>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+                <div className="grid gap-2">
+                    <Label htmlFor="email" className="text-xs uppercase text-muted-foreground tracking-wide">
+                        {t('contact.email_label')}
+                    </Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder={t('contact.email_placeholder')}
+                    />
+                </div>
 
-            <div className="mb-4">
-                <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-                    {t('contact.email_label')}
-                </label>
-                <input
-                    type="email"
-                    placeholder={t('contact.email_placeholder')}
-                    className="w-full px-4 py-3 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
-                />
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 border border-border rounded cursor-pointer accent-primary" />
-                <span className="text-sm text-muted-foreground">{t('contact.news_offers')}</span>
-            </label>
-        </div>
+                <div className="flex items-center space-x-2">
+                    <Checkbox id="news_offers" />
+                    <Label htmlFor="news_offers" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                        {t('contact.news_offers')}
+                    </Label>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

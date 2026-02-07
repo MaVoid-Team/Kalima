@@ -1,5 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export default function PricingSummary({ pricing }) {
     const { t } = useTranslation('checkout');
@@ -19,17 +21,19 @@ export default function PricingSummary({ pricing }) {
                 <span>${pricing.taxes.toFixed(2)}</span>
             </div>
 
-            <div className="flex justify-between items-baseline pt-3 mt-2 border-t border-border">
+            <Separator className="my-2" />
+
+            <div className="flex justify-between items-baseline">
                 <div className="flex items-baseline gap-2 text-sm text-card-foreground">
                     <span>{t('order_summary.total')}</span>
                 </div>
                 <span className="text-2xl font-semibold text-card-foreground">${pricing.total.toFixed(2)}</span>
             </div>
 
-            <button className="flex items-center justify-center gap-2 w-full py-4 mt-2 bg-primary text-primary-foreground rounded-md text-base font-semibold hover:bg-primary/90 transition-colors">
+            <Button className="w-full py-6 mt-2 text-base" size="lg">
                 {t('order_summary.pay')} ${pricing.total.toFixed(2)}
-                <ArrowRight className="w-5 h-5 rtl:rotate-180" />
-            </button>
+                <ArrowRight className="w-5 h-5 rtl:rotate-180 ml-2" />
+            </Button>
         </div>
     );
 }

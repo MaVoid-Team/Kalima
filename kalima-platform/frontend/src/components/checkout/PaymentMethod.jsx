@@ -1,97 +1,104 @@
 import { CreditCard, HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function PaymentMethod() {
     const { t } = useTranslation('checkout');
 
     return (
-        <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-2">{t('payment.title')}</h2>
-            <p className="text-sm text-muted-foreground mb-4">{t('payment.secure_notice')}</p>
-
-            {/* Credit Card Option */}
-            <div className="border-2 border-primary rounded-md overflow-hidden mb-2">
-                <div className="flex justify-between items-center p-4 bg-primary/5">
-                    <label className="flex items-center gap-3 cursor-pointer text-sm font-medium">
-                        <input type="radio" name="payment" defaultChecked className="w-4 h-4 accent-primary" />
-                        <span>{t('payment.credit_card')}</span>
-                    </label>
-                    <div className="flex gap-2 items-center">
-                        <CreditCard className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                </div>
-
-                <div className="p-4 bg-muted/30 border-t border-border">
-                    <div className="mb-4">
-                        <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                            {t('payment.card_number')}
-                        </label>
-                        <div className="relative">
-                            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder={t('payment.card_placeholder')}
-                                className="w-full pl-10 pr-4 py-3 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-                            />
+        <Card>
+            <CardHeader>
+                <CardTitle>{t('payment.title')}</CardTitle>
+                <CardDescription>{t('payment.secure_notice')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <RadioGroup defaultValue="card" className="grid gap-4">
+                    {/* Credit Card Option */}
+                    <div className="border-2 border-primary rounded-md overflow-hidden">
+                        <div className="flex justify-between items-center p-4 bg-primary/5">
+                            <div className="flex items-center space-x-3">
+                                <RadioGroupItem value="card" id="card" className="accent-primary" />
+                                <Label htmlFor="card" className="font-medium cursor-pointer">{t('payment.credit_card')}</Label>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                                <CreditCard className="w-6 h-6 text-muted-foreground" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                                {t('payment.expiration')}
-                            </label>
-                            <input
-                                type="text"
-                                placeholder={t('payment.expiration_placeholder')}
-                                className="w-full px-4 py-3 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                                {t('payment.security_code')}
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder={t('payment.cvc_placeholder')}
-                                    className="w-full px-4 py-3 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
-                                />
-                                <HelpCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground cursor-pointer" />
+                        <div className="p-4 bg-muted/30 border-t border-border grid gap-4">
+                            <div className="grid gap-2">
+                                <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
+                                    {t('payment.card_number')}
+                                </Label>
+                                <div className="relative">
+                                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                    <Input
+                                        type="text"
+                                        placeholder={t('payment.card_placeholder')}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
+                                        {t('payment.expiration')}
+                                    </Label>
+                                    <Input
+                                        type="text"
+                                        placeholder={t('payment.expiration_placeholder')}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
+                                        {t('payment.security_code')}
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            type="text"
+                                            placeholder={t('payment.cvc_placeholder')}
+                                        />
+                                        <HelpCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground cursor-pointer" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
+                                    {t('payment.name_on_card')}
+                                </Label>
+                                <Input type="text" />
                             </div>
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                            {t('payment.name_on_card')}
-                        </label>
-                        <input type="text" className="w-full px-4 py-3 border border-border rounded-md text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+                    {/* PayPal Option */}
+                    <div className="border border-border rounded-md">
+                        <div className="flex justify-between items-center p-4 bg-muted/30">
+                            <div className="flex items-center space-x-3">
+                                <RadioGroupItem value="paypal" id="paypal" />
+                                <Label htmlFor="paypal" className="font-medium cursor-pointer">{t('payment.paypal')}</Label>
+                            </div>
+                            <a href="#" className="text-primary text-sm hover:underline">{t('payment.paypal')}</a>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            {/* PayPal Option */}
-            <div className="border border-border rounded-md mb-2">
-                <div className="flex justify-between items-center p-4 bg-muted/30">
-                    <label className="flex items-center gap-3 cursor-pointer text-sm font-medium">
-                        <input type="radio" name="payment" className="w-4 h-4 accent-primary" />
-                        <span>{t('payment.paypal')}</span>
-                    </label>
-                    <a href="#" className="text-primary text-sm hover:underline">{t('payment.paypal')}</a>
-                </div>
-            </div>
-
-            {/* Apple Pay Option */}
-            <div className="border border-border rounded-md">
-                <div className="flex justify-between items-center p-4 bg-muted/30">
-                    <label className="flex items-center gap-3 cursor-pointer text-sm font-medium">
-                        <input type="radio" name="payment" className="w-4 h-4 accent-primary" />
-                        <span>{t('payment.apple_pay')}</span>
-                    </label>
-                    <span className="text-sm text-foreground">⌘ Pay</span>
-                </div>
-            </div>
-        </div>
+                    {/* Apple Pay Option */}
+                    <div className="border border-border rounded-md">
+                        <div className="flex justify-between items-center p-4 bg-muted/30">
+                            <div className="flex items-center space-x-3">
+                                <RadioGroupItem value="apple" id="apple" />
+                                <Label htmlFor="apple" className="font-medium cursor-pointer">{t('payment.apple_pay')}</Label>
+                            </div>
+                            <span className="text-sm text-foreground">⌘ Pay</span>
+                        </div>
+                    </div>
+                </RadioGroup>
+            </CardContent>
+        </Card>
     );
 }
