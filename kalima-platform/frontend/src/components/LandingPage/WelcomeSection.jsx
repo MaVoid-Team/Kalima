@@ -11,6 +11,17 @@ import {
   AvatarGroupCount,
 } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command"
 
 
 const HERO_IMAGE_URL =
@@ -57,18 +68,45 @@ export default function WelcomeSection() {
               </p>
             </div>
 
+
+            // ... existing code ...
+
             {/* Search Bar */}
-            <div className="flex gap-4">
-              <Input
-                type="text"
-                placeholder={t("welcome.searchPlaceholder")}
-              />
-              <Button
-                size="lg"
-                variant='default'
-              >
-                {t("welcome.searchButton")}
-              </Button>
+            <div className="w-full max-w-md">
+              <Command className="rounded-lg border shadow-sm overflow-visible">
+                <div className="relative flex items-center">
+                  <CommandInput
+                    placeholder={t("welcome.searchPlaceholder")}
+                    className="h-12"
+                  />
+                  <Button
+                    size="sm"
+                    variant='default'
+                    className="absolute right-1.5 h-9"
+                  >
+                    {t("welcome.searchButton")}
+                  </Button>
+                </div>
+                <CommandList className="absolute top-full left-0 w-full bg-popover rounded-md shadow-md z-50 mt-1 hidden group-focus-within:block">
+                  <CommandEmpty>{t("welcome.noResults")}</CommandEmpty>
+                  <CommandGroup heading={t("welcome.recentSearches")}>
+                    <CommandItem>
+                      <span>{t("welcome.examples.react")}</span>
+                      <CommandShortcut>⌘R</CommandShortcut>
+                    </CommandItem>
+                    <CommandItem>
+                      <span>{t("welcome.examples.math")}</span>
+                      <CommandShortcut>⌘M</CommandShortcut>
+                    </CommandItem>
+                  </CommandGroup>
+                  <CommandSeparator />
+                  <CommandGroup heading={t("welcome.categories")}>
+                    <CommandItem>{t("welcome.categoriesItems.science")}</CommandItem>
+                    <CommandItem>{t("welcome.categoriesItems.arts")}</CommandItem>
+                    <CommandItem>{t("welcome.categoriesItems.tech")}</CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">

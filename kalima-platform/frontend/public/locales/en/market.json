@@ -13,7 +13,9 @@
       "stemKits": "STEM Kits",
       "math101": "Math 101",
       "artSupplies": "Art Supplies"
-    }
+    },
+    "noResults": "No results found.",
+    "suggestions": "Suggestions"
   },
   "categories": {
     "allSections": "All Sections",

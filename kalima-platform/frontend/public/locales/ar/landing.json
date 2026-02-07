@@ -8,7 +8,17 @@
     "pricing": "الأسعار",
     "login": "تسجيل الدخول",
     "signup": "إنشاء حساب",
-    "languageToggle": "English"
+    "languageToggle": "English",
+    "searchPlaceholder": "اكتب أمراً أو ابحث...",
+    "searchButtonLong": "بحث في الموقع...",
+    "searchButtonShort": "بحث...",
+    "noResults": "لا توجد نتائج.",
+    "pages": "الصفحات",
+    "settings": "الإعدادات",
+    "toggleLanguageAction": "تغيير اللغة",
+    "shortcuts": {
+      "open": "Ctrl+K"
+    }
   },
   "footer": {
     "brand": "منصة كلمة",
@@ -43,7 +53,19 @@
     },
     "rating": "تقييم",
     "ratingNote": "بناءً على تقييمات الطلاب",
-    "trustedBy": "موثوق به من قبل أكثر من 2000 معلم"
+    "trustedBy": "موثوق به من قبل أكثر من 2000 معلم",
+    "noResults": "لا توجد نتائج.",
+    "recentSearches": "عمليات البحث الأخيرة",
+    "categories": "الفئات",
+    "examples": {
+      "react": "كورس رياكت",
+      "math": "الرياضيات"
+    },
+    "categoriesItems": {
+      "science": "العلوم",
+      "arts": "الفنون",
+      "tech": "التكنولوجيا"
+    }
   },
   "subjects": {
     "title": "استكشف المواد الدراسية",

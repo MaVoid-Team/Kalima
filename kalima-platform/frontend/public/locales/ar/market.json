@@ -13,7 +13,9 @@
       "stemKits": "مجموعات STEM",
       "math101": "رياضيات 101",
       "artSupplies": "أدوات فنية"
-    }
+    },
+    "noResults": "لا توجد نتائج.",
+    "suggestions": "اقتراحات"
   },
   "categories": {
     "allSections": "جميع الأقسام",
@@ -65,7 +67,7 @@
       },
       "notebook": {
         "title": "دفتر رسوم بيانية",
-        "category": "مستلزمات"  
+        "category": "مستلزمات"
       },
       "lamp": {
         "title": "مصباح دراسة",
