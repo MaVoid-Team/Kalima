@@ -1,0 +1,61 @@
+{
+    "header": {
+        "secure_checkout": "Secure Checkout",
+        "market_name": "Kalima Market"
+    },
+    "steps": {
+        "information": "Information",
+        "shipping": "Shipping",
+        "payment": "Payment"
+    },
+    "contact": {
+        "title": "Contact Information",
+        "login": "Log in",
+        "email_label": "Email address",
+        "email_placeholder": "you@example.com",
+        "news_offers": "Email me with news and offers"
+    },
+    "shipping": {
+        "title": "Shipping Address",
+        "country_label": "Country / Region",
+        "first_name": "First name",
+        "last_name": "Last name",
+        "address_label": "Address",
+        "apartment_placeholder": "Apartment, suite, etc. (optional)",
+        "city": "City",
+        "state": "State",
+        "zip_code": "ZIP code"
+    },
+    "payment": {
+        "title": "Payment",
+        "secure_notice": "All transactions are secure and encrypted.",
+        "credit_card": "Credit Card",
+        "paypal": "PayPal",
+        "apple_pay": "Apple Pay",
+        "card_number": "CARD NUMBER",
+        "card_placeholder": "0000 0000 0000 0000",
+        "expiration": "EXPIRATION (MM/YY)",
+        "expiration_placeholder": "MM / YY",
+        "security_code": "SECURITY CODE",
+        "cvc_placeholder": "CVC",
+        "name_on_card": "NAME ON CARD"
+    },
+    "order_summary": {
+        "title": "Order Summary",
+        "discount_placeholder": "Discount code",
+        "apply": "Apply",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "taxes": "Taxes (estimated)",
+        "total": "Total",
+        "currency": "USD",
+        "pay": "Pay"
+    },
+    "footer": {
+        "return_to_cart": "Return to Cart",
+        "copyright": "© 2023 Kalima Market. All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "refund": "Refund Policy"
+    }
+}
