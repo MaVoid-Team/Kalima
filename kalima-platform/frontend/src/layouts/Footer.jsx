@@ -39,10 +39,9 @@ export default function Footer() {
     },
   ];
 
-
   return (
     <footer className="bg-background border-t text-muted-foreground py-12">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="space-y-4">
@@ -67,7 +66,10 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
+                    <a
+                      href={link.href}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
                       {link.label}
                     </a>
                   </li>
@@ -92,7 +94,7 @@ export default function Footer() {
                 className="h-9 w-9 hover:text-primary hover:bg-transparent text-muted-foreground"
               >
                 <a href={href} aria-label={label}>
-                  <Icon className="h-5 w-5" />
+                  <Icon className="h-5 w-5 no-flip" />
                 </a>
               </Button>
             ))}
