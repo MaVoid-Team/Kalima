@@ -9,10 +9,10 @@ import { Separator } from "@/components/ui/separator";
 
 const RATING_DISTRIBUTION = { 5: 78, 4: 15, 3: 4, 2: 1, 1: 2 };
 const AVATAR_COLORS = [
-  "bg-red-500",
-  "bg-purple-500",
-  "bg-blue-500",
-  "bg-green-500",
+  "bg-primary",
+  "bg-secondary",
+  "bg-accent",
+  "bg-muted",
 ];
 
 export default function ProductTabs({ product }) {
@@ -69,14 +69,14 @@ export default function ProductTabs({ product }) {
             ))}
           </ul>
 
-          <Card className="mt-6 border-l-4 border-l-[var(--info-border)] bg-[var(--info-bg)]">
+          <Card className="mt-6 border-l-4 border-l-accent bg-accent/10">
             <CardContent className="pt-4 flex gap-3">
-              <Info className="h-5 w-5 text-[var(--info-border)] flex-shrink-0 mt-0.5" />
+              <Info className="h-5 w-5 text-accent shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-sm text-[var(--info-text)] mb-1">
+                <p className="font-bold text-sm text-foreground mb-1">
                   {t("description.educatorNote")}
                 </p>
-                <p className="text-sm text-[var(--info-text)] opacity-90">
+                <p className="text-sm text-foreground opacity-90">
                   {t("description.educatorNoteText")}
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function ProductTabs({ product }) {
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="text-5xl font-bold mb-2">{product.rating}</div>
-                <div className="flex justify-center text-[var(--rating-star)] mb-2">
+                <div className="flex justify-center text-highlight mb-2">
                   {renderStars(product.rating)}
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -137,7 +137,7 @@ export default function ProductTabs({ product }) {
                     <span className="text-sm w-3">{stars}</span>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[var(--rating-star)]"
+                        className="h-full bg-highlight"
                         style={{ width: `${RATING_DISTRIBUTION[stars]}%` }}
                       />
                     </div>
@@ -169,12 +169,12 @@ export default function ProductTabs({ product }) {
                           <p className="font-bold">{review.author}</p>
                           <Badge
                             variant="outline"
-                            className="bg-[var(--review-verified-bg)] text-[var(--review-verified)] border-transparent"
+                            className="bg-success/10 text-success border-transparent"
                           >
                             {t("reviews.verifiedBuyer")}
                           </Badge>
                         </div>
-                        <div className="flex text-[var(--rating-star)] mt-1">
+                        <div className="flex text-highlight mt-1">
                           {renderStars(review.rating, "h-4 w-4")}
                         </div>
                       </div>

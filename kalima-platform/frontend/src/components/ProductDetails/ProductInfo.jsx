@@ -17,7 +17,7 @@ export default function ProductInfo({ product }) {
 
         {/* Ratings */}
         <div className="flex items-center gap-2 ">
-          <div className="flex text-[var(--rating-star)]">
+          <div className="flex text-highlight">
             {[...Array(fullStars)].map((_, i) => (
               <Star key={i} className="h-5 w-5 fill-current" />
             ))}
@@ -43,14 +43,14 @@ export default function ProductInfo({ product }) {
                 <span className="text-lg text-muted-foreground line-through mb-1">
                   ${product.originalPrice}
                 </span>
-                <span className="text-xs font-bold text-[var(--review-verified)] bg-[var(--review-verified-bg)] px-2 py-1 rounded-full mb-1">
+                <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded-full mb-1">
                   {t("info.save")} {product.discount}%
                 </span>
               </>
             )}
           </div>
           {product.inStock && (
-            <div className="flex items-center gap-2 text-sm text-[var(--review-verified)] font-medium">
+            <div className="flex items-center gap-2 text-sm text-success font-medium">
               <span>
                 {t("info.inStock")} ({t("info.readyToShip")})
               </span>

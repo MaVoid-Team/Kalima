@@ -12,13 +12,13 @@ export default function BookletInfo({ product }) {
       <div className="flex gap-2">
         <Badge
           variant="secondary"
-          className="bg-green-100 text-green-700 hover:bg-green-100"
+          className="bg-success/10 text-success hover:bg-success/20"
         >
           {t("badges.bestSeller")}
         </Badge>
         <Badge
           variant="secondary"
-          className="bg-blue-100 text-blue-700 hover:bg-blue-100"
+          className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
         >
           {t("badges.interactive")}
         </Badge>
@@ -33,7 +33,7 @@ export default function BookletInfo({ product }) {
       <div className="flex items-center justify-between flex-wrap gap-4">
         {/* Price */}
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-black text-red-500">
+          <span className="text-3xl font-black text-primary">
             ${product.price}
           </span>
           {product.originalPrice && (
@@ -47,7 +47,7 @@ export default function BookletInfo({ product }) {
         <div className="flex flex-col items-end">
           <div className="flex items-center gap-1">
             <span className="font-bold text-lg">{product.rating}</span>
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+            <Star className="w-5 h-5 fill-highlight text-highlight" />
           </div>
           <span className="text-sm text-muted-foreground underline decoration-dotted">
             {product.reviewCount} {t("info.reviews")}

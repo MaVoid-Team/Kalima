@@ -28,8 +28,8 @@ export default function BookletFormatSelector({
               className={cn(
                 "relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
                 isSelected
-                  ? "border-red-500 bg-red-50/10"
-                  : "border-border hover:border-gray-300 bg-card",
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary/50 bg-card",
               )}
             >
               <div className="flex items-center gap-4">
@@ -37,8 +37,8 @@ export default function BookletFormatSelector({
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
                     isSelected
-                      ? "bg-red-100 text-red-600"
-                      : "bg-gray-100 text-gray-500",
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground",
                   )}
                 >
                   {format.type === "digital" ? (
@@ -58,7 +58,7 @@ export default function BookletFormatSelector({
                 <span
                   className={cn(
                     "font-bold text-lg",
-                    isSelected ? "text-red-600" : "text-foreground",
+                    isSelected ? "text-primary" : "text-foreground",
                   )}
                 >
                   ${format.price}

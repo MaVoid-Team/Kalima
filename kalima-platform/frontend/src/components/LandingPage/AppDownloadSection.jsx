@@ -34,7 +34,7 @@ export default function AppDownloadSection() {
           <div className="space-y-8 order-2 lg:order-0">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
               {t("appDownload.title")}{" "}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">
+              <span className="text-primary">
                 {t("appDownload.titleHighlight")}
               </span>
               <br />

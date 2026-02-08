@@ -35,7 +35,7 @@ export default function AboutSection() {
           <div className="space-y-8">
             <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
               {t("about.title")}{" "}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">
+              <span className="text-primary">
                 {t("about.titleHighlight")}
               </span>
               <br />

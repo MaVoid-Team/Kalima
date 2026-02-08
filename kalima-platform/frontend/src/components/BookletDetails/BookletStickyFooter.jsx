@@ -12,7 +12,7 @@ export default function BookletStickyFooter({ price, onAddToCart }) {
         {/* Add to Cart (Secondary) */}
         <Button
           variant="outline"
-          className="flex-1 gap-2 font-bold border-red-500 text-red-500 hover:bg-red-50"
+          className="flex-1 gap-2 font-bold border-primary text-primary hover:bg-primary/10"
           size="lg"
           onClick={onAddToCart}
         >
@@ -22,7 +22,7 @@ export default function BookletStickyFooter({ price, onAddToCart }) {
 
         {/* Buy Now (Primary) */}
         <Button
-          className="flex-[2] gap-2 font-bold bg-red-600 hover:bg-red-700 text-white"
+          className="flex-[2] gap-2 font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
           size="lg"
           onClick={() => console.log("Buy Now Clicked")}
         >
