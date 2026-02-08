@@ -1,0 +1,99 @@
+{
+  "breadcrumbs": {
+    "home": "Home",
+    "digitalProducts": "Digital Products",
+    "scienceKits": "Science Kits"
+  },
+  "variants": {
+    "format": "Format",
+    "kitAccentColor": "Kit Accent Color"
+  },
+  "formats": {
+    "physical": "Physical Kit",
+    "digital": "Digital Only",
+    "bundle": "Bundle (Physical + PDF)"
+  },
+  "actions": {
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "follow": "Follow"
+  },
+  "info": {
+    "sku": "SKU",
+    "inStock": "In Stock",
+    "readyToShip": "Ready to ship",
+    "save": "Save",
+    "totalPrice": "Total Price",
+    "view": "Product view",
+    "thumbnail": "Thumbnail",
+    "reviews": "reviews",
+    "createdBy": "Created by"
+  },
+  "trustSignals": {
+    "secureTransaction": "Secure Transaction",
+    "educationVerified": "Education Verified",
+    "freeShipping": "Free Shipping over $100",
+    "thirtyDayReturns": "30-Day Returns"
+  },
+  "tabs": {
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "resources": "Educator Resources"
+  },
+  "description": {
+    "whatsIncluded": "What's Included?",
+    "educatorNote": "Educator Note",
+    "educatorNoteText": "This kit is eligible for Title I funding. Please contact our support team for a formal quote to submit with your purchase order.",
+    "engagementText": "Engage your students with real-world scientific inquiry. The materials provided are durable, safe, and specifically curated to foster curiosity and critical thinking skills in young learners."
+  },
+  "specifications": {
+    "title": "Quick Specs",
+    "gradeLevel": "Grade Level",
+    "subject": "Subject",
+    "language": "Language",
+    "isbn": "ISBN",
+    "publicationDate": "Publication Date"
+  },
+  "reviews": {
+    "basedOn": "Based on {{count}} reviews",
+    "readAll": "Read all {{count}} reviews",
+    "seeAll": "See All",
+    "verifiedBuyer": "✓ Verified Buyer",
+    "weeksAgo": "{{count}} weeks ago",
+    "monthAgo": "{{count}} month ago",
+    "monthsAgo": "{{count}} months ago",
+    "sampleReviews": [
+      {
+        "author": "Jennifer Smith",
+        "initials": "JS",
+        "rating": 5,
+        "timeAgo": "2 weeks ago",
+        "text": "Excellent kit! My 5th graders loved the volcano experiment. The materials are high quality and the instructions were very clear."
+      },
+      {
+        "author": "Mark K.",
+        "initials": "MK",
+        "rating": 5,
+        "timeAgo": "1 month ago",
+        "text": "Great value for the price. The digital resources are a nice bonus, though I wish the physical manual was spiral bound."
+      }
+    ]
+  },
+  "resources": {
+    "placeholder": "Additional educator resources and downloadable materials will be available here."
+  },
+  "badges": {
+    "bestSeller": "Best Seller",
+    "interactive": "Interactive"
+  },
+
+  "booklet": {
+    "selectFormat": "SELECT FORMAT",
+    "aboutResource": "About this Resource",
+    "curriculumAlignment": "Curriculum Alignment",
+    "fileDetails": "File Details",
+    "publisherInfo": "Publisher Info",
+    "saveToPlan": "Save to Plan"
+  }
+}

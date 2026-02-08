@@ -11,6 +11,8 @@ import SignupPage from "./pages/auth/SignupPage";
 import CartPage from "./pages/cart/CartPage";
 import MarketPage from "./pages/market/MarketPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
+import ProductDetailsPage from "./pages/product/ProductDetailsPage";
+import BookletDetailsPage from "./pages/booklet/BookletDetailsPage";
 
 function App() {
   const { i18n } = useTranslation();
@@ -30,6 +32,8 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/market" element={<MarketPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/product/:id" element={<ProductDetailsPage />} />
+          <Route path="/booklet/:id" element={<BookletDetailsPage />} />
         </Route>
       </Routes>
       <Toaster position="bottom-right" richColors />

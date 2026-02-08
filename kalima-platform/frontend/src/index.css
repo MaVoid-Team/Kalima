@@ -57,6 +57,17 @@
   --shadow-xl:
     0 20px 25px -5px oklch(0 0 0 / 0.2), 0 8px 10px -6px oklch(0 0 0 / 0.1);
   --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.35);
+
+  /* Product-specific variables */
+  --rating-star: oklch(0.75 0.15 83.5); /* yellow-500 */
+  --rating-bg: oklch(0.95 0.05 89); /* yellow-50 */
+
+  --review-verified: oklch(0.67 0.15 144.89); /* green-600 */
+  --review-verified-bg: oklch(0.95 0.05 145); /* green-50 */
+
+  --info-bg: oklch(0.96 0.03 251); /* blue-50 */
+  --info-border: oklch(0.65 0.18 251); /* blue-500 */
+  --info-text: oklch(0.35 0.09 251); /* blue-900 */
 }
 
 .dark {
@@ -159,6 +170,26 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
 }
 
 @layer base {
@@ -178,3 +209,14 @@
     transform: scaleX(-1);
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
