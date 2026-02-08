@@ -59,9 +59,15 @@ export default function SubjectsSection() {
               {t("subjects.description")}
             </p>
           </div>
-          <Button variant="link" size="lg" asChild>
+          <Button
+            variant="ghost"
+            size="lg"
+            className="hover:bg-transparent text-primary group"
+            asChild
+          >
             <Link to="/subjects">
-              {t("subjects.viewAll")} <span className="text-lg">&rarr;</span>
+              {t("subjects.viewAll")}{" "}
+              <ArrowRight className=" group-hover:-translate-x-1" />
             </Link>
           </Button>
         </div>
@@ -71,27 +77,23 @@ export default function SubjectsSection() {
           {subjects.map((subject) => (
             <Card
               key={subject.id}
-              className="flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300"
+              className="flex flex-col overflow-hidden rounded-4xl p-0"
             >
-              <CardHeader>
-                <img
-                  src={subject.image}
-                  alt={subject.title}
-                  className="overflow-hidden w-full h-72 object-cover rounded-2xl"
-                />
-              </CardHeader>
-              <CardContent className="flex flex-col p-8">
+              <img
+                src={subject.image}
+                alt={subject.title}
+                className="h-56 w-full object-cover"
+              />
+              <CardContent className="flex flex-col  p-8">
                 <div
-                  className={`mb-6 flex h-12 w-12 items-center justify-center rounded-full ${subject.iconBg}`}
+                  className={`mb-6 flex h-12 w-12 items-center rounded-full justify-center ${subject.iconBg}`}
                 >
                   <subject.icon
-                    className={`h-6 w-6 ${subject.iconColor}`}
+                    className={`h-6 w-6  ${subject.iconColor}`}
                     strokeWidth={2.5}
                   />
                 </div>
-                <h3 className="mb-3 text-2xl font-bold text-foreground">
-                  {subject.title}
-                </h3>
+                <h3 className="mb-3 text-2xl font-bold ">{subject.title}</h3>
                 <p className="text-base font-medium text-muted-foreground leading-relaxed">
                   {subject.description}
                 </p>
