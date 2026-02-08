@@ -1,0 +1,99 @@
+{
+  "breadcrumbs": {
+    "home": "الرئيسية",
+    "digitalProducts": "المنتجات الرقمية",
+    "scienceKits": "مجموعات العلوم"
+  },
+  "variants": {
+    "format": "الشكل",
+    "kitAccentColor": "لون المجموعة"
+  },
+  "formats": {
+    "physical": "مجموعة مادية",
+    "digital": "رقمي فقط",
+    "bundle": "حزمة (مادي + PDF)"
+  },
+  "actions": {
+    "addToCart": "إضافة إلى السلة",
+    "buyNow": "اشتري الآن",
+    "follow": "متابعة"
+  },
+  "info": {
+    "sku": "رقم المنتج",
+    "inStock": "متوفر",
+    "readyToShip": "جاهز للشحن",
+    "save": "وفّر",
+    "totalPrice": "السعر الإجمالي",
+    "view": "عرض المنتج",
+    "thumbnail": "صورة مصغرة",
+    "reviews": "مراجعات",
+    "createdBy": "تم إنشاؤه بواسطة"
+  },
+  "trustSignals": {
+    "secureTransaction": "معاملة آمنة",
+    "educationVerified": "موثق تعليمياً",
+    "freeShipping": "شحن مجاني فوق $100",
+    "thirtyDayReturns": "إرجاع خلال 30 يوم"
+  },
+  "tabs": {
+    "description": "الوصف",
+    "specifications": "المواصفات",
+    "reviews": "المراجعات",
+    "resources": "موارد المعلم"
+  },
+  "description": {
+    "whatsIncluded": "ما هو مشمول؟",
+    "educatorNote": "ملاحظة للمعلم",
+    "educatorNoteText": "هذه المجموعة مؤهلة لتمويل Title I. يرجى الاتصال بفريق الدعم للحصول على عرض أسعار رسمي لتقديمه مع طلب الشراء.",
+    "engagementText": "أشرك طلابك في الاستقصاء العلمي الحقيقي. المواد المقدمة متينة وآمنة ومُختارة خصيصًا لتعزيز الفضول ومهارات التفكير النقدي لدى المتعلمين الصغار."
+  },
+  "specifications": {
+    "title": "المواصفات السريعة",
+    "gradeLevel": "المستوى الدراسي",
+    "subject": "الموضوع",
+    "language": "اللغة",
+    "isbn": "رقم ISBN",
+    "publicationDate": "تاريخ النشر"
+  },
+  "reviews": {
+    "basedOn": "بناءً على {{count}} مراجعة",
+    "readAll": "قراءة جميع {{count}} المراجعات",
+    "seeAll": "عرض الكل",
+    "verifiedBuyer": "✓ مشتري موثق",
+    "weeksAgo": "منذ {{count}} أسابيع",
+    "monthAgo": "منذ شهر",
+    "monthsAgo": "منذ {{count}} أشهر",
+    "sampleReviews": [
+      {
+        "author": "جينيفر سميث",
+        "initials": "JS",
+        "rating": 5,
+        "timeAgo": "منذ أسبوعين",
+        "text": "مجموعة ممتازة! طلاب الصف الخامس أحبوا تجربة البركان. المواد عالية الجودة والتعليمات واضحة جدًا."
+      },
+      {
+        "author": "مارك ك.",
+        "initials": "MK",
+        "rating": 5,
+        "timeAgo": "منذ شهر",
+        "text": "قيمة رائعة مقابل السعر. الموارد الرقمية إضافة رائعة، كنت أتمنى لو كان الدليل الورقي بتجليد حلزوني."
+      }
+    ]
+  },
+  "resources": {
+    "placeholder": "ستكون موارد المعلمين الإضافية والمواد القابلة للتنزيل متاحة هنا."
+  },
+  "badges": {
+    "bestSeller": "الأكثر مبيعاً",
+    "interactive": "تفاعلي"
+  },
+
+  "booklet": {
+    "selectFormat": "اختر الصيغة",
+    "aboutResource": "حول هذا المورد",
+    "curriculumAlignment": "توافق المنهج",
+    "fileDetails": "تفاصيل الملف",
+    "publisherInfo": "معلومات الناشر",
+    "saveToPlan": "حفظ في الخطة"
+  }
+}
