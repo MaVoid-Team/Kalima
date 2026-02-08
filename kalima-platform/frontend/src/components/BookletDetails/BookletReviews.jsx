@@ -37,7 +37,7 @@ export default function BookletReviews({ product }) {
             ({product.reviewCount})
           </span>
         </h2>
-        <button className="text-red-600 font-bold text-sm hover:underline">
+        <button className="text-primary font-bold text-sm hover:underline">
           {t("reviews.seeAll", "See All")}
         </button>
       </div>
@@ -48,21 +48,21 @@ export default function BookletReviews({ product }) {
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-3">
                 <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-purple-100 text-purple-600 text-xs font-bold">
+                  <AvatarFallback className="bg-accent text-accent-foreground text-xs font-bold">
                     {review.initials}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="font-bold text-sm">{review.author}</div>
-                  <div className="flex text-yellow-400">
+                  <div className="flex text-highlight">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
                         className={cn(
                           "w-3 h-3 fill-current",
                           i < review.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300",
+                            ? "text-highlight"
+                            : "text-muted",
                         )}
                       />
                     ))}
@@ -83,7 +83,7 @@ export default function BookletReviews({ product }) {
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="text-[10px] px-2 py-0 h-5 bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  className="text-[10px] px-2 py-0 h-5 bg-muted text-muted-foreground hover:bg-muted/80"
                 >
                   {tag.toUpperCase()}
                 </Badge>
