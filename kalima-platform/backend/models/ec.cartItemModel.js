@@ -31,6 +31,16 @@ const cartItemSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Final price is required"],
     },
+    couponCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ECCoupon",
+      default: null,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+      min: [0, "Discount cannot be negative"],
+    },
     productSnapshot: {
       title: {
         type: String,
@@ -48,12 +58,21 @@ const cartItemSchema = new mongoose.Schema(
       },
       priceAfterDiscount: Number,
     },
+    couponCode: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ECCoupon",
+      required: false,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Index for faster queries
@@ -61,13 +80,19 @@ cartItemSchema.index({ cart: 1, product: 1 }, { unique: true });
 
 // Pre-save middleware to calculate finalPrice
 cartItemSchema.pre("save", function (next) {
-  this.finalPrice = this.priceAtAdd * this.quantity;
+  this.finalPrice = Math.max(
+    0,
+    this.priceAtAdd * this.quantity - (this.discount || 0),
+  );
   next();
 });
 
 // Method to update finalPrice when quantity changes
 cartItemSchema.methods.updatePrice = function () {
-  this.finalPrice = this.priceAtAdd * this.quantity;
+  this.finalPrice = Math.max(
+    0,
+    this.priceAtAdd * this.quantity - (this.discount || 0),
+  );
   return this.finalPrice;
 };
 

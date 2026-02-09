@@ -66,6 +66,8 @@ const ecReferralRoutes = require("./routes/ec.referralRoutes");
 const ecCartRoutes = require("./routes/ec.cartRoutes");
 const ecCartItemRoutes = require("./routes/ec.cartItemRoutes");
 const ecCartPurchaseRoutes = require("./routes/ec.cartPurchaseRoutes");
+const v2CartRoutes = require("./routes/v2/cartRoutes.js");
+const v2CartPurchaseRoutes = require("./routes/v2/cartPurchaseRoutes.js");
 const ecPaymentMethodRoutes = require("./routes/paymentMethodRoutes");
 const whatsAppNumberRoutes = require("./routes/whatsAppNumberRoutes");
 
@@ -88,8 +90,8 @@ mongoose.connection.once("open", async () => {
 });
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '120mb' }));
-app.use(express.urlencoded({ limit: '120mb', extended: true }));
+app.use(express.json({ limit: "120mb" }));
+app.use(express.urlencoded({ limit: "120mb", extended: true }));
 
 app.use(mongoSanitize());
 app.use(cookieParser());
@@ -147,6 +149,9 @@ app.use("/api/v1/ec/subsections", auditLogger, ECSubSectionRouter);
 app.use("/api/v1/ec/cart-items", ecCartItemRoutes);
 app.use("/api/v1/ec/carts", ecCartRoutes);
 app.use("/api/v1/ec/cart-purchases", auditLogger, ecCartPurchaseRoutes);
+// v2 routes (per-item coupon)
+app.use("/api/v2/ec/carts", v2CartRoutes);
+app.use("/api/v2/ec/cart-purchases", auditLogger, v2CartPurchaseRoutes);
 app.use("/api/v1/ec/payment-methods", auditLogger, ecPaymentMethodRoutes);
 app.use("/api/v1/whatsapp-numbers", auditLogger, whatsAppNumberRoutes);
 
@@ -196,7 +201,7 @@ mongoose.connection.once("open", () => {
       }
 
       console.log(
-        `User ${userId} subscribed to notifications with socket ID ${socket.id}`
+        `User ${userId} subscribed to notifications with socket ID ${socket.id}`,
       );
 
       // Add user to connected users map
@@ -214,14 +219,14 @@ mongoose.connection.once("open", () => {
           .limit(20);
 
         console.log(
-          `Found ${pendingNotifications.length} pending notifications for user ${userId}`
+          `Found ${pendingNotifications.length} pending notifications for user ${userId}`,
         );
 
         if (pendingNotifications.length > 0) {
           // Mark notifications as sent
           await Notification.updateMany(
             { userId, isSent: false },
-            { isSent: true }
+            { isSent: true },
           );
 
           // Send each notification to the client
@@ -235,8 +240,8 @@ mongoose.connection.once("open", () => {
                   : notification.type === "new_container"
                     ? "newContainer"
                     : notification.type === "new_attachment" ||
-                      notification.type === "new_attachment_assignment" ||
-                      notification.type === "new_exam"
+                        notification.type === "new_attachment_assignment" ||
+                        notification.type === "new_exam"
                       ? "newAttachment"
                       : notification.type === "lecture_updated"
                         ? "lectureUpdate"
@@ -271,7 +276,7 @@ mongoose.connection.once("open", () => {
       // Remove from connected users map
       const userId = connectedUsers.get(socket.id);
       console.log(
-        `User ${userId} disconnected: ${reason}, socket ID ${socket.id}`
+        `User ${userId} disconnected: ${reason}, socket ID ${socket.id}`,
       );
       connectedUsers.delete(socket.id);
     });

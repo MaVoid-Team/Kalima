@@ -8,12 +8,17 @@ const getCart = catchAsync(async (req, res, next) => {
   })
     .populate({
       path: "itemsWithDetails",
-      populate: {
-        path: "product",
-        select: "title thumbnail price priceAfterDiscount section",
-      },
-    })
-    .populate("couponCode");
+      populate: [
+        {
+          path: "product",
+          select: "title thumbnail price priceAfterDiscount section",
+        },
+        {
+          path: "couponCode",
+          select: "couponCode value expirationDate isActive",
+        },
+      ],
+    });
 
   if (!cart) {
     return res.status(200).json({

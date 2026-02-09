@@ -11,29 +11,22 @@ const updateCartTotals = async (cartId) => {
     {
       $group: {
         _id: null,
-        subtotal: { $sum: "$finalPrice" },
+        subtotal: { $sum: { $multiply: ["$priceAtAdd", "$quantity"] } },
+        totalDiscount: { $sum: { $ifNull: ["$discount", 0] } },
         count: { $sum: "$quantity" },
       },
     },
   ]);
 
   const subtotal = stats.length > 0 ? stats[0].subtotal : 0;
+  const totalDiscount = stats.length > 0 ? stats[0].totalDiscount : 0;
   const totalItems = stats.length > 0 ? stats[0].count : 0;
 
-  const cart = await ECCart.findById(cartId)
-    .select("couponCode")
-    .populate("couponCode");
-
-  let discount = 0;
-  if (cart && cart.couponCode && cart.couponCode.value) {
-    discount = cart.couponCode.value;
-  }
-
-  const total = Math.max(0, subtotal - discount);
+  const total = Math.max(0, subtotal - totalDiscount);
 
   await ECCart.findByIdAndUpdate(cartId, {
     subtotal,
-    discount,
+    discount: totalDiscount,
     total,
     totalItems,
     lastUpdated: new Date(),

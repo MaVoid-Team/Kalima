@@ -49,13 +49,18 @@ module.exports = catchAsync(async (req, res, next) => {
   })
     .populate({
       path: "itemsWithDetails",
-      populate: {
-        path: "product",
-        select:
-          "title thumbnail priceAfterDiscount paymentNumber serial section __t",
-      },
-    })
-    .populate("couponCode");
+      populate: [
+        {
+          path: "product",
+          select:
+            "title thumbnail priceAfterDiscount paymentNumber serial section __t",
+        },
+        {
+          path: "couponCode",
+          select: "couponCode value isActive",
+        },
+      ],
+    });
 
   const cartItems = cart?.itemsWithDetails || [];
   if (!cart) {
@@ -96,7 +101,6 @@ module.exports = catchAsync(async (req, res, next) => {
       : null,
     paymentScreenShot: paymentValidation.paymentScreenShot,
     subtotal: pricingTotals.subtotal,
-    couponCode: pricingTotals.couponCode,
     discount: pricingTotals.discount,
     total: pricingTotals.total,
     notes: req.body.notes,
@@ -104,10 +108,13 @@ module.exports = catchAsync(async (req, res, next) => {
     watermark: watermarkFile ? watermarkFile.path : null,
   });
 
-  if (cart.couponCode) {
-    const coupon = await ECCoupon.findById(cart.couponCode);
-    if (coupon) {
-      await coupon.markAsUsed(purchase._id, req.user._id);
+  // Mark per-item coupons as used
+  for (const item of cartItems) {
+    if (item.couponCode && item.couponCode._id) {
+      const coupon = await ECCoupon.findById(item.couponCode._id);
+      if (coupon && coupon.isActive) {
+        await coupon.markAsUsed(purchase._id, req.user._id);
+      }
     }
   }
 
