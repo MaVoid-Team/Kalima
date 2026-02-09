@@ -6,6 +6,8 @@ const PriceCalculator = {
       product: item.product._id,
       productType: item.product.__t || "ECProduct",
       priceAtPurchase: item.priceAtAdd,
+      couponCode: item.couponCode || null,
+      discount: item.discount || 0,
       productSnapshot: {
         title: item.product.title,
         thumbnail: item.product.thumbnail,
@@ -20,7 +22,6 @@ const PriceCalculator = {
       subtotal: cart.subtotal,
       discount: cart.discount,
       total: cart.total,
-      couponCode: cart.couponCode,
     };
   },
 };

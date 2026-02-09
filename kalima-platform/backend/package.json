@@ -11,7 +11,8 @@
     "seed:governments": "node utils/seeds/seedGovernments.js",
     "cleanup:watermarks": "node scripts/cleanupOldWatermarks.js",
     "backfill:monthly-count": "node scripts/backfillMonthlyConfirmedCount.js",
-    "backfill:user-purchase-stats": "node scripts/migrateUserPurchaseStats.js"
+    "backfill:user-purchase-stats": "node scripts/migrateUserPurchaseStats.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -52,6 +53,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.9"
   }
 }

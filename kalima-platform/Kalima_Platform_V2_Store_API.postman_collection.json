@@ -1,0 +1,622 @@
+{
+  "info": {
+    "name": "Kalima Platform - V2 Store API",
+    "description": "Postman collection for V2 Cart and Cart Purchase endpoints with per-item coupon support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "kalima-platform"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"super-admin@kalima-edu.com\",\n  \"password\": \"Kalima1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login to get JWT token for authenticated requests"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('token', response.accessToken);",
+                  "    console.log('Token saved:', response.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "V2 Cart Management",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts"]
+            },
+            "description": "Get current user's cart with items and totals"
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"507f1f77bcf86cd799439011\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts", "add"]
+            },
+            "description": "Add a product to the cart"
+          }
+        },
+        {
+          "name": "Update Item Quantity",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/items/{{itemId}}/quantity",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "carts",
+                "items",
+                "{{itemId}}",
+                "quantity"
+              ]
+            },
+            "description": "Update quantity of a specific cart item"
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/items/{{itemId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts", "items", "{{itemId}}"]
+            },
+            "description": "Remove a specific item from cart"
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/clear",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts", "clear"]
+            },
+            "description": "Remove all items from cart"
+          }
+        },
+        {
+          "name": "Apply Coupon to Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"507f1f77bcf86cd799439011\",\n  \"couponCode\": \"SAVE20\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/items/apply-coupon",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts", "items", "apply-coupon"]
+            },
+            "description": "Apply a coupon to a specific cart item (V2 feature)"
+          }
+        },
+        {
+          "name": "Remove Coupon from Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/items/{{itemId}}/coupon",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "carts",
+                "items",
+                "{{itemId}}",
+                "coupon"
+              ]
+            },
+            "description": "Remove coupon from a specific cart item"
+          }
+        },
+        {
+          "name": "Checkout Preview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/carts/checkout-preview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "carts", "checkout-preview"]
+            },
+            "description": "Get cart preview with totals and discounts before checkout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "V2 Cart Purchase Management",
+      "item": [
+        {
+          "name": "Create Cart Purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "paymentMethod",
+                  "value": "cash",
+                  "type": "text"
+                },
+                {
+                  "key": "paymentScreenShot",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases"]
+            },
+            "description": "Create a purchase from current cart (requires cart with items)"
+          }
+        },
+        {
+          "name": "Get User Purchases",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases"]
+            },
+            "description": "Get all purchases for current user"
+          }
+        },
+        {
+          "name": "Get All Purchases (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/admin/all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases", "admin", "all"]
+            },
+            "description": "Get all purchases (Admin/SubAdmin/Moderator only)"
+          }
+        },
+        {
+          "name": "Get Purchase Statistics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/admin/statistics",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "admin",
+                "statistics"
+              ]
+            },
+            "description": "Get purchase statistics (Admin only)"
+          }
+        },
+        {
+          "name": "Get Product Purchase Stats (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/admin/product-statistics",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "admin",
+                "product-statistics"
+              ]
+            },
+            "description": "Get product purchase statistics (Admin only)"
+          }
+        },
+        {
+          "name": "Get Response Time Stats (Admin)",
+          "request": {
+            "method": "GET",
+            "header": {
+              "key": "Authorization",
+              "value": "Bearer {{token}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/admin/response-time",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "admin",
+                "response-time"
+              ]
+            },
+            "description": "Get response time statistics (Admin only)"
+          }
+        },
+        {
+          "name": "Get Full Orders Report (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/admin/fullreport",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "admin",
+                "fullreport"
+              ]
+            },
+            "description": "Get full orders report (Admin only)"
+          }
+        },
+        {
+          "name": "Get Monthly Confirmed Count (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/confirmed-count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases", "confirmed-count"]
+            },
+            "description": "Get monthly confirmed purchases count (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Get Purchase by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases", "{{purchaseId}}"]
+            },
+            "description": "Get specific purchase by ID (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Delete Purchase (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "ec", "cart-purchases", "{{purchaseId}}"]
+            },
+            "description": "Delete a purchase (Admin/SubAdmin only)"
+          }
+        },
+        {
+          "name": "Mark Purchase as Received (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}/receive",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "{{purchaseId}}",
+                "receive"
+              ]
+            },
+            "description": "Mark purchase as received (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Confirm Purchase (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}/confirm",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "{{purchaseId}}",
+                "confirm"
+              ]
+            },
+            "description": "Confirm purchase (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Return Purchase (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}/return",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "{{purchaseId}}",
+                "return"
+              ]
+            },
+            "description": "Mark purchase as returned (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Add Admin Note",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminNote\": \"Customer requested refund\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}/admin-note",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "{{purchaseId}}",
+                "admin-note"
+              ]
+            },
+            "description": "Add admin note to purchase (Admin/SubAdmin/Moderator)"
+          }
+        },
+        {
+          "name": "Delete Item from Purchase (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases/{{purchaseId}}/items/{{itemId}}",
+              "host": ["{{base_url}}"],
+              "path": [
+                "api",
+                "v2",
+                "ec",
+                "cart-purchases",
+                "{{purchaseId}}",
+                "items",
+                "{{itemId}}"
+              ]
+            },
+            "description": "Delete specific item from purchase (Admin/SubAdmin only)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
+      "value": "507f1f77bcf86cd799439011",
+      "type": "string"
+    },
+    {
+      "key": "purchaseId",
+      "value": "507f1f77bcf86cd799439011",
+      "type": "string"
+    }
+  ]
+}

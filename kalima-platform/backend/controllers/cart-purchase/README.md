@@ -82,12 +82,12 @@ POST /api/cart-purchases
  │      └── validatePayment({ total, body, paymentFile })
  ├─ 4. StrategyFactory → picks bookStrategy | productStrategy
  ├─ 5. PriceCalculator
- │      ├── buildLineItems(cartItems) → type-agnostic base items
- │      └── totalsFromCart(cart)       → { subtotal, discount, total, couponCode }
+ │      ├── buildLineItems(cartItems) → base items with per-item couponCode & discount
+ │      └── totalsFromCart(cart)       → { subtotal, discount, total }
  ├─ 6. Strategy.decorateItems(baseItems, body) → decorated items
  ├─ 7. SerialService.generatePurchaseSerial(userSerial)
  ├─ 8. ECCartPurchase.create({ ... })
- ├─ 9. coupon.markAsUsed() (if applicable)
+ ├─ 9. Loop cart items → coupon.markAsUsed() for each item that has a coupon
  ├─ 10. Notifications
  │       ├── Email (purchase confirmation to user)
  │       ├── WhatsApp (optional, if phone number exists)
@@ -124,8 +124,17 @@ POST /api/cart-purchases
 
 ## API Reference
 
-**Base path:** `/api/cart-purchases`  
+**Base path:**
+
+- **v1:** `/api/v1/ec/cart-purchases` (cart-level coupon)
+- **v2:** `/api/v2/ec/cart-purchases` (per-item coupon)
+
 **Auth:** All routes require JWT (`verifyJWT` middleware).
+
+> **v2 coupon change:** In v2, coupons are applied per cart item (not per cart). At checkout,
+> each item's coupon is individually marked as used. The purchase `items[]` subdocuments
+> carry their own `couponCode` and `discount` fields. The top-level purchase `discount`
+> is the sum of all per-item discounts.
 
 ### User Endpoints
 
@@ -163,21 +172,21 @@ POST /api/cart-purchases
 
 **Roles:** `Admin`, `SubAdmin`, `Moderator` unless noted otherwise.
 
-| Method   | Path                               | Handler                             | Roles                      | Description                                                     |
-| -------- | ---------------------------------- | ----------------------------------- | -------------------------- | --------------------------------------------------------------- |
-| `GET`    | `/admin/all`                       | `getAllPurchases`                   | Admin, SubAdmin, Moderator | Paginated list with search and filters                          |
-| `GET`    | `/admin/statistics`                | `getPurchaseStatistics`             | Admin                      | Aggregate overview + monthly + optional daily stats             |
-| `GET`    | `/admin/product-statistics`        | `getProductPurchaseStats`           | Admin                      | Per-product purchase count and revenue                          |
-| `GET`    | `/admin/response-time`             | `getResponseTimeStatistics`         | Admin                      | Business-hour response/confirm time analytics                   |
-| `GET`    | `/admin/fullreport`                | `getFullOrdersReport`               | Admin                      | Staff performance report (per-staff response & confirm times)   |
-| `GET`    | `/confirmed-count`                 | `getMonthlyConfirmedPurchasesCount` | Admin, SubAdmin, Moderator | Current user's monthly confirmed purchase count (cached)        |
-| `GET`    | `/:id`                             | `getCartPurchaseById`               | Admin, SubAdmin, Moderator | Single purchase detail with all populates                       |
-| `PATCH`  | `/:id/receive`                     | `receivePurchase`                   | Admin, SubAdmin, Moderator | Transition `pending → received`                                 |
-| `PATCH`  | `/:id/confirm`                     | `confirmCartPurchase`               | Admin, SubAdmin, Moderator | Transition `received/returned → confirmed`                      |
-| `PATCH`  | `/:id/return`                      | `returnCartPurchase`                | Admin, SubAdmin, Moderator | Transition `confirmed/received → returned`                      |
-| `PATCH`  | `/:id/admin-note`                  | `addAdminNote`                      | Admin, SubAdmin, Moderator | Attach/update admin note                                        |
-| `DELETE` | `/:id`                             | `deletePurchase`                    | Admin, SubAdmin            | Delete purchase (rollbacks: user stats, coupon, monthly cache)  |
-| `DELETE` | `/delete/:purchaseId/item/:itemId` | `deleteItemFromPurchase`            | Admin, SubAdmin            | Remove a single item (recalculates totals; blocks if last item) |
+| Method   | Path                         | Handler                             | Roles                      | Description                                                     |
+| -------- | ---------------------------- | ----------------------------------- | -------------------------- | --------------------------------------------------------------- |
+| `GET`    | `/admin/all`                 | `getAllPurchases`                   | Admin, SubAdmin, Moderator | Paginated list with search and filters                          |
+| `GET`    | `/admin/statistics`          | `getPurchaseStatistics`             | Admin                      | Aggregate overview + monthly + optional daily stats             |
+| `GET`    | `/admin/product-statistics`  | `getProductPurchaseStats`           | Admin                      | Per-product purchase count and revenue                          |
+| `GET`    | `/admin/response-time`       | `getResponseTimeStatistics`         | Admin                      | Business-hour response/confirm time analytics                   |
+| `GET`    | `/admin/fullreport`          | `getFullOrdersReport`               | Admin                      | Staff performance report (per-staff response & confirm times)   |
+| `GET`    | `/confirmed-count`           | `getMonthlyConfirmedPurchasesCount` | Admin, SubAdmin, Moderator | Current user's monthly confirmed purchase count (cached)        |
+| `GET`    | `/:id`                       | `getCartPurchaseById`               | Admin, SubAdmin, Moderator | Single purchase detail with all populates                       |
+| `PATCH`  | `/:id/receive`               | `receivePurchase`                   | Admin, SubAdmin, Moderator | Transition `pending → received`                                 |
+| `PATCH`  | `/:id/confirm`               | `confirmCartPurchase`               | Admin, SubAdmin, Moderator | Transition `received/returned → confirmed`                      |
+| `PATCH`  | `/:id/return`                | `returnCartPurchase`                | Admin, SubAdmin, Moderator | Transition `confirmed/received → returned`                      |
+| `PATCH`  | `/:id/admin-note`            | `addAdminNote`                      | Admin, SubAdmin, Moderator | Attach/update admin note                                        |
+| `DELETE` | `/:id`                       | `deletePurchase`                    | Admin, SubAdmin            | Delete purchase (rollbacks: user stats, coupon, monthly cache)  |
+| `DELETE` | `/:purchaseId/items/:itemId` | `deleteItemFromPurchase`            | Admin, SubAdmin            | Remove a single item (recalculates totals; blocks if last item) |
 
 #### `GET /admin/all` — Query Parameters
 
@@ -298,10 +307,10 @@ Encapsulates all pre-checkout validation. Each method throws `AppError` on failu
 
 Produces type-agnostic data structures. Product-type decoration is **not** done here — that responsibility belongs to strategies.
 
-| Method           | Signature                                            | Purpose                                                                         |
-| ---------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `buildLineItems` | `(cartItems) → Array<LineItem>`                      | Maps cart items to `{ product, productType, priceAtPurchase, productSnapshot }` |
-| `totalsFromCart` | `(cart) → { subtotal, discount, total, couponCode }` | Reads pre-calculated totals from the cart document                              |
+| Method           | Signature                                | Purpose                                                                                               |
+| ---------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `buildLineItems` | `(cartItems) → Array<LineItem>`          | Maps cart items to `{ product, productType, priceAtPurchase, couponCode, discount, productSnapshot }` |
+| `totalsFromCart` | `(cart) → { subtotal, discount, total }` | Reads pre-calculated totals from the cart document (discount = sum of per-item discounts)             |
 
 ### SerialService
 
@@ -393,7 +402,7 @@ decorateItems(items) → items  // identity — no decoration
 
 | Feature                           | Where to Change                                                                                            | Controller Impact |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------- |
-| **Per-Item Coupon**               | `services/priceCalculator.js` — apply per-item discount before totals                                      | None              |
+| **Per-Item Coupon**               | ✅ Implemented in v2. See `cart/apply-coupon.js`, `priceCalculator.js`, `createCartPurchase.js`            | Done              |
 | **Dynamic Required Fields**       | `services/checkoutValidator.js` — load rules from a `CheckoutFieldConfig` collection                       | None              |
 | **New Product Type**              | Create `strategies/newTypeStrategy.js` with `decorateItems(items, body)`, register in `strategyFactory.js` | None              |
 | **New Status Transition**         | Add controller file (e.g., `cancelPurchase.js`), export from `index.js`, add route                         | Additive only     |
