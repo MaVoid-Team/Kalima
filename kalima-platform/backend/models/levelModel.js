@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy level model.
 const mongoose = require("mongoose");
 
 const levelSchema = new mongoose.Schema(
@@ -10,7 +13,7 @@ const levelSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Level", levelSchema);

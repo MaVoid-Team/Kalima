@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center management logic.
 const Center = require("../models/centerModel");
 const Lesson = require("../models/lessonModel");
 const Student = require("../models/center.studentModel");
@@ -28,21 +31,29 @@ exports.getAllCenters = catchAsync(async (req, res, next) => {
 
 // Add a lesson to a center
 exports.addLesson = catchAsync(async (req, res, next) => {
-  const {
-    subject,
-    lecturer,
-    level,
-    startTime,
-    duration,
-    centerId,
-  } = req.body;
+  const { subject, lecturer, level, startTime, duration, centerId } = req.body;
 
   // Basic validation
   if (!subject || !lecturer || !level || !startTime || !centerId) {
-    return next(new AppError("Subject, Lecturer, Level, StartTime, and CenterId are required.", 400));
+    return next(
+      new AppError(
+        "Subject, Lecturer, Level, StartTime, and CenterId are required.",
+        400,
+      ),
+    );
   }
-  if (!mongoose.Types.ObjectId.isValid(subject) || !mongoose.Types.ObjectId.isValid(lecturer) || !mongoose.Types.ObjectId.isValid(level) || !mongoose.Types.ObjectId.isValid(centerId)) {
-    return next(new AppError("Invalid ID format for Subject, Lecturer, Level, or Center.", 400));
+  if (
+    !mongoose.Types.ObjectId.isValid(subject) ||
+    !mongoose.Types.ObjectId.isValid(lecturer) ||
+    !mongoose.Types.ObjectId.isValid(level) ||
+    !mongoose.Types.ObjectId.isValid(centerId)
+  ) {
+    return next(
+      new AppError(
+        "Invalid ID format for Subject, Lecturer, Level, or Center.",
+        400,
+      ),
+    );
   }
 
   // Validate center exists
@@ -81,17 +92,17 @@ exports.getTimetable = catchAsync(async (req, res, next) => {
 
   const timetable = lessons.map((lesson) => {
     const timetableEntry = {
-      subject: lesson.subject?.name || 'N/A',
-      lecturer: lesson.lecturer?.name || 'N/A',
+      subject: lesson.subject?.name || "N/A",
+      lecturer: lesson.lecturer?.name || "N/A",
       startTime: lesson.startTime,
       duration: lesson.duration,
-      level: lesson.level?.name || 'N/A',
+      level: lesson.level?.name || "N/A",
       lessonId: lesson._id,
     };
 
     if (lesson.duration) {
       timetableEntry.endTime = new Date(
-        new Date(lesson.startTime).getTime() + lesson.duration * 60000
+        new Date(lesson.startTime).getTime() + lesson.duration * 60000,
       );
     }
 
@@ -150,8 +161,8 @@ exports.getCenterDataById = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "Invalid type. Use one of: lessons, students, lecturers.",
-          400
-        )
+          400,
+        ),
       );
   }
 

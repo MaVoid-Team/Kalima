@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam configuration logic.
 const mongoose = require("mongoose");
 const LecturerExamConfig = require("../models/ExamConfigModel");
 const AppError = require("../utils/appError");
@@ -19,7 +22,7 @@ exports.createExamConfig = catchAsync(async (req, res, next) => {
   // Validate required fields
   if (!name || !googleSheetId || !formUrl) {
     return next(
-      new AppError("Name, Google Sheet ID, and Form URL are required", 400)
+      new AppError("Name, Google Sheet ID, and Form URL are required", 400),
     );
   }
 
@@ -79,8 +82,8 @@ exports.getExamConfig = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "You do not have permission to access this configuration",
-        403
-      )
+        403,
+      ),
     );
   }
 
@@ -124,8 +127,8 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "You do not have permission to modify this configuration",
-        403
-      )
+        403,
+      ),
     );
   }
 
@@ -145,7 +148,7 @@ exports.updateExamConfig = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   res.status(200).json({
@@ -171,8 +174,8 @@ exports.deleteExamConfig = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "You do not have permission to delete this configuration",
-        403
-      )
+        403,
+      ),
     );
   }
 

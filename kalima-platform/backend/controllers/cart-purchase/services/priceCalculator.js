@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store price calculation service.
 // Centralized price calculation to preserve behavior while isolating future changes.
 // Product-type decoration (book fields etc.) is handled by strategies, not here.
 const PriceCalculator = {

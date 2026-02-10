@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy attachments logic.
 /* eslint-disable */
 const mongoose = require("mongoose");
 const Container = require("../models/containerModel");
@@ -42,25 +45,25 @@ const upload = multer({
 exports.upload = upload;
 // For multi-file, multi-category support
 exports.multiUpload = upload.fields([
-  { name: 'booklets', maxCount: 10 },
-  { name: 'pdfsandimages', maxCount: 10 },
-  { name: 'homeworks', maxCount: 10 },
-  { name: 'exams', maxCount: 10 },
+  { name: "booklets", maxCount: 10 },
+  { name: "pdfsandimages", maxCount: 10 },
+  { name: "homeworks", maxCount: 10 },
+  { name: "exams", maxCount: 10 },
 ]);
-  (exports.getLectureAttachments = catchAsync(async (req, res, next) => {
-    const { lectureId } = req.params;
-    const lecture = await Lecture.findById(lectureId)
-      .populate("attachments.booklets")
-      .populate("attachments.pdfsandimages")
-      .populate("attachments.homeworks")
-      .populate("attachments.exams")
-      .lean();
+exports.getLectureAttachments = catchAsync(async (req, res, next) => {
+  const { lectureId } = req.params;
+  const lecture = await Lecture.findById(lectureId)
+    .populate("attachments.booklets")
+    .populate("attachments.pdfsandimages")
+    .populate("attachments.homeworks")
+    .populate("attachments.exams")
+    .lean();
 
-    if (!lecture) {
-      throw new AppError(`Lecture not found`, 404);
-    }
-    res.status(201).json(lecture.attachments);
-  }));
+  if (!lecture) {
+    throw new AppError(`Lecture not found`, 404);
+  }
+  res.status(201).json(lecture.attachments);
+});
 
 exports.getAllAttachments = catchAsync(async (req, res, next) => {
   let query = Attachment.find({});
@@ -106,7 +109,7 @@ exports.getAttachmentFile = catchAsync(async (req, res, next) => {
   res.setHeader("Content-Type", attachment.fileType);
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename="${attachment.fileName}"`
+    `attachment; filename="${attachment.fileName}"`,
   );
 
   file.data.pipe(res);
@@ -154,8 +157,10 @@ exports.createAttachment = catchAsync(async (req, res, next) => {
         }
       }
       // If type is homeworks or exams, check for link
-      if ((type === "homeworks" && homeworkLink && homeworkLink.trim() !== "") ||
-          (type === "exams" && examLink && examLink.trim() !== "")) {
+      if (
+        (type === "homeworks" && homeworkLink && homeworkLink.trim() !== "") ||
+        (type === "exams" && examLink && examLink.trim() !== "")
+      ) {
         const linkValue = type === "homeworks" ? homeworkLink : examLink;
         const attachment = new Attachment({
           lectureId,
@@ -266,12 +271,12 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
 
       console.log(
         "Creating notification for lecturer:",
-        lecture.createdBy._id.toString()
+        lecture.createdBy._id.toString(),
       );
 
       // Create notification for the lecturer who created the lecture
       const lecturerIsOnline = io.sockets.adapter.rooms.has(
-        lecture.createdBy._id.toString()
+        lecture.createdBy._id.toString(),
       );
       console.log("Lecturer is online:", lecturerIsOnline);
       const lecturerIsSent = lecturerIsOnline;
@@ -285,12 +290,12 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
             isSent: lecturerIsSent,
           },
         ],
-        { session }
+        { session },
       );
 
       console.log(
         "Lecturer notification created:",
-        lecturerNotification[0]._id.toString()
+        lecturerNotification[0]._id.toString(),
       );
 
       // Send immediately if lecturer is online
@@ -313,7 +318,7 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
         assistants.map(async (assistant) => {
           // Check if assistant is online
           const isOnline = io.sockets.adapter.rooms.has(
-            assistant._id.toString()
+            assistant._id.toString(),
           );
           const isSent = isOnline;
 
@@ -326,7 +331,7 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
                 isSent,
               },
             ],
-            { session }
+            { session },
           );
 
           // Send immediately if online
@@ -336,7 +341,7 @@ exports.uploadHomeWork = catchAsync(async (req, res, next) => {
               notificationId: notification[0]._id,
             });
           }
-        })
+        }),
       );
     }
 
@@ -394,7 +399,7 @@ exports.deleteAttachment = catchAsync(async (req, res, next) => {
   if (req.user.role === "Student") {
     if (attachment.studentId.toString() !== req.user._id.toString()) {
       return next(
-        new AppError(`You are not authorized to delete this attachment`, 403)
+        new AppError(`You are not authorized to delete this attachment`, 403),
       );
     }
     await cloudinary.uploader.destroy(attachment.publicId);

@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared notification template model.
 const mongoose = require("mongoose");
 
 const notificationTemplateSchema = new mongoose.Schema(
@@ -29,10 +32,10 @@ const notificationTemplateSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model(
   "NotificationTemplate",
-  notificationTemplateSchema
+  notificationTemplateSchema,
 );

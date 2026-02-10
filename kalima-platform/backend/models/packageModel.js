@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy package model.
 const _ = require("lodash");
 const mongoose = require("mongoose");
 
@@ -13,7 +16,7 @@ const pointsSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 const packageSchema = new mongoose.Schema(
   {
@@ -50,7 +53,7 @@ const packageSchema = new mongoose.Schema(
 
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Package", packageSchema);

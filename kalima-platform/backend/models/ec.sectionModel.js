@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store section model.
 const mongoose = require("mongoose");
 
 const sectionSchema = new mongoose.Schema(
@@ -12,7 +15,6 @@ const sectionSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Please enter section number"],
       unique: true,
-
     },
     thumbnail: {
       type: String,
@@ -31,17 +33,12 @@ const sectionSchema = new mongoose.Schema(
     allowedFor: {
       type: [String],
       required: [true, "Please specify roles allowed for this section"],
-      enum: [
-        "Teacher",
-        "Student",
-        "Parent"
-      ],
+      enum: ["Teacher", "Student", "Parent"],
     },
-
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Virtual populate for products

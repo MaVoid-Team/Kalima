@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy attachment model.
 const mongoose = require("mongoose");
 
 const attachmentSchema = new mongoose.Schema({

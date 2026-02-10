@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart model.
 const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema(

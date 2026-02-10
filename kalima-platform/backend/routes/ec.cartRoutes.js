@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart routes.
 const express = require("express");
 const router = express.Router();
 const cartController = require("../controllers/ec.cartController");
@@ -18,7 +21,6 @@ router.delete("/clear", cartController.clearCart);
 
 // Coupon routes
 router.post("/apply-coupon", cartController.applyCoupon);
-
 
 // Checkout preview
 router.get("/checkout-preview", cartController.getCheckoutPreview);

@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy admin dashboard logic.
 const mongoose = require("mongoose");
 const Student = require("../models/studentModel");
 const Parent = require("../models/parentModel");

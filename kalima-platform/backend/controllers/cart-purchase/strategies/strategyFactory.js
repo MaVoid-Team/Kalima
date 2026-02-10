@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase strategy factory.
 const AppError = require("../../../utils/appError");
 const bookStrategy = require("./bookStrategy");
 const productStrategy = require("./productStrategy");

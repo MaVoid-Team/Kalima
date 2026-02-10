@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared message routes.
 // routes/messageRoutes.js
 const express = require("express");
 const messageController = require("../controllers/messageController");
@@ -12,8 +15,14 @@ router.use(verifyJWT);
 // Bulk messaging endpoint
 router.post(
   "/bulk",
-  authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Lecturer", "Assistant"),
-  messageController.sendBulkMessages
+  authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Lecturer",
+    "Assistant",
+  ),
+  messageController.sendBulkMessages,
 );
 
 module.exports = router;

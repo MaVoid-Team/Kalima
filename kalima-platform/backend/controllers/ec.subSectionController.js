@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store sub-section controller logic.
 const mongoose = require("mongoose");
 const ECSection = require("../models/ec.sectionModel");
 const ECSubsection = require("../models/ec.subSectionModel");
@@ -17,13 +20,13 @@ exports.getAllSubSections = catchAsync(async (req, res, next) => {
     subsections.map(async (subsection) => {
       const products = await Product.find({ subSection: subsection._id });
       return { ...subsection, products };
-    })
+    }),
   );
 
   res.status(200).json({
     status: "success",
     results: subsectionsWithProducts.length,
-    data: { subsections: subsectionsWithProducts }
+    data: { subsections: subsectionsWithProducts },
   });
 });
 
@@ -32,7 +35,8 @@ exports.createSubSection = catchAsync(async (req, res, next) => {
   const { name, section } = req.body;
 
   const parentSection = await ECSection.findById(section);
-  if (!parentSection) return next(new AppError("Parent section not found", 404));
+  if (!parentSection)
+    return next(new AppError("Parent section not found", 404));
 
   const subsection = await ECSubsection.create({
     name,
@@ -62,7 +66,7 @@ exports.getSubsectionsBySection = catchAsync(async (req, res, next) => {
     subsections.map(async (subsection) => {
       const products = await Product.find({ subSection: subsection._id });
       return { ...subsection, products };
-    })
+    }),
   );
 
   res.status(200).json({
@@ -90,14 +94,14 @@ exports.getSubSectionWithProducts = catchAsync(async (req, res, next) => {
   // Combine subsection data with products
   const subsectionWithProducts = {
     ...subsection,
-    products
+    products,
   };
 
   res.status(200).json({
     status: "success",
     data: {
-      subsection: subsectionWithProducts
-    }
+      subsection: subsectionWithProducts,
+    },
   });
 });
 
@@ -109,7 +113,7 @@ exports.updateSubSection = catchAsync(async (req, res, next) => {
   const subsection = await ECSubsection.findByIdAndUpdate(
     id,
     { name, section, updatedBy: req.user?._id },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!subsection) return next(new AppError("Subsection not found", 404));
@@ -131,7 +135,7 @@ exports.deleteSubSection = catchAsync(async (req, res, next) => {
   // Detach products from this subsection (do NOT delete products)
   await Product.updateMany(
     { subsection: subsection._id },
-    { $set: { subsection: null } }
+    { $set: { subsection: null } },
   );
 
   await subsection.deleteOne();

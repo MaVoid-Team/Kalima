@@ -1,11 +1,14 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy government reference data routes.
 // routes/governmentRoutes.js
 const express = require("express");
 const router = express.Router();
 const Government = require("../models/governmentModel");
 
 router.get("/", async (req, res) => {
-    const governments = await Government.find({}, "name");
-    res.json(governments);
+  const governments = await Government.find({}, "name");
+  res.json(governments);
 });
 
 router.get("/:name/zones", async (req, res) => {
@@ -13,6 +16,5 @@ router.get("/:name/zones", async (req, res) => {
   if (!gov) return res.status(404).json({ message: "Government not found" });
   res.json({ zones: gov.administrationZone });
 });
-
 
 module.exports = router;

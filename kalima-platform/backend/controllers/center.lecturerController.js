@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center lecturer logic.
 const mongoose = require("mongoose");
 const catchAsync = require("../utils/catchAsync");
 const CLecturer = require("../models/center.lecturerModel");
@@ -12,7 +15,7 @@ exports.createLecturer = catchAsync(async (req, res, next) => {
     return next(new AppError("Name, phone, and subjects are required.", 400));
   }
   const existedSubjects = await Promise.all(
-    subjects.map((subjectId) => Subject.findById(subjectId))
+    subjects.map((subjectId) => Subject.findById(subjectId)),
   );
   if (existedSubjects.includes(null)) {
     return next(new AppError("One or more subjects do not exist.", 400));
@@ -96,7 +99,7 @@ exports.updateLecturer = catchAsync(async (req, res, next) => {
   if (phone) updateData.phone = phone;
   if (subjects) {
     const existedSubjects = await Promise.all(
-      subjects.map((subjectId) => Subject.findById(subjectId))
+      subjects.map((subjectId) => Subject.findById(subjectId)),
     );
     if (existedSubjects.includes(null)) {
       return next(new AppError("One or more subjects do not exist.", 400));
@@ -137,7 +140,7 @@ exports.deleteLecturer = catchAsync(async (req, res, next) => {
 
   const deletedLecturer = await CLecturer.findByIdAndDelete(id);
   if (!deletedLecturer) {
-    return(next(new AppError("Lecturer not found.", 404)));
+    return next(new AppError("Lecturer not found.", 404));
   }
   res.status(204).json({
     status: "success",

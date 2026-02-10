@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared audit log routes.
 const express = require("express");
 const auditLogController = require("../controllers/auditLogController");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -6,7 +9,10 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 // Protect all routes and restrict to admin roles
-router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
+router.use(
+  verifyJWT,
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+);
 
 // Get all audit logs with filtering, sorting and pagination
 router.get("/", auditLogController.getAllAuditLogs);
@@ -18,6 +24,9 @@ router.get("/resource/:resourceType", auditLogController.getResourceAuditLogs);
 router.get("/user/email/:email", auditLogController.getUserAuditLogsByEmail);
 
 // Get logs for specific resource instance
-router.get("/resource/:resourceType/:resourceId", auditLogController.getResourceInstanceAuditLogs);
+router.get(
+  "/resource/:resourceType/:resourceId",
+  auditLogController.getResourceInstanceAuditLogs,
+);
 
 module.exports = router;

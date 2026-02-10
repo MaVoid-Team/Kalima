@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam config routes.
 const express = require("express");
 const router = express.Router();
 const examConfigController = require("../controllers/ExamConfigController");
@@ -12,26 +15,26 @@ router
   .route("/")
   .get(
     authController.verifyRoles("Lecturer", "Admin", "SubAdmin", "Moderator"),
-    examConfigController.getMyExamConfigs
+    examConfigController.getMyExamConfigs,
   )
   .post(
     authController.verifyRoles("Lecturer", "Admin", "SubAdmin", "Moderator"),
-    examConfigController.createExamConfig
+    examConfigController.createExamConfig,
   );
 
 router
   .route("/:id")
   .get(
     authController.verifyRoles("Lecturer", "Admin", "SubAdmin", "Moderator"),
-    examConfigController.getExamConfig
+    examConfigController.getExamConfig,
   )
   .patch(
     authController.verifyRoles("Lecturer", "Admin", "SubAdmin", "Moderator"),
-    examConfigController.updateExamConfig
+    examConfigController.updateExamConfig,
   )
   .delete(
     authController.verifyRoles("Lecturer", "Admin", "SubAdmin", "Moderator"),
-    examConfigController.deleteExamConfig
+    examConfigController.deleteExamConfig,
   );
 
 module.exports = router;

@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared password reset routes.
 const express = require("express");
 const router = express.Router();
 const passwordResetController = require("../controllers/passwordResetController");

@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center student model.
 const mongoose = require("mongoose");
 const mongooseSequence = require("mongoose-sequence")(mongoose);
 
@@ -19,8 +22,8 @@ const cStudentSchema = new mongoose.Schema(
     },
     parent: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'cParent',
-      required: true
+      ref: "cParent",
+      required: true,
     },
     center: {
       type: mongoose.Schema.Types.ObjectId,
@@ -28,7 +31,7 @@ const cStudentSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Add sequenced ID plugin with a unique counter name

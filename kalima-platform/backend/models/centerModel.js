@@ -1,11 +1,17 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center model.
 const mongoose = require("mongoose");
 
-const centerSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  location: { type: String, required: true },
-}, {
-  timestamps: true,
-});
+const centerSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    location: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 const Center = mongoose.model("Center", centerSchema);
 

@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy sub-admin routes.
 const express = require("express");
 const subAdminController = require("../controllers/subAdminController");
 const authController = require("../controllers/authController");
@@ -5,7 +8,10 @@ const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
-router.use(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"));
+router.use(
+  verifyJWT,
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+);
 
 router
   .route("/")

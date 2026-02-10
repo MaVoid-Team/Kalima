@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy container management logic.
 const Container = require("../models/containerModel");
 const Purchase = require("../models/purchaseModel");
 const mongoose = require("mongoose");
@@ -70,18 +73,31 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
       if (!purchase) {
         throw new AppError("Purchase not found or unauthorized", 403);
       }
-      
+
       // Handle both container purchases and lecture purchases
       if (purchase.type === "containerPurchase" && purchase.container) {
         purchasedContainerId = purchase.container.toString();
-        console.log("Container purchase found, using container ID:", purchasedContainerId);
+        console.log(
+          "Container purchase found, using container ID:",
+          purchasedContainerId,
+        );
       } else if (purchase.type === "lecturePurchase" && purchase.lecture) {
         // For lecture purchases, the lecture ID is the container ID
         purchasedContainerId = purchase.lecture.toString();
-        console.log("Lecture purchase found, using lecture ID:", purchasedContainerId);
+        console.log(
+          "Lecture purchase found, using lecture ID:",
+          purchasedContainerId,
+        );
       } else {
-        console.log("Invalid purchase type or missing data:", { type: purchase.type, container: purchase.container, lecture: purchase.lecture });
-        throw new AppError("Invalid purchase type or missing purchase data", 403);
+        console.log("Invalid purchase type or missing data:", {
+          type: purchase.type,
+          container: purchase.container,
+          lecture: purchase.lecture,
+        });
+        throw new AppError(
+          "Invalid purchase type or missing purchase data",
+          403,
+        );
       }
     }
     //  else {
@@ -140,10 +156,12 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
       }).session(session);
 
       if (!access) {
-        const remainingViews = containerDoc.numberOfViews !== undefined && containerDoc.numberOfViews !== null 
-          ? containerDoc.numberOfViews 
-          : 3; // Default to 3 if not set
-        
+        const remainingViews =
+          containerDoc.numberOfViews !== undefined &&
+          containerDoc.numberOfViews !== null
+            ? containerDoc.numberOfViews
+            : 3; // Default to 3 if not set
+
         const accessRecords = await StudentLectureAccess.create(
           [
             {
@@ -152,7 +170,7 @@ exports.getAccessibleChildContainers = catchAsync(async (req, res, next) => {
               remainingViews: remainingViews,
             },
           ],
-          { session }
+          { session },
         );
         access = accessRecords[0];
         if (!access) {
@@ -269,7 +287,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
     const lecturerDoc = await checkDoc(
       Lecturer,
       createdBy || req.user._id,
-      session
+      session,
     );
 
     // Validate required fields for course type
@@ -279,7 +297,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
         await cloudinary.uploader.destroy(req.file.filename);
       }
       return next(
-        new AppError("Description and goal are required for course type.", 400)
+        new AppError("Description and goal are required for course type.", 400),
       );
     }
 
@@ -383,7 +401,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
 
             // Check if student is online
             const isOnline = io.sockets.adapter.rooms.has(
-              student._id.toString()
+              student._id.toString(),
             );
             const isSent = isOnline;
 
@@ -396,7 +414,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
                   isSent,
                 },
               ],
-              { session }
+              { session },
             );
 
             notificationsToCreate.push(notification[0]);
@@ -409,7 +427,7 @@ exports.createContainer = catchAsync(async (req, res, next) => {
                 notificationId: notification[0]._id,
               });
             }
-          })
+          }),
         );
       }
     }
@@ -449,8 +467,8 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "Please log in as a lecturer to access your containers.",
-          401
-        )
+          401,
+        ),
       );
     }
 
@@ -464,7 +482,7 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   }
 
   let container;
-  
+
   // First try to find the container
   const containerDoc = await Container.findById(containerId).populate([
     {
@@ -479,18 +497,20 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
   if (containerDoc) {
     // If container is found, also fetch any lectures that have this container as parent
     const lectures = await Lecture.find({ parent: containerId })
-      .select("name type level subject thumbnail price description lecture_type")
+      .select(
+        "name type level subject thumbnail price description lecture_type",
+      )
       .populate("subject", "name")
       .populate("level", "name");
-    
+
     // Add lectures to the children array with a flag to indicate they're lectures
     const containerObj = containerDoc.toObject();
     containerObj.children = [
       ...(containerObj.children || []),
-      ...lectures.map(lecture => ({
+      ...lectures.map((lecture) => ({
         ...lecture.toObject(),
-        isLecture: true
-      }))
+        isLecture: true,
+      })),
     ];
     container = containerObj;
   } else {
@@ -504,9 +524,9 @@ exports.getContainerById = catchAsync(async (req, res, next) => {
       // Convert lecture to container-like structure for consistent response
       container = {
         ...lecture.toObject(),
-        type: 'lecture',
-        kind: 'Lecture',
-        children: []
+        type: "lecture",
+        kind: "Lecture",
+        children: [],
       };
     }
   }
@@ -709,7 +729,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
   try {
     // Find the container first to check if it exists and to get the current image (if any)
     const container = await Container.findById(req.params.containerId).session(
-      session
+      session,
     );
     if (!container) {
       // If container not found and there's an uploaded image, clean it up
@@ -731,8 +751,8 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             "Description and goal are required for course type.",
-            400
-          )
+            400,
+          ),
         );
       }
       obj.description = description;
@@ -782,7 +802,7 @@ exports.updateContainer = catchAsync(async (req, res, next) => {
         new: true,
         runValidators: true,
         session,
-      }
+      },
     ).populate([
       { path: "children", select: "name" },
       { path: "createdBy", select: "name" },
@@ -828,7 +848,7 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
       await Container.findByIdAndUpdate(
         childId,
         { parent: containerId },
-        { session, runValidators: false }
+        { session, runValidators: false },
       );
       container.children.push(childId);
       await container.save({ session });
@@ -837,10 +857,10 @@ exports.UpdateChildOfContainer = catchAsync(async (req, res, next) => {
       await Container.findByIdAndUpdate(
         childId,
         { parent: null },
-        { session, runValidators: false }
+        { session, runValidators: false },
       );
       container.children = container.children.filter(
-        (child) => child.toString() !== childId
+        (child) => child.toString() !== childId,
       );
       await container.save({ session });
     } else {
@@ -912,12 +932,12 @@ exports.deleteContainerAndChildren = catchAsync(async (req, res, next) => {
       const parent = await Container.findByIdAndUpdate(
         containerDoc.parent,
         { $pull: { children: containerDoc._id } },
-        { session }
+        { session },
       );
       if (!parent) {
         throw new AppError(
           "Failed to remove the container from parent's children array",
-          404
+          404,
         );
       }
     }
@@ -1081,11 +1101,11 @@ exports.getLecturerRevenueByMonth = catchAsync(async (req, res, next) => {
   // Calculate overall total revenue
   const overallTotal = monthlyRevenue.reduce(
     (sum, month) => sum + month.totalRevenue,
-    0
+    0,
   );
   const overallPurchaseCount = monthlyRevenue.reduce(
     (sum, month) => sum + month.purchaseCount,
-    0
+    0,
   );
 
   res.status(200).json({

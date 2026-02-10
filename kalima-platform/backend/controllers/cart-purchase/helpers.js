@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase helpers.
 const { DateTime } = require("luxon");
 
 const EGYPT_TIMEZONE = "Africa/Cairo";
@@ -38,7 +41,10 @@ const calculateBusinessMinutes = (startDate, endDate) => {
       Math.max(current.getTime(), businessStart.getTime()),
     );
     const segmentEnd = new Date(
-      Math.min(businessEnd.getTime(), new Date(current).setHours(23, 59, 59, 999)),
+      Math.min(
+        businessEnd.getTime(),
+        new Date(current).setHours(23, 59, 59, 999),
+      ),
     );
 
     if (segmentEnd > segmentStart) {
@@ -57,7 +63,9 @@ const calculateBusinessMinutes = (startDate, endDate) => {
   const finalStart = new Date(
     Math.max(current.getTime(), finalBusinessStart.getTime()),
   );
-  const finalEnd = new Date(Math.min(end.getTime(), finalBusinessEnd.getTime()));
+  const finalEnd = new Date(
+    Math.min(end.getTime(), finalBusinessEnd.getTime()),
+  );
 
   if (finalEnd > finalStart) {
     total += minutesBetween(finalStart, finalEnd);

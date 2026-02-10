@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Pricing rule routes with unclear domain ownership.
 const express = require("express");
 const pricingRuleController = require("../controllers/pricingRuleController");
 const authController = require("../controllers/authController");

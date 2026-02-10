@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase confirmation logic.
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");

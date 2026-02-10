@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy subject management logic.
 const Subject = require("../models/subjectModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -66,7 +69,7 @@ exports.updateSubjectById = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
   if (!subject) {
     return next(new AppError("No subject found with that ID", 404));
@@ -151,14 +154,14 @@ exports.updateLevelOfSubject = catchAsync(async (req, res, next) => {
             notificationId: notification._id,
           });
         }
-      })
+      }),
     );
   } else if (operation === "remove") {
     if (!subject.level.includes(levelId)) {
       return next(new AppError("Level does not exist in subject", 400));
     }
     subject.level = subject.level.filter(
-      (level) => level.toString() !== levelId
+      (level) => level.toString() !== levelId,
     );
     await subject.save();
   } else {

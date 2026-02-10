@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart coupon application logic.
 const ECCart = require("../../models/ec.cartModel");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const ECCoupon = require("../../models/ec.couponModel");
@@ -69,7 +72,10 @@ const applyCoupon = catchAsync(async (req, res, next) => {
 
   if (couponAlreadyUsed) {
     return next(
-      new AppError("This coupon is already applied to another item in your cart", 400),
+      new AppError(
+        "This coupon is already applied to another item in your cart",
+        400,
+      ),
     );
   }
 

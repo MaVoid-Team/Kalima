@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase model.
 const { required } = require("joi");
 const mongoose = require("mongoose");
 

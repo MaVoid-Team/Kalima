@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store monthly confirmed purchase stats.
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");
 const { getCurrentEgyptTime } = require("./helpers");

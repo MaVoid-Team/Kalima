@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy lecture access model.
 const mongoose = require("mongoose");
 
 const studentLectureAccessSchema = new mongoose.Schema({
@@ -19,5 +22,5 @@ studentLectureAccessSchema.index({ student: 1, lecture: 1 }, { unique: true }); 
 
 module.exports = mongoose.model(
   "StudentLectureAccess",
-  studentLectureAccessSchema
+  studentLectureAccessSchema,
 );

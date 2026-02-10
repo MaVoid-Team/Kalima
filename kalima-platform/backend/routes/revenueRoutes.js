@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Revenue reporting routes with unclear domain ownership.
 const express = require("express");
 const revenueController = require("../controllers/revenueController");
 const authController = require("../controllers/authController");

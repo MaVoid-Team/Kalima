@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase creation logic.
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const ECCart = require("../../models/ec.cartModel");
 const ECCoupon = require("../../models/ec.couponModel");
@@ -46,21 +49,20 @@ module.exports = catchAsync(async (req, res, next) => {
   const cart = await ECCart.findOne({
     user: req.user._id,
     status: "active",
-  })
-    .populate({
-      path: "itemsWithDetails",
-      populate: [
-        {
-          path: "product",
-          select:
-            "title thumbnail priceAfterDiscount paymentNumber serial section __t",
-        },
-        {
-          path: "couponCode",
-          select: "couponCode value isActive",
-        },
-      ],
-    });
+  }).populate({
+    path: "itemsWithDetails",
+    populate: [
+      {
+        path: "product",
+        select:
+          "title thumbnail priceAfterDiscount paymentNumber serial section __t",
+      },
+      {
+        path: "couponCode",
+        select: "couponCode value isActive",
+      },
+    ],
+  });
 
   const cartItems = cart?.itemsWithDetails || [];
   if (!cart) {

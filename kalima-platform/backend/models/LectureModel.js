@@ -1,4 +1,7 @@
-const mongoose = require("mongoose")
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy lecture model.
+const mongoose = require("mongoose");
 
 const lectureSchema = new mongoose.Schema(
   {
@@ -61,7 +64,8 @@ const lectureSchema = new mongoose.Schema(
       required: [true, "A lecture must have a type"],
       enum: {
         values: ["Free", "Paid", "Revision", "Teachers Only"],
-        message: "Lecture type must be either Free, Paid, Revision, or Teachers Only",
+        message:
+          "Lecture type must be either Free, Paid, Revision, or Teachers Only",
       },
     },
     thumbnail: {
@@ -125,44 +129,50 @@ const lectureSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-)
+);
 
 lectureSchema.pre("save", function (next) {
   // Ensure boolean fields are properly converted
   if (this.requiresExam !== undefined) {
     if (typeof this.requiresExam === "string") {
-      this.requiresExam = this.requiresExam.toLowerCase() === "true"
+      this.requiresExam = this.requiresExam.toLowerCase() === "true";
     } else {
-      this.requiresExam = Boolean(this.requiresExam)
+      this.requiresExam = Boolean(this.requiresExam);
     }
   }
   if (this.requiresHomework !== undefined) {
     if (typeof this.requiresHomework === "string") {
-      this.requiresHomework = this.requiresHomework.toLowerCase() === "true"
+      this.requiresHomework = this.requiresHomework.toLowerCase() === "true";
     } else {
-      this.requiresHomework = Boolean(this.requiresHomework)
+      this.requiresHomework = Boolean(this.requiresHomework);
     }
   }
   if (this.teacherAllowed !== undefined) {
     if (typeof this.teacherAllowed === "string") {
-      this.teacherAllowed = this.teacherAllowed.toLowerCase() === "true"
+      this.teacherAllowed = this.teacherAllowed.toLowerCase() === "true";
     } else {
-      this.teacherAllowed = Boolean(this.teacherAllowed)
+      this.teacherAllowed = Boolean(this.teacherAllowed);
     }
   }
-  next()
-})
+  next();
+});
 
 lectureSchema.pre("save", function (next) {
   if (this.requiresExam && !this.examConfig) {
-    return next(new Error("Exam configuration is required when requiresExam is true"))
+    return next(
+      new Error("Exam configuration is required when requiresExam is true"),
+    );
   }
   if (this.requiresHomework && !this.homeworkConfig) {
-    return next(new Error("Homework configuration is required when requiresHomework is true"))
+    return next(
+      new Error(
+        "Homework configuration is required when requiresHomework is true",
+      ),
+    );
   }
-  next()
-})
+  next();
+});
 
-const Lecture = mongoose.model("Lecture", lectureSchema)
+const Lecture = mongoose.model("Lecture", lectureSchema);
 
-module.exports = Lecture
+module.exports = Lecture;

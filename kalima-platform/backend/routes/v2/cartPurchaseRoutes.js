@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store v2 cart purchase routes.
 const express = require("express");
 const cartPurchaseController = require("../../controllers/cart-purchase");
 const verifyJWT = require("../../middleware/verifyJWT");

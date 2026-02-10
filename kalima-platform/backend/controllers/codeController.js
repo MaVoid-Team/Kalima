@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Code-related logic with unclear domain ownership.
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Code = require("../models/codeModel");
@@ -14,7 +17,7 @@ const createCodes = catchAsync(async (req, res, next) => {
     return next(new AppError("Code type and number of codes are required"));
   }
 
-  // For promo codes, we'll set a very large point amount (e.g., 1,000,000) 
+  // For promo codes, we'll set a very large point amount (e.g., 1,000,000)
   // so users can purchase anything they want
   const actualPointsAmount = type === "promo" ? 1000000 : pointsAmount;
 
@@ -122,10 +125,18 @@ const deleteMultipleCodes = catchAsync(async (req, res, next) => {
     return next(new AppError("An array of codes is required", 400));
   }
 
-  const result = await Code.deleteMany({ code: { $in: codes }, isRedeemed: false });
+  const result = await Code.deleteMany({
+    code: { $in: codes },
+    isRedeemed: false,
+  });
 
   if (result.deletedCount === 0) {
-    return next(new AppError("No codes deleted. They may not exist or have been redeemed.", 404));
+    return next(
+      new AppError(
+        "No codes deleted. They may not exist or have been redeemed.",
+        404,
+      ),
+    );
   }
 
   res.status(200).json({
@@ -146,12 +157,12 @@ const redeemCode = catchAsync(async (req, res, next) => {
 
   try {
     const isExistCode = await Code.findOne({ code, isRedeemed: false }).session(
-      session
+      session,
     );
     if (!isExistCode) {
       await session.abortTransaction();
       return next(
-        new AppError("Code not found or has been redeemed before", 404)
+        new AppError("Code not found or has been redeemed before", 404),
       );
     }
 
@@ -166,8 +177,8 @@ const redeemCode = catchAsync(async (req, res, next) => {
     }
 
     // Find the user in the appropriate model based on role
-    if (baseUser.role === 'Student') {
-      const Student = require('../models/studentModel');
+    if (baseUser.role === "Student") {
+      const Student = require("../models/studentModel");
       currentUser = await Student.findById(req.user._id).session(session);
 
       // For promo codes, check if the student already has an active promo
@@ -175,8 +186,8 @@ const redeemCode = catchAsync(async (req, res, next) => {
         await session.abortTransaction();
         return next(new AppError("You already have an active promo code", 400));
       }
-    } else if (baseUser.role === 'Parent') {
-      const Parent = require('../models/parentModel');
+    } else if (baseUser.role === "Parent") {
+      const Parent = require("../models/parentModel");
       currentUser = await Parent.findById(req.user._id).session(session);
     } else {
       // If not a student or parent, use the base user model
@@ -201,7 +212,8 @@ const redeemCode = catchAsync(async (req, res, next) => {
         currentUser.promoPoints = isExistCode.pointsAmount;
       }
 
-      responseMessage = "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
+      responseMessage =
+        "Your promotional code has been redeemed successfully. You can use it for one purchase of any value!";
     } else if (isExistCode.type === "specific") {
       // For specific lecturer codes: Add points to the specific lecturer's balance
       if (!isExistCode.lecturerId) {
@@ -211,13 +223,14 @@ const redeemCode = catchAsync(async (req, res, next) => {
 
       currentUser.addLecturerPoints(
         isExistCode.lecturerId,
-        isExistCode.pointsAmount
+        isExistCode.pointsAmount,
       );
 
       responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} points for this lecturer`;
     } else {
       // For general codes: Add points to the general points balance
-      currentUser.generalPoints = (currentUser.generalPoints || 0) + isExistCode.pointsAmount;
+      currentUser.generalPoints =
+        (currentUser.generalPoints || 0) + isExistCode.pointsAmount;
 
       responseMessage = `Your code has been redeemed successfully, +${isExistCode.pointsAmount} general points`;
     }
@@ -231,7 +244,7 @@ const redeemCode = catchAsync(async (req, res, next) => {
         isRedeemed: true,
         redeemedBy: req.user._id,
         redeemedAt: new Date(),
-      }
+      },
     ).session(session);
 
     await session.commitTransaction();
