@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy purchase routes (non-store).
 const express = require("express");
 const router = express.Router();
 const purchaseController = require("../controllers/purchaseController");
@@ -18,69 +21,69 @@ router.post("/points",
 router.post(
   "/points",
   authController.verifyRoles("Student"),
-  purchaseController.purchaseLecturerPoints
+  purchaseController.purchaseLecturerPoints,
 );
 
 // Purchase a container with lecturer-specific points
 router.post(
   "/container",
   authController.verifyRoles("Student", "Parent", "Teacher"),
-  purchaseController.purchaseContainerWithPoints
+  purchaseController.purchaseContainerWithPoints,
 );
 // Purchase a package with General points
 router.post(
   "/package",
   authController.verifyRoles("Student", "Parent"),
-  purchaseController.purchasePackageWithPoints
+  purchaseController.purchasePackageWithPoints,
 );
 
 // Get all purchases - admin only
 router.get(
   "/",
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-  purchaseController.getAllPurchases
+  purchaseController.getAllPurchases,
 );
 
 // Get current user's points balances across all lecturers
 router.get(
   "/balances",
   authController.verifyRoles("Admin", "Student", "Parent"),
-  purchaseController.getAllUserPointBalances
+  purchaseController.getAllUserPointBalances,
 );
 
 // Get all user's points balances across all lecturers
 router.get(
   "/user/:userId/balances",
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-  purchaseController.getAllUserPointBalances
+  purchaseController.getAllUserPointBalances,
 );
 
 // Get current user's points balance with a specific lecturer
 router.get(
   "/lecturer/:lecturerId/balance",
   authController.verifyRoles("Student", "Parent", "Teacher"),
-  purchaseController.getLecturerPointsBalance
+  purchaseController.getLecturerPointsBalance,
 );
 
 // Get points balance for a user with a specific lecturer
 router.get(
   "/user/:userId/lecturer/:lecturerId/balance",
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-  purchaseController.getLecturerPointsBalance
+  purchaseController.getLecturerPointsBalance,
 );
 
 // Get current user's purchases
 router.get(
   "/history",
   authController.verifyRoles("Student", "Parent", "Teacher"),
-  purchaseController.getPurchasesByUser
+  purchaseController.getPurchasesByUser,
 );
 
 // Get all purchases for a specific user
 router.get(
   "/user/:userId",
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-  purchaseController.getPurchasesByUser
+  purchaseController.getPurchasesByUser,
 );
 
 // Get, update, or delete a specific purchase by ID
@@ -89,7 +92,7 @@ router
   .get(purchaseController.getPurchaseById)
   .delete(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator"),
-    purchaseController.deletePurchase
+    purchaseController.deletePurchase,
   );
 
 module.exports = router;

@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store purchase statistics.
 const { DateTime } = require("luxon");
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const catchAsync = require("../../utils/catchAsync");

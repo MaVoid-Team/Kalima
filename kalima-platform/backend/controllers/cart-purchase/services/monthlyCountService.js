@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store monthly count service.
 const { DateTime } = require("luxon");
 const ECCartPurchase = require("../../../models/ec.cartPurchaseModel");
 const User = require("../../../models/userModel");

@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase deletion logic.
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const ECCoupon = require("../../models/ec.couponModel");
 const User = require("../../models/userModel");

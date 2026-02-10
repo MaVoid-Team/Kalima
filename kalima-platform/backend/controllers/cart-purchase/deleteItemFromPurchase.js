@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase item deletion logic.
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const User = require("../../models/userModel");
 const catchAsync = require("../../utils/catchAsync");

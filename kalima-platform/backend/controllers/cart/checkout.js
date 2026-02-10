@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart checkout logic.
 const ECCart = require("../../models/ec.cartModel");
 const catchAsync = require("../../utils/catchAsync");
 const mongoose = require("mongoose");

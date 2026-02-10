@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart helper logic.
 const mongoose = require("mongoose");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const ECCart = require("../../models/ec.cartModel");

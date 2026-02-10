@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart quantity update logic.
 const ECCart = require("../../models/ec.cartModel");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const AppError = require("../../utils/appError");

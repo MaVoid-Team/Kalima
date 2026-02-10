@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart item removal logic.
 const ECCart = require("../../models/ec.cartModel");
 const AppError = require("../../utils/appError");
 const catchAsync = require("../../utils/catchAsync");

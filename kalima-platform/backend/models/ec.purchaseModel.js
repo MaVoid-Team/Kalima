@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store purchase model.
 const mongoose = require("mongoose");
 
 const ecPurchaseSchema = new mongoose.Schema(
@@ -18,7 +21,7 @@ const ecPurchaseSchema = new mongoose.Schema(
     // Product reference
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-  ref: "ECProduct",
+      ref: "ECProduct",
       required: [true, "Product ID is required"],
     },
 
@@ -107,7 +110,7 @@ const ecPurchaseSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // ecPurchaseSchema.index({ userName: 1 });

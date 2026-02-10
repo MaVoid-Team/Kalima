@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart add item logic.
 const ECCart = require("../../models/ec.cartModel");
 const ECCartItem = require("../../models/ec.cartItemModel");
 const ECProduct = require("../../models/ec.productModel");

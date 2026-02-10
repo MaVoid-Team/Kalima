@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store checkout validation service.
 const AppError = require("../../../utils/appError");
 const PaymentMethod = require("../../../models/paymentMethodModel");
 

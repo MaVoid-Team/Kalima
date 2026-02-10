@@ -1,23 +1,39 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared user routes.
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const validateUser = require("../middleware/validateUser");
 const verifyJWT = require("../middleware/verifyJWT");
-const { uploadFileToDisk, uploadProfilePicToDisk } = require("../utils/upload files/uploadFiles");
+const {
+  uploadFileToDisk,
+  uploadProfilePicToDisk,
+} = require("../utils/upload files/uploadFiles");
 const authController = require("../controllers/authController");
 const convertFormDataToNested = require("../middleware/convertFormDataToNested");
 router
   .route("/stats/created-accounts")
-  .get(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"), userController.getCreatedAccountsStats);
+  .get(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    userController.getCreatedAccountsStats,
+  );
 
 router
   .route("/")
-  .get(verifyJWT, authController.verifyRoles("Admin", "SubAdmin", "Moderator"), userController.getAllUsers)
-  .post(verifyJWT,
+  .get(
+    verifyJWT,
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    userController.getAllUsers,
+  )
+  .post(
+    verifyJWT,
     uploadProfilePicToDisk,
     validateUser,
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    userController.createUser);
+    userController.createUser,
+  );
 
 router
   .route("/:userId")
@@ -26,12 +42,12 @@ router
     validateUser,
     verifyJWT,
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    userController.updateUser
+    userController.updateUser,
   )
   .delete(
     verifyJWT,
     authController.verifyRoles("Admin", "SubAdmin"),
-    userController.deleteUser
+    userController.deleteUser,
   );
 
 router.route("/role/:role").get(userController.getAllUsersByRole);
@@ -52,7 +68,12 @@ router.get("/me/dashboard", userController.getMyData);
 router.get("/me/children", userController.getParentChildrenData);
 
 // Update current user profile information
-router.patch("/me/update", convertFormDataToNested, uploadProfilePicToDisk, userController.updateMe);
+router.patch(
+  "/me/update",
+  convertFormDataToNested,
+  uploadProfilePicToDisk,
+  userController.updateMe,
+);
 
 router.route("/update/password").patch(userController.changePassword);
 
@@ -61,7 +82,7 @@ router.patch(
   "/teachers/:id/confirm",
   verifyJWT,
   authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-  userController.confirmTeacher
+  userController.confirmTeacher,
 );
 
 module.exports = router;

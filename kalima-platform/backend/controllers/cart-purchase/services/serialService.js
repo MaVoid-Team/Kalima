@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store purchase serial generation service.
 const ECCartPurchase = require("../../../models/ec.cartPurchaseModel");
 const { getCurrentEgyptTime } = require("../helpers");
 

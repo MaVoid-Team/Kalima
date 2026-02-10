@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared audit logging logic.
 const AuditLog = require("../models/auditLogModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -21,7 +24,6 @@ const ECPurchase = require("../models/ec.purchaseModel");
 const ECCartPurchase = require("../models/ec.cartPurchaseModel");
 const paymentMethod = require("../models/paymentMethodModel");
 const WhatsAppNumber = require("../models/whatsAppNumberModel");
-
 
 // Helper function to enrich audit logs with readable resource data
 const enrichAuditLogs = async (logs) => {
@@ -60,7 +62,7 @@ const enrichAuditLogs = async (logs) => {
             if (center) {
               enrichedLog.resource.details = {
                 name: center.name,
-                location: center.location
+                location: center.location,
               };
             }
             break;
@@ -71,7 +73,7 @@ const enrichAuditLogs = async (logs) => {
               enrichedLog.resource.details = {
                 code: code.code,
                 type: code.type,
-                isRedeemed: code.isRedeemed
+                isRedeemed: code.isRedeemed,
               };
             }
             break;
@@ -86,7 +88,7 @@ const enrichAuditLogs = async (logs) => {
                 name: container.name,
                 type: container.type,
                 subject: container.subject?.name || "Unknown",
-                level: container.level?.name || "Unknown"
+                level: container.level?.name || "Unknown",
               };
             }
             break;
@@ -96,7 +98,7 @@ const enrichAuditLogs = async (logs) => {
             if (moderator) {
               enrichedLog.resource.details = {
                 name: moderator.name,
-                email: moderator.email
+                email: moderator.email,
               };
             }
             break;
@@ -106,7 +108,7 @@ const enrichAuditLogs = async (logs) => {
             if (subAdmin) {
               enrichedLog.resource.details = {
                 name: subAdmin.name,
-                email: subAdmin.email
+                email: subAdmin.email,
               };
             }
             break;
@@ -119,7 +121,7 @@ const enrichAuditLogs = async (logs) => {
               enrichedLog.resource.details = {
                 name: assistant.name,
                 email: assistant.email,
-                assignedTo: assistant.assignedLecturer?.name || "Unknown"
+                assignedTo: assistant.assignedLecturer?.name || "Unknown",
               };
             }
             break;
@@ -129,7 +131,7 @@ const enrichAuditLogs = async (logs) => {
             if (admin) {
               enrichedLog.resource.details = {
                 name: admin.name,
-                email: admin.email
+                email: admin.email,
               };
             }
             break;
@@ -140,7 +142,7 @@ const enrichAuditLogs = async (logs) => {
               enrichedLog.resource.details = {
                 name: lecturer.name,
                 email: lecturer.email,
-                expertise: lecturer.expertise
+                expertise: lecturer.expertise,
               };
             }
             break;
@@ -151,7 +153,7 @@ const enrichAuditLogs = async (logs) => {
               enrichedLog.resource.details = {
                 name: packageItem.name,
                 type: packageItem.type,
-                price: packageItem.price
+                price: packageItem.price,
               };
             }
             break;
@@ -167,7 +169,7 @@ const enrichAuditLogs = async (logs) => {
                 subject: lesson.subject?.name || "Unknown",
                 level: lesson.level?.name || "Unknown",
                 lecturer: lesson.lecturer?.name || "Unknown",
-                startTime: lesson.startTime
+                startTime: lesson.startTime,
               };
             }
             break;
@@ -179,7 +181,7 @@ const enrichAuditLogs = async (logs) => {
                 name: ecSection.name,
                 description: ecSection.description,
                 isActive: ecSection.isActive,
-                allowedRoles: ecSection.allowedRoles
+                allowedRoles: ecSection.allowedRoles,
               };
             }
             break;
@@ -194,7 +196,7 @@ const enrichAuditLogs = async (logs) => {
                 description: ecProduct.description,
                 price: ecProduct.price,
                 section: ecProduct.section?.name || "Unknown",
-                isActive: ecProduct.isActive
+                isActive: ecProduct.isActive,
               };
             }
             break;
@@ -208,18 +210,18 @@ const enrichAuditLogs = async (logs) => {
             if (ecPurchase) {
               enrichedLog.resource.details = {
                 purchaseSerial: ecPurchase.purchaseSerial,
-                productName: ecPurchase.productName || ecPurchase.productId?.title,
+                productName:
+                  ecPurchase.productName || ecPurchase.productId?.title,
                 price: ecPurchase.price,
                 userName: ecPurchase.userName,
                 confirmed: ecPurchase.confirmed,
                 confirmedBy: ecPurchase.confirmedBy?.name || null,
-                createdBy: ecPurchase.createdBy?.name || "Unknown"
+                createdBy: ecPurchase.createdBy?.name || "Unknown",
               };
             }
             break;
 
           case "ec.cartpurchase":
-
             const ecCartPurchase = await ECCartPurchase.findById(resourceId)
               .populate("createdBy", "name email")
               .populate("confirmedBy", "name email")
@@ -232,27 +234,30 @@ const enrichAuditLogs = async (logs) => {
                 total: ecCartPurchase.total,
                 confirmed: ecCartPurchase.confirmed,
                 confirmedBy: ecCartPurchase.confirmedBy?.name || null,
-                createdBy: ecCartPurchase.createdBy?.name || "Unknown"
+                createdBy: ecCartPurchase.createdBy?.name || "Unknown",
               };
             }
             break;
 
           case "PaymentMethod":
-            const paymentMethodDoc = await paymentMethod.findById(resourceId).lean();
+            const paymentMethodDoc = await paymentMethod
+              .findById(resourceId)
+              .lean();
             if (paymentMethodDoc) {
               enrichedLog.resource.details = {
                 name: paymentMethodDoc.name,
                 description: paymentMethodDoc.description,
-                isActive: paymentMethodDoc.isActive
+                isActive: paymentMethodDoc.isActive,
               };
             }
 
           case "whatsAppNumber":
-            const whatsAppNumberDoc = await WhatsAppNumber.findById(resourceId).lean();
+            const whatsAppNumberDoc =
+              await WhatsAppNumber.findById(resourceId).lean();
             if (whatsAppNumberDoc) {
               enrichedLog.resource.details = {
                 number: whatsAppNumberDoc.number,
-                isActive: whatsAppNumberDoc.isActive
+                isActive: whatsAppNumberDoc.isActive,
               };
             }
             break;
@@ -262,7 +267,10 @@ const enrichAuditLogs = async (logs) => {
             break;
         }
       } catch (error) {
-        console.error(`Error enriching ${resourceType} with ID ${resourceId}:`, error);
+        console.error(
+          `Error enriching ${resourceType} with ID ${resourceId}:`,
+          error,
+        );
         // Continue processing other logs even if one fails
       }
     }
@@ -289,7 +297,10 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
       endDate.setHours(23, 59, 59, 999); // Set to end of day
       dateFilter.$lte = endDate;
     }
-    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+    query
+      .where("timestamp")
+      .gte(dateFilter.$gte || new Date("1970-01-01"))
+      .lte(dateFilter.$lte || new Date());
   }
 
   // Apply query features (filtering, sorting, pagination)
@@ -316,7 +327,9 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
 
   // If filtering by user role, do it after enrichment (when user.role is available)
   if (req.query.role) {
-    enrichedLogs = enrichedLogs.filter(log => log.user && log.user.role === req.query.role);
+    enrichedLogs = enrichedLogs.filter(
+      (log) => log.user && log.user.role === req.query.role,
+    );
   }
 
   // Extract pagination info from query
@@ -326,7 +339,7 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
 
   // Send the response
   res.status(200).json({
-    status: 'success',
+    status: "success",
     results: enrichedLogs.length,
     pagination: {
       total,
@@ -335,8 +348,8 @@ exports.getAllAuditLogs = catchAsync(async (req, res, next) => {
       limit,
     },
     data: {
-      logs: enrichedLogs
-    }
+      logs: enrichedLogs,
+    },
   });
 });
 
@@ -346,11 +359,26 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
 
   // Validate resource type
   const validResourceTypes = [
-    "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package",
-    "lesson", "timetable", "center-lesson", "ec.section",
-    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level",
-    "whatsAppNumber", "PaymentMethod"
+    "center",
+    "code",
+    "container",
+    "moderator",
+    "subAdmin",
+    "assistant",
+    "admin",
+    "lecturer",
+    "package",
+    "lesson",
+    "timetable",
+    "center-lesson",
+    "ec.section",
+    "ec.product",
+    "ec.purchase",
+    "ec.cartpurchase",
+    "subject",
+    "level",
+    "whatsAppNumber",
+    "PaymentMethod",
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
@@ -376,7 +404,10 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
       endDate.setHours(23, 59, 59, 999); // Set to end of day
       dateFilter.$lte = endDate;
     }
-    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+    query
+      .where("timestamp")
+      .gte(dateFilter.$gte || new Date("1970-01-01"))
+      .lte(dateFilter.$lte || new Date());
   }
 
   // Apply query features
@@ -403,7 +434,7 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
 
   // Send the response
   res.status(200).json({
-    status: 'success',
+    status: "success",
     results: enrichedLogs.length,
     pagination: {
       total,
@@ -412,8 +443,8 @@ exports.getResourceAuditLogs = catchAsync(async (req, res, next) => {
       limit,
     },
     data: {
-      logs: enrichedLogs
-    }
+      logs: enrichedLogs,
+    },
   });
 });
 
@@ -445,7 +476,10 @@ exports.getUserAuditLogsByEmail = catchAsync(async (req, res, next) => {
       endDate.setHours(23, 59, 59, 999); // Set to end of day
       dateFilter.$lte = endDate;
     }
-    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+    query
+      .where("timestamp")
+      .gte(dateFilter.$gte || new Date("1970-01-01"))
+      .lte(dateFilter.$lte || new Date());
   }
 
   const features = new QueryFeatures(query, req.query)
@@ -467,7 +501,7 @@ exports.getUserAuditLogsByEmail = catchAsync(async (req, res, next) => {
   const pages = Math.ceil(total / limit);
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     results: enrichedLogs.length,
     pagination: {
       total,
@@ -475,7 +509,7 @@ exports.getUserAuditLogsByEmail = catchAsync(async (req, res, next) => {
       pages,
       limit,
     },
-    data: { logs: enrichedLogs }
+    data: { logs: enrichedLogs },
   });
 });
 
@@ -485,10 +519,26 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
 
   // Validate resource type
   const validResourceTypes = [
-    "center", "code", "container", "moderator", "subAdmin",
-    "assistant", "admin", "lecturer", "package",
-    "lesson", "timetable", "center-lesson", "ec.section",
-    "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level", "whatsAppNumber", "PaymentMethod"
+    "center",
+    "code",
+    "container",
+    "moderator",
+    "subAdmin",
+    "assistant",
+    "admin",
+    "lecturer",
+    "package",
+    "lesson",
+    "timetable",
+    "center-lesson",
+    "ec.section",
+    "ec.product",
+    "ec.purchase",
+    "ec.cartpurchase",
+    "subject",
+    "level",
+    "whatsAppNumber",
+    "PaymentMethod",
   ];
 
   if (!validResourceTypes.includes(resourceType)) {
@@ -498,7 +548,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   // Get total count for pagination info
   const totalQuery = AuditLog.find({
     "resource.type": resourceType,
-    "resource.id": resourceId
+    "resource.id": resourceId,
   });
   new QueryFeatures(totalQuery, req.query).filter();
   const total = await totalQuery.countDocuments();
@@ -506,7 +556,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
   // Create a query to find logs for the specific resource
   const query = AuditLog.find({
     "resource.type": resourceType,
-    "resource.id": resourceId
+    "resource.id": resourceId,
   });
 
   // Apply date filtering if provided
@@ -520,7 +570,10 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
       endDate.setHours(23, 59, 59, 999); // Set to end of day
       dateFilter.$lte = endDate;
     }
-    query.where('timestamp').gte(dateFilter.$gte || new Date('1970-01-01')).lte(dateFilter.$lte || new Date());
+    query
+      .where("timestamp")
+      .gte(dateFilter.$gte || new Date("1970-01-01"))
+      .lte(dateFilter.$lte || new Date());
   }
 
   // Apply query features
@@ -547,7 +600,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
 
   // Send the response
   res.status(200).json({
-    status: 'success',
+    status: "success",
     results: enrichedLogs.length,
     pagination: {
       total,
@@ -556,7 +609,7 @@ exports.getResourceInstanceAuditLogs = catchAsync(async (req, res, next) => {
       limit,
     },
     data: {
-      logs: enrichedLogs
-    }
+      logs: enrichedLogs,
+    },
   });
 });

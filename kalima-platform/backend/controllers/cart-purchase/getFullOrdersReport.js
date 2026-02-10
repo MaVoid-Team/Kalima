@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store orders reporting logic.
 const { DateTime } = require("luxon");
 const ECCartPurchase = require("../../models/ec.cartPurchaseModel");
 const catchAsync = require("../../utils/catchAsync");
@@ -198,7 +201,10 @@ module.exports = catchAsync(async (req, res) => {
     }
 
     // Track person who confirmed the order
-    if (purchase.confirmedBy && STAFF_ROLES.includes(purchase.confirmedBy.role)) {
+    if (
+      purchase.confirmedBy &&
+      STAFF_ROLES.includes(purchase.confirmedBy.role)
+    ) {
       const confirmerId = ensureStaffEntry(staffStats, purchase.confirmedBy);
       staffStats[confirmerId].totalConfirmedOrders++;
       staffStats[confirmerId].totalConfirmedItems +=

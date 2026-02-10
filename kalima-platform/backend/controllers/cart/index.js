@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart controller exports.
 const { checkout } = require("./checkout");
 const { getCart } = require("./get-cart");
 const addItem = require("./add-to-cart");
