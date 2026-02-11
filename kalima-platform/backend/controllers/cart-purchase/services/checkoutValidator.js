@@ -23,7 +23,7 @@ const CheckoutValidator = {
 
     if (missing.length) {
       throw new AppError(
-        "Book details are required \n name on book \n number on book \n series name",
+        `Missing required fields: ${missing.join(", ")}`,
         400,
       );
     }
