@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,4 +5,80 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model auth_identities {
+  id               Int                @id @default(autoincrement())
+  user_id          Int
+  provider         auth_provider_enum
+  provider_user_id String             @db.VarChar
+  provider_email   String?            @db.VarChar
+  users            users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, provider_user_id])
+}
+
+model user_analytics {
+  user_id                     Int       @id
+  views                       Int?      @default(0)
+  total_spent                 Decimal?  @default(0) @db.Decimal(14, 2)
+  number_of_purchases         Int?      @default(0)
+  successful_invites          Int?      @default(0)
+  monthly_confirmed_count     Int?      @default(0)
+  last_confirmed_count_update DateTime? @db.Timestamptz(6)
+  users                       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model user_roles {
+  id      Int         @id @default(autoincrement())
+  user_id Int
+  portal  portal_enum
+  role    role_enum
+  users   users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, portal, role])
+}
+
+model users {
+  id                Int               @id @default(autoincrement())
+  mongo_id          String?           @unique
+  name              String            @db.VarChar
+  email             String?           @unique @db.VarChar
+  password          String?           @db.VarChar
+  phone             String?           @db.VarChar
+  gender            gender_enum?
+  is_email_verified Boolean?          @default(false)
+  created_at        DateTime?         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?         @default(now()) @db.Timestamptz(6)
+  auth_identities   auth_identities[]
+  user_analytics    user_analytics?
+  user_roles        user_roles[]
+}
+
+enum auth_provider_enum {
+  local
+  firebase
+  google
+  facebook
+}
+
+enum gender_enum {
+  male
+  female
+}
+
+enum portal_enum {
+  store
+  academy
+}
+
+enum role_enum {
+  Admin
+  SubAdmin
+  Teacher
+  Student
+  Parent
+  Lecturer
+  Moderator
+  Assistant
 }
