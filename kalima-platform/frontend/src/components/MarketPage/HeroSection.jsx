@@ -25,21 +25,22 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="container py-8 flex flex-col items-center text-center">
-      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 max-w-4xl leading-[1.1]">
+    <section className="container py-8 md:py-12 flex flex-col items-center text-center">
+      <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 md:mb-6 max-w-4xl leading-[1.15] text-balance">
         {t("hero.title")}{" "}
-        <span className="block mt-2">{t("hero.titleHighlight")}</span>
+        <span className="block mt-2 text-primary">{t("hero.titleHighlight")}</span>
       </h1>
 
-      <p className="text-muted-foreground text-lg md:text-xl max-w-2xl  mb-4 font-light">
+      <p className="text-muted-foreground text-base md:text-xl max-w-2xl mb-6 md:mb-8 font-light text-balance px-4">
         {t("hero.subtitle")}
       </p>
 
-      <div className="w-full max-w-2xl mb-4">
-        <Command>
+      <div className="w-full max-w-lg mb-6 md:mb-8 px-2">
+        <Command className="rounded-xl border shadow-md">
           <div className="relative">
             <CommandInput
               placeholder={t("hero.searchPlaceholder")}
+              className="h-12"
             />
           </div>
           <CommandList className="top-full left-0 w-full bg-popover rounded-b-lg shadow-lg z-50 mt-1 hidden group-focus-within:block">
@@ -47,17 +48,6 @@ export default function HeroSection() {
             {/* Add standard suggestions or search results here */}
           </CommandList>
         </Command>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <span className="text-sm font-medium text-muted-foreground">
-          {t("hero.popular")}
-        </span>
-        {popularTags.map((tag) => (
-          <Badge key={tag.key} variant="secondary" className="px-4 py-1.5 ">
-            {tag.label}
-          </Badge>
-        ))}
       </div>
     </section>
   );

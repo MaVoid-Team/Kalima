@@ -40,11 +40,11 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-background border-t text-muted-foreground py-12">
-      <div className="container md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+    <footer className="bg-background border-t text-muted-foreground py-8 md:py-12">
+      <div className="container px-6 md:px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8 text-left">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col items-start">
             <div className="flex items-center gap-2 text-foreground">
               <img
                 src={logo}
@@ -52,14 +52,14 @@ export default function Footer() {
                 className="h-8 w-auto object-contain"
               />
             </div>
-            <p className="text-sm text-muted-foreground/80">
+            <p className="text-sm text-muted-foreground/80 max-w-xs">
               {t("footer.description")}
             </p>
           </div>
 
           {/* Footer Sections */}
           {FOOTER_SECTIONS.map((section) => (
-            <div key={section.title}>
+            <div key={section.title} className="flex flex-col items-start">
               <h3 className="text-foreground font-semibold mb-4">
                 {section.title}
               </h3>
@@ -79,8 +79,8 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="pt-8 border-t flex flex-row flex-wrap justify-between items-center gap-4">
+          <p className="text-sm text-muted-foreground text-left">
             © {new Date().getFullYear()} {t("footer.brand")}.{" "}
             {t("footer.rights")}.
           </p>

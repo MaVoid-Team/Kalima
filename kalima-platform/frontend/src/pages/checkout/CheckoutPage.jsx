@@ -13,7 +13,7 @@ export default function CheckoutPage() {
         <div className="min-h-screen bg-background flex flex-col">
             <StepIndicator steps={steps} currentStep={3} />
 
-            <main className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 max-w-6xl mx-auto px-8 py-8 flex-1">
+            <main className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1">
                 <div className="flex flex-col gap-6">
                     <ContactInformation />
                     <ShippingAddress />

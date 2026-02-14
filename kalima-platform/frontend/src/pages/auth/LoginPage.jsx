@@ -51,10 +51,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0 min-h-[calc(100vh-4rem)]">
-            <div className="lg:p-8">
+        <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0 min-h-[calc(100vh-4rem)] py-8">
+            <div className="lg:p-8 w-full">
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <Card>
+                    <Card className="border-0 shadow-none sm:border sm:shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
                             <CardDescription>{t("login.description")}</CardDescription>

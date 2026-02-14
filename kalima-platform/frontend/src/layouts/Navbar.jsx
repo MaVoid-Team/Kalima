@@ -277,63 +277,51 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border bg-background p-4 absolute top-16 left-0 right-0  duration-200">
-            <nav className="flex flex-col gap-4">
+          <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-background border-t border-border p-6 animate-in slide-in-from-top-5">
+            <nav className="flex flex-col gap-4 h-full overflow-y-auto pb-8">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
-                  className="text-base font-medium text-foreground hover:text-primary transition-colors px-2 py-1"
+                  className="text-lg font-medium text-foreground hover:text-primary transition-colors px-2 py-2 border-b border-border/50"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <hr className="border-border my-2" />
 
-              {/* Language Toggle Mobile */}
-              <Button
-                variant="ghost"
-                onClick={toggleLanguage}
-                className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
-              >
-                <Globe className="h-5 w-5" />
-                <span>{t("navbar.languageToggle")}</span>
-              </Button>
-
-              {/* Cart Button Mobile */}
-              {/* Note that this button will take the place of login/signup buttons after logging in */}
-              <Button
-                variant="ghost"
-                onClick={toggleCartModal}
-                className="justify-start gap-2 px-2 py-1 text-base font-medium text-muted-foreground h-auto"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <div className="flex flex-row justify-between items-center w-full">
-                  <span>{t("navbar.cartToggle")}</span>
-                  <span className={`${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                    {cartItems.length}
-                  </span>
+              <div className="mt-auto space-y-4">
+                <div className="flex items-center justify-between px-2 py-2 border-b border-border/50">
+                  <span className="text-base font-medium text-muted-foreground">{t("navbar.languageToggle")}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleLanguage}
+                    className="gap-2"
+                  >
+                    <Globe className="h-5 w-5" />
+                    <span className="uppercase">{i18n.language}</span>
+                  </Button>
                 </div>
-              </Button>
 
-              <div className="flex flex-col gap-3 mt-2">
-                <Button
-                  variant="outline"
-                  className="w-full font-bold justify-center"
-                  onClick={() => setIsMenuOpen(false)}
-                  asChild
-                >
-                  <Link to="/login">{t("navbar.login")}</Link>
-                </Button>
-                <Button
-                  variant="default"
-                  className="w-full font-bold justify-center"
-                  onClick={() => setIsMenuOpen(false)}
-                  asChild
-                >
-                  <Link to="/signup">{t("navbar.signup")}</Link>
-                </Button>
+                <div className="flex flex-col gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/login">{t("navbar.login")}</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="w-full font-bold justify-center h-12 text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                    asChild
+                  >
+                    <Link to="/signup">{t("navbar.signup")}</Link>
+                  </Button>
+                </div>
               </div>
             </nav>
           </div>

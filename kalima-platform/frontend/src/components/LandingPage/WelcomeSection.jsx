@@ -37,15 +37,15 @@ export default function WelcomeSection() {
   const { t } = useTranslation("landing");
 
   return (
-    <section className="w-full bg-background py-16 md:py-24 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+    <section className="w-full bg-background py-12 md:py-24 overflow-hidden">
+      <div className="container mx-auto px-6 md:px-12 lg:px-16">
+        <div className="grid gap-12 lg:gap-20 lg:grid-cols-2 lg:items-center">
           {/* Content */}
           <div
-            className={`flex flex-col justify-center space-y-8`}
+            className={`flex flex-col justify-center space-y-8 text-left`}
           >
             <div className="space-y-6">
-              <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl xl:text-7xl leading-[1.05]">
+              <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl xl:text-7xl leading-tight text-balance">
                 {t("welcome.title")}{" "}
                 <span
                   className='text-primary'
@@ -55,33 +55,33 @@ export default function WelcomeSection() {
                 {t("welcome.titleEnd")}
               </h1>
 
-              <p className="max-w-[540px] text-muted-foreground leading-relaxed font-medium">
+              <p className="max-w-[600px] text-muted-foreground leading-relaxed font-medium text-lg text-balance">
                 {t("welcome.description")}
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Button variant="default" className="w-fit">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-start">
+              <Button variant="default" className="w-full sm:w-fit h-12 text-base">
                 {t("welcome.browseCourses")}
               </Button>
               <Button
                 variant="secondary"
-                className="w-fit"
+                className="w-full sm:w-fit h-12 text-base"
               >
                 {t("welcome.teachers")}
               </Button>
             </div>
 
             {/* Trusted By */}
-            <div className="flex items-center gap-4 pt-4">
+            <div className="flex items-center justify-start gap-4 pt-4">
               <AvatarGroup>
                 {AVATAR_IMAGES.map((url, index) => (
-                  <Avatar key={index} className="h-11 w-11">
+                  <Avatar key={index} className="h-10 w-10 sm:h-11 sm:w-11 border-2 border-background">
                     <AvatarImage src={url} alt="User Avatar" />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                 ))}
-                <AvatarGroupCount className="h-11 w-11 text-[10px] font-bold">
+                <AvatarGroupCount className="h-10 w-10 sm:h-11 sm:w-11 text-[10px] font-bold border-2 border-background">
                   1.7k+
                 </AvatarGroupCount>
               </AvatarGroup>
@@ -93,9 +93,9 @@ export default function WelcomeSection() {
 
           {/* Image */}
           <div className="relative mx-auto w-full max-w-[600px] lg:max-w-none">
-            <div className="relative h-[600px] w-full">
+            <div className="relative h-[280px] sm:h-[550px] lg:h-[600px] w-full">
               <div
-                className="h-full w-full rounded-[2.5rem] bg-cover bg-center transition-transform duration-700"
+                className="h-full w-full rounded-[2rem] bg-cover bg-center transition-transform duration-700 shadow-2xl"
                 style={{
                   backgroundImage: `url("${HERO_IMAGE_URL}")`,
                 }}

@@ -22,18 +22,18 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="w-full bg-background py-16 md:py-24 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+    <section className="w-full bg-background py-12 md:py-24 overflow-hidden">
+      <div className="container mx-auto px-6 md:px-12 lg:px-16">
+        <div className="grid gap-12 lg:gap-20 lg:grid-cols-2 lg:items-center">
           {/* Image */}
           <img
             src={'/about.png'}
             alt={t("about.title")}
-            className="h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-[2.5rem]"
+            className="h-[280px] sm:h-[550px] lg:h-[600px] w-full max-w-[600px] lg:max-w-none mx-auto object-cover rounded-4xl shadow-xl"
           />
           {/* Content */}
           <div className="space-y-8">
-            <h2 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-[1.1]">
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl xl:text-6xl leading-tight text-balance">
               {t("about.title")}{" "}
               <span className="text-primary">
                 {t("about.titleHighlight")}
@@ -41,7 +41,7 @@ export default function AboutSection() {
               <br />
               {t("about.titleEnd")}
             </h2>
-            <p className="max-w-[500px] text-muted-foreground text-lg leading-relaxed font-medium">
+            <p className="max-w-[500px] text-muted-foreground text-lg leading-relaxed font-medium text-balance">
               {t("about.description")}
             </p>
 

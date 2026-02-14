@@ -7,7 +7,7 @@ const ProductCard = ({ title, category, price, image, badge }) => {
 
   return (
     <Card className="border-none shadow-none ">
-      <CardContent className="p-0 relative overflow-hidden rounded-4xl mb-4">
+      <CardContent className="p-0 relative overflow-hidden rounded-4xl mb-4 aspect-[4/5] sm:aspect-square">
         {badge && (
           <Badge className="absolute top-4 start-4 z-10 ">
             {t(`product.${badge}`)}
