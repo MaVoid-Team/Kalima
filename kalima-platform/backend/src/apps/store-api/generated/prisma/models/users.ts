@@ -257,6 +257,7 @@ export type usersWhereInput = {
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
+  refresh_tokens?: Prisma.Refresh_tokensListRelationFilter
   user_analytics?: Prisma.XOR<Prisma.User_analyticsNullableScalarRelationFilter, Prisma.user_analyticsWhereInput> | null
   user_roles?: Prisma.User_rolesListRelationFilter
 }
@@ -273,6 +274,7 @@ export type usersOrderByWithRelationInput = {
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   auth_identities?: Prisma.auth_identitiesOrderByRelationAggregateInput
+  refresh_tokens?: Prisma.refresh_tokensOrderByRelationAggregateInput
   user_analytics?: Prisma.user_analyticsOrderByWithRelationInput
   user_roles?: Prisma.user_rolesOrderByRelationAggregateInput
 }
@@ -292,6 +294,7 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
+  refresh_tokens?: Prisma.Refresh_tokensListRelationFilter
   user_analytics?: Prisma.XOR<Prisma.User_analyticsNullableScalarRelationFilter, Prisma.user_analyticsWhereInput> | null
   user_roles?: Prisma.User_rolesListRelationFilter
 }, "id" | "mongo_id" | "email">
@@ -341,6 +344,7 @@ export type usersCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
@@ -357,6 +361,7 @@ export type usersUncheckedCreateInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
@@ -372,6 +377,7 @@ export type usersUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
@@ -388,6 +394,7 @@ export type usersUncheckedUpdateInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
@@ -532,6 +539,20 @@ export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }
 
+export type usersCreateNestedOneWithoutRefresh_tokensInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutRefresh_tokensInput, Prisma.usersUncheckedCreateWithoutRefresh_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutRefresh_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutRefresh_tokensNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutRefresh_tokensInput, Prisma.usersUncheckedCreateWithoutRefresh_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutRefresh_tokensInput
+  upsert?: Prisma.usersUpsertWithoutRefresh_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutRefresh_tokensInput, Prisma.usersUpdateWithoutRefresh_tokensInput>, Prisma.usersUncheckedUpdateWithoutRefresh_tokensInput>
+}
+
 export type usersCreateWithoutAuth_identitiesInput = {
   mongo_id?: string | null
   name: string
@@ -542,6 +563,7 @@ export type usersCreateWithoutAuth_identitiesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
@@ -557,6 +579,7 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   is_email_verified?: boolean | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
@@ -587,6 +610,7 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
@@ -602,6 +626,7 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
@@ -617,6 +642,7 @@ export type usersCreateWithoutUser_analyticsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
 
@@ -632,6 +658,7 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
 
@@ -662,6 +689,7 @@ export type usersUpdateWithoutUser_analyticsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
 
@@ -677,6 +705,7 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
@@ -691,6 +720,7 @@ export type usersCreateWithoutUser_rolesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
 }
 
@@ -706,6 +736,7 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
 }
 
@@ -736,6 +767,7 @@ export type usersUpdateWithoutUser_rolesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
 }
 
@@ -751,7 +783,86 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutRefresh_tokensInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutRefresh_tokensInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutRefresh_tokensInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutRefresh_tokensInput, Prisma.usersUncheckedCreateWithoutRefresh_tokensInput>
+}
+
+export type usersUpsertWithoutRefresh_tokensInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutRefresh_tokensInput, Prisma.usersUncheckedUpdateWithoutRefresh_tokensInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutRefresh_tokensInput, Prisma.usersUncheckedCreateWithoutRefresh_tokensInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutRefresh_tokensInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutRefresh_tokensInput, Prisma.usersUncheckedUpdateWithoutRefresh_tokensInput>
+}
+
+export type usersUpdateWithoutRefresh_tokensInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 
@@ -761,11 +872,13 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
 
 export type UsersCountOutputType = {
   auth_identities: number
+  refresh_tokens: number
   user_roles: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auth_identities?: boolean | UsersCountOutputTypeCountAuth_identitiesArgs
+  refresh_tokens?: boolean | UsersCountOutputTypeCountRefresh_tokensArgs
   user_roles?: boolean | UsersCountOutputTypeCountUser_rolesArgs
 }
 
@@ -789,6 +902,13 @@ export type UsersCountOutputTypeCountAuth_identitiesArgs<ExtArgs extends runtime
 /**
  * UsersCountOutputType without action
  */
+export type UsersCountOutputTypeCountRefresh_tokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.refresh_tokensWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
 export type UsersCountOutputTypeCountUser_rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.user_rolesWhereInput
 }
@@ -806,6 +926,7 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   created_at?: boolean
   updated_at?: boolean
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
+  refresh_tokens?: boolean | Prisma.users$refresh_tokensArgs<ExtArgs>
   user_analytics?: boolean | Prisma.users$user_analyticsArgs<ExtArgs>
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
@@ -853,6 +974,7 @@ export type usersSelectScalar = {
 export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
+  refresh_tokens?: boolean | Prisma.users$refresh_tokensArgs<ExtArgs>
   user_analytics?: boolean | Prisma.users$user_analyticsArgs<ExtArgs>
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
@@ -864,6 +986,7 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "users"
   objects: {
     auth_identities: Prisma.$auth_identitiesPayload<ExtArgs>[]
+    refresh_tokens: Prisma.$refresh_tokensPayload<ExtArgs>[]
     user_analytics: Prisma.$user_analyticsPayload<ExtArgs> | null
     user_roles: Prisma.$user_rolesPayload<ExtArgs>[]
   }
@@ -1273,6 +1396,7 @@ readonly fields: usersFieldRefs;
 export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   auth_identities<T extends Prisma.users$auth_identitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$auth_identitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$auth_identitiesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  refresh_tokens<T extends Prisma.users$refresh_tokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$refresh_tokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$refresh_tokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user_analytics<T extends Prisma.users$user_analyticsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$user_analyticsArgs<ExtArgs>>): Prisma.Prisma__user_analyticsClient<runtime.Types.Result.GetResult<Prisma.$user_analyticsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user_roles<T extends Prisma.users$user_rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$user_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$user_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1723,6 +1847,30 @@ export type users$auth_identitiesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.Auth_identitiesScalarFieldEnum | Prisma.Auth_identitiesScalarFieldEnum[]
+}
+
+/**
+ * users.refresh_tokens
+ */
+export type users$refresh_tokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the refresh_tokens
+   */
+  select?: Prisma.refresh_tokensSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the refresh_tokens
+   */
+  omit?: Prisma.refresh_tokensOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.refresh_tokensInclude<ExtArgs> | null
+  where?: Prisma.refresh_tokensWhereInput
+  orderBy?: Prisma.refresh_tokensOrderByWithRelationInput | Prisma.refresh_tokensOrderByWithRelationInput[]
+  cursor?: Prisma.refresh_tokensWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Refresh_tokensScalarFieldEnum | Prisma.Refresh_tokensScalarFieldEnum[]
 }
 
 /**
