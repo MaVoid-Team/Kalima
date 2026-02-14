@@ -45,8 +45,8 @@ export default function SignupPage() {
             </div>
 
             {/* Left Side - Form */}
-            <div className="flex h-full flex-col items-center justify-center p-4 lg:p-8">
-                <div className="flex w-full flex-col justify-center space-y-6">
+            <div className="flex h-full flex-col items-center justify-center p-4 lg:p-8 py-8">
+                <div className="flex w-full flex-col justify-center space-y-6 max-w-md mx-auto">
                     {renderStep()}
                 </div>
             </div>

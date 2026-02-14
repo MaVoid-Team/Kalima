@@ -54,24 +54,24 @@ const NewArrivalsSection = () => {
   ];
 
   return (
-    <section className="container py-16">
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="text-3xl font-bold tracking-tight">
+    <section className="container py-8 md:py-16">
+      <div className="flex items-center justify-between mb-6 md:mb-10">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
           {t("sections.newArrivals.title")}
         </h2>
         <Button
           variant="ghost"
-          className="text-primary hover:bg-transparent group"
+          className="text-primary hover:bg-transparent group px-0 md:px-4"
           asChild
         >
           <Link to="#">
-            {t("sections.newArrivals.viewAll")}
-            <ArrowRight className="h-3 w-3 transition-transform group-hover:-translate-x-1" />
+            <span className="text-sm md:text-base">{t("sections.newArrivals.viewAll")}</span>
+            <ArrowRight className="h-3 w-3 transition-transform group-hover:-translate-x-1 ml-2" />
           </Link>
         </Button>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
         {products.map((product) => (
           <ProductCard key={product.id} {...product} />
         ))}
