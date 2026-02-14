@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "../../libs/db/prisma";
 class CartService {
   constructor(private prisma: PrismaClient) {}
 

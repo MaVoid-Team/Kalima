@@ -57,3 +57,8 @@ export type user_roles = Prisma.user_rolesModel
  * 
  */
 export type users = Prisma.usersModel
+/**
+ * Model refresh_tokens
+ * 
+ */
+export type refresh_tokens = Prisma.refresh_tokensModel
