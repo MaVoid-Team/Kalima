@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy level routes.
 const express = require("express");
 const levelController = require("../controllers/levelController");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -11,7 +14,7 @@ router
   .post(
     verifyJWT,
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    levelController.createLevel
+    levelController.createLevel,
   );
 
 router
@@ -20,12 +23,12 @@ router
   .patch(
     verifyJWT,
     authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
-    levelController.updateLevelById
+    levelController.updateLevelById,
   )
   .delete(
     verifyJWT,
     authController.verifyRoles("Admin", "SubAdmin"),
-    levelController.deleteLevelById
+    levelController.deleteLevelById,
   );
 
 module.exports = router;

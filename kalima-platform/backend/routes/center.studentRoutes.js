@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy center student routes.
 const express = require("express");
 const cStudentController = require("../controllers/center.studentController");
 

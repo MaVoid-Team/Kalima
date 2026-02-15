@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy container model.
 const mongoose = require("mongoose");
 
 const containerSchema = new mongoose.Schema(
@@ -38,18 +41,18 @@ const containerSchema = new mongoose.Schema(
     goal: [{ type: String }], // Optional field for courses as an array of strings
     image: {
       url: { type: String },
-      publicId: { type: String }
+      publicId: { type: String },
     }, // Container image (stored in top-level containers)
   },
   {
     toObject: { virtuals: true },
     toJSON: { virtuals: true },
     discriminatorKey: "kind",
-  }
+  },
 );
 
 // Create virtual to get image from parent if not available
-containerSchema.virtual('containerImage').get(function() {
+containerSchema.virtual("containerImage").get(function () {
   // If container has its own image, return it
   if (this.image && this.image.url) {
     return this.image;

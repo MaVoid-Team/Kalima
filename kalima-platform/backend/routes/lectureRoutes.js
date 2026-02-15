@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy lecture routes.
 const express = require("express");
 const lectureController = require("../controllers/lectureController");
 const attachmentController = require("../controllers/attachmentController");
@@ -33,7 +36,7 @@ router
   .get(attachmentController.getLectureAttachments)
   .post(
     attachmentController.multiUpload, // Use .fields for multi-file, multi-category
-    attachmentController.createAttachment
+    attachmentController.createAttachment,
   );
 
 router
@@ -54,7 +57,7 @@ router
   .get(attachmentController.getAllHomeWork)
   .post(
     attachmentController.upload.single("attachment"),
-    attachmentController.uploadHomeWork
+    attachmentController.uploadHomeWork,
   );
 
 router.route("/update-parent").patch(lectureController.UpdateParentOfLecture);

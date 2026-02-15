@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase model.
 const { required } = require("joi");
 const mongoose = require("mongoose");
 
@@ -15,6 +18,16 @@ const cartPurchaseItemSchema = new mongoose.Schema({
   priceAtPurchase: {
     type: Number,
     required: true,
+  },
+  couponCode: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ECCoupon",
+    default: null,
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    min: [0, "Discount cannot be negative"],
   },
   // For books
   nameOnBook: String,
@@ -159,7 +172,7 @@ const cartPurchaseSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
     strictPopulate: false, // Allow populate on non-reference fields without throwing errors
-  }
+  },
 );
 
 // Indexes for common queries
@@ -182,5 +195,7 @@ cartPurchaseSchema.pre("save", function (next) {
   next();
 });
 
-const ECCartPurchase = mongoose.models.ECCartPurchase || mongoose.model("ECCartPurchase", cartPurchaseSchema);
+const ECCartPurchase =
+  mongoose.models.ECCartPurchase ||
+  mongoose.model("ECCartPurchase", cartPurchaseSchema);
 module.exports = ECCartPurchase;

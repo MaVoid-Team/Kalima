@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Revenue reporting logic with unclear domain ownership.
 const mongoose = require("mongoose");
 const Attendance = require("../models/attendanceModel");
 const AppError = require("../utils/appError");
@@ -25,9 +28,9 @@ const buildRevenueMatchStage = (query) => {
     matchStage.attendanceDate = {};
     if (startDate) matchStage.attendanceDate.$gte = new Date(startDate);
     if (endDate) {
-        const endOfDay = new Date(endDate);
-        endOfDay.setHours(23, 59, 59, 999); // Include the whole end day
-        matchStage.attendanceDate.$lte = endOfDay;
+      const endOfDay = new Date(endDate);
+      endOfDay.setHours(23, 59, 59, 999); // Include the whole end day
+      matchStage.attendanceDate.$lte = endOfDay;
     }
   }
 
@@ -47,8 +50,8 @@ exports.calculateRevenue = catchAsync(async (req, res, next) => {
         from: "lessons",
         localField: "lesson",
         foreignField: "_id",
-        as: "lessonData"
-      }
+        as: "lessonData",
+      },
     },
     {
       $addFields: {
@@ -56,26 +59,29 @@ exports.calculateRevenue = catchAsync(async (req, res, next) => {
           $cond: [
             "$isBookletPurchased",
             { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
-            0
-          ]
+            0,
+          ],
         },
         lessonAmount: {
-          $subtract: ["$amountPaid", { 
-            $cond: [
-              "$isBookletPurchased",
-              { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
-              0
-            ] 
-          }]
-        }
-      }
+          $subtract: [
+            "$amountPaid",
+            {
+              $cond: [
+                "$isBookletPurchased",
+                { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
+                0,
+              ],
+            },
+          ],
+        },
+      },
     },
     {
       $group: {
         _id: null, // Group all matched documents together
         totalLessonRevenue: { $sum: "$lessonAmount" },
         totalBookletRevenue: { $sum: "$bookletAmount" },
-        totalAttendancesPaid: { $sum: 1 } // Count attendances where payment occurred
+        totalAttendancesPaid: { $sum: 1 }, // Count attendances where payment occurred
       },
     },
     {
@@ -84,16 +90,16 @@ exports.calculateRevenue = catchAsync(async (req, res, next) => {
         totalLessonRevenue: 1,
         totalBookletRevenue: 1,
         totalRevenue: { $add: ["$totalLessonRevenue", "$totalBookletRevenue"] },
-        totalAttendancesPaid: 1
-      }
-    }
+        totalAttendancesPaid: 1,
+      },
+    },
   ]);
 
-  const result = revenueResult[0] || { 
-    totalRevenue: 0, 
+  const result = revenueResult[0] || {
+    totalRevenue: 0,
     totalLessonRevenue: 0,
     totalBookletRevenue: 0,
-    totalAttendancesPaid: 0 
+    totalAttendancesPaid: 0,
   }; // Default if no results
 
   res.status(200).json({
@@ -112,8 +118,8 @@ exports.calculateRevenueBreakdown = catchAsync(async (req, res, next) => {
         from: "lessons",
         localField: "lesson",
         foreignField: "_id",
-        as: "lessonData"
-      }
+        as: "lessonData",
+      },
     },
     {
       $addFields: {
@@ -121,20 +127,20 @@ exports.calculateRevenueBreakdown = catchAsync(async (req, res, next) => {
           $cond: [
             "$isBookletPurchased",
             { $arrayElemAt: ["$lessonData.bookletPrice", 0] },
-            0
-          ]
-        }
-      }
+            0,
+          ],
+        },
+      },
     },
     {
       $group: {
         _id: {
           paymentType: "$paymentType",
-          bookletPurchased: "$isBookletPurchased"
+          bookletPurchased: "$isBookletPurchased",
         },
         totalRevenue: { $sum: "$amountPaid" },
         totalBookletRevenue: { $sum: "$bookletAmount" },
-        count: { $sum: 1 }
+        count: { $sum: 1 },
       },
     },
     {
@@ -144,18 +150,29 @@ exports.calculateRevenueBreakdown = catchAsync(async (req, res, next) => {
         bookletPurchased: "$_id.bookletPurchased",
         totalRevenue: 1,
         totalBookletRevenue: 1,
-        totalLessonRevenue: { $subtract: ["$totalRevenue", "$totalBookletRevenue"] },
-        count: 1
-      }
+        totalLessonRevenue: {
+          $subtract: ["$totalRevenue", "$totalBookletRevenue"],
+        },
+        count: 1,
+      },
     },
-    { $sort: { paymentType: 1, bookletPurchased: 1 } }
+    { $sort: { paymentType: 1, bookletPurchased: 1 } },
   ]);
 
   // Calculate overall total
-  const overallTotal = revenueResult.reduce((sum, item) => sum + item.totalRevenue, 0);
+  const overallTotal = revenueResult.reduce(
+    (sum, item) => sum + item.totalRevenue,
+    0,
+  );
   const overallCount = revenueResult.reduce((sum, item) => sum + item.count, 0);
-  const overallBookletRevenue = revenueResult.reduce((sum, item) => sum + item.totalBookletRevenue, 0);
-  const overallLessonRevenue = revenueResult.reduce((sum, item) => sum + item.totalLessonRevenue, 0);
+  const overallBookletRevenue = revenueResult.reduce(
+    (sum, item) => sum + item.totalBookletRevenue,
+    0,
+  );
+  const overallLessonRevenue = revenueResult.reduce(
+    (sum, item) => sum + item.totalLessonRevenue,
+    0,
+  );
 
   res.status(200).json({
     status: "success",
@@ -164,7 +181,7 @@ exports.calculateRevenueBreakdown = catchAsync(async (req, res, next) => {
       overallTotalRevenue: overallTotal,
       overallLessonRevenue: overallLessonRevenue,
       overallBookletRevenue: overallBookletRevenue,
-      overallAttendancesPaid: overallCount
+      overallAttendancesPaid: overallCount,
     },
   });
 });

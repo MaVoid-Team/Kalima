@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy lecture access logic.
 const mongoose = require("mongoose");
 const StudentLectureAccess = require("../models/studentLectureAccessModel");
 const StudentExamSubmission = require("../models/studentExamSubmissionModel");
@@ -29,8 +32,8 @@ exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "You must pass the exam before accessing this lecture",
-          403
-        )
+          403,
+        ),
       );
     }
   }
@@ -46,8 +49,8 @@ exports.createStudentLectureAccess = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           "You must pass the homework before accessing this lecture",
-          403
-        )
+          403,
+        ),
       );
     }
   }
@@ -98,7 +101,7 @@ exports.updateStudentLectureAccess = catchAsync(async (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
   if (!access) {
     return next(new AppError("No document found with that ID", 404));
@@ -135,18 +138,26 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
   // Check requirements
   if (lecture.requiresExam || lecture.requiresHomework) {
     const results = {
-      exam: lecture.requiresExam ? {
-        required: true,
-        passed: false,
-        url: lecture.examConfig ? lecture.examConfig.formUrl : null,
-        passingThreshold: lecture.examConfig ? lecture.examConfig.defaultPassingThreshold : 60
-      } : null,
-      homework: lecture.requiresHomework ? {
-        required: true,
-        passed: false,
-        url: lecture.homeworkConfig ? lecture.homeworkConfig.formUrl : null,
-        passingThreshold: lecture.homeworkConfig ? lecture.homeworkConfig.defaultPassingThreshold : 60
-      } : null
+      exam: lecture.requiresExam
+        ? {
+            required: true,
+            passed: false,
+            url: lecture.examConfig ? lecture.examConfig.formUrl : null,
+            passingThreshold: lecture.examConfig
+              ? lecture.examConfig.defaultPassingThreshold
+              : 60,
+          }
+        : null,
+      homework: lecture.requiresHomework
+        ? {
+            required: true,
+            passed: false,
+            url: lecture.homeworkConfig ? lecture.homeworkConfig.formUrl : null,
+            passingThreshold: lecture.homeworkConfig
+              ? lecture.homeworkConfig.defaultPassingThreshold
+              : 60,
+          }
+        : null,
     };
 
     // Check exam if required
@@ -172,12 +183,15 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
     }
 
     // If any required submission is not passed, return restricted access
-    if ((lecture.requiresExam && !results.exam.passed) || 
-        (lecture.requiresHomework && !results.homework.passed)) {
+    if (
+      (lecture.requiresExam && !results.exam.passed) ||
+      (lecture.requiresHomework && !results.homework.passed)
+    ) {
       return res.status(200).json({
         status: "restricted",
-        message: "You must complete all required submissions before accessing this lecture",
-        data: results
+        message:
+          "You must complete all required submissions before accessing this lecture",
+        data: results,
       });
     }
   }
@@ -193,7 +207,7 @@ exports.checkLectureAccess = catchAsync(async (req, res, next) => {
       requiresExam: lecture.requiresExam,
       requiresHomework: lecture.requiresHomework,
       examPassed: lecture.requiresExam ? true : undefined,
-      homeworkPassed: lecture.requiresHomework ? true : undefined
+      homeworkPassed: lecture.requiresHomework ? true : undefined,
     },
   });
 });

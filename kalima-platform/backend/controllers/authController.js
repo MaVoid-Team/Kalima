@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared authentication and token logic.
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel.js");
@@ -15,8 +18,8 @@ const login = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Please provide either email and password or phone number and password.",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -30,10 +33,11 @@ const login = catchAsync(async (req, res, next) => {
   if (!foundUser) {
     return next(
       new AppError(
-        `Couldn't find a user with this ${newMail ? "email" : "phone number"
+        `Couldn't find a user with this ${
+          newMail ? "email" : "phone number"
         } and password.`,
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -42,10 +46,11 @@ const login = catchAsync(async (req, res, next) => {
   if (!match) {
     return next(
       new AppError(
-        `Couldn't find a user with this ${newMail ? "email" : "phone number"
+        `Couldn't find a user with this ${
+          newMail ? "email" : "phone number"
         } and password.`,
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -74,13 +79,13 @@ const refresh = catchAsync(async (req, res, next) => {
   try {
     decodedRefreshToken = jwt.verify(
       currentUserRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
+      process.env.REFRESH_TOKEN_SECRET,
     );
   } catch (err) {
     if (err.name === "TokenExpiredError" || !decodedRefreshToken) {
       await RefreshToken.deleteOne({ user: userId });
       return next(
-        new AppError("Refresh token is expired, plese login again", 401)
+        new AppError("Refresh token is expired, plese login again", 401),
       );
     }
   }
@@ -109,19 +114,23 @@ const verifyRoles = (...allowedRoles) => {
       // Get and validate user role
       const userRole = req.user.role?.toLowerCase();
       if (!userRole) {
-        return next(new AppError("Unauthorized - User has no assigned role", 401));
+        return next(
+          new AppError("Unauthorized - User has no assigned role", 401),
+        );
       }
 
       // Normalize allowed roles to lowercase for comparison
-      const normalizedAllowedRoles = allowedRoles.map((role) => role.toLowerCase());
+      const normalizedAllowedRoles = allowedRoles.map((role) =>
+        role.toLowerCase(),
+      );
 
       // Check if user role is in allowed roles
       if (!normalizedAllowedRoles.includes(userRole)) {
         return next(
           new AppError(
             `Access Denied - Your role '${userRole}' is not permitted for this resource. Required roles: ${allowedRoles.join(", ")}`,
-            403
-          )
+            403,
+          ),
         );
       }
 
@@ -152,7 +161,7 @@ const optionalJWT = async (req, res, next) => {
 
     // If token is valid, set req.user
     const currentUser = await User.findById(decoded.UserInfo.id).select(
-      "-password"
+      "-password",
     );
 
     if (currentUser) {

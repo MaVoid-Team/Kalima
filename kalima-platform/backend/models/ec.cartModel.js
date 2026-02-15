@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart model.
 const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema(
@@ -45,7 +48,7 @@ const cartSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 cartSchema.index({ user: 1, status: 1 });
@@ -97,10 +100,12 @@ cartSchema.methods.addItem = async function (productId) {
     // Get the first item in the cart to determine the type
     const firstCartItem = await ECCartItem.findById(this.items[0]);
     const firstProductType = firstCartItem.productType;
-    const newProductType = product.__t || "ECProduct";
+    const newProductType = product.__t || "ECP  roduct";
 
     if (newProductType !== firstProductType) {
-      throw new Error(`Cannot add item of type ${newProductType} to cart containing ${firstProductType} items. All items in cart must be of the same type.`);
+      throw new Error(
+        `Cannot add item of type ${newProductType} to cart containing ${firstProductType} items. All items in cart must be of the same type.`,
+      );
     }
   }
 
@@ -152,7 +157,7 @@ cartSchema.methods.removeItem = async function (cartItemId) {
 
   // Remove from items array
   this.items = this.items.filter(
-    (item) => item.toString() !== cartItemId.toString()
+    (item) => item.toString() !== cartItemId.toString(),
   );
 
   // Update cart totals
@@ -223,7 +228,7 @@ cartSchema.methods.convertToPurchases = async function (checkoutData) {
   // Group items by type
   const bookItems = this.items.filter((item) => item.productType === "ECBook");
   const productItems = this.items.filter(
-    (item) => item.productType === "ECProduct"
+    (item) => item.productType === "ECProduct",
   );
 
   // Process book purchases

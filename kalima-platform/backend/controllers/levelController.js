@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy level management logic.
 const Level = require("../models/levelModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");

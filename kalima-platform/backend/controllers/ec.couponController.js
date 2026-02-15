@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store coupon controller logic.
 const ECCoupon = require("../models/ec.couponModel");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
@@ -166,4 +169,3 @@ exports.deleteCoupon = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-

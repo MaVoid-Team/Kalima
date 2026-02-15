@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store purchase controller logic.
 const ECPurchase = require("../models/ec.purchaseModel");
 const ECCoupon = require("../models/ec.couponModel");
 const catchAsync = require("../utils/catchAsync");

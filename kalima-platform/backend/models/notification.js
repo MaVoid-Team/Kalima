@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared notification model.
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({

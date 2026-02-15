@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store book purchase controller logic.
 const ECBookPurchase = require("../models/ec.bookpurchaseModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");

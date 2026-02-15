@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared notification routes.
 const express = require("express");
 const notificationController = require("../controllers/notificationController");
 const verifyJWT = require("../middleware/verifyJWT");

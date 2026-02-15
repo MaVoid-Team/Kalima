@@ -1,10 +1,13 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Pricing rule model with unclear domain ownership.
 const mongoose = require("mongoose");
 
 const pricingRuleSchema = new mongoose.Schema(
   {
     lecturer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CLecturer", 
+      ref: "CLecturer",
       required: true,
     },
     subject: {
@@ -50,7 +53,7 @@ const pricingRuleSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Unique index to ensure only one pricing rule exists for a specific combination
@@ -58,7 +61,7 @@ const pricingRuleSchema = new mongoose.Schema(
 // alongside center-specific rules.
 pricingRuleSchema.index(
   { lecturer: 1, subject: 1, level: 1, center: 1 },
-  { unique: true }
+  { unique: true },
 );
 
 const PricingRule = mongoose.model("PricingRule", pricingRuleSchema);

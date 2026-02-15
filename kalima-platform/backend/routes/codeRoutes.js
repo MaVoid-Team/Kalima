@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Code-related routes with unclear domain ownership.
 const express = require("express");
 const router = express.Router();
 const verifyJWT = require("../middleware/verifyJWT");
@@ -10,15 +13,15 @@ router
   .route("/")
   .get(
     authController.verifyRoles("Admin", "SubAdmin"),
-    codeController.getAllCodes
+    codeController.getAllCodes,
   )
   .post(
     authController.verifyRoles("Admin", "SubAdmin"),
-    codeController.createCodes
+    codeController.createCodes,
   )
   .delete(
     authController.verifyRoles("Admin", "SubAdmin"),
-    codeController.deleteCodes
+    codeController.deleteCodes,
   );
 
 router.route("/:id").get(codeController.getCodeById);
@@ -26,14 +29,14 @@ router.route("/:id").get(codeController.getCodeById);
 router.delete(
   "/multiple",
   authController.verifyRoles("Admin", "SubAdmin"),
-  codeController.deleteMultipleCodes
+  codeController.deleteMultipleCodes,
 );
 
 router
   .route("/redeem")
   .post(
     authController.verifyRoles("Student", "Parent", "Teacher"),
-    codeController.redeemCode
+    codeController.redeemCode,
   );
 
 module.exports = router;

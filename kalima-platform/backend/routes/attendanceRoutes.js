@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy attendance routes.
 const express = require("express");
 const attendanceController = require("../controllers/attendanceController");
 const authController = require("../controllers/authController");
@@ -12,38 +15,43 @@ router
   .route("/")
   .post(
     authController.verifyRoles("Assistant", "Admin", "Sub-Admin", "Moderator"), // Roles allowed to record
-    attendanceController.recordAttendance
+    attendanceController.recordAttendance,
   )
   .get(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view lists
-    attendanceController.getAllAttendance
+    attendanceController.getAllAttendance,
   );
 
 router
   .route("/:id")
   .get(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view specific record
-    attendanceController.getAttendanceById
+    attendanceController.getAttendanceById,
   )
   .patch(
     authController.verifyRoles("Assistant", "Admin", "Sub-Admin", "Moderator"), // Roles allowed to update attendance
-    attendanceController.updateAttendance
+    attendanceController.updateAttendance,
   )
   .delete(
     authController.verifyRoles("Admin", "Sub-Admin", "Moderator"), // Roles allowed to delete
-    attendanceController.deleteAttendance
+    attendanceController.deleteAttendance,
   );
 
 // New route for updating exam results
-router.route("/:id/exam-results")
-  .patch(
-    authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant", "Lecturer"), // Roles allowed to update exam results
-    attendanceController.updateExamResults
-  );
+router.route("/:id/exam-results").patch(
+  authController.verifyRoles(
+    "Admin",
+    "Sub-Admin",
+    "Moderator",
+    "Assistant",
+    "Lecturer",
+  ), // Roles allowed to update exam results
+  attendanceController.updateExamResults,
+);
 
 router.route("/student/:studentSequencedId").get(
   authController.verifyRoles("Admin", "Sub-Admin", "Moderator", "Assistant"), // Roles allowed to view specific student attendance
-  attendanceController.getAttendance
+  attendanceController.getAttendance,
 );
 
 module.exports = router;

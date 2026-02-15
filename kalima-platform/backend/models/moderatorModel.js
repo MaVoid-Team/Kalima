@@ -1,13 +1,17 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy moderator model.
 const mongoose = require("mongoose");
 const User = require("./userModel");
 
-
-const moderatorSchema = new mongoose.Schema({
+const moderatorSchema = new mongoose.Schema(
+  {
     monthlyConfirmedCount: { type: Number, default: 0 },
-    lastConfirmedCountUpdate: { type: Date }
-}, {
+    lastConfirmedCountUpdate: { type: Date },
+  },
+  {
     timestamps: true,
-}
+  },
 );
 
 const Moderator = User.discriminator("Moderator", moderatorSchema);
