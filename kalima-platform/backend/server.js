@@ -1,3 +1,4 @@
+require("reflect-metadata");
 require("dotenv").config();
 
 const parentRoutes = require("./routes/parentRoutes");

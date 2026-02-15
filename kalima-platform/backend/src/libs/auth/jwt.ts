@@ -18,7 +18,7 @@ function getJwtSecret(): string {
 
 export interface AccessTokenPayload {
   userId: number;
-  role?: Array<{ portal: string; role: string }>;
+  roles?: Array<{ portal: string; role: string }>;
 }
 
 export function signAccessToken(payload: AccessTokenPayload): string {
