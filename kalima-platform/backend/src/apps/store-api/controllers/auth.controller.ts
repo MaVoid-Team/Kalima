@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import { authService } from '../services/auth.service.new';
+import { authService } from '../services/auth.service';
 import {
   TeacherRegistrationDto,
   StudentRegistrationDto,
