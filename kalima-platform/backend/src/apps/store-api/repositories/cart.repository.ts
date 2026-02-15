@@ -1,4 +1,4 @@
-import { prisma } from "../../libs/db/prisma";
+import { prisma } from "../../../libs/db/prisma";
 
 class CartRepository {}
 
