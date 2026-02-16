@@ -736,7 +736,7 @@ These endpoints are restricted to Admin users only.
 
 Creates a new Admin user.
 
-**Endpoint:** `POST /create/admin`  
+**Endpoint:** `POST /admin/create-admin`  
 **Auth Required:** Yes (Admin only)
 
 **Request Body:**
@@ -775,7 +775,7 @@ Creates a new Admin user.
 
 Creates a new Sub-Admin user.
 
-**Endpoint:** `POST /create/sub-admin`  
+**Endpoint:** `POST /admin/create-subadmin  `  
 **Auth Required:** Yes (Admin only)
 
 **Request Body:** Same as Create Admin
@@ -790,7 +790,7 @@ Creates a new Sub-Admin user.
 
 Creates a new Moderator user.
 
-**Endpoint:** `POST /create/moderator`  
+**Endpoint:** `POST /admin/create-moderator`  
 **Auth Required:** Yes (Admin or Sub-Admin)
 
 **Request Body:** Same as Create Admin
@@ -805,7 +805,7 @@ Creates a new Moderator user.
 
 Creates a new Assistant user linked to a Lecturer.
 
-**Endpoint:** `POST /create/assistant`  
+**Endpoint:** `POST /admin/create-assistant`  
 **Auth Required:** Yes (Admin, Sub-Admin, or the Lecturer)
 
 **Request Body:**
@@ -818,7 +818,7 @@ Creates a new Assistant user linked to a Lecturer.
   "phone": "string (required)",
   "secondary_phone": "string (optional)",
   "gender": "male | female",
-  "lecturer_user_id": "number (required)"
+  " ": "number (required)"
 }
 ```
 
@@ -835,22 +835,23 @@ When a user is created, they are assigned role(s) in the `user_roles` table. A s
 
 ### Role-to-Portal Mapping
 
-| Role       | Portals Assigned          | Records Created |
-| ---------- | ------------------------- | --------------- |
-| Teacher    | `store` + `academy`       | **2 rows**      |
-| Student    | `academy`                 | 1 row           |
-| Parent     | `academy`                 | 1 row           |
-| Lecturer   | `academy`                 | 1 row           |
-| Moderator  | `academy`                 | 1 row           |
-| Assistant  | `academy`                 | 1 row           |
-| Admin      | `store` + `academy`       | **2 rows**      |
-| SubAdmin   | `store` + `academy`       | **2 rows**      |
+| Role      | Portals Assigned    | Records Created |
+| --------- | ------------------- | --------------- |
+| Teacher   | `store` + `academy` | **2 rows**      |
+| Student   | `academy`           | 1 row           |
+| Parent    | `academy`           | 1 row           |
+| Lecturer  | `academy`           | 1 row           |
+| Moderator | `academy`           | 1 row           |
+| Assistant | `academy`           | 1 row           |
+| Admin     | `store` + `academy` | **2 rows**      |
+| SubAdmin  | `store` + `academy` | **2 rows**      |
 
 ### How the Frontend Determines User Role
 
 Role information is delivered through **two channels** on login:
 
 1. **`portalAccess`** in the response body — indicates which portals the user can access:
+
    ```json
    {
      "portalAccess": {
