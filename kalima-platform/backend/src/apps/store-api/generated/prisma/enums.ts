@@ -47,3 +47,11 @@ export const role_enum = {
 } as const
 
 export type role_enum = (typeof role_enum)[keyof typeof role_enum]
+
+
+export const location_type_enum = {
+  School: 'School',
+  Center: 'Center'
+} as const
+
+export type location_type_enum = (typeof location_type_enum)[keyof typeof location_type_enum]

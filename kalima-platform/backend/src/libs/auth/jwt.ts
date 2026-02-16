@@ -2,19 +2,21 @@ import jwt, { type SignOptions } from "jsonwebtoken";
 import crypto from "crypto";
 import { prisma } from "../db/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN: SignOptions["expiresIn"] =
-  (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) ?? "1h";
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set");
+  }
+  return secret;
+}
+
+function getJwtExpiresIn(): SignOptions["expiresIn"] {
+  return (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) ?? "1h";
+}
+
 const REFRESH_TOKEN_EXPIRES_DAYS = Number(
   process.env.REFRESH_TOKEN_EXPIRES_DAYS ?? 30,
 );
-
-function getJwtSecret(): string {
-  if (!JWT_SECRET) {
-    throw new Error("JWT_SECRET is not set");
-  }
-  return JWT_SECRET;
-}
 
 export interface AccessTokenPayload {
   userId: number;
@@ -22,7 +24,7 @@ export interface AccessTokenPayload {
 }
 
 export function signAccessToken(payload: AccessTokenPayload): string {
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: getJwtExpiresIn() });
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {

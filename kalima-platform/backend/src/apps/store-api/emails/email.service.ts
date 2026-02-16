@@ -56,12 +56,30 @@ export class EmailService {
         user: emailConfig.auth.user,
         pass: emailConfig.auth.pass,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
     this.fromAddress = emailConfig.from;
   }
 
   private getDefaultConfig(): EmailConfig {
+    // Prefer Resend SMTP relay when RESEND_API_KEY is available
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      return {
+        host: 'smtp.resend.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'resend',
+          pass: resendKey,
+        },
+        from: process.env.EMAIL_FROM || 'Kalima Platform <noreply@kalima.com>',
+      };
+    }
+
     return {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587', 10),
@@ -70,7 +88,7 @@ export class EmailService {
         user: process.env.SMTP_USER || '',
         pass: process.env.SMTP_PASS || '',
       },
-      from: process.env.SMTP_FROM || 'Kalima Platform <noreply@kalima.com>',
+      from: process.env.SMTP_FROM || process.env.EMAIL_FROM || 'Kalima Platform <noreply@kalima.com>',
     };
   }
 

@@ -1,4 +1,8 @@
-import { auth_provider_enum, portal_enum, role_enum } from '../../generated/prisma';
+import {
+  auth_provider_enum,
+  portal_enum,
+  role_enum,
+} from "../../generated/prisma";
 
 // ============================================
 // AUTH TOKENS
@@ -29,9 +33,14 @@ export interface UserRole {
   role: role_enum;
 }
 
+export interface PortalAccessEntry {
+  hasAccess: boolean;
+  roles: role_enum[];
+}
+
 export interface PortalAccess {
-  store: boolean;
-  academy: boolean;
+  store: PortalAccessEntry;
+  academy: PortalAccessEntry;
 }
 
 // ============================================
@@ -72,6 +81,7 @@ export interface LinkedProvider {
 
 export interface BaseUserData {
   id: number;
+  mongo_id?: string | null;
   name: string;
   email: string;
   phone: string;

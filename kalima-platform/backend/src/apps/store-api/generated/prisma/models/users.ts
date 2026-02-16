@@ -43,8 +43,16 @@ export type UsersMinAggregateOutputType = {
   phone: string | null
   gender: $Enums.gender_enum | null
   is_email_verified: boolean | null
+  email_verified_at: Date | null
   created_at: Date | null
   updated_at: Date | null
+  secondary_phone: string | null
+  role: $Enums.role_enum | null
+  profile_pic_url: string | null
+  password_changed_at: Date | null
+  confirmed: boolean | null
+  hasPromoCode: boolean | null
+  hasUsedPromoCode: boolean | null
 }
 
 export type UsersMaxAggregateOutputType = {
@@ -56,8 +64,16 @@ export type UsersMaxAggregateOutputType = {
   phone: string | null
   gender: $Enums.gender_enum | null
   is_email_verified: boolean | null
+  email_verified_at: Date | null
   created_at: Date | null
   updated_at: Date | null
+  secondary_phone: string | null
+  role: $Enums.role_enum | null
+  profile_pic_url: string | null
+  password_changed_at: Date | null
+  confirmed: boolean | null
+  hasPromoCode: boolean | null
+  hasUsedPromoCode: boolean | null
 }
 
 export type UsersCountAggregateOutputType = {
@@ -69,8 +85,16 @@ export type UsersCountAggregateOutputType = {
   phone: number
   gender: number
   is_email_verified: number
+  email_verified_at: number
   created_at: number
   updated_at: number
+  secondary_phone: number
+  role: number
+  profile_pic_url: number
+  password_changed_at: number
+  confirmed: number
+  hasPromoCode: number
+  hasUsedPromoCode: number
   _all: number
 }
 
@@ -92,8 +116,16 @@ export type UsersMinAggregateInputType = {
   phone?: true
   gender?: true
   is_email_verified?: true
+  email_verified_at?: true
   created_at?: true
   updated_at?: true
+  secondary_phone?: true
+  role?: true
+  profile_pic_url?: true
+  password_changed_at?: true
+  confirmed?: true
+  hasPromoCode?: true
+  hasUsedPromoCode?: true
 }
 
 export type UsersMaxAggregateInputType = {
@@ -105,8 +137,16 @@ export type UsersMaxAggregateInputType = {
   phone?: true
   gender?: true
   is_email_verified?: true
+  email_verified_at?: true
   created_at?: true
   updated_at?: true
+  secondary_phone?: true
+  role?: true
+  profile_pic_url?: true
+  password_changed_at?: true
+  confirmed?: true
+  hasPromoCode?: true
+  hasUsedPromoCode?: true
 }
 
 export type UsersCountAggregateInputType = {
@@ -118,8 +158,16 @@ export type UsersCountAggregateInputType = {
   phone?: true
   gender?: true
   is_email_verified?: true
+  email_verified_at?: true
   created_at?: true
   updated_at?: true
+  secondary_phone?: true
+  role?: true
+  profile_pic_url?: true
+  password_changed_at?: true
+  confirmed?: true
+  hasPromoCode?: true
+  hasUsedPromoCode?: true
   _all?: true
 }
 
@@ -218,8 +266,16 @@ export type UsersGroupByOutputType = {
   phone: string | null
   gender: $Enums.gender_enum | null
   is_email_verified: boolean | null
+  email_verified_at: Date | null
   created_at: Date | null
   updated_at: Date | null
+  secondary_phone: string | null
+  role: $Enums.role_enum | null
+  profile_pic_url: string | null
+  password_changed_at: Date | null
+  confirmed: boolean | null
+  hasPromoCode: boolean | null
+  hasUsedPromoCode: boolean | null
   _count: UsersCountAggregateOutputType | null
   _avg: UsersAvgAggregateOutputType | null
   _sum: UsersSumAggregateOutputType | null
@@ -254,10 +310,27 @@ export type usersWhereInput = {
   phone?: Prisma.StringNullableFilter<"users"> | string | null
   gender?: Prisma.Enumgender_enumNullableFilter<"users"> | $Enums.gender_enum | null
   is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  email_verified_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
+  role?: Prisma.Enumrole_enumNullableFilter<"users"> | $Enums.role_enum | null
+  profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
+  password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  confirmed?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasUsedPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  assistants?: Prisma.AssistantsListRelationFilter
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
+  email_verification_tokens?: Prisma.XOR<Prisma.Email_verification_tokensNullableScalarRelationFilter, Prisma.email_verification_tokensWhereInput> | null
+  lecturers?: Prisma.XOR<Prisma.LecturersNullableScalarRelationFilter, Prisma.lecturersWhereInput> | null
+  parents?: Prisma.XOR<Prisma.ParentsNullableScalarRelationFilter, Prisma.parentsWhereInput> | null
+  password_reset_tokens?: Prisma.XOR<Prisma.Password_reset_tokensNullableScalarRelationFilter, Prisma.password_reset_tokensWhereInput> | null
   refresh_tokens?: Prisma.Refresh_tokensListRelationFilter
+  social_media?: Prisma.Social_mediaListRelationFilter
+  students?: Prisma.XOR<Prisma.StudentsNullableScalarRelationFilter, Prisma.studentsWhereInput> | null
+  teachers?: Prisma.XOR<Prisma.TeachersNullableScalarRelationFilter, Prisma.teachersWhereInput> | null
+  teaches_at?: Prisma.Teaches_atListRelationFilter
   user_analytics?: Prisma.XOR<Prisma.User_analyticsNullableScalarRelationFilter, Prisma.user_analyticsWhereInput> | null
   user_roles?: Prisma.User_rolesListRelationFilter
 }
@@ -271,10 +344,27 @@ export type usersOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   is_email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
+  email_verified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  secondary_phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrderInput | Prisma.SortOrder
+  profile_pic_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  password_changed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmed?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasUsedPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  assistants?: Prisma.assistantsOrderByRelationAggregateInput
   auth_identities?: Prisma.auth_identitiesOrderByRelationAggregateInput
+  email_verification_tokens?: Prisma.email_verification_tokensOrderByWithRelationInput
+  lecturers?: Prisma.lecturersOrderByWithRelationInput
+  parents?: Prisma.parentsOrderByWithRelationInput
+  password_reset_tokens?: Prisma.password_reset_tokensOrderByWithRelationInput
   refresh_tokens?: Prisma.refresh_tokensOrderByRelationAggregateInput
+  social_media?: Prisma.social_mediaOrderByRelationAggregateInput
+  students?: Prisma.studentsOrderByWithRelationInput
+  teachers?: Prisma.teachersOrderByWithRelationInput
+  teaches_at?: Prisma.teaches_atOrderByRelationAggregateInput
   user_analytics?: Prisma.user_analyticsOrderByWithRelationInput
   user_roles?: Prisma.user_rolesOrderByRelationAggregateInput
 }
@@ -291,10 +381,27 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringNullableFilter<"users"> | string | null
   gender?: Prisma.Enumgender_enumNullableFilter<"users"> | $Enums.gender_enum | null
   is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  email_verified_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
+  role?: Prisma.Enumrole_enumNullableFilter<"users"> | $Enums.role_enum | null
+  profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
+  password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  confirmed?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasUsedPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  assistants?: Prisma.AssistantsListRelationFilter
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
+  email_verification_tokens?: Prisma.XOR<Prisma.Email_verification_tokensNullableScalarRelationFilter, Prisma.email_verification_tokensWhereInput> | null
+  lecturers?: Prisma.XOR<Prisma.LecturersNullableScalarRelationFilter, Prisma.lecturersWhereInput> | null
+  parents?: Prisma.XOR<Prisma.ParentsNullableScalarRelationFilter, Prisma.parentsWhereInput> | null
+  password_reset_tokens?: Prisma.XOR<Prisma.Password_reset_tokensNullableScalarRelationFilter, Prisma.password_reset_tokensWhereInput> | null
   refresh_tokens?: Prisma.Refresh_tokensListRelationFilter
+  social_media?: Prisma.Social_mediaListRelationFilter
+  students?: Prisma.XOR<Prisma.StudentsNullableScalarRelationFilter, Prisma.studentsWhereInput> | null
+  teachers?: Prisma.XOR<Prisma.TeachersNullableScalarRelationFilter, Prisma.teachersWhereInput> | null
+  teaches_at?: Prisma.Teaches_atListRelationFilter
   user_analytics?: Prisma.XOR<Prisma.User_analyticsNullableScalarRelationFilter, Prisma.user_analyticsWhereInput> | null
   user_roles?: Prisma.User_rolesListRelationFilter
 }, "id" | "mongo_id" | "email">
@@ -308,8 +415,16 @@ export type usersOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   is_email_verified?: Prisma.SortOrderInput | Prisma.SortOrder
+  email_verified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrderInput | Prisma.SortOrder
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  secondary_phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrderInput | Prisma.SortOrder
+  profile_pic_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  password_changed_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmed?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  hasUsedPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.usersCountOrderByAggregateInput
   _avg?: Prisma.usersAvgOrderByAggregateInput
   _max?: Prisma.usersMaxOrderByAggregateInput
@@ -329,8 +444,16 @@ export type usersScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
   gender?: Prisma.Enumgender_enumNullableWithAggregatesFilter<"users"> | $Enums.gender_enum | null
   is_email_verified?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
+  email_verified_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
   created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
   updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
+  secondary_phone?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
+  role?: Prisma.Enumrole_enumNullableWithAggregatesFilter<"users"> | $Enums.role_enum | null
+  profile_pic_url?: Prisma.StringNullableWithAggregatesFilter<"users"> | string | null
+  password_changed_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
+  confirmed?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
+  hasPromoCode?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
+  hasUsedPromoCode?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
 }
 
 export type usersCreateInput = {
@@ -341,10 +464,27 @@ export type usersCreateInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
@@ -358,10 +498,27 @@ export type usersUncheckedCreateInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
@@ -374,10 +531,27 @@ export type usersUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
@@ -391,10 +565,27 @@ export type usersUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
@@ -408,8 +599,16 @@ export type usersCreateManyInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
 }
 
 export type usersUpdateManyMutationInput = {
@@ -420,8 +619,16 @@ export type usersUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type usersUncheckedUpdateManyInput = {
@@ -433,8 +640,16 @@ export type usersUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type UsersScalarRelationFilter = {
@@ -451,8 +666,16 @@ export type usersCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   is_email_verified?: Prisma.SortOrder
+  email_verified_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  secondary_phone?: Prisma.SortOrder
+  role?: Prisma.SortOrder
+  profile_pic_url?: Prisma.SortOrder
+  password_changed_at?: Prisma.SortOrder
+  confirmed?: Prisma.SortOrder
+  hasPromoCode?: Prisma.SortOrder
+  hasUsedPromoCode?: Prisma.SortOrder
 }
 
 export type usersAvgOrderByAggregateInput = {
@@ -468,8 +691,16 @@ export type usersMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   is_email_verified?: Prisma.SortOrder
+  email_verified_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  secondary_phone?: Prisma.SortOrder
+  role?: Prisma.SortOrder
+  profile_pic_url?: Prisma.SortOrder
+  password_changed_at?: Prisma.SortOrder
+  confirmed?: Prisma.SortOrder
+  hasPromoCode?: Prisma.SortOrder
+  hasUsedPromoCode?: Prisma.SortOrder
 }
 
 export type usersMinOrderByAggregateInput = {
@@ -481,8 +712,16 @@ export type usersMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   is_email_verified?: Prisma.SortOrder
+  email_verified_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  secondary_phone?: Prisma.SortOrder
+  role?: Prisma.SortOrder
+  profile_pic_url?: Prisma.SortOrder
+  password_changed_at?: Prisma.SortOrder
+  confirmed?: Prisma.SortOrder
+  hasPromoCode?: Prisma.SortOrder
+  hasUsedPromoCode?: Prisma.SortOrder
 }
 
 export type usersSumOrderByAggregateInput = {
@@ -539,6 +778,10 @@ export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }
 
+export type NullableEnumrole_enumFieldUpdateOperationsInput = {
+  set?: $Enums.role_enum | null
+}
+
 export type usersCreateNestedOneWithoutRefresh_tokensInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutRefresh_tokensInput, Prisma.usersUncheckedCreateWithoutRefresh_tokensInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutRefresh_tokensInput
@@ -553,6 +796,132 @@ export type usersUpdateOneRequiredWithoutRefresh_tokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutRefresh_tokensInput, Prisma.usersUpdateWithoutRefresh_tokensInput>, Prisma.usersUncheckedUpdateWithoutRefresh_tokensInput>
 }
 
+export type usersCreateNestedOneWithoutAssistantsInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutAssistantsInput, Prisma.usersUncheckedCreateWithoutAssistantsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutAssistantsInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutAssistantsNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutAssistantsInput, Prisma.usersUncheckedCreateWithoutAssistantsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutAssistantsInput
+  upsert?: Prisma.usersUpsertWithoutAssistantsInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutAssistantsInput, Prisma.usersUpdateWithoutAssistantsInput>, Prisma.usersUncheckedUpdateWithoutAssistantsInput>
+}
+
+export type usersCreateNestedOneWithoutLecturersInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutLecturersInput, Prisma.usersUncheckedCreateWithoutLecturersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutLecturersInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutLecturersNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutLecturersInput, Prisma.usersUncheckedCreateWithoutLecturersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutLecturersInput
+  upsert?: Prisma.usersUpsertWithoutLecturersInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutLecturersInput, Prisma.usersUpdateWithoutLecturersInput>, Prisma.usersUncheckedUpdateWithoutLecturersInput>
+}
+
+export type usersCreateNestedOneWithoutParentsInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutParentsInput, Prisma.usersUncheckedCreateWithoutParentsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutParentsInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutParentsNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutParentsInput, Prisma.usersUncheckedCreateWithoutParentsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutParentsInput
+  upsert?: Prisma.usersUpsertWithoutParentsInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutParentsInput, Prisma.usersUpdateWithoutParentsInput>, Prisma.usersUncheckedUpdateWithoutParentsInput>
+}
+
+export type usersCreateNestedOneWithoutSocial_mediaInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutSocial_mediaInput, Prisma.usersUncheckedCreateWithoutSocial_mediaInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutSocial_mediaInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutSocial_mediaNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutSocial_mediaInput, Prisma.usersUncheckedCreateWithoutSocial_mediaInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutSocial_mediaInput
+  upsert?: Prisma.usersUpsertWithoutSocial_mediaInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutSocial_mediaInput, Prisma.usersUpdateWithoutSocial_mediaInput>, Prisma.usersUncheckedUpdateWithoutSocial_mediaInput>
+}
+
+export type usersCreateNestedOneWithoutStudentsInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutStudentsInput, Prisma.usersUncheckedCreateWithoutStudentsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutStudentsInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutStudentsNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutStudentsInput, Prisma.usersUncheckedCreateWithoutStudentsInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutStudentsInput
+  upsert?: Prisma.usersUpsertWithoutStudentsInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutStudentsInput, Prisma.usersUpdateWithoutStudentsInput>, Prisma.usersUncheckedUpdateWithoutStudentsInput>
+}
+
+export type usersCreateNestedOneWithoutTeachersInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutTeachersInput, Prisma.usersUncheckedCreateWithoutTeachersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutTeachersInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutTeachersNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutTeachersInput, Prisma.usersUncheckedCreateWithoutTeachersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutTeachersInput
+  upsert?: Prisma.usersUpsertWithoutTeachersInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutTeachersInput, Prisma.usersUpdateWithoutTeachersInput>, Prisma.usersUncheckedUpdateWithoutTeachersInput>
+}
+
+export type usersCreateNestedOneWithoutTeaches_atInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutTeaches_atInput, Prisma.usersUncheckedCreateWithoutTeaches_atInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutTeaches_atInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutTeaches_atNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutTeaches_atInput, Prisma.usersUncheckedCreateWithoutTeaches_atInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutTeaches_atInput
+  upsert?: Prisma.usersUpsertWithoutTeaches_atInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutTeaches_atInput, Prisma.usersUpdateWithoutTeaches_atInput>, Prisma.usersUncheckedUpdateWithoutTeaches_atInput>
+}
+
+export type usersCreateNestedOneWithoutEmail_verification_tokensInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedCreateWithoutEmail_verification_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEmail_verification_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutEmail_verification_tokensNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedCreateWithoutEmail_verification_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEmail_verification_tokensInput
+  upsert?: Prisma.usersUpsertWithoutEmail_verification_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutEmail_verification_tokensInput, Prisma.usersUpdateWithoutEmail_verification_tokensInput>, Prisma.usersUncheckedUpdateWithoutEmail_verification_tokensInput>
+}
+
+export type usersCreateNestedOneWithoutPassword_reset_tokensInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedCreateWithoutPassword_reset_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutPassword_reset_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutPassword_reset_tokensNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedCreateWithoutPassword_reset_tokensInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutPassword_reset_tokensInput
+  upsert?: Prisma.usersUpsertWithoutPassword_reset_tokensInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutPassword_reset_tokensInput, Prisma.usersUpdateWithoutPassword_reset_tokensInput>, Prisma.usersUncheckedUpdateWithoutPassword_reset_tokensInput>
+}
+
 export type usersCreateWithoutAuth_identitiesInput = {
   mongo_id?: string | null
   name: string
@@ -561,9 +930,26 @@ export type usersCreateWithoutAuth_identitiesInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
@@ -577,9 +963,26 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
@@ -608,9 +1011,26 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
@@ -624,9 +1044,26 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
@@ -639,10 +1076,27 @@ export type usersCreateWithoutUser_analyticsInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
 
@@ -655,10 +1109,27 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
 
@@ -686,10 +1157,27 @@ export type usersUpdateWithoutUser_analyticsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
 
@@ -702,10 +1190,27 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
@@ -717,10 +1222,27 @@ export type usersCreateWithoutUser_rolesInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
 }
 
@@ -733,10 +1255,27 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
 }
 
@@ -764,10 +1303,27 @@ export type usersUpdateWithoutUser_rolesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
 }
 
@@ -780,10 +1336,27 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
 }
 
@@ -795,9 +1368,26 @@ export type usersCreateWithoutRefresh_tokensInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
 }
@@ -811,9 +1401,26 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   phone?: string | null
   gender?: $Enums.gender_enum | null
   is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
   created_at?: Date | string | null
   updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
 }
@@ -842,9 +1449,26 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
 }
@@ -858,9 +1482,1340 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
   is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutAssistantsInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutAssistantsInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutAssistantsInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutAssistantsInput, Prisma.usersUncheckedCreateWithoutAssistantsInput>
+}
+
+export type usersUpsertWithoutAssistantsInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutAssistantsInput, Prisma.usersUncheckedUpdateWithoutAssistantsInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutAssistantsInput, Prisma.usersUncheckedCreateWithoutAssistantsInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutAssistantsInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutAssistantsInput, Prisma.usersUncheckedUpdateWithoutAssistantsInput>
+}
+
+export type usersUpdateWithoutAssistantsInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutAssistantsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutLecturersInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutLecturersInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutLecturersInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutLecturersInput, Prisma.usersUncheckedCreateWithoutLecturersInput>
+}
+
+export type usersUpsertWithoutLecturersInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutLecturersInput, Prisma.usersUncheckedUpdateWithoutLecturersInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutLecturersInput, Prisma.usersUncheckedCreateWithoutLecturersInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutLecturersInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutLecturersInput, Prisma.usersUncheckedUpdateWithoutLecturersInput>
+}
+
+export type usersUpdateWithoutLecturersInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutLecturersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutParentsInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutParentsInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutParentsInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutParentsInput, Prisma.usersUncheckedCreateWithoutParentsInput>
+}
+
+export type usersUpsertWithoutParentsInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutParentsInput, Prisma.usersUncheckedUpdateWithoutParentsInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutParentsInput, Prisma.usersUncheckedCreateWithoutParentsInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutParentsInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutParentsInput, Prisma.usersUncheckedUpdateWithoutParentsInput>
+}
+
+export type usersUpdateWithoutParentsInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutParentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutSocial_mediaInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutSocial_mediaInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutSocial_mediaInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutSocial_mediaInput, Prisma.usersUncheckedCreateWithoutSocial_mediaInput>
+}
+
+export type usersUpsertWithoutSocial_mediaInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutSocial_mediaInput, Prisma.usersUncheckedUpdateWithoutSocial_mediaInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutSocial_mediaInput, Prisma.usersUncheckedCreateWithoutSocial_mediaInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutSocial_mediaInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutSocial_mediaInput, Prisma.usersUncheckedUpdateWithoutSocial_mediaInput>
+}
+
+export type usersUpdateWithoutSocial_mediaInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutSocial_mediaInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutStudentsInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutStudentsInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutStudentsInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutStudentsInput, Prisma.usersUncheckedCreateWithoutStudentsInput>
+}
+
+export type usersUpsertWithoutStudentsInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutStudentsInput, Prisma.usersUncheckedUpdateWithoutStudentsInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutStudentsInput, Prisma.usersUncheckedCreateWithoutStudentsInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutStudentsInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutStudentsInput, Prisma.usersUncheckedUpdateWithoutStudentsInput>
+}
+
+export type usersUpdateWithoutStudentsInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutStudentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutTeachersInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutTeachersInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutTeachersInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutTeachersInput, Prisma.usersUncheckedCreateWithoutTeachersInput>
+}
+
+export type usersUpsertWithoutTeachersInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutTeachersInput, Prisma.usersUncheckedUpdateWithoutTeachersInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutTeachersInput, Prisma.usersUncheckedCreateWithoutTeachersInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutTeachersInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutTeachersInput, Prisma.usersUncheckedUpdateWithoutTeachersInput>
+}
+
+export type usersUpdateWithoutTeachersInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutTeachersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutTeaches_atInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutTeaches_atInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutTeaches_atInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutTeaches_atInput, Prisma.usersUncheckedCreateWithoutTeaches_atInput>
+}
+
+export type usersUpsertWithoutTeaches_atInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutTeaches_atInput, Prisma.usersUncheckedUpdateWithoutTeaches_atInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutTeaches_atInput, Prisma.usersUncheckedCreateWithoutTeaches_atInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutTeaches_atInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutTeaches_atInput, Prisma.usersUncheckedUpdateWithoutTeaches_atInput>
+}
+
+export type usersUpdateWithoutTeaches_atInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutTeaches_atInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutEmail_verification_tokensInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutEmail_verification_tokensInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedCreateWithoutEmail_verification_tokensInput>
+}
+
+export type usersUpsertWithoutEmail_verification_tokensInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedUpdateWithoutEmail_verification_tokensInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedCreateWithoutEmail_verification_tokensInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutEmail_verification_tokensInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutEmail_verification_tokensInput, Prisma.usersUncheckedUpdateWithoutEmail_verification_tokensInput>
+}
+
+export type usersUpdateWithoutEmail_verification_tokensInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutPassword_reset_tokensInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  email_verified_at?: Date | string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  role?: $Enums.role_enum | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutPassword_reset_tokensInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedCreateWithoutPassword_reset_tokensInput>
+}
+
+export type usersUpsertWithoutPassword_reset_tokensInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedUpdateWithoutPassword_reset_tokensInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedCreateWithoutPassword_reset_tokensInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutPassword_reset_tokensInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutPassword_reset_tokensInput, Prisma.usersUncheckedUpdateWithoutPassword_reset_tokensInput>
+}
+
+export type usersUpdateWithoutPassword_reset_tokensInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
 }
@@ -871,14 +2826,20 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
  */
 
 export type UsersCountOutputType = {
+  assistants: number
   auth_identities: number
   refresh_tokens: number
+  social_media: number
+  teaches_at: number
   user_roles: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  assistants?: boolean | UsersCountOutputTypeCountAssistantsArgs
   auth_identities?: boolean | UsersCountOutputTypeCountAuth_identitiesArgs
   refresh_tokens?: boolean | UsersCountOutputTypeCountRefresh_tokensArgs
+  social_media?: boolean | UsersCountOutputTypeCountSocial_mediaArgs
+  teaches_at?: boolean | UsersCountOutputTypeCountTeaches_atArgs
   user_roles?: boolean | UsersCountOutputTypeCountUser_rolesArgs
 }
 
@@ -890,6 +2851,13 @@ export type UsersCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the UsersCountOutputType
    */
   select?: Prisma.UsersCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountAssistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.assistantsWhereInput
 }
 
 /**
@@ -909,6 +2877,20 @@ export type UsersCountOutputTypeCountRefresh_tokensArgs<ExtArgs extends runtime.
 /**
  * UsersCountOutputType without action
  */
+export type UsersCountOutputTypeCountSocial_mediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.social_mediaWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountTeaches_atArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.teaches_atWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
 export type UsersCountOutputTypeCountUser_rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.user_rolesWhereInput
 }
@@ -923,10 +2905,27 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   phone?: boolean
   gender?: boolean
   is_email_verified?: boolean
+  email_verified_at?: boolean
   created_at?: boolean
   updated_at?: boolean
+  secondary_phone?: boolean
+  role?: boolean
+  profile_pic_url?: boolean
+  password_changed_at?: boolean
+  confirmed?: boolean
+  hasPromoCode?: boolean
+  hasUsedPromoCode?: boolean
+  assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
+  email_verification_tokens?: boolean | Prisma.users$email_verification_tokensArgs<ExtArgs>
+  lecturers?: boolean | Prisma.users$lecturersArgs<ExtArgs>
+  parents?: boolean | Prisma.users$parentsArgs<ExtArgs>
+  password_reset_tokens?: boolean | Prisma.users$password_reset_tokensArgs<ExtArgs>
   refresh_tokens?: boolean | Prisma.users$refresh_tokensArgs<ExtArgs>
+  social_media?: boolean | Prisma.users$social_mediaArgs<ExtArgs>
+  students?: boolean | Prisma.users$studentsArgs<ExtArgs>
+  teachers?: boolean | Prisma.users$teachersArgs<ExtArgs>
+  teaches_at?: boolean | Prisma.users$teaches_atArgs<ExtArgs>
   user_analytics?: boolean | Prisma.users$user_analyticsArgs<ExtArgs>
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
@@ -941,8 +2940,16 @@ export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   phone?: boolean
   gender?: boolean
   is_email_verified?: boolean
+  email_verified_at?: boolean
   created_at?: boolean
   updated_at?: boolean
+  secondary_phone?: boolean
+  role?: boolean
+  profile_pic_url?: boolean
+  password_changed_at?: boolean
+  confirmed?: boolean
+  hasPromoCode?: boolean
+  hasUsedPromoCode?: boolean
 }, ExtArgs["result"]["users"]>
 
 export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -954,8 +2961,16 @@ export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   phone?: boolean
   gender?: boolean
   is_email_verified?: boolean
+  email_verified_at?: boolean
   created_at?: boolean
   updated_at?: boolean
+  secondary_phone?: boolean
+  role?: boolean
+  profile_pic_url?: boolean
+  password_changed_at?: boolean
+  confirmed?: boolean
+  hasPromoCode?: boolean
+  hasUsedPromoCode?: boolean
 }, ExtArgs["result"]["users"]>
 
 export type usersSelectScalar = {
@@ -967,14 +2982,31 @@ export type usersSelectScalar = {
   phone?: boolean
   gender?: boolean
   is_email_verified?: boolean
+  email_verified_at?: boolean
   created_at?: boolean
   updated_at?: boolean
+  secondary_phone?: boolean
+  role?: boolean
+  profile_pic_url?: boolean
+  password_changed_at?: boolean
+  confirmed?: boolean
+  hasPromoCode?: boolean
+  hasUsedPromoCode?: boolean
 }
 
-export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
+export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "email_verified_at" | "created_at" | "updated_at" | "secondary_phone" | "role" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
+  email_verification_tokens?: boolean | Prisma.users$email_verification_tokensArgs<ExtArgs>
+  lecturers?: boolean | Prisma.users$lecturersArgs<ExtArgs>
+  parents?: boolean | Prisma.users$parentsArgs<ExtArgs>
+  password_reset_tokens?: boolean | Prisma.users$password_reset_tokensArgs<ExtArgs>
   refresh_tokens?: boolean | Prisma.users$refresh_tokensArgs<ExtArgs>
+  social_media?: boolean | Prisma.users$social_mediaArgs<ExtArgs>
+  students?: boolean | Prisma.users$studentsArgs<ExtArgs>
+  teachers?: boolean | Prisma.users$teachersArgs<ExtArgs>
+  teaches_at?: boolean | Prisma.users$teaches_atArgs<ExtArgs>
   user_analytics?: boolean | Prisma.users$user_analyticsArgs<ExtArgs>
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
@@ -985,8 +3017,17 @@ export type usersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "users"
   objects: {
+    assistants: Prisma.$assistantsPayload<ExtArgs>[]
     auth_identities: Prisma.$auth_identitiesPayload<ExtArgs>[]
+    email_verification_tokens: Prisma.$email_verification_tokensPayload<ExtArgs> | null
+    lecturers: Prisma.$lecturersPayload<ExtArgs> | null
+    parents: Prisma.$parentsPayload<ExtArgs> | null
+    password_reset_tokens: Prisma.$password_reset_tokensPayload<ExtArgs> | null
     refresh_tokens: Prisma.$refresh_tokensPayload<ExtArgs>[]
+    social_media: Prisma.$social_mediaPayload<ExtArgs>[]
+    students: Prisma.$studentsPayload<ExtArgs> | null
+    teachers: Prisma.$teachersPayload<ExtArgs> | null
+    teaches_at: Prisma.$teaches_atPayload<ExtArgs>[]
     user_analytics: Prisma.$user_analyticsPayload<ExtArgs> | null
     user_roles: Prisma.$user_rolesPayload<ExtArgs>[]
   }
@@ -999,8 +3040,16 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     phone: string | null
     gender: $Enums.gender_enum | null
     is_email_verified: boolean | null
+    email_verified_at: Date | null
     created_at: Date | null
     updated_at: Date | null
+    secondary_phone: string | null
+    role: $Enums.role_enum | null
+    profile_pic_url: string | null
+    password_changed_at: Date | null
+    confirmed: boolean | null
+    hasPromoCode: boolean | null
+    hasUsedPromoCode: boolean | null
   }, ExtArgs["result"]["users"]>
   composites: {}
 }
@@ -1395,8 +3444,17 @@ readonly fields: usersFieldRefs;
  */
 export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  assistants<T extends Prisma.users$assistantsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$assistantsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$assistantsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auth_identities<T extends Prisma.users$auth_identitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$auth_identitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$auth_identitiesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  email_verification_tokens<T extends Prisma.users$email_verification_tokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$email_verification_tokensArgs<ExtArgs>>): Prisma.Prisma__email_verification_tokensClient<runtime.Types.Result.GetResult<Prisma.$email_verification_tokensPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  lecturers<T extends Prisma.users$lecturersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$lecturersArgs<ExtArgs>>): Prisma.Prisma__lecturersClient<runtime.Types.Result.GetResult<Prisma.$lecturersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  parents<T extends Prisma.users$parentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$parentsArgs<ExtArgs>>): Prisma.Prisma__parentsClient<runtime.Types.Result.GetResult<Prisma.$parentsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  password_reset_tokens<T extends Prisma.users$password_reset_tokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$password_reset_tokensArgs<ExtArgs>>): Prisma.Prisma__password_reset_tokensClient<runtime.Types.Result.GetResult<Prisma.$password_reset_tokensPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refresh_tokens<T extends Prisma.users$refresh_tokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$refresh_tokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$refresh_tokensPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  social_media<T extends Prisma.users$social_mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$social_mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$social_mediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  students<T extends Prisma.users$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$studentsArgs<ExtArgs>>): Prisma.Prisma__studentsClient<runtime.Types.Result.GetResult<Prisma.$studentsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  teachers<T extends Prisma.users$teachersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$teachersArgs<ExtArgs>>): Prisma.Prisma__teachersClient<runtime.Types.Result.GetResult<Prisma.$teachersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  teaches_at<T extends Prisma.users$teaches_atArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$teaches_atArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$teaches_atPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user_analytics<T extends Prisma.users$user_analyticsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$user_analyticsArgs<ExtArgs>>): Prisma.Prisma__user_analyticsClient<runtime.Types.Result.GetResult<Prisma.$user_analyticsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user_roles<T extends Prisma.users$user_rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$user_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$user_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1436,8 +3494,16 @@ export interface usersFieldRefs {
   readonly phone: Prisma.FieldRef<"users", 'String'>
   readonly gender: Prisma.FieldRef<"users", 'gender_enum'>
   readonly is_email_verified: Prisma.FieldRef<"users", 'Boolean'>
+  readonly email_verified_at: Prisma.FieldRef<"users", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"users", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"users", 'DateTime'>
+  readonly secondary_phone: Prisma.FieldRef<"users", 'String'>
+  readonly role: Prisma.FieldRef<"users", 'role_enum'>
+  readonly profile_pic_url: Prisma.FieldRef<"users", 'String'>
+  readonly password_changed_at: Prisma.FieldRef<"users", 'DateTime'>
+  readonly confirmed: Prisma.FieldRef<"users", 'Boolean'>
+  readonly hasPromoCode: Prisma.FieldRef<"users", 'Boolean'>
+  readonly hasUsedPromoCode: Prisma.FieldRef<"users", 'Boolean'>
 }
     
 
@@ -1826,6 +3892,30 @@ export type usersDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * users.assistants
+ */
+export type users$assistantsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the assistants
+   */
+  select?: Prisma.assistantsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the assistants
+   */
+  omit?: Prisma.assistantsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.assistantsInclude<ExtArgs> | null
+  where?: Prisma.assistantsWhereInput
+  orderBy?: Prisma.assistantsOrderByWithRelationInput | Prisma.assistantsOrderByWithRelationInput[]
+  cursor?: Prisma.assistantsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssistantsScalarFieldEnum | Prisma.AssistantsScalarFieldEnum[]
+}
+
+/**
  * users.auth_identities
  */
 export type users$auth_identitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1850,6 +3940,82 @@ export type users$auth_identitiesArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
+ * users.email_verification_tokens
+ */
+export type users$email_verification_tokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the email_verification_tokens
+   */
+  select?: Prisma.email_verification_tokensSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the email_verification_tokens
+   */
+  omit?: Prisma.email_verification_tokensOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.email_verification_tokensInclude<ExtArgs> | null
+  where?: Prisma.email_verification_tokensWhereInput
+}
+
+/**
+ * users.lecturers
+ */
+export type users$lecturersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the lecturers
+   */
+  select?: Prisma.lecturersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the lecturers
+   */
+  omit?: Prisma.lecturersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.lecturersInclude<ExtArgs> | null
+  where?: Prisma.lecturersWhereInput
+}
+
+/**
+ * users.parents
+ */
+export type users$parentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the parents
+   */
+  select?: Prisma.parentsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the parents
+   */
+  omit?: Prisma.parentsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.parentsInclude<ExtArgs> | null
+  where?: Prisma.parentsWhereInput
+}
+
+/**
+ * users.password_reset_tokens
+ */
+export type users$password_reset_tokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the password_reset_tokens
+   */
+  select?: Prisma.password_reset_tokensSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the password_reset_tokens
+   */
+  omit?: Prisma.password_reset_tokensOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.password_reset_tokensInclude<ExtArgs> | null
+  where?: Prisma.password_reset_tokensWhereInput
+}
+
+/**
  * users.refresh_tokens
  */
 export type users$refresh_tokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1871,6 +4037,92 @@ export type users$refresh_tokensArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.Refresh_tokensScalarFieldEnum | Prisma.Refresh_tokensScalarFieldEnum[]
+}
+
+/**
+ * users.social_media
+ */
+export type users$social_mediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the social_media
+   */
+  select?: Prisma.social_mediaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the social_media
+   */
+  omit?: Prisma.social_mediaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.social_mediaInclude<ExtArgs> | null
+  where?: Prisma.social_mediaWhereInput
+  orderBy?: Prisma.social_mediaOrderByWithRelationInput | Prisma.social_mediaOrderByWithRelationInput[]
+  cursor?: Prisma.social_mediaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Social_mediaScalarFieldEnum | Prisma.Social_mediaScalarFieldEnum[]
+}
+
+/**
+ * users.students
+ */
+export type users$studentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the students
+   */
+  select?: Prisma.studentsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the students
+   */
+  omit?: Prisma.studentsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.studentsInclude<ExtArgs> | null
+  where?: Prisma.studentsWhereInput
+}
+
+/**
+ * users.teachers
+ */
+export type users$teachersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teachers
+   */
+  select?: Prisma.teachersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teachers
+   */
+  omit?: Prisma.teachersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teachersInclude<ExtArgs> | null
+  where?: Prisma.teachersWhereInput
+}
+
+/**
+ * users.teaches_at
+ */
+export type users$teaches_atArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the teaches_at
+   */
+  select?: Prisma.teaches_atSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the teaches_at
+   */
+  omit?: Prisma.teaches_atOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.teaches_atInclude<ExtArgs> | null
+  where?: Prisma.teaches_atWhereInput
+  orderBy?: Prisma.teaches_atOrderByWithRelationInput | Prisma.teaches_atOrderByWithRelationInput[]
+  cursor?: Prisma.teaches_atWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Teaches_atScalarFieldEnum | Prisma.Teaches_atScalarFieldEnum[]
 }
 
 /**

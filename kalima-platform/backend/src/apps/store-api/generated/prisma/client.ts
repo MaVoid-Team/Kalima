@@ -62,3 +62,78 @@ export type users = Prisma.usersModel
  * 
  */
 export type refresh_tokens = Prisma.refresh_tokensModel
+/**
+ * Model assistants
+ * 
+ */
+export type assistants = Prisma.assistantsModel
+/**
+ * Model government
+ * 
+ */
+export type government = Prisma.governmentModel
+/**
+ * Model lecturers
+ * 
+ */
+export type lecturers = Prisma.lecturersModel
+/**
+ * Model levels
+ * 
+ */
+export type levels = Prisma.levelsModel
+/**
+ * Model parent_children
+ * 
+ */
+export type parent_children = Prisma.parent_childrenModel
+/**
+ * Model parents
+ * 
+ */
+export type parents = Prisma.parentsModel
+/**
+ * Model sites
+ * 
+ */
+export type sites = Prisma.sitesModel
+/**
+ * Model social_media
+ * 
+ */
+export type social_media = Prisma.social_mediaModel
+/**
+ * Model students
+ * 
+ */
+export type students = Prisma.studentsModel
+/**
+ * Model subjects
+ * 
+ */
+export type subjects = Prisma.subjectsModel
+/**
+ * Model teachers
+ * 
+ */
+export type teachers = Prisma.teachersModel
+/**
+ * Model teaches_at
+ * 
+ */
+export type teaches_at = Prisma.teaches_atModel
+/**
+ * Model zones
+ * 
+ */
+export type zones = Prisma.zonesModel
+/**
+ * Model email_verification_tokens
+ * 
+ */
+export type email_verification_tokens = Prisma.email_verification_tokensModel
+/**
+ * Model password_reset_tokens
+ * 
+ */
+export type password_reset_tokens = Prisma.password_reset_tokensModel
