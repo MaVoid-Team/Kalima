@@ -8,8 +8,8 @@ import {
   IsInt,
   IsBoolean,
   IsPositive,
-} from 'class-validator';
-import { gender_enum } from '../../generated/prisma';
+} from "class-validator";
+import { gender_enum } from "../generated/prisma";
 
 // ============================================
 // BASE DTOs
@@ -208,77 +208,6 @@ export class LecturerFirebaseRegistrationDto extends BaseFirebaseRegistrationDto
 }
 
 // ============================================
-// NON-MAIN USER CREATION DTOs (Admin creates these)
-// ============================================
-
-export class CreateAdminDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(8)
-  password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  phone: string;
-
-  @IsString()
-  @IsOptional()
-  secondary_phone?: string;
-
-  @IsEnum(gender_enum)
-  @IsNotEmpty()
-  gender: gender_enum;
-}
-
-export class CreateSubAdminDto extends CreateAdminDto {
-  // Same fields as admin
-}
-
-export class CreateModeratorDto extends CreateAdminDto {
-  // Same fields as admin
-}
-
-export class CreateAssistantDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(8)
-  password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  phone: string;
-
-  @IsString()
-  @IsOptional()
-  secondary_phone?: string;
-
-  @IsEnum(gender_enum)
-  @IsNotEmpty()
-  gender: gender_enum;
-
-  @IsInt()
-  @IsPositive()
-  @IsNotEmpty()
-  lecturer_user_id: number;
-}
-
-// ============================================
 // LOGIN DTOs
 // ============================================
 
@@ -366,7 +295,7 @@ export class LinkFirebaseAccountDto {
 export class UnlinkProviderDto {
   @IsString()
   @IsNotEmpty()
-  provider: 'firebase' | 'google' | 'facebook';
+  provider: "firebase" | "google" | "facebook";
 }
 
 // ============================================

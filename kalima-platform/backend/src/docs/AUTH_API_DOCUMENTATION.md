@@ -17,8 +17,9 @@
 5. [Email Verification](#email-verification)
 6. [Account Linking](#account-linking)
 7. [Admin User Creation](#admin-user-creation)
-8. [Common Response Types](#common-response-types)
-9. [Error Codes](#error-codes)
+8. [Portal & Role Assignment](#portal--role-assignment)
+9. [Common Response Types](#common-response-types)
+10. [Error Codes](#error-codes)
 
 ---
 
@@ -42,6 +43,7 @@ Creates a new teacher account with email/password authentication.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -60,6 +62,7 @@ Creates a new teacher account with email/password authentication.
 ```
 
 **Success Response (201):**
+
 ```json
 {
   "user": {
@@ -91,6 +94,7 @@ Creates a new student account.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -119,6 +123,7 @@ Creates a new parent account.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -142,6 +147,7 @@ Creates a new lecturer account.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -167,6 +173,7 @@ Creates a new teacher account using Firebase OAuth (Google/Facebook).
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)",
@@ -192,6 +199,7 @@ Creates a new teacher account using Firebase OAuth (Google/Facebook).
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)",
@@ -214,6 +222,7 @@ Creates a new teacher account using Firebase OAuth (Google/Facebook).
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)",
@@ -231,6 +240,7 @@ Creates a new teacher account using Firebase OAuth (Google/Facebook).
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)",
@@ -254,6 +264,7 @@ Authenticates user with email and password.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "email": "string (required)",
@@ -262,6 +273,7 @@ Authenticates user with email and password.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "user": {
@@ -298,6 +310,7 @@ Authenticates user with email and password.
 ```
 
 **Error Responses:**
+
 - `401 Unauthorized` - Invalid credentials
 
 ---
@@ -310,6 +323,7 @@ Authenticates user with Firebase OAuth token.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)"
@@ -319,6 +333,7 @@ Authenticates user with Firebase OAuth token.
 **Success Response (200):** Same as local login
 
 **Error Responses:**
+
 - `401 Unauthorized` - Invalid token
 - `404 Not Found` - User not registered
 
@@ -334,6 +349,7 @@ Exchanges a valid refresh token for new access and refresh tokens.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "refreshToken": "string (required)"
@@ -341,6 +357,7 @@ Exchanges a valid refresh token for new access and refresh tokens.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "tokens": {
@@ -352,6 +369,7 @@ Exchanges a valid refresh token for new access and refresh tokens.
 ```
 
 **Error Responses:**
+
 - `401 Unauthorized` - Invalid or expired refresh token
 
 ---
@@ -364,6 +382,7 @@ Revokes the current refresh token.
 **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "refreshToken": "string (required)"
@@ -371,6 +390,7 @@ Revokes the current refresh token.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -389,6 +409,7 @@ Revokes all refresh tokens for the current user.
 **Request Body:** None
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Logged out from all devices"
@@ -407,6 +428,7 @@ Sends password reset email if account exists.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "email": "string (required)"
@@ -414,6 +436,7 @@ Sends password reset email if account exists.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "If an account exists with this email, a reset link has been sent."
@@ -432,6 +455,7 @@ Resets password using token from email.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "token": "string (required, from email link)",
@@ -440,6 +464,7 @@ Resets password using token from email.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Password has been reset successfully."
@@ -447,9 +472,11 @@ Resets password using token from email.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Invalid or expired token
 
 **Side Effects:**
+
 - All refresh tokens are revoked (user logged out from all devices)
 - Password changed notification email sent
 
@@ -463,6 +490,7 @@ Changes password for authenticated user.
 **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "currentPassword": "string (required)",
@@ -471,6 +499,7 @@ Changes password for authenticated user.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Password changed successfully. Please log in again."
@@ -478,9 +507,11 @@ Changes password for authenticated user.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Current password is incorrect
 
 **Side Effects:**
+
 - All refresh tokens are revoked
 - Password changed notification email sent
 
@@ -494,6 +525,7 @@ Sets password for OAuth users who don't have one.
 **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "password": "string (required, min 8 chars)"
@@ -501,6 +533,7 @@ Sets password for OAuth users who don't have one.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Password set successfully."
@@ -508,6 +541,7 @@ Sets password for OAuth users who don't have one.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Password already set
 
 ---
@@ -522,6 +556,7 @@ Verifies user's email using token from email link.
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "token": "string (required, from email link)"
@@ -529,6 +564,7 @@ Verifies user's email using token from email link.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Email verified successfully",
@@ -543,10 +579,12 @@ Verifies user's email using token from email link.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Invalid or expired token
 - `400 Bad Request` - Email already verified
 
 **Side Effects:**
+
 - Welcome email sent after successful verification
 
 ---
@@ -561,6 +599,7 @@ Sends verification email to authenticated user.
 **Request Body:** None
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Verification email sent"
@@ -568,6 +607,7 @@ Sends verification email to authenticated user.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Email already verified
 
 ---
@@ -580,6 +620,7 @@ Resends verification email (public endpoint).
 **Auth Required:** No
 
 **Request Body:**
+
 ```json
 {
   "email": "string (required)"
@@ -587,6 +628,7 @@ Resends verification email (public endpoint).
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "If an account exists with this email, a verification link has been sent."
@@ -603,10 +645,11 @@ Resends verification email (public endpoint).
 
 Links a Firebase OAuth account to existing user.
 
-**Endpoint:** `POST /link-firebase`  
+**Endpoint:** `POST /link/firebase`  
 **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "idToken": "string (required, Firebase ID token)"
@@ -614,6 +657,7 @@ Links a Firebase OAuth account to existing user.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "google account linked successfully",
@@ -625,6 +669,7 @@ Links a Firebase OAuth account to existing user.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Account already linked to another user
 - `400 Bad Request` - Provider already linked
 
@@ -634,10 +679,11 @@ Links a Firebase OAuth account to existing user.
 
 Removes a linked authentication provider.
 
-**Endpoint:** `POST /unlink-provider`  
+**Endpoint:** `POST /unlink`  
 **Auth Required:** Yes
 
 **Request Body:**
+
 ```json
 {
   "provider": "local | google | facebook | firebase"
@@ -645,6 +691,7 @@ Removes a linked authentication provider.
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "google account unlinked successfully",
@@ -655,6 +702,7 @@ Removes a linked authentication provider.
 ```
 
 **Error Responses:**
+
 - `400 Bad Request` - Cannot unlink the only authentication method
 - `404 Not Found` - Provider not linked
 
@@ -668,6 +716,7 @@ Returns all linked authentication providers.
 **Auth Required:** Yes
 
 **Success Response (200):**
+
 ```json
 {
   "linkedProviders": [
@@ -691,6 +740,7 @@ Creates a new Admin user.
 **Auth Required:** Yes (Admin only)
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -703,6 +753,7 @@ Creates a new Admin user.
 ```
 
 **Success Response (201):**
+
 ```json
 {
   "user": {
@@ -715,6 +766,7 @@ Creates a new Admin user.
 ```
 
 **Error Responses:**
+
 - `403 Forbidden` - Only Admin can perform this action
 
 ---
@@ -729,6 +781,7 @@ Creates a new Sub-Admin user.
 **Request Body:** Same as Create Admin
 
 **Error Responses:**
+
 - `403 Forbidden` - Only Admin can perform this action
 
 ---
@@ -743,6 +796,7 @@ Creates a new Moderator user.
 **Request Body:** Same as Create Admin
 
 **Error Responses:**
+
 - `403 Forbidden` - Only Admin or SubAdmin can perform this action
 
 ---
@@ -755,6 +809,7 @@ Creates a new Assistant user linked to a Lecturer.
 **Auth Required:** Yes (Admin, Sub-Admin, or the Lecturer)
 
 **Request Body:**
+
 ```json
 {
   "name": "string (required)",
@@ -768,8 +823,56 @@ Creates a new Assistant user linked to a Lecturer.
 ```
 
 **Error Responses:**
+
 - `403 Forbidden` - Not authorized to create assistant
 - `404 Not Found` - Lecturer not found
+
+---
+
+## Portal & Role Assignment
+
+When a user is created, they are assigned role(s) in the `user_roles` table. A single user **can have multiple records** — one per portal they can access.
+
+### Role-to-Portal Mapping
+
+| Role       | Portals Assigned          | Records Created |
+| ---------- | ------------------------- | --------------- |
+| Teacher    | `store` + `academy`       | **2 rows**      |
+| Student    | `academy`                 | 1 row           |
+| Parent     | `academy`                 | 1 row           |
+| Lecturer   | `academy`                 | 1 row           |
+| Moderator  | `academy`                 | 1 row           |
+| Assistant  | `academy`                 | 1 row           |
+| Admin      | `store` + `academy`       | **2 rows**      |
+| SubAdmin   | `store` + `academy`       | **2 rows**      |
+
+### How the Frontend Determines User Role
+
+Role information is delivered through **two channels** on login:
+
+1. **`portalAccess`** in the response body — indicates which portals the user can access:
+   ```json
+   {
+     "portalAccess": {
+       "store": true,
+       "academy": true
+     }
+   }
+   ```
+
+2. **JWT access token payload** — contains the full `roles` array:
+   ```json
+   {
+     "userId": 1,
+     "roles": [
+       { "portal": "store", "role": "Teacher" },
+       { "portal": "academy", "role": "Teacher" }
+     ]
+   }
+   ```
+   The frontend can decode the JWT client-side to read exact role names.
+
+> **Note:** The `user` object in responses does NOT include roles. Roles are only available via `portalAccess` and the JWT token.
 
 ---
 
@@ -795,8 +898,8 @@ Creates a new Assistant user linked to a Lecturer.
 
 ```typescript
 {
-  accessToken: string;      // JWT, expires in 15 minutes
-  refreshToken: string;     // Opaque token, expires in 7 days
+  accessToken: string; // JWT, expires in 15 minutes
+  refreshToken: string; // Opaque token, expires in 7 days
   refreshTokenExpiresAt: Date;
 }
 ```
@@ -805,8 +908,8 @@ Creates a new Assistant user linked to a Lecturer.
 
 ```typescript
 {
-  store: boolean;    // Access to store portal
-  academy: boolean;  // Access to academy portal
+  store: boolean; // Access to store portal
+  academy: boolean; // Access to academy portal
 }
 ```
 
@@ -823,14 +926,14 @@ Creates a new Assistant user linked to a Lecturer.
 
 ## Error Codes
 
-| Status Code | Description |
-|-------------|-------------|
-| `400` | Bad Request - Invalid input or validation error |
-| `401` | Unauthorized - Invalid or missing authentication |
-| `403` | Forbidden - Insufficient permissions |
-| `404` | Not Found - Resource not found |
-| `409` | Conflict - Resource already exists (e.g., email in use) |
-| `500` | Internal Server Error |
+| Status Code | Description                                             |
+| ----------- | ------------------------------------------------------- |
+| `400`       | Bad Request - Invalid input or validation error         |
+| `401`       | Unauthorized - Invalid or missing authentication        |
+| `403`       | Forbidden - Insufficient permissions                    |
+| `404`       | Not Found - Resource not found                          |
+| `409`       | Conflict - Resource already exists (e.g., email in use) |
+| `500`       | Internal Server Error                                   |
 
 ### Error Response Format
 
@@ -845,23 +948,23 @@ Creates a new Assistant user linked to a Lecturer.
 
 ## Rate Limiting
 
-| Endpoint Category | Limit |
-|-------------------|-------|
-| Login attempts | 5 per minute per IP |
-| Password reset | 3 per hour per email |
-| Registration | 10 per hour per IP |
-| API requests (authenticated) | 100 per minute |
+| Endpoint Category            | Limit                |
+| ---------------------------- | -------------------- |
+| Login attempts               | 5 per minute per IP  |
+| Password reset               | 3 per hour per email |
+| Registration                 | 10 per hour per IP   |
+| API requests (authenticated) | 100 per minute       |
 
 ---
 
 ## Security Considerations
 
 1. **Passwords**: Hashed using bcrypt with 12 salt rounds
-2. **Tokens**: 
+2. **Tokens**:
    - Access tokens expire in 15 minutes
    - Refresh tokens expire in 7 days
    - Tokens are revoked on password change
-3. **Email Verification**: 
+3. **Email Verification**:
    - Tokens expire in 48 hours
    - SHA-256 hashed in database
 4. **Password Reset**:
@@ -880,6 +983,7 @@ Coming soon: Webhook notifications for auth events.
 ## SDK Support
 
 Coming soon: Official SDKs for:
+
 - JavaScript/TypeScript
 - Dart (Flutter)
 - Swift (iOS)

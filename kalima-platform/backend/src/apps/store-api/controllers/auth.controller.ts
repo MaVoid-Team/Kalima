@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { validate } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
-import { authService } from '../services/auth.service';
+import { Request, Response, NextFunction } from "express";
+import { validate } from "class-validator";
+import { plainToInstance } from "class-transformer";
+import { authService } from "../services/auth.service";
 import {
   TeacherRegistrationDto,
   StudentRegistrationDto,
@@ -23,13 +23,15 @@ import {
   ResendVerificationEmailDto,
   LinkFirebaseAccountDto,
   UnlinkProviderDto,
+} from "../dtos/auth.dto";
+import {
   CreateAdminDto,
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
-} from '../dtos/auth.dto';
-import { CreatorContext } from '../interfaces/auth.interface';
-import { auth_provider_enum } from '../../generated/prisma';
+} from "../dtos/admin.dto";
+import { CreatorContext } from "../interfaces/auth.interface";
+import { auth_provider_enum } from "../generated/prisma";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -37,14 +39,14 @@ import { auth_provider_enum } from '../../generated/prisma';
 
 async function validateDto<T extends object>(
   DtoClass: new () => T,
-  body: unknown
+  body: unknown,
 ): Promise<{ dto: T | null; errors: string[] }> {
   const dto = plainToInstance(DtoClass, body);
   const validationErrors = await validate(dto);
 
   if (validationErrors.length > 0) {
     const errors = validationErrors.flatMap((err) =>
-      Object.values(err.constraints || {})
+      Object.values(err.constraints || {}),
     );
     return { dto: null, errors };
   }
@@ -53,14 +55,14 @@ async function validateDto<T extends object>(
 }
 
 function handleError(res: Response, error: unknown, statusCode = 400): void {
-  const message = error instanceof Error ? error.message : 'An error occurred';
+  const message = error instanceof Error ? error.message : "An error occurred";
   res.status(statusCode).json({ success: false, message });
 }
 
 function getIpAddress(req: Request): string | undefined {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0].trim();
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") {
+    return forwarded.split(",")[0].trim();
   }
   return req.socket.remoteAddress;
 }
@@ -74,9 +76,16 @@ export const authController = {
   // REGISTRATION - Local
   // ============================================
 
-  async registerTeacher(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerTeacher(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(TeacherRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        TeacherRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -89,9 +98,16 @@ export const authController = {
     }
   },
 
-  async registerStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerStudent(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(StudentRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        StudentRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -104,9 +120,16 @@ export const authController = {
     }
   },
 
-  async registerParent(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerParent(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(ParentRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        ParentRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -119,9 +142,16 @@ export const authController = {
     }
   },
 
-  async registerLecturer(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerLecturer(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(LecturerRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        LecturerRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -138,9 +168,16 @@ export const authController = {
   // REGISTRATION - Firebase OAuth
   // ============================================
 
-  async registerTeacherFirebase(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerTeacherFirebase(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(TeacherFirebaseRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        TeacherFirebaseRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -153,9 +190,16 @@ export const authController = {
     }
   },
 
-  async registerStudentFirebase(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerStudentFirebase(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(StudentFirebaseRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        StudentFirebaseRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -168,9 +212,16 @@ export const authController = {
     }
   },
 
-  async registerParentFirebase(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerParentFirebase(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(ParentFirebaseRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        ParentFirebaseRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -183,9 +234,16 @@ export const authController = {
     }
   },
 
-  async registerLecturerFirebase(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async registerLecturerFirebase(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(LecturerFirebaseRegistrationDto, req.body);
+      const { dto, errors } = await validateDto(
+        LecturerFirebaseRegistrationDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -217,7 +275,11 @@ export const authController = {
     }
   },
 
-  async loginFirebase(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async loginFirebase(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const { dto, errors } = await validateDto(FirebaseLoginDto, req.body);
       if (!dto) {
@@ -236,7 +298,11 @@ export const authController = {
   // TOKEN MANAGEMENT
   // ============================================
 
-  async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async refresh(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const { dto, errors } = await validateDto(RefreshTokenDto, req.body);
       if (!dto) {
@@ -260,22 +326,30 @@ export const authController = {
       }
 
       await authService.logout(dto.refreshToken);
-      res.status(200).json({ success: true, message: 'Logged out successfully' });
+      res
+        .status(200)
+        .json({ success: true, message: "Logged out successfully" });
     } catch (error) {
       handleError(res, error);
     }
   },
 
-  async logoutAllDevices(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async logoutAllDevices(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
       await authService.logoutAllDevices(userId);
-      res.status(200).json({ success: true, message: 'Logged out from all devices' });
+      res
+        .status(200)
+        .json({ success: true, message: "Logged out from all devices" });
     } catch (error) {
       handleError(res, error);
     }
@@ -285,7 +359,11 @@ export const authController = {
   // PASSWORD MANAGEMENT
   // ============================================
 
-  async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const { dto, errors } = await validateDto(ForgotPasswordDto, req.body);
       if (!dto) {
@@ -300,7 +378,11 @@ export const authController = {
     }
   },
 
-  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const { dto, errors } = await validateDto(ResetPasswordDto, req.body);
       if (!dto) {
@@ -309,18 +391,26 @@ export const authController = {
       }
 
       const ipAddress = getIpAddress(req);
-      const result = await authService.resetPassword(dto.token, dto.newPassword, ipAddress);
+      const result = await authService.resetPassword(
+        dto.token,
+        dto.newPassword,
+        ipAddress,
+      );
       res.status(200).json({ success: true, ...result });
     } catch (error) {
       handleError(res, error);
     }
   },
 
-  async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async changePassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -338,11 +428,15 @@ export const authController = {
     }
   },
 
-  async setPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async setPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -363,7 +457,11 @@ export const authController = {
   // EMAIL VERIFICATION
   // ============================================
 
-  async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async verifyEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const { dto, errors } = await validateDto(VerifyEmailDto, req.body);
       if (!dto) {
@@ -378,9 +476,16 @@ export const authController = {
     }
   },
 
-  async resendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async resendVerificationEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const { dto, errors } = await validateDto(ResendVerificationEmailDto, req.body);
+      const { dto, errors } = await validateDto(
+        ResendVerificationEmailDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -393,11 +498,15 @@ export const authController = {
     }
   },
 
-  async sendVerificationEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async sendVerificationEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -412,15 +521,22 @@ export const authController = {
   // ACCOUNT LINKING
   // ============================================
 
-  async linkFirebaseAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async linkFirebaseAccount(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
-      const { dto, errors } = await validateDto(LinkFirebaseAccountDto, req.body);
+      const { dto, errors } = await validateDto(
+        LinkFirebaseAccountDto,
+        req.body,
+      );
       if (!dto) {
         res.status(400).json({ success: false, errors });
         return;
@@ -433,11 +549,15 @@ export const authController = {
     }
   },
 
-  async unlinkProvider(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async unlinkProvider(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -455,11 +575,15 @@ export const authController = {
     }
   },
 
-  async getLinkedProviders(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getLinkedProviders(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const userId = (req as any).user?.userId;
       if (!userId) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -474,11 +598,15 @@ export const authController = {
   // ADMIN USER CREATION
   // ============================================
 
-  async createAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createAdmin(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const creator = (req as any).user as CreatorContext;
       if (!creator) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -495,11 +623,15 @@ export const authController = {
     }
   },
 
-  async createSubAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createSubAdmin(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const creator = (req as any).user as CreatorContext;
       if (!creator) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -516,11 +648,15 @@ export const authController = {
     }
   },
 
-  async createModerator(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createModerator(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const creator = (req as any).user as CreatorContext;
       if (!creator) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 
@@ -537,11 +673,15 @@ export const authController = {
     }
   },
 
-  async createAssistant(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async createAssistant(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const creator = (req as any).user as CreatorContext;
       if (!creator) {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
+        res.status(401).json({ success: false, message: "Unauthorized" });
         return;
       }
 

@@ -1,11 +1,11 @@
-import { firebaseAuth } from '../../../libs/auth/firebase';
+import { firebaseAuth } from "../../../libs/auth/firebase";
 import {
   generateRefreshToken,
   revokeRefreshToken,
   revokeAllRefreshTokensForUser,
   signAccessToken,
   verifyRefreshToken,
-} from '../../../libs/auth/jwt';
+} from "../../../libs/auth/jwt";
 import {
   TeacherRegistrationDto,
   StudentRegistrationDto,
@@ -16,13 +16,15 @@ import {
   ParentFirebaseRegistrationDto,
   LecturerFirebaseRegistrationDto,
   LoginDto,
+  ChangePasswordDto,
+  SetPasswordDto,
+} from "../dtos/auth.dto";
+import {
   CreateAdminDto,
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
-  ChangePasswordDto,
-  SetPasswordDto,
-} from '../dtos/auth.dto';
+} from "../dtos/admin.dto";
 import {
   AuthTokens,
   LoginResponse,
@@ -34,10 +36,14 @@ import {
   FirebaseUserData,
   LinkedProvider,
   LinkProviderResponse,
-} from '../interfaces/auth.interface';
-import { role_enum, portal_enum, auth_provider_enum } from '../../generated/prisma';
-import { getEmailService } from '../emails';
-import { userManagementService } from './user-management.service';
+} from "../interfaces/auth.interface";
+import {
+  role_enum,
+  portal_enum,
+  auth_provider_enum,
+} from "../generated/prisma";
+import { getEmailService } from "../emails";
+import { userManagementService } from "./user-management.service";
 
 // ============================================
 // CONSTANTS
@@ -45,8 +51,8 @@ import { userManagementService } from './user-management.service';
 
 const RESET_TOKEN_EXPIRY_HOURS = 24;
 const VERIFICATION_TOKEN_EXPIRY_HOURS = 48;
-const APP_URL = process.env.APP_URL || 'http://localhost:3000';
-const SUPPORT_URL = process.env.SUPPORT_URL || 'http://localhost:3000/support';
+const APP_URL = process.env.APP_URL || "http://localhost:5000";
+const SUPPORT_URL = process.env.SUPPORT_URL || "http://localhost:5000/support";
 
 // ============================================
 // AUTH SERVICE CLASS
@@ -59,10 +65,17 @@ class AuthService {
   // MAIN USER REGISTRATION (Local)
   // ============================================
 
-  async registerTeacher(input: TeacherRegistrationDto): Promise<RegistrationResponse> {
+  async registerTeacher(
+    input: TeacherRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const { user, email } = await this.userService.createTeacher(input);
     const tokens = await this.issueTokens(user.id);
-    await this.sendAccountVerificationEmail(user.id, user.name, email, role_enum.Teacher);
+    await this.sendAccountVerificationEmail(
+      user.id,
+      user.name,
+      email,
+      role_enum.Teacher,
+    );
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -70,10 +83,17 @@ class AuthService {
     };
   }
 
-  async registerStudent(input: StudentRegistrationDto): Promise<RegistrationResponse> {
+  async registerStudent(
+    input: StudentRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const { user, email } = await this.userService.createStudent(input);
     const tokens = await this.issueTokens(user.id);
-    await this.sendAccountVerificationEmail(user.id, user.name, email, role_enum.Student);
+    await this.sendAccountVerificationEmail(
+      user.id,
+      user.name,
+      email,
+      role_enum.Student,
+    );
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -81,10 +101,17 @@ class AuthService {
     };
   }
 
-  async registerParent(input: ParentRegistrationDto): Promise<RegistrationResponse> {
+  async registerParent(
+    input: ParentRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const { user, email } = await this.userService.createParent(input);
     const tokens = await this.issueTokens(user.id);
-    await this.sendAccountVerificationEmail(user.id, user.name, email, role_enum.Parent);
+    await this.sendAccountVerificationEmail(
+      user.id,
+      user.name,
+      email,
+      role_enum.Parent,
+    );
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -92,10 +119,17 @@ class AuthService {
     };
   }
 
-  async registerLecturer(input: LecturerRegistrationDto): Promise<RegistrationResponse> {
+  async registerLecturer(
+    input: LecturerRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const { user, email } = await this.userService.createLecturer(input);
     const tokens = await this.issueTokens(user.id);
-    await this.sendAccountVerificationEmail(user.id, user.name, email, role_enum.Lecturer);
+    await this.sendAccountVerificationEmail(
+      user.id,
+      user.name,
+      email,
+      role_enum.Lecturer,
+    );
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -107,9 +141,14 @@ class AuthService {
   // MAIN USER REGISTRATION (Firebase OAuth)
   // ============================================
 
-  async registerTeacherFirebase(input: TeacherFirebaseRegistrationDto): Promise<RegistrationResponse> {
+  async registerTeacherFirebase(
+    input: TeacherFirebaseRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const firebaseUser = await this.verifyFirebaseToken(input.idToken);
-    const { user } = await this.userService.createTeacherFromFirebase(input, firebaseUser);
+    const { user } = await this.userService.createTeacherFromFirebase(
+      input,
+      firebaseUser,
+    );
     const tokens = await this.issueTokens(user.id);
 
     return {
@@ -118,9 +157,14 @@ class AuthService {
     };
   }
 
-  async registerStudentFirebase(input: StudentFirebaseRegistrationDto): Promise<RegistrationResponse> {
+  async registerStudentFirebase(
+    input: StudentFirebaseRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const firebaseUser = await this.verifyFirebaseToken(input.idToken);
-    const { user } = await this.userService.createStudentFromFirebase(input, firebaseUser);
+    const { user } = await this.userService.createStudentFromFirebase(
+      input,
+      firebaseUser,
+    );
     const tokens = await this.issueTokens(user.id);
 
     return {
@@ -129,9 +173,14 @@ class AuthService {
     };
   }
 
-  async registerParentFirebase(input: ParentFirebaseRegistrationDto): Promise<RegistrationResponse> {
+  async registerParentFirebase(
+    input: ParentFirebaseRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const firebaseUser = await this.verifyFirebaseToken(input.idToken);
-    const { user } = await this.userService.createParentFromFirebase(input, firebaseUser);
+    const { user } = await this.userService.createParentFromFirebase(
+      input,
+      firebaseUser,
+    );
     const tokens = await this.issueTokens(user.id);
 
     return {
@@ -140,9 +189,14 @@ class AuthService {
     };
   }
 
-  async registerLecturerFirebase(input: LecturerFirebaseRegistrationDto): Promise<RegistrationResponse> {
+  async registerLecturerFirebase(
+    input: LecturerFirebaseRegistrationDto,
+  ): Promise<RegistrationResponse> {
     const firebaseUser = await this.verifyFirebaseToken(input.idToken);
-    const { user } = await this.userService.createLecturerFromFirebase(input, firebaseUser);
+    const { user } = await this.userService.createLecturerFromFirebase(
+      input,
+      firebaseUser,
+    );
     const tokens = await this.issueTokens(user.id);
 
     return {
@@ -155,19 +209,31 @@ class AuthService {
   // NON-MAIN USER CREATION (Admin creates these)
   // ============================================
 
-  async createAdmin(input: CreateAdminDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createAdmin(
+    input: CreateAdminDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     return this.userService.createAdmin(input, creator);
   }
 
-  async createSubAdmin(input: CreateSubAdminDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createSubAdmin(
+    input: CreateSubAdminDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     return this.userService.createSubAdmin(input, creator);
   }
 
-  async createModerator(input: CreateModeratorDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createModerator(
+    input: CreateModeratorDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     return this.userService.createModerator(input, creator);
   }
 
-  async createAssistant(input: CreateAssistantDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createAssistant(
+    input: CreateAssistantDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     return this.userService.createAssistant(input, creator);
   }
 
@@ -179,13 +245,16 @@ class AuthService {
     const user = await this.userService.findUserByEmail(input.email);
 
     if (!user || !user.password) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
 
-    const passwordValid = await this.userService.verifyPassword(input.password, user.password);
+    const passwordValid = await this.userService.verifyPassword(
+      input.password,
+      user.password,
+    );
 
     if (!passwordValid) {
-      throw new Error('Invalid credentials');
+      throw new Error("Invalid credentials");
     }
 
     const tokens = await this.issueTokens(user.id);
@@ -205,11 +274,13 @@ class AuthService {
 
     const user = await this.userService.findUserByAuthIdentity(
       firebaseUser.provider,
-      firebaseUser.uid
+      firebaseUser.uid,
     );
 
     if (!user) {
-      throw new Error('No account found with this provider. Please register first.');
+      throw new Error(
+        "No account found with this provider. Please register first.",
+      );
     }
 
     const tokens = await this.issueTokens(user.id);
@@ -232,7 +303,7 @@ class AuthService {
     const payload = await verifyRefreshToken(refreshToken);
 
     if (!payload) {
-      throw new Error('Invalid or expired refresh token');
+      throw new Error("Invalid or expired refresh token");
     }
 
     // Revoke old token and issue new ones
@@ -262,14 +333,23 @@ class AuthService {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      return { message: 'If an account exists with this email, a reset link has been sent.' };
+      return {
+        message:
+          "If an account exists with this email, a reset link has been sent.",
+      };
     }
 
     const resetToken = this.userService.generateSecureToken();
     const resetTokenHash = await this.userService.hashToken(resetToken);
-    const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+    const expiresAt = new Date(
+      Date.now() + RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000,
+    );
 
-    await this.userService.createPasswordResetToken(user.id, resetTokenHash, expiresAt);
+    await this.userService.createPasswordResetToken(
+      user.id,
+      resetTokenHash,
+      expiresAt,
+    );
 
     const resetUrl = `${APP_URL}/auth/reset-password?token=${resetToken}`;
     await emailService.sendPasswordResetEmail(user.email!, {
@@ -278,17 +358,25 @@ class AuthService {
       expiresInHours: RESET_TOKEN_EXPIRY_HOURS,
     });
 
-    return { message: 'If an account exists with this email, a reset link has been sent.' };
+    return {
+      message:
+        "If an account exists with this email, a reset link has been sent.",
+    };
   }
 
-  async resetPassword(token: string, newPassword: string, ipAddress?: string): Promise<{ message: string }> {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+    ipAddress?: string,
+  ): Promise<{ message: string }> {
     const tokenHash = await this.userService.hashToken(token);
     const emailService = getEmailService();
 
-    const resetToken = await this.userService.findValidPasswordResetToken(tokenHash);
+    const resetToken =
+      await this.userService.findValidPasswordResetToken(tokenHash);
 
     if (!resetToken || !resetToken.users) {
-      throw new Error('Invalid or expired reset token');
+      throw new Error("Invalid or expired reset token");
     }
 
     const passwordHash = await this.userService.hashPassword(newPassword);
@@ -309,25 +397,34 @@ class AuthService {
       });
     }
 
-    return { message: 'Password has been reset successfully.' };
+    return { message: "Password has been reset successfully." };
   }
 
-  async changePassword(userId: number, input: ChangePasswordDto, ipAddress?: string): Promise<{ message: string }> {
+  async changePassword(
+    userId: number,
+    input: ChangePasswordDto,
+    ipAddress?: string,
+  ): Promise<{ message: string }> {
     const emailService = getEmailService();
 
     const user = await this.userService.findUserById(userId);
 
     if (!user || !user.password) {
-      throw new Error('User not found or has no password set');
+      throw new Error("User not found or has no password set");
     }
 
-    const passwordValid = await this.userService.verifyPassword(input.currentPassword, user.password);
+    const passwordValid = await this.userService.verifyPassword(
+      input.currentPassword,
+      user.password,
+    );
 
     if (!passwordValid) {
-      throw new Error('Current password is incorrect');
+      throw new Error("Current password is incorrect");
     }
 
-    const newPasswordHash = await this.userService.hashPassword(input.newPassword);
+    const newPasswordHash = await this.userService.hashPassword(
+      input.newPassword,
+    );
     await this.userService.updatePassword(userId, newPasswordHash);
 
     // Revoke all refresh tokens to force re-login on all devices
@@ -343,18 +440,21 @@ class AuthService {
       });
     }
 
-    return { message: 'Password changed successfully. Please log in again.' };
+    return { message: "Password changed successfully. Please log in again." };
   }
 
-  async setPassword(userId: number, input: SetPasswordDto): Promise<{ message: string }> {
+  async setPassword(
+    userId: number,
+    input: SetPasswordDto,
+  ): Promise<{ message: string }> {
     const user = await this.userService.findUserById(userId);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     if (user.password) {
-      throw new Error('Password already set. Use change password instead.');
+      throw new Error("Password already set. Use change password instead.");
     }
 
     const passwordHash = await this.userService.hashPassword(input.password);
@@ -367,14 +467,14 @@ class AuthService {
           userId,
           auth_provider_enum.local,
           user.email,
-          user.email
+          user.email,
         );
       } catch {
         // Identity might already exist
       }
     }
 
-    return { message: 'Password set successfully.' };
+    return { message: "Password set successfully." };
   }
 
   // ============================================
@@ -386,18 +486,24 @@ class AuthService {
     const emailService = getEmailService();
 
     if (!user || !user.email) {
-      throw new Error('User not found or has no email');
+      throw new Error("User not found or has no email");
     }
 
     if (user.is_email_verified) {
-      return { message: 'Email is already verified' };
+      return { message: "Email is already verified" };
     }
 
     const verificationToken = this.userService.generateSecureToken();
     const tokenHash = await this.userService.hashToken(verificationToken);
-    const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+    const expiresAt = new Date(
+      Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000,
+    );
 
-    await this.userService.createEmailVerificationToken(userId, tokenHash, expiresAt);
+    await this.userService.createEmailVerificationToken(
+      userId,
+      tokenHash,
+      expiresAt,
+    );
 
     const verificationUrl = `${APP_URL}/auth/verify-email?token=${verificationToken}`;
     await emailService.sendVerificationEmail(user.email, {
@@ -406,24 +512,29 @@ class AuthService {
       expiresInHours: VERIFICATION_TOKEN_EXPIRY_HOURS,
     });
 
-    return { message: 'Verification email sent' };
+    return { message: "Verification email sent" };
   }
 
-  async verifyEmail(token: string): Promise<{ message: string; user: BaseUserData }> {
+  async verifyEmail(
+    token: string,
+  ): Promise<{ message: string; user: BaseUserData }> {
     const emailService = getEmailService();
     const tokenHash = await this.userService.hashToken(token);
 
-    const verificationToken = await this.userService.findValidEmailVerificationToken(tokenHash);
+    const verificationToken =
+      await this.userService.findValidEmailVerificationToken(tokenHash);
 
     if (!verificationToken || !verificationToken.users) {
-      throw new Error('Invalid or expired verification token');
+      throw new Error("Invalid or expired verification token");
     }
 
     if (verificationToken.users.is_email_verified) {
-      throw new Error('Email is already verified');
+      throw new Error("Email is already verified");
     }
 
-    const updatedUser = await this.userService.verifyUserEmail(verificationToken.users.id);
+    const updatedUser = await this.userService.verifyUserEmail(
+      verificationToken.users.id,
+    );
     await this.userService.markEmailVerificationTokenUsed(verificationToken.id);
 
     // Send welcome email
@@ -439,7 +550,7 @@ class AuthService {
     }
 
     return {
-      message: 'Email verified successfully',
+      message: "Email verified successfully",
       user: this.userService.mapToBaseUserData(updatedUser),
     };
   }
@@ -450,51 +561,65 @@ class AuthService {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      return { message: 'If an account exists with this email, a verification link has been sent.' };
+      return {
+        message:
+          "If an account exists with this email, a verification link has been sent.",
+      };
     }
 
     if (user.is_email_verified) {
-      return { message: 'Email is already verified' };
+      return { message: "Email is already verified" };
     }
 
     await this.sendVerificationEmail(user.id);
 
-    return { message: 'If an account exists with this email, a verification link has been sent.' };
+    return {
+      message:
+        "If an account exists with this email, a verification link has been sent.",
+    };
   }
 
   // ============================================
   // ACCOUNT LINKING
   // ============================================
 
-  async linkFirebaseAccount(userId: number, idToken: string): Promise<LinkProviderResponse> {
+  async linkFirebaseAccount(
+    userId: number,
+    idToken: string,
+  ): Promise<LinkProviderResponse> {
     const firebaseUser = await this.verifyFirebaseToken(idToken);
 
     // Check if this Firebase account is already linked to another user
     const existingUser = await this.userService.findUserByAuthIdentity(
       firebaseUser.provider,
-      firebaseUser.uid
+      firebaseUser.uid,
     );
 
     if (existingUser && existingUser.id !== userId) {
-      throw new Error('This account is already linked to another user');
+      throw new Error("This account is already linked to another user");
     }
 
     if (existingUser && existingUser.id === userId) {
-      throw new Error('This account is already linked');
+      throw new Error("This account is already linked");
     }
 
     // Check if user already has this provider linked
-    const existingIdentity = await this.userService.findAuthIdentity(userId, firebaseUser.provider);
+    const existingIdentity = await this.userService.findAuthIdentity(
+      userId,
+      firebaseUser.provider,
+    );
 
     if (existingIdentity) {
-      throw new Error(`You already have a ${firebaseUser.provider} account linked`);
+      throw new Error(
+        `You already have a ${firebaseUser.provider} account linked`,
+      );
     }
 
     await this.userService.createAuthIdentity(
       userId,
       firebaseUser.provider,
       firebaseUser.uid,
-      firebaseUser.email
+      firebaseUser.email,
     );
 
     const identities = await this.userService.findAllAuthIdentities(userId);
@@ -505,7 +630,10 @@ class AuthService {
     };
   }
 
-  async unlinkProvider(userId: number, provider: auth_provider_enum): Promise<LinkProviderResponse> {
+  async unlinkProvider(
+    userId: number,
+    provider: auth_provider_enum,
+  ): Promise<LinkProviderResponse> {
     const identity = await this.userService.findAuthIdentity(userId, provider);
 
     if (!identity) {
@@ -519,16 +647,21 @@ class AuthService {
     const hasOtherProviders = allIdentities.length > 1;
 
     if (!hasPassword && !hasOtherProviders) {
-      throw new Error('Cannot unlink the only authentication method. Set a password first.');
+      throw new Error(
+        "Cannot unlink the only authentication method. Set a password first.",
+      );
     }
 
     if (provider === auth_provider_enum.local && !hasOtherProviders) {
-      throw new Error('Cannot unlink local authentication. Link another provider first.');
+      throw new Error(
+        "Cannot unlink local authentication. Link another provider first.",
+      );
     }
 
     await this.userService.deleteAuthIdentity(identity.id);
 
-    const remainingIdentities = await this.userService.findAllAuthIdentities(userId);
+    const remainingIdentities =
+      await this.userService.findAllAuthIdentities(userId);
 
     return {
       message: `${provider} account unlinked successfully`,
@@ -549,15 +682,21 @@ class AuthService {
     userId: number,
     name: string,
     email: string,
-    role: role_enum
+    role: role_enum,
   ): Promise<void> {
     const emailService = getEmailService();
 
     const verificationToken = this.userService.generateSecureToken();
     const tokenHash = await this.userService.hashToken(verificationToken);
-    const expiresAt = new Date(Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+    const expiresAt = new Date(
+      Date.now() + VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000,
+    );
 
-    await this.userService.createEmailVerificationToken(userId, tokenHash, expiresAt);
+    await this.userService.createEmailVerificationToken(
+      userId,
+      tokenHash,
+      expiresAt,
+    );
 
     const verificationUrl = `${APP_URL}/auth/verify-email?token=${verificationToken}`;
     const roleName = this.formatRoleName(role);
@@ -570,26 +709,28 @@ class AuthService {
     });
   }
 
-  private async verifyFirebaseToken(idToken: string): Promise<FirebaseUserData> {
+  private async verifyFirebaseToken(
+    idToken: string,
+  ): Promise<FirebaseUserData> {
     const decoded = await firebaseAuth.verifyIdToken(idToken);
 
     if (!decoded.email) {
-      throw new Error('Firebase token does not contain an email');
+      throw new Error("Firebase token does not contain an email");
     }
 
     let provider: auth_provider_enum = auth_provider_enum.firebase;
     const signInProvider = decoded.firebase?.sign_in_provider;
 
-    if (signInProvider === 'google.com') {
+    if (signInProvider === "google.com") {
       provider = auth_provider_enum.google;
-    } else if (signInProvider === 'facebook.com') {
+    } else if (signInProvider === "facebook.com") {
       provider = auth_provider_enum.facebook;
     }
 
     return {
       uid: decoded.uid,
       email: decoded.email.toLowerCase(),
-      name: decoded.name ?? decoded.email.split('@')[0],
+      name: decoded.name ?? decoded.email.split("@")[0],
       emailVerified: decoded.email_verified ?? false,
       photoUrl: decoded.picture,
       provider,
@@ -617,25 +758,34 @@ class AuthService {
     };
   }
 
-  private calculatePortalAccess(roles: Array<{ portal: portal_enum; role: role_enum }>): PortalAccess {
+  private calculatePortalAccess(
+    roles: Array<{ portal: portal_enum; role: role_enum }>,
+  ): PortalAccess {
     const access: PortalAccess = {
-      store: false,
-      academy: false,
+      store: { hasAccess: false, roles: [] },
+      academy: { hasAccess: false, roles: [] },
     };
 
     for (const roleEntry of roles) {
       if (roleEntry.portal === portal_enum.store) {
-        access.store = true;
+        access.store.hasAccess = true;
+        access.store.roles.push(roleEntry.role);
       }
       if (roleEntry.portal === portal_enum.academy) {
-        access.academy = true;
+        access.academy.hasAccess = true;
+        access.academy.roles.push(roleEntry.role);
       }
     }
 
     return access;
   }
 
-  private mapLinkedProviders(identities: Array<{ provider: auth_provider_enum; provider_email?: string | null }>): LinkedProvider[] {
+  private mapLinkedProviders(
+    identities: Array<{
+      provider: auth_provider_enum;
+      provider_email?: string | null;
+    }>,
+  ): LinkedProvider[] {
     return identities.map((identity) => ({
       provider: identity.provider,
       providerEmail: identity.provider_email ?? undefined,
@@ -644,14 +794,14 @@ class AuthService {
 
   private formatRoleName(role: role_enum): string {
     const roleNames: Record<role_enum, string> = {
-      [role_enum.Admin]: 'Administrator',
-      [role_enum.SubAdmin]: 'Sub-Administrator',
-      [role_enum.Teacher]: 'Teacher',
-      [role_enum.Student]: 'Student',
-      [role_enum.Parent]: 'Parent',
-      [role_enum.Lecturer]: 'Lecturer',
-      [role_enum.Assistant]: 'Assistant',
-      [role_enum.Moderator]: 'Moderator',
+      [role_enum.Admin]: "Administrator",
+      [role_enum.SubAdmin]: "Sub-Administrator",
+      [role_enum.Teacher]: "Teacher",
+      [role_enum.Student]: "Student",
+      [role_enum.Parent]: "Parent",
+      [role_enum.Lecturer]: "Lecturer",
+      [role_enum.Assistant]: "Assistant",
+      [role_enum.Moderator]: "Moderator",
     };
     return roleNames[role] || role;
   }

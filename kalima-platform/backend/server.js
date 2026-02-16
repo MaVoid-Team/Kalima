@@ -156,6 +156,14 @@ app.use("/api/v2/ec/cart-purchases", auditLogger, v2CartPurchaseRoutes);
 app.use("/api/v1/ec/payment-methods", auditLogger, ecPaymentMethodRoutes);
 app.use("/api/v1/whatsapp-numbers", auditLogger, whatsAppNumberRoutes);
 
+// Handle invalid JSON payloads
+app.use((err, _req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({ message: "Invalid JSON payload" });
+  }
+  return next(err);
+});
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 mongoose.connection.once("open", () => {

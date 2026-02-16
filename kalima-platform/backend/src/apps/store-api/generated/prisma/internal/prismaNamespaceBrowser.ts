@@ -55,7 +55,22 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
-  refresh_tokens: 'refresh_tokens'
+  refresh_tokens: 'refresh_tokens',
+  assistants: 'assistants',
+  government: 'government',
+  lecturers: 'lecturers',
+  levels: 'levels',
+  parent_children: 'parent_children',
+  parents: 'parents',
+  sites: 'sites',
+  social_media: 'social_media',
+  students: 'students',
+  subjects: 'subjects',
+  teachers: 'teachers',
+  teaches_at: 'teaches_at',
+  zones: 'zones',
+  email_verification_tokens: 'email_verification_tokens',
+  password_reset_tokens: 'password_reset_tokens'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -117,8 +132,16 @@ export const UsersScalarFieldEnum = {
   phone: 'phone',
   gender: 'gender',
   is_email_verified: 'is_email_verified',
+  email_verified_at: 'email_verified_at',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  secondary_phone: 'secondary_phone',
+  role: 'role',
+  profile_pic_url: 'profile_pic_url',
+  password_changed_at: 'password_changed_at',
+  confirmed: 'confirmed',
+  hasPromoCode: 'hasPromoCode',
+  hasUsedPromoCode: 'hasUsedPromoCode'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -134,6 +157,161 @@ export const Refresh_tokensScalarFieldEnum = {
 } as const
 
 export type Refresh_tokensScalarFieldEnum = (typeof Refresh_tokensScalarFieldEnum)[keyof typeof Refresh_tokensScalarFieldEnum]
+
+
+export const AssistantsScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  lecturer_user_id: 'lecturer_user_id'
+} as const
+
+export type AssistantsScalarFieldEnum = (typeof AssistantsScalarFieldEnum)[keyof typeof AssistantsScalarFieldEnum]
+
+
+export const GovernmentScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active'
+} as const
+
+export type GovernmentScalarFieldEnum = (typeof GovernmentScalarFieldEnum)[keyof typeof GovernmentScalarFieldEnum]
+
+
+export const LecturersScalarFieldEnum = {
+  user_id: 'user_id',
+  bio: 'bio',
+  expertise: 'expertise'
+} as const
+
+export type LecturersScalarFieldEnum = (typeof LecturersScalarFieldEnum)[keyof typeof LecturersScalarFieldEnum]
+
+
+export const LevelsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active'
+} as const
+
+export type LevelsScalarFieldEnum = (typeof LevelsScalarFieldEnum)[keyof typeof LevelsScalarFieldEnum]
+
+
+export const Parent_childrenScalarFieldEnum = {
+  id: 'id',
+  parent_user_id: 'parent_user_id',
+  student_user_id: 'student_user_id'
+} as const
+
+export type Parent_childrenScalarFieldEnum = (typeof Parent_childrenScalarFieldEnum)[keyof typeof Parent_childrenScalarFieldEnum]
+
+
+export const ParentsScalarFieldEnum = {
+  user_id: 'user_id',
+  government_id: 'government_id',
+  zone_id: 'zone_id'
+} as const
+
+export type ParentsScalarFieldEnum = (typeof ParentsScalarFieldEnum)[keyof typeof ParentsScalarFieldEnum]
+
+
+export const SitesScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active'
+} as const
+
+export type SitesScalarFieldEnum = (typeof SitesScalarFieldEnum)[keyof typeof SitesScalarFieldEnum]
+
+
+export const Social_mediaScalarFieldEnum = {
+  id: 'id',
+  teacher_user_id: 'teacher_user_id',
+  site_id: 'site_id',
+  url: 'url',
+  active: 'active'
+} as const
+
+export type Social_mediaScalarFieldEnum = (typeof Social_mediaScalarFieldEnum)[keyof typeof Social_mediaScalarFieldEnum]
+
+
+export const StudentsScalarFieldEnum = {
+  user_id: 'user_id',
+  level_id: 'level_id',
+  government_id: 'government_id',
+  zone_id: 'zone_id',
+  parent_phone_number: 'parent_phone_number',
+  sequenced_id: 'sequenced_id',
+  faction: 'faction'
+} as const
+
+export type StudentsScalarFieldEnum = (typeof StudentsScalarFieldEnum)[keyof typeof StudentsScalarFieldEnum]
+
+
+export const SubjectsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active'
+} as const
+
+export type SubjectsScalarFieldEnum = (typeof SubjectsScalarFieldEnum)[keyof typeof SubjectsScalarFieldEnum]
+
+
+export const TeachersScalarFieldEnum = {
+  user_id: 'user_id',
+  serial: 'serial',
+  is_primary: 'is_primary',
+  is_preparatory: 'is_preparatory',
+  is_secondary: 'is_secondary',
+  government_id: 'government_id',
+  zone_id: 'zone_id',
+  subject_id: 'subject_id'
+} as const
+
+export type TeachersScalarFieldEnum = (typeof TeachersScalarFieldEnum)[keyof typeof TeachersScalarFieldEnum]
+
+
+export const Teaches_atScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  location_name: 'location_name',
+  location_type: 'location_type',
+  active: 'active'
+} as const
+
+export type Teaches_atScalarFieldEnum = (typeof Teaches_atScalarFieldEnum)[keyof typeof Teaches_atScalarFieldEnum]
+
+
+export const ZonesScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  government_id: 'government_id',
+  active: 'active'
+} as const
+
+export type ZonesScalarFieldEnum = (typeof ZonesScalarFieldEnum)[keyof typeof ZonesScalarFieldEnum]
+
+
+export const Email_verification_tokensScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
+  created_at: 'created_at',
+  expires_at: 'expires_at',
+  used_at: 'used_at'
+} as const
+
+export type Email_verification_tokensScalarFieldEnum = (typeof Email_verification_tokensScalarFieldEnum)[keyof typeof Email_verification_tokensScalarFieldEnum]
+
+
+export const Password_reset_tokensScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
+  created_at: 'created_at',
+  expires_at: 'expires_at',
+  used_at: 'used_at'
+} as const
+
+export type Password_reset_tokensScalarFieldEnum = (typeof Password_reset_tokensScalarFieldEnum)[keyof typeof Password_reset_tokensScalarFieldEnum]
 
 
 export const SortOrder = {

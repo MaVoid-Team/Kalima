@@ -1,8 +1,11 @@
+import "reflect-metadata";
+import "dotenv/config";
 import express from "express";
 import path from "path";
 // const loadRoutes = require('../routes')
 import storeV2Routes from "./apps/store-api/routes/v2/index";
 import authRoutes from "./apps/store-api/routes/v2/auth.routes";
+import adminRoutes from "./apps/store-api/routes/v2/admin.routes";
 // import { prisma} from './libs/db/prisma';
 
 const app = express();
@@ -28,6 +31,7 @@ app.get("/api/v2/health", async (_, res) => {
 // New
 app.use("/api/v2", storeV2Routes);
 app.use("/api/v2/auth", authRoutes);
+app.use("/api/v2/admin", adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 

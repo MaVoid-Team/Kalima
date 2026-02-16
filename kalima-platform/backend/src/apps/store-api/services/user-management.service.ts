@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
-import { prisma } from '../../../libs/db/prisma';
-import type { PrismaClient } from '../../../libs/db/prisma';
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import { prisma } from "../../../libs/db/prisma";
+import type { PrismaClient } from "../../../libs/db/prisma";
 import {
   TeacherRegistrationDto,
   StudentRegistrationDto,
@@ -11,17 +11,23 @@ import {
   StudentFirebaseRegistrationDto,
   ParentFirebaseRegistrationDto,
   LecturerFirebaseRegistrationDto,
+} from "../dtos/auth.dto";
+import {
   CreateAdminDto,
   CreateSubAdminDto,
   CreateModeratorDto,
   CreateAssistantDto,
-} from '../dtos/auth.dto';
+} from "../dtos/admin.dto";
 import {
   BaseUserData,
   CreatorContext,
   FirebaseUserData,
-} from '../interfaces/auth.interface';
-import { role_enum, portal_enum, auth_provider_enum } from '../../generated/prisma';
+} from "../interfaces/auth.interface";
+import {
+  role_enum,
+  portal_enum,
+  auth_provider_enum,
+} from "../generated/prisma";
 
 // ============================================
 // CONSTANTS
@@ -40,12 +46,14 @@ class UserManagementService {
   // CREATE MAIN USERS (Local Registration)
   // ============================================
 
-  async createTeacher(input: TeacherRegistrationDto): Promise<{ user: any; email: string }> {
+  async createTeacher(
+    input: TeacherRegistrationDto,
+  ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
     const passwordHash = await this.hashPassword(input.password);
-    const serial = this.generateTeacherSerial();
+    const serial = await this.generateTeacherSerial(input.subject_id);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -59,7 +67,7 @@ class UserManagementService {
           role: role_enum.Teacher,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -76,10 +84,16 @@ class UserManagementService {
             },
           },
           user_roles: {
-            create: {
-              portal: portal_enum.store,
-              role: role_enum.Teacher,
-            },
+            create: [
+              {
+                portal: portal_enum.store,
+                role: role_enum.Teacher,
+              },
+              {
+                portal: portal_enum.academy,
+                role: role_enum.Teacher,
+              },
+            ],
           },
           user_analytics: {
             create: {},
@@ -94,7 +108,9 @@ class UserManagementService {
     return { user, email };
   }
 
-  async createStudent(input: StudentRegistrationDto): Promise<{ user: any; email: string }> {
+  async createStudent(
+    input: StudentRegistrationDto,
+  ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
@@ -112,7 +128,7 @@ class UserManagementService {
           role: role_enum.Student,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -145,7 +161,9 @@ class UserManagementService {
     return { user, email };
   }
 
-  async createParent(input: ParentRegistrationDto): Promise<{ user: any; email: string }> {
+  async createParent(
+    input: ParentRegistrationDto,
+  ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
@@ -163,7 +181,7 @@ class UserManagementService {
           role: role_enum.Parent,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -190,7 +208,9 @@ class UserManagementService {
     return { user, email };
   }
 
-  async createLecturer(input: LecturerRegistrationDto): Promise<{ user: any; email: string }> {
+  async createLecturer(
+    input: LecturerRegistrationDto,
+  ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
 
@@ -208,7 +228,7 @@ class UserManagementService {
           role: role_enum.Lecturer,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -244,11 +264,11 @@ class UserManagementService {
 
   async createTeacherFromFirebase(
     input: TeacherFirebaseRegistrationDto,
-    firebaseUser: FirebaseUserData
+    firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
     await this.ensureEmailNotExists(firebaseUser.email);
 
-    const serial = this.generateTeacherSerial();
+    const serial = await this.generateTeacherSerial(input.subject_id);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -280,10 +300,16 @@ class UserManagementService {
             },
           },
           user_roles: {
-            create: {
-              portal: portal_enum.store,
-              role: role_enum.Teacher,
-            },
+            create: [
+              {
+                portal: portal_enum.store,
+                role: role_enum.Teacher,
+              },
+              {
+                portal: portal_enum.academy,
+                role: role_enum.Teacher,
+              },
+            ],
           },
           user_analytics: {
             create: {},
@@ -300,7 +326,7 @@ class UserManagementService {
 
   async createStudentFromFirebase(
     input: StudentFirebaseRegistrationDto,
-    firebaseUser: FirebaseUserData
+    firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
     await this.ensureEmailNotExists(firebaseUser.email);
 
@@ -352,7 +378,7 @@ class UserManagementService {
 
   async createParentFromFirebase(
     input: ParentFirebaseRegistrationDto,
-    firebaseUser: FirebaseUserData
+    firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
     await this.ensureEmailNotExists(firebaseUser.email);
 
@@ -398,7 +424,7 @@ class UserManagementService {
 
   async createLecturerFromFirebase(
     input: LecturerFirebaseRegistrationDto,
-    firebaseUser: FirebaseUserData
+    firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
     await this.ensureEmailNotExists(firebaseUser.email);
 
@@ -449,7 +475,10 @@ class UserManagementService {
   // CREATE NON-MAIN USERS (Admin creates these)
   // ============================================
 
-  async createAdmin(input: CreateAdminDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createAdmin(
+    input: CreateAdminDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     this.ensureCreatorIsAdmin(creator);
 
     const email = this.normalizeEmail(input.email);
@@ -470,7 +499,7 @@ class UserManagementService {
           is_email_verified: true, // Admin-created users are pre-verified
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -493,7 +522,10 @@ class UserManagementService {
     return this.mapToBaseUserData(user);
   }
 
-  async createSubAdmin(input: CreateSubAdminDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createSubAdmin(
+    input: CreateSubAdminDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     this.ensureCreatorIsAdmin(creator);
 
     const email = this.normalizeEmail(input.email);
@@ -514,7 +546,7 @@ class UserManagementService {
           is_email_verified: true,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -537,7 +569,10 @@ class UserManagementService {
     return this.mapToBaseUserData(user);
   }
 
-  async createModerator(input: CreateModeratorDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createModerator(
+    input: CreateModeratorDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     this.ensureCreatorIsAdminOrSubAdmin(creator);
 
     const email = this.normalizeEmail(input.email);
@@ -558,7 +593,7 @@ class UserManagementService {
           is_email_verified: true,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -579,7 +614,10 @@ class UserManagementService {
     return this.mapToBaseUserData(user);
   }
 
-  async createAssistant(input: CreateAssistantDto, creator: CreatorContext): Promise<BaseUserData> {
+  async createAssistant(
+    input: CreateAssistantDto,
+    creator: CreatorContext,
+  ): Promise<BaseUserData> {
     this.ensureCreatorCanCreateAssistant(creator, input.lecturer_user_id);
 
     const email = this.normalizeEmail(input.email);
@@ -591,7 +629,7 @@ class UserManagementService {
     });
 
     if (!lecturer) {
-      throw new Error('Lecturer not found');
+      throw new Error("Lecturer not found");
     }
 
     const passwordHash = await this.hashPassword(input.password);
@@ -609,7 +647,7 @@ class UserManagementService {
           is_email_verified: true,
           auth_identities: {
             create: {
-              provider: 'local',
+              provider: "local",
               provider_user_id: email,
               provider_email: email,
             },
@@ -660,7 +698,10 @@ class UserManagementService {
     });
   }
 
-  async findUserByAuthIdentity(provider: auth_provider_enum, providerUserId: string) {
+  async findUserByAuthIdentity(
+    provider: auth_provider_enum,
+    providerUserId: string,
+  ) {
     const identity = await this.db.auth_identities.findFirst({
       where: {
         provider,
@@ -709,7 +750,7 @@ class UserManagementService {
     userId: number,
     provider: auth_provider_enum,
     providerUserId: string,
-    providerEmail?: string
+    providerEmail?: string,
   ): Promise<void> {
     await this.db.auth_identities.create({
       data: {
@@ -747,7 +788,11 @@ class UserManagementService {
   // EMAIL VERIFICATION TOKEN METHODS
   // ============================================
 
-  async createEmailVerificationToken(userId: number, tokenHash: string, expiresAt: Date): Promise<void> {
+  async createEmailVerificationToken(
+    userId: number,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
     await this.db.email_verification_tokens.upsert({
       where: { user_id: userId },
       create: {
@@ -811,7 +856,11 @@ class UserManagementService {
   // PASSWORD RESET TOKEN METHODS
   // ============================================
 
-  async createPasswordResetToken(userId: number, tokenHash: string, expiresAt: Date): Promise<void> {
+  async createPasswordResetToken(
+    userId: number,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
     await this.db.password_reset_tokens.upsert({
       where: { user_id: userId },
       create: {
@@ -850,6 +899,223 @@ class UserManagementService {
   }
 
   // ============================================
+  // ADMIN: USER LISTING & SEARCH
+  // ============================================
+
+  async listUsers(
+    options: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      role?: role_enum;
+      portal?: portal_enum;
+    } = {},
+  ) {
+    const page = Math.max(1, options.page ?? 1);
+    const limit = Math.min(100, Math.max(1, options.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    // Text search on name, email, phone
+    if (options.search) {
+      where.OR = [
+        { name: { contains: options.search, mode: "insensitive" } },
+        { email: { contains: options.search, mode: "insensitive" } },
+        { phone: { contains: options.search } },
+      ];
+    }
+
+    // Filter by role/portal via user_roles relation
+    if (options.role || options.portal) {
+      where.user_roles = {
+        some: {
+          ...(options.role ? { role: options.role } : {}),
+          ...(options.portal ? { portal: options.portal } : {}),
+        },
+      };
+    }
+
+    const [users, total] = await Promise.all([
+      this.db.users.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { created_at: "desc" },
+        select: {
+          ...this.baseUserSelect(),
+          role: true,
+          confirmed: true,
+          user_roles: {
+            select: {
+              id: true,
+              portal: true,
+              role: true,
+            },
+          },
+        },
+      }),
+      this.db.users.count({ where }),
+    ]);
+
+    return {
+      users,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getUserWithRoles(userId: number) {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: {
+        ...this.baseUserSelect(),
+        role: true,
+        confirmed: true,
+        user_roles: {
+          select: {
+            id: true,
+            portal: true,
+            role: true,
+          },
+        },
+        teachers: { select: { serial: true, subject_id: true } },
+        students: { select: { level_id: true } },
+        lecturers: { select: { bio: true } },
+        assistants: { select: { lecturer_user_id: true } },
+        parents: { select: { government_id: true } },
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  }
+
+  // ============================================
+  // ADMIN: ROLE MANAGEMENT
+  // ============================================
+
+  /**
+   * Assign a new role+portal combination to a user.
+   * Will fail if the user already has this exact role+portal.
+   */
+  async assignRole(userId: number, portal: portal_enum, role: role_enum) {
+    // Verify user exists
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if role already exists
+    const existing = await this.db.user_roles.findFirst({
+      where: { user_id: userId, portal, role },
+    });
+    if (existing) {
+      throw new Error(`User already has role ${role} on portal ${portal}`);
+    }
+
+    const created = await this.db.user_roles.create({
+      data: { user_id: userId, portal, role },
+      select: { id: true, portal: true, role: true },
+    });
+
+    return created;
+  }
+
+  /**
+   * Remove a specific role+portal combination from a user.
+   * Prevents removing the last role (user must have at least one).
+   */
+  async revokeRole(userId: number, portal: portal_enum, role: role_enum) {
+    // Find the specific role row
+    const existing = await this.db.user_roles.findFirst({
+      where: { user_id: userId, portal, role },
+    });
+    if (!existing) {
+      throw new Error(`User does not have role ${role} on portal ${portal}`);
+    }
+
+    // Prevent removing the last role
+    const totalRoles = await this.db.user_roles.count({
+      where: { user_id: userId },
+    });
+    if (totalRoles <= 1) {
+      throw new Error(
+        "Cannot remove the last role from a user. Delete the user instead.",
+      );
+    }
+
+    await this.db.user_roles.delete({
+      where: { id: existing.id },
+    });
+
+    return { removed: { portal, role } };
+  }
+
+  /**
+   * Replace ALL roles for a user with a new set of roles.
+   * Requires at least one role in the new set.
+   */
+  async setRoles(
+    userId: number,
+    roles: Array<{ portal: portal_enum; role: role_enum }>,
+  ) {
+    if (!roles.length) {
+      throw new Error("Must provide at least one role");
+    }
+
+    // Verify user exists
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Replace all roles in a transaction
+    const result = await this.db.$transaction(async (tx) => {
+      // Delete all existing roles
+      await tx.user_roles.deleteMany({
+        where: { user_id: userId },
+      });
+
+      // Create new roles
+      await tx.user_roles.createMany({
+        data: roles.map((r) => ({
+          user_id: userId,
+          portal: r.portal,
+          role: r.role,
+        })),
+      });
+
+      // Return the new roles
+      return tx.user_roles.findMany({
+        where: { user_id: userId },
+        select: { id: true, portal: true, role: true },
+      });
+    });
+
+    // Also update the legacy scalar role field to match the "primary" role
+    await this.db.users.update({
+      where: { id: userId },
+      data: { role: roles[0].role },
+    });
+
+    return result;
+  }
+
+  // ============================================
   // HELPER METHODS
   // ============================================
 
@@ -864,22 +1130,36 @@ class UserManagementService {
     });
 
     if (existing) {
-      throw new Error('Email already in use');
+      throw new Error("Email already in use");
     }
   }
 
-  generateTeacherSerial(): string {
-    const timestamp = Date.now().toString(36);
-    const random = crypto.randomBytes(4).toString('hex');
-    return `T-${timestamp}-${random}`.toUpperCase();
+  async generateTeacherSerial(subjectId: number): Promise<string> {
+    const subject = await this.db.subjects.findUnique({
+      where: { id: subjectId },
+      select: { title: true },
+    });
+
+    const serialNo =
+      (await this.db.teachers.count({
+        where: { subject_id: subjectId },
+      })) + 1;
+
+    if (!subject) {
+      throw new Error("Subject not found");
+    }
+
+    let subjectPrefix = subject.title.substring(0, 2).toUpperCase();
+
+    return `${subjectPrefix}${String(serialNo).padStart(3, "0")}`;
   }
 
   generateSecureToken(): string {
-    return crypto.randomBytes(32).toString('hex');
+    return crypto.randomBytes(32).toString("hex");
   }
 
   async hashToken(token: string): Promise<string> {
-    return crypto.createHash('sha256').update(token).digest('hex');
+    return crypto.createHash("sha256").update(token).digest("hex");
   }
 
   baseUserSelect() {
@@ -899,6 +1179,7 @@ class UserManagementService {
   mapToBaseUserData(user: any): BaseUserData {
     return {
       id: user.id,
+      mongo_id: user.mongo_id,
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -912,22 +1193,32 @@ class UserManagementService {
 
   private ensureCreatorIsAdmin(creator: CreatorContext): void {
     if (creator.role !== role_enum.Admin) {
-      throw new Error('Only Admin can perform this action');
+      throw new Error("Only Admin can perform this action");
     }
   }
 
   private ensureCreatorIsAdminOrSubAdmin(creator: CreatorContext): void {
-    if (creator.role !== role_enum.Admin && creator.role !== role_enum.SubAdmin) {
-      throw new Error('Only Admin or SubAdmin can perform this action');
+    if (
+      creator.role !== role_enum.Admin &&
+      creator.role !== role_enum.SubAdmin
+    ) {
+      throw new Error("Only Admin or SubAdmin can perform this action");
     }
   }
 
-  private ensureCreatorCanCreateAssistant(creator: CreatorContext, lecturerUserId: number): void {
-    const isAdminOrSubAdmin = creator.role === role_enum.Admin || creator.role === role_enum.SubAdmin;
-    const isLecturerCreatingOwn = creator.role === role_enum.Lecturer && creator.userId === lecturerUserId;
+  private ensureCreatorCanCreateAssistant(
+    creator: CreatorContext,
+    lecturerUserId: number,
+  ): void {
+    const isAdminOrSubAdmin =
+      creator.role === role_enum.Admin || creator.role === role_enum.SubAdmin;
+    const isLecturerCreatingOwn =
+      creator.role === role_enum.Lecturer && creator.userId === lecturerUserId;
 
     if (!isAdminOrSubAdmin && !isLecturerCreatingOwn) {
-      throw new Error('Only Admin, SubAdmin, or the Lecturer themselves can create an Assistant');
+      throw new Error(
+        "Only Admin, SubAdmin, or the Lecturer themselves can create an Assistant",
+      );
     }
   }
 }
