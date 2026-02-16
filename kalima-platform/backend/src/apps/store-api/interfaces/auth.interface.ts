@@ -175,5 +175,5 @@ export interface PasswordResetToken {
 
 export interface CreatorContext {
   userId: number;
-  role: role_enum;
+  roles: UserRole[];
 }

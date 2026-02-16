@@ -1191,17 +1191,18 @@ class UserManagementService {
     };
   }
 
+  private hasRole(creator: CreatorContext, ...allowed: role_enum[]): boolean {
+    return creator.roles?.some((r) => allowed.includes(r.role as role_enum)) ?? false;
+  }
+
   private ensureCreatorIsAdmin(creator: CreatorContext): void {
-    if (creator.role !== role_enum.Admin) {
+    if (!this.hasRole(creator, role_enum.Admin)) {
       throw new Error("Only Admin can perform this action");
     }
   }
 
   private ensureCreatorIsAdminOrSubAdmin(creator: CreatorContext): void {
-    if (
-      creator.role !== role_enum.Admin &&
-      creator.role !== role_enum.SubAdmin
-    ) {
+    if (!this.hasRole(creator, role_enum.Admin, role_enum.SubAdmin)) {
       throw new Error("Only Admin or SubAdmin can perform this action");
     }
   }
@@ -1210,10 +1211,9 @@ class UserManagementService {
     creator: CreatorContext,
     lecturerUserId: number,
   ): void {
-    const isAdminOrSubAdmin =
-      creator.role === role_enum.Admin || creator.role === role_enum.SubAdmin;
+    const isAdminOrSubAdmin = this.hasRole(creator, role_enum.Admin, role_enum.SubAdmin);
     const isLecturerCreatingOwn =
-      creator.role === role_enum.Lecturer && creator.userId === lecturerUserId;
+      this.hasRole(creator, role_enum.Lecturer) && creator.userId === lecturerUserId;
 
     if (!isAdminOrSubAdmin && !isLecturerCreatingOwn) {
       throw new Error(
