@@ -70,7 +70,12 @@ export const ModelName = {
   teaches_at: 'teaches_at',
   zones: 'zones',
   email_verification_tokens: 'email_verification_tokens',
-  password_reset_tokens: 'password_reset_tokens'
+  password_reset_tokens: 'password_reset_tokens',
+  categories: 'categories',
+  coupons: 'coupons',
+  product_required_fields: 'product_required_fields',
+  products: 'products',
+  required_field_definitions: 'required_field_definitions'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -132,16 +137,16 @@ export const UsersScalarFieldEnum = {
   phone: 'phone',
   gender: 'gender',
   is_email_verified: 'is_email_verified',
-  email_verified_at: 'email_verified_at',
   created_at: 'created_at',
   updated_at: 'updated_at',
   secondary_phone: 'secondary_phone',
-  role: 'role',
   profile_pic_url: 'profile_pic_url',
   password_changed_at: 'password_changed_at',
   confirmed: 'confirmed',
   hasPromoCode: 'hasPromoCode',
-  hasUsedPromoCode: 'hasUsedPromoCode'
+  hasUsedPromoCode: 'hasUsedPromoCode',
+  email_verified_at: 'email_verified_at',
+  role: 'role'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -314,12 +319,92 @@ export const Password_reset_tokensScalarFieldEnum = {
 export type Password_reset_tokensScalarFieldEnum = (typeof Password_reset_tokensScalarFieldEnum)[keyof typeof Password_reset_tokensScalarFieldEnum]
 
 
+export const CategoriesScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active',
+  description: 'description',
+  parent_id: 'parent_id',
+  mongo_id: 'mongo_id',
+  created_at: 'created_at'
+} as const
+
+export type CategoriesScalarFieldEnum = (typeof CategoriesScalarFieldEnum)[keyof typeof CategoriesScalarFieldEnum]
+
+
+export const CouponsScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  discount_amount: 'discount_amount',
+  discount_percentage: 'discount_percentage',
+  active: 'active',
+  expires_at: 'expires_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at',
+  mongo_id: 'mongo_id'
+} as const
+
+export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
+
+
+export const Product_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  field_definition_id: 'field_definition_id',
+  is_required: 'is_required',
+  active: 'active'
+} as const
+
+export type Product_required_fieldsScalarFieldEnum = (typeof Product_required_fieldsScalarFieldEnum)[keyof typeof Product_required_fieldsScalarFieldEnum]
+
+
+export const ProductsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  price: 'price',
+  price_after_discount: 'price_after_discount',
+  serial: 'serial',
+  thumbnail: 'thumbnail',
+  gallery: 'gallery',
+  sample_url: 'sample_url',
+  category_id: 'category_id',
+  coupon_id: 'coupon_id',
+  is_archived: 'is_archived',
+  mongo_id: 'mongo_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
+
+
+export const Required_field_definitionsScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  field_type: 'field_type',
+  active: 'active'
+} as const
+
+export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -336,4 +421,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

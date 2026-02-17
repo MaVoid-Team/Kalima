@@ -44,6 +44,12 @@ import {
 } from "../generated/prisma";
 import { getEmailService } from "../emails";
 import { userManagementService } from "./user-management.service";
+import {
+  UnauthorizedError,
+  NotFoundError,
+  BadRequestError,
+  ConflictError,
+} from "../../../libs/errors";
 
 // ============================================
 // CONSTANTS
@@ -245,7 +251,7 @@ class AuthService {
     const user = await this.userService.findUserByEmail(input.email);
 
     if (!user || !user.password) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     const passwordValid = await this.userService.verifyPassword(
@@ -254,7 +260,7 @@ class AuthService {
     );
 
     if (!passwordValid) {
-      throw new Error("Invalid credentials");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     const tokens = await this.issueTokens(user.id);
@@ -278,7 +284,7 @@ class AuthService {
     );
 
     if (!user) {
-      throw new Error(
+      throw new NotFoundError(
         "No account found with this provider. Please register first.",
       );
     }
@@ -303,7 +309,7 @@ class AuthService {
     const payload = await verifyRefreshToken(refreshToken);
 
     if (!payload) {
-      throw new Error("Invalid or expired refresh token");
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
 
     // Revoke old token and issue new ones
@@ -376,7 +382,7 @@ class AuthService {
       await this.userService.findValidPasswordResetToken(tokenHash);
 
     if (!resetToken || !resetToken.users) {
-      throw new Error("Invalid or expired reset token");
+      throw new BadRequestError("Invalid or expired reset token");
     }
 
     const passwordHash = await this.userService.hashPassword(newPassword);
@@ -410,7 +416,7 @@ class AuthService {
     const user = await this.userService.findUserById(userId);
 
     if (!user || !user.password) {
-      throw new Error("User not found or has no password set");
+      throw new NotFoundError("User not found or has no password set");
     }
 
     const passwordValid = await this.userService.verifyPassword(
@@ -419,7 +425,7 @@ class AuthService {
     );
 
     if (!passwordValid) {
-      throw new Error("Current password is incorrect");
+      throw new UnauthorizedError("Current password is incorrect");
     }
 
     const newPasswordHash = await this.userService.hashPassword(
@@ -450,11 +456,11 @@ class AuthService {
     const user = await this.userService.findUserById(userId);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     if (user.password) {
-      throw new Error("Password already set. Use change password instead.");
+      throw new ConflictError("Password already set. Use change password instead.");
     }
 
     const passwordHash = await this.userService.hashPassword(input.password);
@@ -486,7 +492,7 @@ class AuthService {
     const emailService = getEmailService();
 
     if (!user || !user.email) {
-      throw new Error("User not found or has no email");
+      throw new NotFoundError("User not found or has no email");
     }
 
     if (user.is_email_verified) {
@@ -525,11 +531,11 @@ class AuthService {
       await this.userService.findValidEmailVerificationToken(tokenHash);
 
     if (!verificationToken || !verificationToken.users) {
-      throw new Error("Invalid or expired verification token");
+      throw new BadRequestError("Invalid or expired verification token");
     }
 
     if (verificationToken.users.is_email_verified) {
-      throw new Error("Email is already verified");
+      throw new ConflictError("Email is already verified");
     }
 
     const updatedUser = await this.userService.verifyUserEmail(
@@ -596,11 +602,11 @@ class AuthService {
     );
 
     if (existingUser && existingUser.id !== userId) {
-      throw new Error("This account is already linked to another user");
+      throw new ConflictError("This account is already linked to another user");
     }
 
     if (existingUser && existingUser.id === userId) {
-      throw new Error("This account is already linked");
+      throw new ConflictError("This account is already linked");
     }
 
     // Check if user already has this provider linked
@@ -610,7 +616,7 @@ class AuthService {
     );
 
     if (existingIdentity) {
-      throw new Error(
+      throw new ConflictError(
         `You already have a ${firebaseUser.provider} account linked`,
       );
     }
@@ -637,7 +643,7 @@ class AuthService {
     const identity = await this.userService.findAuthIdentity(userId, provider);
 
     if (!identity) {
-      throw new Error(`No ${provider} account is linked`);
+      throw new NotFoundError(`No ${provider} account is linked`);
     }
 
     const allIdentities = await this.userService.findAllAuthIdentities(userId);
@@ -647,13 +653,13 @@ class AuthService {
     const hasOtherProviders = allIdentities.length > 1;
 
     if (!hasPassword && !hasOtherProviders) {
-      throw new Error(
+      throw new BadRequestError(
         "Cannot unlink the only authentication method. Set a password first.",
       );
     }
 
     if (provider === auth_provider_enum.local && !hasOtherProviders) {
-      throw new Error(
+      throw new BadRequestError(
         "Cannot unlink local authentication. Link another provider first.",
       );
     }
@@ -715,7 +721,7 @@ class AuthService {
     const decoded = await firebaseAuth.verifyIdToken(idToken);
 
     if (!decoded.email) {
-      throw new Error("Firebase token does not contain an email");
+      throw new UnauthorizedError("Firebase token does not contain an email");
     }
 
     let provider: auth_provider_enum = auth_provider_enum.firebase;

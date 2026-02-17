@@ -137,3 +137,28 @@ export type email_verification_tokens = Prisma.email_verification_tokensModel
  * 
  */
 export type password_reset_tokens = Prisma.password_reset_tokensModel
+/**
+ * Model categories
+ * 
+ */
+export type categories = Prisma.categoriesModel
+/**
+ * Model coupons
+ * 
+ */
+export type coupons = Prisma.couponsModel
+/**
+ * Model product_required_fields
+ * 
+ */
+export type product_required_fields = Prisma.product_required_fieldsModel
+/**
+ * Model products
+ * 
+ */
+export type products = Prisma.productsModel
+/**
+ * Model required_field_definitions
+ * 
+ */
+export type required_field_definitions = Prisma.required_field_definitionsModel

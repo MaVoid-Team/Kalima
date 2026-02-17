@@ -28,6 +28,12 @@ import {
   portal_enum,
   auth_provider_enum,
 } from "../generated/prisma";
+import {
+  ConflictError,
+  NotFoundError,
+  ForbiddenError,
+  BadRequestError,
+} from "../../../libs/errors";
 
 // ============================================
 // CONSTANTS
@@ -629,7 +635,7 @@ class UserManagementService {
     });
 
     if (!lecturer) {
-      throw new Error("Lecturer not found");
+      throw new NotFoundError("Lecturer not found");
     }
 
     const passwordHash = await this.hashPassword(input.password);
@@ -992,7 +998,7 @@ class UserManagementService {
     });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     return user;
@@ -1013,7 +1019,7 @@ class UserManagementService {
       select: { id: true },
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     // Check if role already exists
@@ -1021,7 +1027,9 @@ class UserManagementService {
       where: { user_id: userId, portal, role },
     });
     if (existing) {
-      throw new Error(`User already has role ${role} on portal ${portal}`);
+      throw new ConflictError(
+        `User already has role ${role} on portal ${portal}`,
+      );
     }
 
     const created = await this.db.user_roles.create({
@@ -1042,7 +1050,9 @@ class UserManagementService {
       where: { user_id: userId, portal, role },
     });
     if (!existing) {
-      throw new Error(`User does not have role ${role} on portal ${portal}`);
+      throw new NotFoundError(
+        `User does not have role ${role} on portal ${portal}`,
+      );
     }
 
     // Prevent removing the last role
@@ -1050,7 +1060,7 @@ class UserManagementService {
       where: { user_id: userId },
     });
     if (totalRoles <= 1) {
-      throw new Error(
+      throw new BadRequestError(
         "Cannot remove the last role from a user. Delete the user instead.",
       );
     }
@@ -1071,7 +1081,7 @@ class UserManagementService {
     roles: Array<{ portal: portal_enum; role: role_enum }>,
   ) {
     if (!roles.length) {
-      throw new Error("Must provide at least one role");
+      throw new BadRequestError("Must provide at least one role");
     }
 
     // Verify user exists
@@ -1080,7 +1090,7 @@ class UserManagementService {
       select: { id: true },
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     // Replace all roles in a transaction
@@ -1130,7 +1140,7 @@ class UserManagementService {
     });
 
     if (existing) {
-      throw new Error("Email already in use");
+      throw new ConflictError("Email already in use");
     }
   }
 
@@ -1146,7 +1156,7 @@ class UserManagementService {
       })) + 1;
 
     if (!subject) {
-      throw new Error("Subject not found");
+      throw new NotFoundError("Subject not found");
     }
 
     let subjectPrefix = subject.title.substring(0, 2).toUpperCase();
@@ -1192,18 +1202,22 @@ class UserManagementService {
   }
 
   private hasRole(creator: CreatorContext, ...allowed: role_enum[]): boolean {
-    return creator.roles?.some((r) => allowed.includes(r.role as role_enum)) ?? false;
+    return (
+      creator.roles?.some((r) => allowed.includes(r.role as role_enum)) ?? false
+    );
   }
 
   private ensureCreatorIsAdmin(creator: CreatorContext): void {
     if (!this.hasRole(creator, role_enum.Admin)) {
-      throw new Error("Only Admin can perform this action");
+      throw new ForbiddenError("Only Admin can perform this action");
     }
   }
 
   private ensureCreatorIsAdminOrSubAdmin(creator: CreatorContext): void {
     if (!this.hasRole(creator, role_enum.Admin, role_enum.SubAdmin)) {
-      throw new Error("Only Admin or SubAdmin can perform this action");
+      throw new ForbiddenError(
+        "Only Admin or SubAdmin can perform this action",
+      );
     }
   }
 
@@ -1211,12 +1225,17 @@ class UserManagementService {
     creator: CreatorContext,
     lecturerUserId: number,
   ): void {
-    const isAdminOrSubAdmin = this.hasRole(creator, role_enum.Admin, role_enum.SubAdmin);
+    const isAdminOrSubAdmin = this.hasRole(
+      creator,
+      role_enum.Admin,
+      role_enum.SubAdmin,
+    );
     const isLecturerCreatingOwn =
-      this.hasRole(creator, role_enum.Lecturer) && creator.userId === lecturerUserId;
+      this.hasRole(creator, role_enum.Lecturer) &&
+      creator.userId === lecturerUserId;
 
     if (!isAdminOrSubAdmin && !isLecturerCreatingOwn) {
-      throw new Error(
+      throw new ForbiddenError(
         "Only Admin, SubAdmin, or the Lecturer themselves can create an Assistant",
       );
     }
