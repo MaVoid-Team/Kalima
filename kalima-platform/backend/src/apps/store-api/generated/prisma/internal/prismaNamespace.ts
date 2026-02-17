@@ -403,7 +403,12 @@ export const ModelName = {
   teaches_at: 'teaches_at',
   zones: 'zones',
   email_verification_tokens: 'email_verification_tokens',
-  password_reset_tokens: 'password_reset_tokens'
+  password_reset_tokens: 'password_reset_tokens',
+  categories: 'categories',
+  coupons: 'coupons',
+  product_required_fields: 'product_required_fields',
+  products: 'products',
+  required_field_definitions: 'required_field_definitions'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "coupons" | "product_required_fields" | "products" | "required_field_definitions"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1903,6 +1908,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    categories: {
+      payload: Prisma.$categoriesPayload<ExtArgs>
+      fields: Prisma.categoriesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.categoriesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.categoriesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        findFirst: {
+          args: Prisma.categoriesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.categoriesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        findMany: {
+          args: Prisma.categoriesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>[]
+        }
+        create: {
+          args: Prisma.categoriesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        createMany: {
+          args: Prisma.categoriesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.categoriesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>[]
+        }
+        delete: {
+          args: Prisma.categoriesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        update: {
+          args: Prisma.categoriesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        deleteMany: {
+          args: Prisma.categoriesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.categoriesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.categoriesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>[]
+        }
+        upsert: {
+          args: Prisma.categoriesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$categoriesPayload>
+        }
+        aggregate: {
+          args: Prisma.CategoriesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategories>
+        }
+        groupBy: {
+          args: Prisma.categoriesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoriesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.categoriesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoriesCountAggregateOutputType> | number
+        }
+      }
+    }
+    coupons: {
+      payload: Prisma.$couponsPayload<ExtArgs>
+      fields: Prisma.couponsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.couponsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.couponsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        findFirst: {
+          args: Prisma.couponsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.couponsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        findMany: {
+          args: Prisma.couponsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>[]
+        }
+        create: {
+          args: Prisma.couponsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        createMany: {
+          args: Prisma.couponsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.couponsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>[]
+        }
+        delete: {
+          args: Prisma.couponsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        update: {
+          args: Prisma.couponsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        deleteMany: {
+          args: Prisma.couponsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.couponsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.couponsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>[]
+        }
+        upsert: {
+          args: Prisma.couponsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$couponsPayload>
+        }
+        aggregate: {
+          args: Prisma.CouponsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCoupons>
+        }
+        groupBy: {
+          args: Prisma.couponsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.couponsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponsCountAggregateOutputType> | number
+        }
+      }
+    }
+    product_required_fields: {
+      payload: Prisma.$product_required_fieldsPayload<ExtArgs>
+      fields: Prisma.product_required_fieldsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.product_required_fieldsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.product_required_fieldsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        findFirst: {
+          args: Prisma.product_required_fieldsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.product_required_fieldsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        findMany: {
+          args: Prisma.product_required_fieldsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>[]
+        }
+        create: {
+          args: Prisma.product_required_fieldsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        createMany: {
+          args: Prisma.product_required_fieldsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.product_required_fieldsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>[]
+        }
+        delete: {
+          args: Prisma.product_required_fieldsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        update: {
+          args: Prisma.product_required_fieldsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        deleteMany: {
+          args: Prisma.product_required_fieldsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.product_required_fieldsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.product_required_fieldsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>[]
+        }
+        upsert: {
+          args: Prisma.product_required_fieldsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_required_fieldsPayload>
+        }
+        aggregate: {
+          args: Prisma.Product_required_fieldsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct_required_fields>
+        }
+        groupBy: {
+          args: Prisma.product_required_fieldsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_required_fieldsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.product_required_fieldsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_required_fieldsCountAggregateOutputType> | number
+        }
+      }
+    }
+    products: {
+      payload: Prisma.$productsPayload<ExtArgs>
+      fields: Prisma.productsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.productsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.productsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        findFirst: {
+          args: Prisma.productsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.productsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        findMany: {
+          args: Prisma.productsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>[]
+        }
+        create: {
+          args: Prisma.productsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        createMany: {
+          args: Prisma.productsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.productsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>[]
+        }
+        delete: {
+          args: Prisma.productsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        update: {
+          args: Prisma.productsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        deleteMany: {
+          args: Prisma.productsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.productsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.productsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>[]
+        }
+        upsert: {
+          args: Prisma.productsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$productsPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProducts>
+        }
+        groupBy: {
+          args: Prisma.productsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.productsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductsCountAggregateOutputType> | number
+        }
+      }
+    }
+    required_field_definitions: {
+      payload: Prisma.$required_field_definitionsPayload<ExtArgs>
+      fields: Prisma.required_field_definitionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.required_field_definitionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.required_field_definitionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        findFirst: {
+          args: Prisma.required_field_definitionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.required_field_definitionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        findMany: {
+          args: Prisma.required_field_definitionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>[]
+        }
+        create: {
+          args: Prisma.required_field_definitionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        createMany: {
+          args: Prisma.required_field_definitionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.required_field_definitionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>[]
+        }
+        delete: {
+          args: Prisma.required_field_definitionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        update: {
+          args: Prisma.required_field_definitionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.required_field_definitionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.required_field_definitionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.required_field_definitionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.required_field_definitionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$required_field_definitionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Required_field_definitionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRequired_field_definitions>
+        }
+        groupBy: {
+          args: Prisma.required_field_definitionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Required_field_definitionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.required_field_definitionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Required_field_definitionsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1985,16 +2360,16 @@ export const UsersScalarFieldEnum = {
   phone: 'phone',
   gender: 'gender',
   is_email_verified: 'is_email_verified',
-  email_verified_at: 'email_verified_at',
   created_at: 'created_at',
   updated_at: 'updated_at',
   secondary_phone: 'secondary_phone',
-  role: 'role',
   profile_pic_url: 'profile_pic_url',
   password_changed_at: 'password_changed_at',
   confirmed: 'confirmed',
   hasPromoCode: 'hasPromoCode',
-  hasUsedPromoCode: 'hasUsedPromoCode'
+  hasUsedPromoCode: 'hasUsedPromoCode',
+  email_verified_at: 'email_verified_at',
+  role: 'role'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -2167,12 +2542,92 @@ export const Password_reset_tokensScalarFieldEnum = {
 export type Password_reset_tokensScalarFieldEnum = (typeof Password_reset_tokensScalarFieldEnum)[keyof typeof Password_reset_tokensScalarFieldEnum]
 
 
+export const CategoriesScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  active: 'active',
+  description: 'description',
+  parent_id: 'parent_id',
+  mongo_id: 'mongo_id',
+  created_at: 'created_at'
+} as const
+
+export type CategoriesScalarFieldEnum = (typeof CategoriesScalarFieldEnum)[keyof typeof CategoriesScalarFieldEnum]
+
+
+export const CouponsScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  discount_amount: 'discount_amount',
+  discount_percentage: 'discount_percentage',
+  active: 'active',
+  expires_at: 'expires_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at',
+  mongo_id: 'mongo_id'
+} as const
+
+export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
+
+
+export const Product_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  field_definition_id: 'field_definition_id',
+  is_required: 'is_required',
+  active: 'active'
+} as const
+
+export type Product_required_fieldsScalarFieldEnum = (typeof Product_required_fieldsScalarFieldEnum)[keyof typeof Product_required_fieldsScalarFieldEnum]
+
+
+export const ProductsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  price: 'price',
+  price_after_discount: 'price_after_discount',
+  serial: 'serial',
+  thumbnail: 'thumbnail',
+  gallery: 'gallery',
+  sample_url: 'sample_url',
+  category_id: 'category_id',
+  coupon_id: 'coupon_id',
+  is_archived: 'is_archived',
+  mongo_id: 'mongo_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
+
+
+export const Required_field_definitionsScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  field_type: 'field_type',
+  active: 'active'
+} as const
+
+export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2189,6 +2644,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -2331,6 +2795,20 @@ export type ListEnumlocation_type_enumFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2458,6 +2936,11 @@ export type GlobalOmitConfig = {
   zones?: Prisma.zonesOmit
   email_verification_tokens?: Prisma.email_verification_tokensOmit
   password_reset_tokens?: Prisma.password_reset_tokensOmit
+  categories?: Prisma.categoriesOmit
+  coupons?: Prisma.couponsOmit
+  product_required_fields?: Prisma.product_required_fieldsOmit
+  products?: Prisma.productsOmit
+  required_field_definitions?: Prisma.required_field_definitionsOmit
 }
 
 /* Types for Logging */

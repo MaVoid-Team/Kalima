@@ -48,6 +48,7 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "luxon": "^3.7.2",
+    "mapped-types": "^0.0.1",
     "mongoose": "^8.11.0",
     "mongoose-sequence": "^6.0.1",
     "morgan": "^1.10.0",

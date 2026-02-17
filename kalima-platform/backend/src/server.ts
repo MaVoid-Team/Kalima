@@ -6,6 +6,7 @@ import path from "path";
 import storeV2Routes from "./apps/store-api/routes/v2/index";
 import authRoutes from "./apps/store-api/routes/v2/auth.routes";
 import adminRoutes from "./apps/store-api/routes/v2/admin.routes";
+import { errorHandler } from "./libs/errors";
 // import { prisma} from './libs/db/prisma';
 
 const app = express();
@@ -32,6 +33,9 @@ app.get("/api/v2/health", async (_, res) => {
 app.use("/api/v2", storeV2Routes);
 app.use("/api/v2/auth", authRoutes);
 app.use("/api/v2/admin", adminRoutes);
+
+// Global error handler — must be registered AFTER all routes
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

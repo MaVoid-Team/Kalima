@@ -4,6 +4,7 @@ import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
 import { AssignRoleDto, RevokeRoleDto, SetRolesDto } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma";
+import { ValidationError, BadRequestError } from "../../../libs/errors";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -12,7 +13,7 @@ import { role_enum, portal_enum } from "../generated/prisma";
 async function validateDto<T extends object>(
   DtoClass: new () => T,
   body: unknown,
-): Promise<{ dto: T | null; errors: string[] }> {
+): Promise<T> {
   const dto = plainToInstance(DtoClass, body);
   const validationErrors = await validate(dto);
 
@@ -20,15 +21,10 @@ async function validateDto<T extends object>(
     const errors = validationErrors.flatMap((err) =>
       Object.values(err.constraints || {}),
     );
-    return { dto: null, errors };
+    throw new ValidationError(errors);
   }
 
-  return { dto, errors: [] };
-}
-
-function handleError(res: Response, error: unknown, statusCode = 400): void {
-  const message = error instanceof Error ? error.message : "An error occurred";
-  res.status(statusCode).json({ success: false, message });
+  return dto;
 }
 
 const VALID_ROLES = Object.values(role_enum);
@@ -37,21 +33,16 @@ const VALID_PORTALS = Object.values(portal_enum);
 function validateEnums(
   portal: string,
   role: string,
-  res: Response,
-): { portal: portal_enum; role: role_enum } | null {
+): { portal: portal_enum; role: role_enum } {
   if (!VALID_PORTALS.includes(portal as portal_enum)) {
-    res.status(400).json({
-      success: false,
-      message: `Invalid portal "${portal}". Must be one of: ${VALID_PORTALS.join(", ")}`,
-    });
-    return null;
+    throw new BadRequestError(
+      `Invalid portal "${portal}". Must be one of: ${VALID_PORTALS.join(", ")}`,
+    );
   }
   if (!VALID_ROLES.includes(role as role_enum)) {
-    res.status(400).json({
-      success: false,
-      message: `Invalid role "${role}". Must be one of: ${VALID_ROLES.join(", ")}`,
-    });
-    return null;
+    throw new BadRequestError(
+      `Invalid role "${role}". Must be one of: ${VALID_ROLES.join(", ")}`,
+    );
   }
   return { portal: portal as portal_enum, role: role as role_enum };
 }
@@ -86,18 +77,14 @@ export const adminController = {
 
       // Validate role/portal enums if provided
       if (role && !VALID_ROLES.includes(role as role_enum)) {
-        res.status(400).json({
-          success: false,
-          message: `Invalid role filter "${role}". Must be one of: ${VALID_ROLES.join(", ")}`,
-        });
-        return;
+        throw new BadRequestError(
+          `Invalid role filter "${role}". Must be one of: ${VALID_ROLES.join(", ")}`,
+        );
       }
       if (portal && !VALID_PORTALS.includes(portal as portal_enum)) {
-        res.status(400).json({
-          success: false,
-          message: `Invalid portal filter "${portal}". Must be one of: ${VALID_PORTALS.join(", ")}`,
-        });
-        return;
+        throw new BadRequestError(
+          `Invalid portal filter "${portal}". Must be one of: ${VALID_PORTALS.join(", ")}`,
+        );
       }
 
       const result = await userManagementService.listUsers({
@@ -110,7 +97,7 @@ export const adminController = {
 
       res.status(200).json({ success: true, data: result });
     } catch (error) {
-      handleError(res, error);
+      _next(error);
     }
   },
 
@@ -129,20 +116,13 @@ export const adminController = {
     try {
       const userId = parseInt(req.params.userId as string, 10);
       if (isNaN(userId)) {
-        res.status(400).json({ success: false, message: "Invalid user ID" });
-        return;
+        throw new BadRequestError("Invalid user ID");
       }
 
       const user = await userManagementService.getUserWithRoles(userId);
       res.status(200).json({ success: true, data: user });
     } catch (error) {
-      handleError(
-        res,
-        error,
-        error instanceof Error && error.message === "User not found"
-          ? 404
-          : 400,
-      );
+      _next(error);
     }
   },
 
@@ -162,18 +142,11 @@ export const adminController = {
     try {
       const userId = parseInt(req.params.userId as string, 10);
       if (isNaN(userId)) {
-        res.status(400).json({ success: false, message: "Invalid user ID" });
-        return;
+        throw new BadRequestError("Invalid user ID");
       }
 
-      const { dto, errors } = await validateDto(AssignRoleDto, req.body);
-      if (!dto) {
-        res.status(400).json({ success: false, errors });
-        return;
-      }
-
-      const validated = validateEnums(dto.portal, dto.role, res);
-      if (!validated) return;
+      const dto = await validateDto(AssignRoleDto, req.body);
+      const validated = validateEnums(dto.portal, dto.role);
 
       const result = await userManagementService.assignRole(
         userId,
@@ -187,7 +160,7 @@ export const adminController = {
         data: result,
       });
     } catch (error) {
-      handleError(res, error);
+      _next(error);
     }
   },
 
@@ -207,18 +180,11 @@ export const adminController = {
     try {
       const userId = parseInt(req.params.userId as string, 10);
       if (isNaN(userId)) {
-        res.status(400).json({ success: false, message: "Invalid user ID" });
-        return;
+        throw new BadRequestError("Invalid user ID");
       }
 
-      const { dto, errors } = await validateDto(RevokeRoleDto, req.body);
-      if (!dto) {
-        res.status(400).json({ success: false, errors });
-        return;
-      }
-
-      const validated = validateEnums(dto.portal, dto.role, res);
-      if (!validated) return;
+      const dto = await validateDto(RevokeRoleDto, req.body);
+      const validated = validateEnums(dto.portal, dto.role);
 
       const result = await userManagementService.revokeRole(
         userId,
@@ -232,7 +198,7 @@ export const adminController = {
         data: result,
       });
     } catch (error) {
-      handleError(res, error);
+      _next(error);
     }
   },
 
@@ -252,22 +218,16 @@ export const adminController = {
     try {
       const userId = parseInt(req.params.userId as string, 10);
       if (isNaN(userId)) {
-        res.status(400).json({ success: false, message: "Invalid user ID" });
-        return;
+        throw new BadRequestError("Invalid user ID");
       }
 
-      const { dto, errors } = await validateDto(SetRolesDto, req.body);
-      if (!dto) {
-        res.status(400).json({ success: false, errors });
-        return;
-      }
+      const dto = await validateDto(SetRolesDto, req.body);
 
       // Validate all role entries
       const validatedRoles: Array<{ portal: portal_enum; role: role_enum }> =
         [];
       for (const entry of dto.roles) {
-        const validated = validateEnums(entry.portal, entry.role, res);
-        if (!validated) return;
+        const validated = validateEnums(entry.portal, entry.role);
         validatedRoles.push(validated);
       }
 
@@ -282,7 +242,7 @@ export const adminController = {
         data: result,
       });
     } catch (error) {
-      handleError(res, error);
+      _next(error);
     }
   },
 
@@ -301,8 +261,7 @@ export const adminController = {
     try {
       const userId = parseInt(req.params.userId as string, 10);
       if (isNaN(userId)) {
-        res.status(400).json({ success: false, message: "Invalid user ID" });
-        return;
+        throw new BadRequestError("Invalid user ID");
       }
 
       const user = await userManagementService.getUserWithRoles(userId);
@@ -316,13 +275,7 @@ export const adminController = {
         },
       });
     } catch (error) {
-      handleError(
-        res,
-        error,
-        error instanceof Error && error.message === "User not found"
-          ? 404
-          : 400,
-      );
+      _next(error);
     }
   },
 };

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { role_enum, portal_enum } from "../generated/prisma";
+import { UnauthorizedError, ForbiddenError } from "../../../libs/errors";
 
 /**
  * Middleware that checks if the authenticated user has one of the required roles
@@ -14,21 +15,17 @@ import { role_enum, portal_enum } from "../generated/prisma";
  *   router.get('/admin/users', authenticateToken, requireRole([role_enum.Admin], portal_enum.store), handler);
  */
 export function requireRole(allowedRoles: role_enum[], portal?: portal_enum) {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const user = (req as any).user;
 
     if (!user) {
-      res.status(401).json({ success: false, message: "Unauthorized" });
-      return;
+      return next(new UnauthorizedError());
     }
 
     const roles: Array<{ portal: string; role: string }> = user.roles ?? [];
 
     if (!roles.length) {
-      res
-        .status(403)
-        .json({ success: false, message: "Forbidden: No roles assigned" });
-      return;
+      return next(new ForbiddenError("Forbidden: No roles assigned"));
     }
 
     const hasPermission = roles.some((r) => {
@@ -38,11 +35,11 @@ export function requireRole(allowedRoles: role_enum[], portal?: portal_enum) {
     });
 
     if (!hasPermission) {
-      res.status(403).json({
-        success: false,
-        message: `Forbidden: Requires one of [${allowedRoles.join(", ")}]`,
-      });
-      return;
+      return next(
+        new ForbiddenError(
+          `Forbidden: Requires one of [${allowedRoles.join(", ")}]`,
+        ),
+      );
     }
 
     next();
