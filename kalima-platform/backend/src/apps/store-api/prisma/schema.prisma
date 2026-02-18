@@ -303,8 +303,11 @@ model products {
 model required_field_definitions {
   id                      Int                       @id @default(autoincrement())
   label                   String                    @unique @db.VarChar(255)
-  field_type              String?                   @default("text") @db.VarChar(50)
+  field_type              field_type_enum            @default(text)
   active                  Boolean?                  @default(true)
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?                 @db.Timestamp(6)
+  deleted_at              DateTime?                 @db.Timestamp(6)
   product_required_fields product_required_fields[]
 }
 
@@ -334,6 +337,13 @@ enum role_enum {
   Lecturer
   Moderator
   Assistant
+}
+
+enum field_type_enum {
+  text
+  number
+  date
+  image
 }
 
 enum location_type_enum {
