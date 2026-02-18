@@ -1,5 +1,5 @@
 trnode_modules
 # Keep environment variables out of version control
 .env
-.toml
+migration_lock.toml
 /generated/prisma
