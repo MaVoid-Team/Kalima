@@ -2608,7 +2608,10 @@ export const Required_field_definitionsScalarFieldEnum = {
   id: 'id',
   label: 'label',
   field_type: 'field_type',
-  active: 'active'
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
@@ -2805,6 +2808,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'field_type_enum'
+ */
+export type Enumfield_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'field_type_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'field_type_enum[]'
+ */
+export type ListEnumfield_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'field_type_enum[]'>
     
 
 

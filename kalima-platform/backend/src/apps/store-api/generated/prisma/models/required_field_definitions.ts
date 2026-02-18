@@ -37,15 +37,21 @@ export type Required_field_definitionsSumAggregateOutputType = {
 export type Required_field_definitionsMinAggregateOutputType = {
   id: number | null
   label: string | null
-  field_type: string | null
+  field_type: $Enums.field_type_enum | null
   active: boolean | null
+  created_at: Date | null
+  updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type Required_field_definitionsMaxAggregateOutputType = {
   id: number | null
   label: string | null
-  field_type: string | null
+  field_type: $Enums.field_type_enum | null
   active: boolean | null
+  created_at: Date | null
+  updated_at: Date | null
+  deleted_at: Date | null
 }
 
 export type Required_field_definitionsCountAggregateOutputType = {
@@ -53,6 +59,9 @@ export type Required_field_definitionsCountAggregateOutputType = {
   label: number
   field_type: number
   active: number
+  created_at: number
+  updated_at: number
+  deleted_at: number
   _all: number
 }
 
@@ -70,6 +79,9 @@ export type Required_field_definitionsMinAggregateInputType = {
   label?: true
   field_type?: true
   active?: true
+  created_at?: true
+  updated_at?: true
+  deleted_at?: true
 }
 
 export type Required_field_definitionsMaxAggregateInputType = {
@@ -77,6 +89,9 @@ export type Required_field_definitionsMaxAggregateInputType = {
   label?: true
   field_type?: true
   active?: true
+  created_at?: true
+  updated_at?: true
+  deleted_at?: true
 }
 
 export type Required_field_definitionsCountAggregateInputType = {
@@ -84,6 +99,9 @@ export type Required_field_definitionsCountAggregateInputType = {
   label?: true
   field_type?: true
   active?: true
+  created_at?: true
+  updated_at?: true
+  deleted_at?: true
   _all?: true
 }
 
@@ -176,8 +194,11 @@ export type required_field_definitionsGroupByArgs<ExtArgs extends runtime.Types.
 export type Required_field_definitionsGroupByOutputType = {
   id: number
   label: string
-  field_type: string | null
+  field_type: $Enums.field_type_enum
   active: boolean | null
+  created_at: Date | null
+  updated_at: Date | null
+  deleted_at: Date | null
   _count: Required_field_definitionsCountAggregateOutputType | null
   _avg: Required_field_definitionsAvgAggregateOutputType | null
   _sum: Required_field_definitionsSumAggregateOutputType | null
@@ -206,16 +227,22 @@ export type required_field_definitionsWhereInput = {
   NOT?: Prisma.required_field_definitionsWhereInput | Prisma.required_field_definitionsWhereInput[]
   id?: Prisma.IntFilter<"required_field_definitions"> | number
   label?: Prisma.StringFilter<"required_field_definitions"> | string
-  field_type?: Prisma.StringNullableFilter<"required_field_definitions"> | string | null
+  field_type?: Prisma.Enumfield_type_enumFilter<"required_field_definitions"> | $Enums.field_type_enum
   active?: Prisma.BoolNullableFilter<"required_field_definitions"> | boolean | null
+  created_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
 }
 
 export type required_field_definitionsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  field_type?: Prisma.SortOrderInput | Prisma.SortOrder
+  field_type?: Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   product_required_fields?: Prisma.product_required_fieldsOrderByRelationAggregateInput
 }
 
@@ -225,16 +252,22 @@ export type required_field_definitionsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.required_field_definitionsWhereInput | Prisma.required_field_definitionsWhereInput[]
   OR?: Prisma.required_field_definitionsWhereInput[]
   NOT?: Prisma.required_field_definitionsWhereInput | Prisma.required_field_definitionsWhereInput[]
-  field_type?: Prisma.StringNullableFilter<"required_field_definitions"> | string | null
+  field_type?: Prisma.Enumfield_type_enumFilter<"required_field_definitions"> | $Enums.field_type_enum
   active?: Prisma.BoolNullableFilter<"required_field_definitions"> | boolean | null
+  created_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
 }, "id" | "label">
 
 export type required_field_definitionsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
-  field_type?: Prisma.SortOrderInput | Prisma.SortOrder
+  field_type?: Prisma.SortOrder
   active?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.required_field_definitionsCountOrderByAggregateInput
   _avg?: Prisma.required_field_definitionsAvgOrderByAggregateInput
   _max?: Prisma.required_field_definitionsMaxOrderByAggregateInput
@@ -248,58 +281,82 @@ export type required_field_definitionsScalarWhereWithAggregatesInput = {
   NOT?: Prisma.required_field_definitionsScalarWhereWithAggregatesInput | Prisma.required_field_definitionsScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"required_field_definitions"> | number
   label?: Prisma.StringWithAggregatesFilter<"required_field_definitions"> | string
-  field_type?: Prisma.StringNullableWithAggregatesFilter<"required_field_definitions"> | string | null
+  field_type?: Prisma.Enumfield_type_enumWithAggregatesFilter<"required_field_definitions"> | $Enums.field_type_enum
   active?: Prisma.BoolNullableWithAggregatesFilter<"required_field_definitions"> | boolean | null
+  created_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"required_field_definitions"> | Date | string | null
 }
 
 export type required_field_definitionsCreateInput = {
   label: string
-  field_type?: string | null
+  field_type?: $Enums.field_type_enum
   active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsUncheckedCreateInput = {
   id?: number
   label: string
-  field_type?: string | null
+  field_type?: $Enums.field_type_enum
   active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsUpdateInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 export type required_field_definitionsUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 export type required_field_definitionsCreateManyInput = {
   id?: number
   label: string
-  field_type?: string | null
+  field_type?: $Enums.field_type_enum
   active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
 }
 
 export type required_field_definitionsUpdateManyMutationInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type required_field_definitionsUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type Required_field_definitionsScalarRelationFilter = {
@@ -312,6 +369,9 @@ export type required_field_definitionsCountOrderByAggregateInput = {
   label?: Prisma.SortOrder
   field_type?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type required_field_definitionsAvgOrderByAggregateInput = {
@@ -323,6 +383,9 @@ export type required_field_definitionsMaxOrderByAggregateInput = {
   label?: Prisma.SortOrder
   field_type?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type required_field_definitionsMinOrderByAggregateInput = {
@@ -330,6 +393,9 @@ export type required_field_definitionsMinOrderByAggregateInput = {
   label?: Prisma.SortOrder
   field_type?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrder
 }
 
 export type required_field_definitionsSumOrderByAggregateInput = {
@@ -350,17 +416,27 @@ export type required_field_definitionsUpdateOneRequiredWithoutProduct_required_f
   update?: Prisma.XOR<Prisma.XOR<Prisma.required_field_definitionsUpdateToOneWithWhereWithoutProduct_required_fieldsInput, Prisma.required_field_definitionsUpdateWithoutProduct_required_fieldsInput>, Prisma.required_field_definitionsUncheckedUpdateWithoutProduct_required_fieldsInput>
 }
 
+export type Enumfield_type_enumFieldUpdateOperationsInput = {
+  set?: $Enums.field_type_enum
+}
+
 export type required_field_definitionsCreateWithoutProduct_required_fieldsInput = {
   label: string
-  field_type?: string | null
+  field_type?: $Enums.field_type_enum
   active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
 }
 
 export type required_field_definitionsUncheckedCreateWithoutProduct_required_fieldsInput = {
   id?: number
   label: string
-  field_type?: string | null
+  field_type?: $Enums.field_type_enum
   active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
 }
 
 export type required_field_definitionsCreateOrConnectWithoutProduct_required_fieldsInput = {
@@ -381,15 +457,21 @@ export type required_field_definitionsUpdateToOneWithWhereWithoutProduct_require
 
 export type required_field_definitionsUpdateWithoutProduct_required_fieldsInput = {
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type required_field_definitionsUncheckedUpdateWithoutProduct_required_fieldsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.StringFieldUpdateOperationsInput | string
-  field_type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
   active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -428,6 +510,9 @@ export type required_field_definitionsSelect<ExtArgs extends runtime.Types.Exten
   label?: boolean
   field_type?: boolean
   active?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  deleted_at?: boolean
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
   _count?: boolean | Prisma.Required_field_definitionsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["required_field_definitions"]>
@@ -437,6 +522,9 @@ export type required_field_definitionsSelectCreateManyAndReturn<ExtArgs extends 
   label?: boolean
   field_type?: boolean
   active?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["required_field_definitions"]>
 
 export type required_field_definitionsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -444,6 +532,9 @@ export type required_field_definitionsSelectUpdateManyAndReturn<ExtArgs extends 
   label?: boolean
   field_type?: boolean
   active?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  deleted_at?: boolean
 }, ExtArgs["result"]["required_field_definitions"]>
 
 export type required_field_definitionsSelectScalar = {
@@ -451,9 +542,12 @@ export type required_field_definitionsSelectScalar = {
   label?: boolean
   field_type?: boolean
   active?: boolean
+  created_at?: boolean
+  updated_at?: boolean
+  deleted_at?: boolean
 }
 
-export type required_field_definitionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "field_type" | "active", ExtArgs["result"]["required_field_definitions"]>
+export type required_field_definitionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "field_type" | "active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["required_field_definitions"]>
 export type required_field_definitionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
   _count?: boolean | Prisma.Required_field_definitionsCountOutputTypeDefaultArgs<ExtArgs>
@@ -469,8 +563,11 @@ export type $required_field_definitionsPayload<ExtArgs extends runtime.Types.Ext
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     label: string
-    field_type: string | null
+    field_type: $Enums.field_type_enum
     active: boolean | null
+    created_at: Date | null
+    updated_at: Date | null
+    deleted_at: Date | null
   }, ExtArgs["result"]["required_field_definitions"]>
   composites: {}
 }
@@ -897,8 +994,11 @@ export interface Prisma__required_field_definitionsClient<T, Null = never, ExtAr
 export interface required_field_definitionsFieldRefs {
   readonly id: Prisma.FieldRef<"required_field_definitions", 'Int'>
   readonly label: Prisma.FieldRef<"required_field_definitions", 'String'>
-  readonly field_type: Prisma.FieldRef<"required_field_definitions", 'String'>
+  readonly field_type: Prisma.FieldRef<"required_field_definitions", 'field_type_enum'>
   readonly active: Prisma.FieldRef<"required_field_definitions", 'Boolean'>
+  readonly created_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
+  readonly deleted_at: Prisma.FieldRef<"required_field_definitions", 'DateTime'>
 }
     
 
