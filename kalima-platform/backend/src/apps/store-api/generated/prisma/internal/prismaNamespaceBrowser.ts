@@ -385,7 +385,10 @@ export const Required_field_definitionsScalarFieldEnum = {
   id: 'id',
   label: 'label',
   field_type: 'field_type',
-  active: 'active'
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
 } as const
 
 export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
