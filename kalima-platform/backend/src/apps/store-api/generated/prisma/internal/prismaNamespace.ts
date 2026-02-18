@@ -405,6 +405,7 @@ export const ModelName = {
   email_verification_tokens: 'email_verification_tokens',
   password_reset_tokens: 'password_reset_tokens',
   categories: 'categories',
+  product_categories: 'product_categories',
   coupons: 'coupons',
   product_required_fields: 'product_required_fields',
   products: 'products',
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "coupons" | "product_required_fields" | "products" | "required_field_definitions"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "product_required_fields" | "products" | "required_field_definitions"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1982,6 +1983,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    product_categories: {
+      payload: Prisma.$product_categoriesPayload<ExtArgs>
+      fields: Prisma.product_categoriesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.product_categoriesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.product_categoriesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        findFirst: {
+          args: Prisma.product_categoriesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.product_categoriesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        findMany: {
+          args: Prisma.product_categoriesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>[]
+        }
+        create: {
+          args: Prisma.product_categoriesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        createMany: {
+          args: Prisma.product_categoriesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.product_categoriesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>[]
+        }
+        delete: {
+          args: Prisma.product_categoriesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        update: {
+          args: Prisma.product_categoriesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        deleteMany: {
+          args: Prisma.product_categoriesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.product_categoriesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.product_categoriesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>[]
+        }
+        upsert: {
+          args: Prisma.product_categoriesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$product_categoriesPayload>
+        }
+        aggregate: {
+          args: Prisma.Product_categoriesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProduct_categories>
+        }
+        groupBy: {
+          args: Prisma.product_categoriesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_categoriesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.product_categoriesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Product_categoriesCountAggregateOutputType> | number
+        }
+      }
+    }
     coupons: {
       payload: Prisma.$couponsPayload<ExtArgs>
       fields: Prisma.couponsFieldRefs
@@ -2549,10 +2624,20 @@ export const CategoriesScalarFieldEnum = {
   description: 'description',
   parent_id: 'parent_id',
   mongo_id: 'mongo_id',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type CategoriesScalarFieldEnum = (typeof CategoriesScalarFieldEnum)[keyof typeof CategoriesScalarFieldEnum]
+
+
+export const Product_categoriesScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  category_id: 'category_id'
+} as const
+
+export type Product_categoriesScalarFieldEnum = (typeof Product_categoriesScalarFieldEnum)[keyof typeof Product_categoriesScalarFieldEnum]
 
 
 export const CouponsScalarFieldEnum = {
@@ -2592,7 +2677,6 @@ export const ProductsScalarFieldEnum = {
   thumbnail: 'thumbnail',
   gallery: 'gallery',
   sample_url: 'sample_url',
-  category_id: 'category_id',
   coupon_id: 'coupon_id',
   is_archived: 'is_archived',
   mongo_id: 'mongo_id',
@@ -2954,6 +3038,7 @@ export type GlobalOmitConfig = {
   email_verification_tokens?: Prisma.email_verification_tokensOmit
   password_reset_tokens?: Prisma.password_reset_tokensOmit
   categories?: Prisma.categoriesOmit
+  product_categories?: Prisma.product_categoriesOmit
   coupons?: Prisma.couponsOmit
   product_required_fields?: Prisma.product_required_fieldsOmit
   products?: Prisma.productsOmit

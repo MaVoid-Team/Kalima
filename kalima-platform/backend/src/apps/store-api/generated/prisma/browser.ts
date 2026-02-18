@@ -123,6 +123,11 @@ export type password_reset_tokens = Prisma.password_reset_tokensModel
  */
 export type categories = Prisma.categoriesModel
 /**
+ * Model product_categories
+ * 
+ */
+export type product_categories = Prisma.product_categoriesModel
+/**
  * Model coupons
  * 
  */
