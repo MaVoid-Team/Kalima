@@ -72,6 +72,7 @@ export const ModelName = {
   email_verification_tokens: 'email_verification_tokens',
   password_reset_tokens: 'password_reset_tokens',
   categories: 'categories',
+  product_categories: 'product_categories',
   coupons: 'coupons',
   product_required_fields: 'product_required_fields',
   products: 'products',
@@ -326,10 +327,20 @@ export const CategoriesScalarFieldEnum = {
   description: 'description',
   parent_id: 'parent_id',
   mongo_id: 'mongo_id',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type CategoriesScalarFieldEnum = (typeof CategoriesScalarFieldEnum)[keyof typeof CategoriesScalarFieldEnum]
+
+
+export const Product_categoriesScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  category_id: 'category_id'
+} as const
+
+export type Product_categoriesScalarFieldEnum = (typeof Product_categoriesScalarFieldEnum)[keyof typeof Product_categoriesScalarFieldEnum]
 
 
 export const CouponsScalarFieldEnum = {
@@ -369,7 +380,6 @@ export const ProductsScalarFieldEnum = {
   thumbnail: 'thumbnail',
   gallery: 'gallery',
   sample_url: 'sample_url',
-  category_id: 'category_id',
   coupon_id: 'coupon_id',
   is_archived: 'is_archived',
   mongo_id: 'mongo_id',
