@@ -13,7 +13,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import logo from "../assets/Logo.png";
-import CartPreview from "../components/cart/CartPreview";
+import CartPreview from "./cart/CartPreview";
 
 export default function Navbar() {
   const [cartItems] = useState([
@@ -102,8 +102,8 @@ export default function Navbar() {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const { t, i18n } = useTranslation("landing");
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation("landing");
 
   useEffect(() => {
     const down = (e) => {
