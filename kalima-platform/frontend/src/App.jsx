@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainLayout from "./layouts/MainLayout";
+import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/landing/LandingPage";
 import { Toaster } from "sonner";
 
@@ -23,21 +22,19 @@ function App() {
   }, [i18n, i18n.language]);
 
   return (
-    <Router>
+    <>
       <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/market" element={<MarketPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/product/:id" element={<ProductDetailsPage />} />
-          <Route path="/booklet/:id" element={<BookletDetailsPage />} />
-        </Route>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/market" element={<MarketPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/product/:id" element={<ProductDetailsPage />} />
+        <Route path="/booklet/:id" element={<BookletDetailsPage />} />
       </Routes>
       <Toaster position="bottom-right" richColors />
-    </Router>
+    </>
   );
 }
 

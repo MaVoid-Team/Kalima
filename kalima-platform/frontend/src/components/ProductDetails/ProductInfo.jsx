@@ -11,7 +11,7 @@ export default function ProductInfo({ product }) {
     <div className="flex flex-col gap-6">
       {/* Header Info */}
       <div>
-        <h1 className="text-2xl md:text-4xl font-bold leading-tight tracking-tight mb-3 text-balance break-words">
+        <h1 className="text-2xl md:text-4xl font-bold leading-tight tracking-tight mb-3 text-balance wrap-break-word">
           {product.title}
         </h1>
 

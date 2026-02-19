@@ -22,7 +22,7 @@ export default function BookletStickyFooter({ price, onAddToCart }) {
 
         {/* Buy Now (Primary) */}
         <Button
-          className="flex-[2] gap-2 font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="flex-2 gap-2 font-bold bg-primary hover:bg-primary/90 text-primary-foreground"
           size="lg"
           onClick={() => console.log("Buy Now Clicked")}
         >

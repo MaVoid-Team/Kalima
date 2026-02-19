@@ -1,8 +1,5 @@
-import { Star, BadgeCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Avatar,
   AvatarFallback,
@@ -10,18 +7,6 @@ import {
   AvatarGroup,
   AvatarGroupCount,
 } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
 
 
 const HERO_IMAGE_URL =
@@ -95,7 +80,7 @@ export default function WelcomeSection() {
           <div className="relative mx-auto w-full max-w-[600px] lg:max-w-none">
             <div className="relative h-[280px] sm:h-[550px] lg:h-[600px] w-full">
               <div
-                className="h-full w-full rounded-[2rem] bg-cover bg-center transition-transform duration-700 shadow-2xl"
+                className="h-full w-full rounded-4xl bg-cover bg-center transition-transform duration-700 shadow-2xl"
                 style={{
                   backgroundImage: `url("${HERO_IMAGE_URL}")`,
                 }}
