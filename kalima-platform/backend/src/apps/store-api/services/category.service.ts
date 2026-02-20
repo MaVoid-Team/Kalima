@@ -102,6 +102,45 @@ class CategoryService {
   }
 
   // ============================================
+  // EXTRA READS — ROOTS & CHILDREN (public, no auth)
+  // ============================================
+
+  /**
+   * Return only root (parent) categories (parent_id = null).
+   * Optional `active` filter supported.
+   */
+  async getRootCategories(filters?: { active?: boolean }): Promise<categories[]> {
+    const where: any = { parent_id: null };
+    if (filters?.active !== undefined) where.active = filters.active;
+
+    const roots = await this.db.categories.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+    });
+
+    return roots;
+  }
+
+  /**
+   * Return direct children of a parent category (parent_id = parentId).
+   * Throws NotFoundError when parent does not exist.
+   */
+  async getChildrenByParent(parentId: number, filters?: { active?: boolean }): Promise<categories[]> {
+    const parent = await this.db.categories.findUnique({ where: { id: parentId } });
+    if (!parent) throw new NotFoundError("Parent category not found");
+
+    const where: any = { parent_id: parentId };
+    if (filters?.active !== undefined) where.active = filters.active;
+
+    const children = await this.db.categories.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+    });
+
+    return children;
+  }
+
+  // ============================================
   // READ — SINGLE
   // ============================================
 

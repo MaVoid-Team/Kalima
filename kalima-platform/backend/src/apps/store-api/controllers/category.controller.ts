@@ -93,6 +93,55 @@ export const categoryController = {
   },
 
   // ============================================
+  // PUBLIC — UNAUTHENTICATED HELPERS
+  // ============================================
+
+  /**
+   * GET /categories/roots
+   * Return all root (parent) categories (parent_id = null). No auth required.
+   */
+  async getRootCategories(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const active =
+        req.query.active !== undefined ? req.query.active === "true" : undefined;
+
+      const categories = await categoryService.getRootCategories({ active });
+
+      res.status(200).json({ success: true, results: categories.length, data: categories });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * GET /categories/:id/children
+   * Return direct child categories for given parent ID. No auth required.
+   */
+  async getChildrenByParent(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid category ID");
+
+      const active =
+        req.query.active !== undefined ? req.query.active === "true" : undefined;
+
+      const children = await categoryService.getChildrenByParent(id, { active });
+
+      res.status(200).json({ success: true, results: children.length, data: children });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  // ============================================
   // GET SINGLE (Public — any authenticated user)
   // ============================================
 
