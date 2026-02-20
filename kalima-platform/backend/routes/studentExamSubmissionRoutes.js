@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam submission routes.
 const express = require("express");
 const router = express.Router();
 const examSubmissionController = require("../controllers/studentExamSubmissionController");
@@ -10,22 +13,28 @@ router.use(verifyJWT);
 
 // Routes for students
 router.get(
-  "/my-submissions", 
+  "/my-submissions",
   authController.verifyRoles("Student", "Admin", "SubAdmin", "Moderator"),
-  examSubmissionController.getMyExamSubmissions
+  examSubmissionController.getMyExamSubmissions,
 );
 
 router.post(
-  "/verify/:lectureId", 
+  "/verify/:lectureId",
   authController.verifyRoles("Student", "Admin", "SubAdmin", "Moderator"),
-  examSubmissionController.verifyExamSubmission
+  examSubmissionController.verifyExamSubmission,
 );
 
 // Routes for lecturers/assistants and administrators
 router.get(
-  "/lecture/:lectureId", 
-  authController.verifyRoles("Lecturer", "Assistant", "Admin", "SubAdmin", "Moderator"),
-  examSubmissionController.getLectureSubmissions
+  "/lecture/:lectureId",
+  authController.verifyRoles(
+    "Lecturer",
+    "Assistant",
+    "Admin",
+    "SubAdmin",
+    "Moderator",
+  ),
+  examSubmissionController.getLectureSubmissions,
 );
 
 // Test route for Google Sheets API connection
@@ -35,40 +44,40 @@ router.get(
   async (req, res) => {
     try {
       const { sheetId } = req.params;
-      
+
       if (!sheetId) {
         return res.status(400).json({
           status: "error",
-          message: "Sheet ID is required"
+          message: "Sheet ID is required",
         });
       }
-      
+
       // Configure Google Sheets API client
       const sheets = configureGoogleSheets();
-      
+
       // Get basic spreadsheet info as a connection test
       const response = await sheets.spreadsheets.get({
         spreadsheetId: sheetId,
-        fields: 'sheets.properties.title,properties.title'
+        fields: "sheets.properties.title,properties.title",
       });
-      
+
       return res.status(200).json({
         status: "success",
         message: "Google Sheets API connection successful",
         data: {
           spreadsheetTitle: response.data.properties.title,
-          sheets: response.data.sheets.map(sheet => sheet.properties.title)
-        }
+          sheets: response.data.sheets.map((sheet) => sheet.properties.title),
+        },
       });
     } catch (error) {
       console.error("Google Sheets API test error:", error);
       return res.status(500).json({
         status: "error",
         message: "Google Sheets API connection failed",
-        error: error.message
+        error: error.message,
       });
     }
-  }
+  },
 );
 
 module.exports = router;

@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared audit log model.
 const mongoose = require("mongoose");
 
 const auditLogSchema = new mongoose.Schema(
@@ -6,55 +9,70 @@ const auditLogSchema = new mongoose.Schema(
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: true,
       },
       name: {
         type: String,
-        required: true
+        required: true,
       },
       role: {
         type: String,
-        required: true
-      }
+        required: true,
+      },
     },
     action: {
       type: String,
       enum: ["create", "update", "delete"],
-      required: true
+      required: true,
     },
     resource: {
       type: {
         type: String,
         required: true,
         enum: [
-          "center", "code", "container", "moderator", "subAdmin",
-          "assistant", "admin", "lecturer", "package",
-          "lesson", "timetable", "center-lesson", "ec.section", "ec.subSection",
-          "ec.product", "ec.purchase", "ec.cartpurchase", "subject", "level"
-        ]
+          "center",
+          "code",
+          "container",
+          "moderator",
+          "subAdmin",
+          "assistant",
+          "admin",
+          "lecturer",
+          "package",
+          "lesson",
+          "timetable",
+          "center-lesson",
+          "ec.section",
+          "ec.subSection",
+          "ec.product",
+          "ec.purchase",
+          "ec.cartpurchase",
+          "subject",
+          "level",
+        ],
       },
       id: {
         type: mongoose.Schema.Types.ObjectId,
-        required: false
+        required: false,
       },
       name: {
         type: String,
-        required: false
-      }
+        required: false,
+      },
     },
     status: {
       type: String,
       enum: ["success", "failed"],
-      required: true
+      required: true,
     },
     timestamp: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 // Compound index for faster queries

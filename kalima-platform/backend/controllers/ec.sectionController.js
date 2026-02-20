@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store section controller logic.
 const ECSection = require("../models/ec.sectionModel");
 const ECProduct = require("../models/ec.productModel");
 const ECSubsection = require("../models/ec.subSectionModel");
@@ -20,7 +23,10 @@ exports.createSection = catchAsync(async (req, res, next) => {
 
 // Get all sections
 exports.getAllSections = catchAsync(async (req, res, next) => {
-  const sections = await ECSection.find().populate({ path: "subSections", select: "name _id" });
+  const sections = await ECSection.find().populate({
+    path: "subSections",
+    select: "name _id",
+  });
   res.status(200).json({
     status: "success",
     results: sections.length,
@@ -32,7 +38,10 @@ exports.getAllSections = catchAsync(async (req, res, next) => {
 
 // Get section by ID
 exports.getSectionById = catchAsync(async (req, res, next) => {
-  const section = await ECSection.findById(req.params.id).populate({ path: "subSections", select: "name _id" });
+  const section = await ECSection.findById(req.params.id).populate({
+    path: "subSections",
+    select: "name _id",
+  });
   if (!section) {
     return next(new AppError("No section found with that ID", 404));
   }
@@ -49,29 +58,32 @@ exports.getSection = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
   // Get section with subsections first
-  const section = await ECSection.findById(id)
-    .populate({
-      path: "subSections",
-      options: { sort: { createdAt: -1 } }
-    });
+  const section = await ECSection.findById(id).populate({
+    path: "subSections",
+    options: { sort: { createdAt: -1 } },
+  });
 
   if (!section) {
     return next(new AppError("Section not found", 404));
   }
 
   // Get products for the section
-  const sectionProducts = await ECProduct.find({ section: id }).sort({ createdAt: -1 });
+  const sectionProducts = await ECProduct.find({ section: id }).sort({
+    createdAt: -1,
+  });
 
   // Get products for each subsection
   const subsectionsWithProducts = await Promise.all(
     section.subSections.map(async (subsection) => {
-      const subsectionProducts = await ECProduct.find({ subSection: subsection._id });
+      const subsectionProducts = await ECProduct.find({
+        subSection: subsection._id,
+      });
       const subsectionObj = subsection.toObject();
       return {
         ...subsectionObj,
-        products: subsectionProducts
+        products: subsectionProducts,
       };
-    })
+    }),
   );
 
   // Create the final response
@@ -124,16 +136,18 @@ exports.getSectionByIdAllowed = catchAsync(async (req, res, next) => {
     return next(new AppError("User role not found in request", 401));
   }
   // Debug log
-  console.log('User role:', userRole, 'Section ID:', req.params.id);
+  console.log("User role:", userRole, "Section ID:", req.params.id);
   const section = await ECSection.findOne({
     _id: req.params.id,
     allowedFor: { $elemMatch: { $eq: userRole } },
   });
   if (section) {
-    console.log('Section allowedFor:', section.allowedFor);
+    console.log("Section allowedFor:", section.allowedFor);
   }
   if (!section) {
-    return next(new AppError("No section found with that ID for your role", 404));
+    return next(
+      new AppError("No section found with that ID for your role", 404),
+    );
   }
   res.status(200).json({
     status: "success",
@@ -149,7 +163,9 @@ exports.getAllowedSections = catchAsync(async (req, res, next) => {
   if (!userRole) {
     return next(new AppError("User role not found in request", 401));
   }
-  const sections = await ECSection.find({ allowedFor: { $elemMatch: { $eq: userRole } } });
+  const sections = await ECSection.find({
+    allowedFor: { $elemMatch: { $eq: userRole } },
+  });
   res.status(200).json({
     status: "success",
     results: sections.length,

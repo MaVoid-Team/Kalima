@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared user management logic.
 const registerController = require("../controllers/registerController");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
@@ -149,8 +152,8 @@ const updateUser = catchAsync(async (req, res, next) => {
             return next(
               new AppError(
                 "Not all children values are valid UserId or SequenceId.",
-                400
-              )
+                400,
+              ),
             );
           }
         }
@@ -295,7 +298,7 @@ const changePassword = catchAsync(async (req, res, next) => {
 
   if (!currentPassword || !newPassword) {
     return next(
-      new AppError("You should provide both current and new password", 400)
+      new AppError("You should provide both current and new password", 400),
     );
   }
 
@@ -306,7 +309,7 @@ const changePassword = catchAsync(async (req, res, next) => {
 
   const isValidCurrentPassword = await user.comparePassword(
     currentPassword,
-    user.password
+    user.password,
   );
   if (!isValidCurrentPassword) {
     return next(new AppError("Your current password is wrong", 401));
@@ -314,7 +317,7 @@ const changePassword = catchAsync(async (req, res, next) => {
 
   if (currentPassword === newPassword) {
     return next(
-      new AppError("New password can't be the same as old password", 400)
+      new AppError("New password can't be the same as old password", 400),
     );
   }
 
@@ -371,8 +374,8 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
   if (!accountType || !allAccountTypes.includes(accountType)) {
     return next(
       new AppError(
-        "You should provide one of these account types: parent, teacher, student"
-      )
+        "You should provide one of these account types: parent, teacher, student",
+      ),
     );
   }
 
@@ -385,7 +388,7 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
     await handleCSV(req.file.buffer, accountType, res, next);
   } else if (
     fileType ===
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
     fileType === "application/vnd.ms-excel"
   ) {
     await handleExcel(req.file.buffer, accountType, res, next);
@@ -393,8 +396,8 @@ const uploadFileForBulkCreation = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "Unsupported file type. Please upload a CSV or Excel file",
-        400
-      )
+        400,
+      ),
     );
   }
 });
@@ -476,7 +479,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           userId,
           responseData,
           student.lecturerPoints || [],
-          req.query
+          req.query,
         );
       }
       break;
@@ -522,7 +525,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           userId,
           responseData,
           parent.lecturerPoints || [],
-          req.query
+          req.query,
         );
       }
       break;
@@ -553,7 +556,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get containers (courses, terms, etc.) created by the lecturer
         let containerQuery = Container.find({ createdBy: userId })
           .select(
-            "name type price subject level createdAt thumbnail description"
+            "name type price subject level createdAt thumbnail description",
           )
           .populate("subject", "name")
           .populate("level", "name");
@@ -574,7 +577,7 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get all lectures created by the lecturer
         const lectures = await Lecture.find({ createdBy: userId })
           .select(
-            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type subject level createdAt thumbnail"
+            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type subject level createdAt thumbnail",
           )
           .populate("subject", "name")
           .populate("level", "name")
@@ -701,7 +704,7 @@ const getMyData = catchAsync(async (req, res, next) => {
             responseData.examSubmissions.length;
           const totalExamScores = responseData.examSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0),
-            0
+            0,
           );
           stats.averageExamScore =
             responseData.examSubmissions.length > 0
@@ -717,7 +720,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           stats.totalStudentExamSubmissions = examSubmissions.length;
           const totalExamScores = examSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0),
-            0
+            0,
           );
           stats.averageExamScore =
             examSubmissions.length > 0
@@ -730,7 +733,7 @@ const getMyData = catchAsync(async (req, res, next) => {
             responseData.homeworkSubmissions.length;
           const totalHomeworkScores = responseData.homeworkSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0),
-            0
+            0,
           );
           stats.averageHomeworkScore =
             responseData.homeworkSubmissions.length > 0
@@ -746,7 +749,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           stats.totalStudentHomeworkSubmissions = homeworkSubmissions.length;
           const totalHomeworkScores = homeworkSubmissions.reduce(
             (sum, sub) => sum + (sub.score || 0),
-            0
+            0,
           );
           stats.averageHomeworkScore =
             homeworkSubmissions.length > 0
@@ -800,7 +803,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           userId,
           responseData,
           teacher.lecturerPoints || [],
-          req.query
+          req.query,
         );
       }
 
@@ -869,7 +872,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           .populate("subject", "name")
           .populate("level", "name")
           .select(
-            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type"
+            "name description videoLink numberOfViews requiresExam requiresHomework lecture_type",
           )
           .lean();
 
@@ -900,8 +903,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         // Get exam submissions for lectures created by the assigned lecturer
         const lecturerLectures = !responseData.lectures
           ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
-            .select("_id")
-            .lean()
+              .select("_id")
+              .lean()
           : responseData.lectures;
 
         const lectureIds = lecturerLectures.map((lecture) => lecture._id);
@@ -922,8 +925,8 @@ const getMyData = catchAsync(async (req, res, next) => {
         const lecturerLectures =
           !responseData.lectures && !responseData.examSubmissions
             ? await Lecture.find({ createdBy: assistant.assignedLecturer._id })
-              .select("_id")
-              .lean()
+                .select("_id")
+                .lean()
             : responseData.lectures || responseData.examSubmissions;
 
         // Get lecture IDs, handling both direct lecture objects and exam submission objects
@@ -962,7 +965,7 @@ const getMyData = catchAsync(async (req, res, next) => {
           stats.totalLectures = responseData.lectures.length;
           stats.lectureViews = responseData.lectures.reduce(
             (sum, lecture) => sum + (lecture.numberOfViews || 0),
-            0
+            0,
           );
         } else {
           const lectureCount = await Lecture.countDocuments({
@@ -978,40 +981,40 @@ const getMyData = catchAsync(async (req, res, next) => {
 
           stats.lectureViews = lectures.reduce(
             (sum, lecture) => sum + (lecture.numberOfViews || 0),
-            0
+            0,
           );
         }
         stats.totalStudentExamSubmissions = responseData.examSubmissions
           ? responseData.examSubmissions.length
           : await StudentExamSubmission.countDocuments({
-            lecture: {
-              $in: await Lecture.find({
-                createdBy: assistant.assignedLecturer._id,
-              }).distinct("_id"),
-            },
-            type: "exam",
-          });
+              lecture: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+              type: "exam",
+            });
 
         stats.totalStudentHomeworkSubmissions = responseData.homeworkSubmissions
           ? responseData.homeworkSubmissions.length
           : await StudentExamSubmission.countDocuments({
-            lecture: {
-              $in: await Lecture.find({
-                createdBy: assistant.assignedLecturer._id,
-              }).distinct("_id"),
-            },
-            type: "homework",
-          });
+              lecture: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+              type: "homework",
+            });
 
         stats.totalAttachments = responseData.attachments
           ? responseData.attachments.length
           : await Attachment.countDocuments({
-            lectureId: {
-              $in: await Lecture.find({
-                createdBy: assistant.assignedLecturer._id,
-              }).distinct("_id"),
-            },
-          });
+              lectureId: {
+                $in: await Lecture.find({
+                  createdBy: assistant.assignedLecturer._id,
+                }).distinct("_id"),
+              },
+            });
 
         responseData.stats = stats;
       }
@@ -1052,7 +1055,7 @@ const getStudentParentAdditionalData = async (
   userId,
   responseData,
   pointsBalances,
-  queryParams = {}
+  queryParams = {},
 ) => {
   const fields = queryParams.fields ? queryParams.fields.split(",") : null;
 
@@ -1174,7 +1177,7 @@ const getStudentParentAdditionalData = async (
         page: parseInt(queryParams.page) || 1,
         limit: parseInt(queryParams.limit) || 10,
         totalPages: Math.ceil(
-          totalPurchases / (parseInt(queryParams.limit) || 10)
+          totalPurchases / (parseInt(queryParams.limit) || 10),
         ),
       },
     };
@@ -1187,7 +1190,7 @@ const getStudentParentAdditionalData = async (
       const purchaseIds = purchaseHistory.map((p) => p._id.toString());
       const missingIds = purchaseIds.filter(
         (id) =>
-          !studentDoc.purchaseHistory.map((x) => x.toString()).includes(id)
+          !studentDoc.purchaseHistory.map((x) => x.toString()).includes(id),
       );
       if (missingIds.length > 0) {
         studentDoc.purchaseHistory.push(...missingIds);
@@ -1237,7 +1240,7 @@ const getStudentParentAdditionalData = async (
     // Apply query features for lecture access
     const lectureAccessFeatures = new QueryFeatures(
       lectureAccessQuery,
-      queryParams
+      queryParams,
     )
       .filter()
       .sort()
@@ -1264,7 +1267,7 @@ const getStudentParentAdditionalData = async (
       page: parseInt(queryParams.page) || 1,
       limit: parseInt(queryParams.limit) || 10,
       totalPages: Math.ceil(
-        totalLectureAccess / (parseInt(queryParams.limit) || 10)
+        totalLectureAccess / (parseInt(queryParams.limit) || 10),
       ),
     };
   }
@@ -1319,7 +1322,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
   // Check if user is a parent
   if (req.user.role !== "Parent") {
     return next(
-      new AppError("Only parents can access their children's data", 403)
+      new AppError("Only parents can access their children's data", 403),
     );
   }
 
@@ -1390,7 +1393,7 @@ const getParentChildrenData = catchAsync(async (req, res, next) => {
         redeemedCodes,
         examScores, // Include exam scores in the response
       };
-    })
+    }),
   );
 
   res.status(200).json({
@@ -1412,8 +1415,8 @@ const updateMe = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "This route is not for password updates. Please use /update/password",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -1459,7 +1462,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   if (req.file && req.file.fieldname === "profilePic") {
     // Delete old profile picture if it exists
     const currentUser = await User.findById(userId).select(
-      "profilePic referredBy userSerial"
+      "profilePic referredBy userSerial",
     );
     if (
       currentUser &&
@@ -1477,7 +1480,7 @@ const updateMe = catchAsync(async (req, res, next) => {
   } else {
     // If not uploading a new profilePic, still need currentUser for referral logic
     var currentUser = await User.findById(userId).select(
-      "referredBy userSerial"
+      "referredBy userSerial",
     );
   }
 
@@ -1500,7 +1503,7 @@ const updateMe = catchAsync(async (req, res, next) => {
       }
     } else {
       return next(
-        new AppError("Referral code already set and cannot be changed.", 400)
+        new AppError("Referral code already set and cannot be changed.", 400),
       );
     }
   }
@@ -1534,7 +1537,7 @@ const updateMe = catchAsync(async (req, res, next) => {
         // Check if child is already in the list to avoid duplicates
         const childIdStr = child._id.toString();
         const alreadyAdded = childrenToAdd.some(
-          (id) => id.toString() === childIdStr
+          (id) => id.toString() === childIdStr,
         );
 
         if (!alreadyAdded) {
@@ -1641,7 +1644,7 @@ const confirmTeacher = catchAsync(async (req, res, next) => {
   const teacher = await Teacher.findByIdAndUpdate(
     teacherId,
     { confrimed: true, confrimedBy: adminId },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password");
 
   if (!teacher) {
@@ -1726,9 +1729,9 @@ const getCreatedAccountsStats = catchAsync(async (req, res, next) => {
   // Convert to array and populate creator details
   const result = [];
   for (const creatorId of Object.keys(creatorMap)) {
-    const creator = await User.findById(creatorId).select(
-      "name email role"
-    ).lean();
+    const creator = await User.findById(creatorId)
+      .select("name email role")
+      .lean();
 
     if (creator) {
       result.push({

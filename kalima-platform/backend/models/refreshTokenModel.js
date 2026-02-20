@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared refresh token model.
 const mongoose = require("mongoose");
 
 const refreshTokenSchema = new mongoose.Schema({
