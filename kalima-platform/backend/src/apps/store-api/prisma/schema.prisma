@@ -73,7 +73,10 @@ model users {
   user_analytics            user_analytics?
   user_roles                user_roles[]
   carts                     carts[]
-  purchases                 purchases[]
+  purchases                 purchases[]           @relation("PurchaseCreator")
+  purchases_received        purchases[]           @relation("PurchaseReceiver")
+  purchases_confirmed       purchases[]           @relation("PurchaseConfirmer")
+  purchases_returned        purchases[]           @relation("PurchaseReturner")
   coupon_usages             coupon_usages[]
 
   @@index([mongo_id], map: "ix_users_mongo_id")
@@ -420,12 +423,21 @@ model purchases {
   notes                String?
   admin_notes          String?
   admin_note_by        Int?
+  received_at          DateTime? @db.Timestamp(6)
+  received_by          Int?
+  confirmed_at         DateTime? @db.Timestamp(6)
+  confirmed_by         Int?
+  returned_at          DateTime? @db.Timestamp(6)
+  returned_by          Int?
   created_at           DateTime? @default(now()) @db.Timestamp(6)
   updated_at           DateTime? @db.Timestamp(6)
   deleted_at           DateTime? @db.Timestamp(6)
   purchase_items       purchase_items[]
   coupon_usages        coupon_usages[]
-  users                users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users                users     @relation("PurchaseCreator", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  received_by_user     users?    @relation("PurchaseReceiver", fields: [received_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  confirmed_by_user    users?    @relation("PurchaseConfirmer", fields: [confirmed_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  returned_by_user     users?    @relation("PurchaseReturner", fields: [returned_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   payment_methods      payment_methods? @relation(fields: [payment_method_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   payment_screenshot   images?   @relation("PurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   watermark            images?   @relation("PurchaseWatermark", fields: [watermark_id], references: [id], onDelete: SetNull, onUpdate: NoAction)

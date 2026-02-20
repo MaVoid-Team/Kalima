@@ -3612,6 +3612,12 @@ export const PurchasesScalarFieldEnum = {
   notes: 'notes',
   admin_notes: 'admin_notes',
   admin_note_by: 'admin_note_by',
+  received_at: 'received_at',
+  received_by: 'received_by',
+  confirmed_at: 'confirmed_at',
+  confirmed_by: 'confirmed_by',
+  returned_at: 'returned_at',
+  returned_by: 'returned_by',
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at'
