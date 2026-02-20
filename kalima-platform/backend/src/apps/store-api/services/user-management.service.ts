@@ -48,6 +48,26 @@ const SALT_ROUNDS = 12;
 class UserManagementService {
   constructor(private db: PrismaClient = prisma) {}
 
+  /**
+   * Increment user's analytics counters (safe to call inside a transaction when `tx` is provided).
+   */
+  async incrementUserAnalytics(
+    user_id: number,
+    totalSpentIncrement: number,
+    purchasesIncrement: number,
+    tx?: PrismaClient,
+  ) {
+    const client = tx ?? this.db;
+    await client.user_analytics.upsert({
+      where: { user_id },
+      create: { user_id, total_spent: totalSpentIncrement, number_of_purchases: purchasesIncrement },
+      update: {
+        total_spent: { increment: totalSpentIncrement },
+        number_of_purchases: { increment: purchasesIncrement },
+      },
+    });
+  }
+
   // ============================================
   // CREATE MAIN USERS (Local Registration)
   // ============================================

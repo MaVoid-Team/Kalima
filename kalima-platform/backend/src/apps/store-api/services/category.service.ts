@@ -60,7 +60,18 @@ class CategoryService {
    */
   async getAllCategories(filters?: {
     active?: boolean;
-  }): Promise<categories[]> {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: categories[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 50;
+    const skip = (page - 1) * limit;
+
     const where: any = {};
 
     if (filters?.active !== undefined) {
@@ -70,35 +81,42 @@ class CategoryService {
     // Get root categories (no parent) with 3 levels of nesting
     where.parent_id = null;
 
-    const roots = await this.db.categories.findMany({
-      where,
-      include: {
-        other_categories: {
-          where:
-            filters?.active !== undefined ? { active: filters.active } : {},
-          include: {
-            other_categories: {
-              where:
-                filters?.active !== undefined ? { active: filters.active } : {},
-              include: {
-                product_categories: {
-                  select: { product_id: true },
+    const [data, total] = await Promise.all([
+      this.db.categories.findMany({
+        where,
+        include: {
+          other_categories: {
+            where:
+              filters?.active !== undefined ? { active: filters.active } : {},
+            include: {
+              other_categories: {
+                where:
+                  filters?.active !== undefined
+                    ? { active: filters.active }
+                    : {},
+                include: {
+                  product_categories: {
+                    select: { product_id: true },
+                  },
                 },
               },
-            },
-            product_categories: {
-              select: { product_id: true },
+              product_categories: {
+                select: { product_id: true },
+              },
             },
           },
+          product_categories: {
+            select: { product_id: true },
+          },
         },
-        product_categories: {
-          select: { product_id: true },
-        },
-      },
-      orderBy: { created_at: "desc" },
-    });
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.categories.count({ where }),
+    ]);
 
-    return roots;
+    return { data, total, page, limit };
   }
 
   // ============================================
@@ -109,7 +127,9 @@ class CategoryService {
    * Return only root (parent) categories (parent_id = null).
    * Optional `active` filter supported.
    */
-  async getRootCategories(filters?: { active?: boolean }): Promise<categories[]> {
+  async getRootCategories(filters?: {
+    active?: boolean;
+  }): Promise<categories[]> {
     const where: any = { parent_id: null };
     if (filters?.active !== undefined) where.active = filters.active;
 
@@ -125,8 +145,13 @@ class CategoryService {
    * Return direct children of a parent category (parent_id = parentId).
    * Throws NotFoundError when parent does not exist.
    */
-  async getChildrenByParent(parentId: number, filters?: { active?: boolean }): Promise<categories[]> {
-    const parent = await this.db.categories.findUnique({ where: { id: parentId } });
+  async getChildrenByParent(
+    parentId: number,
+    filters?: { active?: boolean },
+  ): Promise<categories[]> {
+    const parent = await this.db.categories.findUnique({
+      where: { id: parentId },
+    });
     if (!parent) throw new NotFoundError("Parent category not found");
 
     const where: any = { parent_id: parentId };

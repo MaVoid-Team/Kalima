@@ -81,13 +81,11 @@ export const sitesController = {
       if (isNaN(id)) throw new BadRequestError("Invalid site ID");
       const dto = await validateDto(UpdateSiteDto, req.body);
       const updated = await sitesService.updateSite(id, dto);
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Site updated successfully",
-          data: updated,
-        });
+      res.status(200).json({
+        success: true,
+        message: "Site updated successfully",
+        data: updated,
+      });
     } catch (err) {
       _next(err);
     }

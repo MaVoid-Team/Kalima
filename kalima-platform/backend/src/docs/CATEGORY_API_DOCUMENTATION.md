@@ -53,23 +53,26 @@ These two endpoints are intentionally public and do **not** require a JWT.
 
 ### Get All Categories (Tree)
 
-Returns all root-level categories with nested children up to **3 levels deep**. Supports filtering by active status.
+Returns root-level categories (with nested children up to **3 levels deep**) and supports optional pagination and active filtering.
 
 **Endpoint:** `GET /`  
 **Auth Required:** Yes (any role)
 
 **Query Parameters:**
 
-| Param    | Type    | Required | Description                                                   |
-| -------- | ------- | -------- | ------------------------------------------------------------- |
-| `active` | boolean | No       | Filter by active status (`true` or `false`). Omit to get all. |
+| Param    | Type    | Default | Description                                                   |
+| -------- | ------- | ------- | ------------------------------------------------------------- |
+| `active` | boolean | —       | Filter by active status (`true` or `false`). Omit to get all. |
+| `page`   | number  | 1       | Page number (1-based)                                         |
+| `limit`  | number  | 50      | Items per page (root categories per page)                     |
+
+**Example:** `GET /?active=true&page=1&limit=50`
 
 **Success Response (200):**
 
 ```json
 {
   "success": true,
-  "results": 2,
   "data": [
     {
       "id": 1,
@@ -115,7 +118,10 @@ Returns all root-level categories with nested children up to **3 levels deep**. 
       "product_categories": [],
       "other_categories": []
     }
-  ]
+  ],
+  "total": 2,
+  "page": 1,
+  "limit": 50
 }
 ```
 

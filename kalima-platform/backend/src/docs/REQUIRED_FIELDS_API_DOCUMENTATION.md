@@ -89,60 +89,54 @@ Creates a new field definition in the dictionary. Labels must be unique.
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 409 | `Field definition with label "X" already exists` | Duplicate label |
-| 422 | Validation errors array | Invalid or missing fields |
+| Status | Message                                          | Condition                 |
+| ------ | ------------------------------------------------ | ------------------------- |
+| 409    | `Field definition with label "X" already exists` | Duplicate label           |
+| 422    | Validation errors array                          | Invalid or missing fields |
 
 ---
 
 ### Get All Field Definitions
 
-Returns a paginated list of all non-deleted field definitions.
+Returns the full list of non-deleted field definitions (not paginated).
 
 **Endpoint:** `GET /definitions`  
 **Auth Required:** Yes (Admin, SubAdmin)
 
 **Query Parameters:**
 
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `page` | number | 1 | Page number |
-| `limit` | number | 20 | Items per page |
-| `active` | boolean | — | Filter by active status (`true` or `false`) |
+| Param    | Type    | Default | Description                                 |
+| -------- | ------- | ------- | ------------------------------------------- |
+| `active` | boolean | —       | Filter by active status (`true` or `false`) |
 
-**Example:** `GET /definitions?page=1&limit=10&active=true`
+**Example:** `GET /definitions?active=true`
 
 **Success Response (200):**
 
 ```json
 {
   "success": true,
-  "data": {
-    "definitions": [
-      {
-        "id": 1,
-        "label": "Student Name",
-        "field_type": "text",
-        "active": true,
-        "created_at": "2026-02-18T10:00:00.000Z",
-        "updated_at": null,
-        "deleted_at": null
-      },
-      {
-        "id": 2,
-        "label": "Birth Date",
-        "field_type": "date",
-        "active": true,
-        "created_at": "2026-02-18T10:05:00.000Z",
-        "updated_at": null,
-        "deleted_at": null
-      }
-    ],
-    "total": 2,
-    "page": 1,
-    "limit": 10
-  }
+  "results": 2,
+  "data": [
+    {
+      "id": 1,
+      "label": "Student Name",
+      "field_type": "text",
+      "active": true,
+      "created_at": "2026-02-18T10:00:00.000Z",
+      "updated_at": null,
+      "deleted_at": null
+    },
+    {
+      "id": 2,
+      "label": "Birth Date",
+      "field_type": "date",
+      "active": true,
+      "created_at": "2026-02-18T10:05:00.000Z",
+      "updated_at": null,
+      "deleted_at": null
+    }
+  ]
 }
 ```
 
@@ -157,9 +151,9 @@ Returns a single field definition. Returns 404 if not found or soft-deleted.
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `id` | number | Field definition ID |
+| Param | Type   | Description         |
+| ----- | ------ | ------------------- |
+| `id`  | number | Field definition ID |
 
 **Success Response (200):**
 
@@ -180,10 +174,10 @@ Returns a single field definition. Returns 404 if not found or soft-deleted.
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid field definition ID` | ID is not a number |
-| 404 | `Field definition not found` | Does not exist or is soft-deleted |
+| Status | Message                       | Condition                         |
+| ------ | ----------------------------- | --------------------------------- |
+| 400    | `Invalid field definition ID` | ID is not a number                |
+| 404    | `Field definition not found`  | Does not exist or is soft-deleted |
 
 ---
 
@@ -196,9 +190,9 @@ Updates one or more fields on an existing definition. Use this to rename, change
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `id` | number | Field definition ID |
+| Param | Type   | Description         |
+| ----- | ------ | ------------------- |
+| `id`  | number | Field definition ID |
 
 **Request Body (all fields optional):**
 
@@ -247,12 +241,12 @@ Updates one or more fields on an existing definition. Use this to rename, change
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid field definition ID` | ID is not a number |
-| 404 | `Field definition not found` | Does not exist or is soft-deleted |
-| 409 | `Field definition with label "X" already exists` | New label conflicts with another |
-| 422 | Validation errors array | Invalid fields |
+| Status | Message                                          | Condition                         |
+| ------ | ------------------------------------------------ | --------------------------------- |
+| 400    | `Invalid field definition ID`                    | ID is not a number                |
+| 404    | `Field definition not found`                     | Does not exist or is soft-deleted |
+| 409    | `Field definition with label "X" already exists` | New label conflicts with another  |
+| 422    | Validation errors array                          | Invalid fields                    |
 
 ---
 
@@ -265,9 +259,9 @@ Soft-deletes a field definition by setting `deleted_at` and `active = false`. Al
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `id` | number | Field definition ID |
+| Param | Type   | Description         |
+| ----- | ------ | ------------------- |
+| `id`  | number | Field definition ID |
 
 **Success Response (200):**
 
@@ -280,10 +274,10 @@ Soft-deletes a field definition by setting `deleted_at` and `active = false`. Al
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid field definition ID` | ID is not a number |
-| 404 | `Field definition not found` | Does not exist or is already deleted |
+| Status | Message                       | Condition                            |
+| ------ | ----------------------------- | ------------------------------------ |
+| 400    | `Invalid field definition ID` | ID is not a number                   |
+| 404    | `Field definition not found`  | Does not exist or is already deleted |
 
 ---
 
@@ -302,9 +296,9 @@ Attaches one or more field definitions to a product. Duplicates are silently ski
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `productId` | number | Product ID |
+| Param       | Type   | Description |
+| ----------- | ------ | ----------- |
+| `productId` | number | Product ID  |
 
 **Request Body:**
 
@@ -346,12 +340,12 @@ Attaches one or more field definitions to a product. Duplicates are silently ski
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid product ID` | ID is not a number |
-| 404 | `Product not found` | Product does not exist or is soft-deleted |
-| 404 | `Field definition(s) not found: 5, 9` | One or more definition IDs are invalid |
-| 422 | Validation errors array | Invalid body structure |
+| Status | Message                               | Condition                                 |
+| ------ | ------------------------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID`                  | ID is not a number                        |
+| 404    | `Product not found`                   | Product does not exist or is soft-deleted |
+| 404    | `Field definition(s) not found: 5, 9` | One or more definition IDs are invalid    |
+| 422    | Validation errors array               | Invalid body structure                    |
 
 ---
 
@@ -364,9 +358,9 @@ Lists all active fields attached to a product, including the full definition det
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `productId` | number | Product ID |
+| Param       | Type   | Description |
+| ----------- | ------ | ----------- |
+| `productId` | number | Product ID  |
 
 **Success Response (200):**
 
@@ -413,10 +407,10 @@ Lists all active fields attached to a product, including the full definition det
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid product ID` | ID is not a number |
-| 404 | `Product not found` | Product does not exist or is soft-deleted |
+| Status | Message              | Condition                                 |
+| ------ | -------------------- | ----------------------------------------- |
+| 400    | `Invalid product ID` | ID is not a number                        |
+| 404    | `Product not found`  | Product does not exist or is soft-deleted |
 
 ---
 
@@ -429,9 +423,9 @@ Removes a field definition from a product (hard deletes the junction row).
 
 **URL Parameters:**
 
-| Param | Type | Description |
-|-------|------|-------------|
-| `productId` | number | Product ID |
+| Param        | Type   | Description                   |
+| ------------ | ------ | ----------------------------- |
+| `productId`  | number | Product ID                    |
 | `fieldDefId` | number | Field definition ID to detach |
 
 **Success Response (200):**
@@ -445,11 +439,11 @@ Removes a field definition from a product (hard deletes the junction row).
 
 **Error Responses:**
 
-| Status | Message | Condition |
-|--------|---------|-----------|
-| 400 | `Invalid product ID` | ID is not a number |
-| 400 | `Invalid field definition ID` | ID is not a number |
-| 404 | `This field is not attached to the specified product` | Junction row does not exist |
+| Status | Message                                               | Condition                   |
+| ------ | ----------------------------------------------------- | --------------------------- |
+| 400    | `Invalid product ID`                                  | ID is not a number          |
+| 400    | `Invalid field definition ID`                         | ID is not a number          |
+| 404    | `This field is not attached to the specified product` | Junction row does not exist |
 
 ---
 
@@ -457,12 +451,12 @@ Removes a field definition from a product (hard deletes the junction row).
 
 ### FieldType (`field_type_enum`)
 
-| Value | Description |
-|-------|-------------|
-| `text` | Free-text input |
-| `number` | Numeric input |
-| `date` | Date picker |
-| `image` | Image upload |
+| Value    | Description     |
+| -------- | --------------- |
+| `text`   | Free-text input |
+| `number` | Numeric input   |
+| `date`   | Date picker     |
+| `image`  | Image upload    |
 
 ### Field Definition Object
 
@@ -522,14 +516,14 @@ Removes a field definition from a product (hard deletes the junction row).
 
 ## Error Codes
 
-| Status | Error Type | Description |
-|--------|------------|-------------|
-| 400 | `BadRequestError` | Invalid input (e.g. non-numeric ID) |
-| 401 | `UnauthorizedError` | Missing or invalid authorization token |
-| 403 | `ForbiddenError` | User does not have Admin or SubAdmin role |
-| 404 | `NotFoundError` | Resource not found or soft-deleted |
-| 409 | `ConflictError` | Duplicate label |
-| 422 | `ValidationError` | DTO validation failed — returns `errors` array |
+| Status | Error Type          | Description                                    |
+| ------ | ------------------- | ---------------------------------------------- |
+| 400    | `BadRequestError`   | Invalid input (e.g. non-numeric ID)            |
+| 401    | `UnauthorizedError` | Missing or invalid authorization token         |
+| 403    | `ForbiddenError`    | User does not have Admin or SubAdmin role      |
+| 404    | `NotFoundError`     | Resource not found or soft-deleted             |
+| 409    | `ConflictError`     | Duplicate label                                |
+| 422    | `ValidationError`   | DTO validation failed — returns `errors` array |
 
 ### Error Response Format
 
