@@ -17,16 +17,17 @@ import {
   setCachedCart,
   invalidateCartCache,
 } from "./cartCache.service";
+import { validatePaymentForCheckout } from "./checkout-validation.service";
 import type { Prisma } from "../generated/prisma";
 import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 
 // Typed payloads from Prisma for cart items/purchases
 type CartItemWithRelations = Prisma.cart_itemsGetPayload<{
-  include: { products: true; required_fields: true };
+  include: { products: true; cart_item_required_fields: true };
 }>;
 type CartWithItems = Prisma.cartsGetPayload<{
   include: {
-    cart_items: { include: { products: true; required_fields: true } };
+    cart_items: { include: { products: true; cart_item_required_fields: true } };
   };
 }>;
 
@@ -169,7 +170,7 @@ class CartService {
         cart_items: {
           include: {
             products: true,
-            required_fields: true,
+            cart_item_required_fields: true,
           },
         },
       },
@@ -403,43 +404,25 @@ class CartService {
     const total = this.#calculateTotal(subtotal, discount);
     const itemCount = this.#calculateItemCount(cart.cart_items);
 
-    // 4. Validate payment method, process payment, handle payment screenshot, etc.
+    // 4. Validate payment method, process payment, handle payment screenshot
     if (!dto.payment_method_id) {
       throw new BadRequestError("Payment method is required");
     }
-    const paymentMethod = await this.db.payment_methods.findUnique({
-      where: { id: dto.payment_method_id },
-    });
-    if (!paymentMethod || paymentMethod.status !== true)
-      throw new BadRequestError("Invalid or inactive payment method");
 
-    if (!payment_screenshot_file)
+    if (!payment_screenshot_file) {
       throw new BadRequestError("Payment screenshot is required");
+    }
     const paymentScreenshot = await imageService.uploadImage(
       payment_screenshot_file,
       { compress: true, quality: 80 },
     );
     const payment_screenshot_id = paymentScreenshot.id;
 
-    if (
-      total > 0 &&
-      (!dto.numberTransferredFrom ||
-        String(dto.numberTransferredFrom).trim().length === 0)
-    ) {
-      throw new BadRequestError(
-        "Number transferred from is required for paid purchases",
-      );
-    }
-    if (
-      dto.numberTransferredFrom &&
-      paymentMethod.phone_number &&
-      String(dto.numberTransferredFrom).trim() ===
-        String(paymentMethod.phone_number).trim()
-    ) {
-      throw new BadRequestError(
-        "Please enter the number you used to pay, not the payment method's phone number",
-      );
-    }
+    const paymentMethod = await validatePaymentForCheckout(this.db, {
+      total,
+      numberTransferredFrom: dto.numberTransferredFrom,
+      payment_method_id: dto.payment_method_id,
+    });
 
     // 5. Assemble purchase payload (typed)
     const purchaseInput: CreatePurchaseDto = {
@@ -448,9 +431,9 @@ class CartService {
       payment_screenshot_id,
       items: cart.cart_items.map((item) => ({
         product_id: item.product_id,
-        price_at_purchase: Number(item.price_at_add),
+        price_at_purchase: Number(item.price_at_add) * item.quantity,
         discount: Number(item.discount || 0),
-        required_fields: ((item.required_fields as { field_definition_id: number; value: string }[]) || []).map((rf) => ({
+        required_fields: (item.cart_item_required_fields || []).map((rf) => ({
           field_definition_id: rf.field_definition_id,
           value: rf.value,
         })),

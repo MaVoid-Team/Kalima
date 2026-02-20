@@ -7,6 +7,7 @@ import { imageService } from "./image.service";
 import type { Prisma } from "../generated/prisma";
 import type { CheckoutDto } from "../dtos/cart.dto";
 import { couponService } from "./coupon.service";
+import { validatePaymentForCheckout } from "./checkout-validation.service";
 
 class PurchasesService {
   constructor(private db: PrismaClient = prisma) {}
@@ -84,7 +85,7 @@ class PurchasesService {
 
     // Generate purchase serial
     const userSerial = this.buildUserSerialFrom({
-      mongo_id: (user as any).mongo_id,
+      mongo_id: user.mongo_id ?? undefined,
       id: user.id,
     });
     const purchaseSerial = await this.generatePurchaseSerial(
@@ -120,15 +121,13 @@ class PurchasesService {
       });
 
       if (item.required_fields && item.required_fields.length > 0) {
-        for (const rf of item.required_fields) {
-          await client.purchase_item_required_fields.create({
-            data: {
-              purchase_item_id: purchaseItem.id,
-              field_definition_id: rf.field_definition_id,
-              value: rf.value,
-            },
-          });
-        }
+        await client.purchase_item_required_fields.createMany({
+          data: item.required_fields.map((rf) => ({
+            purchase_item_id: purchaseItem.id,
+            field_definition_id: rf.field_definition_id,
+            value: rf.value,
+          })),
+        });
       }
     }
 
@@ -255,58 +254,43 @@ class PurchasesService {
         );
     }
 
-    // validate payment method
-    const paymentMethod = await client.payment_methods.findUnique({
-      where: { id: checkout.payment_method_id },
-    });
-    if (!paymentMethod || paymentMethod.status !== true)
-      throw new BadRequestError("Invalid or inactive payment method");
-
     // upload payment screenshot
-    if (!payment_screenshot_file)
+    if (!payment_screenshot_file) {
       throw new BadRequestError("Payment screenshot is required");
+    }
     const screenshot = await imageService.uploadImage(payment_screenshot_file, {
       compress: true,
       quality: 80,
     });
 
-    // assemble purchase DTO for single-item purchase
-    const lineItem: CreatePurchaseItemDto = {
-      product_id: product_id,
-      price_at_purchase: Number(product.price),
-      discount: 0,
-      required_fields: (checkout.required_fields || []).map((f) => ({ field_definition_id: f.required_field_definition_id, value: f.value })),
-    };
-
-    const subtotal = Number(product.price) * quantity;
+    const unitPrice = Number(product.price);
+    const subtotal = unitPrice * quantity;
     const discount = 0;
     const total = Math.max(0, subtotal - discount);
 
-    if (
-      total > 0 &&
-      (!checkout.numberTransferredFrom ||
-        checkout.numberTransferredFrom.trim().length === 0)
-    ) {
-      throw new BadRequestError(
-        "Number transferred from is required for paid purchases",
-      );
-    }
-    if (
-      checkout.numberTransferredFrom &&
-      paymentMethod.phone_number &&
-      String(checkout.numberTransferredFrom).trim() ===
-        String(paymentMethod.phone_number).trim()
-    ) {
-      throw new BadRequestError(
-        "Please enter the number you used to pay, not the payment method's phone number",
-      );
-    }
+    const paymentMethod = await validatePaymentForCheckout(client, {
+      total,
+      numberTransferredFrom: checkout.numberTransferredFrom,
+      payment_method_id: checkout.payment_method_id,
+    });
+
+    // Create one purchase_item per unit (schema has no quantity field)
+    const requiredFieldsMapped = (checkout.required_fields || []).map((f) => ({
+      field_definition_id: f.required_field_definition_id,
+      value: f.value,
+    }));
+    const items: CreatePurchaseItemDto[] = Array.from({ length: quantity }, () => ({
+      product_id: product_id,
+      price_at_purchase: unitPrice,
+      discount: 0,
+      required_fields: requiredFieldsMapped.length > 0 ? requiredFieldsMapped : undefined,
+    }));
 
     const purchaseDto: CreatePurchaseDto = {
       user_id,
       payment_method_id: checkout.payment_method_id,
       payment_screenshot_id: screenshot.id,
-      items: [lineItem],
+      items,
       subtotal,
       discount,
       total,
