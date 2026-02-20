@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
-import { productGalleryService } from "../services/product-gallery.service";
-import { UpdateGalleryEntryDto } from "../dtos/product-gallery.dto";
+import { productService as productGalleryService } from "../services/product.service";
+import { UpdateGalleryEntryDto } from "../dtos/product.dto";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 
 // ============================================
@@ -46,7 +46,7 @@ export const productGalleryController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const productId = parseInt(req.params.productId, 10);
+      const productId = parseInt(req.params.productId as string, 10);
       if (isNaN(productId)) {
         throw new BadRequestError("Invalid product ID");
       }
@@ -88,7 +88,7 @@ export const productGalleryController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const productId = parseInt(req.params.productId, 10);
+      const productId = parseInt(req.params.productId as string, 10);
       if (isNaN(productId)) {
         throw new BadRequestError("Invalid product ID");
       }
@@ -124,8 +124,8 @@ export const productGalleryController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const productId = parseInt(req.params.productId, 10);
-      const galleryId = parseInt(req.params.galleryId, 10);
+      const productId = parseInt(req.params.productId as string, 10);
+      const galleryId = req.params.galleryId ? parseInt(req.params.galleryId as string, 10) : NaN;
       if (isNaN(productId) || isNaN(galleryId)) {
         throw new BadRequestError("Invalid product ID or gallery ID");
       }
@@ -162,8 +162,8 @@ export const productGalleryController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const productId = parseInt(req.params.productId, 10);
-      const galleryId = parseInt(req.params.galleryId, 10);
+      const productId = parseInt(req.params.productId as string, 10);
+      const galleryId = req.params.galleryId ? parseInt(req.params.galleryId as string, 10) : NaN;
       if (isNaN(productId) || isNaN(galleryId)) {
         throw new BadRequestError("Invalid product ID or gallery ID");
       }

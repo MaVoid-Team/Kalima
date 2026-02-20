@@ -65,7 +65,7 @@ export function startPurchaseNotificationConsumer(
     if (!running) return;
     if (!isRedisAvailable() || !redis) return;
     try {
-      const results = await redis.xreadgroup(
+      const results = await (redis.xreadgroup as any)(
         "GROUP",
         CONSUMER_GROUP,
         CONSUMER_NAME,
