@@ -12,9 +12,12 @@ import {
   startPurchaseNotificationConsumer,
 } from "./apps/store-api/services/notificationStream.service";
 import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
+import cors from "cors";
+import corsOptions from "./config/corsOptions";
 
 const app = express();
 
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
