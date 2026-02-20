@@ -63,9 +63,17 @@ export const productController = {
       }
 
       const dto = await validateDto(CreateProductDto, req.body);
-      const thumbnailFile = req.file as Express.Multer.File | undefined;
+      const files = req.files as
+        | { thumbnail?: Express.Multer.File[]; sample?: Express.Multer.File[] }
+        | undefined;
+      const thumbnailFile = files?.thumbnail?.[0];
+      const sampleFile = files?.sample?.[0];
 
-      const product = await productService.createProduct(dto, thumbnailFile);
+      const product = await productService.createProduct(
+        dto,
+        thumbnailFile,
+        sampleFile,
+      );
 
       res.status(201).json({
         success: true,

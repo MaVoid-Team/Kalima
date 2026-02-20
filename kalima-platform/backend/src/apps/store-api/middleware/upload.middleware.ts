@@ -15,6 +15,8 @@ const IMAGE_MIME_TYPES = new Set([
   "image/avif",
 ]);
 
+const SAMPLE_MIME_TYPES = new Set(["application/pdf"]);
+
 // ============================================
 // FILE FILTER — images only
 // ============================================
@@ -72,3 +74,39 @@ export const uploadProfilePic = (fieldName: string) =>
 /** Custom size — for special use cases */
 export const uploadImageWithLimit = (fieldName: string, maxSizeMB: number) =>
   createImageUpload(maxSizeMB).single(fieldName);
+
+// ============================================
+// PRODUCT CREATE — thumbnail + sample (PDF)
+// ============================================
+
+function productWithSampleFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (file.fieldname === "thumbnail") {
+    return imageFilter(_req, file, cb);
+  }
+  if (file.fieldname === "sample") {
+    if (SAMPLE_MIME_TYPES.has(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new BadRequestError("Sample must be a PDF file") as unknown as Error,
+        false,
+      );
+    }
+    return;
+  }
+  cb(null, true);
+}
+
+/** Product create: thumbnail (image) + optional sample (PDF). Max 150 MB per file. */
+export const uploadProductWithSample = multer({
+  storage: memoryStorage,
+  fileFilter: productWithSampleFilter,
+  limits: { fileSize: 150 * 1024 * 1024 },
+}).fields([
+  { name: "thumbnail", maxCount: 1 },
+  { name: "sample", maxCount: 1 },
+]);

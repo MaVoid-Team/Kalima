@@ -7,6 +7,7 @@ import {
   product_required_fields,
 } from "../generated/prisma";
 import { imageService, UploadImageOptions } from "./image.service";
+import { sampleService } from "./sample.service";
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -35,6 +36,7 @@ const PRODUCT_INCLUDE = {
     include: { required_field_definitions: true },
   },
   coupons: true,
+  samples: true,
 };
 
 // ============================================
@@ -51,6 +53,7 @@ class ProductService {
   async createProduct(
     dto: CreateProductDto,
     thumbnailFile?: Express.Multer.File,
+    sampleFile?: Express.Multer.File,
   ): Promise<products> {
     // If coupon_id provided, verify it exists
     if (dto.coupon_id) {
@@ -113,7 +116,12 @@ class ProductService {
       });
     }
 
-    // Re-fetch to include categories
+    // Upload sample if provided
+    if (sampleFile) {
+      await sampleService.uploadSample(sampleFile, product.id);
+    }
+
+    // Re-fetch to include categories and sample
     return this.getProductById(product.id);
   }
 

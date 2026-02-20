@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import "dotenv/config";
+import path from "path";
 import express from "express";
 import { createServer } from "http";
 import storeV2Routes from "./apps/store-api/routes/v2/index";
@@ -16,6 +17,10 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "../uploads")),
+);
 
 app.get("/health", (_, res) => {
   res.json({ status: "ok" });

@@ -5,6 +5,7 @@ import { requireRole } from "../../middleware/requireRole.middleware";
 import {
   uploadSingleImage,
   uploadMultipleImages,
+  uploadProductWithSample,
 } from "../../middleware/upload.middleware";
 import { role_enum } from "../../generated/prisma";
 
@@ -31,7 +32,7 @@ router.get("/:id/required-fields", productController.getProductRequiredFields);
 router.post(
   "/",
   ...adminAuth,
-  uploadSingleImage("thumbnail"),
+  uploadProductWithSample,
   productController.createProduct,
 );
 
