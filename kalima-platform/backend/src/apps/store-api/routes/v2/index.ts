@@ -9,11 +9,9 @@ import sampleRoutes from "./sample.routes";
 import governmentRoutes from "./government.routes";
 import zonesRoutes from "./zones.routes";
 import sitesRoutes from "./sites.routes";
-import socialMediaRoutes from "./social-media.routes";
 import levelsRoutes from "./levels.routes";
 import subjectsRoutes from "./subjects.routes";
-import teachesAtRoutes from "./teaches-at.routes";
-import parentChildrenRoutes from "./parent-children.routes";
+import userProfileRoutes from "./user-profile.routes";
 
 const router = Router();
 
@@ -25,14 +23,15 @@ router.use("/products", productRoutes);
 router.use("/purchases", purchaseRoutes);
 router.use("/samples", sampleRoutes);
 
-// New geography & social-media endpoints
+// Lookup / reference-data endpoints
 router.use("/governments", governmentRoutes);
 router.use("/zones", zonesRoutes);
 router.use("/sites", sitesRoutes);
-router.use("/social-media", socialMediaRoutes);
 router.use("/levels", levelsRoutes);
 router.use("/subjects", subjectsRoutes);
-router.use("/teaches-at", teachesAtRoutes);
-router.use("/parent-children", parentChildrenRoutes);
+
+// User profile (consolidated teaches-at, social-media, parent-children)
+router.use("/profile", userProfileRoutes);
 
 export default router;
+

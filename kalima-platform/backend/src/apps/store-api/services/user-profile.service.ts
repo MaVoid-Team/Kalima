@@ -1,0 +1,261 @@
+import type { PrismaClient } from "../../../libs/db/prisma";
+import { prisma } from "../../../libs/db/prisma";
+import {
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+} from "../../../libs/errors";
+import { imageService } from "./image.service";
+import { teachesAtService } from "./teaches-at.service";
+import { socialMediaService } from "./social-media.service";
+import { parentChildrenService } from "./parent-children.service";
+import type { UpdateProfileDto } from "../dtos/user-profile.dto";
+import type { gender_enum } from "../generated/prisma/client";
+
+// ============================================
+// Includes for getProfile query
+// ============================================
+
+const PROFILE_INCLUDE = {
+  user_roles: { select: { portal: true, role: true } },
+  user_analytics: true,
+  teachers: {
+    select: {
+      serial: true,
+      is_primary: true,
+      is_preparatory: true,
+      is_secondary: true,
+      government_id: true,
+      zone_id: true,
+      subject_id: true,
+      government: { select: { id: true, title: true } },
+      zones: { select: { id: true, title: true } },
+      subjects: { select: { id: true, title: true } },
+    },
+  },
+  students: {
+    select: {
+      level_id: true,
+      government_id: true,
+      zone_id: true,
+      parent_phone_number: true,
+      sequenced_id: true,
+      faction: true,
+      levels: { select: { id: true, title: true } },
+      government: { select: { id: true, title: true } },
+      zones: { select: { id: true, title: true } },
+    },
+  },
+  parents: {
+    select: {
+      government_id: true,
+      zone_id: true,
+      government: { select: { id: true, title: true } },
+      zones: { select: { id: true, title: true } },
+    },
+  },
+  lecturers: { select: { bio: true, expertise: true } },
+} as const;
+
+// ============================================
+// USER PROFILE SERVICE
+// ============================================
+
+class UserProfileService {
+  constructor(private db: PrismaClient = prisma) {}
+
+  // ==========================================
+  // GET PROFILE
+  // ==========================================
+
+  async getProfile(userId: number) {
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        secondary_phone: true,
+        gender: true,
+        profile_pic_url: true,
+        is_email_verified: true,
+        created_at: true,
+        ...PROFILE_INCLUDE,
+      },
+    });
+    if (!user) throw new NotFoundError("User not found");
+    return user;
+  }
+
+  // ==========================================
+  // UPDATE PROFILE
+  // ==========================================
+
+  async updateProfile(userId: number, dto: UpdateProfileDto, userRoles: string[]) {
+    const user = await this.db.users.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundError("User not found");
+
+    // ── Basic fields (all roles) ──
+    const userData: Record<string, unknown> = {};
+    if (dto.name !== undefined) userData.name = dto.name;
+    if (dto.phone !== undefined) userData.phone = dto.phone;
+    if (dto.secondary_phone !== undefined)
+      userData.secondary_phone = dto.secondary_phone;
+    if (dto.gender !== undefined)
+      userData.gender = dto.gender as gender_enum;
+    userData.updated_at = new Date();
+
+    await this.db.users.update({ where: { id: userId }, data: userData });
+
+    // ── Teacher-specific ──
+    if (userRoles.includes("Teacher")) {
+      const teacherData: Record<string, unknown> = {};
+      let hasTeacherUpdate = false;
+
+      if (dto.subject_id !== undefined) {
+        const subj = await this.db.subjects.findUnique({
+          where: { id: dto.subject_id },
+        });
+        if (!subj) throw new NotFoundError("Subject not found");
+        teacherData.subject_id = dto.subject_id;
+        hasTeacherUpdate = true;
+      }
+      if (dto.government_id !== undefined) {
+        const gov = await this.db.government.findUnique({
+          where: { id: dto.government_id },
+        });
+        if (!gov) throw new NotFoundError("Government not found");
+        teacherData.government_id = dto.government_id;
+        hasTeacherUpdate = true;
+      }
+      if (dto.zone_id !== undefined) {
+        const zone = await this.db.zones.findUnique({
+          where: { id: dto.zone_id },
+        });
+        if (!zone) throw new NotFoundError("Zone not found");
+        teacherData.zone_id = dto.zone_id;
+        hasTeacherUpdate = true;
+      }
+
+      if (hasTeacherUpdate) {
+        await this.db.teachers.upsert({
+          where: { user_id: userId },
+          update: teacherData,
+          create: { user_id: userId, ...teacherData },
+        });
+      }
+    }
+
+    // ── Student-specific ──
+    if (userRoles.includes("Student")) {
+      const studentData: Record<string, unknown> = {};
+      let hasStudentUpdate = false;
+
+      if (dto.level_id !== undefined) {
+        const lvl = await this.db.levels.findUnique({
+          where: { id: dto.level_id },
+        });
+        if (!lvl) throw new NotFoundError("Level not found");
+        studentData.level_id = dto.level_id;
+        hasStudentUpdate = true;
+      }
+      if (dto.faction !== undefined) {
+        studentData.faction = dto.faction;
+        hasStudentUpdate = true;
+      }
+      if (dto.government_id !== undefined) {
+        studentData.government_id = dto.government_id;
+        hasStudentUpdate = true;
+      }
+      if (dto.zone_id !== undefined) {
+        studentData.zone_id = dto.zone_id;
+        hasStudentUpdate = true;
+      }
+      if (dto.parent_phone_number !== undefined) {
+        studentData.parent_phone_number = dto.parent_phone_number;
+        hasStudentUpdate = true;
+      }
+
+      if (hasStudentUpdate) {
+        await this.db.students.upsert({
+          where: { user_id: userId },
+          update: studentData,
+          create: { user_id: userId, ...studentData },
+        });
+      }
+    }
+
+    // ── Parent-specific ──
+    if (userRoles.includes("Parent")) {
+      const parentData: Record<string, unknown> = {};
+      let hasParentUpdate = false;
+
+      if (dto.government_id !== undefined) {
+        parentData.government_id = dto.government_id;
+        hasParentUpdate = true;
+      }
+      if (dto.zone_id !== undefined) {
+        parentData.zone_id = dto.zone_id;
+        hasParentUpdate = true;
+      }
+
+      if (hasParentUpdate) {
+        await this.db.parents.upsert({
+          where: { user_id: userId },
+          update: parentData,
+          create: { user_id: userId, ...parentData },
+        });
+      }
+    }
+
+    return this.getProfile(userId);
+  }
+
+  // ==========================================
+  // UPLOAD PROFILE PICTURE
+  // ==========================================
+
+  async uploadProfilePic(userId: number, file: Express.Multer.File) {
+    const user = await this.db.users.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundError("User not found");
+
+    const image = await imageService.uploadImage(file, {
+      compress: true,
+      quality: 80,
+    });
+
+    await this.db.users.update({
+      where: { id: userId },
+      data: { profile_pic_url: image.url, updated_at: new Date() },
+    });
+
+    return { profile_pic_url: image.url };
+  }
+
+  // ==========================================
+  // TEACHES-AT (delegates to service)
+  // ==========================================
+
+  get teachesAt() {
+    return teachesAtService;
+  }
+
+  // ==========================================
+  // SOCIAL MEDIA (delegates to service)
+  // ==========================================
+
+  get socialMedia() {
+    return socialMediaService;
+  }
+
+  // ==========================================
+  // PARENT-CHILDREN (delegates to service)
+  // ==========================================
+
+  get children() {
+    return parentChildrenService;
+  }
+}
+
+export const userProfileService = new UserProfileService();
