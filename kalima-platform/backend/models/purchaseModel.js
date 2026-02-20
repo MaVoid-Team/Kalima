@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy purchase model (non-store).
 const mongoose = require("mongoose");
 
 const purchaseSchema = new mongoose.Schema({
@@ -62,7 +65,13 @@ const purchaseSchema = new mongoose.Schema({
   // Type of transaction: "pointPurchase" or "containerPurchase"
   type: {
     type: String,
-    enum: ["pointPurchase", "containerPurchase", "lecturePurchase", "packagePurchase", "promoCodePurchase"],
+    enum: [
+      "pointPurchase",
+      "containerPurchase",
+      "lecturePurchase",
+      "packagePurchase",
+      "promoCodePurchase",
+    ],
     required: true,
   },
   // Additional details

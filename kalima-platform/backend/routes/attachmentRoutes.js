@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy attachment routes.
 const express = require("express");
 const AttachmentController = require("../controllers/attachmentController");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -18,14 +21,14 @@ router.use("/upload-homework/:lectureId", verifyJWT);
 router.post(
   "/upload-homework/:lectureId",
   AttachmentController.upload.single("file"), // Use 'file' as the field name
-  AttachmentController.uploadHomeWork
+  AttachmentController.uploadHomeWork,
 );
 
 // Add route to get all homework for a lecture
 router.get(
   "/homework/:lectureId",
   verifyJWT,
-  AttachmentController.getAllHomeWork
+  AttachmentController.getAllHomeWork,
 );
 
 module.exports = router;

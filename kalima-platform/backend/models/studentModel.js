@@ -1,20 +1,23 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy student model.
 // Helper to convert Arabic numerals to English numerals
 // Helper to format Egyptian phone numbers to international format robustly
 function formatEgyptianPhoneNumber(number) {
   if (!number) return number;
   // Remove all non-digit characters except leading +
-  let num = number.trim().replace(/[^\d+]/g, '');
+  let num = number.trim().replace(/[^\d+]/g, "");
   // Remove leading zeros (except if it's just '0')
-  if (num.startsWith('00')) num = '+' + num.slice(2);
-  if (num.startsWith('0') && num.length > 1) num = num.slice(1);
+  if (num.startsWith("00")) num = "+" + num.slice(2);
+  if (num.startsWith("0") && num.length > 1) num = num.slice(1);
   // Add +20 if missing
-  if (num.startsWith('+20')) return num;
-  if (num.startsWith('20')) return '+' + num;
-  if (num.startsWith('+')) return num; // fallback for other country codes
+  if (num.startsWith("+20")) return num;
+  if (num.startsWith("20")) return "+" + num;
+  if (num.startsWith("+")) return num; // fallback for other country codes
   // If only 10 or 11 digits, assume it's a local Egyptian number
-  if (num.length === 10) return '+20' + num;
-  if (num.length === 11 && num[0] === '1') return '+20' + num;
-  return '+20' + num;
+  if (num.length === 10) return "+20" + num;
+  if (num.length === 11 && num[0] === "1") return "+20" + num;
+  return "+20" + num;
 }
 
 const mongoose = require("mongoose");
@@ -34,7 +37,7 @@ const lecturerPointsSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const studentSchema = new mongoose.Schema(
@@ -46,7 +49,7 @@ const studentSchema = new mongoose.Schema(
     },
     hobbies: {
       required: false,
-      type: [String]
+      type: [String],
     },
     parentPhoneNumber: String,
     faction: String,
@@ -99,7 +102,7 @@ const studentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     successfulInvites: { type: Number, default: 0 },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -112,7 +115,7 @@ const studentSchema = new mongoose.Schema(
     strictPopulate: false,
     // toJSON: { virtuals: true },
     // toObject: { virtuals: true },
-  }
+  },
 );
 // studentSchema.virtual("purchases", {
 //   ref: "Purchase",
@@ -122,7 +125,7 @@ const studentSchema = new mongoose.Schema(
 // Helper method to get points balance for a specific lecturer
 studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
   return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
@@ -130,7 +133,7 @@ studentSchema.methods.getLecturerPointsBalance = function (lecturerId) {
 // Helper method to add points for a specific lecturer
 studentSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
 
   if (lecturerPointsEntry) {
@@ -148,7 +151,7 @@ studentSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   }
 
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
 
   if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
@@ -208,7 +211,7 @@ studentSchema.pre("validate", async function (next) {
     } else if (!gov.administrationZone.includes(this.administrationZone)) {
       this.invalidate(
         "zone",
-        "Selected zone does not belong to the selected government."
+        "Selected zone does not belong to the selected government.",
       );
     }
   }

@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy teacher model.
 // Helper to format Egyptian phone numbers to international format robustly
 function formatEgyptianPhoneNumber(number) {
   if (!number) return number;
@@ -34,7 +37,7 @@ const lecturerPointsSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const teacherSchema = new mongoose.Schema(
@@ -107,15 +110,15 @@ const teacherSchema = new mongoose.Schema(
     preferredContactTime: {
       from: {
         type: String,
-        required: false
+        required: false,
       }, // e.g., "08:00 AM"
       to: {
         type: String,
-        required: false
+        required: false,
       },
       note: {
-        type: String // e.g., "09:00 PM"
-      }
+        type: String, // e.g., "09:00 PM"
+      },
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -133,7 +136,7 @@ const teacherSchema = new mongoose.Schema(
   {
     timestamps: true,
     strictPopulate: false,
-  }
+  },
 );
 
 teacherSchema.pre("save", async function (next) {
@@ -172,7 +175,7 @@ teacherSchema.pre("save", async function (next) {
           {
             userSerial: { $regex: `^${subjectPrefix}` },
           },
-          "userSerial"
+          "userSerial",
         )
         .lean();
 
@@ -220,7 +223,7 @@ teacherSchema.pre("validate", function (next) {
   ) {
     this.invalidate(
       "centers",
-      "At least one center is required if teachesAtType is 'Center' or 'Both'."
+      "At least one center is required if teachesAtType is 'Center' or 'Both'.",
     );
   }
   if (
@@ -229,7 +232,7 @@ teacherSchema.pre("validate", function (next) {
   ) {
     this.invalidate(
       "school",
-      "School is required if teachesAtType is 'School' or 'Both'."
+      "School is required if teachesAtType is 'School' or 'Both'.",
     );
   }
   next();
@@ -242,10 +245,13 @@ teacherSchema.pre("save", function (next) {
   ) {
     this.invalidate(
       "phoneNumber2",
-      "Phone number 2 must be different from phone number 1."
+      "Phone number 2 must be different from phone number 1.",
     );
     return next(
-      new AppError("Phone number 2 must be different from phone number 1.", 400)
+      new AppError(
+        "Phone number 2 must be different from phone number 1.",
+        400,
+      ),
     );
   }
   next();
@@ -258,7 +264,7 @@ teacherSchema.pre("validate", async function (next) {
     } else if (!gov.administrationZone.includes(this.administrationZone)) {
       this.invalidate(
         "zone",
-        "Selected zone does not belong to the selected government."
+        "Selected zone does not belong to the selected government.",
       );
     }
   }
@@ -267,7 +273,7 @@ teacherSchema.pre("validate", async function (next) {
 
 teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
   return lecturerPointsEntry ? lecturerPointsEntry.points : 0;
 };
@@ -275,7 +281,7 @@ teacherSchema.methods.getLecturerPointsBalance = function (lecturerId) {
 // Helper method to add points for a specific lecturer
 teacherSchema.methods.addLecturerPoints = function (lecturerId, pointsToAdd) {
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
 
   if (lecturerPointsEntry) {
@@ -293,7 +299,7 @@ teacherSchema.methods.useLecturerPoints = function (lecturerId, pointsToUse) {
   }
 
   const lecturerPointsEntry = this.lecturerPoints.find(
-    (entry) => entry.lecturer.toString() === lecturerId.toString()
+    (entry) => entry.lecturer.toString() === lecturerId.toString(),
   );
 
   if (!lecturerPointsEntry || lecturerPointsEntry.points < pointsToUse) {
