@@ -74,9 +74,12 @@ class CartService {
       throw new NotFoundError("Cart item not found in user's cart");
     }
 
-    // 2. Validate coupon (active, not expired, etc.)
+    // 2. Validate coupon (active, date range, not already used by this user)
     const { couponService } = await import("./coupon.service");
-    const { isValid, coupon } = await couponService.validateCoupon(coupon_code);
+    const { isValid, coupon } = await couponService.validateCoupon(
+      coupon_code,
+      user_id,
+    );
     if (!isValid) throw new BadRequestError("Invalid coupon code");
 
     // 3. Ensure coupon is not already used on another item in this cart

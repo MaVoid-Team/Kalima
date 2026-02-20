@@ -335,6 +335,7 @@ export type usersWhereInput = {
   user_roles?: Prisma.User_rolesListRelationFilter
   carts?: Prisma.CartsListRelationFilter
   purchases?: Prisma.PurchasesListRelationFilter
+  coupon_usages?: Prisma.Coupon_usagesListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -371,6 +372,7 @@ export type usersOrderByWithRelationInput = {
   user_roles?: Prisma.user_rolesOrderByRelationAggregateInput
   carts?: Prisma.cartsOrderByRelationAggregateInput
   purchases?: Prisma.purchasesOrderByRelationAggregateInput
+  coupon_usages?: Prisma.coupon_usagesOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -410,6 +412,7 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   user_roles?: Prisma.User_rolesListRelationFilter
   carts?: Prisma.CartsListRelationFilter
   purchases?: Prisma.PurchasesListRelationFilter
+  coupon_usages?: Prisma.Coupon_usagesListRelationFilter
 }, "id" | "mongo_id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -495,6 +498,7 @@ export type usersCreateInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -531,6 +535,7 @@ export type usersUncheckedCreateInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersUpdateInput = {
@@ -566,6 +571,7 @@ export type usersUpdateInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -602,6 +608,7 @@ export type usersUncheckedUpdateInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -936,6 +943,20 @@ export type usersUpdateOneRequiredWithoutPassword_reset_tokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutPassword_reset_tokensInput, Prisma.usersUpdateWithoutPassword_reset_tokensInput>, Prisma.usersUncheckedUpdateWithoutPassword_reset_tokensInput>
 }
 
+export type usersCreateNestedOneWithoutCoupon_usagesInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCoupon_usagesInput, Prisma.usersUncheckedCreateWithoutCoupon_usagesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCoupon_usagesInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutCoupon_usagesNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCoupon_usagesInput, Prisma.usersUncheckedCreateWithoutCoupon_usagesInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCoupon_usagesInput
+  upsert?: Prisma.usersUpsertWithoutCoupon_usagesInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutCoupon_usagesInput, Prisma.usersUpdateWithoutCoupon_usagesInput>, Prisma.usersUncheckedUpdateWithoutCoupon_usagesInput>
+}
+
 export type usersCreateNestedOneWithoutCartsInput = {
   create?: Prisma.XOR<Prisma.usersCreateWithoutCartsInput, Prisma.usersUncheckedCreateWithoutCartsInput>
   connectOrCreate?: Prisma.usersCreateOrConnectWithoutCartsInput
@@ -996,6 +1017,7 @@ export type usersCreateWithoutAuth_identitiesInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutAuth_identitiesInput = {
@@ -1031,6 +1053,7 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutAuth_identitiesInput = {
@@ -1081,6 +1104,7 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
@@ -1116,6 +1140,7 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutUser_analyticsInput = {
@@ -1150,6 +1175,7 @@ export type usersCreateWithoutUser_analyticsInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutUser_analyticsInput = {
@@ -1185,6 +1211,7 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutUser_analyticsInput = {
@@ -1235,6 +1262,7 @@ export type usersUpdateWithoutUser_analyticsInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_analyticsInput = {
@@ -1270,6 +1298,7 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutUser_rolesInput = {
@@ -1304,6 +1333,7 @@ export type usersCreateWithoutUser_rolesInput = {
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutUser_rolesInput = {
@@ -1339,6 +1369,7 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutUser_rolesInput = {
@@ -1389,6 +1420,7 @@ export type usersUpdateWithoutUser_rolesInput = {
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_rolesInput = {
@@ -1424,6 +1456,7 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutRefresh_tokensInput = {
@@ -1458,6 +1491,7 @@ export type usersCreateWithoutRefresh_tokensInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutRefresh_tokensInput = {
@@ -1493,6 +1527,7 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutRefresh_tokensInput = {
@@ -1543,6 +1578,7 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
@@ -1578,6 +1614,7 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutAssistantsInput = {
@@ -1612,6 +1649,7 @@ export type usersCreateWithoutAssistantsInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutAssistantsInput = {
@@ -1647,6 +1685,7 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutAssistantsInput = {
@@ -1697,6 +1736,7 @@ export type usersUpdateWithoutAssistantsInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAssistantsInput = {
@@ -1732,6 +1772,7 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutLecturersInput = {
@@ -1766,6 +1807,7 @@ export type usersCreateWithoutLecturersInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutLecturersInput = {
@@ -1801,6 +1843,7 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutLecturersInput = {
@@ -1851,6 +1894,7 @@ export type usersUpdateWithoutLecturersInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutLecturersInput = {
@@ -1886,6 +1930,7 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutParentsInput = {
@@ -1920,6 +1965,7 @@ export type usersCreateWithoutParentsInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutParentsInput = {
@@ -1955,6 +2001,7 @@ export type usersUncheckedCreateWithoutParentsInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutParentsInput = {
@@ -2005,6 +2052,7 @@ export type usersUpdateWithoutParentsInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutParentsInput = {
@@ -2040,6 +2088,7 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutSocial_mediaInput = {
@@ -2074,6 +2123,7 @@ export type usersCreateWithoutSocial_mediaInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutSocial_mediaInput = {
@@ -2109,6 +2159,7 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutSocial_mediaInput = {
@@ -2159,6 +2210,7 @@ export type usersUpdateWithoutSocial_mediaInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutSocial_mediaInput = {
@@ -2194,6 +2246,7 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutStudentsInput = {
@@ -2228,6 +2281,7 @@ export type usersCreateWithoutStudentsInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutStudentsInput = {
@@ -2263,6 +2317,7 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutStudentsInput = {
@@ -2313,6 +2368,7 @@ export type usersUpdateWithoutStudentsInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutStudentsInput = {
@@ -2348,6 +2404,7 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutTeachersInput = {
@@ -2382,6 +2439,7 @@ export type usersCreateWithoutTeachersInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutTeachersInput = {
@@ -2417,6 +2475,7 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutTeachersInput = {
@@ -2467,6 +2526,7 @@ export type usersUpdateWithoutTeachersInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeachersInput = {
@@ -2502,6 +2562,7 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutTeaches_atInput = {
@@ -2536,6 +2597,7 @@ export type usersCreateWithoutTeaches_atInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutTeaches_atInput = {
@@ -2571,6 +2633,7 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutTeaches_atInput = {
@@ -2621,6 +2684,7 @@ export type usersUpdateWithoutTeaches_atInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeaches_atInput = {
@@ -2656,6 +2720,7 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutEmail_verification_tokensInput = {
@@ -2690,6 +2755,7 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
@@ -2725,6 +2791,7 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutEmail_verification_tokensInput = {
@@ -2775,6 +2842,7 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
@@ -2810,6 +2878,7 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutPassword_reset_tokensInput = {
@@ -2844,6 +2913,7 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
@@ -2879,6 +2949,7 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutPassword_reset_tokensInput = {
@@ -2929,6 +3000,7 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
@@ -2955,6 +3027,165 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
   lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
   parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersCreateWithoutCoupon_usagesInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+}
+
+export type usersUncheckedCreateWithoutCoupon_usagesInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutCoupon_usagesInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutCoupon_usagesInput, Prisma.usersUncheckedCreateWithoutCoupon_usagesInput>
+}
+
+export type usersUpsertWithoutCoupon_usagesInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutCoupon_usagesInput, Prisma.usersUncheckedUpdateWithoutCoupon_usagesInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutCoupon_usagesInput, Prisma.usersUncheckedCreateWithoutCoupon_usagesInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutCoupon_usagesInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutCoupon_usagesInput, Prisma.usersUncheckedUpdateWithoutCoupon_usagesInput>
+}
+
+export type usersUpdateWithoutCoupon_usagesInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
   refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
   social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
   students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
@@ -2998,6 +3229,7 @@ export type usersCreateWithoutCartsInput = {
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutCartsInput = {
@@ -3033,6 +3265,7 @@ export type usersUncheckedCreateWithoutCartsInput = {
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutCartsInput = {
@@ -3083,6 +3316,7 @@ export type usersUpdateWithoutCartsInput = {
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCartsInput = {
@@ -3118,6 +3352,7 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 export type usersCreateWithoutPurchasesInput = {
@@ -3152,6 +3387,7 @@ export type usersCreateWithoutPurchasesInput = {
   user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
 }
 
 export type usersUncheckedCreateWithoutPurchasesInput = {
@@ -3187,6 +3423,7 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
   user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
   carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
 }
 
 export type usersCreateOrConnectWithoutPurchasesInput = {
@@ -3237,6 +3474,7 @@ export type usersUpdateWithoutPurchasesInput = {
   user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchasesInput = {
@@ -3272,6 +3510,7 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
   user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
   carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
 }
 
 
@@ -3288,6 +3527,7 @@ export type UsersCountOutputType = {
   user_roles: number
   carts: number
   purchases: number
+  coupon_usages: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3299,6 +3539,7 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   user_roles?: boolean | UsersCountOutputTypeCountUser_rolesArgs
   carts?: boolean | UsersCountOutputTypeCountCartsArgs
   purchases?: boolean | UsersCountOutputTypeCountPurchasesArgs
+  coupon_usages?: boolean | UsersCountOutputTypeCountCoupon_usagesArgs
 }
 
 /**
@@ -3367,6 +3608,13 @@ export type UsersCountOutputTypeCountPurchasesArgs<ExtArgs extends runtime.Types
   where?: Prisma.purchasesWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountCoupon_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.coupon_usagesWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3402,6 +3650,7 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   carts?: boolean | Prisma.users$cartsArgs<ExtArgs>
   purchases?: boolean | Prisma.users$purchasesArgs<ExtArgs>
+  coupon_usages?: boolean | Prisma.users$coupon_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -3485,6 +3734,7 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   user_roles?: boolean | Prisma.users$user_rolesArgs<ExtArgs>
   carts?: boolean | Prisma.users$cartsArgs<ExtArgs>
   purchases?: boolean | Prisma.users$purchasesArgs<ExtArgs>
+  coupon_usages?: boolean | Prisma.users$coupon_usagesArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3508,6 +3758,7 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     user_roles: Prisma.$user_rolesPayload<ExtArgs>[]
     carts: Prisma.$cartsPayload<ExtArgs>[]
     purchases: Prisma.$purchasesPayload<ExtArgs>[]
+    coupon_usages: Prisma.$coupon_usagesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -3937,6 +4188,7 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   user_roles<T extends Prisma.users$user_rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$user_rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$user_rolesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   carts<T extends Prisma.users$cartsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$cartsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$cartsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchases<T extends Prisma.users$purchasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coupon_usages<T extends Prisma.users$coupon_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$coupon_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$coupon_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4694,6 +4946,30 @@ export type users$purchasesArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PurchasesScalarFieldEnum | Prisma.PurchasesScalarFieldEnum[]
+}
+
+/**
+ * users.coupon_usages
+ */
+export type users$coupon_usagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the coupon_usages
+   */
+  select?: Prisma.coupon_usagesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the coupon_usages
+   */
+  omit?: Prisma.coupon_usagesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.coupon_usagesInclude<ExtArgs> | null
+  where?: Prisma.coupon_usagesWhereInput
+  orderBy?: Prisma.coupon_usagesOrderByWithRelationInput | Prisma.coupon_usagesOrderByWithRelationInput[]
+  cursor?: Prisma.coupon_usagesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
 }
 
 /**

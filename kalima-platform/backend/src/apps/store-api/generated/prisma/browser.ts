@@ -133,6 +133,11 @@ export type product_categories = Prisma.product_categoriesModel
  */
 export type coupons = Prisma.couponsModel
 /**
+ * Model coupon_usages
+ * 
+ */
+export type coupon_usages = Prisma.coupon_usagesModel
+/**
  * Model product_required_fields
  * 
  */

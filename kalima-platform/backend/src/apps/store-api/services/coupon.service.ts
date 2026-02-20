@@ -61,8 +61,8 @@ class CouponService {
     // Build data based on discount type
     const data: any = {
       code: dto.code,
+      starts_at: dto.starts_at ?? null,
       expires_at: dto.expires_at,
-      // created_by: _user_id, // TODO: uncomment after adding created_by column to coupons table
     };
 
     if (dto.discount_type === DiscountType.AMOUNT) {
@@ -152,6 +152,7 @@ class CouponService {
     };
 
     if (dto.code !== undefined) data.code = dto.code;
+    if (dto.starts_at !== undefined) data.starts_at = dto.starts_at;
     if (dto.expires_at !== undefined) data.expires_at = dto.expires_at;
     if (dto.is_active !== undefined) data.active = dto.is_active;
 
@@ -202,10 +203,18 @@ class CouponService {
   }
 
   // ============================================
-  // VALIDATE COUPON (Teacher)
+  // VALIDATE COUPON
   // ============================================
 
-  async validateCoupon(code: string): Promise<{ isValid: boolean; coupon: coupons }> {
+  /**
+   * Validates a coupon for use.
+   * @param code - Coupon code
+   * @param user_id - Optional. When provided, checks if user has already used this coupon (one-time per user).
+   */
+  async validateCoupon(
+    code: string,
+    user_id?: number,
+  ): Promise<{ isValid: boolean; coupon: coupons }> {
     const coupon = await this.db.coupons.findUnique({ where: { code } });
 
     if (!coupon || coupon.deleted_at) {
@@ -216,43 +225,59 @@ class CouponService {
       throw new BadRequestError("This coupon is no longer active");
     }
 
-    if (coupon.expires_at && coupon.expires_at < new Date()) {
+    const now = new Date();
+
+    if (coupon.starts_at && coupon.starts_at > now) {
+      throw new BadRequestError("This coupon is not yet valid");
+    }
+
+    if (coupon.expires_at && coupon.expires_at < now) {
       throw new BadRequestError("This coupon has expired");
+    }
+
+    if (user_id !== undefined) {
+      const alreadyUsed = await this.db.coupon_usages.findUnique({
+        where: {
+          user_id_coupon_id: { user_id, coupon_id: coupon.id },
+        },
+      });
+      if (alreadyUsed) {
+        throw new BadRequestError("You have already used this coupon");
+      }
     }
 
     return { isValid: true, coupon };
   }
 
-  // ============================================
-  // USE COUPON (Teacher)
-  // ============================================
-
-  async useCoupon(code: string, _user_id: number): Promise<coupons> {
-    const coupon = await this.db.coupons.findUnique({ where: { code } });
-
-    if (!coupon || coupon.deleted_at) {
-      throw new NotFoundError("Invalid coupon code");
-    }
-
-    if (!coupon.active) {
-      throw new BadRequestError("This coupon has already been used or deactivated");
-    }
-
-    if (coupon.expires_at && coupon.expires_at < new Date()) {
-      throw new BadRequestError("This coupon has expired");
-    }
-
-    const updated = await this.db.coupons.update({
-      where: { id: coupon.id },
+  /**
+   * Records that a user has used a coupon (called when purchase completes).
+   */
+  async recordCouponUsage(
+    user_id: number,
+    coupon_id: number,
+    purchase_id?: number,
+  ): Promise<void> {
+    await this.db.coupon_usages.create({
       data: {
-        active: false,
-        updated_at: new Date(),
-        // used_by: _user_id, // TODO: uncomment after adding used_by column to coupons table
-        // used_at: new Date(), // TODO: uncomment after adding used_at column to coupons table
+        user_id,
+        coupon_id,
+        purchase_id: purchase_id ?? null,
       },
     });
+  }
 
-    return updated;
+  // ============================================
+  // USE COUPON (Teacher / Account-level promo)
+  // ============================================
+
+  /**
+   * Records that a user has used a coupon (e.g. for account-level promo).
+   * Each user can use each coupon only once (enforced via validateCoupon).
+   */
+  async useCoupon(code: string, user_id: number): Promise<coupons> {
+    const { coupon } = await this.validateCoupon(code, user_id);
+    await this.recordCouponUsage(user_id, coupon.id);
+    return coupon;
   }
 }
 

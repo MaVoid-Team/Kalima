@@ -74,6 +74,7 @@ export const ModelName = {
   categories: 'categories',
   product_categories: 'product_categories',
   coupons: 'coupons',
+  coupon_usages: 'coupon_usages',
   product_required_fields: 'product_required_fields',
   products: 'products',
   samples: 'samples',
@@ -359,6 +360,7 @@ export const CouponsScalarFieldEnum = {
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
+  starts_at: 'starts_at',
   expires_at: 'expires_at',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -367,6 +369,17 @@ export const CouponsScalarFieldEnum = {
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
+
+
+export const Coupon_usagesScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  coupon_id: 'coupon_id',
+  purchase_id: 'purchase_id',
+  created_at: 'created_at'
+} as const
+
+export type Coupon_usagesScalarFieldEnum = (typeof Coupon_usagesScalarFieldEnum)[keyof typeof Coupon_usagesScalarFieldEnum]
 
 
 export const Product_required_fieldsScalarFieldEnum = {
