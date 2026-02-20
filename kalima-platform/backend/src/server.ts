@@ -1,13 +1,16 @@
 import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
-import path from "path";
-// const loadRoutes = require('../routes')
+import { createServer } from "http";
 import storeV2Routes from "./apps/store-api/routes/v2/index";
 import authRoutes from "./apps/store-api/routes/v2/auth.routes";
 import adminRoutes from "./apps/store-api/routes/v2/admin.routes";
 import { errorHandler } from "./libs/errors";
-// import { prisma} from './libs/db/prisma';
+import { setupStoreSocket } from "./libs/socket/setupStoreSocket";
+import {
+  startPurchaseNotificationConsumer,
+} from "./apps/store-api/services/notificationStream.service";
+import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
 
 const app = express();
 
@@ -26,25 +29,28 @@ app.get("/api/v2/health", async (_, res) => {
   res.json({ status: "ok", version: "v2 new" });
 });
 
-// Legacy
-// loadRoutes(app);
-
-// New
 app.use("/api/v2", storeV2Routes);
 app.use("/api/v2/auth", authRoutes);
 app.use("/api/v2/admin", adminRoutes);
 
-// Global error handler — must be registered AFTER all routes
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
+const httpServer = createServer(app);
+
+const io = setupStoreSocket(httpServer);
+app.set("io", io);
+
 async function start() {
   try {
-    // await prisma.$connect()
-    // console.log('✅ DB Connected')
+    if (process.env.REDIS_URL) {
+      startPurchaseNotificationConsumer((payload) => {
+        emitStorePurchaseToAdmins(io, payload);
+      });
+    }
 
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (err) {

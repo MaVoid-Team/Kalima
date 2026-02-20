@@ -11,6 +11,12 @@ import {
 import { imageService } from "./image.service";
 import { purchasesService } from "./purchases.service";
 import { userManagementService } from "./user-management.service";
+import { addPurchaseEvent } from "./notificationStream.service";
+import {
+  getCachedCart,
+  setCachedCart,
+  invalidateCartCache,
+} from "./cartCache.service";
 import type { Prisma } from "../generated/prisma";
 import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 
@@ -127,6 +133,7 @@ class CartService {
       data: { subtotal, discount: discountTotal, total },
     });
 
+    await invalidateCartCache(user_id);
     return { success: true };
   }
   constructor(private db: PrismaClient = prisma) {}
@@ -147,9 +154,12 @@ class CartService {
   }
 
   // ============================================
-  // GET CART BY USER
+  // GET CART BY USER (with Redis read-through cache)
   // ============================================
   async getActiveCartByUser(user_id: number): Promise<CartWithItems> {
+    const cached = await getCachedCart<CartWithItems>(user_id);
+    if (cached) return cached;
+
     const cart = await this.db.carts.findFirst({
       where: { user_id, status: "active" },
       include: {
@@ -162,7 +172,9 @@ class CartService {
       },
     });
     if (!cart) throw new NotFoundError("Active cart not found");
-    return cart as CartWithItems;
+    const result = cart as CartWithItems;
+    await setCachedCart(user_id, result);
+    return result;
   }
 
   // ============================================
@@ -247,6 +259,7 @@ class CartService {
         });
       }
     }
+    await invalidateCartCache(user_id);
     return cartItem;
   }
 
@@ -276,6 +289,7 @@ class CartService {
       data: { subtotal, discount: discountTotal, total },
     });
 
+    await invalidateCartCache(user_id);
     return { success: true };
   }
 
@@ -306,6 +320,7 @@ class CartService {
       data: { subtotal, discount: discountTotal, total },
     });
 
+    await invalidateCartCache(user_id);
     return { success: true };
   }
 
@@ -324,6 +339,7 @@ class CartService {
       where: { id: dto.cart_item_id },
       data: { quantity: dto.quantity },
     });
+    await invalidateCartCache(user_id);
     return updated;
   }
 
@@ -333,6 +349,7 @@ class CartService {
   async clearCart(user_id: number) {
     const cart = await this.getActiveCartByUser(user_id);
     await this.db.cart_items.deleteMany({ where: { cart_id: cart.id } });
+    await invalidateCartCache(user_id);
     return this.getActiveCartByUser(user_id);
   }
 
@@ -483,11 +500,29 @@ class CartService {
           subtotal,
           discount,
           total,
-          total_items: itemCount,
         },
       });
       await tx.cart_items.deleteMany({ where: { cart_id: cart.id } });
     });
+
+    await invalidateCartCache(user_id);
+
+    if (createdPurchase) {
+      const user = await this.db.users.findUnique({
+        where: { id: user_id },
+        select: { name: true },
+      });
+      addPurchaseEvent({
+        purchase_id: createdPurchase.id,
+        purchase_serial: createdPurchase.purchase_serial ?? "",
+        user_id,
+        total: Number(total),
+        item_count: itemCount,
+        customer_name: user?.name ?? "Customer",
+      }).catch((err) =>
+        console.error("[Cart] Failed to publish purchase notification:", err)
+      );
+    }
 
     return {
       success: true,
@@ -558,6 +593,7 @@ class CartService {
         },
       });
     }
+    await invalidateCartCache(user_id);
     return { success: true };
   }
 }
