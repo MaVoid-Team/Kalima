@@ -31,7 +31,7 @@ import {
   CreateAssistantDto,
 } from "../dtos/admin.dto";
 import { CreatorContext } from "../interfaces/auth.interface";
-import { auth_provider_enum } from "../generated/prisma";
+import { auth_provider_enum } from "../generated/prisma/client";
 import { ValidationError, UnauthorizedError } from "../../../libs/errors";
 
 // ============================================

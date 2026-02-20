@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requiredFieldController } from "../../controllers/required-field.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
-import { role_enum } from "../../generated/prisma";
+import { role_enum } from "../../generated/prisma/client";
 
 const router = Router();
 
@@ -16,18 +16,50 @@ const adminAuth = [
 // FIELD DEFINITIONS — DICTIONARY CRUD
 // ============================================
 
-router.post("/definitions", ...adminAuth, requiredFieldController.createDefinition);
-router.get("/definitions", ...adminAuth, requiredFieldController.getAllDefinitions);
-router.get("/definitions/:id", ...adminAuth, requiredFieldController.getDefinitionById);
-router.patch("/definitions/:id", ...adminAuth, requiredFieldController.updateDefinition);
-router.delete("/definitions/:id", ...adminAuth, requiredFieldController.deleteDefinition);
+router.post(
+  "/definitions",
+  ...adminAuth,
+  requiredFieldController.createDefinition,
+);
+router.get(
+  "/definitions",
+  ...adminAuth,
+  requiredFieldController.getAllDefinitions,
+);
+router.get(
+  "/definitions/:id",
+  ...adminAuth,
+  requiredFieldController.getDefinitionById,
+);
+router.patch(
+  "/definitions/:id",
+  ...adminAuth,
+  requiredFieldController.updateDefinition,
+);
+router.delete(
+  "/definitions/:id",
+  ...adminAuth,
+  requiredFieldController.deleteDefinition,
+);
 
 // ============================================
 // PRODUCT FIELD ATTACHMENT
 // ============================================
 
-router.post("/products/:productId/fields", ...adminAuth, requiredFieldController.attachFieldsToProduct);
-router.get("/products/:productId/fields", ...adminAuth, requiredFieldController.getProductFields);
-router.delete("/products/:productId/fields/:fieldDefId", ...adminAuth, requiredFieldController.detachFieldFromProduct);
+router.post(
+  "/products/:productId/fields",
+  ...adminAuth,
+  requiredFieldController.attachFieldsToProduct,
+);
+router.get(
+  "/products/:productId/fields",
+  ...adminAuth,
+  requiredFieldController.getProductFields,
+);
+router.delete(
+  "/products/:productId/fields/:fieldDefId",
+  ...adminAuth,
+  requiredFieldController.detachFieldFromProduct,
+);
 
 export default router;

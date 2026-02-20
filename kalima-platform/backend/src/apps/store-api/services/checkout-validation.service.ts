@@ -1,6 +1,6 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { BadRequestError } from "../../../libs/errors";
-import type { payment_methods } from "../generated/prisma";
+import type { payment_methods } from "../generated/prisma/client";
 
 /** Shape required for payment validation */
 export interface PaymentValidationInput {

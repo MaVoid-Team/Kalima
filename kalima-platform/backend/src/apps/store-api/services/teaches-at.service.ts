@@ -1,7 +1,7 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { CreateTeachesAtDto, UpdateTeachesAtDto } from "../dtos/teaches-at.dto";
-import { teaches_at, location_type_enum } from "../generated/prisma";
+import { teaches_at, location_type_enum } from "../generated/prisma/client";
 import { NotFoundError, ConflictError } from "../../../libs/errors";
 
 class TeachesAtService {
@@ -24,7 +24,11 @@ class TeachesAtService {
     return created;
   }
 
-  async getAllTeachesAt(filters?: { user_id?: number; location_type?: string; active?: boolean; }): Promise<teaches_at[]> {
+  async getAllTeachesAt(filters?: {
+    user_id?: number;
+    location_type?: string;
+    active?: boolean;
+  }): Promise<teaches_at[]> {
     const where: any = {};
     if (filters?.user_id !== undefined) where.user_id = filters.user_id;
     if (filters?.location_type !== undefined)

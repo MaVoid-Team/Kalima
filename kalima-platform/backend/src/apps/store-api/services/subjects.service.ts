@@ -1,7 +1,7 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { CreateSubjectDto, UpdateSubjectDto } from "../dtos/subject.dto";
-import { subjects } from "../generated/prisma";
+import { subjects } from "../generated/prisma/client";
 import {
   NotFoundError,
   ConflictError,

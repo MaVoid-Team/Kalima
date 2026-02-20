@@ -3,11 +3,14 @@ import { governmentController } from "../../controllers/government.controller";
 import { zonesController } from "../../controllers/zones.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
-import { role_enum } from "../../generated/prisma";
+import { role_enum } from "../../generated/prisma/client";
 
 const router = Router();
 
-const adminAuth = [authenticateToken, requireRole([role_enum.Admin, role_enum.SubAdmin])];
+const adminAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC — read-only

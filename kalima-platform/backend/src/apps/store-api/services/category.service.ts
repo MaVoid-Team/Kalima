@@ -1,7 +1,7 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { CreateCategoryDto, UpdateCategoryDto } from "../dtos/category.dto";
-import { categories } from "../generated/prisma";
+import { categories } from "../generated/prisma/client";
 import { BadRequestError, NotFoundError } from "../../../libs/errors";
 
 // ============================================

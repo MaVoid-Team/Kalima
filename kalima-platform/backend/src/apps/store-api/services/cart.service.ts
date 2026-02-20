@@ -18,7 +18,7 @@ import {
   invalidateCartCache,
 } from "./cartCache.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
-import type { Prisma } from "../generated/prisma";
+import type { Prisma } from "../generated/prisma/client";
 import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 
 // Typed payloads from Prisma for cart items/purchases
@@ -27,7 +27,9 @@ type CartItemWithRelations = Prisma.cart_itemsGetPayload<{
 }>;
 type CartWithItems = Prisma.cartsGetPayload<{
   include: {
-    cart_items: { include: { products: true; cart_item_required_fields: true } };
+    cart_items: {
+      include: { products: true; cart_item_required_fields: true };
+    };
   };
 }>;
 
@@ -464,9 +466,14 @@ class CartService {
       for (const item of cart.cart_items) {
         const couponId = (item as { coupon_id?: number | null }).coupon_id;
         if (couponId) {
-          const coupon = await tx.coupons.findUnique({ where: { id: couponId } });
+          const coupon = await tx.coupons.findUnique({
+            where: { id: couponId },
+          });
           if (coupon && coupon.active) {
-            await tx.coupons.update({ where: { id: coupon.id }, data: { active: false, updated_at: new Date() } });
+            await tx.coupons.update({
+              where: { id: coupon.id },
+              data: { active: false, updated_at: new Date() },
+            });
           }
         }
       }
@@ -506,7 +513,7 @@ class CartService {
         item_count: itemCount,
         customer_name: user?.name ?? "Customer",
       }).catch((err) =>
-        console.error("[Cart] Failed to publish purchase notification:", err)
+        console.error("[Cart] Failed to publish purchase notification:", err),
       );
     }
 
@@ -559,16 +566,26 @@ class CartService {
     if (cartItem.cart_id !== cart.id)
       throw new BadRequestError("Cart item does not belong to user's cart");
     // preload definitions to determine if any required field expects an image
-    const defIds = dto.required_fields.map((x) => x.required_field_definition_id);
-    const defs = await this.db.required_field_definitions.findMany({ where: { id: { in: defIds } }, select: { id: true, field_type: true } });
-      const defMap = new Map<number, FieldType>();
-      for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
-    await this.db.cart_item_required_fields.deleteMany({ where: { cart_item_id: dto.cart_item_id } });
+    const defIds = dto.required_fields.map(
+      (x) => x.required_field_definition_id,
+    );
+    const defs = await this.db.required_field_definitions.findMany({
+      where: { id: { in: defIds } },
+      select: { id: true, field_type: true },
+    });
+    const defMap = new Map<number, FieldType>();
+    for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
+    await this.db.cart_item_required_fields.deleteMany({
+      where: { cart_item_id: dto.cart_item_id },
+    });
     for (const f of dto.required_fields) {
       let value = f.value;
       const fieldType = defMap.get(f.required_field_definition_id);
       if (fieldType === "image" && file) {
-        const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
+        const image = await imageService.uploadImage(file, {
+          compress: true,
+          quality: 80,
+        });
         value = image.id.toString();
       }
       await this.db.cart_item_required_fields.create({

@@ -5,7 +5,7 @@ import {
   UpdateCouponDto,
   DiscountType,
 } from "../dtos/coupon.dto";
-import { coupons, role_enum } from "../generated/prisma";
+import { coupons, role_enum } from "../generated/prisma/client";
 import {
   BadRequestError,
   NotFoundError,
@@ -46,10 +46,7 @@ class CouponService {
   // CREATE
   // ============================================
 
-  async createCoupon(
-    dto: CreateCouponDto,
-    _user_id: number,
-  ): Promise<coupons> {
+  async createCoupon(dto: CreateCouponDto, _user_id: number): Promise<coupons> {
     // Check uniqueness of the provided code
     const existing = await this.db.coupons.findUnique({
       where: { code: dto.code },
@@ -85,7 +82,12 @@ class CouponService {
     page?: number;
     limit?: number;
     active?: boolean;
-  }): Promise<{ coupons: coupons[]; total: number; page: number; limit: number }> {
+  }): Promise<{
+    coupons: coupons[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const page = filters?.page ?? 1;
     const limit = filters?.limit ?? 20;
     const skip = (page - 1) * limit;

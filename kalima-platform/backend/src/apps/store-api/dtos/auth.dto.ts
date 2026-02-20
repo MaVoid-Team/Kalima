@@ -9,7 +9,7 @@ import {
   IsBoolean,
   IsPositive,
 } from "class-validator";
-import { gender_enum } from "../generated/prisma";
+import { gender_enum } from "../generated/prisma/client";
 
 // ============================================
 // BASE DTOs

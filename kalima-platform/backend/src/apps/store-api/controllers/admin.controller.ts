@@ -3,7 +3,7 @@ import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
 import { AssignRoleDto, RevokeRoleDto, SetRolesDto } from "../dtos/admin.dto";
-import { role_enum, portal_enum } from "../generated/prisma";
+import { role_enum, portal_enum } from "../generated/prisma/client";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 
 // ============================================

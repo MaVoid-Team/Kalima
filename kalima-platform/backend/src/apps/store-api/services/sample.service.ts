@@ -3,7 +3,7 @@ import fs from "fs";
 import crypto from "crypto";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
-import { samples } from "../generated/prisma";
+import { samples } from "../generated/prisma/client";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 
 // ============================================

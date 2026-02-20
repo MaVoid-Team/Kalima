@@ -13,7 +13,7 @@ import {
   BadRequestError,
   ForbiddenError,
 } from "../../../libs/errors";
-import { role_enum } from "../generated/prisma";
+import { role_enum } from "../generated/prisma/client";
 
 async function validateDto<T extends object>(
   DtoClass: new () => T,
@@ -57,13 +57,11 @@ export const teachersController = {
       }
 
       const created = await socialMediaService.createSocialMedia(dto);
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Social media entry created",
-          data: created,
-        });
+      res.status(201).json({
+        success: true,
+        message: "Social media entry created",
+        data: created,
+      });
     } catch (err) {
       _next(err);
     }
@@ -140,13 +138,11 @@ export const teachersController = {
       if (auth.role === role_enum.Teacher) dto.teacher_user_id = auth.id;
 
       const updated = await socialMediaService.updateSocialMedia(id, dto);
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Social media updated",
-          data: updated,
-        });
+      res.status(200).json({
+        success: true,
+        message: "Social media updated",
+        data: updated,
+      });
     } catch (err) {
       _next(err);
     }

@@ -11,7 +11,7 @@ import {
   BadRequestError,
   ForbiddenError,
 } from "../../../libs/errors";
-import { role_enum } from "../generated/prisma";
+import { role_enum } from "../generated/prisma/client";
 
 async function validateDto<T extends object>(
   DtoClass: new () => T,

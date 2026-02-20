@@ -1,7 +1,7 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { CreateLevelDto, UpdateLevelDto } from "../dtos/level.dto";
-import { levels } from "../generated/prisma";
+import { levels } from "../generated/prisma/client";
 import {
   NotFoundError,
   ConflictError,

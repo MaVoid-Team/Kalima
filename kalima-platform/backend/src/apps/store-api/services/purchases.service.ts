@@ -4,7 +4,7 @@ import { BadRequestError, NotFoundError } from "../../../libs/errors";
 import { CreatePurchaseDto, CreatePurchaseItemDto } from "../dtos/purchase.dto";
 import { userManagementService } from "./user-management.service";
 import { imageService } from "./image.service";
-import type { Prisma } from "../generated/prisma";
+import type { Prisma } from "../generated/prisma/client";
 import type { CheckoutDto } from "../dtos/cart.dto";
 import { couponService } from "./coupon.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
@@ -244,7 +244,9 @@ class PurchasesService {
     });
     if (requiredDefs.length > 0) {
       const provided = checkout.required_fields || [];
-      const providedSet = new Set(provided.map((p) => p.required_field_definition_id));
+      const providedSet = new Set(
+        provided.map((p) => p.required_field_definition_id),
+      );
       const missing = requiredDefs.filter(
         (r) => !providedSet.has(r.field_definition_id),
       );
@@ -279,12 +281,16 @@ class PurchasesService {
       field_definition_id: f.required_field_definition_id,
       value: f.value,
     }));
-    const items: CreatePurchaseItemDto[] = Array.from({ length: quantity }, () => ({
-      product_id: product_id,
-      price_at_purchase: unitPrice,
-      discount: 0,
-      required_fields: requiredFieldsMapped.length > 0 ? requiredFieldsMapped : undefined,
-    }));
+    const items: CreatePurchaseItemDto[] = Array.from(
+      { length: quantity },
+      () => ({
+        product_id: product_id,
+        price_at_purchase: unitPrice,
+        discount: 0,
+        required_fields:
+          requiredFieldsMapped.length > 0 ? requiredFieldsMapped : undefined,
+      }),
+    );
 
     const purchaseDto: CreatePurchaseDto = {
       user_id,

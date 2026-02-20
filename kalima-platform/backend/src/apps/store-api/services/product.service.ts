@@ -5,7 +5,7 @@ import {
   product_gallery,
   product_categories,
   product_required_fields,
-} from "../generated/prisma";
+} from "../generated/prisma/client";
 import { imageService, UploadImageOptions } from "./image.service";
 import { sampleService } from "./sample.service";
 import {

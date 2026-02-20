@@ -12,7 +12,7 @@ import {
   ArrayMinSize,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { gender_enum } from "../generated/prisma";
+import { gender_enum } from "../generated/prisma/client";
 
 // ============================================
 // ADMIN USER CREATION DTOs

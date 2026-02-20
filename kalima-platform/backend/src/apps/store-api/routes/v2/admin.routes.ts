@@ -2,7 +2,7 @@ import { Router } from "express";
 import { adminController } from "../../controllers/admin.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
-import { role_enum } from "../../generated/prisma";
+import { role_enum } from "../../generated/prisma/client";
 
 const router = Router();
 

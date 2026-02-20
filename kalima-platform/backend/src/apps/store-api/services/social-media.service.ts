@@ -1,7 +1,10 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
-import { CreateSocialMediaDto, UpdateSocialMediaDto } from "../dtos/social-media.dto";
-import { social_media } from "../generated/prisma";
+import {
+  CreateSocialMediaDto,
+  UpdateSocialMediaDto,
+} from "../dtos/social-media.dto";
+import { social_media } from "../generated/prisma/client";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 
 class SocialMediaService {
@@ -13,27 +16,38 @@ class SocialMediaService {
       throw new BadRequestError("teacher_user_id is required");
     }
 
-    const user = await this.db.users.findUnique({ where: { id: dto.teacher_user_id } });
+    const user = await this.db.users.findUnique({
+      where: { id: dto.teacher_user_id },
+    });
     if (!user) throw new NotFoundError("Teacher (user) not found");
 
     if (dto.site_id !== undefined) {
-      const site = await this.db.sites.findUnique({ where: { id: dto.site_id } });
+      const site = await this.db.sites.findUnique({
+        where: { id: dto.site_id },
+      });
       if (!site) throw new NotFoundError("Site not found");
     }
 
-    const created = await this.db.social_media.create({ data: {
-      teacher_user_id: dto.teacher_user_id,
-      site_id: dto.site_id ?? null,
-      url: dto.url,
-      active: dto.active ?? true,
-    }});
+    const created = await this.db.social_media.create({
+      data: {
+        teacher_user_id: dto.teacher_user_id,
+        site_id: dto.site_id ?? null,
+        url: dto.url,
+        active: dto.active ?? true,
+      },
+    });
 
     return created;
   }
 
-  async getAllSocialMedia(filters?: { teacher_user_id?: number; site_id?: number; active?: boolean }): Promise<social_media[]> {
+  async getAllSocialMedia(filters?: {
+    teacher_user_id?: number;
+    site_id?: number;
+    active?: boolean;
+  }): Promise<social_media[]> {
     const where: any = {};
-    if (filters?.teacher_user_id !== undefined) where.teacher_user_id = filters.teacher_user_id;
+    if (filters?.teacher_user_id !== undefined)
+      where.teacher_user_id = filters.teacher_user_id;
     if (filters?.site_id !== undefined) where.site_id = filters.site_id;
     if (filters?.active !== undefined) where.active = filters.active;
 
@@ -46,22 +60,30 @@ class SocialMediaService {
     return s;
   }
 
-  async updateSocialMedia(id: number, dto: UpdateSocialMediaDto): Promise<social_media> {
+  async updateSocialMedia(
+    id: number,
+    dto: UpdateSocialMediaDto,
+  ): Promise<social_media> {
     const s = await this.db.social_media.findUnique({ where: { id } });
     if (!s) throw new NotFoundError("Social media entry not found");
 
     if (dto.teacher_user_id !== undefined) {
-      const user = await this.db.users.findUnique({ where: { id: dto.teacher_user_id } });
+      const user = await this.db.users.findUnique({
+        where: { id: dto.teacher_user_id },
+      });
       if (!user) throw new NotFoundError("Teacher (user) not found");
     }
 
     if (dto.site_id !== undefined) {
-      const site = await this.db.sites.findUnique({ where: { id: dto.site_id } });
+      const site = await this.db.sites.findUnique({
+        where: { id: dto.site_id },
+      });
       if (!site) throw new NotFoundError("Site not found");
     }
 
     const data: any = {};
-    if (dto.teacher_user_id !== undefined) data.teacher_user_id = dto.teacher_user_id;
+    if (dto.teacher_user_id !== undefined)
+      data.teacher_user_id = dto.teacher_user_id;
     if (dto.site_id !== undefined) data.site_id = dto.site_id;
     if (dto.url !== undefined) data.url = dto.url;
     if (dto.active !== undefined) data.active = dto.active;
