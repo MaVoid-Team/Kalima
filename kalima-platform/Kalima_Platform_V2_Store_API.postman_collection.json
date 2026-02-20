@@ -595,6 +595,275 @@
           }
         }
       ]
+    },
+    {
+      "name": "V2 Admin & Resources",
+      "item": [
+        {
+          "name": "Subjects - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/subjects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "subjects"]
+            },
+            "description": "List subjects (public)"
+          }
+        },
+        {
+          "name": "Subjects - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"title\": \"Mathematics\", \"active\": true }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/subjects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "subjects"]
+            },
+            "description": "Create subject (Admin/SubAdmin)"
+          }
+        },
+        {
+          "name": "Levels - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/levels",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "levels"]
+            },
+            "description": "List levels"
+          }
+        },
+        {
+          "name": "Levels - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"title\": \"Grade 1\", \"active\": true }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/levels",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "levels"]
+            },
+            "description": "Create level (Admin/SubAdmin)"
+          }
+        },
+        {
+          "name": "Sites - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/sites",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "sites"]
+            },
+            "description": "List sites"
+          }
+        },
+        {
+          "name": "Sites - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"title\": \"Main Campus\", \"active\": true }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/sites",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "sites"]
+            },
+            "description": "Create site (Admin/SubAdmin)"
+          }
+        },
+        {
+          "name": "Governments - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/governments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "governments"]
+            },
+            "description": "List governments"
+          }
+        },
+        {
+          "name": "Governments - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"title\": \"Cairo\", \"active\": true }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/governments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "governments"]
+            },
+            "description": "Create government (Admin/SubAdmin)"
+          }
+        },
+        {
+          "name": "Zones - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "zones"]
+            },
+            "description": "List zones"
+          }
+        },
+        {
+          "name": "Zones - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"title\": \"Downtown\", \"government_id\": 1 }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/zones",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "zones"]
+            },
+            "description": "Create zone (Admin/SubAdmin)"
+          }
+        },
+        {
+          "name": "Social Media - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/social-media",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "social-media"]
+            },
+            "description": "List social media entries"
+          }
+        },
+        {
+          "name": "Social Media - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"teacher_user_id\": 42, \"url\": \"https://twitter.com/example\" }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/social-media",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "social-media"]
+            },
+            "description": "Create social media entry (Teacher on own behalf or Admin)"
+          }
+        },
+        {
+          "name": "TeachesAt - List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v2/teaches-at",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "teaches-at"]
+            },
+            "description": "List teacher locations"
+          }
+        },
+        {
+          "name": "TeachesAt - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"user_id\": 42, \"location_name\": \"Downtown Center\", \"location_type\": \"Center\" }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/teaches-at",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "teaches-at"]
+            },
+            "description": "Create teaches_at entry (Teacher on own behalf or Admin)"
+          }
+        },
+        {
+          "name": "Parent-Children - List",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/v2/parent-children",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "parent-children"]
+            },
+            "description": "List parent-child relations (auth)"
+          }
+        },
+        {
+          "name": "Parent-Children - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"parent_user_id\": 10, \"student_user_id\": 55 }"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v2/parent-children",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v2", "parent-children"]
+            },
+            "description": "Create parent-child relation (authenticated)"
+          }
+        }
+      ]
     }
   ],
   "variable": [

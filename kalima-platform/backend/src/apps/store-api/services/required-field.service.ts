@@ -38,7 +38,9 @@ class RequiredFieldService {
       where: { label: dto.label, deleted_at: null },
     });
     if (existing) {
-      throw new ConflictError(`Field definition with label "${dto.label}" already exists`);
+      throw new ConflictError(
+        `Field definition with label "${dto.label}" already exists`,
+      );
     }
 
     const definition = await this.db.required_field_definitions.create({
@@ -55,38 +57,17 @@ class RequiredFieldService {
    * List all field definitions with optional pagination and active filter.
    */
   async getAllDefinitions(filters?: {
-    page?: number;
-    limit?: number;
     active?: boolean;
-  }): Promise<{
-    definitions: required_field_definitions[];
-    total: number;
-    page: number;
-    limit: number;
-  }> {
-    const page = filters?.page ?? 1;
-    const limit = filters?.limit ?? 20;
-    const skip = (page - 1) * limit;
+  }): Promise<required_field_definitions[]> {
+    const where: any = { deleted_at: null };
+    if (filters?.active !== undefined) where.active = filters.active;
 
-    const where: any = {
-      deleted_at: null,
-    };
+    const definitions = await this.db.required_field_definitions.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+    });
 
-    if (filters?.active !== undefined) {
-      where.active = filters.active;
-    }
-
-    const [definitions, total] = await Promise.all([
-      this.db.required_field_definitions.findMany({
-        where,
-        orderBy: { created_at: "desc" },
-        skip,
-        take: limit,
-      }),
-      this.db.required_field_definitions.count({ where }),
-    ]);
-
-    return { definitions, total, page, limit };
+    return definitions;
   }
 
   /**

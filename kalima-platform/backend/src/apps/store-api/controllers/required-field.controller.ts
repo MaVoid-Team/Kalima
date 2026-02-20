@@ -70,26 +70,17 @@ export const requiredFieldController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const page = req.query.page
-        ? parseInt(req.query.page as string, 10)
-        : undefined;
-      const limit = req.query.limit
-        ? parseInt(req.query.limit as string, 10)
-        : undefined;
       const active =
         req.query.active !== undefined
           ? req.query.active === "true"
           : undefined;
 
-      const result = await requiredFieldService.getAllDefinitions({
-        page,
-        limit,
-        active,
-      });
+      const list = await requiredFieldService.getAllDefinitions({ active });
 
       res.status(200).json({
         success: true,
-        data: result,
+        results: list.length,
+        data: list,
       });
     } catch (error) {
       _next(error);
