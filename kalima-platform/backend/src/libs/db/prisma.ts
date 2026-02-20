@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../apps/store-api/generated/prisma";
+import { PrismaClient } from "../../apps/store-api/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
@@ -14,8 +14,7 @@ if (!databaseUrl) {
 }
 
 // Extract the schema from the DATABASE_URL (?schema=kalima), default to "public"
-const schema =
-  new URL(databaseUrl).searchParams.get("schema") ?? "public";
+const schema = new URL(databaseUrl).searchParams.get("schema") ?? "public";
 
 const pool =
   globalForPrisma.pool ?? new Pool({ connectionString: databaseUrl });

@@ -9,7 +9,7 @@ import {
   required_field_definitions,
   product_required_fields,
   field_type_enum,
-} from "../generated/prisma";
+} from "../generated/prisma/client";
 import {
   BadRequestError,
   NotFoundError,

@@ -91,10 +91,7 @@ function productWithSampleFilter(
     if (SAMPLE_MIME_TYPES.has(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(
-        new BadRequestError("Sample must be a PDF file") as unknown as Error,
-        false,
-      );
+      cb(new BadRequestError("Sample must be a PDF file") as any, false);
     }
     return;
   }

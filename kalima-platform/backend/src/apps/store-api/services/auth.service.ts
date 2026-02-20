@@ -41,7 +41,7 @@ import {
   role_enum,
   portal_enum,
   auth_provider_enum,
-} from "../generated/prisma";
+} from "../generated/prisma/client";
 import { getEmailService } from "../emails";
 import { userManagementService } from "./user-management.service";
 import {
@@ -460,7 +460,9 @@ class AuthService {
     }
 
     if (user.password) {
-      throw new ConflictError("Password already set. Use change password instead.");
+      throw new ConflictError(
+        "Password already set. Use change password instead.",
+      );
     }
 
     const passwordHash = await this.userService.hashPassword(input.password);

@@ -1,7 +1,7 @@
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import { CreateSiteDto, UpdateSiteDto } from "../dtos/site.dto";
-import { sites } from "../generated/prisma";
+import { sites } from "../generated/prisma/client";
 import {
   NotFoundError,
   ConflictError,

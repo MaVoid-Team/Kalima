@@ -4,7 +4,7 @@ import {
   CreateParentChildDto,
   UpdateParentChildDto,
 } from "../dtos/parent-children.dto";
-import { parent_children } from "../generated/prisma";
+import { parent_children } from "../generated/prisma/client";
 import { NotFoundError, ConflictError } from "../../../libs/errors";
 
 class ParentChildrenService {
@@ -42,10 +42,15 @@ class ParentChildrenService {
     return created;
   }
 
-  async getAllParentChildren(filters?: { parent_user_id?: number; student_user_id?: number; }): Promise<parent_children[]> {
+  async getAllParentChildren(filters?: {
+    parent_user_id?: number;
+    student_user_id?: number;
+  }): Promise<parent_children[]> {
     const where: any = {};
-    if (filters?.parent_user_id !== undefined) where.parent_user_id = filters.parent_user_id;
-    if (filters?.student_user_id !== undefined) where.student_user_id = filters.student_user_id;
+    if (filters?.parent_user_id !== undefined)
+      where.parent_user_id = filters.parent_user_id;
+    if (filters?.student_user_id !== undefined)
+      where.student_user_id = filters.student_user_id;
 
     return this.db.parent_children.findMany({ where, orderBy: { id: "asc" } });
   }

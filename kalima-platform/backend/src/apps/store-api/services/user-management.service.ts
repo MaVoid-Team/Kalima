@@ -27,7 +27,7 @@ import {
   role_enum,
   portal_enum,
   auth_provider_enum,
-} from "../generated/prisma";
+} from "../generated/prisma/client";
 import {
   ConflictError,
   NotFoundError,
@@ -60,7 +60,11 @@ class UserManagementService {
     const client = tx ?? this.db;
     await client.user_analytics.upsert({
       where: { user_id },
-      create: { user_id, total_spent: totalSpentIncrement, number_of_purchases: purchasesIncrement },
+      create: {
+        user_id,
+        total_spent: totalSpentIncrement,
+        number_of_purchases: purchasesIncrement,
+      },
       update: {
         total_spent: { increment: totalSpentIncrement },
         number_of_purchases: { increment: purchasesIncrement },

@@ -2,7 +2,7 @@ import {
   auth_provider_enum,
   portal_enum,
   role_enum,
-} from "../../generated/prisma";
+} from "../generated/prisma/client";
 
 // ============================================
 // AUTH TOKENS

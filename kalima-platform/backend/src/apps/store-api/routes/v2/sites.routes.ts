@@ -2,10 +2,13 @@ import { Router } from "express";
 import { sitesController } from "../../controllers/sites.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
-import { role_enum } from "../../generated/prisma";
+import { role_enum } from "../../generated/prisma/client";
 
 const router = Router();
-const adminAuth = [authenticateToken, requireRole([role_enum.Admin, role_enum.SubAdmin])];
+const adminAuth = [
+  authenticateToken,
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC
