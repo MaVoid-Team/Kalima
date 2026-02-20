@@ -415,6 +415,8 @@ class ProductService {
       throw new NotFoundError("Gallery entry not found");
     }
 
+    // Delete gallery row first, then clean up the image file
+    await this.db.product_gallery.delete({ where: { id: galleryId } });
     await imageService.deleteImage(entry.image_id);
   }
 
