@@ -40,9 +40,10 @@ async function validateDto<T extends object>(
   return dto;
 }
 
-function parseIntParam(raw: string | undefined, name: string): number {
-  const n = Number(raw);
-  if (!raw || Number.isNaN(n) || n <= 0)
+function parseIntParam(raw: string | string[] | undefined, name: string): number {
+  const val = Array.isArray(raw) ? raw[0] : raw;
+  const n = Number(val);
+  if (!val || Number.isNaN(n) || n <= 0)
     throw new BadRequestError(`Invalid ${name}`);
   return n;
 }
