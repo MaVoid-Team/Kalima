@@ -4,6 +4,7 @@ import couponRoutes from "./coupon.routes";
 import requiredFieldRoutes from "./required-field.routes";
 import categoryRoutes from "./category.routes";
 import productRoutes from "./product.routes";
+import purchaseRoutes from "./purchase.routes";
 import sampleRoutes from "./sample.routes";
 import governmentRoutes from "./government.routes";
 import zonesRoutes from "./zones.routes";
@@ -21,6 +22,7 @@ router.use("/coupons", couponRoutes);
 router.use("/required-fields", requiredFieldRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/products", productRoutes);
+router.use("/purchases", purchaseRoutes);
 router.use("/samples", sampleRoutes);
 
 // New geography & social-media endpoints

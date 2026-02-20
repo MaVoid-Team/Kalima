@@ -463,18 +463,18 @@ class CartService {
         tx as unknown as PrismaClient,
       );
 
+      // Record coupon usage per user (does NOT deactivate the coupon globally)
+      const { couponService: cs } = await import("./coupon.service");
+      const seenCoupons = new Set<number>();
       for (const item of cart.cart_items) {
         const couponId = (item as { coupon_id?: number | null }).coupon_id;
-        if (couponId) {
-          const coupon = await tx.coupons.findUnique({
-            where: { id: couponId },
-          });
-          if (coupon && coupon.active) {
-            await tx.coupons.update({
-              where: { id: coupon.id },
-              data: { active: false, updated_at: new Date() },
-            });
-          }
+        if (couponId && !seenCoupons.has(couponId)) {
+          seenCoupons.add(couponId);
+          await cs.recordCouponUsage(
+            user_id,
+            couponId,
+            createdPurchase ? (createdPurchase as any).id : undefined,
+          );
         }
       }
 
