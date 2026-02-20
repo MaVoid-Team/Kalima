@@ -16,7 +16,7 @@ services:
     networks:
       - dev-network
 
-  devbackend:
+  dev-backend:
     build:
       context: ./backend
       dockerfile: src/Dockerfile
