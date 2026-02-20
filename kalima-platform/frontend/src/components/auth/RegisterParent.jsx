@@ -15,14 +15,14 @@ import useRegister from "../../hooks/auth/useRegister";
 
 export default function RegisterParent({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerParent, loading: registerLoading } = useRegister();
+    const { registerParent, registerFirebaseParent, loading: registerLoading } = useRegister();
 
     // Schema
     const parentSchema = z.object({
         secondary_phone: z.string().optional(),
     });
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, firebaseToken) => {
         const { confirmPassword, ...data } = values;
 
         // Ensure empty string is treated as null or handle as optional
@@ -30,7 +30,11 @@ export default function RegisterParent({ onBack }) {
             delete data.secondary_phone;
         }
 
-        await registerParent(data);
+        if (firebaseToken) {
+            await registerFirebaseParent({ ...data, idToken: firebaseToken });
+        } else {
+            await registerParent(data);
+        }
     };
 
     return (

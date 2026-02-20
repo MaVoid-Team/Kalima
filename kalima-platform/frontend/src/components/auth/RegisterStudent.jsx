@@ -24,7 +24,7 @@ import useLookups from "../../hooks/useLookups";
 
 export default function RegisterStudent({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerStudent, loading: registerLoading } = useRegister();
+    const { registerStudent, registerFirebaseStudent, loading: registerLoading } = useRegister();
 
     // Schema
     const studentSchema = z.object({
@@ -36,7 +36,7 @@ export default function RegisterStudent({ onBack }) {
         faction: z.string().default("Alpha"),
     });
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, firebaseToken) => {
         const { confirmPassword, ...data } = values;
 
         const payload = {
@@ -47,7 +47,11 @@ export default function RegisterStudent({ onBack }) {
             // faction is already in data or default
         };
 
-        await registerStudent(payload);
+        if (firebaseToken) {
+            await registerFirebaseStudent({ ...payload, idToken: firebaseToken });
+        } else {
+            await registerStudent(payload);
+        }
     };
 
     return (

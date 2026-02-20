@@ -25,9 +25,27 @@ const useLogin = () => {
             setLoading(false);
         }
     };
+    const loginWithFirebase = async (idToken) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await axios.post('/auth/login/firebase', { idToken });
+            const { user, tokens } = response.data.data || response.data;
+
+            loginSuccess(user, tokens);
+            toast.success('Login successful!');
+            return response.data;
+        } catch (err) {
+            setError(err);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return {
         login,
+        loginWithFirebase,
         loading,
         error
     };
