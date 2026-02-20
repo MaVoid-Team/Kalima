@@ -1,3 +1,6 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store cart purchase controller logic.
 const ECCartPurchase = require("../models/ec.cartPurchaseModel");
 const ECCart = require("../models/ec.cartModel");
 const ECCoupon = require("../models/ec.couponModel");
@@ -969,19 +972,19 @@ exports.getPurchaseStatistics = catchAsync(async (req, res, next) => {
 exports.getResponseTimeStatistics = catchAsync(async (req, res, next) => {
   const startDate = req.query.startDate
     ? DateTime.fromISO(req.query.startDate)
-      .setZone("Africa/Cairo")
-      .startOf("day")
-      .toJSDate()
+        .setZone("Africa/Cairo")
+        .startOf("day")
+        .toJSDate()
     : DateTime.fromJSDate(DEFAULT_STATS_START_DATE)
-      .setZone("Africa/Cairo")
-      .startOf("day")
-      .toJSDate();
+        .setZone("Africa/Cairo")
+        .startOf("day")
+        .toJSDate();
 
   const endDate = req.query.endDate
     ? DateTime.fromISO(req.query.endDate)
-      .setZone("Africa/Cairo")
-      .endOf("day")
-      .toJSDate()
+        .setZone("Africa/Cairo")
+        .endOf("day")
+        .toJSDate()
     : getCurrentEgyptTime().endOf("day").toJSDate();
 
   // Get purchases within date range
@@ -1839,17 +1842,17 @@ exports.getFullOrdersReport = catchAsync(async (req, res, next) => {
       const avgResponseMinutes =
         stat.responseTimesMinutes.length > 0
           ? Math.round(
-            stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
-            stat.responseTimesMinutes.length,
-          )
+              stat.responseTimesMinutes.reduce((a, b) => a + b, 0) /
+                stat.responseTimesMinutes.length,
+            )
           : 0;
 
       const avgConfirmationMinutes =
         stat.confirmationTimesMinutes.length > 0
           ? Math.round(
-            stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
-            stat.confirmationTimesMinutes.length,
-          )
+              stat.confirmationTimesMinutes.reduce((a, b) => a + b, 0) /
+                stat.confirmationTimesMinutes.length,
+            )
           : 0;
 
       // Format minutes to "Xh Ym" format

@@ -1,3 +1,6 @@
+// DOMAIN: SHARED
+// STATUS: LEGACY
+// NOTE: Shared registration logic.
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel.js");
 const Parent = require("../models/parentModel.js");
@@ -20,7 +23,7 @@ const validatePassword = (password) => {
   if (password.length < requiredLength) {
     throw new AppError(
       `Password must be at least ${requiredLength} characters long`,
-      400
+      400,
     );
   }
 };
@@ -85,8 +88,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             `Invalid government: ${normalizedGovernment}. Available governments: ${govNames}`, // ← Better error with options
-            400
-          )
+            400,
+          ),
         );
       }
 
@@ -98,8 +101,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             `No administration zones defined for government: ${government}.`,
-            400
-          )
+            400,
+          ),
         );
       }
       // First check if the zone exists in the Government document
@@ -107,7 +110,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         (zone) =>
           zone &&
           zone.toLowerCase().trim() ===
-          normalizedAdministrationZone.toLowerCase() // ← Use normalized value
+            normalizedAdministrationZone.toLowerCase(), // ← Use normalized value
       );
 
       if (!zoneExistsInGov) {
@@ -123,8 +126,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
           return next(
             new AppError(
               `Administration zone "${administrationZone}" not found for government: ${government}.`,
-              400
-            )
+              400,
+            ),
           );
         }
 
@@ -132,7 +135,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
       }
     } catch (error) {
       return next(
-        new AppError(`Error validating location data: ${error.message}`, 500)
+        new AppError(`Error validating location data: ${error.message}`, 500),
       );
     }
   }
@@ -156,14 +159,14 @@ const registerNewUser = catchAsync(async (req, res, next) => {
 
   if (duplicateEmail) {
     return next(
-      new AppError("This E-Mail is already associated with a user.", 409)
+      new AppError("This E-Mail is already associated with a user.", 409),
     );
   }
 
   const duplicatePhone = await User.findOne({ phoneNumber });
   if (phoneRequiredRoles.includes(role.toLowerCase()) && duplicatePhone) {
     return next(
-      new AppError("This phone number is already associated with a user.", 400)
+      new AppError("This phone number is already associated with a user.", 400),
     );
   }
 
@@ -185,8 +188,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
             return next(
               new AppError(
                 "Not all children values are valid UserId or SequenceId.",
-                400
-              )
+                400,
+              ),
             );
           }
         }
@@ -260,8 +263,8 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         return next(
           new AppError(
             "At least one center is required if teachesAtType is 'Center'",
-            400
-          )
+            400,
+          ),
         );
       }
       // Validate school
@@ -270,7 +273,7 @@ const registerNewUser = catchAsync(async (req, res, next) => {
         (!newUser.school || newUser.school.trim() === "")
       ) {
         return next(
-          new AppError("School is required if teachesAtType is 'School'", 400)
+          new AppError("School is required if teachesAtType is 'School'", 400),
         );
       }
       // Validate socialMedia (optional, but if present, must be array of {platform, account})
@@ -294,7 +297,10 @@ const registerNewUser = catchAsync(async (req, res, next) => {
             ].includes(sm.platform)
           ) {
             return next(
-              new AppError(`Invalid social media platform: ${sm.platform}`, 400)
+              new AppError(
+                `Invalid social media platform: ${sm.platform}`,
+                400,
+              ),
             );
           }
         }
