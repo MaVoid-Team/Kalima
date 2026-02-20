@@ -13,40 +13,39 @@ import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "../../hooks/auth/useRegister";
 
-export default function RegisterParent({ onBack }) {
+export default function RegisterLecturer({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerParent, loading: registerLoading } = useRegister();
+    const { registerLecturer, loading: registerLoading } = useRegister();
 
     // Schema
-    const parentSchema = z.object({
+    const lecturerSchema = z.object({
         secondary_phone: z.string().optional(),
     });
 
     const handleSubmit = async (values) => {
         const { confirmPassword, ...data } = values;
 
-        // Ensure empty string is treated as null or handle as optional
         if (!data.secondary_phone) {
             delete data.secondary_phone;
         }
 
-        await registerParent(data);
+        await registerLecturer(data);
     };
 
     return (
         <CommonRegisterForm
-            role="parent"
+            role="lecturer"
             onBack={onBack}
-            extraSchema={parentSchema}
+            extraSchema={lecturerSchema}
             defaultValues={{ secondary_phone: "" }}
             onSubmit={handleSubmit}
         >
-            <ParentFields />
+            <LecturerFields />
         </CommonRegisterForm>
     );
 }
 
-function ParentFields() {
+function LecturerFields() {
     const { t } = useTranslation("auth");
     const { control } = useFormContext();
 
