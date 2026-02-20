@@ -9,12 +9,52 @@ import type { CheckoutDto } from "../dtos/cart.dto";
 import { couponService } from "./coupon.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
 
+/** Standard include shape for purchase queries */
+const PURCHASE_INCLUDE = {
+  purchase_items: {
+    include: {
+      purchase_item_required_fields: {
+        include: { required_field_definitions: true },
+      },
+      products: {
+        select: {
+          id: true,
+          title: true,
+          serial: true,
+          type: true,
+          price: true,
+          thumbnail_image: { select: { id: true, url: true } },
+        },
+      },
+    },
+  },
+  users: { select: { id: true, name: true, email: true, phone: true } },
+  received_by_user: { select: { id: true, name: true } },
+  confirmed_by_user: { select: { id: true, name: true } },
+  returned_by_user: { select: { id: true, name: true } },
+  payment_methods: { select: { id: true, name: true, phone_number: true } },
+  payment_screenshot: { select: { id: true, url: true } },
+  watermark: { select: { id: true, url: true } },
+  coupon_usages: {
+    include: {
+      coupons: {
+        select: {
+          id: true,
+          code: true,
+          discount_amount: true,
+          discount_percentage: true,
+        },
+      },
+    },
+  },
+} as const;
+
 class PurchasesService {
   constructor(private db: PrismaClient = prisma) {}
 
-  // -----------------------------
+  // ---------------------------------------------------------------
   // Helpers
-  // -----------------------------
+  // ---------------------------------------------------------------
   private buildUserSerialFrom(userRecord: {
     mongo_id?: string;
     id: number;
@@ -53,11 +93,10 @@ class PurchasesService {
     return `${userSerial}-CP-${formattedDate}-${formattedSeq}`;
   }
 
-  // -----------------------------
-  // Core persistence (typed)
-  // -----------------------------
+  // ---------------------------------------------------------------
+  // Core persistence
+  // ---------------------------------------------------------------
   async createPurchase(input: CreatePurchaseDto, txClient?: PrismaClient) {
-    // run inside provided transaction or start a new one
     if (!txClient) {
       return this.db.$transaction(async (tx) =>
         this.createPurchase(input, tx as unknown as PrismaClient),
@@ -66,24 +105,20 @@ class PurchasesService {
 
     const client = txClient;
 
-    // Validate user via user-management.service (use service as canonical source)
     const user = await userManagementService.findUserById(input.user_id);
     if (!user) throw new NotFoundError("User not found");
 
-    // Validate payment method
     const paymentMethod = await client.payment_methods.findUnique({
       where: { id: input.payment_method_id },
     });
     if (!paymentMethod || paymentMethod.status !== true)
       throw new BadRequestError("Invalid or inactive payment method");
 
-    // Validate payment screenshot exists
     const screenshot = await client.images.findUnique({
       where: { id: input.payment_screenshot_id },
     });
     if (!screenshot) throw new BadRequestError("Payment screenshot not found");
 
-    // Generate purchase serial
     const userSerial = this.buildUserSerialFrom({
       mongo_id: user.mongo_id ?? undefined,
       id: user.id,
@@ -93,7 +128,6 @@ class PurchasesService {
       userSerial,
     );
 
-    // Persist purchase
     const created = await client.purchases.create({
       data: {
         user_id: input.user_id,
@@ -109,7 +143,6 @@ class PurchasesService {
       },
     });
 
-    // Persist items + required fields
     for (const item of input.items) {
       const purchaseItem = await client.purchase_items.create({
         data: {
@@ -131,21 +164,15 @@ class PurchasesService {
       }
     }
 
-    // Return fully populated purchase
-    const result = await client.purchases.findUnique({
+    return client.purchases.findUnique({
       where: { id: created.id },
-      include: {
-        purchase_items: { include: { purchase_item_required_fields: true } },
-      },
+      include: PURCHASE_INCLUDE,
     });
-
-    return result;
   }
 
-  // -----------------------------
-  // Create purchase directly from an active cart (does NOT clear cart or mark coupons)
-  // Useful for services/controllers that need to persist a purchase based on the cart payload
-  // -----------------------------
+  // ---------------------------------------------------------------
+  // Create purchase from active cart
+  // ---------------------------------------------------------------
   async createPurchaseFromCart(
     user_id: number,
     input: {
@@ -158,7 +185,6 @@ class PurchasesService {
   ) {
     const client = txClient ?? this.db;
 
-    // load active cart with relations
     type CartWithItems = Prisma.cartsGetPayload<{
       include: { cart_items: { include: { cart_item_required_fields: true } } };
     }>;
@@ -169,7 +195,6 @@ class PurchasesService {
     if (!cart || !cart.cart_items || cart.cart_items.length === 0)
       throw new BadRequestError("Active cart is empty");
 
-    // build purchase DTO from cart
     const items: CreatePurchaseItemDto[] = cart.cart_items.map((ci) => ({
       product_id: ci.product_id,
       price_at_purchase: Number(ci.price_at_add),
@@ -193,10 +218,8 @@ class PurchasesService {
       notes: input.notes || undefined,
     };
 
-    // delegate to createPurchase (transaction-safe)
     const purchase = await this.createPurchase(purchaseDto, txClient);
 
-    // Record coupon usage for each unique coupon used in this purchase (one-time per user)
     const couponIds = [
       ...new Set(
         cart.cart_items
@@ -215,12 +238,9 @@ class PurchasesService {
     return purchase;
   }
 
-  // -----------------------------
-  // Fast-buy: purchase a single product without mutating user's cart
-  // - Validates required fields for product
-  // - Uploads payment screenshot via imageService
-  // - Persists purchase using createPurchase
-  // -----------------------------
+  // ---------------------------------------------------------------
+  // Fast-buy (single product, no cart mutation)
+  // ---------------------------------------------------------------
   async fastBuy(
     user_id: number,
     product_id: number,
@@ -231,15 +251,13 @@ class PurchasesService {
   ) {
     const client = txClient ?? this.db;
 
-    // product exists
     const product = await client.products.findUnique({
       where: { id: product_id },
     });
     if (!product) throw new NotFoundError("Product not found");
 
-    // validate required fields for this product
     const requiredDefs = await client.product_required_fields.findMany({
-      where: { product_id: product_id, is_required: true, active: true },
+      where: { product_id, is_required: true, active: true },
       select: { field_definition_id: true },
     });
     if (requiredDefs.length > 0) {
@@ -256,14 +274,13 @@ class PurchasesService {
         );
     }
 
-    // upload payment screenshot
     if (!payment_screenshot_file) {
       throw new BadRequestError("Payment screenshot is required");
     }
-    const screenshot = await imageService.uploadImage(payment_screenshot_file, {
-      compress: true,
-      quality: 80,
-    });
+    const screenshot = await imageService.uploadImage(
+      payment_screenshot_file,
+      { compress: true, quality: 80 },
+    );
 
     const unitPrice = Number(product.price);
     const subtotal = unitPrice * quantity;
@@ -276,7 +293,6 @@ class PurchasesService {
       payment_method_id: checkout.payment_method_id,
     });
 
-    // Create one purchase_item per unit (schema has no quantity field)
     const requiredFieldsMapped = (checkout.required_fields || []).map((f) => ({
       field_definition_id: f.required_field_definition_id,
       value: f.value,
@@ -284,7 +300,7 @@ class PurchasesService {
     const items: CreatePurchaseItemDto[] = Array.from(
       { length: quantity },
       () => ({
-        product_id: product_id,
+        product_id,
         price_at_purchase: unitPrice,
         discount: 0,
         required_fields:
@@ -306,6 +322,259 @@ class PurchasesService {
     };
 
     return this.createPurchase(purchaseDto, txClient);
+  }
+
+  // =============================================================
+  // Read operations
+  // =============================================================
+
+  /** Admin paginated list with search and filters */
+  async getAll(filters: {
+    status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    minTotal?: number;
+    maxTotal?: number;
+    page: number;
+    limit: number;
+  }) {
+    const { page, limit } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.purchasesWhereInput = {};
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    if (filters.startDate || filters.endDate) {
+      where.created_at = {};
+      if (filters.startDate)
+        where.created_at.gte = new Date(filters.startDate);
+      if (filters.endDate) where.created_at.lte = new Date(filters.endDate);
+    }
+
+    if (filters.minTotal !== undefined || filters.maxTotal !== undefined) {
+      where.total = {};
+      if (filters.minTotal !== undefined) where.total.gte = filters.minTotal;
+      if (filters.maxTotal !== undefined) where.total.lte = filters.maxTotal;
+    }
+
+    if (filters.search) {
+      const s = filters.search.trim();
+      where.OR = [
+        { purchase_serial: { contains: s, mode: "insensitive" } },
+        {
+          number_transferred_from: { contains: s, mode: "insensitive" },
+        },
+        { users: { name: { contains: s, mode: "insensitive" } } },
+        { users: { email: { contains: s, mode: "insensitive" } } },
+        { users: { phone: { contains: s, mode: "insensitive" } } },
+        {
+          purchase_items: {
+            some: {
+              products: { title: { contains: s, mode: "insensitive" } },
+            },
+          },
+        },
+        {
+          purchase_items: {
+            some: {
+              products: { serial: { contains: s, mode: "insensitive" } },
+            },
+          },
+        },
+      ];
+    }
+
+    const [purchases, total] = await Promise.all([
+      this.db.purchases.findMany({
+        where,
+        include: PURCHASE_INCLUDE,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.purchases.count({ where }),
+    ]);
+
+    return { purchases, total, page, pages: Math.ceil(total / limit), limit };
+  }
+
+  /** Teacher's own purchases */
+  async getByUser(userId: number) {
+    return this.db.purchases.findMany({
+      where: { user_id: userId },
+      include: PURCHASE_INCLUDE,
+      orderBy: { created_at: "desc" },
+    });
+  }
+
+  /** Single purchase by ID */
+  async getById(id: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id },
+      include: PURCHASE_INCLUDE,
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+    return purchase;
+  }
+
+  // =============================================================
+  // Status transitions
+  // =============================================================
+
+  /** pending → received */
+  async receive(purchaseId: number, adminId: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+    if (purchase.status !== "pending") {
+      throw new BadRequestError(`Purchase is already ${purchase.status}`);
+    }
+
+    return this.db.purchases.update({
+      where: { id: purchaseId },
+      data: {
+        status: "received",
+        received_by: adminId,
+        received_at: new Date(),
+        updated_at: new Date(),
+      },
+      include: PURCHASE_INCLUDE,
+    });
+  }
+
+  /** received | returned → confirmed */
+  async confirm(purchaseId: number, adminId: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+    if (purchase.status === "confirmed") {
+      throw new BadRequestError("Purchase is already confirmed");
+    }
+    if (!["received", "returned"].includes(purchase.status)) {
+      throw new BadRequestError(
+        "Purchase must be received or in returned status before it can be confirmed",
+      );
+    }
+
+    return this.db.purchases.update({
+      where: { id: purchaseId },
+      data: {
+        status: "confirmed",
+        confirmed_by: adminId,
+        confirmed_at: new Date(),
+        updated_at: new Date(),
+      },
+      include: PURCHASE_INCLUDE,
+    });
+  }
+
+  /** received | confirmed → returned */
+  async returnPurchase(purchaseId: number, adminId: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+
+    if (!["confirmed", "received"].includes(purchase.status)) {
+      throw new BadRequestError(
+        purchase.status === "returned"
+          ? "Purchase is already returned"
+          : "Only confirmed or received purchases can be returned",
+      );
+    }
+
+    return this.db.purchases.update({
+      where: { id: purchaseId },
+      data: {
+        status: "returned",
+        returned_by: adminId,
+        returned_at: new Date(),
+        updated_at: new Date(),
+      },
+      include: PURCHASE_INCLUDE,
+    });
+  }
+
+  // =============================================================
+  // Admin operations
+  // =============================================================
+
+  /** Update admin notes */
+  async addAdminNote(purchaseId: number, adminNotes: string, adminId: number) {
+    const exists = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+    });
+    if (!exists) throw new NotFoundError("Purchase not found");
+
+    return this.db.purchases.update({
+      where: { id: purchaseId },
+      data: {
+        admin_notes: adminNotes,
+        admin_note_by: adminId,
+        updated_at: new Date(),
+      },
+      include: PURCHASE_INCLUDE,
+    });
+  }
+
+  /** Hard-delete a purchase. Restores used coupons if confirmed. */
+  async deletePurchase(purchaseId: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+      include: { coupon_usages: true },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+
+    if (purchase.status === "confirmed" && purchase.coupon_usages.length > 0) {
+      for (const usage of purchase.coupon_usages) {
+        await this.db.coupon_usages.delete({ where: { id: usage.id } });
+      }
+    }
+
+    await this.db.purchases.delete({ where: { id: purchaseId } });
+  }
+
+  /** Remove a single item; recalculate totals. Cannot remove last item. */
+  async deleteItem(purchaseId: number, itemId: number) {
+    const purchase = await this.db.purchases.findUnique({
+      where: { id: purchaseId },
+      include: { purchase_items: true },
+    });
+    if (!purchase) throw new NotFoundError("Purchase not found");
+
+    const item = purchase.purchase_items.find((i) => i.id === itemId);
+    if (!item) throw new NotFoundError("Item not found in this purchase");
+
+    if (purchase.purchase_items.length === 1) {
+      throw new BadRequestError(
+        "Cannot remove the last item. Delete the entire purchase instead.",
+      );
+    }
+
+    await this.db.purchase_items.delete({ where: { id: itemId } });
+
+    const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);
+    const newSubtotal = remaining.reduce(
+      (sum, i) => sum + Number(i.price_at_purchase),
+      0,
+    );
+    const newTotal = Math.max(0, newSubtotal - Number(purchase.discount));
+
+    return this.db.purchases.update({
+      where: { id: purchaseId },
+      data: {
+        subtotal: newSubtotal,
+        total: newTotal,
+        updated_at: new Date(),
+      },
+      include: PURCHASE_INCLUDE,
+    });
   }
 }
 

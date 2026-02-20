@@ -27,7 +27,7 @@ export function setupStoreSocket(httpServer: HttpServer): Server {
         where: {
           user_id: userId,
           portal: "store",
-          role: { in: ADMIN_ROLES },
+          role: { in: ADMIN_ROLES as any[] },
         },
       });
 
