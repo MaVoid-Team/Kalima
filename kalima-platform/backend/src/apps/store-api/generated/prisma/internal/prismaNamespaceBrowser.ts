@@ -76,7 +76,16 @@ export const ModelName = {
   coupons: 'coupons',
   product_required_fields: 'product_required_fields',
   products: 'products',
-  required_field_definitions: 'required_field_definitions'
+  required_field_definitions: 'required_field_definitions',
+  carts: 'carts',
+  cart_items: 'cart_items',
+  cart_item_required_fields: 'cart_item_required_fields',
+  purchases: 'purchases',
+  purchase_items: 'purchase_items',
+  purchase_item_required_fields: 'purchase_item_required_fields',
+  payment_methods: 'payment_methods',
+  images: 'images',
+  product_gallery: 'product_gallery'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -374,11 +383,11 @@ export const ProductsScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  type: 'type',
   price: 'price',
   price_after_discount: 'price_after_discount',
   serial: 'serial',
-  thumbnail: 'thumbnail',
-  gallery: 'gallery',
+  thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
   coupon_id: 'coupon_id',
   is_archived: 'is_archived',
@@ -404,20 +413,146 @@ export const Required_field_definitionsScalarFieldEnum = {
 export type Required_field_definitionsScalarFieldEnum = (typeof Required_field_definitionsScalarFieldEnum)[keyof typeof Required_field_definitionsScalarFieldEnum]
 
 
+export const CartsScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  status: 'status',
+  subtotal: 'subtotal',
+  discount: 'discount',
+  total: 'total',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type CartsScalarFieldEnum = (typeof CartsScalarFieldEnum)[keyof typeof CartsScalarFieldEnum]
+
+
+export const Cart_itemsScalarFieldEnum = {
+  id: 'id',
+  cart_id: 'cart_id',
+  product_id: 'product_id',
+  coupon_id: 'coupon_id',
+  quantity: 'quantity',
+  price_at_add: 'price_at_add',
+  final_price: 'final_price',
+  discount: 'discount',
+  required_fields_filled: 'required_fields_filled',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type Cart_itemsScalarFieldEnum = (typeof Cart_itemsScalarFieldEnum)[keyof typeof Cart_itemsScalarFieldEnum]
+
+
+export const Cart_item_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  cart_item_id: 'cart_item_id',
+  field_definition_id: 'field_definition_id',
+  value: 'value',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Cart_item_required_fieldsScalarFieldEnum = (typeof Cart_item_required_fieldsScalarFieldEnum)[keyof typeof Cart_item_required_fieldsScalarFieldEnum]
+
+
+export const PurchasesScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  status: 'status',
+  subtotal: 'subtotal',
+  discount: 'discount',
+  total: 'total',
+  payment_method_id: 'payment_method_id',
+  payment_screenshot_id: 'payment_screenshot_id',
+  watermark_id: 'watermark_id',
+  purchase_serial: 'purchase_serial',
+  number_transferred_from: 'number_transferred_from',
+  payment_number: 'payment_number',
+  notes: 'notes',
+  admin_notes: 'admin_notes',
+  admin_note_by: 'admin_note_by',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type PurchasesScalarFieldEnum = (typeof PurchasesScalarFieldEnum)[keyof typeof PurchasesScalarFieldEnum]
+
+
+export const Purchase_itemsScalarFieldEnum = {
+  id: 'id',
+  purchase_id: 'purchase_id',
+  product_id: 'product_id',
+  price_at_purchase: 'price_at_purchase',
+  discount: 'discount',
+  required_fields_filled: 'required_fields_filled',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type Purchase_itemsScalarFieldEnum = (typeof Purchase_itemsScalarFieldEnum)[keyof typeof Purchase_itemsScalarFieldEnum]
+
+
+export const Purchase_item_required_fieldsScalarFieldEnum = {
+  id: 'id',
+  purchase_item_id: 'purchase_item_id',
+  field_definition_id: 'field_definition_id',
+  value: 'value',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Purchase_item_required_fieldsScalarFieldEnum = (typeof Purchase_item_required_fieldsScalarFieldEnum)[keyof typeof Purchase_item_required_fieldsScalarFieldEnum]
+
+
+export const Payment_methodsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phone_number: 'phone_number',
+  status: 'status',
+  image_id: 'image_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+} as const
+
+export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
+
+
+export const ImagesScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  created_at: 'created_at'
+} as const
+
+export type ImagesScalarFieldEnum = (typeof ImagesScalarFieldEnum)[keyof typeof ImagesScalarFieldEnum]
+
+
+export const Product_galleryScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  image_id: 'image_id',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at'
+} as const
+
+export type Product_galleryScalarFieldEnum = (typeof Product_galleryScalarFieldEnum)[keyof typeof Product_galleryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-export const NullableJsonNullValueInput = {
-  DbNull: DbNull,
-  JsonNull: JsonNull
-} as const
-
-export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -434,13 +569,4 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
