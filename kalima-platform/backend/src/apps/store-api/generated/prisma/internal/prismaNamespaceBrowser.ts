@@ -76,6 +76,7 @@ export const ModelName = {
   coupons: 'coupons',
   product_required_fields: 'product_required_fields',
   products: 'products',
+  samples: 'samples',
   required_field_definitions: 'required_field_definitions',
   carts: 'carts',
   cart_items: 'cart_items',
@@ -398,6 +399,19 @@ export const ProductsScalarFieldEnum = {
 } as const
 
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
+
+
+export const SamplesScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  url: 'url',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  created_at: 'created_at'
+} as const
+
+export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
 
 
 export const Required_field_definitionsScalarFieldEnum = {

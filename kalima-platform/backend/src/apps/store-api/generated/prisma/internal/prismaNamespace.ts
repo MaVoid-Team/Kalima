@@ -409,6 +409,7 @@ export const ModelName = {
   coupons: 'coupons',
   product_required_fields: 'product_required_fields',
   products: 'products',
+  samples: 'samples',
   required_field_definitions: 'required_field_definitions',
   carts: 'carts',
   cart_items: 'cart_items',
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "product_required_fields" | "products" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2288,6 +2289,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    samples: {
+      payload: Prisma.$samplesPayload<ExtArgs>
+      fields: Prisma.samplesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.samplesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.samplesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        findFirst: {
+          args: Prisma.samplesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.samplesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        findMany: {
+          args: Prisma.samplesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>[]
+        }
+        create: {
+          args: Prisma.samplesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        createMany: {
+          args: Prisma.samplesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.samplesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>[]
+        }
+        delete: {
+          args: Prisma.samplesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        update: {
+          args: Prisma.samplesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        deleteMany: {
+          args: Prisma.samplesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.samplesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.samplesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>[]
+        }
+        upsert: {
+          args: Prisma.samplesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$samplesPayload>
+        }
+        aggregate: {
+          args: Prisma.SamplesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSamples>
+        }
+        groupBy: {
+          args: Prisma.samplesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SamplesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.samplesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SamplesCountAggregateOutputType> | number
+        }
+      }
+    }
     required_field_definitions: {
       payload: Prisma.$required_field_definitionsPayload<ExtArgs>
       fields: Prisma.required_field_definitionsFieldRefs
@@ -3363,6 +3438,19 @@ export const ProductsScalarFieldEnum = {
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]
 
 
+export const SamplesScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  url: 'url',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  created_at: 'created_at'
+} as const
+
+export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
+
+
 export const Required_field_definitionsScalarFieldEnum = {
   id: 'id',
   label: 'label',
@@ -3848,6 +3936,7 @@ export type GlobalOmitConfig = {
   coupons?: Prisma.couponsOmit
   product_required_fields?: Prisma.product_required_fieldsOmit
   products?: Prisma.productsOmit
+  samples?: Prisma.samplesOmit
   required_field_definitions?: Prisma.required_field_definitionsOmit
   carts?: Prisma.cartsOmit
   cart_items?: Prisma.cart_itemsOmit
