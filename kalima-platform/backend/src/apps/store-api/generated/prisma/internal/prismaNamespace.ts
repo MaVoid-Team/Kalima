@@ -407,6 +407,7 @@ export const ModelName = {
   categories: 'categories',
   product_categories: 'product_categories',
   coupons: 'coupons',
+  coupon_usages: 'coupon_usages',
   product_required_fields: 'product_required_fields',
   products: 'products',
   samples: 'samples',
@@ -435,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2141,6 +2142,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    coupon_usages: {
+      payload: Prisma.$coupon_usagesPayload<ExtArgs>
+      fields: Prisma.coupon_usagesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.coupon_usagesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.coupon_usagesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        findFirst: {
+          args: Prisma.coupon_usagesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.coupon_usagesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        findMany: {
+          args: Prisma.coupon_usagesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>[]
+        }
+        create: {
+          args: Prisma.coupon_usagesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        createMany: {
+          args: Prisma.coupon_usagesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.coupon_usagesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>[]
+        }
+        delete: {
+          args: Prisma.coupon_usagesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        update: {
+          args: Prisma.coupon_usagesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        deleteMany: {
+          args: Prisma.coupon_usagesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.coupon_usagesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.coupon_usagesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>[]
+        }
+        upsert: {
+          args: Prisma.coupon_usagesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$coupon_usagesPayload>
+        }
+        aggregate: {
+          args: Prisma.Coupon_usagesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCoupon_usages>
+        }
+        groupBy: {
+          args: Prisma.coupon_usagesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Coupon_usagesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.coupon_usagesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Coupon_usagesCountAggregateOutputType> | number
+        }
+      }
+    }
     product_required_fields: {
       payload: Prisma.$product_required_fieldsPayload<ExtArgs>
       fields: Prisma.product_required_fieldsFieldRefs
@@ -3396,6 +3471,7 @@ export const CouponsScalarFieldEnum = {
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
+  starts_at: 'starts_at',
   expires_at: 'expires_at',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -3404,6 +3480,17 @@ export const CouponsScalarFieldEnum = {
 } as const
 
 export type CouponsScalarFieldEnum = (typeof CouponsScalarFieldEnum)[keyof typeof CouponsScalarFieldEnum]
+
+
+export const Coupon_usagesScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  coupon_id: 'coupon_id',
+  purchase_id: 'purchase_id',
+  created_at: 'created_at'
+} as const
+
+export type Coupon_usagesScalarFieldEnum = (typeof Coupon_usagesScalarFieldEnum)[keyof typeof Coupon_usagesScalarFieldEnum]
 
 
 export const Product_required_fieldsScalarFieldEnum = {
@@ -3934,6 +4021,7 @@ export type GlobalOmitConfig = {
   categories?: Prisma.categoriesOmit
   product_categories?: Prisma.product_categoriesOmit
   coupons?: Prisma.couponsOmit
+  coupon_usages?: Prisma.coupon_usagesOmit
   product_required_fields?: Prisma.product_required_fieldsOmit
   products?: Prisma.productsOmit
   samples?: Prisma.samplesOmit

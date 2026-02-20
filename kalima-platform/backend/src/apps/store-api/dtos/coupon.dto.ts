@@ -50,6 +50,11 @@ export class CreateCouponDto {
   discount_percentage: number;
 
   @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  starts_at?: Date;
+
+  @Type(() => Date)
   @IsNotEmpty()
   @IsDate()
   expires_at: Date;
@@ -85,9 +90,13 @@ export class UpdateCouponDto {
   discount_percentage?: number;
 
   @Type(() => Date)
-  @IsNotEmpty()
-  @IsDate()
   @IsOptional()
+  @IsDate()
+  starts_at?: Date;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
   expires_at?: Date;
 
   @Type(() => Boolean)

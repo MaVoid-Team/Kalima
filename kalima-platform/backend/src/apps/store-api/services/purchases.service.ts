@@ -6,6 +6,7 @@ import { userManagementService } from "./user-management.service";
 import { imageService } from "./image.service";
 import type { Prisma } from "../generated/prisma";
 import type { CheckoutDto } from "../dtos/cart.dto";
+import { couponService } from "./coupon.service";
 
 class PurchasesService {
   constructor(private db: PrismaClient = prisma) {}
@@ -194,7 +195,25 @@ class PurchasesService {
     };
 
     // delegate to createPurchase (transaction-safe)
-    return this.createPurchase(purchaseDto, txClient);
+    const purchase = await this.createPurchase(purchaseDto, txClient);
+
+    // Record coupon usage for each unique coupon used in this purchase (one-time per user)
+    const couponIds = [
+      ...new Set(
+        cart.cart_items
+          .filter((ci) => ci.coupon_id != null)
+          .map((ci) => ci.coupon_id as number),
+      ),
+    ];
+    for (const couponId of couponIds) {
+      await couponService.recordCouponUsage(
+        user_id,
+        couponId,
+        purchase?.id ?? undefined,
+      );
+    }
+
+    return purchase;
   }
 
   // -----------------------------
