@@ -12,9 +12,14 @@ const adminAuth = [
 ];
 
 // ============================================
-// PUBLIC — any authenticated user can read
+// PUBLIC — read (some endpoints unauthenticated)
 // ============================================
 
+// Public / unauthenticated helpers
+router.get("/roots", categoryController.getRootCategories);
+router.get("/:id/children", categoryController.getChildrenByParent);
+
+// Existing endpoints (authenticated)
 router.get("/", authenticateToken, categoryController.getAllCategories);
 router.get("/:id", authenticateToken, categoryController.getCategoryById);
 

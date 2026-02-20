@@ -34,7 +34,18 @@ Authorization: Bearer <access_token>
 
 ---
 
-## Public Endpoints (Authenticated)
+## Public Endpoints
+
+### Unauthenticated (no auth required)
+
+- GET `/roots` — return all root categories (no parents).
+- GET `/:id/children` — return direct child categories of the given parent ID.
+
+These two endpoints are intentionally public and do **not** require a JWT.
+
+---
+
+### Authenticated (any role)
 
 > Any authenticated user can access these endpoints regardless of role.
 
