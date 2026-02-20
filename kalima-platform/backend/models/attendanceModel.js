@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy attendance model.
 const mongoose = require("mongoose");
 
 const attendanceSchema = new mongoose.Schema(
@@ -11,7 +14,7 @@ const attendanceSchema = new mongoose.Schema(
     studentSequencedId: {
       type: Number,
       required: true,
-      index: true // Add an index for faster lookups
+      index: true, // Add an index for faster lookups
     },
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
@@ -25,7 +28,7 @@ const attendanceSchema = new mongoose.Schema(
     },
     lecturer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CLecturer", 
+      ref: "CLecturer",
       required: true,
     },
     subject: {
@@ -45,11 +48,11 @@ const attendanceSchema = new mongoose.Schema(
     },
     // New fields for attendance duration tracking
     leaveTime: {
-      type: Date
+      type: Date,
     },
     attendanceDuration: {
       type: Number, // Duration in minutes
-      min: 0
+      min: 0,
     },
     paymentType: {
       type: String,
@@ -86,30 +89,30 @@ const attendanceSchema = new mongoose.Schema(
     // New exam result fields
     examScore: {
       type: Number,
-      min: 0
+      min: 0,
     },
     examMaxScore: {
       type: Number,
-      min: 0
+      min: 0,
     },
     examPassThreshold: {
       type: Number,
-      min: 0
+      min: 0,
     },
     examStatus: {
       type: String,
       enum: ["passed", "failed", "absent", "pending"],
     },
     examDate: {
-      type: Date
+      type: Date,
     },
     examNotes: {
-      type: String
-    }
+      type: String,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index to efficiently find the latest multi-session payment for a student/lecturer/subject/level
