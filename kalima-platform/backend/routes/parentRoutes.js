@@ -1,22 +1,28 @@
-const express = require('express');
-const parentController = require('../controllers/parentController');
-const verifyJWT = require('../middleware/verifyJWT');
-const authController = require('../controllers/authController');
-const convertFormDataToNested = require('../middleware/convertFormDataToNested');
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy parent routes.
+const express = require("express");
+const parentController = require("../controllers/parentController");
+const verifyJWT = require("../middleware/verifyJWT");
+const authController = require("../controllers/authController");
+const convertFormDataToNested = require("../middleware/convertFormDataToNested");
 
 const router = express.Router();
 
-router.use(verifyJWT, authController.verifyRoles('Admin', 'SubAdmin', 'Moderator', 'Assistant'));
+router.use(
+  verifyJWT,
+  authController.verifyRoles("Admin", "SubAdmin", "Moderator", "Assistant"),
+);
 router.use(convertFormDataToNested);
 
-router.post('/', parentController.createParent);
+router.post("/", parentController.createParent);
 
-router.get('/', parentController.getAllParents);
+router.get("/", parentController.getAllParents);
 
-router.get('/:id', parentController.getParentById);
+router.get("/:id", parentController.getParentById);
 
-router.patch('/:id', parentController.updateParent);
+router.patch("/:id", parentController.updateParent);
 
-router.delete('/:id', parentController.deleteParent);
+router.delete("/:id", parentController.deleteParent);
 
 module.exports = router;

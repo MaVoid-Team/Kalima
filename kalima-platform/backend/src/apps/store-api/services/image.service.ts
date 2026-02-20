@@ -1,0 +1,240 @@
+import path from "path";
+import fs from "fs";
+import crypto from "crypto";
+import sharp from "sharp";
+import type { PrismaClient } from "../../../libs/db/prisma";
+import { prisma } from "../../../libs/db/prisma";
+import { images, image_mime_type_enum } from "../generated/prisma/client";
+import { NotFoundError, BadRequestError } from "../../../libs/errors";
+
+// ============================================
+// CONSTANTS
+// ============================================
+
+/** All images go into a single flat folder */
+const UPLOAD_DIR = path.resolve(__dirname, "../../../../uploads/images");
+
+/** Maps browser mime types → our DB enum */
+const MIME_TO_ENUM: Record<string, image_mime_type_enum> = {
+  "image/jpeg": image_mime_type_enum.jpeg,
+  "image/png": image_mime_type_enum.png,
+  "image/webp": image_mime_type_enum.webp,
+  "image/gif": image_mime_type_enum.gif,
+  "image/svg+xml": image_mime_type_enum.svg,
+  "image/avif": image_mime_type_enum.avif,
+};
+
+/** Maps our DB enum → file extension (after compression most become .webp) */
+const ENUM_TO_EXT: Record<image_mime_type_enum, string> = {
+  [image_mime_type_enum.jpeg]: ".jpeg",
+  [image_mime_type_enum.png]: ".png",
+  [image_mime_type_enum.webp]: ".webp",
+  [image_mime_type_enum.gif]: ".gif",
+  [image_mime_type_enum.svg]: ".svg",
+  [image_mime_type_enum.avif]: ".avif",
+};
+
+// ============================================
+// TYPES
+// ============================================
+
+export interface UploadImageOptions {
+  /** Convert to WebP and compress. Default: false */
+  compress?: boolean;
+  /** Sharp quality 1–100 (only when compress=true). Default: 75 */
+  quality?: number;
+  /** Resize width (only when compress=true). Null = keep original. */
+  width?: number;
+  /** Resize height (only when compress=true). Null = keep original. */
+  height?: number;
+}
+
+// ============================================
+// IMAGE SERVICE (internal — no controller)
+// ============================================
+
+class ImageService {
+  constructor(private db: PrismaClient = prisma) {
+    // Ensure upload directory exists
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    }
+  }
+
+  // ============================================
+  // UPLOAD SINGLE IMAGE
+  // ============================================
+
+  /**
+   * Saves a multer file buffer to disk, optionally compresses it,
+   * and creates an `images` record in the database.
+   *
+   * @param file - Express.Multer.File (from memoryStorage — has `.buffer`)
+   * @param options - compression / resize options
+   * @returns The created `images` record
+   */
+  async uploadImage(
+    file: Express.Multer.File,
+    options: UploadImageOptions = {},
+  ): Promise<images> {
+    const { compress = false, quality = 75, width, height } = options;
+
+    const mimeEnum = MIME_TO_ENUM[file.mimetype];
+    if (!mimeEnum) {
+      throw new BadRequestError(`Unsupported image type: ${file.mimetype}`);
+    }
+
+    // Generate unique filename
+    const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
+    let finalBuffer: Buffer;
+    let finalMime: image_mime_type_enum;
+    let ext: string;
+
+    if (compress) {
+      // Convert to WebP with optional resize
+      let pipeline = sharp(file.buffer).webp({ quality });
+      if (width || height) {
+        pipeline = pipeline.resize(width, height, { fit: "inside" });
+      }
+      finalBuffer = await pipeline.toBuffer();
+      finalMime = image_mime_type_enum.webp;
+      ext = ".webp";
+    } else {
+      // Store as-is
+      finalBuffer = file.buffer;
+      finalMime = mimeEnum;
+      ext = ENUM_TO_EXT[mimeEnum];
+    }
+
+    const filename = `${uniqueId}${ext}`;
+    const filePath = path.join(UPLOAD_DIR, filename);
+
+    // Write to disk
+    fs.writeFileSync(filePath, finalBuffer);
+
+    // Relative URL for serving via express.static
+    const url = `/uploads/images/${filename}`;
+
+    // Create DB record
+    const image = await this.db.images.create({
+      data: {
+        url,
+        original_name: file.originalname,
+        mime_type: finalMime,
+        size: finalBuffer.length,
+      },
+    });
+
+    return image;
+  }
+
+  // ============================================
+  // UPLOAD MULTIPLE IMAGES
+  // ============================================
+
+  /**
+   * Uploads multiple files. Returns all created image records.
+   */
+  async uploadImages(
+    files: Express.Multer.File[],
+    options: UploadImageOptions = {},
+  ): Promise<images[]> {
+    const results: images[] = [];
+    for (const file of files) {
+      const image = await this.uploadImage(file, options);
+      results.push(image);
+    }
+    return results;
+  }
+
+  // ============================================
+  // GET IMAGE BY ID
+  // ============================================
+
+  async getImageById(id: number): Promise<images> {
+    const image = await this.db.images.findUnique({ where: { id } });
+    if (!image) {
+      throw new NotFoundError("Image not found");
+    }
+    return image;
+  }
+
+  // ============================================
+  // DELETE IMAGE (DB + disk)
+  // ============================================
+
+  /**
+   * Deletes an image record from the database and removes the file from disk.
+   */
+  async deleteImage(id: number): Promise<void> {
+    const image = await this.db.images.findUnique({ where: { id } });
+    if (!image) {
+      throw new NotFoundError("Image not found");
+    }
+
+    // Delete file from disk
+    this.removeFileFromDisk(image.url);
+
+    // Delete DB record (cascades remove product_gallery entries, nullifies product thumbnail_id)
+    await this.db.images.delete({ where: { id } });
+  }
+
+  // ============================================
+  // DELETE IMAGE FILE ONLY (disk cleanup helper)
+  // ============================================
+
+  /**
+   * Removes a file from disk by its URL path.
+   * Does not throw if the file doesn't exist (already cleaned up).
+   */
+  removeFileFromDisk(url: string): void {
+    // url is like /uploads/images/filename.webp
+    // Resolve to absolute path from project root
+    const absolutePath = path.resolve(
+      __dirname,
+      "../../../..",
+      url.startsWith("/") ? url.slice(1) : url,
+    );
+
+    try {
+      if (fs.existsSync(absolutePath)) {
+        fs.unlinkSync(absolutePath);
+      }
+    } catch {
+      // Silently ignore — file may have been cleaned up already
+    }
+  }
+
+  // ============================================
+  // REPLACE IMAGE (upload new + delete old)
+  // ============================================
+
+  /**
+   * Uploads a new image and deletes the old one (both DB record and file).
+   * Useful for updating a product thumbnail or profile pic.
+   *
+   * @param oldImageId - ID of the image to replace (null if no previous image)
+   * @param file - new file to upload
+   * @param options - compression options
+   * @returns The new image record
+   */
+  async replaceImage(
+    oldImageId: number | null,
+    file: Express.Multer.File,
+    options: UploadImageOptions = {},
+  ): Promise<images> {
+    const newImage = await this.uploadImage(file, options);
+
+    if (oldImageId) {
+      try {
+        await this.deleteImage(oldImageId);
+      } catch {
+        // Old image may already be gone — that's fine
+      }
+    }
+
+    return newImage;
+  }
+}
+
+export const imageService = new ImageService();

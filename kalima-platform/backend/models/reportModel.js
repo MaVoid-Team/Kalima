@@ -1,3 +1,6 @@
+// DOMAIN: UNKNOWN
+// STATUS: LEGACY
+// NOTE: Report model with unclear domain ownership.
 const mongoose = require("mongoose");
 
 const reportSchema = new mongoose.Schema(
@@ -20,7 +23,7 @@ const reportSchema = new mongoose.Schema(
     lesson: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
-      required: function() {
+      required: function () {
         return this.reportType === "lesson";
       },
     },
@@ -28,7 +31,7 @@ const reportSchema = new mongoose.Schema(
     courseOrmonth: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "groupedLessons",
-      required: function() {
+      required: function () {
         return this.reportType === "month" || this.reportType === "course";
       },
     },
@@ -40,7 +43,7 @@ const reportSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Report = mongoose.model("Report", reportSchema);

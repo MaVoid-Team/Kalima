@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy exam configuration model.
 // ExamConfigModel.js
 const mongoose = require("mongoose");
 
@@ -17,7 +20,7 @@ const lecturerExamConfigSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["exam", "homework"],
-      default: "exam"
+      default: "exam",
     },
     description: {
       type: String,
@@ -51,11 +54,11 @@ const lecturerExamConfigSchema = new mongoose.Schema(
     formUrl: {
       type: String,
       required: true,
-    }
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("LecturerExamConfig", lecturerExamConfigSchema);
