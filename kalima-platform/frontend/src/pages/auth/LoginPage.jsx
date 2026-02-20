@@ -5,6 +5,8 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useNavigate } from "react-router-dom";
+import useLogin from "../../hooks/auth/useLogin";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +29,8 @@ import {
 
 export default function LoginPage() {
     const { t } = useTranslation("auth");
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const { login, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
 
     const formSchema = z.object({
@@ -44,10 +47,14 @@ export default function LoginPage() {
     });
 
     const onSubmit = async (values) => {
-        setIsLoading(true);
-        console.log(values);
-        // Simulate API call
-        setTimeout(() => setIsLoading(false), 2000);
+        try {
+            await login(values);
+            // Navigate to dashboard or home after successful login
+            navigate("/");
+        } catch (error) {
+            console.error("Login failed:", error);
+            // Error is handled by interceptor/hook (toast)
+        }
     };
 
     return (
@@ -107,8 +114,8 @@ export default function LoginPage() {
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="w-full" disabled={isLoading}>
-                                        {isLoading && (
+                                    <Button type="submit" className="w-full" disabled={loading}>
+                                        {loading && (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         )}
                                         {t("login.submit")}

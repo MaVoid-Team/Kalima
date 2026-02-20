@@ -13,7 +13,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import logo from "../assets/Logo.png";
-import CartPreview from "./cart/CartPreview";
+import CartPreview from "../components/cart/CartPreview";
 
 export default function Navbar() {
   const [cartItems] = useState([

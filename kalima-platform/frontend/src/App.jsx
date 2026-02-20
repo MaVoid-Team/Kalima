@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/landing/LandingPage";
-import { Toaster } from "sonner";
 
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -33,7 +32,6 @@ function App() {
         <Route path="/product/:id" element={<ProductDetailsPage />} />
         <Route path="/booklet/:id" element={<BookletDetailsPage />} />
       </Routes>
-      <Toaster position="bottom-right" richColors />
     </>
   );
 }

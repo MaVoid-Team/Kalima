@@ -4,15 +4,20 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 import './i18n';
-import Footer from './components/Footer.jsx'
-import Navbar from './components/Navbar.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx';
+import { Toaster } from 'sonner';
+import Footer from './layouts/Footer.jsx'
+import Navbar from './layouts/Navbar.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <BrowserRouter>
-            <Navbar />
-            <App />
-            <Footer />
+            <AuthProvider>
+                <Navbar />
+                <App />
+                <Footer />
+            </AuthProvider>
+            <Toaster richColors position="bottom-right" />
         </BrowserRouter>
     </React.StrictMode>,
 )

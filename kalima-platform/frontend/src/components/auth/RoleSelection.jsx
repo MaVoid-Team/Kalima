@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { GraduationCap, School, User } from "lucide-react";
+import { GraduationCap, School, User, Mic2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function RoleSelection({ onRoleSelect }) {
@@ -24,6 +24,12 @@ export default function RoleSelection({ onRoleSelect }) {
             label: t("signup.roles.parent"),
             icon: User,
             description: "Monitor your child's progress"
+        },
+        {
+            id: "lecturer",
+            label: t("signup.roles.lecturer"),
+            icon: Mic2,
+            description: "Share knowledge and give lectures"
         }
     ];
 

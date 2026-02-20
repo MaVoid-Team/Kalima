@@ -16,9 +16,16 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues }) {
+export default function CommonRegisterForm({ role, onBack, children, extraSchema, defaultValues, onSubmit }) {
     const { t, i18n } = useTranslation("auth");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +35,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
         name: z.string().min(1, { message: t("validation.required") }),
         email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
         phone: z.string().min(1, { message: t("validation.required") }),
+        gender: z.enum(["male", "female"], { required_error: t("validation.required") }),
         password: z.string().min(6, { message: t("validation.password_min") }),
         confirmPassword: z.string().min(1, { message: t("validation.required") }),
     };
@@ -46,17 +54,19 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             name: "",
             email: "",
             phone: "",
+            gender: undefined,
             password: "",
             confirmPassword: "",
             ...defaultValues,
         },
     });
 
-    const onSubmit = async (values) => {
+    const handleSubmit = async (values) => {
         setIsLoading(true);
-        console.log(values);
-        // Simulate API call
-        setTimeout(() => setIsLoading(false), 2000);
+        if (onSubmit) {
+            await onSubmit(values);
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -73,7 +83,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4" noValidate>
                     <FormField
                         control={form.control}
                         name="name"
@@ -116,6 +126,28 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                             )}
                         />
                     </div>
+
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{t("signup.fields.gender")}</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder={t("signup.fields.genderPlaceholder")} />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="male">{t("signup.gender.male")}</SelectItem>
+                                        <SelectItem value="female">{t("signup.gender.female")}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     <div className="grid grid-cols-2 gap-4">
                         <FormField

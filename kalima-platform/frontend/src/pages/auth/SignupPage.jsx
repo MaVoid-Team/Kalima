@@ -5,6 +5,7 @@ import RoleSelection from "@/components/auth/RoleSelection";
 import RegisterStudent from "@/components/auth/RegisterStudent";
 import RegisterTeacher from "@/components/auth/RegisterTeacher";
 import RegisterParent from "@/components/auth/RegisterParent";
+import RegisterLecturer from "@/components/auth/RegisterLecturer";
 
 export default function SignupPage() {
     const { t, i18n } = useTranslation("auth");
@@ -23,6 +24,8 @@ export default function SignupPage() {
                 return <RegisterTeacher onBack={() => setRole(null)} />;
             case "parent":
                 return <RegisterParent onBack={() => setRole(null)} />;
+            case "lecturer":
+                return <RegisterLecturer onBack={() => setRole(null)} />;
             default:
                 return null;
         }
