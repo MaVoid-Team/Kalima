@@ -167,3 +167,48 @@ export type products = Prisma.productsModel
  * 
  */
 export type required_field_definitions = Prisma.required_field_definitionsModel
+/**
+ * Model carts
+ * 
+ */
+export type carts = Prisma.cartsModel
+/**
+ * Model cart_items
+ * 
+ */
+export type cart_items = Prisma.cart_itemsModel
+/**
+ * Model cart_item_required_fields
+ * 
+ */
+export type cart_item_required_fields = Prisma.cart_item_required_fieldsModel
+/**
+ * Model purchases
+ * 
+ */
+export type purchases = Prisma.purchasesModel
+/**
+ * Model purchase_items
+ * 
+ */
+export type purchase_items = Prisma.purchase_itemsModel
+/**
+ * Model purchase_item_required_fields
+ * 
+ */
+export type purchase_item_required_fields = Prisma.purchase_item_required_fieldsModel
+/**
+ * Model payment_methods
+ * 
+ */
+export type payment_methods = Prisma.payment_methodsModel
+/**
+ * Model images
+ * 
+ */
+export type images = Prisma.imagesModel
+/**
+ * Model product_gallery
+ * 
+ */
+export type product_gallery = Prisma.product_galleryModel

@@ -233,6 +233,8 @@ export type required_field_definitionsWhereInput = {
   updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
+  purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
+  cart_item_required_fields?: Prisma.Cart_item_required_fieldsListRelationFilter
 }
 
 export type required_field_definitionsOrderByWithRelationInput = {
@@ -244,6 +246,8 @@ export type required_field_definitionsOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   product_required_fields?: Prisma.product_required_fieldsOrderByRelationAggregateInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsOrderByRelationAggregateInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsOrderByRelationAggregateInput
 }
 
 export type required_field_definitionsWhereUniqueInput = Prisma.AtLeast<{
@@ -258,6 +262,8 @@ export type required_field_definitionsWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   deleted_at?: Prisma.DateTimeNullableFilter<"required_field_definitions"> | Date | string | null
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
+  purchase_item_required_fields?: Prisma.Purchase_item_required_fieldsListRelationFilter
+  cart_item_required_fields?: Prisma.Cart_item_required_fieldsListRelationFilter
 }, "id" | "label">
 
 export type required_field_definitionsOrderByWithAggregationInput = {
@@ -296,6 +302,8 @@ export type required_field_definitionsCreateInput = {
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsUncheckedCreateInput = {
@@ -307,6 +315,8 @@ export type required_field_definitionsUncheckedCreateInput = {
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsUpdateInput = {
@@ -317,6 +327,8 @@ export type required_field_definitionsUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 export type required_field_definitionsUncheckedUpdateInput = {
@@ -328,6 +340,8 @@ export type required_field_definitionsUncheckedUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 export type required_field_definitionsCreateManyInput = {
@@ -420,6 +434,34 @@ export type Enumfield_type_enumFieldUpdateOperationsInput = {
   set?: $Enums.field_type_enum
 }
 
+export type required_field_definitionsCreateNestedOneWithoutCart_item_required_fieldsInput = {
+  create?: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutCart_item_required_fieldsInput>
+  connectOrCreate?: Prisma.required_field_definitionsCreateOrConnectWithoutCart_item_required_fieldsInput
+  connect?: Prisma.required_field_definitionsWhereUniqueInput
+}
+
+export type required_field_definitionsUpdateOneRequiredWithoutCart_item_required_fieldsNestedInput = {
+  create?: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutCart_item_required_fieldsInput>
+  connectOrCreate?: Prisma.required_field_definitionsCreateOrConnectWithoutCart_item_required_fieldsInput
+  upsert?: Prisma.required_field_definitionsUpsertWithoutCart_item_required_fieldsInput
+  connect?: Prisma.required_field_definitionsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.required_field_definitionsUpdateToOneWithWhereWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUpdateWithoutCart_item_required_fieldsInput>, Prisma.required_field_definitionsUncheckedUpdateWithoutCart_item_required_fieldsInput>
+}
+
+export type required_field_definitionsCreateNestedOneWithoutPurchase_item_required_fieldsInput = {
+  create?: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutPurchase_item_required_fieldsInput>
+  connectOrCreate?: Prisma.required_field_definitionsCreateOrConnectWithoutPurchase_item_required_fieldsInput
+  connect?: Prisma.required_field_definitionsWhereUniqueInput
+}
+
+export type required_field_definitionsUpdateOneRequiredWithoutPurchase_item_required_fieldsNestedInput = {
+  create?: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutPurchase_item_required_fieldsInput>
+  connectOrCreate?: Prisma.required_field_definitionsCreateOrConnectWithoutPurchase_item_required_fieldsInput
+  upsert?: Prisma.required_field_definitionsUpsertWithoutPurchase_item_required_fieldsInput
+  connect?: Prisma.required_field_definitionsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.required_field_definitionsUpdateToOneWithWhereWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUpdateWithoutPurchase_item_required_fieldsInput>, Prisma.required_field_definitionsUncheckedUpdateWithoutPurchase_item_required_fieldsInput>
+}
+
 export type required_field_definitionsCreateWithoutProduct_required_fieldsInput = {
   label: string
   field_type?: $Enums.field_type_enum
@@ -427,6 +469,8 @@ export type required_field_definitionsCreateWithoutProduct_required_fieldsInput 
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsUncheckedCreateWithoutProduct_required_fieldsInput = {
@@ -437,6 +481,8 @@ export type required_field_definitionsUncheckedCreateWithoutProduct_required_fie
   created_at?: Date | string | null
   updated_at?: Date | string | null
   deleted_at?: Date | string | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
 }
 
 export type required_field_definitionsCreateOrConnectWithoutProduct_required_fieldsInput = {
@@ -462,6 +508,8 @@ export type required_field_definitionsUpdateWithoutProduct_required_fieldsInput 
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 export type required_field_definitionsUncheckedUpdateWithoutProduct_required_fieldsInput = {
@@ -472,6 +520,132 @@ export type required_field_definitionsUncheckedUpdateWithoutProduct_required_fie
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+}
+
+export type required_field_definitionsCreateWithoutCart_item_required_fieldsInput = {
+  label: string
+  field_type?: $Enums.field_type_enum
+  active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+}
+
+export type required_field_definitionsUncheckedCreateWithoutCart_item_required_fieldsInput = {
+  id?: number
+  label: string
+  field_type?: $Enums.field_type_enum
+  active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+}
+
+export type required_field_definitionsCreateOrConnectWithoutCart_item_required_fieldsInput = {
+  where: Prisma.required_field_definitionsWhereUniqueInput
+  create: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutCart_item_required_fieldsInput>
+}
+
+export type required_field_definitionsUpsertWithoutCart_item_required_fieldsInput = {
+  update: Prisma.XOR<Prisma.required_field_definitionsUpdateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedUpdateWithoutCart_item_required_fieldsInput>
+  create: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutCart_item_required_fieldsInput>
+  where?: Prisma.required_field_definitionsWhereInput
+}
+
+export type required_field_definitionsUpdateToOneWithWhereWithoutCart_item_required_fieldsInput = {
+  where?: Prisma.required_field_definitionsWhereInput
+  data: Prisma.XOR<Prisma.required_field_definitionsUpdateWithoutCart_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedUpdateWithoutCart_item_required_fieldsInput>
+}
+
+export type required_field_definitionsUpdateWithoutCart_item_required_fieldsInput = {
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+}
+
+export type required_field_definitionsUncheckedUpdateWithoutCart_item_required_fieldsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+  purchase_item_required_fields?: Prisma.purchase_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+}
+
+export type required_field_definitionsCreateWithoutPurchase_item_required_fieldsInput = {
+  label: string
+  field_type?: $Enums.field_type_enum
+  active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsCreateNestedManyWithoutRequired_field_definitionsInput
+}
+
+export type required_field_definitionsUncheckedCreateWithoutPurchase_item_required_fieldsInput = {
+  id?: number
+  label: string
+  field_type?: $Enums.field_type_enum
+  active?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedCreateNestedManyWithoutRequired_field_definitionsInput
+}
+
+export type required_field_definitionsCreateOrConnectWithoutPurchase_item_required_fieldsInput = {
+  where: Prisma.required_field_definitionsWhereUniqueInput
+  create: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutPurchase_item_required_fieldsInput>
+}
+
+export type required_field_definitionsUpsertWithoutPurchase_item_required_fieldsInput = {
+  update: Prisma.XOR<Prisma.required_field_definitionsUpdateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedUpdateWithoutPurchase_item_required_fieldsInput>
+  create: Prisma.XOR<Prisma.required_field_definitionsCreateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedCreateWithoutPurchase_item_required_fieldsInput>
+  where?: Prisma.required_field_definitionsWhereInput
+}
+
+export type required_field_definitionsUpdateToOneWithWhereWithoutPurchase_item_required_fieldsInput = {
+  where?: Prisma.required_field_definitionsWhereInput
+  data: Prisma.XOR<Prisma.required_field_definitionsUpdateWithoutPurchase_item_required_fieldsInput, Prisma.required_field_definitionsUncheckedUpdateWithoutPurchase_item_required_fieldsInput>
+}
+
+export type required_field_definitionsUpdateWithoutPurchase_item_required_fieldsInput = {
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUpdateManyWithoutRequired_field_definitionsNestedInput
+}
+
+export type required_field_definitionsUncheckedUpdateWithoutPurchase_item_required_fieldsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  field_type?: Prisma.Enumfield_type_enumFieldUpdateOperationsInput | $Enums.field_type_enum
+  active?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
+  cart_item_required_fields?: Prisma.cart_item_required_fieldsUncheckedUpdateManyWithoutRequired_field_definitionsNestedInput
 }
 
 
@@ -481,10 +655,14 @@ export type required_field_definitionsUncheckedUpdateWithoutProduct_required_fie
 
 export type Required_field_definitionsCountOutputType = {
   product_required_fields: number
+  purchase_item_required_fields: number
+  cart_item_required_fields: number
 }
 
 export type Required_field_definitionsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_required_fields?: boolean | Required_field_definitionsCountOutputTypeCountProduct_required_fieldsArgs
+  purchase_item_required_fields?: boolean | Required_field_definitionsCountOutputTypeCountPurchase_item_required_fieldsArgs
+  cart_item_required_fields?: boolean | Required_field_definitionsCountOutputTypeCountCart_item_required_fieldsArgs
 }
 
 /**
@@ -504,6 +682,20 @@ export type Required_field_definitionsCountOutputTypeCountProduct_required_field
   where?: Prisma.product_required_fieldsWhereInput
 }
 
+/**
+ * Required_field_definitionsCountOutputType without action
+ */
+export type Required_field_definitionsCountOutputTypeCountPurchase_item_required_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.purchase_item_required_fieldsWhereInput
+}
+
+/**
+ * Required_field_definitionsCountOutputType without action
+ */
+export type Required_field_definitionsCountOutputTypeCountCart_item_required_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.cart_item_required_fieldsWhereInput
+}
+
 
 export type required_field_definitionsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -514,6 +706,8 @@ export type required_field_definitionsSelect<ExtArgs extends runtime.Types.Exten
   updated_at?: boolean
   deleted_at?: boolean
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
+  purchase_item_required_fields?: boolean | Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs>
+  cart_item_required_fields?: boolean | Prisma.required_field_definitions$cart_item_required_fieldsArgs<ExtArgs>
   _count?: boolean | Prisma.Required_field_definitionsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["required_field_definitions"]>
 
@@ -550,6 +744,8 @@ export type required_field_definitionsSelectScalar = {
 export type required_field_definitionsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "field_type" | "active" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["required_field_definitions"]>
 export type required_field_definitionsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product_required_fields?: boolean | Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>
+  purchase_item_required_fields?: boolean | Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs>
+  cart_item_required_fields?: boolean | Prisma.required_field_definitions$cart_item_required_fieldsArgs<ExtArgs>
   _count?: boolean | Prisma.Required_field_definitionsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type required_field_definitionsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -559,6 +755,8 @@ export type $required_field_definitionsPayload<ExtArgs extends runtime.Types.Ext
   name: "required_field_definitions"
   objects: {
     product_required_fields: Prisma.$product_required_fieldsPayload<ExtArgs>[]
+    purchase_item_required_fields: Prisma.$purchase_item_required_fieldsPayload<ExtArgs>[]
+    cart_item_required_fields: Prisma.$cart_item_required_fieldsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -963,6 +1161,8 @@ readonly fields: required_field_definitionsFieldRefs;
 export interface Prisma__required_field_definitionsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   product_required_fields<T extends Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.required_field_definitions$product_required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchase_item_required_fields<T extends Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_item_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cart_item_required_fields<T extends Prisma.required_field_definitions$cart_item_required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.required_field_definitions$cart_item_required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$cart_item_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1408,6 +1608,54 @@ export type required_field_definitions$product_required_fieldsArgs<ExtArgs exten
   take?: number
   skip?: number
   distinct?: Prisma.Product_required_fieldsScalarFieldEnum | Prisma.Product_required_fieldsScalarFieldEnum[]
+}
+
+/**
+ * required_field_definitions.purchase_item_required_fields
+ */
+export type required_field_definitions$purchase_item_required_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the purchase_item_required_fields
+   */
+  select?: Prisma.purchase_item_required_fieldsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the purchase_item_required_fields
+   */
+  omit?: Prisma.purchase_item_required_fieldsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.purchase_item_required_fieldsInclude<ExtArgs> | null
+  where?: Prisma.purchase_item_required_fieldsWhereInput
+  orderBy?: Prisma.purchase_item_required_fieldsOrderByWithRelationInput | Prisma.purchase_item_required_fieldsOrderByWithRelationInput[]
+  cursor?: Prisma.purchase_item_required_fieldsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Purchase_item_required_fieldsScalarFieldEnum | Prisma.Purchase_item_required_fieldsScalarFieldEnum[]
+}
+
+/**
+ * required_field_definitions.cart_item_required_fields
+ */
+export type required_field_definitions$cart_item_required_fieldsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the cart_item_required_fields
+   */
+  select?: Prisma.cart_item_required_fieldsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the cart_item_required_fields
+   */
+  omit?: Prisma.cart_item_required_fieldsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.cart_item_required_fieldsInclude<ExtArgs> | null
+  where?: Prisma.cart_item_required_fieldsWhereInput
+  orderBy?: Prisma.cart_item_required_fieldsOrderByWithRelationInput | Prisma.cart_item_required_fieldsOrderByWithRelationInput[]
+  cursor?: Prisma.cart_item_required_fieldsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Cart_item_required_fieldsScalarFieldEnum | Prisma.Cart_item_required_fieldsScalarFieldEnum[]
 }
 
 /**

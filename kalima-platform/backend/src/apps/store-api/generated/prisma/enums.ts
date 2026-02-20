@@ -59,6 +59,26 @@ export const field_type_enum = {
 export type field_type_enum = (typeof field_type_enum)[keyof typeof field_type_enum]
 
 
+export const image_mime_type_enum = {
+  jpeg: 'jpeg',
+  png: 'png',
+  webp: 'webp',
+  gif: 'gif',
+  svg: 'svg',
+  avif: 'avif'
+} as const
+
+export type image_mime_type_enum = (typeof image_mime_type_enum)[keyof typeof image_mime_type_enum]
+
+
+export const product_type_enum = {
+  Book: 'Book',
+  Product: 'Product'
+} as const
+
+export type product_type_enum = (typeof product_type_enum)[keyof typeof product_type_enum]
+
+
 export const location_type_enum = {
   School: 'School',
   Center: 'Center'

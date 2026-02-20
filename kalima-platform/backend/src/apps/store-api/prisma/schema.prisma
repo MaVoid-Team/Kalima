@@ -72,6 +72,8 @@ model users {
   teaches_at                teaches_at[]
   user_analytics            user_analytics?
   user_roles                user_roles[]
+  carts                     carts[]
+  purchases                 purchases[] // <-- Added opposite relation for purchases
 
   @@index([mongo_id], map: "ix_users_mongo_id")
 }
@@ -277,6 +279,7 @@ model coupons {
   deleted_at          DateTime?  @db.Timestamp(6)
   mongo_id            String?    @unique
   products            products[]
+  cart_items          cart_items[] // <-- Added opposite relation for cart_items
 }
 
 model product_required_fields {
@@ -295,11 +298,11 @@ model products {
   id                      Int                       @id @default(autoincrement())
   title                   String                    @db.VarChar(255)
   description             String?
+  type                    product_type_enum          @default(Product)
   price                   Decimal                   @default(0) @db.Decimal(10, 2)
   price_after_discount    Decimal?                  @db.Decimal(10, 2)
   serial                  String?                   @db.VarChar(255)
-  thumbnail               String?
-  gallery                 Json?
+  thumbnail_id            Int?
   sample_url              String?
   coupon_id               Int?
   is_archived             Boolean?                  @default(false)
@@ -309,18 +312,133 @@ model products {
   deleted_at              DateTime?                 @db.Timestamp(6)
   product_required_fields product_required_fields[]
   product_categories      product_categories[]
+  product_gallery         product_gallery[]
+  cart_items              cart_items[]              // <-- Add this line for the relation
+  purchase_items          purchase_items[]          // <-- Add this line for the opposite relation
+  thumbnail_image         images?                   @relation("ProductThumbnail", fields: [thumbnail_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   coupons                 coupons?                  @relation(fields: [coupon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model required_field_definitions {
-  id                      Int                       @id @default(autoincrement())
-  label                   String                    @unique @db.VarChar(255)
-  field_type              field_type_enum            @default(text)
-  active                  Boolean?                  @default(true)
-  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
-  updated_at              DateTime?                 @db.Timestamp(6)
-  deleted_at              DateTime?                 @db.Timestamp(6)
-  product_required_fields product_required_fields[]
+  id                           Int                           @id @default(autoincrement())
+  label                        String                        @unique @db.VarChar(255)
+  field_type                   field_type_enum                @default(text)
+  active                       Boolean?                      @default(true)
+  created_at                   DateTime?                     @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime?                     @db.Timestamp(6)
+  deleted_at                   DateTime?                     @db.Timestamp(6)
+  product_required_fields      product_required_fields[]
+  purchase_item_required_fields purchase_item_required_fields[]
+  cart_item_required_fields    cart_item_required_fields[]    // <-- Added missing opposite relation
+}
+
+model carts {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  status       String   @default("active")
+  subtotal     Decimal  @default(0) @db.Decimal(10, 2)
+  discount     Decimal  @default(0) @db.Decimal(10, 2)
+  total        Decimal  @default(0) @db.Decimal(10, 2)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @db.Timestamp(6)
+  deleted_at   DateTime? @db.Timestamp(6)
+  cart_items   cart_items[]
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model cart_items {
+  id                    Int      @id @default(autoincrement())
+  cart_id               Int
+  product_id            Int
+  coupon_id             Int?     // <-- Added coupon_id for relation to coupons
+  quantity              Int      @default(1)
+  price_at_add          Decimal  @default(0) @db.Decimal(10, 2)
+  final_price           Decimal  @default(0) @db.Decimal(10, 2)
+  discount              Decimal  @default(0) @db.Decimal(10, 2)
+  required_fields_filled Boolean @default(false)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  updated_at            DateTime? @db.Timestamp(6)
+  deleted_at            DateTime? @db.Timestamp(6)
+  carts                 carts    @relation(fields: [cart_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products              products @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  coupons               coupons? @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  cart_item_required_fields cart_item_required_fields[]
+}
+
+model cart_item_required_fields {
+  id                  Int      @id @default(autoincrement())
+  cart_item_id        Int
+  field_definition_id Int
+  value               String
+  created_at          DateTime? @default(now()) @db.Timestamp(6)
+  updated_at          DateTime? @db.Timestamp(6)
+  cart_items          cart_items @relation(fields: [cart_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model purchases {
+  id                   Int       @id @default(autoincrement())
+  user_id              Int
+  status               String    @default("pending")
+  subtotal             Decimal   @default(0) @db.Decimal(10, 2)
+  discount             Decimal   @default(0) @db.Decimal(10, 2)
+  total                Decimal   @default(0) @db.Decimal(10, 2)
+  payment_method_id    Int?
+  payment_screenshot_id Int?
+  watermark_id         Int?
+  purchase_serial      String?   @db.VarChar(255)
+  number_transferred_from String? @db.VarChar(50)
+  payment_number       String?   @db.VarChar(50)
+  notes                String?
+  admin_notes          String?
+  admin_note_by        Int?
+  created_at           DateTime? @default(now()) @db.Timestamp(6)
+  updated_at           DateTime? @db.Timestamp(6)
+  deleted_at           DateTime? @db.Timestamp(6)
+  purchase_items       purchase_items[]
+  users                users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  payment_methods      payment_methods? @relation(fields: [payment_method_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  payment_screenshot   images?   @relation("PurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  watermark            images?   @relation("PurchaseWatermark", fields: [watermark_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+}
+
+model purchase_items {
+  id                        Int      @id @default(autoincrement())
+  purchase_id               Int
+  product_id                Int
+  price_at_purchase         Decimal  @default(0) @db.Decimal(10, 2)
+  discount                  Decimal  @default(0) @db.Decimal(10, 2)
+  required_fields_filled    Boolean  @default(false)
+  created_at                DateTime? @default(now()) @db.Timestamp(6)
+  updated_at                DateTime? @db.Timestamp(6)
+  deleted_at                DateTime? @db.Timestamp(6)
+  purchases                 purchases @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products                  products  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  purchase_item_required_fields purchase_item_required_fields[]
+}
+
+model purchase_item_required_fields {
+  id                  Int      @id @default(autoincrement())
+  purchase_item_id     Int
+  field_definition_id  Int
+  value                String
+  created_at           DateTime? @default(now()) @db.Timestamp(6)
+  updated_at           DateTime? @db.Timestamp(6)
+  purchase_items       purchase_items @relation(fields: [purchase_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model payment_methods {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  phone_number String   @db.VarChar(50)
+  status       Boolean? @default(true)
+  image_id     Int?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @db.Timestamp(6)
+  deleted_at   DateTime? @db.Timestamp(6)
+  images       images?  @relation(fields: [image_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  purchases    purchases[]
 }
 
 enum auth_provider_enum {
@@ -358,7 +476,50 @@ enum field_type_enum {
   image
 }
 
+enum image_mime_type_enum {
+  jpeg
+  png
+  webp
+  gif
+  svg
+  avif
+}
+
+enum product_type_enum {
+  Book
+  Product
+}
+
 enum location_type_enum {
   School
   Center
+}
+
+model images {
+  id                Int                  @id @default(autoincrement())
+  url               String
+  original_name     String               @db.VarChar(255)
+  mime_type         image_mime_type_enum
+  size              Int
+  created_at        DateTime?            @default(now()) @db.Timestamp(6)
+
+  product_thumbnail products[]           @relation("ProductThumbnail")
+  product_gallery   product_gallery[]
+  purchase_watermark purchases[]         @relation("PurchaseWatermark")
+  purchase_payment_screenshot purchases[] @relation("PurchasePaymentScreenshot")
+  payment_methods   payment_methods[]    // <-- Added opposite relation for payment_methods
+}
+
+model product_gallery {
+  id          Int       @id @default(autoincrement())
+  product_id  Int
+  image_id    Int
+  sort_order  Int?      @default(0)
+  active      Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  products    products  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  images      images    @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([product_id, image_id])
 }
