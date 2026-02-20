@@ -24,7 +24,7 @@ import useLookups from "../../hooks/useLookups";
 
 export default function RegisterTeacher({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerTeacher, loading: registerLoading } = useRegister();
+    const { registerTeacher, registerFirebaseTeacher, loading: registerLoading } = useRegister();
 
     // Schema
     const teacherSchema = z.object({
@@ -36,7 +36,7 @@ export default function RegisterTeacher({ onBack }) {
         is_secondary: z.boolean().default(false),
     });
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, firebaseToken) => {
         const { confirmPassword, ...data } = values;
 
         const payload = {
@@ -46,7 +46,11 @@ export default function RegisterTeacher({ onBack }) {
             subject_id: parseInt(data.subject_id),
         };
 
-        await registerTeacher(payload);
+        if (firebaseToken) {
+            await registerFirebaseTeacher({ ...payload, idToken: firebaseToken });
+        } else {
+            await registerTeacher(payload);
+        }
     };
 
     return (

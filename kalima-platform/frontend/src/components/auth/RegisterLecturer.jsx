@@ -15,21 +15,25 @@ import useRegister from "../../hooks/auth/useRegister";
 
 export default function RegisterLecturer({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerLecturer, loading: registerLoading } = useRegister();
+    const { registerLecturer, registerFirebaseLecturer, loading: registerLoading } = useRegister();
 
     // Schema
     const lecturerSchema = z.object({
         secondary_phone: z.string().optional(),
     });
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, firebaseToken) => {
         const { confirmPassword, ...data } = values;
 
         if (!data.secondary_phone) {
             delete data.secondary_phone;
         }
 
-        await registerLecturer(data);
+        if (firebaseToken) {
+            await registerFirebaseLecturer({ ...data, idToken: firebaseToken });
+        } else {
+            await registerLecturer(data);
+        }
     };
 
     return (
