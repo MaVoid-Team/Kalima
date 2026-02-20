@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy purchase logic (non-store).
 const mongoose = require("mongoose");
 const Purchase = require("../models/purchaseModel");
 const Container = require("../models/containerModel");
@@ -39,7 +42,7 @@ const findAllChildContainers = async (containerId, session) => {
     const allChildren = containerDoc.nestedChildren;
 
     console.log(
-      `Found ${allChildren.length} child containers for container ${containerId}`
+      `Found ${allChildren.length} child containers for container ${containerId}`,
     );
     return allChildren;
   } catch (error) {
@@ -79,7 +82,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     const currentUserIndexOfPointsToThisLecture =
       currentUser.lecturerPoints.findIndex(
-        (index) => index.lecturer.toString() === lecturerId
+        (index) => index.lecturer.toString() === lecturerId,
       );
     if (currentUserIndexOfPointsToThisLecture === -1) {
       return next(new AppError("You don't have points to this lecturer", 400));
@@ -89,29 +92,33 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
 
     const hasEnoughPoints = currentUser.useLecturerPoints(
       lecturerId,
-      lecturePrice
+      lecturePrice,
     );
     if (!hasEnoughPoints) {
       await session.abortTransaction();
       return next(
         new AppError(
           "You don't have enough points for purchasing from this lecturer",
-          400
-        )
+          400,
+        ),
       );
     }
 
     currentUser.totalPoints -= lecturePrice;
 
     await studentLectureAccess.create(
-      [{ 
-        student: req.user._id, 
-        lecture: lecture._id,
-        remainingViews: lecture.numberOfViews !== undefined && lecture.numberOfViews !== null 
-          ? lecture.numberOfViews 
-          : 3 // Only default to 3 if numberOfViews is not set
-      }],
-      { session }
+      [
+        {
+          student: req.user._id,
+          lecture: lecture._id,
+          remainingViews:
+            lecture.numberOfViews !== undefined &&
+            lecture.numberOfViews !== null
+              ? lecture.numberOfViews
+              : 3, // Only default to 3 if numberOfViews is not set
+        },
+      ],
+      { session },
     );
 
     await currentUser.save({ session });
@@ -126,7 +133,7 @@ exports.purchaseLecturerPoints = catchAsync(async (req, res, next) => {
           description: `Purchased lecture ${lecture.name} for ${lecturePrice} points`,
         },
       ],
-      { session }
+      { session },
     );
 
     await session.commitTransaction();
@@ -307,7 +314,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     }
 
     if (!item.createdBy) {
-      return next(new AppError("Item is not associated with any lecturer", 400));
+      return next(
+        new AppError("Item is not associated with any lecturer", 400),
+      );
     }
 
     const lecturerId = item.createdBy.toString();
@@ -316,7 +325,9 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
     // Find user model
     let userModel;
     if (req.user.role === "Teacher" && item.teacherAllowed === false) {
-      return next(new AppError("You are not allowed to purchase this item", 400));
+      return next(
+        new AppError("You are not allowed to purchase this item", 400),
+      );
     }
     userModel = await Student.findById(userId).session(session);
     if (!userModel) {
@@ -353,8 +364,13 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
         await session.abortTransaction();
         return next(new AppError("Failed to deduct lecturer points", 500));
       }
-      purchaseType = pointsRequired === 0 ? "Free (lecturer)" : "Lecturer points";
-    } else if (userModel.hasPromoCode && !userModel.hasUsedPromoCode && promoPoints > 0) {
+      purchaseType =
+        pointsRequired === 0 ? "Free (lecturer)" : "Lecturer points";
+    } else if (
+      userModel.hasPromoCode &&
+      !userModel.hasUsedPromoCode &&
+      promoPoints > 0
+    ) {
       userModel.hasUsedPromoCode = true;
       userModel.promoPoints = 0;
       purchaseType = "Promo code (one-time use)";
@@ -364,42 +380,58 @@ exports.purchaseContainerWithPoints = catchAsync(async (req, res, next) => {
       purchaseType = "General points";
     } else {
       await session.abortTransaction();
-      return next(new AppError(`Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`, 400));
+      return next(
+        new AppError(
+          `Not enough points. Required: ${pointsRequired}, Available lecturer points: ${lecturerPoints}, Available general points: ${generalPoints}`,
+          400,
+        ),
+      );
     }
 
     await userModel.save({ session });
     // Create purchase record, set lecture field if it's a lecture
-    const purchase = await Purchase.create([
-      isLecture
-        ? {
-            student: userId,
-            lecturer: lecturerId,
-            points: isPromoCodePurchase ? 0 : pointsRequired,
-            lecture: containerId,
-            type: isPromoCodePurchase ? "promoCodePurchase" : "lecturePurchase",
-            description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
-          }
-        : {
-            student: userId,
-            lecturer: lecturerId,
-            points: isPromoCodePurchase ? 0 : pointsRequired,
-            container: containerId,
-            type: isPromoCodePurchase ? "promoCodePurchase" : "containerPurchase",
-            description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
-          },
-    ], { session });
+    const purchase = await Purchase.create(
+      [
+        isLecture
+          ? {
+              student: userId,
+              lecturer: lecturerId,
+              points: isPromoCodePurchase ? 0 : pointsRequired,
+              lecture: containerId,
+              type: isPromoCodePurchase
+                ? "promoCodePurchase"
+                : "lecturePurchase",
+              description: `Purchased lecture ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+            }
+          : {
+              student: userId,
+              lecturer: lecturerId,
+              points: isPromoCodePurchase ? 0 : pointsRequired,
+              container: containerId,
+              type: isPromoCodePurchase
+                ? "promoCodePurchase"
+                : "containerPurchase",
+              description: `Purchased container ${item.name} ${isPromoCodePurchase ? "using promotional code" : `for ${pointsRequired} points using ${purchaseType}`}`,
+            },
+      ],
+      { session },
+    );
     // Grant access if it's a lecture
     let lectureInfo = null;
     if (isLecture) {
-      await studentLectureAccess.create([
-        {
-          student: userId,
-          lecture: containerId,
-          remainingViews: item.numberOfViews !== undefined && item.numberOfViews !== null 
-            ? item.numberOfViews 
-            : 3, // Only default to 3 if numberOfViews is not set
-        },
-      ], { session });
+      await studentLectureAccess.create(
+        [
+          {
+            student: userId,
+            lecture: containerId,
+            remainingViews:
+              item.numberOfViews !== undefined && item.numberOfViews !== null
+                ? item.numberOfViews
+                : 3, // Only default to 3 if numberOfViews is not set
+          },
+        ],
+        { session },
+      );
       // Populate lecture info for response
       const Lecture = require("../models/LectureModel");
       lectureInfo = await Lecture.findById(containerId).lean();
@@ -755,8 +787,8 @@ exports.purchasePackageWithPoints = catchAsync(async (req, res, next) => {
       return next(
         new AppError(
           `No enough points. Required: ${packagePrice}, Available: ${currentPoints}`,
-          400
-        )
+          400,
+        ),
       );
     }
 
@@ -775,7 +807,7 @@ exports.purchasePackageWithPoints = catchAsync(async (req, res, next) => {
           description: `Purchased package ${packageDoc.name} for ${packagePrice} points`,
         },
       ],
-      { session }
+      { session },
     );
     if (!purchaseDocs[0]) {
       await session.abortTransaction();

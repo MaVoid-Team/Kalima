@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy subject model.
 const mongoose = require("mongoose");
 const subjectSchema = new mongoose.Schema(
   {
@@ -16,7 +19,7 @@ const subjectSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 subjectSchema.pre("save", function (next) {

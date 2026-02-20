@@ -1,3 +1,6 @@
+// DOMAIN: ACADEMY
+// STATUS: LEGACY
+// NOTE: Academy moderator routes.
 const express = require("express");
 const moderatorController = require("../controllers/moderatorController");
 const verifyJWT = require("../middleware/verifyJWT");
@@ -8,14 +11,26 @@ const router = express.Router();
 router.use(verifyJWT);
 
 router
-    .route("/")
-    .post(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.createModerator)
-    .get(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.getAllModerators);
+  .route("/")
+  .post(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    moderatorController.createModerator,
+  )
+  .get(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    moderatorController.getAllModerators,
+  );
 
 router
-    .route("/:id")
-    .get(moderatorController.getModeratorById)
-    .patch(authController.verifyRoles("Admin", "SubAdmin", "Moderator"), moderatorController.updateModerator)
-    .delete(authController.verifyRoles("Admin", "SubAdmin"), moderatorController.deleteModerator);
+  .route("/:id")
+  .get(moderatorController.getModeratorById)
+  .patch(
+    authController.verifyRoles("Admin", "SubAdmin", "Moderator"),
+    moderatorController.updateModerator,
+  )
+  .delete(
+    authController.verifyRoles("Admin", "SubAdmin"),
+    moderatorController.deleteModerator,
+  );
 
 module.exports = router;

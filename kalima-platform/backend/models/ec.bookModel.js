@@ -1,12 +1,19 @@
+// DOMAIN: STORE
+// STATUS: LEGACY
+// NOTE: Store book model.
 const mongoose = require("mongoose");
 const Product = require("./ec.productModel");
 
 const bookSchema = new mongoose.Schema({
-    subject: { type: mongoose.Schema.Types.ObjectId, ref: "Subject", required: true }
+  subject: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subject",
+    required: true,
+  },
 });
 
 bookSchema.add({
-    description: { type: String, required: [true, "Description is required"], }
+  description: { type: String, required: [true, "Description is required"] },
 });
 
 const ECBook = Product.discriminator("ECBook", bookSchema);
