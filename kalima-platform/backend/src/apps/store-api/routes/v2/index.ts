@@ -1,5 +1,5 @@
 import { Router } from "express";
-// import cartRoutes from './cart.routes';
+import cartRoutes from "./cart.routes";
 import couponRoutes from "./coupon.routes";
 import requiredFieldRoutes from "./required-field.routes";
 import categoryRoutes from "./category.routes";
@@ -17,7 +17,7 @@ import parentChildrenRoutes from "./parent-children.routes";
 
 const router = Router();
 
-// router.use('/cart', cartRoutes);
+router.use("/cart", cartRoutes);
 router.use("/coupons", couponRoutes);
 router.use("/required-fields", requiredFieldRoutes);
 router.use("/categories", categoryRoutes);
