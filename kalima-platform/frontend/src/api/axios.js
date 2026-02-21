@@ -1,6 +1,7 @@
 import axios from 'axios';
 import i18n from '../i18n';
 import { toast } from 'sonner';
+import { performLocalLogout } from '../lib/authUtils';
 
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v2';
 
@@ -9,6 +10,7 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 });
 
 let refreshTokenPromise = null;
@@ -25,13 +27,6 @@ const decodeToken = (token) => {
     } catch (e) {
         return null;
     }
-};
-
-const performLocalLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
 };
 
 // Request Interceptor

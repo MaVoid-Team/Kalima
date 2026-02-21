@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import { performLocalLogout } from '../lib/authUtils';
 
 const AuthContext = createContext(null);
 
@@ -36,10 +37,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem('user');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
+        performLocalLogout();
     };
 
     return (

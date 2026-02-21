@@ -1,54 +1,36 @@
-import { useState, useCallback } from 'react';
-import axios from '../../api/axios';
-import { toast } from 'sonner';
+import { useCallback } from 'react';
+import useApiMutation from '../useApiMutation';
 
 const useLinkAccounts = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const { mutate, loading, error } = useApiMutation();
 
     const linkFirebaseAccount = async (idToken) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/link/firebase', { idToken });
-            toast.success(response.data?.message || 'Account linked successfully');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/link/firebase',
+            data: { idToken },
+            defaultSuccessMessage: 'Account linked successfully'
+        });
     };
 
     const unlinkProvider = async (provider) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/unlink', { provider });
-            toast.success(response.data?.message || 'Account unlinked successfully');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/unlink',
+            data: { provider },
+            defaultSuccessMessage: 'Account unlinked successfully'
+        });
     };
 
     const getLinkedProviders = useCallback(async () => {
-        setLoading(true);
-        setError(null);
         try {
-            const response = await axios.get('/auth/linked-providers');
-            return response.data?.linkedProviders || response.data?.data?.linkedProviders || [];
+            const responseData = await mutate({
+                method: 'get',
+                endpoint: '/auth/linked-providers'
+            });
+            return responseData?.linkedProviders || responseData?.data?.linkedProviders || [];
         } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
+            return [];
         }
-    }, []);
+    }, [mutate]);
 
     return {
         linkFirebaseAccount,

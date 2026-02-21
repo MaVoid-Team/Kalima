@@ -1,16 +1,31 @@
 import { Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/landing/LandingPage";
-
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
+import { Loader2 } from "lucide-react";
 
-import LoginPage from "./pages/auth/LoginPage";
-import SignupPage from "./pages/auth/SignupPage";
-import CartPage from "./pages/cart/CartPage";
-import MarketPage from "./pages/market/MarketPage";
-import CheckoutPage from "./pages/checkout/CheckoutPage";
-import ProductDetailsPage from "./pages/product/ProductDetailsPage";
-import BookletDetailsPage from "./pages/booklet/BookletDetailsPage";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
+import MainLayout from "./layouts/MainLayout";
+
+// Lazy-loaded pages
+const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
+const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"));
+const CartPage = lazy(() => import("./pages/cart/CartPage"));
+const MarketPage = lazy(() => import("./pages/market/MarketPage"));
+const CheckoutPage = lazy(() => import("./pages/checkout/CheckoutPage"));
+const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage"));
+const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 function App() {
   const { i18n } = useTranslation();
@@ -21,18 +36,39 @@ function App() {
   }, [i18n, i18n.language]);
 
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/market" element={<MarketPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route path="/booklet/:id" element={<BookletDetailsPage />} />
-      </Routes>
-    </>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Public Routes with MainLayout (Navbar & Footer) */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/market" element={<MarketPage />} />
+            <Route path="/product/:id" element={<ProductDetailsPage />} />
+            <Route path="/booklet/:id" element={<BookletDetailsPage />} />
+
+            {/* Protected Routes inside MainLayout */}
+            <Route element={<ProtectedRoute requireAuth={true} />}>
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+            </Route>
+
+            {/* 404 Fallback */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
+          <Route element={<MainLayout />}>
+            <Route element={<ProtectedRoute requireAuth={false} />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+            </Route>
+          </Route>
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
