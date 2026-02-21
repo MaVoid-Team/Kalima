@@ -118,6 +118,7 @@ axiosInstance.interceptors.response.use(
                         errorMessage = i18n.t('auth:errors.invalid_credentials', 'Invalid email or password');
                     } else {
                         errorMessage = i18n.t('auth:errors.unauthorized');
+                        performLocalLogout();
                         // Final fallback logout if 401 occurs despite proactive refresh
                     }
                     break;
