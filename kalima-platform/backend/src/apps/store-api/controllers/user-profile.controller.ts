@@ -51,10 +51,15 @@ function parseIntParam(raw: string | string[] | undefined, name: string): number
 /** Extract authenticated user */
 function getAuth(req: Request): { id: number; role: role_enum; roles: string[] } {
   const user = req.user as any;
+  const rawRoles = Array.isArray(user.roles) ? user.roles : [];
+  const rolesList = rawRoles.map((r: any) => r.role || r);
+  const primaryRole = rolesList.includes(role_enum.Admin) ? role_enum.Admin :
+                      rolesList.includes(role_enum.SubAdmin) ? role_enum.SubAdmin :
+                      rolesList[0] || null;
   return {
-    id: user.id,
-    role: user.role,
-    roles: Array.isArray(user.roles) ? user.roles : [user.role],
+    id: user.userId || user.id,
+    role: primaryRole,
+    roles: rolesList,
   };
 }
 

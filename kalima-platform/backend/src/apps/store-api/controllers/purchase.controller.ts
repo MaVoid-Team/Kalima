@@ -85,7 +85,7 @@ export const purchaseController = {
   /** GET /my — teacher's own purchases */
   async getMyPurchases(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const purchases = await purchasesService.getByUser(userId);
       res.status(200).json({
         success: true,
@@ -103,7 +103,7 @@ export const purchaseController = {
   async receive(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
-      const adminId = (req.user as any).id;
+      const adminId = (req.user as any).userId;
       const purchase = await purchasesService.receive(id, adminId);
       res.status(200).json({
         success: true,
@@ -119,7 +119,7 @@ export const purchaseController = {
   async confirm(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
-      const adminId = (req.user as any).id;
+      const adminId = (req.user as any).userId;
       const purchase = await purchasesService.confirm(id, adminId);
       res.status(200).json({
         success: true,
@@ -135,7 +135,7 @@ export const purchaseController = {
   async returnPurchase(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
-      const adminId = (req.user as any).id;
+      const adminId = (req.user as any).userId;
       const purchase = await purchasesService.returnPurchase(id, adminId);
       res.status(200).json({
         success: true,
@@ -154,7 +154,7 @@ export const purchaseController = {
     try {
       const id = parseIntParam(req.params.id, "purchase ID");
       const dto = await validateDto(AdminNoteDto, req.body);
-      const adminId = (req.user as any).id;
+      const adminId = (req.user as any).userId;
       const purchase = await purchasesService.addAdminNote(
         id,
         dto.admin_notes,
