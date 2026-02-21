@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
 import * as z from "zod";
@@ -21,10 +20,11 @@ import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "../../hooks/auth/useRegister";
 import useLookups from "../../hooks/useLookups";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterStudent({ onBack }) {
     const { t } = useTranslation("auth");
-    const { registerStudent, registerFirebaseStudent, loading: registerLoading } = useRegister();
+    const { registerStudent, registerFirebaseStudent } = useRegister();
 
     // Schema
     const studentSchema = z.object({
@@ -52,6 +52,8 @@ export default function RegisterStudent({ onBack }) {
         } else {
             await registerStudent(payload);
         }
+
+        navigate(`/auth/verify-email?email=${encodeURIComponent(data.email || "")}`);
     };
 
     return (

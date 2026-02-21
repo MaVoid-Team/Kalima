@@ -1,15 +1,12 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import usePassword from "../../hooks/auth/usePassword";
 import { toast } from "sonner";
-import useLogin from "../../hooks/auth/useLogin";
-import { signInWithPopup } from 'firebase/auth';
-import { auth } from "../../lib/firebase";
-import SocialLoginButtons from "../../components/auth/SocialLoginButtons";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,49 +27,52 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
     const { t } = useTranslation("auth");
     const navigate = useNavigate();
-    const { login, loginWithFirebase, loading } = useLogin();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get("token");
+    const { resetPassword, loading } = usePassword();
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    useEffect(() => {
+        if (!token) {
+            toast.error("Invalid or missing password reset token.");
+            navigate("/login");
+        }
+    }, [token, navigate]);
 
     const formSchema = React.useMemo(() => {
         return z.object({
-            email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
-            password: z.string().min(1, { message: t("validation.required") }),
+            password: z.string().min(6, { message: t("validation.password_min") }),
+            confirmPassword: z.string().min(6, { message: t("validation.password_min") }),
+        }).refine((data) => data.password === data.confirmPassword, {
+            message: t("validation.password_mismatch"),
+            path: ["confirmPassword"],
         });
     }, [t]);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: "",
             password: "",
+            confirmPassword: "",
         },
     });
 
     const onSubmit = async (values) => {
+        if (!token) return;
         try {
-            await login(values);
-            // Navigate to dashboard or home after successful login
-            navigate("/");
+            await resetPassword(token, values.password);
+            // Navigate to login after successful reset
+            navigate("/login");
         } catch (error) {
-            console.error("Login failed:", error);
-            // Error is handled by interceptor/hook (toast)
+            console.error("Reset password failed:", error);
         }
     };
 
-    const handleFirebaseLogin = async (provider) => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const idToken = await result.user.getIdToken();
-            await loginWithFirebase(idToken);
-            navigate("/");
-        } catch (error) {
-            console.error("Firebase Login failed:", error);
-            toast.error(error?.message || "Failed to login with Firebase");
-        }
-    };
+    if (!token) return null;
 
     return (
         <div className="container relative flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-1 lg:px-0 min-h-[calc(100vh-4rem)] py-8">
@@ -80,31 +80,18 @@ export default function LoginPage() {
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <Card className="border-0 shadow-none sm:border sm:shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-2xl">{t("login.title")}</CardTitle>
-                            <CardDescription>{t("login.description")}</CardDescription>
+                            <CardTitle className="text-2xl">{t("reset_password.title", "Reset Password")}</CardTitle>
+                            <CardDescription>{t("reset_password.description", "Enter your new password below.")}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
                                     <FormField
                                         control={form.control}
-                                        name="email"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>{t("login.emailLabel")}</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="name@example.com" type="email" {...field} className="bg-background" />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t("login.passwordLabel")}</FormLabel>
+                                                <FormLabel>{t("reset_password.newPasswordLabel", "New Password")}</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input
@@ -128,14 +115,38 @@ export default function LoginPage() {
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
-                                                <div className="flex justify-end mt-1">
-                                                    <Link
-                                                        to="/forgot-password"
-                                                        className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                                                    >
-                                                        {t("login.forgotPassword", "Forgot Password?")}
-                                                    </Link>
-                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="confirmPassword"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>{t("reset_password.confirmPasswordLabel", "Confirm New Password")}</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Input
+                                                            type={showConfirmPassword ? "text" : "password"}
+                                                            className="bg-background pr-10"
+                                                            {...field}
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                        >
+                                                            {showConfirmPassword ? (
+                                                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                                            ) : (
+                                                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -143,37 +154,19 @@ export default function LoginPage() {
                                         {loading && (
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         )}
-                                        {t("login.submit")}
+                                        {t("reset_password.submit", "Reset Password")}
                                     </Button>
-
-                                    <div className="relative my-4">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <span className="w-full border-t" />
-                                        </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-background px-2 text-muted-foreground">
-                                                {t("login.continueWith", "Or continue with")}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <SocialLoginButtons
-                                        onProviderSelect={handleFirebaseLogin}
-                                        isLoading={loading}
-                                        textGoogle={t("login.google", "Google")}
-                                        textFacebook={t("login.facebook", "Facebook")}
-                                    />
                                 </form>
                             </Form>
                         </CardContent>
                         <CardFooter className="flex flex-col gap-2">
                             <div className="text-sm text-muted-foreground text-center">
-                                {t("login.noAccount", "Don't have an account?")}{" "}
                                 <Link
-                                    to="/signup"
-                                    className="underline underline-offset-4 hover:text-primary font-medium"
+                                    to="/login"
+                                    className="flex items-center justify-center gap-2 underline underline-offset-4 hover:text-primary font-medium"
                                 >
-                                    {t("login.signupLink", "Sign up")}
+                                    <ArrowLeft className="w-4 h-4" />
+                                    {t("reset_password.backToLogin", "Back to login")}
                                 </Link>
                             </div>
                         </CardFooter>

@@ -11,25 +11,25 @@ export default function RoleSelection({ onRoleSelect }) {
             id: "student",
             label: t("signup.roles.student"),
             icon: GraduationCap,
-            description: "Access courses and track progress"
+            description: t("signup.roleDescriptions.student")
         },
         {
             id: "teacher",
             label: t("signup.roles.teacher"),
             icon: School,
-            description: "Create courses and manage students"
+            description: t("signup.roleDescriptions.teacher")
         },
         {
             id: "parent",
             label: t("signup.roles.parent"),
             icon: User,
-            description: "Monitor your child's progress"
+            description: t("signup.roleDescriptions.parent")
         },
         {
             id: "lecturer",
             label: t("signup.roles.lecturer"),
             icon: Mic2,
-            description: "Share knowledge and give lectures"
+            description: t("signup.roleDescriptions.lecturer")
         }
     ];
 

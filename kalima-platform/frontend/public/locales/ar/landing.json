@@ -19,7 +19,16 @@
     "toggleLanguageAction": "تغيير اللغة",
     "shortcuts": {
       "open": "Ctrl+K"
-    }
+    },
+    "myOrders": "طلباتي",
+    "dashboard": "لوحة التحكم",
+    "logout": "تسجيل الخروج"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "الصفحة غير موجودة",
+    "description": "عذراً! الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backHome": "العودة للرئيسية"
   },
   "footer": {
     "brand": "منصة كلمة",

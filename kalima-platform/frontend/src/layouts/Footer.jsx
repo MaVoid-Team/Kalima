@@ -1,5 +1,6 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import logo from "../assets/Logo.png";
 
@@ -66,12 +67,12 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -93,7 +94,7 @@ export default function Footer() {
                 asChild
                 className="h-9 w-9 hover:text-primary hover:bg-transparent text-muted-foreground"
               >
-                <a href={href} aria-label={label}>
+                <a href={href} aria-label={label} target="_blank" rel="noopener noreferrer">
                   <Icon className="h-5 w-5 no-flip" />
                 </a>
               </Button>

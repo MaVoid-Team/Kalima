@@ -1,69 +1,38 @@
-import { useState } from 'react';
-import axios from '../../api/axios';
-import { toast } from 'sonner';
+import useApiMutation from '../useApiMutation';
 
 const usePassword = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const { mutate, loading, error } = useApiMutation();
 
     const forgotPassword = async (email) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/forgot-password', { email });
-            toast.success(response.data?.message || 'Password reset email sent');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/forgot-password',
+            data: { email },
+            defaultSuccessMessage: 'Password reset email sent'
+        });
     };
 
     const resetPassword = async (token, newPassword) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/reset-password', { token, newPassword });
-            toast.success(response.data?.message || 'Password reset successfully');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/reset-password',
+            data: { token, newPassword },
+            defaultSuccessMessage: 'Password reset successfully'
+        });
     };
 
     const changePassword = async (currentPassword, newPassword) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/change-password', { currentPassword, newPassword });
-            toast.success(response.data?.message || 'Password changed successfully');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/change-password',
+            data: { currentPassword, newPassword },
+            defaultSuccessMessage: 'Password changed successfully'
+        });
     };
 
     const setPassword = async (password) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await axios.post('/auth/set-password', { password });
-            toast.success(response.data?.message || 'Password set successfully');
-            return response.data;
-        } catch (err) {
-            setError(err);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
+        return await mutate({
+            endpoint: '/auth/set-password',
+            data: { password },
+            defaultSuccessMessage: 'Password set successfully'
+        });
     };
 
     return {

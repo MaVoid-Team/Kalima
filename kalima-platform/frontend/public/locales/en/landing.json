@@ -19,7 +19,16 @@
     "toggleLanguageAction": "Toggle Language",
     "shortcuts": {
       "open": "Ctrl+K"
-    }
+    },
+    "myOrders": "My Orders",
+    "dashboard": "Dashboard",
+    "logout": "Log Out"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page Not Found",
+    "description": "Oops! The page you are looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
   },
   "footer": {
     "brand": "Kalima Platform",
