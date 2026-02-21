@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/command";
 import logo from "../assets/Logo.png";
 import CartPreview from "../components/cart/CartPreview";
+import useAuth from "../hooks/auth/useAuth";
 
 export default function Navbar() {
   const [cartItems] = useState([
@@ -102,6 +103,7 @@ export default function Navbar() {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("landing");
 
@@ -216,21 +218,51 @@ export default function Navbar() {
                 </span>
               </Button>
 
-              <Button
-                variant="ghost"
-                className="font-bold hover:bg-transparent hover:text-primary"
-                asChild
-              >
-                <Link to="/login">{t("navbar.login")}</Link>
-              </Button>
-              <Button
-                variant="default"
-                size="default"
-                className="font-bold px-6"
-                asChild
-              >
-                <Link to="/signup">{t("navbar.signup")}</Link>
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="font-bold hover:bg-transparent hover:text-primary"
+                    asChild
+                  >
+                    <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="default"
+                    className="font-bold px-6"
+                    asChild
+                  >
+                    <Link to="/dashboard">{t("navbar.dashboard", "Dashboard")}</Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="font-bold px-6 text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20"
+                    onClick={logout}
+                  >
+                    {t("navbar.logout", "Log out")}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="font-bold hover:bg-transparent hover:text-primary"
+                    asChild
+                  >
+                    <Link to="/login">{t("navbar.login")}</Link>
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="default"
+                    className="font-bold px-6"
+                    asChild
+                  >
+                    <Link to="/signup">{t("navbar.signup")}</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -305,22 +337,55 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex flex-col gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    className="w-full font-bold justify-center h-12 text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                    asChild
-                  >
-                    <Link to="/login">{t("navbar.login")}</Link>
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="w-full font-bold justify-center h-12 text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                    asChild
-                  >
-                    <Link to="/signup">{t("navbar.signup")}</Link>
-                  </Button>
+                  {isAuthenticated ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="w-full font-bold justify-center h-12 text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                        asChild
+                      >
+                        <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="w-full font-bold justify-center h-12 text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                        asChild
+                      >
+                        <Link to="/dashboard">{t("navbar.dashboard", "Dashboard")}</Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full font-bold justify-center h-12 text-base text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20 mt-2"
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          logout();
+                        }}
+                      >
+                        {t("navbar.logout", "Log out")}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="w-full font-bold justify-center h-12 text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                        asChild
+                      >
+                        <Link to="/login">{t("navbar.login")}</Link>
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="w-full font-bold justify-center h-12 text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                        asChild
+                      >
+                        <Link to="/signup">{t("navbar.signup")}</Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </nav>
