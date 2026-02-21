@@ -18,7 +18,7 @@ async function validateDto<T extends object>(DtoClass: new () => T, body: unknow
 export const cartController = {
   async getCart(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const cart = await cartService.getActiveCartByUser(userId);
       res.status(200).json({ success: true, data: cart });
     } catch (err) {
@@ -33,7 +33,7 @@ export const cartController = {
 
       const dto = await validateDto(AddCartItemDto, req.body);
       const file = req.file as Express.Multer.File | undefined;
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const item = await cartService.addItemToCart(userId, dto, file);
       res.status(201).json({ success: true, data: item });
     } catch (err) {
@@ -45,7 +45,7 @@ export const cartController = {
     try {
       (req.body as any).cart_item_id = Number(req.params.itemId);
       const dto = await validateDto(UpdateCartItemDto, req.body);
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const updated = await cartService.updateCartItem(userId, dto);
       res.status(200).json({ success: true, data: updated });
     } catch (err) {
@@ -55,7 +55,7 @@ export const cartController = {
 
   async removeFromCart(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const itemId = Number(req.params.itemId);
       await cartService.removeItemFromCart(userId, itemId);
       res.status(200).json({ success: true, message: "Item removed from cart" });
@@ -66,7 +66,7 @@ export const cartController = {
 
   async clearCart(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const cart = await cartService.clearCart(userId);
       res.status(200).json({ success: true, data: cart });
     } catch (err) {
@@ -78,7 +78,7 @@ export const cartController = {
     try {
       const { couponCode, itemId } = req.body;
       if (!couponCode || !itemId) throw new BadRequestError("couponCode and itemId are required");
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       await cartService.applyCouponToCartItem(userId, Number(itemId), couponCode);
       res.status(200).json({ success: true });
     } catch (err) {
@@ -88,7 +88,7 @@ export const cartController = {
 
   async removeCoupon(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const itemId = Number(req.params.itemId);
       await cartService.removeCouponFromCartItem(userId, itemId);
       res.status(200).json({ success: true });
@@ -101,7 +101,7 @@ export const cartController = {
     try {
       const file = req.file as Express.Multer.File | undefined;
       const dto = await validateDto(UpdateCartItemRequiredFieldsDto, req.body);
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       await cartService.updateCartItemRequiredFields(userId, dto, file);
       res.status(200).json({ success: true });
     } catch (err) {
@@ -116,7 +116,7 @@ export const cartController = {
 
       const dto = await validateDto(CheckoutDto, req.body);
       const file = req.file as Express.Multer.File | undefined; // payment screenshot
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const result = await cartService.checkout(userId, dto, file as any);
       res.status(201).json({ success: true, data: result });
     } catch (err) {
@@ -126,7 +126,7 @@ export const cartController = {
 
   async getCheckoutPreview(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req.user as any).id;
+      const userId = (req.user as any).userId;
       const cart = await cartService.getActiveCartByUser(userId);
       const hasBooks = cart.cart_items.some((i: any) => i.products?.type === "Book");
       const requiredFields = {
