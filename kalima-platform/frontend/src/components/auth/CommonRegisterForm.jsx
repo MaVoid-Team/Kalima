@@ -36,12 +36,12 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
     const isRTL = i18n.dir() === "rtl";
 
     const baseShape = {
-        name: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().min(1, { message: t("validation.required") }),
-        gender: z.enum(["male", "female"], { required_error: t("validation.required") }),
-        password: z.string().optional(),
-        confirmPassword: z.string().optional(),
+        name: z.string().min(2, { message: t("validation.required", "Name is required") }).optional().or(z.literal("")),
+        email: z.string().email({ message: t("validation.email_invalid", "Invalid email") }).optional().or(z.literal("")),
+        phone: z.string().min(1, { message: t("validation.required", "Phone is required") }),
+        gender: z.enum(["male", "female"], { required_error: t("validation.required", "Gender is required") }),
+        password: z.string().optional().or(z.literal("")),
+        confirmPassword: z.string().optional().or(z.literal("")),
     };
 
     const formSchema = z.object({
@@ -83,10 +83,15 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
     const handleSubmit = async (values) => {
         setIsLoading(true);
-        if (onSubmit) {
-            await onSubmit(values, firebaseToken);
+        try {
+            if (onSubmit) {
+                await onSubmit(values, firebaseToken);
+            }
+        } catch (error) {
+            console.error("Form submission error:", error);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     return (
