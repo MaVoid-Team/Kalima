@@ -182,6 +182,45 @@ Returns a single product with linked categories, gallery entries, sample, coupon
 
 ---
 
+### Get Product Thumbnail
+
+Returns the thumbnail image details for a product. Returns 404 if the product does not exist or has no thumbnail.
+
+**Endpoint:** `GET /:id/thumbnail`  
+**Auth Required:** No
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 5,
+    "url": "/uploads/images/abc.webp",
+    "original_name": "abc.webp",
+    "mime_type": "webp",
+    "size": 12345,
+    "created_at": "2026-02-20T10:00:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Message                                  | Condition                                    |
+| ------ | ---------------------------------------- | -------------------------------------------- |
+| 400    | `Invalid product ID`                     | ID is not a number                           |
+| 404    | `Product not found`                      | Product does not exist or is soft-deleted    |
+| 404    | `Thumbnail not found for this product`   | Product has no thumbnail                     |
+
+---
+
 ### Get Product Gallery
 
 Returns gallery entries for a product. Optionally include inactive (hidden) entries.

@@ -9,7 +9,7 @@ import {
   AttachCategoriesDto,
   AttachRequiredFieldsDto,
 } from "../dtos/product.dto";
-import { ValidationError, BadRequestError } from "../../../libs/errors";
+import { ValidationError, BadRequestError, NotFoundError } from "../../../libs/errors";
 
 // ============================================
 // HELPER
@@ -136,6 +136,33 @@ export const productController = {
       res.status(200).json({
         success: true,
         data: product,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
+   * GET /products/:id/thumbnail
+   */
+  async getThumbnail(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const product = await productService.getProductById(id) as any;
+
+      if (!product.thumbnail_image) {
+        throw new NotFoundError("Thumbnail not found for this product");
+      }
+
+      res.status(200).json({
+        success: true,
+        data: product.thumbnail_image,
       });
     } catch (error) {
       _next(error);
