@@ -21,6 +21,12 @@
     "allSections": "All Sections",
     "allSubSections": "All SubSections"
   },
+  "sidebar": {
+    "allCategories": "All Categories"
+  },
+  "loading": {
+    "products": "Loading products..."
+  },
   "search": {
     "placeholder": "Search for products..."
   },
