@@ -21,6 +21,12 @@
     "allSections": "جميع الأقسام",
     "allSubSections": "جميع الأقسام الفرعية"
   },
+  "sidebar": {
+    "allCategories": "جميع الفئات"
+  },
+  "loading": {
+    "products": "جارٍ تحميل المنتجات..."
+  },
   "search": {
     "placeholder": "ابحث عن المنتجات..."
   },
