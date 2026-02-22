@@ -549,7 +549,7 @@ class ProductService {
 
   async getProductRequiredFields(
     productId: number,
-  ): Promise<product_required_fields[]> {
+  ): Promise<any[]> {
     const product = await this.db.products.findFirst({
       where: { id: productId, deleted_at: null },
     });
@@ -559,7 +559,16 @@ class ProductService {
 
     return this.db.product_required_fields.findMany({
       where: { product_id: productId, active: true },
-      include: { required_field_definitions: true },
+      select: {
+        field_definition_id: true,
+        is_required: true,
+        required_field_definitions: {
+          select: {
+            label: true,
+            field_type: true,
+          },
+        },
+      },
     });
   }
 
