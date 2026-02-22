@@ -4,6 +4,8 @@
     "digitalProducts": "Digital Products",
     "scienceKits": "Science Kits"
   },
+  "loading": "Loading product...",
+  "notFound": "Product not found.",
   "variants": {
     "format": "Format",
     "kitAccentColor": "Kit Accent Color"
@@ -27,7 +29,8 @@
     "view": "Product view",
     "thumbnail": "Thumbnail",
     "reviews": "reviews",
-    "createdBy": "Created by"
+    "createdBy": "Created by",
+    "currency": "EGP"
   },
   "trustSignals": {
     "secureTransaction": "Secure Transaction",
@@ -87,7 +90,6 @@
     "bestSeller": "Best Seller",
     "interactive": "Interactive"
   },
-
   "booklet": {
     "selectFormat": "SELECT FORMAT",
     "aboutResource": "About this Resource",
