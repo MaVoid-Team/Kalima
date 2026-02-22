@@ -23,6 +23,7 @@ function getMockPrismaClient() {
       },
       coupons: {
         findUnique: jest.fn(),
+        findMany: jest.fn(),
       },
     };
   }
@@ -154,6 +155,7 @@ describe("CartService", () => {
             { id: 100, cart_id: 1, product_id: 10, quantity: 3, price_at_add: 100, discount: 30, coupon_id: 99 },
         ];
         mockPrismaClient.cart_items.findMany.mockResolvedValueOnce(updatedCartItems);
+        mockPrismaClient.coupons.findMany.mockResolvedValueOnce([{ id: 99, discount_percentage: 10 }]);
 
         await cartService.updateCartItem(42, { cart_item_id: 100, quantity: 3 });
 
