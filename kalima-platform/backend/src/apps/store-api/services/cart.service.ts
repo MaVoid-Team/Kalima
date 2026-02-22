@@ -18,7 +18,7 @@ import {
   invalidateCartCache,
 } from "./cartCache.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
-import type { Prisma } from "../generated/prisma/client";
+import type { Prisma, purchases } from "../generated/prisma/client";
 import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 
 // Typed payloads from Prisma for cart items/purchases
@@ -605,7 +605,7 @@ class CartService {
 
     return {
       success: true,
-      purchase: createdPurchase,
+      purchase: createdPurchase ? this.purchaseSnapshot(createdPurchase) : null,
       subtotal,
       discount,
       total,
@@ -718,6 +718,36 @@ class CartService {
     }
     await invalidateCartCache(user_id);
     return { success: true };
+  }
+
+  // ============================================
+  // Helper methods
+  // ============================================
+  private purchaseSnapshot(purchase: any) {
+    const snapshot = {
+      id: purchase.id,
+      status: purchase.status,
+      subtotal: purchase.subtotal,
+      discount: purchase.discount,
+      total: purchase.total,
+      payment_method_id: purchase.payment_method_id,
+      purchase_serial: purchase.purchase_serial,
+      purchase_items: purchase.purchase_items?.map((item: any) => ({
+        created_at: item.created_at,
+        price_at_purchase: item.price_at_purchase,
+        discount: item.discount,
+        products: item.products ? {
+          id: item.products.id,
+          title: item.products.title,
+          serial: item.products.serial,
+          type: item.products.type,
+          thumbnail_image: item.products.thumbnail_image ? {
+            url: item.products.thumbnail_image.url,
+          } : null,
+        } : null,
+      })) || [],
+    };
+    return snapshot;
   }
 }
 
