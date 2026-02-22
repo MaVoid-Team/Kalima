@@ -390,7 +390,7 @@ class CartService {
       subtotal: 0,
       discount: 0,
       total: 0,
-    } as CartWithItems;
+    } as unknown as CartWithItems;
   }
 
   // ============================================
@@ -678,7 +678,7 @@ class CartService {
           );
           if (expectedDiscount !== Number(item.discount || 0)) {
             updates.push({ id: item.id, discount: expectedDiscount });
-            (item as { discount?: number }).discount = expectedDiscount;
+            (item as unknown as { discount?: number }).discount = expectedDiscount;
           }
         }
       }
