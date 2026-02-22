@@ -159,8 +159,20 @@ class CartService {
       include: {
         cart_items: {
           include: {
-            products: true,
+            products: {
+              include: {
+                thumbnail_image: true,
+              },
+            },
             cart_item_required_fields: true,
+            coupons: {
+              select: {
+                id: true,
+                code: true,
+                discount_amount: true,
+                discount_percentage: true,
+              },
+            },
           },
         },
       },
