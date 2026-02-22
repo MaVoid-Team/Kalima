@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import {
   Sheet,
@@ -11,23 +11,35 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
-export default function CartPreview({ open, onOpenChange, cartItems, onViewFullCart }) {
+export default function CartPreview({ open, onOpenChange, cart, onViewFullCart, getProductThumbnail }) {
   const { t, i18n } = useTranslation('cart');
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const [thumbnails, setThumbnails] = useState({});
+
+  useEffect(() => {
+    cart?.cart_items?.forEach((item) => {
+      const pid = item?.products?.id;
+      if (pid && !thumbnails[pid]) {
+        getProductThumbnail(pid)
+          .then(url => setThumbnails(prev => ({ ...prev, [pid]: url || 'https://via.placeholder.com/150' })))
+          .catch(() => {});
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, getProductThumbnail]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side={i18n.language === 'ar' ? 'left' : 'right'} className="w-full sm:max-w-md p-0 flex flex-col">
         <SheetHeader className="px-6 py-4">
           <SheetTitle className="text-xl font-bold">
-            {t('previewTitle', { count: cartItems.length })}
+            {t('previewTitle', { count: cart.cart_items.length })}
           </SheetTitle>
           <SheetDescription className="sr-only">
             {t('previewDescription')}
           </SheetDescription>
         </SheetHeader>
 
-        {cartItems.length === 0 ? (
+        {cart?.cart_items?.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4">
               <ShoppingBag className="w-10 h-10 text-muted-foreground" />
@@ -47,38 +59,31 @@ export default function CartPreview({ open, onOpenChange, cartItems, onViewFullC
           <>
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="space-y-4">
-                {cartItems.map((item) => (
+                {cart?.cart_items?.map((item) => (
                   <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
                     <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'}
+                        alt={item?.products?.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold mb-1">
-                        {item.name}
+                        {item?.products?.title}
                       </h4>
                       <p className="text-xs text-muted-foreground mb-2">
-                        {item.description}
+                        {item?.products?.description}
                       </p>
                       <div className="flex items-center justify-between">
                         <div className="text-sm">
                           <span className="font-semibold">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ${item?.final_price}
                           </span>
                           <span className={"text-muted-foreground" + (i18n.language === 'ar' ? ' mr-1' : ' ml-1')}>
-                            {t('qty')} {item.quantity}
+                            {t('qty')} {item?.quantity}
                           </span>
                         </div>
-                        <button
-                          onClick={(e) => e.preventDefault()}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                          aria-label={t('removeItem')}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -89,7 +94,7 @@ export default function CartPreview({ open, onOpenChange, cartItems, onViewFullC
             <SheetFooter className="px-6 py-4 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{t('subtotal')}</span>
-                <span className="text-xl font-bold">${subtotal.toFixed(2)}</span>
+                <span className="text-xl font-bold">${cart?.subtotal}</span>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">

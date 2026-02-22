@@ -3,15 +3,11 @@ import { ArrowLeft, ArrowRight, Lock, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 export default function CartOrderSummary({
   subtotal,
-  shippingEstimate,
-  taxEstimate,
+  discount = '0',
   total,
-  promoCode,
-  onPromoCodeChange,
 }) {
   const { t, i18n } = useTranslation('cart');
 
@@ -25,43 +21,25 @@ export default function CartOrderSummary({
           <div className="space-y-4 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('subtotal')}</span>
-              <span className="font-semibold">${subtotal.toFixed(2)}</span>
+              <span className="font-semibold">${subtotal}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t('shippingEstimate')}</span>
-              <span className="text-xs">{shippingEstimate}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{t('taxEstimate')}</span>
-              <span className="font-semibold">${taxEstimate.toFixed(2)}</span>
-            </div>
+            {discount && discount !== '0' && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">{t('discount', 'Discount')}</span>
+                <span className="font-semibold">-${discount}</span>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between items-center py-4 border-t border-b border-gray-200 mb-6">
             <span className="text-base font-bold">{t('total')}</span>
-            <span className="text-2xl font-bold">${total.toFixed(2)}</span>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-xs font-semibold uppercase tracking-wider mb-2">{t('promoLabel')}</label>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                value={promoCode}
-                onChange={(e) => onPromoCodeChange(e.target.value)}
-                placeholder={t('promoPlaceholder')}
-                className="flex-1 w-full border-gray-300 rounded-lg text-sm focus-visible:ring-red-500"
-              />
-              <Button variant="secondary" className="px-4 py-2 text-sm font-medium rounded-lg">
-                {t('apply')}
-              </Button>
-            </div>
+            <span className="text-2xl font-bold">${total}</span>
           </div>
 
           <Button className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4">
             {t('proceedToCheckout')}
             <span>
-              {i18n.language === 'ar' ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+              <ArrowRight className="w-4 h-4" />
             </span>
           </Button>
 

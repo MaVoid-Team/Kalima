@@ -15,8 +15,10 @@ export default function CartHeader({ itemCount, onContinueShopping }) {
           variant="link"
           className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium p-0 h-auto"
         >
+          {/* arrow always visible */}
           {i18n.language === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-          {t('continueShopping')}
+          {/* hide text on mobile */}
+          <span className="hidden md:inline">{t('continueShopping')}</span>
         </Button>
       </div>
       <p className="text-gray-600 text-sm">{t('itemsInCart', { count: itemCount })}</p>

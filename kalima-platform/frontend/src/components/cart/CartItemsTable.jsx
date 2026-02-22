@@ -1,13 +1,61 @@
-import React from 'react';
-import { Minus, Plus } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Minus, Plus, Trash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
-export default function CartItemsTable({ cartItems, localize, updateQuantity }) {
+export default function CartItemsTable({ 
+  cartItems, 
+  updateQuantity, 
+  removeFromCart, 
+  applyCoupon, 
+  removeCoupon, 
+  thumbnails }) {
   const { t } = useTranslation('cart');
+  
+  // thumbnails come from parent via prop
+
+  // delete confirmation dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  // coupon dialog state
+  const [couponDialogOpen, setCouponDialogOpen] = useState(false);
+  const [itemForCoupon, setItemForCoupon] = useState(null);
+  const [couponValue, setCouponValue] = useState("");
+
+  
+
+  const handleApply = async (itemId, code) => {
+    if (!code) return;
+    try {
+      await applyCoupon(itemId, code);
+    } catch (err) {
+      console.error('Coupon apply failed:', err);
+    }
+  };
+
+  const handleRemove = async (itemId) => {
+    try {
+      await removeCoupon(itemId);
+    } catch (err) {
+      console.error('Coupon removal failed:', err);
+    }
+  };
+
 
   return (
     <Card className="rounded-lg shadow-sm border">
@@ -18,10 +66,12 @@ export default function CartItemsTable({ cartItems, localize, updateQuantity }) 
               <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('header.product')}</TableHead>
               <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.quantity')}</TableHead>
               <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right hidden md:table-cell">{t('header.total')}</TableHead>
+              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.coupon', 'Coupon')}</TableHead>
+              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.remove', 'Remove')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cartItems.map((item, idx) => (
+            {cartItems?.map((item, idx) => (
               <motion.tr
                 key={item.id}
                 initial={{ opacity: 0, y: 6 }}
@@ -32,17 +82,13 @@ export default function CartItemsTable({ cartItems, localize, updateQuantity }) 
                 <TableCell className="px-6 py-6 align-top whitespace-normal">
                   <div className="flex gap-4">
                     <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden">
-                      <img src={item.image} alt={localize(item, 'name')} className="w-full h-full object-cover" />
+                      <img src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold mb-1">{localize(item, 'name')}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{localize(item, 'description')}</p>
+                      <h3 className="text-sm font-semibold mb-1">{item?.products?.title}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">{item?.products?.description}</p>
                       <div className="flex flex-col gap-1">
-                        <span className="text-xs text-muted-foreground">{localize(item, 'type')}</span>
-                        <span className={`text-xs font-medium flex items-center gap-1 ${item.stockLow ? 'text-red-600' : 'text-green-600'}`}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                          {localize(item, 'stock')}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{item?.products?.type}</span>
                       </div>
                     </div>
                   </div>
@@ -50,13 +96,30 @@ export default function CartItemsTable({ cartItems, localize, updateQuantity }) 
                 <TableCell className="px-6 py-6">
                   <div className="flex items-center justify-between md:justify-center gap-3 border rounded-lg px-3 py-2 w-full md:w-auto">
                     <Button aria-label={t('decreaseQuantity')} onClick={() => updateQuantity(item.id, item.quantity - 1)} variant="ghost" size="icon" className="text-muted-foreground p-1.5 md:p-0 h-auto w-auto"><Minus className="w-4 h-4" /></Button>
-                    <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                    <span className="text-sm font-medium w-6 text-center">{item?.quantity}</span>
                     <Button aria-label={t('increaseQuantity')} onClick={() => updateQuantity(item.id, item.quantity + 1)} variant="ghost" size="icon" className="text-muted-foreground p-1.5 md:p-0 h-auto w-auto"><Plus className="w-4 h-4" /></Button>
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-6 text-right">
-                  <div className="text-lg font-bold">${(item.price * item.quantity).toFixed(2)}</div>
-                  <div className="text-xs text-muted-foreground">{t('each', { price: `$${item.price.toFixed(2)}` })}</div>
+                  <div className="text-lg font-bold">${item?.final_price}</div>
+                  <div className="text-xs text-muted-foreground">{t('each', { price: `$${item?.price_at_add}` })}</div>
+                </TableCell>
+                <TableCell className="px-6 py-6 text-center">
+                  {item.coupon_id ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-sm text-green-600">{t('applied', 'Applied')}</span>
+                      <Button size="sm" variant="link" onClick={() => handleRemove(item.id)}>{t('remove', 'Remove')}</Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" onClick={() => { setItemForCoupon(item.id); setCouponValue(''); setCouponDialogOpen(true); }}>
+                      {t('applyCoupon', 'Apply Coupon')}
+                    </Button>
+                  )}
+                </TableCell>
+                <TableCell className="px-6 py-6 text-center">
+                  <Button variant="ghost" size="icon" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
+                    <Trash className="h-4 w-4 text-destructive" />
+                  </Button>
                 </TableCell>
               </motion.tr>
             ))}
@@ -75,21 +138,16 @@ export default function CartItemsTable({ cartItems, localize, updateQuantity }) 
           >
             <div className="flex gap-4">
               <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
-                <img src={item.image} alt={localize(item, 'name')} className="w-full h-full object-cover" />
+                <img src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">{localize(item, 'name')}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-1 mb-2">{localize(item, 'description')}</p>
+                  <h3 className="text-sm font-bold text-foreground line-clamp-2 mb-1 leading-snug">{item?.products?.title}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-1 mb-2">{item?.products?.description}</p>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="text-base font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</div>
-                  {item.stockLow && (
-                    <span className="text-[10px] font-medium bg-red-50 text-red-600 px-2 py-0.5 rounded-full">
-                      {localize(item, 'stock')}
-                    </span>
-                  )}
+                  <div className="text-base font-bold text-primary">${item?.final_price}</div>
                 </div>
               </div>
             </div>
@@ -117,12 +175,94 @@ export default function CartItemsTable({ cartItems, localize, updateQuantity }) 
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground font-medium">
-                {t('each', { price: `$${item.price.toFixed(2)}` })}
+                {t('each', { price: `$${item?.price_at_add}` })}
               </div>
+            </div>
+
+            {/* coupon controls for mobile */}
+            <div className="mt-2 flex items-center justify-between">
+              <div>
+                {item.coupon_id ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-green-600">{t('applied', 'Applied')}</span>
+                    <Button size="sm" variant="link" onClick={() => handleRemove(item.id)}>{t('remove', 'Remove')}</Button>
+                  </div>
+                ) : (
+                  <Button size="sm" onClick={() => { setItemForCoupon(item.id); setCouponValue(''); setCouponDialogOpen(true); }}>
+                    {t('applyCoupon', 'Apply Coupon')}
+                  </Button>
+                )}
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
+                <Trash className="h-4 w-4 text-destructive" />
+              </Button>
             </div>
           </motion.div>
         ))}
       </div>
+      
+      {/* coupon dialog */}
+      <AlertDialog open={couponDialogOpen} onOpenChange={setCouponDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('applyCouponTitle','Enter coupon code')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('applyCouponDesc','Type your promo code and hit apply.')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2 mt-2">
+            <Input
+              value={couponValue}
+              onChange={(e)=>setCouponValue(e.target.value)}
+              placeholder={t('enterCode','Code')}
+              className="w-full"
+            />
+            <Button
+              onClick={async () => {
+                if (itemForCoupon && couponValue.trim()) {
+                  try {
+                    await handleApply(itemForCoupon, couponValue.trim());
+                    // only close on success
+                    setCouponDialogOpen(false);
+                    setItemForCoupon(null);
+                  } catch (e) {
+                    // keep dialog open so user can retry
+                    console.error('Coupon apply error, keeping dialog open', e);
+                  }
+                }
+              }}
+            >
+              {t('applyCoupon','Apply Coupon')}
+            </Button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCouponDialogOpen(false)}>{t('cancel','Cancel')}</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* alert dialog for delete confirmation */}
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmDeleteTitle', 'Delete item')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('confirmDeleteDesc', 'Are you sure you want to remove this item from your cart? This action cannot be undone.')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDialogOpen(false)}>{t('cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (itemToDelete) {
+                  removeFromCart(itemToDelete);
+                }
+                setDialogOpen(false);
+                setItemToDelete(null);
+              }}
+              className="text-destructive"
+            >
+              {t('delete', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
