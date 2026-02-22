@@ -370,20 +370,27 @@ class CartService {
   // ============================================
   // CLEAR CART
   // ============================================
-  async clearCart(user_id: number) {
+  async clearCart(user_id: number): Promise<CartWithItems> {
     const cart = await this.getActiveCartByUser(user_id);
     await this.db.cart_items.deleteMany({ where: { cart_id: cart.id } });
-    await this.db.carts.update({ 
+    await this.db.carts.update({
       where: { id: cart.id },
-      data: { 
+      data: {
         total: 0,
         subtotal: 0,
         discount: 0,
         status: "active",
-      } 
+      },
     });
     await invalidateCartCache(user_id);
-    return this.getActiveCartByUser(user_id);
+    // Return empty cart structure without refetching from DB
+    return {
+      ...cart,
+      cart_items: [],
+      subtotal: 0,
+      discount: 0,
+      total: 0,
+    } as CartWithItems;
   }
 
   // ============================================
@@ -640,24 +647,52 @@ class CartService {
     const updatedCartItems = await this.db.cart_items.findMany({
       where: { cart_id, deleted_at: null },
     });
-    
-    // Also recalculate coupons on incremental add
+
+    // Batch-fetch coupons for items that have them (avoids N+1)
+    const couponIds = [
+      ...new Set(
+        updatedCartItems
+          .filter((i) => i.coupon_id)
+          .map((i) => i.coupon_id as number),
+      ),
+    ];
+    const couponsMap = new Map<number, { discount_percentage: number | null }>();
+    if (couponIds.length > 0) {
+      const coupons = await this.db.coupons.findMany({
+        where: { id: { in: couponIds } },
+        select: { id: true, discount_percentage: true },
+      });
+      for (const c of coupons) couponsMap.set(c.id, c);
+    }
+
+    // Recompute discounts and batch updates
+    const updates: { id: number; discount: number }[] = [];
     for (const item of updatedCartItems) {
-       if (item.coupon_id) {
-           const coupon = await this.db.coupons.findUnique({ where: { id: item.coupon_id } });
-           if (coupon && coupon.discount_percentage && coupon.discount_percentage > 0) {
-               const expectedDiscount = Math.floor(
-                 Number(item.price_at_add) * item.quantity * (coupon.discount_percentage / 100)
-               );
-               if (expectedDiscount !== Number(item.discount || 0)) {
-                  await this.db.cart_items.update({
-                      where: { id: item.id },
-                      data: { discount: expectedDiscount }
-                  });
-                  item.discount = expectedDiscount as any;
-               }
-           }
-       }
+      if (item.coupon_id) {
+        const coupon = couponsMap.get(item.coupon_id);
+        if (coupon?.discount_percentage && coupon.discount_percentage > 0) {
+          const expectedDiscount = Math.floor(
+            Number(item.price_at_add) *
+              item.quantity *
+              (coupon.discount_percentage / 100),
+          );
+          if (expectedDiscount !== Number(item.discount || 0)) {
+            updates.push({ id: item.id, discount: expectedDiscount });
+            (item as { discount?: number }).discount = expectedDiscount;
+          }
+        }
+      }
+    }
+
+    if (updates.length > 0) {
+      await Promise.all(
+        updates.map((u) =>
+          this.db.cart_items.update({
+            where: { id: u.id },
+            data: { discount: u.discount },
+          }),
+        ),
+      );
     }
 
     const subtotal = this.#calculateSubtotal(updatedCartItems);
