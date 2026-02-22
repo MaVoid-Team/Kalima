@@ -78,6 +78,7 @@ class UserManagementService {
 
   async createTeacher(
     input: TeacherRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -95,6 +96,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Teacher,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -140,6 +142,7 @@ class UserManagementService {
 
   async createStudent(
     input: StudentRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -156,6 +159,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Student,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -193,6 +197,7 @@ class UserManagementService {
 
   async createParent(
     input: ParentRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -209,6 +214,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Parent,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -240,6 +246,7 @@ class UserManagementService {
 
   async createLecturer(
     input: LecturerRegistrationDto,
+    creator?: CreatorContext,
   ): Promise<{ user: any; email: string }> {
     const email = this.normalizeEmail(input.email);
     await this.ensureEmailNotExists(email);
@@ -256,6 +263,7 @@ class UserManagementService {
           gender: input.gender,
           password: passwordHash,
           role: role_enum.Lecturer,
+          created_by: creator?.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -527,6 +535,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Admin,
           is_email_verified: true, // Admin-created users are pre-verified
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -574,6 +583,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.SubAdmin,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -621,6 +631,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Moderator,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",
@@ -675,6 +686,7 @@ class UserManagementService {
           password: passwordHash,
           role: role_enum.Assistant,
           is_email_verified: true,
+          created_by: creator.userId,
           auth_identities: {
             create: {
               provider: "local",

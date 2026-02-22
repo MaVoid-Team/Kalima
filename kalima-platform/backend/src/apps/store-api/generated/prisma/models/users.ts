@@ -28,10 +28,12 @@ export type AggregateUsers = {
 
 export type UsersAvgAggregateOutputType = {
   id: number | null
+  created_by: number | null
 }
 
 export type UsersSumAggregateOutputType = {
   id: number | null
+  created_by: number | null
 }
 
 export type UsersMinAggregateOutputType = {
@@ -53,6 +55,7 @@ export type UsersMinAggregateOutputType = {
   hasUsedPromoCode: boolean | null
   email_verified_at: Date | null
   role: $Enums.role_enum | null
+  created_by: number | null
 }
 
 export type UsersMaxAggregateOutputType = {
@@ -74,6 +77,7 @@ export type UsersMaxAggregateOutputType = {
   hasUsedPromoCode: boolean | null
   email_verified_at: Date | null
   role: $Enums.role_enum | null
+  created_by: number | null
 }
 
 export type UsersCountAggregateOutputType = {
@@ -95,16 +99,19 @@ export type UsersCountAggregateOutputType = {
   hasUsedPromoCode: number
   email_verified_at: number
   role: number
+  created_by: number
   _all: number
 }
 
 
 export type UsersAvgAggregateInputType = {
   id?: true
+  created_by?: true
 }
 
 export type UsersSumAggregateInputType = {
   id?: true
+  created_by?: true
 }
 
 export type UsersMinAggregateInputType = {
@@ -126,6 +133,7 @@ export type UsersMinAggregateInputType = {
   hasUsedPromoCode?: true
   email_verified_at?: true
   role?: true
+  created_by?: true
 }
 
 export type UsersMaxAggregateInputType = {
@@ -147,6 +155,7 @@ export type UsersMaxAggregateInputType = {
   hasUsedPromoCode?: true
   email_verified_at?: true
   role?: true
+  created_by?: true
 }
 
 export type UsersCountAggregateInputType = {
@@ -168,6 +177,7 @@ export type UsersCountAggregateInputType = {
   hasUsedPromoCode?: true
   email_verified_at?: true
   role?: true
+  created_by?: true
   _all?: true
 }
 
@@ -276,6 +286,7 @@ export type UsersGroupByOutputType = {
   hasUsedPromoCode: boolean | null
   email_verified_at: Date | null
   role: $Enums.role_enum | null
+  created_by: number | null
   _count: UsersCountAggregateOutputType | null
   _avg: UsersAvgAggregateOutputType | null
   _sum: UsersSumAggregateOutputType | null
@@ -320,6 +331,7 @@ export type usersWhereInput = {
   hasUsedPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
   email_verified_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   role?: Prisma.Enumrole_enumNullableFilter<"users"> | $Enums.role_enum | null
+  created_by?: Prisma.IntNullableFilter<"users"> | number | null
   assistants?: Prisma.AssistantsListRelationFilter
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
   email_verification_tokens?: Prisma.XOR<Prisma.Email_verification_tokensNullableScalarRelationFilter, Prisma.email_verification_tokensWhereInput> | null
@@ -339,6 +351,8 @@ export type usersWhereInput = {
   purchases_confirmed?: Prisma.PurchasesListRelationFilter
   purchases_returned?: Prisma.PurchasesListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
+  creator_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  created_users?: Prisma.UsersListRelationFilter
 }
 
 export type usersOrderByWithRelationInput = {
@@ -360,6 +374,7 @@ export type usersOrderByWithRelationInput = {
   hasUsedPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
   email_verified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_by?: Prisma.SortOrderInput | Prisma.SortOrder
   assistants?: Prisma.assistantsOrderByRelationAggregateInput
   auth_identities?: Prisma.auth_identitiesOrderByRelationAggregateInput
   email_verification_tokens?: Prisma.email_verification_tokensOrderByWithRelationInput
@@ -379,6 +394,8 @@ export type usersOrderByWithRelationInput = {
   purchases_confirmed?: Prisma.purchasesOrderByRelationAggregateInput
   purchases_returned?: Prisma.purchasesOrderByRelationAggregateInput
   coupon_usages?: Prisma.coupon_usagesOrderByRelationAggregateInput
+  creator_user?: Prisma.usersOrderByWithRelationInput
+  created_users?: Prisma.usersOrderByRelationAggregateInput
 }
 
 export type usersWhereUniqueInput = Prisma.AtLeast<{
@@ -403,6 +420,7 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   hasUsedPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
   email_verified_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
   role?: Prisma.Enumrole_enumNullableFilter<"users"> | $Enums.role_enum | null
+  created_by?: Prisma.IntNullableFilter<"users"> | number | null
   assistants?: Prisma.AssistantsListRelationFilter
   auth_identities?: Prisma.Auth_identitiesListRelationFilter
   email_verification_tokens?: Prisma.XOR<Prisma.Email_verification_tokensNullableScalarRelationFilter, Prisma.email_verification_tokensWhereInput> | null
@@ -422,6 +440,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   purchases_confirmed?: Prisma.PurchasesListRelationFilter
   purchases_returned?: Prisma.PurchasesListRelationFilter
   coupon_usages?: Prisma.Coupon_usagesListRelationFilter
+  creator_user?: Prisma.XOR<Prisma.UsersNullableScalarRelationFilter, Prisma.usersWhereInput> | null
+  created_users?: Prisma.UsersListRelationFilter
 }, "id" | "mongo_id" | "email">
 
 export type usersOrderByWithAggregationInput = {
@@ -443,6 +463,7 @@ export type usersOrderByWithAggregationInput = {
   hasUsedPromoCode?: Prisma.SortOrderInput | Prisma.SortOrder
   email_verified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  created_by?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.usersCountOrderByAggregateInput
   _avg?: Prisma.usersAvgOrderByAggregateInput
   _max?: Prisma.usersMaxOrderByAggregateInput
@@ -472,6 +493,7 @@ export type usersScalarWhereWithAggregatesInput = {
   hasUsedPromoCode?: Prisma.BoolNullableWithAggregatesFilter<"users"> | boolean | null
   email_verified_at?: Prisma.DateTimeNullableWithAggregatesFilter<"users"> | Date | string | null
   role?: Prisma.Enumrole_enumNullableWithAggregatesFilter<"users"> | $Enums.role_enum | null
+  created_by?: Prisma.IntNullableWithAggregatesFilter<"users"> | number | null
 }
 
 export type usersCreateInput = {
@@ -511,6 +533,8 @@ export type usersCreateInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateInput = {
@@ -532,6 +556,7 @@ export type usersUncheckedCreateInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -551,6 +576,7 @@ export type usersUncheckedCreateInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUpdateInput = {
@@ -590,6 +616,8 @@ export type usersUpdateInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateInput = {
@@ -611,6 +639,7 @@ export type usersUncheckedUpdateInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -630,6 +659,7 @@ export type usersUncheckedUpdateInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateManyInput = {
@@ -651,6 +681,7 @@ export type usersCreateManyInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
 }
 
 export type usersUpdateManyMutationInput = {
@@ -692,11 +723,27 @@ export type usersUncheckedUpdateManyInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type UsersScalarRelationFilter = {
   is?: Prisma.usersWhereInput
   isNot?: Prisma.usersWhereInput
+}
+
+export type UsersNullableScalarRelationFilter = {
+  is?: Prisma.usersWhereInput | null
+  isNot?: Prisma.usersWhereInput | null
+}
+
+export type UsersListRelationFilter = {
+  every?: Prisma.usersWhereInput
+  some?: Prisma.usersWhereInput
+  none?: Prisma.usersWhereInput
+}
+
+export type usersOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type usersCountOrderByAggregateInput = {
@@ -718,10 +765,12 @@ export type usersCountOrderByAggregateInput = {
   hasUsedPromoCode?: Prisma.SortOrder
   email_verified_at?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
 }
 
 export type usersAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
 }
 
 export type usersMaxOrderByAggregateInput = {
@@ -743,6 +792,7 @@ export type usersMaxOrderByAggregateInput = {
   hasUsedPromoCode?: Prisma.SortOrder
   email_verified_at?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
 }
 
 export type usersMinOrderByAggregateInput = {
@@ -764,15 +814,12 @@ export type usersMinOrderByAggregateInput = {
   hasUsedPromoCode?: Prisma.SortOrder
   email_verified_at?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  created_by?: Prisma.SortOrder
 }
 
 export type usersSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-}
-
-export type UsersNullableScalarRelationFilter = {
-  is?: Prisma.usersWhereInput | null
-  isNot?: Prisma.usersWhereInput | null
+  created_by?: Prisma.SortOrder
 }
 
 export type usersCreateNestedOneWithoutAuth_identitiesInput = {
@@ -817,6 +864,26 @@ export type usersUpdateOneRequiredWithoutUser_rolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutUser_rolesInput, Prisma.usersUpdateWithoutUser_rolesInput>, Prisma.usersUncheckedUpdateWithoutUser_rolesInput>
 }
 
+export type usersCreateNestedOneWithoutCreated_usersInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreated_usersInput, Prisma.usersUncheckedCreateWithoutCreated_usersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreated_usersInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersCreateNestedManyWithoutCreator_userInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput> | Prisma.usersCreateWithoutCreator_userInput[] | Prisma.usersUncheckedCreateWithoutCreator_userInput[]
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreator_userInput | Prisma.usersCreateOrConnectWithoutCreator_userInput[]
+  createMany?: Prisma.usersCreateManyCreator_userInputEnvelope
+  connect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+}
+
+export type usersUncheckedCreateNestedManyWithoutCreator_userInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput> | Prisma.usersCreateWithoutCreator_userInput[] | Prisma.usersUncheckedCreateWithoutCreator_userInput[]
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreator_userInput | Prisma.usersCreateOrConnectWithoutCreator_userInput[]
+  createMany?: Prisma.usersCreateManyCreator_userInputEnvelope
+  connect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+}
+
 export type NullableEnumgender_enumFieldUpdateOperationsInput = {
   set?: $Enums.gender_enum | null
 }
@@ -827,6 +894,44 @@ export type NullableBoolFieldUpdateOperationsInput = {
 
 export type NullableEnumrole_enumFieldUpdateOperationsInput = {
   set?: $Enums.role_enum | null
+}
+
+export type usersUpdateOneWithoutCreated_usersNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreated_usersInput, Prisma.usersUncheckedCreateWithoutCreated_usersInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreated_usersInput
+  upsert?: Prisma.usersUpsertWithoutCreated_usersInput
+  disconnect?: Prisma.usersWhereInput | boolean
+  delete?: Prisma.usersWhereInput | boolean
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutCreated_usersInput, Prisma.usersUpdateWithoutCreated_usersInput>, Prisma.usersUncheckedUpdateWithoutCreated_usersInput>
+}
+
+export type usersUpdateManyWithoutCreator_userNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput> | Prisma.usersCreateWithoutCreator_userInput[] | Prisma.usersUncheckedCreateWithoutCreator_userInput[]
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreator_userInput | Prisma.usersCreateOrConnectWithoutCreator_userInput[]
+  upsert?: Prisma.usersUpsertWithWhereUniqueWithoutCreator_userInput | Prisma.usersUpsertWithWhereUniqueWithoutCreator_userInput[]
+  createMany?: Prisma.usersCreateManyCreator_userInputEnvelope
+  set?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  disconnect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  delete?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  connect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  update?: Prisma.usersUpdateWithWhereUniqueWithoutCreator_userInput | Prisma.usersUpdateWithWhereUniqueWithoutCreator_userInput[]
+  updateMany?: Prisma.usersUpdateManyWithWhereWithoutCreator_userInput | Prisma.usersUpdateManyWithWhereWithoutCreator_userInput[]
+  deleteMany?: Prisma.usersScalarWhereInput | Prisma.usersScalarWhereInput[]
+}
+
+export type usersUncheckedUpdateManyWithoutCreator_userNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput> | Prisma.usersCreateWithoutCreator_userInput[] | Prisma.usersUncheckedCreateWithoutCreator_userInput[]
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutCreator_userInput | Prisma.usersCreateOrConnectWithoutCreator_userInput[]
+  upsert?: Prisma.usersUpsertWithWhereUniqueWithoutCreator_userInput | Prisma.usersUpsertWithWhereUniqueWithoutCreator_userInput[]
+  createMany?: Prisma.usersCreateManyCreator_userInputEnvelope
+  set?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  disconnect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  delete?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  connect?: Prisma.usersWhereUniqueInput | Prisma.usersWhereUniqueInput[]
+  update?: Prisma.usersUpdateWithWhereUniqueWithoutCreator_userInput | Prisma.usersUpdateWithWhereUniqueWithoutCreator_userInput[]
+  updateMany?: Prisma.usersUpdateManyWithWhereWithoutCreator_userInput | Prisma.usersUpdateManyWithWhereWithoutCreator_userInput[]
+  deleteMany?: Prisma.usersScalarWhereInput | Prisma.usersScalarWhereInput[]
 }
 
 export type usersCreateNestedOneWithoutRefresh_tokensInput = {
@@ -1095,6 +1200,8 @@ export type usersCreateWithoutAuth_identitiesInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutAuth_identitiesInput = {
@@ -1116,6 +1223,7 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
   lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
@@ -1134,6 +1242,7 @@ export type usersUncheckedCreateWithoutAuth_identitiesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutAuth_identitiesInput = {
@@ -1188,6 +1297,8 @@ export type usersUpdateWithoutAuth_identitiesInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
@@ -1209,6 +1320,7 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
   lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
@@ -1227,6 +1339,7 @@ export type usersUncheckedUpdateWithoutAuth_identitiesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutUser_analyticsInput = {
@@ -1265,6 +1378,8 @@ export type usersCreateWithoutUser_analyticsInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutUser_analyticsInput = {
@@ -1286,6 +1401,7 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -1304,6 +1420,7 @@ export type usersUncheckedCreateWithoutUser_analyticsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutUser_analyticsInput = {
@@ -1358,6 +1475,8 @@ export type usersUpdateWithoutUser_analyticsInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_analyticsInput = {
@@ -1379,6 +1498,7 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -1397,6 +1517,7 @@ export type usersUncheckedUpdateWithoutUser_analyticsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutUser_rolesInput = {
@@ -1435,6 +1556,8 @@ export type usersCreateWithoutUser_rolesInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutUser_rolesInput = {
@@ -1456,6 +1579,7 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -1474,6 +1598,7 @@ export type usersUncheckedCreateWithoutUser_rolesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutUser_rolesInput = {
@@ -1528,6 +1653,8 @@ export type usersUpdateWithoutUser_rolesInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutUser_rolesInput = {
@@ -1549,6 +1676,7 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -1567,6 +1695,317 @@ export type usersUncheckedUpdateWithoutUser_rolesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+}
+
+export type usersCreateWithoutCreated_usersInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+}
+
+export type usersUncheckedCreateWithoutCreated_usersInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  created_by?: number | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+}
+
+export type usersCreateOrConnectWithoutCreated_usersInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutCreated_usersInput, Prisma.usersUncheckedCreateWithoutCreated_usersInput>
+}
+
+export type usersCreateWithoutCreator_userInput = {
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  assistants?: Prisma.assistantsCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
+}
+
+export type usersUncheckedCreateWithoutCreator_userInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+  assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
+  auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
+  lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
+  parents?: Prisma.parentsUncheckedCreateNestedOneWithoutUsersInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedCreateNestedOneWithoutUsersInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedCreateNestedManyWithoutUsersInput
+  social_media?: Prisma.social_mediaUncheckedCreateNestedManyWithoutUsersInput
+  students?: Prisma.studentsUncheckedCreateNestedOneWithoutUsersInput
+  teachers?: Prisma.teachersUncheckedCreateNestedOneWithoutUsersInput
+  teaches_at?: Prisma.teaches_atUncheckedCreateNestedManyWithoutUsersInput
+  user_analytics?: Prisma.user_analyticsUncheckedCreateNestedOneWithoutUsersInput
+  user_roles?: Prisma.user_rolesUncheckedCreateNestedManyWithoutUsersInput
+  carts?: Prisma.cartsUncheckedCreateNestedManyWithoutUsersInput
+  purchases?: Prisma.purchasesUncheckedCreateNestedManyWithoutUsersInput
+  purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
+  purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
+  purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
+}
+
+export type usersCreateOrConnectWithoutCreator_userInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput>
+}
+
+export type usersCreateManyCreator_userInputEnvelope = {
+  data: Prisma.usersCreateManyCreator_userInput | Prisma.usersCreateManyCreator_userInput[]
+  skipDuplicates?: boolean
+}
+
+export type usersUpsertWithoutCreated_usersInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutCreated_usersInput, Prisma.usersUncheckedUpdateWithoutCreated_usersInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutCreated_usersInput, Prisma.usersUncheckedCreateWithoutCreated_usersInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutCreated_usersInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutCreated_usersInput, Prisma.usersUncheckedUpdateWithoutCreated_usersInput>
+}
+
+export type usersUpdateWithoutCreated_usersInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+}
+
+export type usersUncheckedUpdateWithoutCreated_usersInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+}
+
+export type usersUpsertWithWhereUniqueWithoutCreator_userInput = {
+  where: Prisma.usersWhereUniqueInput
+  update: Prisma.XOR<Prisma.usersUpdateWithoutCreator_userInput, Prisma.usersUncheckedUpdateWithoutCreator_userInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutCreator_userInput, Prisma.usersUncheckedCreateWithoutCreator_userInput>
+}
+
+export type usersUpdateWithWhereUniqueWithoutCreator_userInput = {
+  where: Prisma.usersWhereUniqueInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutCreator_userInput, Prisma.usersUncheckedUpdateWithoutCreator_userInput>
+}
+
+export type usersUpdateManyWithWhereWithoutCreator_userInput = {
+  where: Prisma.usersScalarWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateManyMutationInput, Prisma.usersUncheckedUpdateManyWithoutCreator_userInput>
+}
+
+export type usersScalarWhereInput = {
+  AND?: Prisma.usersScalarWhereInput | Prisma.usersScalarWhereInput[]
+  OR?: Prisma.usersScalarWhereInput[]
+  NOT?: Prisma.usersScalarWhereInput | Prisma.usersScalarWhereInput[]
+  id?: Prisma.IntFilter<"users"> | number
+  mongo_id?: Prisma.StringNullableFilter<"users"> | string | null
+  name?: Prisma.StringFilter<"users"> | string
+  email?: Prisma.StringNullableFilter<"users"> | string | null
+  password?: Prisma.StringNullableFilter<"users"> | string | null
+  phone?: Prisma.StringNullableFilter<"users"> | string | null
+  gender?: Prisma.Enumgender_enumNullableFilter<"users"> | $Enums.gender_enum | null
+  is_email_verified?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  created_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  updated_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  secondary_phone?: Prisma.StringNullableFilter<"users"> | string | null
+  profile_pic_url?: Prisma.StringNullableFilter<"users"> | string | null
+  password_changed_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  confirmed?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  hasUsedPromoCode?: Prisma.BoolNullableFilter<"users"> | boolean | null
+  email_verified_at?: Prisma.DateTimeNullableFilter<"users"> | Date | string | null
+  role?: Prisma.Enumrole_enumNullableFilter<"users"> | $Enums.role_enum | null
+  created_by?: Prisma.IntNullableFilter<"users"> | number | null
 }
 
 export type usersCreateWithoutRefresh_tokensInput = {
@@ -1605,6 +2044,8 @@ export type usersCreateWithoutRefresh_tokensInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutRefresh_tokensInput = {
@@ -1626,6 +2067,7 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -1644,6 +2086,7 @@ export type usersUncheckedCreateWithoutRefresh_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutRefresh_tokensInput = {
@@ -1698,6 +2141,8 @@ export type usersUpdateWithoutRefresh_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
@@ -1719,6 +2164,7 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -1737,6 +2183,7 @@ export type usersUncheckedUpdateWithoutRefresh_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutAssistantsInput = {
@@ -1775,6 +2222,8 @@ export type usersCreateWithoutAssistantsInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutAssistantsInput = {
@@ -1796,6 +2245,7 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
   lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
@@ -1814,6 +2264,7 @@ export type usersUncheckedCreateWithoutAssistantsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutAssistantsInput = {
@@ -1868,6 +2319,8 @@ export type usersUpdateWithoutAssistantsInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutAssistantsInput = {
@@ -1889,6 +2342,7 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
   lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
@@ -1907,6 +2361,7 @@ export type usersUncheckedUpdateWithoutAssistantsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutLecturersInput = {
@@ -1945,6 +2400,8 @@ export type usersCreateWithoutLecturersInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutLecturersInput = {
@@ -1966,6 +2423,7 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -1984,6 +2442,7 @@ export type usersUncheckedCreateWithoutLecturersInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutLecturersInput = {
@@ -2038,6 +2497,8 @@ export type usersUpdateWithoutLecturersInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutLecturersInput = {
@@ -2059,6 +2520,7 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2077,6 +2539,7 @@ export type usersUncheckedUpdateWithoutLecturersInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutParentsInput = {
@@ -2115,6 +2578,8 @@ export type usersCreateWithoutParentsInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutParentsInput = {
@@ -2136,6 +2601,7 @@ export type usersUncheckedCreateWithoutParentsInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -2154,6 +2620,7 @@ export type usersUncheckedCreateWithoutParentsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutParentsInput = {
@@ -2208,6 +2675,8 @@ export type usersUpdateWithoutParentsInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutParentsInput = {
@@ -2229,6 +2698,7 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2247,6 +2717,7 @@ export type usersUncheckedUpdateWithoutParentsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutSocial_mediaInput = {
@@ -2285,6 +2756,8 @@ export type usersCreateWithoutSocial_mediaInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutSocial_mediaInput = {
@@ -2306,6 +2779,7 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -2324,6 +2798,7 @@ export type usersUncheckedCreateWithoutSocial_mediaInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutSocial_mediaInput = {
@@ -2378,6 +2853,8 @@ export type usersUpdateWithoutSocial_mediaInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutSocial_mediaInput = {
@@ -2399,6 +2876,7 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2417,6 +2895,7 @@ export type usersUncheckedUpdateWithoutSocial_mediaInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutStudentsInput = {
@@ -2455,6 +2934,8 @@ export type usersCreateWithoutStudentsInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutStudentsInput = {
@@ -2476,6 +2957,7 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -2494,6 +2976,7 @@ export type usersUncheckedCreateWithoutStudentsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutStudentsInput = {
@@ -2548,6 +3031,8 @@ export type usersUpdateWithoutStudentsInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutStudentsInput = {
@@ -2569,6 +3054,7 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2587,6 +3073,7 @@ export type usersUncheckedUpdateWithoutStudentsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutTeachersInput = {
@@ -2625,6 +3112,8 @@ export type usersCreateWithoutTeachersInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutTeachersInput = {
@@ -2646,6 +3135,7 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -2664,6 +3154,7 @@ export type usersUncheckedCreateWithoutTeachersInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutTeachersInput = {
@@ -2718,6 +3209,8 @@ export type usersUpdateWithoutTeachersInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeachersInput = {
@@ -2739,6 +3232,7 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2757,6 +3251,7 @@ export type usersUncheckedUpdateWithoutTeachersInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutTeaches_atInput = {
@@ -2795,6 +3290,8 @@ export type usersCreateWithoutTeaches_atInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutTeaches_atInput = {
@@ -2816,6 +3313,7 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -2834,6 +3332,7 @@ export type usersUncheckedCreateWithoutTeaches_atInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutTeaches_atInput = {
@@ -2888,6 +3387,8 @@ export type usersUpdateWithoutTeaches_atInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutTeaches_atInput = {
@@ -2909,6 +3410,7 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -2927,6 +3429,7 @@ export type usersUncheckedUpdateWithoutTeaches_atInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutEmail_verification_tokensInput = {
@@ -2965,6 +3468,8 @@ export type usersCreateWithoutEmail_verification_tokensInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
@@ -2986,6 +3491,7 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   lecturers?: Prisma.lecturersUncheckedCreateNestedOneWithoutUsersInput
@@ -3004,6 +3510,7 @@ export type usersUncheckedCreateWithoutEmail_verification_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutEmail_verification_tokensInput = {
@@ -3058,6 +3565,8 @@ export type usersUpdateWithoutEmail_verification_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
@@ -3079,6 +3588,7 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
@@ -3097,6 +3607,7 @@ export type usersUncheckedUpdateWithoutEmail_verification_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutPassword_reset_tokensInput = {
@@ -3135,6 +3646,8 @@ export type usersCreateWithoutPassword_reset_tokensInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
@@ -3156,6 +3669,7 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3174,6 +3688,7 @@ export type usersUncheckedCreateWithoutPassword_reset_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutPassword_reset_tokensInput = {
@@ -3228,6 +3743,8 @@ export type usersUpdateWithoutPassword_reset_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
@@ -3249,6 +3766,7 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -3267,6 +3785,7 @@ export type usersUncheckedUpdateWithoutPassword_reset_tokensInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutCoupon_usagesInput = {
@@ -3305,6 +3824,8 @@ export type usersCreateWithoutCoupon_usagesInput = {
   purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutCoupon_usagesInput = {
@@ -3326,6 +3847,7 @@ export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3344,6 +3866,7 @@ export type usersUncheckedCreateWithoutCoupon_usagesInput = {
   purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutCoupon_usagesInput = {
@@ -3398,6 +3921,8 @@ export type usersUpdateWithoutCoupon_usagesInput = {
   purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
@@ -3419,6 +3944,7 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -3437,6 +3963,7 @@ export type usersUncheckedUpdateWithoutCoupon_usagesInput = {
   purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutCartsInput = {
@@ -3475,6 +4002,8 @@ export type usersCreateWithoutCartsInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutCartsInput = {
@@ -3496,6 +4025,7 @@ export type usersUncheckedCreateWithoutCartsInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3514,6 +4044,7 @@ export type usersUncheckedCreateWithoutCartsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutCartsInput = {
@@ -3568,6 +4099,8 @@ export type usersUpdateWithoutCartsInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutCartsInput = {
@@ -3589,6 +4122,7 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -3607,6 +4141,7 @@ export type usersUncheckedUpdateWithoutCartsInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersCreateWithoutPurchasesInput = {
@@ -3645,6 +4180,8 @@ export type usersCreateWithoutPurchasesInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutPurchasesInput = {
@@ -3666,6 +4203,7 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3684,6 +4222,7 @@ export type usersUncheckedCreateWithoutPurchasesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutPurchasesInput = {
@@ -3727,6 +4266,8 @@ export type usersCreateWithoutPurchases_receivedInput = {
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_receivedInput = {
@@ -3748,6 +4289,7 @@ export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3766,6 +4308,7 @@ export type usersUncheckedCreateWithoutPurchases_receivedInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_receivedInput = {
@@ -3809,6 +4352,8 @@ export type usersCreateWithoutPurchases_confirmedInput = {
   purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
   purchases_returned?: Prisma.purchasesCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
@@ -3830,6 +4375,7 @@ export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3848,6 +4394,7 @@ export type usersUncheckedCreateWithoutPurchases_confirmedInput = {
   purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
   purchases_returned?: Prisma.purchasesUncheckedCreateNestedManyWithoutReturned_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_confirmedInput = {
@@ -3891,6 +4438,8 @@ export type usersCreateWithoutPurchases_returnedInput = {
   purchases_received?: Prisma.purchasesCreateNestedManyWithoutReceived_by_userInput
   purchases_confirmed?: Prisma.purchasesCreateNestedManyWithoutConfirmed_by_userInput
   coupon_usages?: Prisma.coupon_usagesCreateNestedManyWithoutUsersInput
+  creator_user?: Prisma.usersCreateNestedOneWithoutCreated_usersInput
+  created_users?: Prisma.usersCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersUncheckedCreateWithoutPurchases_returnedInput = {
@@ -3912,6 +4461,7 @@ export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   hasUsedPromoCode?: boolean | null
   email_verified_at?: Date | string | null
   role?: $Enums.role_enum | null
+  created_by?: number | null
   assistants?: Prisma.assistantsUncheckedCreateNestedManyWithoutUsersInput
   auth_identities?: Prisma.auth_identitiesUncheckedCreateNestedManyWithoutUsersInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedCreateNestedOneWithoutUsersInput
@@ -3930,6 +4480,7 @@ export type usersUncheckedCreateWithoutPurchases_returnedInput = {
   purchases_received?: Prisma.purchasesUncheckedCreateNestedManyWithoutReceived_by_userInput
   purchases_confirmed?: Prisma.purchasesUncheckedCreateNestedManyWithoutConfirmed_by_userInput
   coupon_usages?: Prisma.coupon_usagesUncheckedCreateNestedManyWithoutUsersInput
+  created_users?: Prisma.usersUncheckedCreateNestedManyWithoutCreator_userInput
 }
 
 export type usersCreateOrConnectWithoutPurchases_returnedInput = {
@@ -3984,6 +4535,8 @@ export type usersUpdateWithoutPurchasesInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchasesInput = {
@@ -4005,6 +4558,7 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -4023,6 +4577,7 @@ export type usersUncheckedUpdateWithoutPurchasesInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUpsertWithoutPurchases_receivedInput = {
@@ -4072,6 +4627,8 @@ export type usersUpdateWithoutPurchases_receivedInput = {
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
@@ -4093,6 +4650,7 @@ export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -4111,6 +4669,7 @@ export type usersUncheckedUpdateWithoutPurchases_receivedInput = {
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUpsertWithoutPurchases_confirmedInput = {
@@ -4160,6 +4719,8 @@ export type usersUpdateWithoutPurchases_confirmedInput = {
   purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
   purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
@@ -4181,6 +4742,7 @@ export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
   auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
   email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
@@ -4199,6 +4761,7 @@ export type usersUncheckedUpdateWithoutPurchases_confirmedInput = {
   purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
   purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUpsertWithoutPurchases_returnedInput = {
@@ -4248,9 +4811,113 @@ export type usersUpdateWithoutPurchases_returnedInput = {
   purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
   purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  creator_user?: Prisma.usersUpdateOneWithoutCreated_usersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
 }
 
 export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  created_by?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  assistants?: Prisma.assistantsUncheckedUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUncheckedUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUncheckedUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUncheckedUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUncheckedUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUncheckedUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUncheckedUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUncheckedUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUncheckedUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUncheckedUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUncheckedUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUncheckedUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUncheckedUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+}
+
+export type usersCreateManyCreator_userInput = {
+  id?: number
+  mongo_id?: string | null
+  name: string
+  email?: string | null
+  password?: string | null
+  phone?: string | null
+  gender?: $Enums.gender_enum | null
+  is_email_verified?: boolean | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  secondary_phone?: string | null
+  profile_pic_url?: string | null
+  password_changed_at?: Date | string | null
+  confirmed?: boolean | null
+  hasPromoCode?: boolean | null
+  hasUsedPromoCode?: boolean | null
+  email_verified_at?: Date | string | null
+  role?: $Enums.role_enum | null
+}
+
+export type usersUpdateWithoutCreator_userInput = {
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
+  assistants?: Prisma.assistantsUpdateManyWithoutUsersNestedInput
+  auth_identities?: Prisma.auth_identitiesUpdateManyWithoutUsersNestedInput
+  email_verification_tokens?: Prisma.email_verification_tokensUpdateOneWithoutUsersNestedInput
+  lecturers?: Prisma.lecturersUpdateOneWithoutUsersNestedInput
+  parents?: Prisma.parentsUpdateOneWithoutUsersNestedInput
+  password_reset_tokens?: Prisma.password_reset_tokensUpdateOneWithoutUsersNestedInput
+  refresh_tokens?: Prisma.refresh_tokensUpdateManyWithoutUsersNestedInput
+  social_media?: Prisma.social_mediaUpdateManyWithoutUsersNestedInput
+  students?: Prisma.studentsUpdateOneWithoutUsersNestedInput
+  teachers?: Prisma.teachersUpdateOneWithoutUsersNestedInput
+  teaches_at?: Prisma.teaches_atUpdateManyWithoutUsersNestedInput
+  user_analytics?: Prisma.user_analyticsUpdateOneWithoutUsersNestedInput
+  user_roles?: Prisma.user_rolesUpdateManyWithoutUsersNestedInput
+  carts?: Prisma.cartsUpdateManyWithoutUsersNestedInput
+  purchases?: Prisma.purchasesUpdateManyWithoutUsersNestedInput
+  purchases_received?: Prisma.purchasesUpdateManyWithoutReceived_by_userNestedInput
+  purchases_confirmed?: Prisma.purchasesUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUpdateManyWithoutReturned_by_userNestedInput
+  coupon_usages?: Prisma.coupon_usagesUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUpdateManyWithoutCreator_userNestedInput
+}
+
+export type usersUncheckedUpdateWithoutCreator_userInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4286,7 +4953,30 @@ export type usersUncheckedUpdateWithoutPurchases_returnedInput = {
   purchases?: Prisma.purchasesUncheckedUpdateManyWithoutUsersNestedInput
   purchases_received?: Prisma.purchasesUncheckedUpdateManyWithoutReceived_by_userNestedInput
   purchases_confirmed?: Prisma.purchasesUncheckedUpdateManyWithoutConfirmed_by_userNestedInput
+  purchases_returned?: Prisma.purchasesUncheckedUpdateManyWithoutReturned_by_userNestedInput
   coupon_usages?: Prisma.coupon_usagesUncheckedUpdateManyWithoutUsersNestedInput
+  created_users?: Prisma.usersUncheckedUpdateManyWithoutCreator_userNestedInput
+}
+
+export type usersUncheckedUpdateManyWithoutCreator_userInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumgender_enumFieldUpdateOperationsInput | $Enums.gender_enum | null
+  is_email_verified?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  secondary_phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profile_pic_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_changed_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmed?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  hasUsedPromoCode?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  email_verified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.NullableEnumrole_enumFieldUpdateOperationsInput | $Enums.role_enum | null
 }
 
 
@@ -4307,6 +4997,7 @@ export type UsersCountOutputType = {
   purchases_confirmed: number
   purchases_returned: number
   coupon_usages: number
+  created_users: number
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4322,6 +5013,7 @@ export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   purchases_confirmed?: boolean | UsersCountOutputTypeCountPurchases_confirmedArgs
   purchases_returned?: boolean | UsersCountOutputTypeCountPurchases_returnedArgs
   coupon_usages?: boolean | UsersCountOutputTypeCountCoupon_usagesArgs
+  created_users?: boolean | UsersCountOutputTypeCountCreated_usersArgs
 }
 
 /**
@@ -4418,6 +5110,13 @@ export type UsersCountOutputTypeCountCoupon_usagesArgs<ExtArgs extends runtime.T
   where?: Prisma.coupon_usagesWhereInput
 }
 
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountCreated_usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.usersWhereInput
+}
+
 
 export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4438,6 +5137,7 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   hasUsedPromoCode?: boolean
   email_verified_at?: boolean
   role?: boolean
+  created_by?: boolean
   assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
   email_verification_tokens?: boolean | Prisma.users$email_verification_tokensArgs<ExtArgs>
@@ -4457,6 +5157,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   purchases_confirmed?: boolean | Prisma.users$purchases_confirmedArgs<ExtArgs>
   purchases_returned?: boolean | Prisma.users$purchases_returnedArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.users$coupon_usagesArgs<ExtArgs>
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
+  created_users?: boolean | Prisma.users$created_usersArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
@@ -4479,6 +5181,8 @@ export type usersSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   hasUsedPromoCode?: boolean
   email_verified_at?: boolean
   role?: boolean
+  created_by?: boolean
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
 export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -4500,6 +5204,8 @@ export type usersSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   hasUsedPromoCode?: boolean
   email_verified_at?: boolean
   role?: boolean
+  created_by?: boolean
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
 }, ExtArgs["result"]["users"]>
 
 export type usersSelectScalar = {
@@ -4521,9 +5227,10 @@ export type usersSelectScalar = {
   hasUsedPromoCode?: boolean
   email_verified_at?: boolean
   role?: boolean
+  created_by?: boolean
 }
 
-export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role", ExtArgs["result"]["users"]>
+export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mongo_id" | "name" | "email" | "password" | "phone" | "gender" | "is_email_verified" | "created_at" | "updated_at" | "secondary_phone" | "profile_pic_url" | "password_changed_at" | "confirmed" | "hasPromoCode" | "hasUsedPromoCode" | "email_verified_at" | "role" | "created_by", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   assistants?: boolean | Prisma.users$assistantsArgs<ExtArgs>
   auth_identities?: boolean | Prisma.users$auth_identitiesArgs<ExtArgs>
@@ -4544,10 +5251,16 @@ export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   purchases_confirmed?: boolean | Prisma.users$purchases_confirmedArgs<ExtArgs>
   purchases_returned?: boolean | Prisma.users$purchases_returnedArgs<ExtArgs>
   coupon_usages?: boolean | Prisma.users$coupon_usagesArgs<ExtArgs>
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
+  created_users?: boolean | Prisma.users$created_usersArgs<ExtArgs>
   _count?: boolean | Prisma.UsersCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type usersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type usersIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
+}
+export type usersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  creator_user?: boolean | Prisma.users$creator_userArgs<ExtArgs>
+}
 
 export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "users"
@@ -4571,6 +5284,8 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     purchases_confirmed: Prisma.$purchasesPayload<ExtArgs>[]
     purchases_returned: Prisma.$purchasesPayload<ExtArgs>[]
     coupon_usages: Prisma.$coupon_usagesPayload<ExtArgs>[]
+    creator_user: Prisma.$usersPayload<ExtArgs> | null
+    created_users: Prisma.$usersPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -4591,6 +5306,7 @@ export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     hasUsedPromoCode: boolean | null
     email_verified_at: Date | null
     role: $Enums.role_enum | null
+    created_by: number | null
   }, ExtArgs["result"]["users"]>
   composites: {}
 }
@@ -5004,6 +5720,8 @@ export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Ty
   purchases_confirmed<T extends Prisma.users$purchases_confirmedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$purchases_confirmedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchases_returned<T extends Prisma.users$purchases_returnedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$purchases_returnedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchasesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coupon_usages<T extends Prisma.users$coupon_usagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$coupon_usagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$coupon_usagesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  creator_user<T extends Prisma.users$creator_userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$creator_userArgs<ExtArgs>>): Prisma.Prisma__usersClient<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  created_users<T extends Prisma.users$created_usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$created_usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$usersPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5051,6 +5769,7 @@ export interface usersFieldRefs {
   readonly hasUsedPromoCode: Prisma.FieldRef<"users", 'Boolean'>
   readonly email_verified_at: Prisma.FieldRef<"users", 'DateTime'>
   readonly role: Prisma.FieldRef<"users", 'role_enum'>
+  readonly created_by: Prisma.FieldRef<"users", 'Int'>
 }
     
 
@@ -5300,6 +6019,10 @@ export type usersCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    */
   data: Prisma.usersCreateManyInput | Prisma.usersCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -5370,6 +6093,10 @@ export type usersUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -5857,6 +6584,49 @@ export type users$coupon_usagesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
+}
+
+/**
+ * users.creator_user
+ */
+export type users$creator_userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
+}
+
+/**
+ * users.created_users
+ */
+export type users$created_usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the users
+   */
+  select?: Prisma.usersSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the users
+   */
+  omit?: Prisma.usersOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.usersInclude<ExtArgs> | null
+  where?: Prisma.usersWhereInput
+  orderBy?: Prisma.usersOrderByWithRelationInput | Prisma.usersOrderByWithRelationInput[]
+  cursor?: Prisma.usersWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UsersScalarFieldEnum | Prisma.UsersScalarFieldEnum[]
 }
 
 /**
