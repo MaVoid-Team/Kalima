@@ -25,12 +25,50 @@ import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 type CartItemWithRelations = Prisma.cart_itemsGetPayload<{
   include: { products: true; cart_item_required_fields: true };
 }>;
+const cartWithItemsQueryInclude = {
+  cart_items: {
+    select: {
+      id: true,
+      cart_id: true,
+      product_id: true,
+      coupon_id: true,
+      quantity: true,
+      price_at_add: true,
+      final_price: true,
+      discount: true,
+      required_fields_filled: true,
+      created_at: true,
+      updated_at: true,
+      products: {
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          price: true,
+          price_after_discount: true,
+          type: true,
+          serial: true,
+          thumbnail_image: {
+            select: {
+              url: true,
+            },
+          },
+        },
+      },
+      cart_item_required_fields: true,
+      coupons: {
+        select: {
+          code: true,
+          discount_amount: true,
+          discount_percentage: true,
+        },
+      },
+    },
+  },
+} satisfies Prisma.cartsInclude;
+
 type CartWithItems = Prisma.cartsGetPayload<{
-  include: {
-    cart_items: {
-      include: { products: true; cart_item_required_fields: true };
-    };
-  };
+  include: typeof cartWithItemsQueryInclude;
 }>;
 
 // FieldType enum (kept as literal union so we don't rely on generated enum export)
@@ -123,6 +161,7 @@ class CartService {
       data: {
         coupon_id: coupon.id,
         discount,
+        final_price: Number(cartItem.final_price) - discount,
       },
     });
 
@@ -156,26 +195,7 @@ class CartService {
 
     const cart = await this.db.carts.findFirst({
       where: { user_id, status: "active" },
-      include: {
-        cart_items: {
-          include: {
-            products: {
-              include: {
-                thumbnail_image: true,
-              },
-            },
-            cart_item_required_fields: true,
-            coupons: {
-              select: {
-                id: true,
-                code: true,
-                discount_amount: true,
-                discount_percentage: true,
-              },
-            },
-          },
-        },
-      },
+      include: cartWithItemsQueryInclude,
     });
     if (!cart) throw new NotFoundError("Active cart not found");
     const result = cart as CartWithItems;
@@ -225,7 +245,7 @@ class CartService {
           product_id: dto.product_id,
           quantity: dto.quantity,
           price_at_add: product.price,
-          final_price: product.price, // TODO: handle discounts if needed
+          final_price: Number(product.price) * dto.quantity, // TODO: handle discounts if needed
         },
       });
     }
