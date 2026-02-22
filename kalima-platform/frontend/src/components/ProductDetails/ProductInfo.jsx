@@ -20,12 +20,12 @@ export default function ProductInfo({ product }) {
         <CardContent className="p-4 pt-4">
           <div className="flex items-end gap-3 mb-2 flex-wrap">
             <span className="text-3xl font-black">
-              {t("info.currency")} {formatPrice(product.price)}
+              {formatPrice(product.price)} {t("info.currency")}
             </span>
             {product.originalPrice && (
               <>
                 <span className="text-lg text-muted-foreground line-through mb-1">
-                  {t("info.currency")} {formatPrice(product.originalPrice)}
+                  {formatPrice(product.originalPrice)} {t("info.currency")}
                 </span>
                 {product.discount && (
                   <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded-full mb-1">

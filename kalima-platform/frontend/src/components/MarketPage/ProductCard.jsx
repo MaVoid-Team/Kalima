@@ -39,11 +39,11 @@ const ProductCard = ({ id, title, category, price, originalPrice, image }) => {
           <p className="text-sm text-muted-foreground w-full truncate">{category}</p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <span className="text-base font-semibold">
-              {t("product.currency")} {formatPrice(price)}
+              {formatPrice(price)} {t("product.currency")}
             </span>
             {originalPrice != null && (
               <span className="text-sm text-muted-foreground line-through">
-                {t("product.currency")} {formatPrice(originalPrice)}
+                {formatPrice(originalPrice)} {t("product.currency")}
               </span>
             )}
           </div>

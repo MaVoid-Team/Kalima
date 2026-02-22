@@ -29,7 +29,7 @@ export default function ProductActions({ price, productId }) {
           <span className="text-xs text-muted-foreground">
             {t("info.totalPrice")}
           </span>
-          <span className="text-xl font-black">{t("info.currency")} {formattedPrice}</span>
+          <span className="text-xl font-black">{formattedPrice} {t("info.currency")}</span>
         </div>
         <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg">
           <ShoppingCart className="h-5 w-5" />
