@@ -3,15 +3,16 @@ import { Minus, Plus, ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { formatPrice } from "@/lib/storeUtils";
+import { formatPrice, getImageUrl } from "@/lib/storeUtils";
 
 /**
  * ProductActions
  * Props:
  *   - price: number
  *   - productId: string | number   (passed in for future cart integration)
+ *   - sampleUrl: string | null
  */
-export default function ProductActions({ price, productId }) {
+export default function ProductActions({ price, productId, sampleUrl }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -75,20 +76,13 @@ export default function ProductActions({ price, productId }) {
           <Button variant="secondary" className="text-sm flex-1" size="lg">
             {t("actions.buyNow")}
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setIsFavorite(!isFavorite)}
-            className={
-              isFavorite
-                ? "text-destructive border-destructive hover:text-destructive"
-                : "text-muted-foreground hover:text-destructive hover:border-destructive"
-            }
-          >
-            <Heart
-              className={`h-5 w-5 transition-all ${isFavorite ? "fill-current" : ""}`}
-            />
-          </Button>
+          {sampleUrl && (
+            <Button variant="outline" className="text-sm flex-1" size="lg" asChild>
+              <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                View Sample
+              </a>
+            </Button>
+          )}
         </div>
       </div>
     </div>
