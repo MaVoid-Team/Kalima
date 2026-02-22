@@ -458,8 +458,17 @@ Processes the cart checkout: validates items & required fields, uploads payment 
         {
           "id": 30,
           "product_id": 10,
-          "price_at_purchase": "250.00",
-          "discount": "25.00",
+          "price_at_purchase": "125.00",
+          "discount": "12.50",
+          "purchase_item_required_fields": [
+            { "field_definition_id": 7, "value": "Mohamed Ali" }
+          ]
+        },
+        {
+          "id": 31,
+          "product_id": 10,
+          "price_at_purchase": "125.00",
+          "discount": "12.50",
           "purchase_item_required_fields": [
             { "field_definition_id": 7, "value": "Mohamed Ali" }
           ]

@@ -126,20 +126,8 @@ class CartService {
       },
     });
 
-    // Update cart totals after applying coupon
-    // Re-fetch all cart items for this cart (excluding deleted)
-    const updatedCartItems = await this.db.cart_items.findMany({
-      where: { cart_id: cart.id, deleted_at: null },
-    });
-    const subtotal = this.#calculateSubtotal(updatedCartItems);
-    const discountTotal = this.#calculateDiscount(updatedCartItems);
-    const total = this.#calculateTotal(subtotal, discountTotal);
-    await this.db.carts.update({
-      where: { id: cart.id },
-      data: { subtotal, discount: discountTotal, total },
-    });
-
     await invalidateCartCache(user_id);
+    await this.#recalculateAndSaveCart(cart.id);
     return { success: true };
   }
   constructor(private db: PrismaClient = prisma) {}
@@ -265,6 +253,8 @@ class CartService {
         });
       }
     }
+    
+    await this.#recalculateAndSaveCart(cart.id);
     await invalidateCartCache(user_id);
     return cartItem;
   }
@@ -284,17 +274,7 @@ class CartService {
     await this.db.cart_items.delete({ where: { id: cart_item_id } });
 
     // Recalculate cart totals and persist
-    const updatedCartItems = await this.db.cart_items.findMany({
-      where: { cart_id: cart.id, deleted_at: null },
-    });
-    const subtotal = this.#calculateSubtotal(updatedCartItems);
-    const discountTotal = this.#calculateDiscount(updatedCartItems);
-    const total = this.#calculateTotal(subtotal, discountTotal);
-    await this.db.carts.update({
-      where: { id: cart.id },
-      data: { subtotal, discount: discountTotal, total },
-    });
-
+    await this.#recalculateAndSaveCart(cart.id);
     await invalidateCartCache(user_id);
     return { success: true };
   }
@@ -315,17 +295,7 @@ class CartService {
       data: { coupon_id: null, discount: 0 },
     });
 
-    const updatedCartItems = await this.db.cart_items.findMany({
-      where: { cart_id: cart.id, deleted_at: null },
-    });
-    const subtotal = this.#calculateSubtotal(updatedCartItems);
-    const discountTotal = this.#calculateDiscount(updatedCartItems);
-    const total = this.#calculateTotal(subtotal, discountTotal);
-    await this.db.carts.update({
-      where: { id: cart.id },
-      data: { subtotal, discount: discountTotal, total },
-    });
-
+    await this.#recalculateAndSaveCart(cart.id);
     await invalidateCartCache(user_id);
     return { success: true };
   }
@@ -345,6 +315,22 @@ class CartService {
       where: { id: dto.cart_item_id },
       data: { quantity: dto.quantity },
     });
+    
+    // Specifically recalculate discount for this item if it has a percentage coupon
+    if (updated.coupon_id) {
+       const coupon = await this.db.coupons.findUnique({ where: { id: updated.coupon_id }});
+       if (coupon && coupon.discount_percentage && coupon.discount_percentage > 0) {
+           const newDiscount = Math.floor(
+             Number(updated.price_at_add) * updated.quantity * (coupon.discount_percentage / 100)
+           );
+           await this.db.cart_items.update({
+               where: { id: updated.id },
+               data: { discount: newDiscount }
+           });
+       }
+    }
+
+    await this.#recalculateAndSaveCart(cart.id);
     await invalidateCartCache(user_id);
     return updated;
   }
@@ -427,19 +413,31 @@ class CartService {
     });
 
     // 5. Assemble purchase payload (typed)
+    // Here we split the cart items into `quantity` purchase items
+    const flattenedItems: CreatePurchaseDto["items"] = [];
+    for (const item of cart.cart_items) {
+      const unitPrice = Number(item.price_at_add);
+      const unitDiscount = Number(item.discount || 0) / item.quantity;
+      const required_fields = (item.cart_item_required_fields || []).map((rf) => ({
+        field_definition_id: rf.field_definition_id,
+        value: rf.value,
+      }));
+
+      for (let i = 0; i < item.quantity; i++) {
+        flattenedItems.push({
+          product_id: item.product_id,
+          price_at_purchase: unitPrice,
+          discount: unitDiscount,
+          required_fields,
+        });
+      }
+    }
+
     const purchaseInput: CreatePurchaseDto = {
       user_id,
       payment_method_id: dto.payment_method_id,
       payment_screenshot_id,
-      items: cart.cart_items.map((item) => ({
-        product_id: item.product_id,
-        price_at_purchase: Number(item.price_at_add) * item.quantity,
-        discount: Number(item.discount || 0),
-        required_fields: (item.cart_item_required_fields || []).map((rf) => ({
-          field_definition_id: rf.field_definition_id,
-          value: rf.value,
-        })),
-      })),
+      items: flattenedItems,
       subtotal,
       discount,
       total,
@@ -548,6 +546,40 @@ class CartService {
 
   #calculateItemCount(cartItems: CalcCartItem[]): number {
     return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  async #recalculateAndSaveCart(cart_id: number): Promise<void> {
+    const updatedCartItems = await this.db.cart_items.findMany({
+      where: { cart_id, deleted_at: null },
+    });
+    
+    // Also recalculate coupons on incremental add
+    for (const item of updatedCartItems) {
+       if (item.coupon_id) {
+           const coupon = await this.db.coupons.findUnique({ where: { id: item.coupon_id } });
+           if (coupon && coupon.discount_percentage && coupon.discount_percentage > 0) {
+               const expectedDiscount = Math.floor(
+                 Number(item.price_at_add) * item.quantity * (coupon.discount_percentage / 100)
+               );
+               if (expectedDiscount !== Number(item.discount || 0)) {
+                  await this.db.cart_items.update({
+                      where: { id: item.id },
+                      data: { discount: expectedDiscount }
+                  });
+                  item.discount = expectedDiscount as any;
+               }
+           }
+       }
+    }
+
+    const subtotal = this.#calculateSubtotal(updatedCartItems);
+    const discount = this.#calculateDiscount(updatedCartItems);
+    const total = this.#calculateTotal(subtotal, discount);
+
+    await this.db.carts.update({
+      where: { id: cart_id },
+      data: { subtotal, discount, total },
+    });
   }
 
   // ============================================
