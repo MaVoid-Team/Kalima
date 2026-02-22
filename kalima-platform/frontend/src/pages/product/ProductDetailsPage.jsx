@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Loader2,
@@ -18,64 +17,13 @@ import ImageGallery from "@/components/ProductDetails/ImageGallery";
 import ProductInfo from "@/components/ProductDetails/ProductInfo";
 import ProductActions from "@/components/ProductDetails/ProductActions";
 
-import axios from "@/api/axios";
-import { buildProductImages } from "@/lib/storeUtils";
-
-
+import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const { t } = useTranslation("product");
 
-  const [product, setProduct] = useState(null);
-  const [images, setImages] = useState({ main: null, thumbnails: [] });
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-
-
-
-  useEffect(() => {
-    if (!id) return;
-
-    let cancelled = false;
-    setLoading(true);
-    setNotFound(false);
-    setProduct(null);
-    setImages({ main: null, thumbnails: [] });
-
-    // Concurrent fetch: product details + gallery
-    Promise.all([
-      axios.get(`/products/${id}`),
-      axios.get(`/products/${id}/gallery`).catch(() => ({ data: [] })),
-    ])
-      .then(([productRes, galleryRes]) => {
-        if (cancelled) return;
-
-        const rawProduct =
-          productRes.data?.data ?? productRes.data;
-        const rawGallery = Array.isArray(galleryRes.data?.data)
-          ? galleryRes.data.data
-          : Array.isArray(galleryRes.data)
-            ? galleryRes.data
-            : [];
-
-        setProduct(rawProduct);
-        setImages(buildProductImages(rawProduct, rawGallery));
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        if (err?.response?.status === 404) {
-          setNotFound(true);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
+  const { product: productProps, images, loading, notFound } = useProducts(id);
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (loading) {
@@ -90,7 +38,7 @@ export default function ProductDetailsPage() {
   }
 
   // ── Not found / error ────────────────────────────────────────────────────
-  if (notFound || !product) {
+  if (notFound || !productProps) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center px-4">
@@ -106,19 +54,6 @@ export default function ProductDetailsPage() {
       </div>
     );
   }
-
-  // ── Map API fields to component props ────────────────────────────────────
-  const productProps = {
-    id: product.id,
-    title: product.title ?? product.name ?? "",
-    category: product.product_categories?.[0]?.categories?.title ?? product.category?.name ?? product.category_name ?? "",
-    price: product.price_after_discount ?? product.price ?? 0,
-    originalPrice: product.price_after_discount ? product.price : null,
-    discount: product.price_after_discount
-      ? Math.round(((product.price - product.price_after_discount) / product.price) * 100)
-      : null,
-    description: product.description ?? "",
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -177,8 +112,9 @@ export default function ProductDetailsPage() {
               <ProductInfo product={productProps} />
 
               <ProductActions
-                price={productProps.price}
+                price={productProps.price_after_discount || productProps.price}
                 productId={productProps.id}
+                sampleUrl={productProps.sample_url}
               />
 
               {/* Description Text */}
@@ -196,3 +132,4 @@ export default function ProductDetailsPage() {
     </div>
   );
 }
+

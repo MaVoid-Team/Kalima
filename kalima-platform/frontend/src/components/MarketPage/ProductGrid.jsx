@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, PackageOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { cn } from "@/lib/utils";
+import { formatPrice, getImageUrl } from "@/lib/storeUtils";
 import { motion } from "framer-motion";
 
 /**
@@ -69,17 +70,26 @@ export default function ProductGrid({
                 animate="show"
                 className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-12"
             >
-                {products.map((product) => (
-                    <motion.div
-                        key={product.id}
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 200, damping: 20 } },
-                        }}
-                    >
-                        <ProductCard {...product} />
-                    </motion.div>
-                ))}
+                {products.map((product) => {
+                    const mappedProduct = {
+                        ...product,
+                        category: product.product_categories?.[0]?.categories?.title || product.category,
+                        image: getImageUrl(product.thumbnail_image?.url) || product.image,
+                        originalPrice: product.price_after_discount ? product.price : product.originalPrice,
+                        price: product.price_after_discount || product.price,
+                    };
+                    return (
+                        <motion.div
+                            key={product.id}
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 200, damping: 20 } },
+                            }}
+                        >
+                            <ProductCard {...mappedProduct} />
+                        </motion.div>
+                    );
+                })}
             </motion.div>
 
             {/* Pagination */}
