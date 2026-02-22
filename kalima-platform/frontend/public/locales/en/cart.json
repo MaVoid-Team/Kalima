@@ -3,11 +3,6 @@
   "continueShopping": "Continue Shopping",
   "goShopping": "Go Shopping",
   "itemsInCart": "You have {{count}} items in your cart ready for checkout.",
-  "header": {
-    "product": "Product",
-    "quantity": "Quantity",
-    "total": "Total"
-  },
   "orderSummary": "Order Summary",
   "subtotal": "Subtotal",
   "shippingEstimate": "Shipping Estimate",
@@ -15,7 +10,7 @@
   "total": "Total",
   "promoLabel": "Promo Code",
   "promoPlaceholder": "Enter code",
-  "apply": "Apply",
+  "applyCoupon": "Apply Coupon",
   "proceedToCheckout": "Proceed to Checkout",
   "secureCheckout": "Secure SSL Encrypted Checkout",
   "needHelp": "Need help?",
@@ -51,6 +46,23 @@
   "removeItem": "Remove item",
   "increaseQuantity": "Increase quantity",
   "decreaseQuantity": "Decrease quantity",
+  "discount": "Discount",
+  "applied": "Applied",
+  "remove": "Remove",
+  "enterCode": "Enter code",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "confirmDeleteTitle": "Delete item",
+  "confirmDeleteDesc": "Are you sure you want to remove this item from your cart? This action cannot be undone.",
+  "header": {
+    "product": "Product",
+    "quantity": "Quantity",
+    "total": "Total",
+    "coupon": "Coupon",
+    "remove": "Remove"
+  },
+  "applyCouponTitle": "Enter coupon code",
+  "applyCouponDesc": "Type your promo code and hit apply.",
 
   "productTypes": {
     "physical": "Physical Item",

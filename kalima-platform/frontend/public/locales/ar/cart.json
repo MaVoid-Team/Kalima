@@ -3,11 +3,6 @@
   "continueShopping": "مواصلة التسوق",
   "goShopping": "اذهب للتسوق",
   "itemsInCart": "لديك {{count}} عنصر في سلة التسوق جاهز للدفع.",
-  "header": {
-    "product": "المنتج",
-    "quantity": "الكمية",
-    "total": "الإجمالي"
-  },
   "orderSummary": "ملخص الطلب",
   "subtotal": "المجموع الفرعي",
   "shippingEstimate": "تقدير الشحن",
@@ -15,7 +10,7 @@
   "total": "الإجمالي",
   "promoLabel": "رمز العرض",
   "promoPlaceholder": "أدخل الرمز",
-  "apply": "تطبيق",
+  "applyCoupon": " تطبيق القسيمة",
   "proceedToCheckout": "المتابعة إلى الدفع",
   "secureCheckout": "دفع مشفر SSL آمن",
   "needHelp": "تحتاج مساعدة؟",
@@ -51,6 +46,23 @@
   "removeItem": "إزالة العنصر",
   "increaseQuantity": "زيادة الكمية",
   "decreaseQuantity": "نقص الكمية",
+  "discount": "الخصم",
+  "applied": "تم التطبيق",
+  "remove": "إزالة",
+  "enterCode": "أدخل الرمز",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "confirmDeleteTitle": "حذف العنصر",
+  "confirmDeleteDesc": "هل أنت متأكد أنك تريد إزالة هذا العنصر من سلة التسوق؟ هذا الإجراء لا يمكن التراجع عنه.",
+  "header": {
+    "product": "المنتج",
+    "quantity": "الكمية",
+    "total": "الإجمالي",
+    "coupon": "قسيمة",
+    "remove": "إزالة"
+  },
+  "applyCouponTitle": "أدخل رمز القسيمة",
+  "applyCouponDesc": "اكتب رمز الخصم الخاص بك ثم اضغط تطبيق.",
 
   "productTypes": {
     "physical": "عنصر مادي",

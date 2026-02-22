@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,98 +15,21 @@ import {
 import logo from "../assets/Logo.png";
 import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
+import useCart from "../hooks/cart/useCart";
+import { is } from "zod/v4/locales";
 
 export default function Navbar() {
-  const [cartItems] = useState([
-    {
-      id: 'item-1',
-      name: 'Algebra Basics Booklet',
-      description: 'A beginner-friendly algebra booklet.',
-      price: 9.99,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Algebra'
-    },
-    {
-      id: 'item-2',
-      name: 'English Grammar Guide',
-      description: 'Concise grammar rules and exercises.',
-      price: 7.5,
-      quantity: 2,
-      image: 'https://via.placeholder.com/150?text=Grammar'
-    },
-    {
-      id: 'item-3',
-      name: 'Physics Problem Sets',
-      description: 'Challenging problems with solutions.',
-      price: 12.0,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Physics'
-    },
-    {
-      id: 'item-4',
-      name: 'Chemistry Lab Notes',
-      description: 'Key lab techniques and safety tips.',
-      price: 8.25,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Chemistry'
-    },
-    {
-      id: 'item-5',
-      name: 'World History Timeline',
-      description: 'Important events summarized.',
-      price: 5.99,
-      quantity: 3,
-      image: 'https://via.placeholder.com/150?text=History'
-    },
-    {
-      id: 'item-6',
-      name: 'Biology Illustrated',
-      description: 'Visual guide to biological concepts.',
-      price: 11.5,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Biology'
-    },
-    {
-      id: 'item-7',
-      name: 'Geography Maps Pack',
-      description: 'High-quality printable maps.',
-      price: 6.0,
-      quantity: 2,
-      image: 'https://via.placeholder.com/150?text=Maps'
-    },
-    {
-      id: 'item-8',
-      name: 'Arabic Reading Set',
-      description: 'Beginner reading exercises in Arabic.',
-      price: 9.0,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Arabic'
-    },
-    {
-      id: 'item-9',
-      name: 'Programming Fundamentals',
-      description: 'Intro to coding concepts and exercises.',
-      price: 14.99,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Code'
-    },
-    {
-      id: 'item-10',
-      name: 'Exam Prep Pack',
-      description: 'Practice tests and solutions.',
-      price: 19.99,
-      quantity: 1,
-      image: 'https://via.placeholder.com/150?text=Exam+Prep'
-    }
-  ]);
-
+  const [cart, setCart] = useState({ cart_items: [], subtotal: 0, discount: 0, total: 0 });
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
+  const { getCart, getProductThumbnail, loading } = useCart();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("landing");
-
+  const didFetchCart = useRef(false);
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  
   useEffect(() => {
     const down = (e) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -119,19 +42,55 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  // fetching cart items
+  useEffect(() => {
+    if (!isAuthenticated) {
+      // reset flag when logging out so that a new login will refetch
+      didFetchCart.current = false;
+      return;
+    }
+
+    if (didFetchCart.current) return; // avoid duplicate calls (React strict mode, re-renders, etc.)
+    didFetchCart.current = true;
+
+    fetchCart();
+  }, [isAuthenticated]);
+
+    const fetchCart = async () => {
+      try {
+        const response = await getCart();
+        console.log("Fetched cart items:", response);
+        setCart(response);
+      } catch (error) {
+        console.error("Failed to fetch cart items:", error);
+      }
+    };
+
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
     i18n.changeLanguage(newLang);
   };
 
   const toggleCartModal = () => {
+    if (!isCartModalOpen) fetchCart(); 
     setIsCartModalOpen(!isCartModalOpen);
     setIsMenuOpen(false);
   };
 
   const handleViewFullCart = () => {
     setIsCartModalOpen(false);
-    navigate("/cart", { state: { cart: cartItems } }); // Pass cart items to the cart page
+    navigate("/cart"); // Pass cart items to the cart page
+  };
+
+  const onGetProductThumbnail = async (productId) => {
+    if (productId == null) return "https://via.placeholder.com/150";
+    try {
+      const thumbnailUrl = await getProductThumbnail(productId);
+      return baseURL.split('api/v2')[0] + thumbnailUrl?.url;
+    } catch (error) {
+      console.error("Failed to get product thumbnail:", error);
+      return "https://via.placeholder.com/150"; // fallback thumbnail
+    }
   };
 
   const runCommand = (command) => {
@@ -205,7 +164,7 @@ export default function Navbar() {
               </Button>
 
               {/* Cart Button Desktop */}
-              <Button
+              {isAuthenticated && <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleCartModal}
@@ -214,9 +173,9 @@ export default function Navbar() {
               >
                 <ShoppingCart className="h-5 w-5" />
                 <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                  {cartItems.length}
+                  {loading ? "..." : cart.cart_items.length}
                 </span>
-              </Button>
+              </Button>}
 
               {isAuthenticated ? (
                 <>
@@ -279,7 +238,7 @@ export default function Navbar() {
 
             {/* Cart Button */}
             {/* Note that this button will take the place of login/signup buttons after logging in */}
-            <Button
+            {isAuthenticated && <Button
               variant="ghost"
               size="icon"
               onClick={toggleCartModal}
@@ -288,9 +247,9 @@ export default function Navbar() {
             >
               <ShoppingCart className="h-5 w-5" />
               <span className={`absolute -top-2 ${i18n.language === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center z-10`}>
-                {cartItems.length}
+                {cart.cart_items.length}
               </span>
-            </Button>
+            </Button>}
 
             <Button
               variant="ghost"
@@ -395,8 +354,9 @@ export default function Navbar() {
         <CartPreview
           open={isCartModalOpen}
           onOpenChange={setIsCartModalOpen}
-          cartItems={cartItems}
+          cart={cart}
           onViewFullCart={handleViewFullCart}
+          getProductThumbnail={onGetProductThumbnail}
         />
       </header>
 
