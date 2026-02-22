@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 
 export default function ImageGallery({ images, badge }) {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("product");
   const [mainApi, setMainApi] = useState(null);
   const [thumbApi, setThumbApi] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -48,12 +48,22 @@ export default function ImageGallery({ images, badge }) {
     [mainApi],
   );
 
-  if (!imagesList.length) return null;
+  const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+  if (!imagesList.length) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
+          <img src={fallbackImage} alt="No image available" className="w-full h-full object-cover opacity-50" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
       {/* Main Slider */}
-      <div className="relative w-full aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden bg-muted group">
+      <div className="relative w-full aspect-square md:aspect-4/3 rounded-2xl overflow-hidden bg-muted group">
         <Carousel
           setApi={setMainApi}
           opts={{
@@ -69,6 +79,10 @@ export default function ImageGallery({ images, badge }) {
                   src={img}
                   alt={`${t("info.view")} ${index + 1}`}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = fallbackImage;
+                  }}
                 />
               </CarouselItem>
             ))}
@@ -136,6 +150,10 @@ export default function ImageGallery({ images, badge }) {
                       src={thumb}
                       alt={`${t("info.thumbnail")} ${index + 1}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = fallbackImage;
+                      }}
                     />
                   </div>
                 </CarouselItem>

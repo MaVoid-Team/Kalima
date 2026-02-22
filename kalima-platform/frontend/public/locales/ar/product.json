@@ -4,6 +4,8 @@
     "digitalProducts": "المنتجات الرقمية",
     "scienceKits": "مجموعات العلوم"
   },
+  "loading": "جارٍ تحميل المنتج...",
+  "notFound": "المنتج غير موجود.",
   "variants": {
     "format": "الشكل",
     "kitAccentColor": "لون المجموعة"
@@ -27,7 +29,8 @@
     "view": "عرض المنتج",
     "thumbnail": "صورة مصغرة",
     "reviews": "مراجعات",
-    "createdBy": "تم إنشاؤه بواسطة"
+    "createdBy": "تم إنشاؤه بواسطة",
+    "currency": "ج"
   },
   "trustSignals": {
     "secureTransaction": "معاملة آمنة",
@@ -87,7 +90,6 @@
     "bestSeller": "الأكثر مبيعاً",
     "interactive": "تفاعلي"
   },
-
   "booklet": {
     "selectFormat": "اختر الصيغة",
     "aboutResource": "حول هذا المورد",
