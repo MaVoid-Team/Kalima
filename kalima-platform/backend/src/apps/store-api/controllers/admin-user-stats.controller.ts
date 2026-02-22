@@ -30,7 +30,7 @@ export const adminUserStatsController = {
       });
 
       // Fetch the details of the creator users
-      const creatorIds = [...new Set(stats.map(s => s.created_by).filter(id => id !== null))] as number[];
+      const creatorIds = Array.from(new Set(stats.map(s => s.created_by).filter(id => id !== null))) as number[];
       
       const creators = await prisma.users.findMany({
         where: { id: { in: creatorIds } },

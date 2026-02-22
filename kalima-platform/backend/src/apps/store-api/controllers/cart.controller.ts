@@ -127,13 +127,12 @@ export const cartController = {
   async getCheckoutPreview(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req.user as any).userId;
-      const cart = await cartService.getActiveCartByUser(userId);
-      const hasBooks = cart.cart_items.some((i: any) => i.products?.type === "Book");
-      const requiredFields = {
-        common: ["numberTransferredFrom", "paymentScreenShot"],
-        books: hasBooks ? ["nameOnBook", "numberOnBook", "seriesName"] : [],
-      };
-      res.status(200).json({ success: true, data: { hasBooks, requiredFields } });
+      const previewData = await cartService.getCheckoutPreview(userId);
+
+      res.status(200).json({ 
+        success: true, 
+        data: previewData,
+      });
     } catch (err) {
       next(err);
     }

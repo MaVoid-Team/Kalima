@@ -258,8 +258,10 @@ class CouponService {
     user_id: number,
     coupon_id: number,
     purchase_id?: number,
+    tx?: PrismaClient,
   ): Promise<void> {
-    await this.db.coupon_usages.create({
+    const db = tx || this.db;
+    await db.coupon_usages.create({
       data: {
         user_id,
         coupon_id,

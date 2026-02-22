@@ -346,26 +346,28 @@ class CartService {
   }
 
   // ============================================
-  // CHECKOUT
+  // CHECKOUT PREVIEW
   // ============================================
-  async checkout(
-    user_id: number,
-    dto: CheckoutDto,
-    payment_screenshot_file: Express.Multer.File,
-  ) {
-    // 1. Validate cart
+  async getCheckoutPreview(user_id: number) {
     const cart = await this.getActiveCartByUser(user_id);
-    if (!cart.cart_items.length) {
-      throw new BadRequestError("Cart is empty");
-    }
+    const hasBooks = cart.cart_items.some(
+      (i: any) => i.products?.type === "Book",
+    );
 
-    // 2. Validate required fields (payment, etc.)
-    // For each cart item, ensure all required fields for the product are filled
+    const itemsMissingFields: Array<{
+      cart_item_id: number;
+      product_id: number;
+      product_name: string;
+      missing_fields: Array<{ id: number; label: string; field_type: string }>;
+    }> = [];
+
     for (const item of cart.cart_items) {
+      // Find required fields for this product
       const requiredFields = await this.db.product_required_fields.findMany({
         where: { product_id: item.product_id, is_required: true, active: true },
-        select: { field_definition_id: true },
+        include: { required_field_definitions: true },
       });
+
       if (requiredFields.length > 0) {
         const filledFields = await this.db.cart_item_required_fields.findMany({
           where: { cart_item_id: item.id },
@@ -374,17 +376,61 @@ class CartService {
         const filledSet = new Set(
           filledFields.map((f) => f.field_definition_id),
         );
+
         const missing = requiredFields.filter(
           (rf) => !filledSet.has(rf.field_definition_id),
         );
+
         if (missing.length > 0) {
-          throw new BadRequestError(
-            `Cart item for product ${item.product_id} is missing required fields: ` +
-              missing.map((m) => m.field_definition_id).join(", "),
-          );
+          itemsMissingFields.push({
+            cart_item_id: item.id,
+            product_id: item.product_id,
+            product_name: (item.products as any)?.name,
+            missing_fields: missing.map((m) => ({
+              id: m.required_field_definitions?.id as number,
+              label: m.required_field_definitions?.label as string,
+              field_type: m.required_field_definitions?.field_type as string,
+            })),
+          });
         }
       }
     }
+
+    return {
+      hasBooks,
+      requiredFields: {
+        common: ["numberTransferredFrom", "paymentScreenShot"],
+        itemsMissingFields,
+      },
+      isCheckoutReady: itemsMissingFields.length === 0,
+    };
+  }
+
+  // ============================================
+  // CHECKOUT
+  // ============================================
+  async checkout(
+    user_id: number,
+    dto: CheckoutDto,
+    payment_screenshot_file: Express.Multer.File,
+  ) {
+    // 1. Validate cart and required fields via unified preview logic
+    const preview = await this.getCheckoutPreview(user_id);
+    
+    // Check if the cart is ready internally (item-specific missing fields)
+    if (!preview.isCheckoutReady) {
+      throw new BadRequestError(
+        "Cart is missing required fields for some items. Please complete all required item fields before checkout."
+      );
+    }
+
+    const cart = await this.getActiveCartByUser(user_id);
+    if (!cart.cart_items.length) {
+      throw new BadRequestError("Cart is empty");
+    }
+
+    // Common fields validation is mostly handled by DTO + earlier controller checks,
+    // but the payment specific fields are handled down below.
 
     // 3. Calculate totals (subtotal, discount, total, item count)
     const subtotal = this.#calculateSubtotal(cart.cart_items);
@@ -472,6 +518,7 @@ class CartService {
             user_id,
             couponId,
             createdPurchase ? (createdPurchase as any).id : undefined,
+            tx as unknown as PrismaClient,
           );
         }
       }

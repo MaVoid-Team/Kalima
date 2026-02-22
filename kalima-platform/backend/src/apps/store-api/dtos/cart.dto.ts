@@ -8,6 +8,7 @@ import {
   ValidateNested,
   Min,
   MaxLength,
+  IsNotEmpty,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -60,27 +61,24 @@ export class UpdateCartItemDto {
 export class CheckoutDto {
   @IsInt()
   @IsPositive()
-  user_id: number;
-
-  @IsInt()
-  @IsPositive()
+  @Type(() => Number)
   payment_method_id: number;
 
-  @IsOptional()
   @IsString()
-  numberTransferredFrom?: string;
+  @IsNotEmpty()
+  numberTransferredFrom: string;
 
-  @IsOptional()
-  @IsString()
-  nameOnBook?: string;
+  // @IsOptional()
+  // @IsString()
+  // nameOnBook?: string;
 
-  @IsOptional()
-  @IsString()
-  numberOnBook?: string;
+  // @IsOptional()
+  // @IsString()
+  // numberOnBook?: string;
 
-  @IsOptional()
-  @IsString()
-  seriesName?: string;
+  // @IsOptional()
+  // @IsString()
+  // seriesName?: string;
 
   @IsOptional()
   @IsString()
