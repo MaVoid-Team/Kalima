@@ -382,7 +382,7 @@ Updates the required field values for a cart item. Supports an image upload for 
 
 ### Get Checkout Preview
 
-Returns checkout requirements based on the cart contents (e.g., whether books require extra fields).
+Returns checkout requirements based on the cart contents. It checks all items against the database to determine which exact products are missing which specific required fields. Returns an `isCheckoutReady` boolean that must be true to proceed to checkout.
 
 **Endpoint:** `GET /checkout/preview`  
 **Auth Required:** Yes
@@ -395,9 +395,26 @@ Returns checkout requirements based on the cart contents (e.g., whether books re
   "data": {
     "hasBooks": true,
     "requiredFields": {
-      "common": ["numberTransferredFrom", "paymentScreenShot"],
-      "books": ["nameOnBook", "numberOnBook", "seriesName"]
-    }
+      "common": [
+        "numberTransferredFrom",
+        "paymentScreenShot"
+      ],
+      "itemsMissingFields": [
+        {
+          "cart_item_id": 35,
+          "product_id": 10,
+          "product_name": "Algebra Book",
+          "missing_fields": [
+            {
+              "id": 7,
+              "label": "nameOnBook",
+              "field_type": "text"
+            }
+          ]
+        }
+      ]
+    },
+    "isCheckoutReady": false
   }
 }
 ```
@@ -423,7 +440,7 @@ Processes the cart checkout: validates items & required fields, uploads payment 
 ```json
 {
   "payment_method_id": "number (required)",
-  "numberTransferredFrom": "string (optional)",
+  "numberTransferredFrom": "string (required)",
   "notes": "string (optional)"
 }
 ```
