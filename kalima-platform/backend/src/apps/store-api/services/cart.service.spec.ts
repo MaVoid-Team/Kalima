@@ -195,7 +195,7 @@ describe("CartService", () => {
       mockPrismaClient.$transaction = jest.fn(async (cb) => { return cb(mockPrismaClient); });
 
       try {
-        await cartService.checkout(42, { payment_method_id: 1, user_id: 42, numberTransferredFrom: undefined }, null as any);
+        await cartService.checkout(42, { payment_method_id: 1, numberTransferredFrom: "123456" }, null as any);
       } catch (e) {
         // we're short-circuiting file upload but we want to capture the payload
       }
