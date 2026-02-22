@@ -31,7 +31,7 @@ const cartWithItemsQueryInclude = {
       id: true,
       cart_id: true,
       product_id: true,
-      coupon_id: true,
+      // coupon_id: true,
       quantity: true,
       price_at_add: true,
       final_price: true,
@@ -373,6 +373,15 @@ class CartService {
   async clearCart(user_id: number) {
     const cart = await this.getActiveCartByUser(user_id);
     await this.db.cart_items.deleteMany({ where: { cart_id: cart.id } });
+    await this.db.carts.update({ 
+      where: { id: cart.id },
+      data: { 
+        total: 0,
+        subtotal: 0,
+        discount: 0,
+        status: "active",
+      } 
+    });
     await invalidateCartCache(user_id);
     return this.getActiveCartByUser(user_id);
   }
