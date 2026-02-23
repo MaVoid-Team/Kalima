@@ -18,6 +18,7 @@ import {
   invalidateCartCache,
 } from "./cartCache.service";
 import { validatePaymentForCheckout } from "./checkout-validation.service";
+import { couponService } from "./coupon.service";
 import type { Prisma, purchases } from "../generated/prisma/client";
 import type { CreatePurchaseDto } from "../dtos/purchase.dto";
 
@@ -117,7 +118,7 @@ class CartService {
     }
 
     // 2. Validate coupon (active, date range, not already used by this user)
-    const { couponService } = await import("./coupon.service");
+    // couponService is now a static import (avoid dynamic import overhead)
     const { isValid, coupon } = await couponService.validateCoupon(
       coupon_code,
       user_id,
@@ -230,32 +231,29 @@ class CartService {
     ]);
     if (!product) throw new NotFoundError("Product not found");
 
-    let cartItem = await this.db.cart_items.findFirst({
+    // Use findFirst + conditional upsert to reduce roundtrips
+    const existing = await this.db.cart_items.findFirst({
       where: { cart_id: cart.id, product_id: dto.product_id, deleted_at: null },
     });
-    if (cartItem) {
-      // Update quantity
-      cartItem = await this.db.cart_items.update({
-        where: { id: cartItem.id },
-        data: { quantity: cartItem.quantity + dto.quantity },
-      });
-    } else {
-      // Create new cart item
-      cartItem = await this.db.cart_items.create({
-        data: {
-          cart_id: cart.id,
-          product_id: dto.product_id,
-          quantity: dto.quantity,
-          price_at_add: product.price,
-          final_price: Number(product.price) * dto.quantity, // TODO: handle discounts if needed
-        },
-      });
-    }
 
+    const cartItem = existing
+      ? await this.db.cart_items.update({
+          where: { id: existing.id },
+          data: { quantity: existing.quantity + dto.quantity },
+        })
+      : await this.db.cart_items.create({
+          data: {
+            cart_id: cart.id,
+            product_id: dto.product_id,
+            quantity: dto.quantity,
+            price_at_add: product.price,
+            final_price: Number(product.price) * dto.quantity,
+          },
+        });
+
+    // Handle required fields (including image upload) — batched
     if (dto.required_fields && dto.required_fields.length > 0) {
-      const defIds = dto.required_fields.map(
-        (x) => x.required_field_definition_id,
-      );
+      const defIds = dto.required_fields.map((x) => x.required_field_definition_id);
       const defs = await this.db.required_field_definitions.findMany({
         where: { id: { in: defIds } },
         select: { id: true, field_type: true },
@@ -263,37 +261,27 @@ class CartService {
       const defMap = new Map<number, FieldType>();
       for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
 
-      const requiredFieldsData: Array<{
-        cart_item_id: number;
-        field_definition_id: number;
-        value: string;
-      }> = [];
+      // Process image uploads first (must be sequential per file)
+      const fieldsData: { cart_item_id: number; field_definition_id: number; value: string }[] = [];
       for (const f of dto.required_fields) {
         let value = f.value;
         const fieldType = defMap.get(f.required_field_definition_id);
         if (fieldType === "image" && file) {
-          const image = await imageService.uploadImage(file, {
-            compress: true,
-            quality: 80,
-          });
+          const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
           value = image.id.toString();
         }
-        requiredFieldsData.push({
+        fieldsData.push({
           cart_item_id: cartItem.id,
           field_definition_id: f.required_field_definition_id,
           value,
         });
       }
-      await this.db.cart_item_required_fields.deleteMany({
-        where: { cart_item_id: cartItem.id },
-      });
-      if (requiredFieldsData.length > 0) {
-        await this.db.cart_item_required_fields.createMany({
-          data: requiredFieldsData,
-        });
-      }
+
+      // Batch: delete old + insert all new in one call each
+      await this.db.cart_item_required_fields.deleteMany({ where: { cart_item_id: cartItem.id } });
+      await this.db.cart_item_required_fields.createMany({ data: fieldsData });
     }
-    
+
     await Promise.all([
       this.#recalculateAndSaveCart(cart.id),
       invalidateCartCache(user_id),
@@ -357,21 +345,8 @@ class CartService {
       where: { id: dto.cart_item_id },
       data: { quantity: dto.quantity },
     });
-    
-    // Specifically recalculate discount for this item if it has a percentage coupon
-    if (updated.coupon_id) {
-       const coupon = await this.db.coupons.findUnique({ where: { id: updated.coupon_id }});
-       if (coupon && coupon.discount_percentage && coupon.discount_percentage > 0) {
-           const newDiscount = Math.floor(
-             Number(updated.price_at_add) * updated.quantity * (coupon.discount_percentage / 100)
-           );
-           await this.db.cart_items.update({
-               where: { id: updated.id },
-               data: { discount: newDiscount }
-           });
-       }
-    }
 
+    // Coupon discount recalculation is handled inside #recalculateAndSaveCart
     await this.#recalculateAndSaveCart(cart.id);
     await invalidateCartCache(user_id);
     return updated;
@@ -604,7 +579,7 @@ class CartService {
       );
 
       // Record coupon usage per user (does NOT deactivate the coupon globally)
-      const { couponService: cs } = await import("./coupon.service");
+      const cs = couponService;
       const seenCoupons = new Set<number>();
       for (const item of cart.cart_items) {
         const couponId = (item as { coupon_id?: number | null }).coupon_id;

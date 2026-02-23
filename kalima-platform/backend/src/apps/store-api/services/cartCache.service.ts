@@ -25,21 +25,33 @@ export async function getCachedCart<T>(userId: number): Promise<T | null> {
   }
 }
 
+const CACHE_WRITE_TIMEOUT_MS = 500;
+
 export async function setCachedCart(userId: number, cart: unknown): Promise<void> {
   if (!isRedisAvailable() || !redis) return;
   try {
     const key = cartCacheKey(userId);
-    await redis.setex(key, CART_TTL_SECONDS, JSON.stringify(cart));
-  } catch (err) {
-    console.error("[CartCache] Failed to set:", err);
+    await Promise.race([
+      redis.setex(key, CART_TTL_SECONDS, JSON.stringify(cart)),
+      new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error("Cache write timeout")), CACHE_WRITE_TIMEOUT_MS)
+      ),
+    ]);
+  } catch {
+    // Swallow — cache write failure is non-critical
   }
 }
 
 export async function invalidateCartCache(userId: number): Promise<void> {
   if (!isRedisAvailable() || !redis) return;
   try {
-    await redis.del(cartCacheKey(userId));
-  } catch (err) {
-    console.error("[CartCache] Failed to invalidate:", err);
+    await Promise.race([
+      redis.del(cartCacheKey(userId)),
+      new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error("Cache invalidate timeout")), CACHE_WRITE_TIMEOUT_MS)
+      ),
+    ]);
+  } catch {
+    // Swallow — cache invalidation failure is non-critical
   }
 }
