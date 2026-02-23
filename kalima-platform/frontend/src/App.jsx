@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import MainLayout from "./layouts/MainLayout";
 
 // Lazy-loaded pages
@@ -21,6 +22,10 @@ const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage
 const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
+// Admin lazy-loaded pages
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
+const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -54,6 +59,14 @@ function App() {
 
             {/* 404 Fallback */}
             <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/orders" element={<OrdersPage />} />
+              <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+            </Route>
           </Route>
 
           {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}

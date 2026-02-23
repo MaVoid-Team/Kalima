@@ -1,0 +1,84 @@
+{
+    "dashboardTitle": "لوحة الإدارة",
+    "nav": {
+        "orders": "الطلبات",
+        "backToStore": "العودة للمتجر",
+        "logout": "تسجيل الخروج"
+    },
+    "common": {
+        "currencyEGP": "ج.م",
+        "na": "غير متوفر",
+        "admin": "الإدارة",
+        "loading": "جاري التحميل...",
+        "cancel": "إلغاء",
+        "confirm": "تأكيد"
+    },
+    "orders": {
+        "title": "إدارة الطلبات",
+        "totalOrders": "{{count}} طلبات",
+        "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
+        "statusAll": "كل الحالات",
+        "statusPending": "قيد الانتظار",
+        "statusReceived": "تم الاستلام",
+        "statusConfirmed": "مؤكد",
+        "statusReturned": "مرتجع",
+        "statusCreated": "تم الإنشاء",
+        "clearFilters": "مسح",
+        "table": {
+            "serial": "الرقم التسلسلي",
+            "customer": "العميل",
+            "status": "الحالة",
+            "total": "الإجمالي",
+            "payment": "الدفع",
+            "actions": "إجراءات"
+        },
+        "items": {
+            "product": "المنتج",
+            "type": "النوع",
+            "price": "السعر",
+            "discount": "الخصم",
+            "actions": "الإجراءات",
+            "unknownProduct": "منتج غير معروف"
+        },
+        "actions": {
+            "view": "عرض التفاصيل",
+            "receive": "تحديد كمستلم",
+            "confirm": "تأكيد الطلب",
+            "return": "إرجاع الطلب",
+            "delete": "حذف الطلب",
+            "deleteItem": "حذف العنصر"
+        },
+        "messages": {
+            "receiveSuccess": "تم تحديث الطلب إلى مستلم",
+            "confirmSuccess": "تم تأكيد الطلب",
+            "returnSuccess": "تم إرجاع الطلب",
+            "saveNoteSuccess": "تم حفظ ملاحظات الإدارة بنجاح",
+            "deleteOrderWarning": "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+            "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
+            "deleteOrderSuccess": "تم حذف الطلب بنجاح",
+            "deleteItemSuccess": "تم حذف العنصر بنجاح"
+        },
+        "details": {
+            "backToOrders": "العودة للطلبات",
+            "customerInfo": "معلومات العميل",
+            "orderSummary": "ملخص الطلب",
+            "paymentInfo": "معلومات الدفع",
+            "statusTimeline": "الجدول الزمني للحالة",
+            "orderItems": "عناصر الطلب",
+            "adminNotes": "ملاحظات الإدارة",
+            "couponInfo": "الكوبون المستخدم",
+            "dateCreated": "تاريخ الإنشاء",
+            "itemsCount": "عدد العناصر",
+            "subtotal": "المجموع الفرعي",
+            "discount": "الخصم",
+            "method": "طريقة الدفع",
+            "transferFrom": "محول من",
+            "paymentNumber": "رقم الدفع",
+            "screenshot": "صورة الحوالة",
+            "saveNote": "حفظ الملاحظة",
+            "total": "الإجمالي",
+            "by": "بواسطة",
+            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}"
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import axios from '../api/axios';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ export default function useApiMutation() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const mutate = async (config) => {
+    const mutate = useCallback(async (config) => {
         const { endpoint, method = 'post', data, defaultSuccessMessage } = config;
 
         setLoading(true);
@@ -32,7 +32,7 @@ export default function useApiMutation() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     return { mutate, loading, error };
 }

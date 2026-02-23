@@ -26,12 +26,15 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const loginSuccess = (userData, tokens) => {
+    const loginSuccess = (userData, tokens, portalAccess) => {
         setUser(userData);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('accessToken', tokens.accessToken);
         localStorage.setItem('refreshToken', tokens.refreshToken);
+        if (portalAccess) {
+            localStorage.setItem('portalAccess', JSON.stringify(portalAccess));
+        }
     };
 
     const logout = () => {
