@@ -411,6 +411,8 @@ model cart_item_required_fields {
   updated_at                 DateTime?                  @db.Timestamp(6)
   cart_items                 cart_items                 @relation(fields: [cart_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([cart_item_id, field_definition_id])
 }
 
 model purchases {

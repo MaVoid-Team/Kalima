@@ -249,6 +249,7 @@ export type cart_item_required_fieldsOrderByWithRelationInput = {
 
 export type cart_item_required_fieldsWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  cart_item_id_field_definition_id?: Prisma.cart_item_required_fieldsCart_item_idField_definition_idCompoundUniqueInput
   AND?: Prisma.cart_item_required_fieldsWhereInput | Prisma.cart_item_required_fieldsWhereInput[]
   OR?: Prisma.cart_item_required_fieldsWhereInput[]
   NOT?: Prisma.cart_item_required_fieldsWhereInput | Prisma.cart_item_required_fieldsWhereInput[]
@@ -259,7 +260,7 @@ export type cart_item_required_fieldsWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"cart_item_required_fields"> | Date | string | null
   cart_items?: Prisma.XOR<Prisma.Cart_itemsScalarRelationFilter, Prisma.cart_itemsWhereInput>
   required_field_definitions?: Prisma.XOR<Prisma.Required_field_definitionsScalarRelationFilter, Prisma.required_field_definitionsWhereInput>
-}, "id">
+}, "id" | "cart_item_id_field_definition_id">
 
 export type cart_item_required_fieldsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -353,6 +354,11 @@ export type Cart_item_required_fieldsListRelationFilter = {
 
 export type cart_item_required_fieldsOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type cart_item_required_fieldsCart_item_idField_definition_idCompoundUniqueInput = {
+  cart_item_id: number
+  field_definition_id: number
 }
 
 export type cart_item_required_fieldsCountOrderByAggregateInput = {
