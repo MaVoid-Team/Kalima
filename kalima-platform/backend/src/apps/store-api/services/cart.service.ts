@@ -187,6 +187,17 @@ class CartService {
     });
   }
 
+  async #getOrCreateCart(user_id: number): Promise<CartWithItems> {
+    try {
+      return await this.getActiveCartByUser(user_id);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return this.createCart({ user_id }) as Promise<CartWithItems>;
+      }
+      throw err;
+    }
+  }
+
   // ============================================
   // GET CART BY USER (with Redis read-through cache)
   // ============================================
@@ -213,23 +224,12 @@ class CartService {
     dto: AddCartItemDto,
     file?: Express.Multer.File,
   ) {
-    let cart = null;
-    try {
-      cart = await this.getActiveCartByUser(user_id);
-    } catch (err) {
-      if (err instanceof NotFoundError) {
-        cart = await this.createCart({ user_id });
-      } else {
-        throw err;
-      }
-    }
-    // Validate product exists
-    const product = await this.db.products.findUnique({
-      where: { id: dto.product_id },
-    });
+    const [cart, product] = await Promise.all([
+      this.#getOrCreateCart(user_id),
+      this.db.products.findUnique({ where: { id: dto.product_id } }),
+    ]);
     if (!product) throw new NotFoundError("Product not found");
 
-    // Check if item already exists in cart
     let cartItem = await this.db.cart_items.findFirst({
       where: { cart_id: cart.id, product_id: dto.product_id, deleted_at: null },
     });
