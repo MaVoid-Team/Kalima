@@ -1,8 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import useApiMutation from './useApiMutation';
 
-export const useOrders = (id = null) => {
+export const useOrders = (optionsOrId = null) => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
+
+    let id = null;
+    let initialLimit = 20;
+
+    if (optionsOrId !== null) {
+        if (typeof optionsOrId === 'object') {
+            id = optionsOrId.id || null;
+            initialLimit = optionsOrId.limit || 20;
+        } else {
+            id = optionsOrId;
+        }
+    }
 
     // List state
     const [orders, setOrders] = useState([]);
@@ -10,7 +22,7 @@ export const useOrders = (id = null) => {
         total: 0,
         page: 1,
         pages: 1,
-        limit: 20
+        limit: initialLimit
     });
     const [filters, setFilters] = useState({
         search: '',
