@@ -370,7 +370,7 @@ model required_field_definitions {
 model carts {
   id         Int          @id @default(autoincrement())
   user_id    Int
-  status     String       @default("active")
+  status     String       @default("active") // "active", "checked_out", "fastbuy"
   subtotal   Decimal      @default(0) @db.Decimal(10, 2)
   discount   Decimal      @default(0) @db.Decimal(10, 2)
   total      Decimal      @default(0) @db.Decimal(10, 2)

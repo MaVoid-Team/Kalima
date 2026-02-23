@@ -13,11 +13,10 @@ const adminAuth = [
 ];
 
 // ============================================
-// AUTHENTICATED — teacher reads own purchases & fast buy
+// AUTHENTICATED — teacher reads own purchases
 // ============================================
 
 router.get("/my", authenticateToken, purchaseController.getMyPurchases);
-router.post("/fast-buy", authenticateToken, uploadFastBuy, purchaseController.fastBuy);
 
 // ============================================
 // ADMIN / SUBADMIN — purchase management
