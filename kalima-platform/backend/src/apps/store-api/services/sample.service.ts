@@ -30,10 +30,15 @@ const MIME_TO_EXT: Record<string, string> = {
 // ============================================
 
 class SampleService {
-  constructor(private db: PrismaClient = prisma) {
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  private initPromise: Promise<unknown> | null = null;
+
+  constructor(private db: PrismaClient = prisma) {}
+
+  private async ensureUploadDir(): Promise<void> {
+    if (!this.initPromise) {
+      this.initPromise = fsPromises.mkdir(UPLOAD_DIR, { recursive: true });
     }
+    await this.initPromise;
   }
 
   async uploadSample(
@@ -56,7 +61,8 @@ class SampleService {
     const filename = `${uniqueId}${ext}`;
     const filePath = path.join(UPLOAD_DIR, filename);
 
-    fs.writeFileSync(filePath, file.buffer);
+    await this.ensureUploadDir();
+    await fsPromises.writeFile(filePath, file.buffer);
 
     const url = `/uploads/samples/${filename}`;
 

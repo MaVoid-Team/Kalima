@@ -23,6 +23,15 @@ import {
 // SHARED INCLUDES
 // ============================================
 
+/** Minimal include for product list (getAllProducts) */
+const PRODUCT_LIST_INCLUDE = {
+  thumbnail_image: true,
+  product_categories: {
+    include: { categories: { select: { id: true, name: true } } },
+  },
+};
+
+/** Full include for single product (getProductById, create, update) */
 const PRODUCT_INCLUDE = {
   thumbnail_image: true,
   product_gallery: {
