@@ -94,25 +94,27 @@ class CartService {
     cart_item_id: number,
     coupon_code: string,
   ) {
-    // 1. Validate cart and cart item
-    const cart = await this.getActiveCartByUser(user_id);
-    const cartItem = await this.db.cart_items.findUnique({
-      where: { id: cart_item_id },
-      select: {
-        id: true,
-        discount: true,
-        created_at: true,
-        updated_at: true,
-        deleted_at: true,
-        cart_id: true,
-        product_id: true,
-        quantity: true,
-        price_at_add: true,
-        final_price: true,
-        required_fields_filled: true,
-        coupon_id: true,
-      },
-    });
+    // 1. Validate cart and cart item in parallel
+    const [cart, cartItem] = await Promise.all([
+      this.getActiveCartByUser(user_id),
+      this.db.cart_items.findUnique({
+        where: { id: cart_item_id },
+        select: {
+          id: true,
+          discount: true,
+          created_at: true,
+          updated_at: true,
+          deleted_at: true,
+          cart_id: true,
+          product_id: true,
+          quantity: true,
+          price_at_add: true,
+          final_price: true,
+          required_fields_filled: true,
+          coupon_id: true,
+        },
+      }),
+    ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
       throw new NotFoundError("Cart item not found in user's cart");
     }
@@ -293,10 +295,10 @@ class CartService {
   // REMOVE ITEM FROM CART
   // ============================================
   async removeItemFromCart(user_id: number, cart_item_id: number) {
-    const cart = await this.getActiveCartByUser(user_id);
-    const cartItem = await this.db.cart_items.findUnique({
-      where: { id: cart_item_id },
-    });
+    const [cart, cartItem] = await Promise.all([
+      this.getActiveCartByUser(user_id),
+      this.db.cart_items.findUnique({ where: { id: cart_item_id } }),
+    ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
       throw new NotFoundError("Cart item not found in user's cart");
     }
@@ -313,10 +315,10 @@ class CartService {
   // REMOVE COUPON FROM CART ITEM
   // ============================================
   async removeCouponFromCartItem(user_id: number, cart_item_id: number) {
-    const cart = await this.getActiveCartByUser(user_id);
-    const cartItem = await this.db.cart_items.findUnique({
-      where: { id: cart_item_id },
-    });
+    const [cart, cartItem] = await Promise.all([
+      this.getActiveCartByUser(user_id),
+      this.db.cart_items.findUnique({ where: { id: cart_item_id } }),
+    ]);
     if (!cartItem || cartItem.cart_id !== cart.id)
       throw new NotFoundError("Cart item not found in user's cart");
 
@@ -334,10 +336,10 @@ class CartService {
   // UPDATE ITEM QUANTITY
   // ============================================
   async updateCartItem(user_id: number, dto: UpdateCartItemDto) {
-    const cart = await this.getActiveCartByUser(user_id);
-    const cartItem = await this.db.cart_items.findUnique({
-      where: { id: dto.cart_item_id },
-    });
+    const [cart, cartItem] = await Promise.all([
+      this.getActiveCartByUser(user_id),
+      this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
+    ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
       throw new NotFoundError("Cart item not found in user's cart");
     }
@@ -736,44 +738,44 @@ class CartService {
     dto: UpdateCartItemRequiredFieldsDto,
     file?: Express.Multer.File,
   ) {
-    const cartItem = await this.db.cart_items.findUnique({
-      where: { id: dto.cart_item_id },
-    });
+    // Fetch cart item and user's cart in parallel
+    const [cartItem, cart] = await Promise.all([
+      this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
+      this.getActiveCartByUser(user_id),
+    ]);
     if (!cartItem) throw new NotFoundError("Cart item not found");
-    const cart = await this.getActiveCartByUser(user_id);
     if (cartItem.cart_id !== cart.id)
       throw new BadRequestError("Cart item does not belong to user's cart");
+
     // preload definitions to determine if any required field expects an image
-    const defIds = dto.required_fields.map(
-      (x) => x.required_field_definition_id,
-    );
+    const defIds = dto.required_fields.map((x) => x.required_field_definition_id);
     const defs = await this.db.required_field_definitions.findMany({
       where: { id: { in: defIds } },
       select: { id: true, field_type: true },
     });
     const defMap = new Map<number, FieldType>();
     for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
-    await this.db.cart_item_required_fields.deleteMany({
-      where: { cart_item_id: dto.cart_item_id },
-    });
+
+    // Build all field data, handling image uploads sequentially
+    const fieldsData: { cart_item_id: number; field_definition_id: number; value: string }[] = [];
     for (const f of dto.required_fields) {
       let value = f.value;
       const fieldType = defMap.get(f.required_field_definition_id);
       if (fieldType === "image" && file) {
-        const image = await imageService.uploadImage(file, {
-          compress: true,
-          quality: 80,
-        });
+        const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
         value = image.id.toString();
       }
-      await this.db.cart_item_required_fields.create({
-        data: {
-          cart_item_id: dto.cart_item_id,
-          field_definition_id: f.required_field_definition_id,
-          value,
-        },
+      fieldsData.push({
+        cart_item_id: dto.cart_item_id,
+        field_definition_id: f.required_field_definition_id,
+        value,
       });
     }
+
+    // Batch: delete old + insert all new
+    await this.db.cart_item_required_fields.deleteMany({ where: { cart_item_id: dto.cart_item_id } });
+    await this.db.cart_item_required_fields.createMany({ data: fieldsData });
+
     await invalidateCartCache(user_id);
     return { success: true };
   }
