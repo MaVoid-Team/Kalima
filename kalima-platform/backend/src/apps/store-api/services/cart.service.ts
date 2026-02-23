@@ -252,9 +252,7 @@ class CartService {
       });
     }
 
-    // Handle required fields (including image upload)
     if (dto.required_fields && dto.required_fields.length > 0) {
-      // preload definitions for proper type-based handling (no `any`)
       const defIds = dto.required_fields.map(
         (x) => x.required_field_definition_id,
       );
@@ -265,9 +263,11 @@ class CartService {
       const defMap = new Map<number, FieldType>();
       for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
 
-      await this.db.cart_item_required_fields.deleteMany({
-        where: { cart_item_id: cartItem.id },
-      });
+      const requiredFieldsData: Array<{
+        cart_item_id: number;
+        field_definition_id: number;
+        value: string;
+      }> = [];
       for (const f of dto.required_fields) {
         let value = f.value;
         const fieldType = defMap.get(f.required_field_definition_id);
@@ -278,18 +278,26 @@ class CartService {
           });
           value = image.id.toString();
         }
-        await this.db.cart_item_required_fields.create({
-          data: {
-            cart_item_id: cartItem.id,
-            field_definition_id: f.required_field_definition_id,
-            value,
-          },
+        requiredFieldsData.push({
+          cart_item_id: cartItem.id,
+          field_definition_id: f.required_field_definition_id,
+          value,
+        });
+      }
+      await this.db.cart_item_required_fields.deleteMany({
+        where: { cart_item_id: cartItem.id },
+      });
+      if (requiredFieldsData.length > 0) {
+        await this.db.cart_item_required_fields.createMany({
+          data: requiredFieldsData,
         });
       }
     }
     
-    await this.#recalculateAndSaveCart(cart.id);
-    await invalidateCartCache(user_id);
+    await Promise.all([
+      this.#recalculateAndSaveCart(cart.id),
+      invalidateCartCache(user_id),
+    ]);
     return cartItem;
   }
 

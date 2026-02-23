@@ -17,7 +17,12 @@ if (!databaseUrl) {
 const schema = new URL(databaseUrl).searchParams.get("schema") ?? "public";
 
 const pool =
-  globalForPrisma.pool ?? new Pool({ connectionString: databaseUrl });
+  globalForPrisma.pool ??
+  new Pool({
+    connectionString: databaseUrl,
+    max: 5,
+    idleTimeoutMillis: 30000,
+  });
 const adapter = new PrismaPg(pool, { schema });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
