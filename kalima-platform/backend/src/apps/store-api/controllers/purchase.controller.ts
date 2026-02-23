@@ -157,7 +157,7 @@ export const purchaseController = {
       const adminId = (req.user as any).userId;
       const purchase = await purchasesService.addAdminNote(
         id,
-        dto.admin_notes,
+        dto.admin_notes || dto.adminNote || "",
         adminId,
       );
       res.status(200).json({
