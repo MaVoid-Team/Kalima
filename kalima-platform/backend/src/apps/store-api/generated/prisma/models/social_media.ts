@@ -672,7 +672,7 @@ export type $social_mediaPayload<ExtArgs extends runtime.Types.Extensions.Intern
 export type social_mediaGetPayload<S extends boolean | null | undefined | social_mediaDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$social_mediaPayload, S>
 
 export type social_mediaCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<social_mediaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<social_mediaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Social_mediaCountAggregateInputType | true
   }
 
@@ -1119,6 +1119,7 @@ export type social_mediaFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which social_media to fetch.
    */
   where: Prisma.social_mediaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1141,6 +1142,7 @@ export type social_mediaFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which social_media to fetch.
    */
   where: Prisma.social_mediaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1193,6 +1195,7 @@ export type social_mediaFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of social_medias.
    */
   distinct?: Prisma.Social_mediaScalarFieldEnum | Prisma.Social_mediaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1245,6 +1248,7 @@ export type social_mediaFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
    * Filter by unique combinations of social_medias.
    */
   distinct?: Prisma.Social_mediaScalarFieldEnum | Prisma.Social_mediaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1292,6 +1296,7 @@ export type social_mediaFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   skip?: number
   distinct?: Prisma.Social_mediaScalarFieldEnum | Prisma.Social_mediaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1314,6 +1319,7 @@ export type social_mediaCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data needed to create a social_media.
    */
   data: Prisma.XOR<Prisma.social_mediaCreateInput, Prisma.social_mediaUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1374,6 +1380,7 @@ export type social_mediaUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Choose, which social_media to update.
    */
   where: Prisma.social_mediaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1452,6 +1459,7 @@ export type social_mediaUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * In case the social_media was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.social_mediaUpdateInput, Prisma.social_mediaUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1474,6 +1482,7 @@ export type social_mediaDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter which social_media to delete.
    */
   where: Prisma.social_mediaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

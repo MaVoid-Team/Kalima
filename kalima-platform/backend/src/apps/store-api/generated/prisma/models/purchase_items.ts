@@ -974,7 +974,7 @@ export type $purchase_itemsPayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type purchase_itemsGetPayload<S extends boolean | null | undefined | purchase_itemsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$purchase_itemsPayload, S>
 
 export type purchase_itemsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<purchase_itemsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<purchase_itemsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Purchase_itemsCountAggregateInputType | true
   }
 
@@ -1426,6 +1426,7 @@ export type purchase_itemsFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which purchase_items to fetch.
    */
   where: Prisma.purchase_itemsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1448,6 +1449,7 @@ export type purchase_itemsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which purchase_items to fetch.
    */
   where: Prisma.purchase_itemsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1500,6 +1502,7 @@ export type purchase_itemsFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of purchase_items.
    */
   distinct?: Prisma.Purchase_itemsScalarFieldEnum | Prisma.Purchase_itemsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1552,6 +1555,7 @@ export type purchase_itemsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of purchase_items.
    */
   distinct?: Prisma.Purchase_itemsScalarFieldEnum | Prisma.Purchase_itemsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1599,6 +1603,7 @@ export type purchase_itemsFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    */
   skip?: number
   distinct?: Prisma.Purchase_itemsScalarFieldEnum | Prisma.Purchase_itemsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1621,6 +1626,7 @@ export type purchase_itemsCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a purchase_items.
    */
   data: Prisma.XOR<Prisma.purchase_itemsCreateInput, Prisma.purchase_itemsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1681,6 +1687,7 @@ export type purchase_itemsUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which purchase_items to update.
    */
   where: Prisma.purchase_itemsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1759,6 +1766,7 @@ export type purchase_itemsUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the purchase_items was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.purchase_itemsUpdateInput, Prisma.purchase_itemsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1781,6 +1789,7 @@ export type purchase_itemsDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which purchase_items to delete.
    */
   where: Prisma.purchase_itemsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -575,7 +575,7 @@ export type $auth_identitiesPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type auth_identitiesGetPayload<S extends boolean | null | undefined | auth_identitiesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$auth_identitiesPayload, S>
 
 export type auth_identitiesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<auth_identitiesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<auth_identitiesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Auth_identitiesCountAggregateInputType | true
   }
 
@@ -1021,6 +1021,7 @@ export type auth_identitiesFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which auth_identities to fetch.
    */
   where: Prisma.auth_identitiesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1043,6 +1044,7 @@ export type auth_identitiesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which auth_identities to fetch.
    */
   where: Prisma.auth_identitiesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1095,6 +1097,7 @@ export type auth_identitiesFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of auth_identities.
    */
   distinct?: Prisma.Auth_identitiesScalarFieldEnum | Prisma.Auth_identitiesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1147,6 +1150,7 @@ export type auth_identitiesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of auth_identities.
    */
   distinct?: Prisma.Auth_identitiesScalarFieldEnum | Prisma.Auth_identitiesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,6 +1198,7 @@ export type auth_identitiesFindManyArgs<ExtArgs extends runtime.Types.Extensions
    */
   skip?: number
   distinct?: Prisma.Auth_identitiesScalarFieldEnum | Prisma.Auth_identitiesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1216,6 +1221,7 @@ export type auth_identitiesCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a auth_identities.
    */
   data: Prisma.XOR<Prisma.auth_identitiesCreateInput, Prisma.auth_identitiesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1276,6 +1282,7 @@ export type auth_identitiesUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which auth_identities to update.
    */
   where: Prisma.auth_identitiesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1354,6 +1361,7 @@ export type auth_identitiesUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the auth_identities was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.auth_identitiesUpdateInput, Prisma.auth_identitiesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1376,6 +1384,7 @@ export type auth_identitiesDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which auth_identities to delete.
    */
   where: Prisma.auth_identitiesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -593,7 +593,7 @@ export type $assistantsPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type assistantsGetPayload<S extends boolean | null | undefined | assistantsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$assistantsPayload, S>
 
 export type assistantsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<assistantsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<assistantsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AssistantsCountAggregateInputType | true
   }
 
@@ -1038,6 +1038,7 @@ export type assistantsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which assistants to fetch.
    */
   where: Prisma.assistantsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1060,6 +1061,7 @@ export type assistantsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which assistants to fetch.
    */
   where: Prisma.assistantsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1112,6 +1114,7 @@ export type assistantsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of assistants.
    */
   distinct?: Prisma.AssistantsScalarFieldEnum | Prisma.AssistantsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1164,6 +1167,7 @@ export type assistantsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of assistants.
    */
   distinct?: Prisma.AssistantsScalarFieldEnum | Prisma.AssistantsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1211,6 +1215,7 @@ export type assistantsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.AssistantsScalarFieldEnum | Prisma.AssistantsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1233,6 +1238,7 @@ export type assistantsCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a assistants.
    */
   data: Prisma.XOR<Prisma.assistantsCreateInput, Prisma.assistantsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1293,6 +1299,7 @@ export type assistantsUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which assistants to update.
    */
   where: Prisma.assistantsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1371,6 +1378,7 @@ export type assistantsUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the assistants was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.assistantsUpdateInput, Prisma.assistantsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1393,6 +1401,7 @@ export type assistantsDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which assistants to delete.
    */
   where: Prisma.assistantsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

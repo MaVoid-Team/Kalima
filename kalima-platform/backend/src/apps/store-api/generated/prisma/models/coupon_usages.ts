@@ -801,7 +801,7 @@ export type $coupon_usagesPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type coupon_usagesGetPayload<S extends boolean | null | undefined | coupon_usagesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$coupon_usagesPayload, S>
 
 export type coupon_usagesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<coupon_usagesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<coupon_usagesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Coupon_usagesCountAggregateInputType | true
   }
 
@@ -1249,6 +1249,7 @@ export type coupon_usagesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which coupon_usages to fetch.
    */
   where: Prisma.coupon_usagesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1271,6 +1272,7 @@ export type coupon_usagesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which coupon_usages to fetch.
    */
   where: Prisma.coupon_usagesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1323,6 +1325,7 @@ export type coupon_usagesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of coupon_usages.
    */
   distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1375,6 +1378,7 @@ export type coupon_usagesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of coupon_usages.
    */
   distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1422,6 +1426,7 @@ export type coupon_usagesFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   skip?: number
   distinct?: Prisma.Coupon_usagesScalarFieldEnum | Prisma.Coupon_usagesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1444,6 +1449,7 @@ export type coupon_usagesCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a coupon_usages.
    */
   data: Prisma.XOR<Prisma.coupon_usagesCreateInput, Prisma.coupon_usagesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1504,6 +1510,7 @@ export type coupon_usagesUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which coupon_usages to update.
    */
   where: Prisma.coupon_usagesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1582,6 +1589,7 @@ export type coupon_usagesUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the coupon_usages was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.coupon_usagesUpdateInput, Prisma.coupon_usagesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1604,6 +1612,7 @@ export type coupon_usagesDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which coupon_usages to delete.
    */
   where: Prisma.coupon_usagesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

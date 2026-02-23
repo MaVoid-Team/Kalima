@@ -883,7 +883,7 @@ export type $categoriesPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type categoriesGetPayload<S extends boolean | null | undefined | categoriesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$categoriesPayload, S>
 
 export type categoriesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<categoriesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<categoriesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: CategoriesCountAggregateInputType | true
   }
 
@@ -1334,6 +1334,7 @@ export type categoriesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which categories to fetch.
    */
   where: Prisma.categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1356,6 +1357,7 @@ export type categoriesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which categories to fetch.
    */
   where: Prisma.categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1408,6 +1410,7 @@ export type categoriesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of categories.
    */
   distinct?: Prisma.CategoriesScalarFieldEnum | Prisma.CategoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1460,6 +1463,7 @@ export type categoriesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of categories.
    */
   distinct?: Prisma.CategoriesScalarFieldEnum | Prisma.CategoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1507,6 +1511,7 @@ export type categoriesFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.CategoriesScalarFieldEnum | Prisma.CategoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1529,6 +1534,7 @@ export type categoriesCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a categories.
    */
   data: Prisma.XOR<Prisma.categoriesCreateInput, Prisma.categoriesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1589,6 +1595,7 @@ export type categoriesUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which categories to update.
    */
   where: Prisma.categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1667,6 +1674,7 @@ export type categoriesUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the categories was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.categoriesUpdateInput, Prisma.categoriesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1689,6 +1697,7 @@ export type categoriesDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which categories to delete.
    */
   where: Prisma.categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -599,7 +599,7 @@ export type $product_categoriesPayload<ExtArgs extends runtime.Types.Extensions.
 export type product_categoriesGetPayload<S extends boolean | null | undefined | product_categoriesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$product_categoriesPayload, S>
 
 export type product_categoriesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<product_categoriesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<product_categoriesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Product_categoriesCountAggregateInputType | true
   }
 
@@ -1044,6 +1044,7 @@ export type product_categoriesFindUniqueArgs<ExtArgs extends runtime.Types.Exten
    * Filter, which product_categories to fetch.
    */
   where: Prisma.product_categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,6 +1067,7 @@ export type product_categoriesFindUniqueOrThrowArgs<ExtArgs extends runtime.Type
    * Filter, which product_categories to fetch.
    */
   where: Prisma.product_categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1118,6 +1120,7 @@ export type product_categoriesFindFirstArgs<ExtArgs extends runtime.Types.Extens
    * Filter by unique combinations of product_categories.
    */
   distinct?: Prisma.Product_categoriesScalarFieldEnum | Prisma.Product_categoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1170,6 +1173,7 @@ export type product_categoriesFindFirstOrThrowArgs<ExtArgs extends runtime.Types
    * Filter by unique combinations of product_categories.
    */
   distinct?: Prisma.Product_categoriesScalarFieldEnum | Prisma.Product_categoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1217,6 +1221,7 @@ export type product_categoriesFindManyArgs<ExtArgs extends runtime.Types.Extensi
    */
   skip?: number
   distinct?: Prisma.Product_categoriesScalarFieldEnum | Prisma.Product_categoriesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1239,6 +1244,7 @@ export type product_categoriesCreateArgs<ExtArgs extends runtime.Types.Extension
    * The data needed to create a product_categories.
    */
   data: Prisma.XOR<Prisma.product_categoriesCreateInput, Prisma.product_categoriesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1299,6 +1305,7 @@ export type product_categoriesUpdateArgs<ExtArgs extends runtime.Types.Extension
    * Choose, which product_categories to update.
    */
   where: Prisma.product_categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1377,6 +1384,7 @@ export type product_categoriesUpsertArgs<ExtArgs extends runtime.Types.Extension
    * In case the product_categories was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.product_categoriesUpdateInput, Prisma.product_categoriesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1399,6 +1407,7 @@ export type product_categoriesDeleteArgs<ExtArgs extends runtime.Types.Extension
    * Filter which product_categories to delete.
    */
   where: Prisma.product_categoriesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

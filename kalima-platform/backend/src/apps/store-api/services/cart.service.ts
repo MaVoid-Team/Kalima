@@ -27,6 +27,7 @@ type CartItemWithRelations = Prisma.cart_itemsGetPayload<{
 }>;
 const cartWithItemsQueryInclude = {
   cart_items: {
+    where: { deleted_at: null },
     select: {
       id: true,
       cart_id: true,
@@ -196,6 +197,7 @@ class CartService {
     const cart = await this.db.carts.findFirst({
       where: { user_id, status: "active" },
       include: cartWithItemsQueryInclude,
+      relationLoadStrategy: "join",
     });
     if (!cart) throw new NotFoundError("Active cart not found");
     const result = cart as CartWithItems;
