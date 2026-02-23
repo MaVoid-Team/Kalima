@@ -267,14 +267,26 @@ class CartService {
         filledMap.set(f.field_definition_id, f.value);
       }
 
-      const cart_item_required_fields = defs.map((def) => ({
-        field_definition_id: def.field_definition_id,
-        is_required: def.is_required,
-        required_field_definitions: def.required_field_definitions,
-        value: filledMap.get(def.field_definition_id) ?? null,
-      }));
+      const cart_item_required_fields = defs.map((def) => {
+        let val = filledMap.get(def.field_definition_id) ?? null;
+        if (typeof val === "string" && val.trim() === "") {
+          val = null;
+        }
+        return {
+          field_definition_id: def.field_definition_id,
+          is_required: def.is_required,
+          required_field_definitions: def.required_field_definitions,
+          value: val,
+        };
+      });
 
-      return { ...item, cart_item_required_fields };
+      // Recalculate required_fields_filled dynamically
+      const required_fields_filled = cart_item_required_fields.every((f) => {
+        if (!f.is_required) return true;
+        return f.value !== null;
+      });
+
+      return { ...item, cart_item_required_fields, required_fields_filled };
     });
 
     return { ...cart, cart_items: enrichedItems };
@@ -821,9 +833,13 @@ class CartService {
     // Using findFirst + update/create instead of upsert to avoid schema cache issues in dev
     const operations: Promise<unknown>[] = [];
     for (const f of dto.required_fields) {
-      let value = f.value;
+      let value: string | null = f.value;
+      if (typeof value === "string" && value.trim() === "") {
+        value = null; // empty string becomes null representing not-filled
+      }
+
       const fieldType = defMap.get(f.required_field_definition_id);
-      if (fieldType === "image" && file) {
+      if (fieldType === "image" && file && value !== null) {
         const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
         value = image.id.toString();
       }
@@ -836,13 +852,21 @@ class CartService {
       });
 
       if (existing) {
-        operations.push(
-          this.db.cart_item_required_fields.update({
-            where: { id: existing.id },
-            data: { value },
-          }),
-        );
-      } else {
+        if (value === null) {
+          // If clearing out the value, we can just delete the record or update to null (schema allows String, but practically it's not null, it's string. Let's send empty string to DB instead of strict null if schema requires string)
+          // Wait, Prisma schema says `value String` so it cannot be null in DB. Let's delete the record if value is null
+          operations.push(
+            this.db.cart_item_required_fields.delete({ where: { id: existing.id } })
+          );
+        } else {
+          operations.push(
+            this.db.cart_item_required_fields.update({
+              where: { id: existing.id },
+              data: { value },
+            }),
+          );
+        }
+      } else if (value !== null) {
         operations.push(
           this.db.cart_item_required_fields.create({
             data: {
@@ -855,6 +879,31 @@ class CartService {
       }
     }
     await Promise.all(operations);
+
+    // After updating, recalculate if the entire item is now "filled"
+    // Get all required definitions for the product
+    const allDefs = await this.db.product_required_fields.findMany({
+      where: { product_id: cartItem.product_id, active: true },
+    });
+    const requiredDefIds = allDefs.filter(d => d.is_required).map(d => d.field_definition_id);
+    
+    // Get all currently filled definitions for this cart item
+    const filledFields = await this.db.cart_item_required_fields.findMany({
+      where: { cart_item_id: dto.cart_item_id },
+      select: { field_definition_id: true, value: true }
+    });
+    
+    // Check if every required definition ID has a corresponding non-empty value in filledFields
+    const isFilled = requiredDefIds.every(reqId => {
+      const match = filledFields.find(f => f.field_definition_id === reqId);
+      return match && match.value.trim() !== "";
+    });
+
+    // Update the cart item
+    await this.db.cart_items.update({
+      where: { id: dto.cart_item_id },
+      data: { required_fields_filled: isFilled }
+    });
 
     await invalidateCartCache(user_id);
     return { success: true };

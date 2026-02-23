@@ -3,6 +3,7 @@ import { purchaseController } from "../../controllers/purchase.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { uploadFastBuy } from "../../middleware/upload.middleware";
 
 const router = Router();
 
@@ -12,10 +13,11 @@ const adminAuth = [
 ];
 
 // ============================================
-// AUTHENTICATED — teacher reads own purchases
+// AUTHENTICATED — teacher reads own purchases & fast buy
 // ============================================
 
 router.get("/my", authenticateToken, purchaseController.getMyPurchases);
+router.post("/fast-buy", authenticateToken, uploadFastBuy, purchaseController.fastBuy);
 
 // ============================================
 // ADMIN / SUBADMIN — purchase management

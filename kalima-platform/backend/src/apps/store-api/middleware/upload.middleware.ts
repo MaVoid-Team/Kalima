@@ -107,3 +107,12 @@ export const uploadProductWithSample = multer({
   { name: "thumbnail", maxCount: 1 },
   { name: "sample", maxCount: 1 },
 ]);
+
+// ============================================
+// FAST BUY — payment screenshot + optional product image
+// ============================================
+
+export const uploadFastBuy = createImageUpload(5).fields([
+  { name: "payment_screenshot", maxCount: 1 },
+  { name: "product_image", maxCount: 1 },
+]);
