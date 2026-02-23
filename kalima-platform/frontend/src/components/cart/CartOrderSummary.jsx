@@ -1,16 +1,27 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Lock, MessageCircle } from 'lucide-react';
+import { ArrowRight, Lock, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function CartOrderSummary({
   subtotal,
   discount = '0',
   total,
+  isCartItemsRequiredFieldsFilled = true,
 }) {
-  const { t, i18n } = useTranslation('cart');
+  const { t } = useTranslation('cart');
+  const navigate = useNavigate();
 
+  const handleCheckout = () => {
+    if (isCartItemsRequiredFieldsFilled){
+      navigate('/checkout');
+      return;
+    }
+    toast.error(t('fillRequiredFields'), { description: t('fillRequiredFieldsHint') });
+  };
   return (
     <div className="space-y-6 sticky top-20">
       <Card className="rounded-lg shadow-sm border border-gray-200">
@@ -36,7 +47,7 @@ export default function CartOrderSummary({
             <span className="text-2xl font-bold">{total} {t('L.E')}</span>
           </div>
 
-          <Button className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4">
+          <Button onClick={handleCheckout} className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4">
             {t('proceedToCheckout')}
             <span>
               <ArrowRight className="w-4 h-4" />

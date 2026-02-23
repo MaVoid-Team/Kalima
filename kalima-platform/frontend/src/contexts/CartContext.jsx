@@ -14,7 +14,6 @@ export function CartProvider({ children }) {
     removeFromCart: removeItemNetwork,
     applyCoupon: applyCouponNetwork,
     removeCoupon: removeCouponNetwork,
-    getProductRequiredFields,
     updateCartItemRequiredFields: updateCartItemRequiredFieldsNetwork,
     loading,
     error,
@@ -56,6 +55,11 @@ export function CartProvider({ children }) {
     }
   };
 
+  const addProductToCart = async (productId, quantity) => {
+    await addToCart(productId, quantity);
+    await loadCart();
+  };
+
   const applyCoupon = async (itemId, code) => {
     await applyCouponNetwork(itemId, code);
     await loadCart();
@@ -76,13 +80,12 @@ export function CartProvider({ children }) {
     loading,
     error,
     loadCart,
-    addToCart,
+    addToCart: addProductToCart,
     updateQuantity,
     clearCart,
     removeFromCart: removeItem,
     applyCoupon,
     removeCoupon,
-    getProductRequiredFields,
     updateCartItemRequiredFields,
   };
 

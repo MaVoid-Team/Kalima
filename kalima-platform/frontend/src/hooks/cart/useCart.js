@@ -1,8 +1,11 @@
 import React from "react";
 import useApiMutation from "../useApiMutation";
+import { toast } from 'sonner';
+import { useTranslation } from "react-i18next";
 
 export default function useCart() {
     const { mutate, loading, error } = useApiMutation();
+    const { t } = useTranslation('cart');
 
     const getCart = async () => {
         try {
@@ -27,9 +30,10 @@ export default function useCart() {
             const res = await mutate({
                 method: "POST",
                 endpoint: "/cart/items",
-                data: { productId, quantity }
+                data: { productId, quantity, required_fields: [] }
             });
             if (res.success) {
+                toast.success(t("itemAddedToCart", "Item added to cart"));
                 return res.data;
             }
             else {
@@ -120,24 +124,6 @@ export default function useCart() {
         }
     };
 
-    const getProductRequiredFields = async (productId) => {
-        try {
-            const res = await mutate({
-                method: "GET",
-                endpoint: `/products/${productId}/required-fields`
-            });
-            if (res.success) {
-                return res.data;
-            }
-            else {
-                throw new Error(res?.message || "Failed to get product required fields");
-            }
-        } catch (error) {
-            console.error("Failed to get product required fields:", error);
-            throw error;
-        }
-    };
-
     const updateCartItemRequiredFields = async (itemId, requiredFieldsData) => {
         try {
             const res = await mutate({
@@ -146,6 +132,7 @@ export default function useCart() {
                 data: {"cart_item_id": itemId, "required_fields": requiredFieldsData}
             });
             if (res.success) {
+                toast.success(t("requiredFieldsUpdated", "Required fields updated"));
                 return res.data;
             }
             else {
@@ -165,7 +152,6 @@ export default function useCart() {
         removeFromCart,
         applyCoupon,
         removeCoupon,
-        getProductRequiredFields,
         updateCartItemRequiredFields,
         loading,
         error
