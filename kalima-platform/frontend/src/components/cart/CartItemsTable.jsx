@@ -73,6 +73,21 @@ export default function CartItemsTable({
     }
   };
 
+  const handleCartRequiredFieldsSubmit = async (e, itemId) => {
+    e.preventDefault();
+    const data = Object.entries(fieldValues[itemId] || {}).map(
+      ([id, value]) => ({
+        required_field_definition_id: Number(id),
+        value,
+      })
+    );
+    try {
+      await updateCartItemRequiredFields(itemId, data);
+    } catch (e) {
+      console.error('failed updating required fields', e);
+    }
+  }
+
 
   return (
     <Card className="rounded-lg shadow-sm border">
@@ -184,65 +199,56 @@ export default function CartItemsTable({
                   type="single"
                   collapsible
                   className="w-full"
-                  value={openItems[item.id] ? 'fields' : undefined}
                   onValueChange={val => {
                     const open = !!val;
                     setOpenItems(prev => ({ ...prev, [item.id]: open }));
                     if (open && !fieldValues[item.id]) {
                       const vals = {};
                       item.cart_item_required_fields.forEach(rf => {
-                        vals[rf.field_definition_id] = rf.required_field_definitions.value || '';
+                        vals[rf.field_definition_id] = rf.value || '';
                       });
                       setFieldValues(prev => ({ ...prev, [item.id]: vals }));
                     }
                   }}
                 >
                   <AccordionItem value="fields">
-                    <AccordionTrigger className="text-sm text-primary">
+                    <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-green-600" : "text-primary")}>
                       {openItems[item.id] ? t('hideDetails','Hide details') : t('viewMore','View more')}
                     </AccordionTrigger>
                     <AccordionContent className="mt-2 space-y-2 p-2 border rounded">
-                      {item.cart_item_required_fields.map(rf => (
-                        <div key={rf.field_definition_id} className="flex flex-col">
-                          <label className="text-xs font-medium mb-1">
-                            {rf.required_field_definitions.label}
-                          </label>
-                          <Input
-                            type={rf.required_field_definitions.field_type}
-                            value={fieldValues[item.id]?.[rf.field_definition_id] || ''}
-                            required={rf.required_field_definitions.is_required}
-                            onChange={e => {
-                              const val = e.target.value;
-                              setFieldValues(prev => ({
-                                ...prev,
-                                [item.id]: {
-                                  ...prev[item.id],
-                                  [rf.field_definition_id]: val,
-                                },
-                              }));
-                            }}
-                            className="input-sm"
-                          />
-                        </div>
-                      ))}
-                      <Button
-                        size="sm"
-                        onClick={async () => {
-                          const data = Object.entries(fieldValues[item.id] || {}).map(
-                            ([id, value]) => ({
-                              required_field_definition_id: Number(id),
-                              value,
-                            })
-                          );
-                          try {
-                            await updateCartItemRequiredFields(item.id, data);
-                          } catch (e) {
-                            console.error('failed updating required fields', e);
-                          }
-                        }}
-                      >
+                      <form onSubmit={(e) => handleCartRequiredFieldsSubmit(e, item.id)} className='flex flex-col gap-2'>
+                        {item.cart_item_required_fields.map(rf => (
+                          <div key={rf.field_definition_id} className="flex flex-col">
+                            <label className="text-xs font-medium mb-1">
+                              {rf.required_field_definitions.label}
+                              <span className="text-destructive">{rf.is_required ? ' *' : ''}</span>
+                            </label>
+                            <Input
+                              type={rf?.required_field_definitions?.field_type}
+                              value={fieldValues[item.id]?.[rf.field_definition_id] || ''}
+                              required={rf?.is_required}
+                              onChange={e => {
+                                const val = e.target.value;
+                                setFieldValues(prev => ({
+                                  ...prev,
+                                  [item.id]: {
+                                    ...prev[item.id],
+                                    [rf.field_definition_id]: val,
+                                  },
+                                }));
+                              }}
+                              className="input-sm"
+                            />
+                          </div>
+                        ))}
+                        <Button
+                          size="sm"
+                          type="submit"
+                          className="w-fit self-end"
+                        >
                         {t('save','Save')}
                       </Button>
+                    </form>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

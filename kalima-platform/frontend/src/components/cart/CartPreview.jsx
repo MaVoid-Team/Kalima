@@ -10,9 +10,11 @@ import {
 } from '@/components/ui/sheet';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }) {
   const { t, i18n } = useTranslation('cart');
+  const navigate = useNavigate();
   // derive just the origin (scheme+host+port) once; strip any appended paths like `/api/v2`
   const baseURL = useMemo(() => {
     const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -23,6 +25,11 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
       return raw.split('/api/v2')[0];
     }
   }, []);
+
+  const onContinueShopping = () => {
+    onOpenChange(false);
+    navigate('/market');
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -119,7 +126,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                   {t('viewFullCart')}
                 </Button>
                 <Button
-                  onClick={() => onOpenChange(false)}
+                  onClick={onContinueShopping}
                   variant='outline'
                 >
                   {t('continueShopping')}

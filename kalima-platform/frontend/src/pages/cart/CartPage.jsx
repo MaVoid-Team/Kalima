@@ -6,6 +6,7 @@ import CartItemsTable from '@/components/cart/CartItemsTable';
 import CartOrderSummary from '@/components/cart/CartOrderSummary';
 import EmptyCartState from '@/components/cart/EmptyCartState';
 import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function CartPage() {
   const { 
@@ -17,6 +18,7 @@ export default function CartPage() {
     removeCoupon,
     updateCartItemRequiredFields,
   } = useCart();
+  const navigator = useNavigate();
   
 // Sample Cart Object Structure (for reference)
 //         "id": 2,
@@ -66,7 +68,7 @@ export default function CartPage() {
   // Empty Cart State
   if (!cart || cart.cart_items.length === 0) {
     return (
-      <EmptyCartState onBrowseProducts={(e) => e.preventDefault()} />
+      <EmptyCartState onBrowseProducts={() => navigator('/market')} />
     );
   }
 
@@ -82,7 +84,6 @@ export default function CartPage() {
         {/* Header */}
         <CartHeader
           itemCount={cart?.cart_items?.length}
-          onContinueShopping={(e) => e.preventDefault()}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -104,6 +105,7 @@ export default function CartPage() {
               subtotal={cart?.subtotal}
               discount={cart?.discount}
               total={cart?.total}
+              isCartItemsRequiredFieldsFilled={cart?.cart_items?.every(item => item.required_fields_filled)}
             />
           </div>
           </div>
