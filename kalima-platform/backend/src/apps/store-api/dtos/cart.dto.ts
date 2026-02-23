@@ -111,10 +111,23 @@ export class FastBuyDto extends CheckoutDto {
 export class UpdateCartItemRequiredFieldsDto {
   @IsInt()
   @IsPositive()
+  @Type(() => Number)
   cart_item_id: number;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CartItemRequiredFieldDto)
   required_fields: CartItemRequiredFieldDto[];
+}
+
+export class UpdateCartItemRequiredFieldImageDto {
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  cart_item_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  required_field_definition_id: number;
 }

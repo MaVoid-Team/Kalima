@@ -101,10 +101,11 @@ class CartService {
     user_id: number,
     cart_item_id: number,
     coupon_code: string,
+    cartStatus: "active" | "fastbuy" = "active"
   ) {
     // 1. Validate cart and cart item in parallel
     const [cart, cartItem] = await Promise.all([
-      this.getActiveCartByUser(user_id),
+      this.getActiveCartByUser(user_id, cartStatus),
       this.db.cart_items.findUnique({
         where: { id: cart_item_id },
         select: {
@@ -198,6 +199,28 @@ class CartService {
     });
   }
 
+  // ============================================
+  // START FAST BUY (Clears old fastbuys, creates new one, adds item)
+  // ============================================
+  async startFastBuy(user_id: number, product_id: number, quantity: number) {
+    // 1. Delete any existing fastbuy carts for this user
+    await this.db.carts.deleteMany({
+      where: { user_id, status: "fastbuy" },
+    });
+    await invalidateCartCache(`fastbuy:${user_id}` as any);
+
+    // 2. Add the requested item into the fresh fastbuy cart
+    await this.addItemToCart(
+      user_id,
+      { product_id, quantity },
+      undefined,
+      "fastbuy"
+    );
+
+    // 3. Return the fully formed fastbuy cart
+    return this.getActiveCartByUser(user_id, "fastbuy");
+  }
+
   async #getOrCreateCart(user_id: number): Promise<CartWithItems> {
     try {
       return await this.getActiveCartByUser(user_id);
@@ -212,19 +235,20 @@ class CartService {
   // ============================================
   // GET CART BY USER (with Redis read-through cache)
   // ============================================
-  async getActiveCartByUser(user_id: number) {
-    const cached = await getCachedCart<any>(user_id);
+  async getActiveCartByUser(user_id: number, cartStatus: "active" | "fastbuy" = "active") {
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
+    const cached = await getCachedCart<any>(cacheKeyUserId as any);
     if (cached) return cached;
 
     const cart = await this.db.carts.findFirst({
-      where: { user_id, status: "active" },
+      where: { user_id, status: cartStatus },
       include: cartWithItemsQueryInclude,
       relationLoadStrategy: "join",
     });
     if (!cart) throw new NotFoundError("Active cart not found");
 
     const enriched = await this.#mergeRequiredFields(cart);
-    await setCachedCart(user_id, enriched);
+    await setCachedCart(cacheKeyUserId as any, enriched);
     return enriched;
   }
 
@@ -299,11 +323,21 @@ class CartService {
     user_id: number,
     dto: AddCartItemDto,
     file?: Express.Multer.File,
+    cartStatus: "active" | "fastbuy" = "active"
   ) {
-    const [cart, product] = await Promise.all([
-      this.#getOrCreateCart(user_id),
-      this.db.products.findUnique({ where: { id: dto.product_id } }),
-    ]);
+    let cart = await this.db.carts.findFirst({
+      where: { user_id, status: cartStatus },
+      select: { id: true },
+    });
+
+    if (!cart) {
+      cart = await this.db.carts.create({
+        data: { user_id, status: cartStatus },
+        select: { id: true },
+      });
+    }
+
+    const product = await this.db.products.findUnique({ where: { id: dto.product_id } });
     if (!product) throw new NotFoundError("Product not found");
 
     // Use findFirst + conditional upsert to reduce roundtrips
@@ -357,9 +391,10 @@ class CartService {
       await this.db.cart_item_required_fields.createMany({ data: fieldsData });
     }
 
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
     await Promise.all([
       this.#recalculateAndSaveCart(cart.id),
-      invalidateCartCache(user_id),
+      invalidateCartCache(cacheKeyUserId as any),
     ]);
     return cartItem;
   }
@@ -367,9 +402,9 @@ class CartService {
   // ============================================
   // REMOVE ITEM FROM CART
   // ============================================
-  async removeItemFromCart(user_id: number, cart_item_id: number) {
+  async removeItemFromCart(user_id: number, cart_item_id: number, cartStatus: "active" | "fastbuy" = "active") {
     const [cart, cartItem] = await Promise.all([
-      this.getActiveCartByUser(user_id),
+      this.getActiveCartByUser(user_id, cartStatus),
       this.db.cart_items.findUnique({ where: { id: cart_item_id } }),
     ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
@@ -379,17 +414,18 @@ class CartService {
     await this.db.cart_items.delete({ where: { id: cart_item_id } });
 
     // Recalculate cart totals and persist
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
     await this.#recalculateAndSaveCart(cart.id);
-    await invalidateCartCache(user_id);
+    await invalidateCartCache(cacheKeyUserId as any);
     return { success: true };
   }
 
   // ============================================
   // REMOVE COUPON FROM CART ITEM
   // ============================================
-  async removeCouponFromCartItem(user_id: number, cart_item_id: number) {
+  async removeCouponFromCartItem(user_id: number, cart_item_id: number, cartStatus: "active" | "fastbuy" = "active") {
     const [cart, cartItem] = await Promise.all([
-      this.getActiveCartByUser(user_id),
+      this.getActiveCartByUser(user_id, cartStatus),
       this.db.cart_items.findUnique({ where: { id: cart_item_id } }),
     ]);
     if (!cartItem || cartItem.cart_id !== cart.id)
@@ -400,17 +436,18 @@ class CartService {
       data: { coupon_id: null, discount: 0, final_price: Number(cartItem.price_at_add) * cartItem.quantity },
     });
 
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
     await this.#recalculateAndSaveCart(cart.id);
-    await invalidateCartCache(user_id);
+    await invalidateCartCache(cacheKeyUserId as any);
     return { success: true };
   }
 
   // ============================================
   // UPDATE ITEM QUANTITY
   // ============================================
-  async updateCartItem(user_id: number, dto: UpdateCartItemDto) {
+  async updateCartItem(user_id: number, dto: UpdateCartItemDto, cartStatus: "active" | "fastbuy" = "active") {
     const [cart, cartItem] = await Promise.all([
-      this.getActiveCartByUser(user_id),
+      this.getActiveCartByUser(user_id, cartStatus),
       this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
     ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
@@ -422,16 +459,17 @@ class CartService {
     });
 
     // Coupon discount recalculation is handled inside #recalculateAndSaveCart
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
     await this.#recalculateAndSaveCart(cart.id);
-    await invalidateCartCache(user_id);
+    await invalidateCartCache(cacheKeyUserId as any);
     return updated;
   }
 
   // ============================================
   // CLEAR CART
   // ============================================
-  async clearCart(user_id: number): Promise<CartWithItems> {
-    const cart = await this.getActiveCartByUser(user_id);
+  async clearCart(user_id: number, cartStatus: "active" | "fastbuy" = "active"): Promise<CartWithItems> {
+    const cart = await this.getActiveCartByUser(user_id, cartStatus);
     await this.db.$transaction([
       this.db.cart_items.deleteMany({ where: { cart_id: cart.id } }),
       this.db.carts.update({
@@ -440,11 +478,12 @@ class CartService {
           total: 0,
           subtotal: 0,
           discount: 0,
-          status: "active",
+          status: cartStatus,
         },
       }),
     ]);
-    await invalidateCartCache(user_id);
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
+    await invalidateCartCache(cacheKeyUserId as any);
     // Return empty cart structure without refetching from DB
     return {
       ...cart,
@@ -458,8 +497,8 @@ class CartService {
   // ============================================
   // CHECKOUT PREVIEW (batched — avoids N+1)
   // ============================================
-  async getCheckoutPreview(user_id: number) {
-    const cart = await this.getActiveCartByUser(user_id);
+  async getCheckoutPreview(user_id: number, cartStatus: "active" | "fastbuy" = "active") {
+    const cart = await this.getActiveCartByUser(user_id, cartStatus);
     const hasBooks = cart.cart_items.some(
       (i: any) => i.products?.type === "Book",
     );
@@ -559,9 +598,10 @@ class CartService {
     user_id: number,
     dto: CheckoutDto,
     payment_screenshot_file: Express.Multer.File,
+    cartStatus: "active" | "fastbuy" = "active"
   ) {
     // 1. Validate cart and required fields via unified preview logic
-    const preview = await this.getCheckoutPreview(user_id);
+    const preview = await this.getCheckoutPreview(user_id, cartStatus);
     
     // Check if the cart is ready internally (item-specific missing fields)
     if (!preview.isCheckoutReady) {
@@ -570,7 +610,7 @@ class CartService {
       );
     }
 
-    const cart = await this.getActiveCartByUser(user_id);
+    const cart = await this.getActiveCartByUser(user_id, cartStatus);
     if (!cart.cart_items.length) {
       throw new BadRequestError("Cart is empty");
     }
@@ -689,7 +729,8 @@ class CartService {
       await tx.cart_items.deleteMany({ where: { cart_id: cart.id } });
     });
 
-    await invalidateCartCache(user_id);
+    const cacheKeyUserId = cartStatus === "fastbuy" ? `fastbuy:${user_id}` : user_id;
+    await invalidateCartCache(cacheKeyUserId as any);
 
     if (createdPurchase) {
       const user = await this.db.users.findUnique({
@@ -804,17 +845,17 @@ class CartService {
   }
 
   // ============================================
-  // UPDATE REQUIRED FIELDS FOR CART ITEM
+  // UPDATE REQUIRED FIELDS FOR CART ITEM (JSON Text)
   // ============================================
   async updateCartItemRequiredFields(
     user_id: number,
     dto: UpdateCartItemRequiredFieldsDto,
-    file?: Express.Multer.File,
+    cartStatus: "active" | "fastbuy" = "active"
   ) {
     // Fetch cart item and user's cart in parallel
     const [cartItem, cart] = await Promise.all([
       this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
-      this.getActiveCartByUser(user_id),
+      this.getActiveCartByUser(user_id, cartStatus),
     ]);
     if (!cartItem) throw new NotFoundError("Cart item not found");
     if (cartItem.cart_id !== cart.id)
@@ -829,8 +870,7 @@ class CartService {
     const defMap = new Map<number, FieldType>();
     for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
 
-    // Build field values, handling image uploads sequentially
-    // Using findFirst + update/create instead of upsert to avoid schema cache issues in dev
+    // Build field values
     const operations: Promise<unknown>[] = [];
     for (const f of dto.required_fields) {
       let value: string | null = f.value;
@@ -839,9 +879,8 @@ class CartService {
       }
 
       const fieldType = defMap.get(f.required_field_definition_id);
-      if (fieldType === "image" && file && value !== null) {
-        const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
-        value = image.id.toString();
+      if (fieldType === "image") {
+        throw new BadRequestError(`Field ${f.required_field_definition_id} requires an image upload via the dedicated form-data endpoint.`);
       }
       
       const existing = await this.db.cart_item_required_fields.findFirst({
@@ -853,8 +892,6 @@ class CartService {
 
       if (existing) {
         if (value === null) {
-          // If clearing out the value, we can just delete the record or update to null (schema allows String, but practically it's not null, it's string. Let's send empty string to DB instead of strict null if schema requires string)
-          // Wait, Prisma schema says `value String` so it cannot be null in DB. Let's delete the record if value is null
           operations.push(
             this.db.cart_item_required_fields.delete({ where: { id: existing.id } })
           );
@@ -881,25 +918,99 @@ class CartService {
     await Promise.all(operations);
 
     // After updating, recalculate if the entire item is now "filled"
-    // Get all required definitions for the product
     const allDefs = await this.db.product_required_fields.findMany({
       where: { product_id: cartItem.product_id, active: true },
     });
     const requiredDefIds = allDefs.filter(d => d.is_required).map(d => d.field_definition_id);
     
-    // Get all currently filled definitions for this cart item
     const filledFields = await this.db.cart_item_required_fields.findMany({
       where: { cart_item_id: dto.cart_item_id },
       select: { field_definition_id: true, value: true }
     });
     
-    // Check if every required definition ID has a corresponding non-empty value in filledFields
     const isFilled = requiredDefIds.every(reqId => {
       const match = filledFields.find(f => f.field_definition_id === reqId);
       return match && match.value.trim() !== "";
     });
 
-    // Update the cart item
+    await this.db.cart_items.update({
+      where: { id: dto.cart_item_id },
+      data: { required_fields_filled: isFilled }
+    });
+
+    await invalidateCartCache(user_id);
+    return { success: true };
+  }
+
+  // ============================================
+  // UPDATE REQUIRED FIELD IMAGE FOR CART ITEM (FormData)
+  // ============================================
+  async updateCartItemRequiredFieldImage(
+    user_id: number,
+    dto: import("../dtos/cart.dto").UpdateCartItemRequiredFieldImageDto,
+    file: Express.Multer.File,
+    cartStatus: "active" | "fastbuy" = "active"
+  ) {
+    if (!file) throw new BadRequestError("Image file is required");
+
+    const [cartItem, cart] = await Promise.all([
+      this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
+      this.getActiveCartByUser(user_id, cartStatus),
+    ]);
+    if (!cartItem) throw new NotFoundError("Cart item not found");
+    if (cartItem.cart_id !== cart.id)
+      throw new BadRequestError("Cart item does not belong to user's cart");
+
+    const def = await this.db.required_field_definitions.findUnique({
+      where: { id: dto.required_field_definition_id },
+      select: { id: true, field_type: true },
+    });
+
+    if (!def) throw new NotFoundError("Required field definition not found");
+    if (def.field_type !== "image") {
+      throw new BadRequestError(`Field ${def.id} is not an image type.`);
+    }
+
+    const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
+    const value = image.id.toString();
+
+    const existing = await this.db.cart_item_required_fields.findFirst({
+        where: {
+          cart_item_id: dto.cart_item_id,
+          field_definition_id: dto.required_field_definition_id,
+        },
+    });
+
+    if (existing) {
+        await this.db.cart_item_required_fields.update({
+            where: { id: existing.id },
+            data: { value },
+        });
+    } else {
+        await this.db.cart_item_required_fields.create({
+            data: {
+              cart_item_id: dto.cart_item_id,
+              field_definition_id: dto.required_field_definition_id,
+              value,
+            },
+        });
+    }
+
+    const allDefs = await this.db.product_required_fields.findMany({
+      where: { product_id: cartItem.product_id, active: true },
+    });
+    const requiredDefIds = allDefs.filter(d => d.is_required).map(d => d.field_definition_id);
+    
+    const filledFields = await this.db.cart_item_required_fields.findMany({
+      where: { cart_item_id: dto.cart_item_id },
+      select: { field_definition_id: true, value: true }
+    });
+    
+    const isFilled = requiredDefIds.every(reqId => {
+      const match = filledFields.find(f => f.field_definition_id === reqId);
+      return match && match.value.trim() !== "";
+    });
+
     await this.db.cart_items.update({
       where: { id: dto.cart_item_id },
       data: { required_fields_filled: isFilled }

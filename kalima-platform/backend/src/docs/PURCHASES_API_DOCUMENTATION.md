@@ -115,39 +115,6 @@ Returns the authenticated user's purchases, sorted by newest first.
 ```
 
 ---
-
-### Fast Buy
-
-Allows a Teacher to purchase a single product immediately without using the cart. Since this includes uploading a payment screenshot (and optionally a product image requirement), the request must be `multipart/form-data`.
-
-**Endpoint:** `POST /fast-buy`  
-**Auth Required:** Yes (Teacher)
-
-**Request Type:** `multipart/form-data`
-
-**Form Data Fields:**
-
-| Field                          | Type   | Required | Description                                                         |
-| ------------------------------ | ------ | -------- | ------------------------------------------------------------------- |
-| `product_id` or `productId`    | number | Yes      | ID of the product being purchased                                   |
-| `quantity`                     | number | Yes      | Quantity of the product (must be ≥ 1)                               |
-| `payment_method_id`            | number | Yes      | ID of the payment method used                                       |
-| `numberTransferredFrom`        | string | Yes      | Phone/Account number the payment was sent from                      |
-| `notes`                        | string | No       | Optional user notes for the admin                                   |
-| `payment_screenshot`           | File   | Yes      | Image file of the payment receipt                                   |
-| `product_image`                | File   | No       | Required ONLY if the product has an image required field            |
-| `required_fields[0][id]`*      | number | No       | `required_field_definition_id` for custom fields                    |
-| `required_fields[0][value]`*   | string | No       | The filled text/number value for the required field                 |
-
-*\* Replace `0` with the index for multiple required fields.*
-
-**Success Response (201):**
-
-```json
-{
-  "success": true,
-  "message": "Purchase created successfully",
-  "data": {
     "purchase": {
       "id": 16,
       "user_id": 42,

@@ -97,51 +97,6 @@ export const purchaseController = {
     }
   },
 
-  /** POST /fast-buy — Teacher directly buys a product without cart */
-  async fastBuy(req: Request, res: Response, next: NextFunction) {
-    try {
-      // Normalize incoming form-data fields
-      if ((req.body as any).paymentMethod !== undefined) {
-        (req.body as any).payment_method_id = Number((req.body as any).paymentMethod);
-      }
-      if ((req.body as any).productId !== undefined) {
-        (req.body as any).product_id = Number((req.body as any).productId);
-      }
-      if (typeof req.body.quantity === "string") {
-        req.body.quantity = Number(req.body.quantity);
-      }
-
-      const dto = await validateDto(
-        (await import("../dtos/cart.dto")).FastBuyDto,
-        req.body
-      );
-
-      const userId = (req.user as any).userId;
-      
-      // Handle Multer files
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
-      const paymentScreenshot = files?.["payment_screenshot"]?.[0] || req.file; // Fallback to req.file if single upload
-      const productImage = files?.["product_image"]?.[0]; // If product required field needs an image
-
-      const purchase = await purchasesService.fastBuy(
-        userId,
-        dto.product_id,
-        dto.quantity,
-        dto, // FastBuyDto extends CheckoutDto
-        paymentScreenshot as Express.Multer.File,
-        productImage as Express.Multer.File | undefined,
-      );
-
-      res.status(201).json({
-        success: true,
-        message: "Purchase created successfully",
-        data: { purchase },
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-
   // ---- Status transitions (Admin / SubAdmin) ----
 
   /** PATCH /:id/receive — pending → received */
