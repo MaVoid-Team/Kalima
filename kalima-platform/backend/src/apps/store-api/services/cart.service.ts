@@ -1,4 +1,6 @@
-import type { PrismaClient } from "../../../libs/db/prisma";
+import { PrismaClient } from "../generated/prisma/client";
+import { redis } from "../../../libs/redis/client";
+import { getEmailService } from "../emails/email.service";
 import { prisma } from "../../../libs/db/prisma";
 import { BadRequestError, NotFoundError } from "../../../libs/errors";
 import {
@@ -735,7 +737,7 @@ class CartService {
     if (createdPurchase) {
       const user = await this.db.users.findUnique({
         where: { id: user_id },
-        select: { name: true },
+        select: { name: true, email: true },
       });
       addPurchaseEvent({
         purchase_id: createdPurchase.id,
@@ -747,6 +749,23 @@ class CartService {
       }).catch((err) =>
         console.error("[Cart] Failed to publish purchase notification:", err),
       );
+
+      if (user?.email) {
+        let productListHTML = "";
+        cart.cart_items.forEach((item, index) => {
+          const productTitle = item.products?.title || "Unknown Product";
+          productListHTML += "<tr><td style='text-align:center; padding: 8px; border-bottom: 1px solid #ddd;'>" + (index + 1) + "</td><td style='text-align:start; padding: 8px; border-bottom: 1px solid #ddd;'>" + productTitle + " x" + item.quantity + "</td></tr>";
+        });
+
+        getEmailService().sendOrderReceivedEmail(user.email, {
+          name: user.name,
+          purchaseSerial: createdPurchase.purchase_serial ?? "N/A",
+          totalItems: itemCount,
+          productListHTML,
+        }).catch((err) => 
+          console.error("[Cart] Failed to send order received email:", err)
+        );
+      }
     }
 
     return {

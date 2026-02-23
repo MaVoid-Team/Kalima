@@ -22,7 +22,7 @@
 4. [Reference: Enums & Constants](#reference-enums--constants)
 5. [Common Response Types](#common-response-types)
 6. [Error Codes](#error-codes)
-7. [Planned: Admin Dashboard](#planned-admin-dashboard)
+7. [Admin Dashboard](#admin-dashboard)
 
 ---
 
@@ -403,16 +403,74 @@ The `user_roles` table has a **unique constraint** on `(user_id, portal, role)` 
 
 ---
 
-## Planned: Admin Dashboard
+## Admin Dashboard
 
-> **Coming soon** — The following endpoints are planned for a future admin dashboard feature:
+The following endpoints provide platform-wide statistics, revenue breakdowns, and user activity metrics.
 
-- `GET /dashboard/stats` — Platform-wide statistics (total users, revenue, etc.)
-- `GET /dashboard/users/activity` — User activity metrics
-- `GET /dashboard/revenue` — Revenue breakdowns
-- `POST /admin/users/:userId/ban` — Ban/suspend a user
-- `POST /admin/users/:userId/unban` — Unban a user
-- `DELETE /admin/users/:userId` — Delete a user account
-- `GET /admin/audit-log` — Admin action audit trail
+### Store Statistics
 
-These will be documented in detail once implemented.
+Overview of total purchases, confirmed purchases, revenue, pending purchases, and average price. Supports optional date range filtering.
+
+**Endpoint:** `GET /dashboard/store-stats`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Query Parameters:**
+
+| Parameter  | Type   | Required | Description |
+| ---------- | ------ | -------- | ----------- |
+| `startDate`| string | No       | ISO date string (e.g., `2026-01-01T00:00:00Z`) |
+| `endDate`  | string | No       | ISO date string (e.g., `2026-01-31T23:59:59Z`) |
+
+**Success Response (200):** Returns an overview object containing `totalPurchases`, `totalRevenue`, `averagePrice`, `confirmedPurchases`, `confirmedRevenue`, and `pendingPurchases`.
+
+---
+
+### Confirmer Statistics
+
+Groups purchases by the `confirmed_by_user` to track how many purchases each sub-admin or admin has handled, categorized by status.
+
+**Endpoint:** `GET /dashboard/confirmer-stats`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Success Response (200):** Returns an array of objects detailing `user` info, `byStatus` counts (e.g., confirmed, pending), and `totalHandled`.
+
+---
+
+### Product Performance
+
+Ranks products by total value generated and times purchased based on `purchase_items`.
+
+**Endpoint:** `GET /dashboard/product-performance`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Success Response (200):** Returns an array of the top 50 products showing their `product` details, `timesPurchased`, and `totalValue` generated.
+
+---
+
+### Response Time Analytics
+
+Calculates the average, minimum, and maximum differences in minutes between `created_at` and `confirmed_at` for purchases.
+
+**Endpoint:** `GET /dashboard/response-time`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Success Response (200):** Returns an object containing `averageResponseTimeMinutes`, `fastestResponseTimeMinutes`, and `slowestResponseTimeMinutes`.
+
+---
+
+### Created Accounts Statistics
+
+Returns statistics on how many user accounts were created by each Admin/SubAdmin. Note that this is located under the `/users` path.
+
+**Endpoint:** `GET /users/stats/created-accounts`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Success Response (200):** Returns an array of admin objects with their respective account creation counts.
+
+---
+
+> **Planned Future Endpoints:**  
+> - `POST /admin/users/:userId/ban` — Ban/suspend a user
+> - `POST /admin/users/:userId/unban` — Unban a user
+> - `DELETE /admin/users/:userId` — Delete a user account
+> - `GET /admin/audit-log` — Admin action audit trail
