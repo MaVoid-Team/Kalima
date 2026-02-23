@@ -26,7 +26,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
     return (
         <aside
-            className={`fixed inset-y-0 ${isRtl ? 'right-0' : 'left-0'} z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:static lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
+            className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:static lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
         >
             {/* Header + Toggles */}
             <div className={`flex h-16 items-center px-4 border-b border-sidebar-border ${isCollapsed ? 'lg:justify-center justify-between' : 'justify-between'}`}>
@@ -67,7 +67,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                                 : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                                 } ${isCollapsed ? 'lg:justify-center' : ''}`}
                         >
-                            <item.icon className={`h-5 w-5 shrink-0 ${isRtl ? 'ml-3' : 'mr-3'} ${isCollapsed ? (isRtl ? 'lg:ml-0' : 'lg:mr-0') : ''}`} aria-hidden="true" />
+                            <item.icon className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} aria-hidden="true" />
                             <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
                         </Link>
                     );
@@ -81,7 +81,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
                 >
-                    <Globe className={`h-5 w-5 shrink-0 ${isRtl ? 'ml-3' : 'mr-3'} ${isCollapsed ? (isRtl ? 'lg:ml-0' : 'lg:mr-0') : ''}`} />
+                    <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
                 </button>
 
@@ -90,7 +90,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     title={isCollapsed ? t('nav.backToStore') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
                 >
-                    <Home className={`h-5 w-5 shrink-0 ${isRtl ? 'ml-3' : 'mr-3'} ${isCollapsed ? (isRtl ? 'lg:ml-0' : 'lg:mr-0') : ''}`} />
+                    <Home className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{t('nav.backToStore')}</span>
                 </Link>
 
@@ -99,7 +99,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     title={isCollapsed ? t('nav.logout') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? 'lg:justify-center' : ''}`}
                 >
-                    <LogOut className={`h-5 w-5 shrink-0 ${isRtl ? 'ml-3' : 'mr-3'} ${isCollapsed ? (isRtl ? 'lg:ml-0' : 'lg:mr-0') : ''}`} />
+                    <LogOut className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{t('nav.logout')}</span>
                 </button>
             </div>

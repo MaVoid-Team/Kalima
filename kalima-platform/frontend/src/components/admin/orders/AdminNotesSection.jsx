@@ -67,12 +67,12 @@ export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) 
                     <div className="flex items-center justify-between">
                         <div className="text-xs text-muted-foreground">
                         </div>
-                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                        <div className="flex items-center gap-2">
                             <span className="text-xs text-muted-foreground" dir="ltr">
                                 {newNote.length} / {remainingChars}
                             </span>
                             <Button onClick={handleSave} size="sm" className="flex items-center" disabled={!newNote.trim()}>
-                                <Save className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                                <Save className="h-4 w-4 me-2" />
                                 {t('orders.details.saveNote')}
                             </Button>
                         </div>
