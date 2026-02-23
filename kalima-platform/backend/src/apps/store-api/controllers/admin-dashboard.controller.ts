@@ -37,7 +37,7 @@ export const adminDashboardController = {
         _sum: { total: true },
         where: {
           ...whereClause,
-          status: 'Confirmed', // Assuming 'Confirmed' is a string status, adjust based on your schema
+          status: "confirmed",
         },
       });
 
@@ -58,7 +58,7 @@ export const adminDashboardController = {
             averagePrice: aggregates._avg.total || 0,
             confirmedPurchases: confirmedAggregates._count.id,
             confirmedRevenue: confirmedAggregates._sum.total || 0,
-            pendingPurchases: pendingAggregates,
+            pendingPurchases: pendingCount,
           },
         },
       });

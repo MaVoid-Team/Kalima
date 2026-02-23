@@ -307,13 +307,14 @@ model coupon_usages {
 model product_required_fields {
   id                         Int                        @id @default(autoincrement())
   product_id                 Int
-  field_definition_id        Int
+  field_definition_id       Int
   is_required                Boolean?                   @default(true)
   active                     Boolean?                   @default(true)
   required_field_definitions required_field_definitions @relation(fields: [field_definition_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   products                   products                   @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([product_id, field_definition_id])
+  @@index([product_id, is_required, active], map: "ix_product_required_fields_product_active")
 }
 
 model products {
@@ -444,6 +445,11 @@ model purchases {
   payment_methods         payment_methods? @relation(fields: [payment_method_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   payment_screenshot      images?          @relation("PurchasePaymentScreenshot", fields: [payment_screenshot_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   watermark               images?          @relation("PurchaseWatermark", fields: [watermark_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@index([user_id], map: "ix_purchases_user_id")
+  @@index([status], map: "ix_purchases_status")
+  @@index([created_at], map: "ix_purchases_created_at")
+  @@index([purchase_serial], map: "ix_purchases_serial")
 }
 
 model purchase_items {

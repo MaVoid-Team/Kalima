@@ -11,6 +11,7 @@ function createRedisClient(): Redis | null {
   const client = new Redis(REDIS_URL, {
     maxRetriesPerRequest: 3,
     connectTimeout: 5000,
+    commandTimeout: 5000,
     enableReadyCheck: true,
   });
   client.on("error", (err) => console.error("[Redis] Error:", err.message));

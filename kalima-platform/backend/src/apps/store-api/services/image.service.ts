@@ -139,12 +139,7 @@ class ImageService {
     files: Express.Multer.File[],
     options: UploadImageOptions = {},
   ): Promise<images[]> {
-    const results: images[] = [];
-    for (const file of files) {
-      const image = await this.uploadImage(file, options);
-      results.push(image);
-    }
-    return results;
+    return Promise.all(files.map((file) => this.uploadImage(file, options)));
   }
 
   // ============================================
@@ -188,21 +183,12 @@ class ImageService {
    * Does not throw if the file doesn't exist (already cleaned up).
    */
   removeFileFromDisk(url: string): void {
-    // url is like /uploads/images/filename.webp
-    // Resolve to absolute path from project root
     const absolutePath = path.resolve(
       __dirname,
       "../../../..",
       url.startsWith("/") ? url.slice(1) : url,
     );
-
-    try {
-      if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-      }
-    } catch {
-      // Silently ignore — file may have been cleaned up already
-    }
+    void fsPromises.unlink(absolutePath).catch(() => {});
   }
 
   // ============================================
