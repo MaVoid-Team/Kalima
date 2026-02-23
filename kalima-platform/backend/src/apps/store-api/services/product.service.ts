@@ -167,7 +167,7 @@ class ProductService {
     const [data, total] = await Promise.all([
       this.db.products.findMany({
         where,
-        include: PRODUCT_INCLUDE,
+        include: PRODUCT_LIST_INCLUDE,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -329,7 +329,6 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    // Get current max sort_order
     const maxEntry = await this.db.product_gallery.findFirst({
       where: { product_id: productId },
       orderBy: { sort_order: "desc" },
@@ -337,27 +336,24 @@ class ProductService {
     });
     let nextSort = (maxEntry?.sort_order ?? -1) + 1;
 
-    const entries: product_gallery[] = [];
+    const images = await Promise.all(
+      files.map((file) =>
+        imageService.uploadImage(file, { compress, quality: 75 }),
+      ),
+    );
 
-    for (const file of files) {
-      const image = await imageService.uploadImage(file, {
-        compress,
-        quality: 75,
-      });
+    const createData = images.map((image) => ({
+      product_id: productId,
+      image_id: image.id,
+      sort_order: nextSort++,
+    }));
 
-      const entry = await this.db.product_gallery.create({
-        data: {
-          product_id: productId,
-          image_id: image.id,
-          sort_order: nextSort++,
-        },
-        include: { images: true },
-      });
+    const created = await this.db.product_gallery.createManyAndReturn({
+      data: createData,
+      include: { images: true },
+    });
 
-      entries.push(entry);
-    }
-
-    return entries;
+    return created;
   }
 
   // ============================================

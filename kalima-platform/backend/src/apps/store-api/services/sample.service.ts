@@ -1,5 +1,5 @@
 import path from "path";
-import fs from "fs";
+import { promises as fsPromises } from "fs";
 import crypto from "crypto";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
@@ -105,13 +105,7 @@ class SampleService {
       sample.url.startsWith("/") ? sample.url.slice(1) : sample.url,
     );
 
-    try {
-      if (fs.existsSync(absolutePath)) {
-        fs.unlinkSync(absolutePath);
-      }
-    } catch {
-      // Silently ignore if file already gone
-    }
+    await fsPromises.unlink(absolutePath).catch(() => {});
 
     await this.db.samples.delete({ where: { id } });
   }

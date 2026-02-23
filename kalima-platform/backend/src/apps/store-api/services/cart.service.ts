@@ -372,16 +372,18 @@ class CartService {
   // ============================================
   async clearCart(user_id: number): Promise<CartWithItems> {
     const cart = await this.getActiveCartByUser(user_id);
-    await this.db.cart_items.deleteMany({ where: { cart_id: cart.id } });
-    await this.db.carts.update({
-      where: { id: cart.id },
-      data: {
-        total: 0,
-        subtotal: 0,
-        discount: 0,
-        status: "active",
-      },
-    });
+    await this.db.$transaction([
+      this.db.cart_items.deleteMany({ where: { cart_id: cart.id } }),
+      this.db.carts.update({
+        where: { id: cart.id },
+        data: {
+          total: 0,
+          subtotal: 0,
+          discount: 0,
+          status: "active",
+        },
+      }),
+    ]);
     await invalidateCartCache(user_id);
     // Return empty cart structure without refetching from DB
     return {
@@ -394,13 +396,62 @@ class CartService {
   }
 
   // ============================================
-  // CHECKOUT PREVIEW
+  // CHECKOUT PREVIEW (batched — avoids N+1)
   // ============================================
   async getCheckoutPreview(user_id: number) {
     const cart = await this.getActiveCartByUser(user_id);
     const hasBooks = cart.cart_items.some(
       (i: any) => i.products?.type === "Book",
     );
+
+    if (cart.cart_items.length === 0) {
+      return {
+        hasBooks: false,
+        requiredFields: {
+          common: ["numberTransferredFrom", "paymentScreenShot"],
+          itemsMissingFields: [],
+        },
+        isCheckoutReady: true,
+      };
+    }
+
+    const productIds = cart.cart_items.map((i) => i.product_id);
+    const cartItemIds = cart.cart_items.map((i) => i.id);
+
+    const [allProductRequiredFields, allFilledFields] = await Promise.all([
+      this.db.product_required_fields.findMany({
+        where: {
+          product_id: { in: productIds },
+          is_required: true,
+          active: true,
+        },
+        include: { required_field_definitions: true },
+      }),
+      this.db.cart_item_required_fields.findMany({
+        where: { cart_item_id: { in: cartItemIds } },
+        select: { cart_item_id: true, field_definition_id: true },
+      }),
+    ]);
+
+    const requiredByProduct = new Map<
+      number,
+      Array<{
+        field_definition_id: number;
+        required_field_definitions: { id: number; label: string; field_type: string } | null;
+      }>
+    >();
+    for (const rf of allProductRequiredFields) {
+      const list = requiredByProduct.get(rf.product_id) ?? [];
+      list.push(rf);
+      requiredByProduct.set(rf.product_id, list);
+    }
+
+    const filledByCartItem = new Map<number, Set<number>>();
+    for (const f of allFilledFields) {
+      const set = filledByCartItem.get(f.cart_item_id) ?? new Set();
+      set.add(f.field_definition_id);
+      filledByCartItem.set(f.cart_item_id, set);
+    }
 
     const itemsMissingFields: Array<{
       cart_item_id: number;
@@ -410,37 +461,24 @@ class CartService {
     }> = [];
 
     for (const item of cart.cart_items) {
-      // Find required fields for this product
-      const requiredFields = await this.db.product_required_fields.findMany({
-        where: { product_id: item.product_id, is_required: true, active: true },
-        include: { required_field_definitions: true },
-      });
+      const requiredFields = requiredByProduct.get(item.product_id) ?? [];
+      if (requiredFields.length === 0) continue;
 
-      if (requiredFields.length > 0) {
-        const filledFields = await this.db.cart_item_required_fields.findMany({
-          where: { cart_item_id: item.id },
-          select: { field_definition_id: true },
+      const filledSet = filledByCartItem.get(item.id) ?? new Set();
+      const missing = requiredFields.filter(
+        (rf) => !filledSet.has(rf.field_definition_id),
+      );
+      if (missing.length > 0) {
+        itemsMissingFields.push({
+          cart_item_id: item.id,
+          product_id: item.product_id,
+          product_name: (item.products as any)?.title ?? (item.products as any)?.name ?? "",
+          missing_fields: missing.map((m) => ({
+            id: m.required_field_definitions?.id ?? 0,
+            label: m.required_field_definitions?.label ?? "",
+            field_type: m.required_field_definitions?.field_type ?? "text",
+          })),
         });
-        const filledSet = new Set(
-          filledFields.map((f) => f.field_definition_id),
-        );
-
-        const missing = requiredFields.filter(
-          (rf) => !filledSet.has(rf.field_definition_id),
-        );
-
-        if (missing.length > 0) {
-          itemsMissingFields.push({
-            cart_item_id: item.id,
-            product_id: item.product_id,
-            product_name: (item.products as any)?.name,
-            missing_fields: missing.map((m) => ({
-              id: m.required_field_definitions?.id as number,
-              label: m.required_field_definitions?.label as string,
-              field_type: m.required_field_definitions?.field_type as string,
-            })),
-          });
-        }
       }
     }
 

@@ -1,7 +1,7 @@
 import { redis, isRedisAvailable } from "../../../libs/redis/client";
 
 const CART_KEY_PREFIX = "cart:user:";
-const CART_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+const CART_TTL_SECONDS = 2 * 60 * 60; // 2 hours for active carts; avoids stale data after mutations
 
 export function cartCacheKey(userId: number): string {
   return `${CART_KEY_PREFIX}${userId}`;

@@ -143,25 +143,39 @@ class PurchasesService {
       },
     });
 
-    for (const item of input.items) {
-      const purchaseItem = await client.purchase_items.create({
-        data: {
-          purchase_id: created.id,
-          product_id: item.product_id,
-          price_at_purchase: item.price_at_purchase,
-          discount: item.discount,
-        },
-      });
+    const purchaseItemsData = input.items.map((item) => ({
+      purchase_id: created.id,
+      product_id: item.product_id,
+      price_at_purchase: item.price_at_purchase,
+      discount: item.discount,
+    }));
 
-      if (item.required_fields && item.required_fields.length > 0) {
-        await client.purchase_item_required_fields.createMany({
-          data: item.required_fields.map((rf) => ({
+    const createdItems = await client.purchase_items.createManyAndReturn({
+      data: purchaseItemsData,
+    });
+
+    const requiredFieldsData: Array<{
+      purchase_item_id: number;
+      field_definition_id: number;
+      value: string;
+    }> = [];
+    for (let i = 0; i < input.items.length; i++) {
+      const item = input.items[i];
+      const purchaseItem = createdItems[i];
+      if (item.required_fields?.length && purchaseItem) {
+        for (const rf of item.required_fields) {
+          requiredFieldsData.push({
             purchase_item_id: purchaseItem.id,
             field_definition_id: rf.field_definition_id,
             value: rf.value,
-          })),
-        });
+          });
+        }
       }
+    }
+    if (requiredFieldsData.length > 0) {
+      await client.purchase_item_required_fields.createMany({
+        data: requiredFieldsData,
+      });
     }
 
     return client.purchases.findUnique({
@@ -459,17 +473,17 @@ class PurchasesService {
   async deletePurchase(purchaseId: number) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
-      include: { coupon_usages: true },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
 
-    if (purchase.status === "confirmed" && purchase.coupon_usages.length > 0) {
-      for (const usage of purchase.coupon_usages) {
-        await this.db.coupon_usages.delete({ where: { id: usage.id } });
+    await this.db.$transaction(async (tx) => {
+      if (purchase.status === "confirmed") {
+        await tx.coupon_usages.deleteMany({
+          where: { purchase_id: purchaseId },
+        });
       }
-    }
-
-    await this.db.purchases.delete({ where: { id: purchaseId } });
+      await tx.purchases.delete({ where: { id: purchaseId } });
+    });
   }
 
   /** Remove a single item; recalculate totals. Cannot remove last item. */

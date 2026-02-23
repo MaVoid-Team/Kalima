@@ -79,6 +79,7 @@ export function startPurchaseNotificationConsumer(
       );
 
       if (!results || results.length === 0) {
+        await new Promise((r) => setTimeout(r, 200));
         setImmediate(poll);
         return;
       }
