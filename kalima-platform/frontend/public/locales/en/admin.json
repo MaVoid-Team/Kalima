@@ -29,7 +29,7 @@
             "customer": "Customer",
             "status": "Status",
             "total": "Total",
-            "payment": "Payment",
+            "payment": "Payment Method",
             "actions": "Actions"
         },
         "items": {
