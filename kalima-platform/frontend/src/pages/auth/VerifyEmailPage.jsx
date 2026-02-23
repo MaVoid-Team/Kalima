@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, CheckCircle2, XCircle, ArrowLeft, Mail } from "lucide-react";
+import { CheckCircle2, XCircle, Mail } from "lucide-react";
 import useEmailVerification from "../../hooks/auth/useEmailVerification";
-import useAuth from "../../hooks/auth/useAuth";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -79,7 +77,7 @@ export default function VerifyEmailPage() {
                         <CardContent className="flex flex-col items-center py-6">
                             {status === "verifying" || status === "idle" ? (
                                 <>
-                                    <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                                    <LoadingSpinner className="h-12 w-12 text-primary mb-4" />
                                     <p className="text-muted-foreground">
                                         {t("verify_email.verifying", "Verifying your email address...")}
                                     </p>
@@ -91,7 +89,7 @@ export default function VerifyEmailPage() {
                                         {t("verify_email.pending", "Registration successful! Please check your inbox for the verification link.")}
                                     </p>
                                     <Button onClick={handleResend} variant="outline" className="w-full" disabled={loading}>
-                                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        {loading && <LoadingSpinner className="mr-2 h-4 w-4" />}
                                         {t("verify_email.resend", "Resend Verification Email")}
                                     </Button>
                                     <Button asChild variant="ghost" className="w-full mt-2">

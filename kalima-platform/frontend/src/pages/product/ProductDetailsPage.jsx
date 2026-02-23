@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import {
-  Loader2,
   AlertCircle,
 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useTranslation } from "react-i18next";
 import {
   Breadcrumb,
@@ -30,7 +30,7 @@ export default function ProductDetailsPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-muted-foreground">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <LoadingSpinner className="h-10 w-10 text-primary" />
           <p className="text-sm">{t("loading")}</p>
         </div>
       </div>

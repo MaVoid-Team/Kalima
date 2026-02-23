@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/auth/useAuth';
-import { Loader2 } from 'lucide-react';
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const ProtectedRoute = ({ requireAuth = true }) => {
     const { isAuthenticated, loading } = useAuth();
@@ -9,7 +9,7 @@ const ProtectedRoute = ({ requireAuth = true }) => {
     if (loading) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingSpinner className="h-8 w-8 text-primary" />
             </div>
         );
     }
