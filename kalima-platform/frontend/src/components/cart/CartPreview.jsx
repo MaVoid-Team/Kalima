@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, { useMemo } from 'react';
 import { ShoppingBag, TicketCheck } from 'lucide-react';
 import {
   Sheet,
@@ -53,7 +53,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
               {t('emptyHint')}
             </p>
             <button
-              onClick={() => onOpenChange(false)}
+              onClick={() => onContinueShopping()}
               variant='secondary'
             >
               {t('goShopping')}
@@ -86,21 +86,21 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                       <div className={"flex items-center justify-between"}>
                         <div className="text-sm">
                           <span className="font-semibold">
-                            ${item?.final_price}
+                            {item?.final_price}
                           </span>
                           <span className={"text-muted-foreground" + (i18n.language === 'ar' ? ' mr-1' : ' ml-1')}>
                             {t('qty')} {item?.quantity}
                           </span>
                         </div>
-                        {item?.coupons && 
-                        <div className='flex justify-center items-center gap-1'>
+                        {item?.coupons &&
+                          <div className='flex justify-center items-center gap-1'>
                             <TicketCheck className={`w-5 h-5 text-green-500 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} />
                             <span className="text-xs text-green-500">
                               {item?.coupons?.discount_percentage != 0 && `${item?.coupons?.discount_percentage}%`}
                               {item?.coupons?.discount_amount != 0 && `${item?.coupons?.discount_amount} ${t('L.E')}`}
                             </span>
-                        </div>
-                      }
+                          </div>
+                        }
                       </div>
                     </div>
                   </div>
@@ -111,7 +111,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
             <SheetFooter className="px-6 py-4 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{t('subtotal')}</span>
-                <span className="text-xl font-bold">${cart?.subtotal}</span>
+                <span className="text-xl font-bold">{cart?.subtotal}</span>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">

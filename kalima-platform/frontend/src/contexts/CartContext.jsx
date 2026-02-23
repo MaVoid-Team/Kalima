@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import useCartNetwork from '../hooks/cart/useCart';
+import useAuth from '../hooks/auth/useAuth';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
+  const { isAuthenticated } = useAuth();
   // this hook is only responsible for performing API calls; the provider
   // wraps its results with state and caching.
   const {
@@ -31,8 +33,12 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    loadCart();
-  }, []);
+    if (isAuthenticated) {
+      loadCart();
+    } else {
+      setCart({ cart_items: [], subtotal: 0, discount: 0, total: 0 });
+    }
+  }, [isAuthenticated]);
 
   const updateQuantity = async (itemId, quantity) => {
     if (quantity < 1) return;
