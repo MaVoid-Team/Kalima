@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -152,7 +153,7 @@ export default function ResetPasswordPage() {
                                     />
                                     <Button type="submit" className="w-full" disabled={loading}>
                                         {loading && (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
                                         {t("reset_password.submit", "Reset Password")}
                                     </Button>
