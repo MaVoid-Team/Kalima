@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -141,7 +142,7 @@ export default function LoginPage() {
                                     />
                                     <Button type="submit" className="w-full" disabled={loading}>
                                         {loading && (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
                                         {t("login.submit")}
                                     </Button>
