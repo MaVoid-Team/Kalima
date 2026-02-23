@@ -23,31 +23,22 @@ export const adminDashboardController = {
         };
       }
 
-      // Aggregates for all purchases matching the date range
-      const aggregates = await prisma.purchases.aggregate({
-        _count: { id: true },
-        _sum: { total: true },
-        _avg: { total: true },
-        where: whereClause,
-      });
-
-      // Aggregates for confirmed purchases
-      const confirmedAggregates = await prisma.purchases.aggregate({
-        _count: { id: true },
-        _sum: { total: true },
-        where: {
-          ...whereClause,
-          status: "confirmed",
-        },
-      });
-
-      // Aggregates for pending purchases
-      const pendingAggregates = await prisma.purchases.count({
-        where: {
-          ...whereClause,
-          status: 'Pending',
-        },
-      });
+      const [aggregates, confirmedAggregates, pendingCount] = await Promise.all([
+        prisma.purchases.aggregate({
+          _count: { id: true },
+          _sum: { total: true },
+          _avg: { total: true },
+          where: whereClause,
+        }),
+        prisma.purchases.aggregate({
+          _count: { id: true },
+          _sum: { total: true },
+          where: { ...whereClause, status: "confirmed" },
+        }),
+        prisma.purchases.count({
+          where: { ...whereClause, status: "pending" },
+        }),
+      ]);
 
       res.status(200).json({
         success: true,
