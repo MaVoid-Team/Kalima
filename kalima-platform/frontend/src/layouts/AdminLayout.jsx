@@ -46,7 +46,7 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/20 p-4 sm:p-12 lg:p-16">
+                <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-12 lg:p-16">
                     <Outlet />
                 </main>
             </div>

@@ -15,7 +15,7 @@ export default function OrdersPage() {
         setStatus,
         setPage,
         fetchOrders
-    } = useOrders();
+    } = useOrders({ limit: 6 });
 
     const handleSearch = (query) => {
         setSearch(query);
