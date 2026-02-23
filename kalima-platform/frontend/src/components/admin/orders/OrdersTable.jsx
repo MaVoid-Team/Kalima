@@ -28,7 +28,7 @@ export default function OrdersTable({ orders, loading, onActionSuccess }) {
                             <TableHead>{t('orders.table.status')}</TableHead>
                             <TableHead>{t('orders.table.total')}</TableHead>
                             <TableHead>{t('orders.table.payment')}</TableHead>
-                            <TableHead className="text-right">{t('orders.table.actions')}</TableHead>
+                            <TableHead className="text-end">{t('orders.table.actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

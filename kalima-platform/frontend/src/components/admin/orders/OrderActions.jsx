@@ -29,9 +29,8 @@ import { Button } from "../../ui/button";
 import useOrders from '../../../hooks/useOrders';
 
 export default function OrderActions({ order, onActionSuccess }) {
-    const { t, i18n } = useTranslation('admin');
+    const { t } = useTranslation('admin');
     const { receiveOrder, confirmOrder, returnOrder, deleteOrder } = useOrders();
-    const isRtl = i18n.language === 'ar';
 
     const handleAction = async (actionFn) => {
         const res = await actionFn();
@@ -54,7 +53,7 @@ export default function OrderActions({ order, onActionSuccess }) {
     const status = order?.status?.toLowerCase();
 
     return (
-        <div className={`${isRtl ? 'flex items-start justify-start gap-1' : 'flex items-end justify-end gap-1'}`}>
+        <div className="flex items-center justify-end gap-1">
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
@@ -86,7 +85,7 @@ export default function OrderActions({ order, onActionSuccess }) {
             {order.admin_notes && (
                 <Button
                     variant="ghost"
-                    className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10"
                     onClick={() => setNoteDialogOpen(true)}
                     title={t('orders.actions.viewNote', 'View Note')}
                 >

@@ -16,16 +16,22 @@ This workflow outlines the established patterns in the frontend architecture. De
 - **Clean Pages:** Keep page components clean by extracting complex logic into these smaller components.
 
 ## 3. API & State Management
-- **Axios:** All API calls must utilize the configured Axios instance from `src/api/axios.js`.
+- **Hooks-Only API Pattern:** Components should never make direct API calls. Extract all data fetching and API logic into dedicated custom hooks (e.g., `useProducts.js`, `useProfileSettings.js`).
+- **Axios:** All API calls within those custom hooks must utilize the configured Axios instance from `src/api/axios.js`.
 - **Mutations:** For API mutations (POST, PATCH, DELETE), utilize the custom hook `useApiMutation` (`src/hooks/useApiMutation.js`) to standardize loading states and error/toast notifications.
 
 ## 4. Handling Duplicate Code (Helpers & Constants)
 - **DRY Principle:** Do not duplicate code! Extract duplicate calculations (e.g., totaling prices), formatting logic (e.g., currency), or parsing logic.
-- **Helpers:** Create shared helper/lib files in the `src/lib/` directory (e.g., `src/lib/storeUtils.js` or `src/lib/cartUtils.js`).
+- **Helpers:** Create shared helper/lib files in the `src/lib/` directory (e.g., `src/lib/storeUtils.js` or `src/lib/cartUtils.js`). 
 - **Constants:** Extract hardcoded string literals or reused static values as shared constants.
 
 ## 5. Styling
 - **Tailwind CSS:** The project uses Tailwind CSS.
+- **Semantic Colors:** We strictly use semantic colors from our `kalima-platform/frontend/src/index.css` file (e.g., `bg-background`, `text-primary`, `border-border`). Almost never hardcode rigid color values (like `bg-blue-500` or `#ffffff`). This properly supports our dynamic theming and dark mode toggle.
 - **Class Merging:** Utilize the `cn()` utility from `src/lib/utils.js` for conditionally combining Tailwind classes safely.
+
+## 6. Internationalization & Localization
+- **Translations:** Use `react-i18next` (`useTranslation`) for all user-facing text. Avoid hardcoded strings in the UI components.
+- **RTL & Logical Properties:** Ensure layouts naturally adapt to Right-To-Left (RTL) languages like Arabic. Use Tailwind's logical properties (e.g., `ms-2`, `pe-4`, `text-start`) instead of directional ones (e.g., `ml-2`, `pr-4`, `text-left`).
 
 **By following these guidelines, you will ensure the frontend codebase remains clean, maintainable, and uniform.**
