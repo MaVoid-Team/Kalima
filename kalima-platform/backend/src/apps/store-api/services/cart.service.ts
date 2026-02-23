@@ -324,7 +324,7 @@ class CartService {
 
     await this.db.cart_items.update({
       where: { id: cart_item_id },
-      data: { coupon_id: null, discount: 0 },
+      data: { coupon_id: null, discount: 0, final_price: Number(cartItem.price_at_add) * cartItem.quantity },
     });
 
     await this.#recalculateAndSaveCart(cart.id);
