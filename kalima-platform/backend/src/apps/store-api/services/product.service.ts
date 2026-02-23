@@ -27,7 +27,7 @@ import {
 const PRODUCT_LIST_INCLUDE = {
   thumbnail_image: true,
   product_categories: {
-    include: { categories: { select: { id: true, name: true } } },
+    include: { categories: { select: { id: true, title: true } } },
   },
 };
 
