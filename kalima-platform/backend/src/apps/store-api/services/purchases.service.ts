@@ -193,6 +193,7 @@ class PurchasesService {
     quantity: number,
     checkout: CheckoutDto,
     payment_screenshot_file: Express.Multer.File,
+    product_image_file?: Express.Multer.File,
     txClient?: PrismaClient,
   ) {
     const client = txClient ?? this.db;
@@ -239,10 +240,37 @@ class PurchasesService {
       payment_method_id: checkout.payment_method_id,
     });
 
-    const requiredFieldsMapped = (checkout.required_fields || []).map((f) => ({
-      field_definition_id: f.required_field_definition_id,
-      value: f.value,
-    }));
+    const providedReqFields = checkout.required_fields || [];
+    const requiredFieldsMapped: { field_definition_id: number; value: string }[] = [];
+
+    if (providedReqFields.length > 0) {
+      const defIds = providedReqFields.map((x) => x.required_field_definition_id);
+      const defs = await client.required_field_definitions.findMany({
+        where: { id: { in: defIds } },
+        select: { id: true, field_type: true },
+      });
+      const defMap = new Map<number, string>();
+      for (const d of defs) defMap.set(d.id, d.field_type);
+
+      for (const f of providedReqFields) {
+        let value = f.value;
+        const fieldType = defMap.get(f.required_field_definition_id);
+        
+        if (fieldType === "image" && product_image_file) {
+          const uploadedImg = await imageService.uploadImage(product_image_file, {
+            compress: true,
+            quality: 80,
+          });
+          value = uploadedImg.id.toString();
+        }
+
+        requiredFieldsMapped.push({
+          field_definition_id: f.required_field_definition_id,
+          value,
+        });
+      }
+    }
+
     const items: CreatePurchaseItemDto[] = Array.from(
       { length: quantity },
       () => ({
