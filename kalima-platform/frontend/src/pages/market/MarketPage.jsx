@@ -62,7 +62,7 @@ export default function MarketPage() {
       </div>
 
       {/* Promo banner stays below */}
-      <PromoBanner />
+      {/* <PromoBanner /> */}
     </>
   );
 }
