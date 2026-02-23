@@ -57,7 +57,15 @@ const cartWithItemsQueryInclude = {
           },
         },
       },
-      cart_item_required_fields: true,
+      cart_item_required_fields: {
+        select: {
+          field_definition_id: true,
+          value: true,
+          required_field_definitions: {
+            select: { label: true, field_type: true },
+          },
+        },
+      },
       coupons: {
         select: {
           code: true,
@@ -204,8 +212,8 @@ class CartService {
   // ============================================
   // GET CART BY USER (with Redis read-through cache)
   // ============================================
-  async getActiveCartByUser(user_id: number): Promise<CartWithItems> {
-    const cached = await getCachedCart<CartWithItems>(user_id);
+  async getActiveCartByUser(user_id: number) {
+    const cached = await getCachedCart<any>(user_id);
     if (cached) return cached;
 
     const cart = await this.db.carts.findFirst({
@@ -214,9 +222,62 @@ class CartService {
       relationLoadStrategy: "join",
     });
     if (!cart) throw new NotFoundError("Active cart not found");
-    const result = cart as CartWithItems;
-    await setCachedCart(user_id, result);
-    return result;
+
+    const enriched = await this.#mergeRequiredFields(cart);
+    await setCachedCart(user_id, enriched);
+    return enriched;
+  }
+
+  /**
+   * For each cart item, builds the full list of product required fields
+   * with the user's filled value (or null if not yet filled).
+   * Uses a single batched query for all products in the cart.
+   */
+  async #mergeRequiredFields(cart: CartWithItems) {
+    const productIds = [...new Set(cart.cart_items.map((i) => i.product_id))];
+    if (productIds.length === 0) return cart;
+
+    // Batch-fetch all required field definitions for every product in the cart
+    const productFields = await this.db.product_required_fields.findMany({
+      where: { product_id: { in: productIds }, active: true },
+      select: {
+        product_id: true,
+        field_definition_id: true,
+        is_required: true,
+        required_field_definitions: {
+          select: { label: true, field_type: true },
+        },
+      },
+    });
+
+    // Group by product_id for O(1) lookup
+    const fieldsByProduct = new Map<number, typeof productFields>();
+    for (const pf of productFields) {
+      let arr = fieldsByProduct.get(pf.product_id);
+      if (!arr) { arr = []; fieldsByProduct.set(pf.product_id, arr); }
+      arr.push(pf);
+    }
+
+    // Merge into each cart item
+    const enrichedItems = cart.cart_items.map((item) => {
+      const defs = fieldsByProduct.get(item.product_id) ?? [];
+      // Build a map of filled values by field_definition_id
+      const filledMap = new Map<number, string>();
+      for (const f of item.cart_item_required_fields) {
+        filledMap.set(f.field_definition_id, f.value);
+      }
+
+      const cart_item_required_fields = defs.map((def) => ({
+        field_definition_id: def.field_definition_id,
+        is_required: def.is_required,
+        required_field_definitions: def.required_field_definitions,
+        value: filledMap.get(def.field_definition_id) ?? null,
+      }));
+
+      return { ...item, cart_item_required_fields };
+    });
+
+    return { ...cart, cart_items: enrichedItems };
   }
 
   // ============================================
@@ -756,8 +817,9 @@ class CartService {
     const defMap = new Map<number, FieldType>();
     for (const d of defs) defMap.set(d.id, d.field_type as FieldType);
 
-    // Build all field data, handling image uploads sequentially
-    const fieldsData: { cart_item_id: number; field_definition_id: number; value: string }[] = [];
+    // Build field values, handling image uploads sequentially
+    // Using findFirst + update/create instead of upsert to avoid schema cache issues in dev
+    const operations: Promise<unknown>[] = [];
     for (const f of dto.required_fields) {
       let value = f.value;
       const fieldType = defMap.get(f.required_field_definition_id);
@@ -765,16 +827,34 @@ class CartService {
         const image = await imageService.uploadImage(file, { compress: true, quality: 80 });
         value = image.id.toString();
       }
-      fieldsData.push({
-        cart_item_id: dto.cart_item_id,
-        field_definition_id: f.required_field_definition_id,
-        value,
+      
+      const existing = await this.db.cart_item_required_fields.findFirst({
+        where: {
+          cart_item_id: dto.cart_item_id,
+          field_definition_id: f.required_field_definition_id,
+        },
       });
-    }
 
-    // Batch: delete old + insert all new
-    await this.db.cart_item_required_fields.deleteMany({ where: { cart_item_id: dto.cart_item_id } });
-    await this.db.cart_item_required_fields.createMany({ data: fieldsData });
+      if (existing) {
+        operations.push(
+          this.db.cart_item_required_fields.update({
+            where: { id: existing.id },
+            data: { value },
+          }),
+        );
+      } else {
+        operations.push(
+          this.db.cart_item_required_fields.create({
+            data: {
+              cart_item_id: dto.cart_item_id,
+              field_definition_id: f.required_field_definition_id,
+              value,
+            },
+          }),
+        );
+      }
+    }
+    await Promise.all(operations);
 
     await invalidateCartCache(user_id);
     return { success: true };
