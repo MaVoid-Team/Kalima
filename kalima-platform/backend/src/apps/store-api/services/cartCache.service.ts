@@ -7,12 +7,19 @@ export function cartCacheKey(userId: number): string {
   return `${CART_KEY_PREFIX}${userId}`;
 }
 
+const CACHE_GET_TIMEOUT_MS = 500;
+
 export async function getCachedCart<T>(userId: number): Promise<T | null> {
   if (!isRedisAvailable() || !redis) return null;
   try {
-    const raw = await redis.get(cartCacheKey(userId));
+    const raw = await Promise.race([
+      redis.get(cartCacheKey(userId)),
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error("Cache timeout")), CACHE_GET_TIMEOUT_MS)
+      ),
+    ]);
     if (!raw) return null;
-    return JSON.parse(raw) as T;
+    return JSON.parse(raw as string) as T;
   } catch {
     return null;
   }

@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client"
   output          = "../generated/prisma"
-  previewFeatures = ["partialIndexes"]
+  previewFeatures = ["partialIndexes", "relationJoins"]
 }
 
 datasource db {
@@ -398,6 +398,8 @@ model cart_items {
   products                  products                    @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   coupons                   coupons?                    @relation(fields: [coupon_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   cart_item_required_fields cart_item_required_fields[]
+
+  @@index([cart_id], map: "ix_cart_items_cart_id")
 }
 
 model cart_item_required_fields {

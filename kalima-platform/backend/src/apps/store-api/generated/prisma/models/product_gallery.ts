@@ -724,7 +724,7 @@ export type $product_galleryPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type product_galleryGetPayload<S extends boolean | null | undefined | product_galleryDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$product_galleryPayload, S>
 
 export type product_galleryCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<product_galleryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<product_galleryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Product_galleryCountAggregateInputType | true
   }
 
@@ -1172,6 +1172,7 @@ export type product_galleryFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which product_gallery to fetch.
    */
   where: Prisma.product_galleryWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,6 +1195,7 @@ export type product_galleryFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which product_gallery to fetch.
    */
   where: Prisma.product_galleryWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1246,6 +1248,7 @@ export type product_galleryFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of product_galleries.
    */
   distinct?: Prisma.Product_galleryScalarFieldEnum | Prisma.Product_galleryScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1298,6 +1301,7 @@ export type product_galleryFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of product_galleries.
    */
   distinct?: Prisma.Product_galleryScalarFieldEnum | Prisma.Product_galleryScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1345,6 +1349,7 @@ export type product_galleryFindManyArgs<ExtArgs extends runtime.Types.Extensions
    */
   skip?: number
   distinct?: Prisma.Product_galleryScalarFieldEnum | Prisma.Product_galleryScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1367,6 +1372,7 @@ export type product_galleryCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a product_gallery.
    */
   data: Prisma.XOR<Prisma.product_galleryCreateInput, Prisma.product_galleryUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1427,6 +1433,7 @@ export type product_galleryUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which product_gallery to update.
    */
   where: Prisma.product_galleryWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1505,6 +1512,7 @@ export type product_galleryUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the product_gallery was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.product_galleryUpdateInput, Prisma.product_galleryUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1527,6 +1535,7 @@ export type product_galleryDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which product_gallery to delete.
    */
   where: Prisma.product_galleryWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

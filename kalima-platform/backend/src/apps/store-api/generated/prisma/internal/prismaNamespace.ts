@@ -3228,6 +3228,14 @@ export const Auth_identitiesScalarFieldEnum = {
 export type Auth_identitiesScalarFieldEnum = (typeof Auth_identitiesScalarFieldEnum)[keyof typeof Auth_identitiesScalarFieldEnum]
 
 
+export const RelationLoadStrategy = {
+  query: 'query',
+  join: 'join'
+} as const
+
+export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
+
+
 export const User_analyticsScalarFieldEnum = {
   user_id: 'user_id',
   views: 'views',

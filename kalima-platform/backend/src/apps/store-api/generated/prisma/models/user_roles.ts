@@ -530,7 +530,7 @@ export type $user_rolesPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type user_rolesGetPayload<S extends boolean | null | undefined | user_rolesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$user_rolesPayload, S>
 
 export type user_rolesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<user_rolesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<user_rolesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: User_rolesCountAggregateInputType | true
   }
 
@@ -975,6 +975,7 @@ export type user_rolesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which user_roles to fetch.
    */
   where: Prisma.user_rolesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -997,6 +998,7 @@ export type user_rolesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which user_roles to fetch.
    */
   where: Prisma.user_rolesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1049,6 +1051,7 @@ export type user_rolesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of user_roles.
    */
   distinct?: Prisma.User_rolesScalarFieldEnum | Prisma.User_rolesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1101,6 +1104,7 @@ export type user_rolesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of user_roles.
    */
   distinct?: Prisma.User_rolesScalarFieldEnum | Prisma.User_rolesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1148,6 +1152,7 @@ export type user_rolesFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.User_rolesScalarFieldEnum | Prisma.User_rolesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1170,6 +1175,7 @@ export type user_rolesCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a user_roles.
    */
   data: Prisma.XOR<Prisma.user_rolesCreateInput, Prisma.user_rolesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1230,6 +1236,7 @@ export type user_rolesUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which user_roles to update.
    */
   where: Prisma.user_rolesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1308,6 +1315,7 @@ export type user_rolesUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the user_roles was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.user_rolesUpdateInput, Prisma.user_rolesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1330,6 +1338,7 @@ export type user_rolesDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which user_roles to delete.
    */
   where: Prisma.user_rolesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

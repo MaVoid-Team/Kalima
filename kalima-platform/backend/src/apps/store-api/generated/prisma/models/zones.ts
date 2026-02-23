@@ -815,7 +815,7 @@ export type $zonesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type zonesGetPayload<S extends boolean | null | undefined | zonesDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$zonesPayload, S>
 
 export type zonesCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<zonesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<zonesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ZonesCountAggregateInputType | true
   }
 
@@ -1263,6 +1263,7 @@ export type zonesFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter, which zones to fetch.
    */
   where: Prisma.zonesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1285,6 +1286,7 @@ export type zonesFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which zones to fetch.
    */
   where: Prisma.zonesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1337,6 +1339,7 @@ export type zonesFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of zones.
    */
   distinct?: Prisma.ZonesScalarFieldEnum | Prisma.ZonesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1389,6 +1392,7 @@ export type zonesFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of zones.
    */
   distinct?: Prisma.ZonesScalarFieldEnum | Prisma.ZonesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1436,6 +1440,7 @@ export type zonesFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   skip?: number
   distinct?: Prisma.ZonesScalarFieldEnum | Prisma.ZonesScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1458,6 +1463,7 @@ export type zonesCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * The data needed to create a zones.
    */
   data: Prisma.XOR<Prisma.zonesCreateInput, Prisma.zonesUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1518,6 +1524,7 @@ export type zonesUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Choose, which zones to update.
    */
   where: Prisma.zonesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1596,6 +1603,7 @@ export type zonesUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * In case the zones was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.zonesUpdateInput, Prisma.zonesUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1618,6 +1626,7 @@ export type zonesDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Filter which zones to delete.
    */
   where: Prisma.zonesWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
