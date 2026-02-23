@@ -1,3 +1,4 @@
+import React from 'react';
 import { useTranslation } from "react-i18next";
 import HeroSection from "@/components/MarketPage/HeroSection";
 import PromoBanner from "@/components/MarketPage/PromoBanner";
@@ -8,6 +9,10 @@ import { useCategories } from "@/hooks/useCategories";
 
 export default function MarketPage() {
   const { t } = useTranslation("market");
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const {
     products,
@@ -57,7 +62,7 @@ export default function MarketPage() {
       </div>
 
       {/* Promo banner stays below */}
-      <PromoBanner />
+      {/* <PromoBanner /> */}
     </>
   );
 }

@@ -1,7 +1,8 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, ArrowLeft } from "lucide-react";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import { ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -79,7 +80,7 @@ export default function ForgotPasswordPage() {
                                     />
                                     <Button type="submit" className="w-full" disabled={loading}>
                                         {loading && (
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
                                         {t("forgot_password.submit", "Send Reset Link")}
                                     </Button>

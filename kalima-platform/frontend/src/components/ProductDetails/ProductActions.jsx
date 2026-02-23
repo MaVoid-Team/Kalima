@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
+import { useCart } from "../../contexts/CartContext";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 /**
  * ProductActions
@@ -16,7 +18,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
-
+  const { addToCart, loading } = useCart();
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
@@ -32,9 +34,14 @@ export default function ProductActions({ price, productId, sampleUrl }) {
           </span>
           <span className="text-xl font-black">{formattedPrice} {t("info.currency")}</span>
         </div>
-        <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg">
-          <ShoppingCart className="h-5 w-5" />
-          {t("actions.addToCart")}
+        <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
+          {loading ? (
+              <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : (<>
+              <ShoppingCart className="h-5 w-5" />
+              {t("actions.addToCart")}
+              </>
+            )}
         </Button>
       </div>
 
@@ -65,9 +72,14 @@ export default function ProductActions({ price, productId, sampleUrl }) {
           </div>
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg">
-            <ShoppingCart className="h-5 w-5" />
-            {t("actions.addToCart")}
+          <Button className="gap-2 flex-1" size="lg" onClick={() => addToCart(productId, quantity)} disabled={loading}>
+            {loading ? (
+              <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : (<>
+              <ShoppingCart className="h-5 w-5" />
+              {t("actions.addToCart")}
+              </>
+            )}
           </Button>
         </div>
 
