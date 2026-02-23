@@ -94,6 +94,18 @@ export class CheckoutDto {
   // Add more fields as needed for checkout (e.g., address)
 }
 
+// DTO for fast buy (checkout single item directly)
+export class FastBuyDto extends CheckoutDto {
+  @IsInt()
+  @IsPositive()
+  product_id: number;
+
+  @IsInt()
+  @IsPositive()
+  @Min(1)
+  quantity: number;
+}
+
 // DTO for updating required fields of a cart item
 
 export class UpdateCartItemRequiredFieldsDto {
