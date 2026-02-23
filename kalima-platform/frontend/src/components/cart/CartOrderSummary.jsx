@@ -21,19 +21,19 @@ export default function CartOrderSummary({
           <div className="space-y-4 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">{t('subtotal')}</span>
-              <span className="font-semibold">${subtotal}</span>
+              <span className="font-semibold">{subtotal} {t('L.E')}</span>
             </div>
             {discount && discount !== '0' && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">{t('discount', 'Discount')}</span>
-                <span className="font-semibold">-${discount}</span>
+                <span className="font-semibold">-{discount} {t('L.E')}</span>
               </div>
             )}
           </div>
 
           <div className="flex justify-between items-center py-4 border-t border-b border-gray-200 mb-6">
             <span className="text-base font-bold">{t('total')}</span>
-            <span className="text-2xl font-bold">${total}</span>
+            <span className="text-2xl font-bold">{total} {t('L.E')}</span>
           </div>
 
           <Button className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4">

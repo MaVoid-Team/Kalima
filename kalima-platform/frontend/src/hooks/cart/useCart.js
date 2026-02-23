@@ -10,7 +10,6 @@ export default function useCart() {
                 method: "get",
                 endpoint: "/cart"
             });
-            console.log("Cart response:", res);
             if (res.success) {
                 return res.data;
             }
@@ -121,22 +120,42 @@ export default function useCart() {
         }
     };
 
-    const getProductThumbnail = React.useCallback(async(product_id) => {
-    try {
+    const getProductRequiredFields = async (productId) => {
+        try {
             const res = await mutate({
                 method: "GET",
-                endpoint: `/products/${product_id}/thumbnail`
+                endpoint: `/products/${productId}/required-fields`
             });
             if (res.success) {
                 return res.data;
-            } else {
-                throw new Error(res?.message || "Failed to get product thumbnail");
+            }
+            else {
+                throw new Error(res?.message || "Failed to get product required fields");
             }
         } catch (error) {
-            console.error("Failed to get product thumbnail:", error);
+            console.error("Failed to get product required fields:", error);
             throw error;
         }
-    }, [mutate]);
+    };
+
+    const updateCartItemRequiredFields = async (itemId, requiredFieldsData) => {
+        try {
+            const res = await mutate({
+                method: "PATCH",
+                endpoint: `/cart/items/required-fields`,
+                data: {"cart_item_id": itemId, "required_fields": requiredFieldsData}
+            });
+            if (res.success) {
+                return res.data;
+            }
+            else {
+                throw new Error(res?.message || "Failed to update cart item required fields");
+            }
+        } catch (error) {
+            console.error("Failed to update cart item required fields:", error);
+            throw error;
+        }
+    };
 
     return {
         getCart,
@@ -146,8 +165,12 @@ export default function useCart() {
         removeFromCart,
         applyCoupon,
         removeCoupon,
-        getProductThumbnail,
+        getProductRequiredFields,
+        updateCartItemRequiredFields,
         loading,
         error
     };
 }
+
+// hook used internally by the context provider; exported for convenience
+export { useCart as useCartNetwork };

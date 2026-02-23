@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import { ShoppingBag, Trash2 } from 'lucide-react';
+import React, {useMemo} from 'react';
+import { ShoppingBag, TicketCheck } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -11,21 +11,18 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 
-export default function CartPreview({ open, onOpenChange, cart, onViewFullCart, getProductThumbnail }) {
+export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }) {
   const { t, i18n } = useTranslation('cart');
-  const [thumbnails, setThumbnails] = useState({});
-
-  useEffect(() => {
-    cart?.cart_items?.forEach((item) => {
-      const pid = item?.products?.id;
-      if (pid && !thumbnails[pid]) {
-        getProductThumbnail(pid)
-          .then(url => setThumbnails(prev => ({ ...prev, [pid]: url || 'https://via.placeholder.com/150' })))
-          .catch(() => {});
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart, getProductThumbnail]);
+  // derive just the origin (scheme+host+port) once; strip any appended paths like `/api/v2`
+  const baseURL = useMemo(() => {
+    const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    try {
+      return new URL(raw).origin;
+    } catch {
+      // fallback to manual fallback if URL parsing fails
+      return raw.split('/api/v2')[0];
+    }
+  }, []);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -63,7 +60,11 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart, 
                   <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
                     <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
                       <img
-                        src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'}
+                        src={
+                          item?.products?.thumbnail_image?.url
+                            ? new URL(item.products.thumbnail_image.url, baseURL).toString()
+                            : 'https://via.placeholder.com/150'
+                        }
                         alt={item?.products?.title}
                         className="w-full h-full object-cover"
                       />
@@ -75,7 +76,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart, 
                       <p className="text-xs text-muted-foreground mb-2">
                         {item?.products?.description}
                       </p>
-                      <div className="flex items-center justify-between">
+                      <div className={"flex items-center justify-between"}>
                         <div className="text-sm">
                           <span className="font-semibold">
                             ${item?.final_price}
@@ -84,6 +85,15 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart, 
                             {t('qty')} {item?.quantity}
                           </span>
                         </div>
+                        {item?.coupons && 
+                        <div className='flex justify-center items-center gap-1'>
+                            <TicketCheck className={`w-5 h-5 text-green-500 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} />
+                            <span className="text-xs text-green-500">
+                              {item?.coupons?.discount_percentage != 0 && `${item?.coupons?.discount_percentage}%`}
+                              {item?.coupons?.discount_amount != 0 && `${item?.coupons?.discount_amount} ${t('L.E')}`}
+                            </span>
+                        </div>
+                      }
                       </div>
                     </div>
                   </div>
