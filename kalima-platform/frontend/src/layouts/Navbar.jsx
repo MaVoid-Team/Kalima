@@ -233,7 +233,7 @@ export default function Navbar() {
                     className="font-bold px-6"
                     asChild
                   >
-                    <Link to="/dashboard">{t("navbar.dashboard", "Dashboard")}</Link>
+                    <Link to="/admin/orders">{t("navbar.dashboard", "Dashboard")}</Link>
                   </Button>
                   <Button
                     variant="outline"
