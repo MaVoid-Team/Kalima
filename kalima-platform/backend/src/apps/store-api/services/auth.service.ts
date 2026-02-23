@@ -42,7 +42,8 @@ import {
   portal_enum,
   auth_provider_enum,
 } from "../generated/prisma/client";
-import { getEmailService } from "../emails";
+import { getEmailService } from "../emails/email.service";
+import fs from "fs";
 import { userManagementService } from "./user-management.service";
 import {
   UnauthorizedError,
@@ -157,6 +158,16 @@ class AuthService {
     );
     const tokens = await this.issueTokens(user.id);
 
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/auth/login`,
+      });
+    }
+
     return {
       user: this.userService.mapToBaseUserData(user),
       tokens,
@@ -172,6 +183,16 @@ class AuthService {
       firebaseUser,
     );
     const tokens = await this.issueTokens(user.id);
+
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/auth/login`,
+      });
+    }
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -189,6 +210,16 @@ class AuthService {
     );
     const tokens = await this.issueTokens(user.id);
 
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/auth/login`,
+      });
+    }
+
     return {
       user: this.userService.mapToBaseUserData(user),
       tokens,
@@ -204,6 +235,16 @@ class AuthService {
       firebaseUser,
     );
     const tokens = await this.issueTokens(user.id);
+
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/auth/login`,
+      });
+    }
 
     return {
       user: this.userService.mapToBaseUserData(user),

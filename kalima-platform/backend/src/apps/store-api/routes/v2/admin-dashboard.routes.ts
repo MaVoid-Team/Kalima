@@ -28,4 +28,7 @@ router.get("/product-performance", ...adminAuth, adminDashboardController.getPro
 // Response Time Analytics
 router.get("/response-time", ...adminAuth, adminDashboardController.getResponseTimeAnalytics);
 
+// Staff Performance Tracking (Received/Confirmed/Returned/Response Times)
+router.get("/staff-report", ...adminAuth, adminDashboardController.getStaffPerformanceReport);
+
 export default router;

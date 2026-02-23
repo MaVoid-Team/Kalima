@@ -200,5 +200,121 @@ export const adminDashboardController = {
     } catch (error) {
       _next(error);
     }
+  },
+
+  /**
+   * GET /admin/dashboard/staff-report
+   * Comprehensive report for staff performance:
+   * - Total Received
+   * - Total Confirmed
+   * - Total Returned
+   * - Average Response Time (created_at -> received_at)
+   * - Average Confirmation Time (received_at -> confirmed_at)
+   */
+  async getStaffPerformanceReport(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      // 1. Get all users who are Sub_Admin, Moderator, or Assistant
+      const staffMembers = await prisma.users.findMany({
+        where: {
+          role: {
+            in: ["SubAdmin", "Moderator", "Assistant"],
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          email: true,
+        },
+      });
+
+      // 2. We'll run raw queries to get accurate averages and counts per staff, 
+      //    since Prisma's native groupBy across multiple relation keys is complex.
+      //    This is similar to how the legacy system's `getFullOrdersReport` worked.
+
+      const staffIds = staffMembers.map(s => s.id);
+      
+      if (staffIds.length === 0) {
+        res.status(200).json({ success: true, data: [] });
+        return;
+      }
+
+      const idList = staffIds.join(',');
+
+      // Count Received
+      const receivedCounts: any[] = await prisma.$queryRawUnsafe(`
+        SELECT received_by as admin_id, COUNT(*) as count
+        FROM purchases
+        WHERE received_by IN (${idList})
+        GROUP BY received_by;
+      `);
+
+      // Count Confirmed
+      const confirmedCounts: any[] = await prisma.$queryRawUnsafe(`
+        SELECT confirmed_by as admin_id, COUNT(*) as count
+        FROM purchases
+        WHERE confirmed_by IN (${idList})
+        GROUP BY confirmed_by;
+      `);
+
+      // Count Returned
+      const returnedCounts: any[] = await prisma.$queryRawUnsafe(`
+        SELECT returned_by as admin_id, COUNT(*) as count
+        FROM purchases
+        WHERE returned_by IN (${idList})
+        GROUP BY returned_by;
+      `);
+
+      // Average Response Time (created -> received)
+      const responseTimes: any[] = await prisma.$queryRawUnsafe(`
+        SELECT received_by as admin_id, AVG(EXTRACT(EPOCH FROM (received_at - created_at))/60) as avg_minutes
+        FROM purchases
+        WHERE received_by IN (${idList}) AND received_at IS NOT NULL
+        GROUP BY received_by;
+      `);
+
+      // Average Confrimation Time (received -> confirmed)
+      const confirmTimes: any[] = await prisma.$queryRawUnsafe(`
+        SELECT confirmed_by as admin_id, AVG(EXTRACT(EPOCH FROM (confirmed_at - received_at))/60) as avg_minutes
+        FROM purchases
+        WHERE confirmed_by IN (${idList}) AND confirmed_at IS NOT NULL AND received_at IS NOT NULL
+        GROUP BY confirmed_by;
+      `);
+
+      const getVal = (arr: any[], id: number, key: string) => {
+        const found = arr.find(item => Number(item.admin_id) === id);
+        return found ? Number(found[key]) : 0;
+      };
+
+      const report = staffMembers.map(staff => {
+        return {
+          staff: {
+            id: staff.id,
+            name: staff.name,
+            role: staff.role,
+            email: staff.email,
+          },
+          metrics: {
+            totalReceived: getVal(receivedCounts, staff.id, 'count'),
+            totalConfirmed: getVal(confirmedCounts, staff.id, 'count'),
+            totalReturned: getVal(returnedCounts, staff.id, 'count'),
+            avgResponseMinutes: getVal(responseTimes, staff.id, 'avg_minutes'),
+            avgConfirmationMinutes: getVal(confirmTimes, staff.id, 'avg_minutes'),
+          },
+        };
+      });
+
+      res.status(200).json({
+        success: true,
+        data: report,
+      });
+
+    } catch (error) {
+      _next(error);
+    }
   }
 };
