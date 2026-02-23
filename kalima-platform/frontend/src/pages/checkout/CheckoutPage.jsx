@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     StepIndicator,
     ContactInformation,
@@ -9,6 +11,10 @@ import {
 import { orderItems, pricingData, steps } from './constants/checkoutData';
 
 export default function CheckoutPage() {
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <div className="min-h-screen bg-background flex flex-col">
             <StepIndicator steps={steps} currentStep={3} />

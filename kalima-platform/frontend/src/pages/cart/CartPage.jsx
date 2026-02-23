@@ -19,6 +19,10 @@ export default function CartPage() {
     updateCartItemRequiredFields,
   } = useCart();
   const navigator = useNavigate();
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
 // Sample Cart Object Structure (for reference)
 //         "id": 2,

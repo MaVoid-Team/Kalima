@@ -1,3 +1,4 @@
+import React from 'react';
 import { useParams, Link } from "react-router-dom";
 import {
   AlertCircle,
@@ -22,6 +23,10 @@ import { useProducts } from "@/hooks/useProducts";
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const { t } = useTranslation("product");
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const { product: productProps, images, loading, notFound } = useProducts(id);
 
