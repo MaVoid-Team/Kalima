@@ -39,7 +39,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                         className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
                         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                     >
-                        {isCollapsed ? <Menu size={20} /> : (isRtl ? <ChevronRight size={20} /> : <ChevronLeft size={20} />)}
+                        {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
                     </button>
 
                     {/* Mobile Close Toggle */}
