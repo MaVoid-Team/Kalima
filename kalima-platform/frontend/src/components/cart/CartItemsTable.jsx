@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Minus, Plus, Trash } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Minus, Plus, TicketCheck, TicketPlus, Trash } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -22,11 +28,10 @@ export default function CartItemsTable({
   updateQuantity, 
   removeFromCart, 
   applyCoupon, 
-  removeCoupon, 
-  thumbnails }) {
-  const { t } = useTranslation('cart');
-  
-  // thumbnails come from parent via prop
+  removeCoupon,
+  updateCartItemRequiredFields
+}) {
+  const { t, i18n } = useTranslation('cart');
 
   // delete confirmation dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -36,8 +41,20 @@ export default function CartItemsTable({
   const [couponDialogOpen, setCouponDialogOpen] = useState(false);
   const [itemForCoupon, setItemForCoupon] = useState(null);
   const [couponValue, setCouponValue] = useState("");
+  const [hoveredCouponItem, setHoveredCouponItem] = useState(null);
+  const [openItems, setOpenItems] = useState({});
+  const [fieldValues, setFieldValues] = useState({});
 
-  
+  // derive just the origin (scheme+host+port) once; strip any appended paths like `/api/v2`
+    const baseURL = useMemo(() => {
+      const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      try {
+        return new URL(raw).origin;
+      } catch {
+        // fallback to manual fallback if URL parsing fails
+        return raw.split('/api/v2')[0];
+      }
+    }, []);
 
   const handleApply = async (itemId, code) => {
     if (!code) return;
@@ -59,75 +76,8 @@ export default function CartItemsTable({
 
   return (
     <Card className="rounded-lg shadow-sm border">
-      <div className="hidden md:block">
-        <Table className="w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('header.product')}</TableHead>
-              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.quantity')}</TableHead>
-              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-right hidden md:table-cell">{t('header.total')}</TableHead>
-              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.coupon', 'Coupon')}</TableHead>
-              <TableHead className="px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider text-center hidden md:table-cell">{t('header.remove', 'Remove')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {cartItems?.map((item, idx) => (
-              <motion.tr
-                key={item.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.04, duration: 0.35 }}
-                className="hover:bg-muted/50 border-b transition-colors"
-              >
-                <TableCell className="px-6 py-6 align-top whitespace-normal">
-                  <div className="flex gap-4">
-                    <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden">
-                      <img src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold mb-1">{item?.products?.title}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{item?.products?.description}</p>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs text-muted-foreground">{item?.products?.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="px-6 py-6">
-                  <div className="flex items-center justify-between md:justify-center gap-3 border rounded-lg px-3 py-2 w-full md:w-auto">
-                    <Button aria-label={t('decreaseQuantity')} onClick={() => updateQuantity(item.id, item.quantity - 1)} variant="ghost" size="icon" className="text-muted-foreground p-1.5 md:p-0 h-auto w-auto"><Minus className="w-4 h-4" /></Button>
-                    <span className="text-sm font-medium w-6 text-center">{item?.quantity}</span>
-                    <Button aria-label={t('increaseQuantity')} onClick={() => updateQuantity(item.id, item.quantity + 1)} variant="ghost" size="icon" className="text-muted-foreground p-1.5 md:p-0 h-auto w-auto"><Plus className="w-4 h-4" /></Button>
-                  </div>
-                </TableCell>
-                <TableCell className="px-6 py-6 text-right">
-                  <div className="text-lg font-bold">${item?.final_price}</div>
-                  <div className="text-xs text-muted-foreground">{t('each', { price: `$${item?.price_at_add}` })}</div>
-                </TableCell>
-                <TableCell className="px-6 py-6 text-center">
-                  {item.coupon_id ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-sm text-green-600">{t('applied', 'Applied')}</span>
-                      <Button size="sm" variant="link" onClick={() => handleRemove(item.id)}>{t('remove', 'Remove')}</Button>
-                    </div>
-                  ) : (
-                    <Button size="sm" onClick={() => { setItemForCoupon(item.id); setCouponValue(''); setCouponDialogOpen(true); }}>
-                      {t('applyCoupon', 'Apply Coupon')}
-                    </Button>
-                  )}
-                </TableCell>
-                <TableCell className="px-6 py-6 text-center">
-                  <Button variant="ghost" size="icon" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
-                    <Trash className="h-4 w-4 text-destructive" />
-                  </Button>
-                </TableCell>
-              </motion.tr>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
 
-      <div className="md:hidden divide-y divide-gray-100">
+      <div className="divide-y divide-gray-100">
         {cartItems.map((item, idx) => (
           <motion.div
             key={item.id}
@@ -138,7 +88,9 @@ export default function CartItemsTable({
           >
             <div className="flex gap-4">
               <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
-                <img src={thumbnails[item?.products?.id] || 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
+                <img src={item?.products?.thumbnail_image?.url
+                            ? new URL(item.products.thumbnail_image.url, baseURL).toString()
+                            : 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
@@ -147,7 +99,7 @@ export default function CartItemsTable({
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="text-base font-bold text-primary">${item?.final_price}</div>
+                  <div className="text-base font-bold">{item?.final_price} {t('L.E')}</div>
                 </div>
               </div>
             </div>
@@ -175,28 +127,131 @@ export default function CartItemsTable({
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground font-medium">
-                {t('each', { price: `$${item?.price_at_add}` })}
+                {t('each', { price: `${item?.price_at_add} ${t('L.E')}` })}
               </div>
             </div>
 
             {/* coupon controls for mobile */}
             <div className="mt-2 flex items-center justify-between">
-              <div>
-                {item.coupon_id ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-green-600">{t('applied', 'Applied')}</span>
-                    <Button size="sm" variant="link" onClick={() => handleRemove(item.id)}>{t('remove', 'Remove')}</Button>
+              <div className='w-full'>
+                {item.coupons ? (
+                  <div className="flex items-center justify-between flex-row gap-2">
+                    <div className="flex items-center gap-1">
+                    <span className="text-sm text-green-600" title={t('applied', 'Applied')}><TicketCheck className={`w-4 h-4 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} /></span>
+                    <Badge variant="success" className="h-5 px-1.5 text-xs bg-accent">{item?.coupons?.code}</Badge>
+                    {item?.coupons?.discount_percentage != 0 &&<span className="text-sm text-muted-foreground">{i18n.language==='en' && '-'}{item?.coupons?.discount_percentage}%{i18n.language==='ar' && '-'}</span>}
+                    {item?.coupons?.discount_amount != 0 &&<span className="text-sm text-muted-foreground">{i18n.language==='en' && '-'}{item?.coupons?.discount_amount} {t('L.E')} {i18n.language==='ar' && '-'}</span>}
+                    <span className="text-xs text-muted-foreground ml-1">({" - " +  item?.discount} {t('L.E')})</span>
+                    </div>
+                    <Button size="icon" variant="ghost" onClick={() => handleRemove(item.id)}>
+                      <Trash className="w-4 h-4 text-destructive" />
+                    </Button>
                   </div>
                 ) : (
-                  <Button size="sm" onClick={() => { setItemForCoupon(item.id); setCouponValue(''); setCouponDialogOpen(true); }}>
-                    {t('applyCoupon', 'Apply Coupon')}
-                  </Button>
+                  <motion.div
+                    className="inline-block mb-2"
+                    onHoverStart={() => setHoveredCouponItem(item.id)}
+                    onHoverEnd={() => setHoveredCouponItem(null)}
+                  >
+                    <Button
+                      size="sm"
+                      className="bg-accent not-hover:text-accent-foreground flex items-center"
+                      onClick={() => { setItemForCoupon(item.id); setCouponValue(''); setCouponDialogOpen(true); }}
+                    >
+                      <TicketPlus className="w-4 h-4" />
+                      <motion.span
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={
+                          hoveredCouponItem === item.id
+                            ? { width: 'auto', opacity: 1 }
+                            : { width: 0, opacity: 0 }
+                        }
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden whitespace-nowrap"
+                      >
+                        {t('applyCoupon', 'Apply Coupon')}
+                      </motion.span>
+                    </Button>
+                  </motion.div>
                 )}
               </div>
-              <Button variant="ghost" size="icon" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
-                <Trash className="h-4 w-4 text-destructive" />
-              </Button>
             </div>
+
+            {/* required fields accordion (shadcn) */}
+            {item.cart_item_required_fields && item.cart_item_required_fields.length > 0 && (
+              <div className="mt-2">
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full"
+                  value={openItems[item.id] ? 'fields' : undefined}
+                  onValueChange={val => {
+                    const open = !!val;
+                    setOpenItems(prev => ({ ...prev, [item.id]: open }));
+                    if (open && !fieldValues[item.id]) {
+                      const vals = {};
+                      item.cart_item_required_fields.forEach(rf => {
+                        vals[rf.field_definition_id] = rf.required_field_definitions.value || '';
+                      });
+                      setFieldValues(prev => ({ ...prev, [item.id]: vals }));
+                    }
+                  }}
+                >
+                  <AccordionItem value="fields">
+                    <AccordionTrigger className="text-sm text-primary">
+                      {openItems[item.id] ? t('hideDetails','Hide details') : t('viewMore','View more')}
+                    </AccordionTrigger>
+                    <AccordionContent className="mt-2 space-y-2 p-2 border rounded">
+                      {item.cart_item_required_fields.map(rf => (
+                        <div key={rf.field_definition_id} className="flex flex-col">
+                          <label className="text-xs font-medium mb-1">
+                            {rf.required_field_definitions.label}
+                          </label>
+                          <Input
+                            type={rf.required_field_definitions.field_type}
+                            value={fieldValues[item.id]?.[rf.field_definition_id] || ''}
+                            required={rf.required_field_definitions.is_required}
+                            onChange={e => {
+                              const val = e.target.value;
+                              setFieldValues(prev => ({
+                                ...prev,
+                                [item.id]: {
+                                  ...prev[item.id],
+                                  [rf.field_definition_id]: val,
+                                },
+                              }));
+                            }}
+                            className="input-sm"
+                          />
+                        </div>
+                      ))}
+                      <Button
+                        size="sm"
+                        onClick={async () => {
+                          const data = Object.entries(fieldValues[item.id] || {}).map(
+                            ([id, value]) => ({
+                              required_field_definition_id: Number(id),
+                              value,
+                            })
+                          );
+                          try {
+                            await updateCartItemRequiredFields(item.id, data);
+                          } catch (e) {
+                            console.error('failed updating required fields', e);
+                          }
+                        }}
+                      >
+                        {t('save','Save')}
+                      </Button>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            )}
+
+            <Button className="w-full" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
+                {t('removeFromCart', 'Remove From Cart')}
+              </Button>
           </motion.div>
         ))}
       </div>

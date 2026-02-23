@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,20 +15,17 @@ import {
 import logo from "../assets/Logo.png";
 import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
-import useCart from "../hooks/cart/useCart";
-import { is } from "zod/v4/locales";
+import { useCart } from "../contexts/CartContext";
 
 export default function Navbar() {
-  const [cart, setCart] = useState({ cart_items: [], subtotal: 0, discount: 0, total: 0 });
+  const { cart, loading } = useCart();
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { getCart, getProductThumbnail, loading } = useCart();
+  // getCart is now handled by provider; cart data available directly
   const navigate = useNavigate();
   const { t, i18n } = useTranslation("landing");
-  const didFetchCart = useRef(false);
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   
   useEffect(() => {
     const down = (e) => {
@@ -42,29 +39,6 @@ export default function Navbar() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // fetching cart items
-  useEffect(() => {
-    if (!isAuthenticated) {
-      // reset flag when logging out so that a new login will refetch
-      didFetchCart.current = false;
-      return;
-    }
-
-    if (didFetchCart.current) return; // avoid duplicate calls (React strict mode, re-renders, etc.)
-    didFetchCart.current = true;
-
-    fetchCart();
-  }, [isAuthenticated]);
-
-    const fetchCart = async () => {
-      try {
-        const response = await getCart();
-        console.log("Fetched cart items:", response);
-        setCart(response);
-      } catch (error) {
-        console.error("Failed to fetch cart items:", error);
-      }
-    };
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "ar" ? "en" : "ar";
@@ -72,7 +46,7 @@ export default function Navbar() {
   };
 
   const toggleCartModal = () => {
-    if (!isCartModalOpen) fetchCart(); 
+    // provider keeps cart up to date automatically
     setIsCartModalOpen(!isCartModalOpen);
     setIsMenuOpen(false);
   };
@@ -80,17 +54,6 @@ export default function Navbar() {
   const handleViewFullCart = () => {
     setIsCartModalOpen(false);
     navigate("/cart"); // Pass cart items to the cart page
-  };
-
-  const onGetProductThumbnail = async (productId) => {
-    if (productId == null) return "https://via.placeholder.com/150";
-    try {
-      const thumbnailUrl = await getProductThumbnail(productId);
-      return baseURL.split('api/v2')[0] + thumbnailUrl?.url;
-    } catch (error) {
-      console.error("Failed to get product thumbnail:", error);
-      return "https://via.placeholder.com/150"; // fallback thumbnail
-    }
   };
 
   const runCommand = (command) => {
@@ -356,7 +319,6 @@ export default function Navbar() {
           onOpenChange={setIsCartModalOpen}
           cart={cart}
           onViewFullCart={handleViewFullCart}
-          getProductThumbnail={onGetProductThumbnail}
         />
       </header>
 
