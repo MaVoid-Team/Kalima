@@ -162,7 +162,6 @@ export default function LoginPage() {
                                         onProviderSelect={handleFirebaseLogin}
                                         isLoading={loading}
                                         textGoogle={t("login.google", "Google")}
-                                        textFacebook={t("login.facebook", "Facebook")}
                                     />
                                 </form>
                             </Form>

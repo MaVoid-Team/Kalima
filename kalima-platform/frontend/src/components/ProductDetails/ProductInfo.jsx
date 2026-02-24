@@ -2,17 +2,14 @@ import { Star, StarHalf } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/storeUtils";
+import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
 
 export default function ProductInfo({ product }) {
   const { t } = useTranslation(["product", "checkout"]);
 
   const currentPrice = product.price_after_discount || product.price;
   const originalPrice = product.price_after_discount ? product.price : null;
-  const discount =
-    originalPrice && currentPrice
-      ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
-      : null;
+  const discount = calculateDiscountPercentage(originalPrice, currentPrice, 0);
 
   return (
     <div className="flex flex-col gap-6">

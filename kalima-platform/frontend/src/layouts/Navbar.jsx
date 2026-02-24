@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,9 @@ export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
   // getCart is now handled by provider; cart data available directly
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation("landing");
+  const [commandValue, setCommandValue] = useState("");
   
   useEffect(() => {
     const down = (e) => {
@@ -38,6 +40,14 @@ export default function Navbar() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const routeValues = ["/teachers", "/market"];
+    const current = routeValues.find((route) => location.pathname.startsWith(route));
+    setCommandValue(current || "");
+  }, [open, location.pathname]);
 
 
   const toggleLanguage = () => {
@@ -62,11 +72,8 @@ export default function Navbar() {
   };
 
   const NAV_LINKS = [
-    { label: t("navbar.courses"), href: "/courses" },
     { label: t("navbar.teachers"), href: "/teachers" },
-    { label: t("navbar.services"), href: "/services" },
     { label: t("navbar.market"), href: "/market" },
-    { label: t("navbar.pricing"), href: "/pricing" },
   ];
 
 
@@ -323,22 +330,20 @@ export default function Navbar() {
       </header>
 
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        commandProps={{ value: commandValue, onValueChange: setCommandValue }}
+      >
         <CommandInput placeholder={t("navbar.searchPlaceholder")} />
         <CommandList>
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
-            <CommandItem onSelect={() => runCommand(() => navigate("/courses"))}>
-              {t("navbar.courses")}
-            </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => navigate("/teachers"))}>
+            <CommandItem value="/teachers" onSelect={() => runCommand(() => navigate("/teachers"))}>
               {t("navbar.teachers")}
             </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => navigate("/market"))}>
+            <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
               {t("navbar.market")}
-            </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => navigate("/services"))}>
-              {t("navbar.services")}
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />

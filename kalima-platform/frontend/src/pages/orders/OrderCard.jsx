@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
 import { useTranslation } from 'react-i18next';
 import { Package, Clock, CalendarDays, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { formatCurrency, formatOrderDate, getStatusColor, getImageUrl } from '@/lib/storeUtils';
+import OrderDetailsDialog from '@/components/orders/OrderDetailsDialog';
 
 const OrderCard = ({ order }) => {
     const { t, i18n } = useTranslation('admin');
@@ -48,6 +50,9 @@ const OrderCard = ({ order }) => {
                     <span className="text-lg font-bold text-foreground">
                         {formatCurrency(order.total, t)}
                     </span>
+                    <div className="pt-1">
+                        <OrderDetailsDialog order={order} />
+                    </div>
                 </div>
             </div>
 

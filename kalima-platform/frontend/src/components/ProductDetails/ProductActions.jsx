@@ -29,7 +29,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
   return (
     <div className="flex flex-col gap-4 mt-2">
       {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 z-50 md:hidden shadow-lg flex items-center justify-between gap-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 z-30 md:hidden shadow-lg flex items-center justify-between gap-4">
         <div className="flex flex-col">
           <span className="text-xs text-muted-foreground">
             {t("info.totalPrice")}
@@ -38,16 +38,40 @@ export default function ProductActions({ price, productId, sampleUrl }) {
             {formattedPrice} {t("info.currency")}
           </span>
         </div>
-        <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
-          {loading ? (
-            <LoadingSpinner className="h-5 w-5 border-white" />
-          ) : (
-            <>
-              <ShoppingCart className="h-5 w-5" />
-              {t("actions.addToCart")}
-            </>
-          )}
-        </Button>
+        <div className="flex flex-col justify-center items-center gap-2">
+          <Button className="flex-1 gap-2 h-12 p-0.5 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
+            {loading ? (
+              <LoadingSpinner className="h-5 w-5 border-white" />
+            ) : (
+              <>
+                <ShoppingCart className="h-5 w-5" />
+                {t("actions.addToCart")}
+              </>
+            )}
+          </Button>
+            {/* Quantity Stepper */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleDecrement}
+              disabled={quantity <= 1}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <div className="relative">
+              <Input
+                type="text"
+                value={quantity}
+                readOnly
+                className="w-14 text-center font-bold shadow-none border-transparent px-0"
+              />
+            </div>
+            <Button variant="outline" size="icon" onClick={handleIncrement}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Desktop Layout */}

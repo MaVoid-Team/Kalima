@@ -17,7 +17,6 @@ import { motion } from "framer-motion";
 import ImageGallery from "@/components/ProductDetails/ImageGallery";
 import ProductInfo from "@/components/ProductDetails/ProductInfo";
 import ProductActions from "@/components/ProductDetails/ProductActions";
-
 import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductDetailsPage() {
