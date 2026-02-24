@@ -1,12 +1,23 @@
-import { payment_methods, Prisma } from "../generated/prisma/client";
+import { payment_methods, Prisma, images } from "../generated/prisma/client";
 import { NotFoundError, BadRequestError } from "../../../libs/errors";
 import { prisma } from "../../../libs/db/prisma";
+import { imageService } from "./image.service";
+
+export type PaymentMethodResponse = Omit<payment_methods, "image_id"> & { image_url: string | null };
+
+function formatPaymentMethod(pm: payment_methods & { images: images | null }): PaymentMethodResponse {
+  const { image_id, images, ...rest } = pm;
+  return {
+    ...rest,
+    image_url: images?.url || null,
+  };
+}
 
 export const paymentMethodService = {
   /**
    * List all payment methods
    */
-  async listPaymentMethods(filters?: { status?: boolean; search?: string }): Promise<payment_methods[]> {
+  async listPaymentMethods(filters?: { status?: boolean; search?: string }): Promise<PaymentMethodResponse[]> {
     const where: Prisma.payment_methodsWhereInput = {};
 
     if (filters?.status !== undefined) {
@@ -17,19 +28,21 @@ export const paymentMethodService = {
       where.name = { contains: filters.search, mode: "insensitive" };
     }
 
-    return prisma.payment_methods.findMany({
+    const results = await prisma.payment_methods.findMany({
       where,
       orderBy: { created_at: "desc" },
       include: {
         images: true
       }
     });
+
+    return results.map(formatPaymentMethod);
   },
 
   /**
    * Get a single payment method by ID
    */
-  async getPaymentMethodById(id: number): Promise<payment_methods> {
+  async getPaymentMethodById(id: number): Promise<PaymentMethodResponse> {
     const paymentMethod = await prisma.payment_methods.findUnique({
       where: { id },
       include: {
@@ -41,56 +54,72 @@ export const paymentMethodService = {
       throw new NotFoundError(`Payment method with ID ${id} not found.`);
     }
 
-    return paymentMethod;
+    return formatPaymentMethod(paymentMethod);
   },
 
   /**
    * Create a new payment method
    */
-  async createPaymentMethod(data: { name: string; phone_number: string; status?: boolean; image_id?: number }): Promise<payment_methods> {
-    if (data.image_id) {
-      const imageExists = await prisma.images.findUnique({ where: { id: data.image_id } });
-      if (!imageExists) {
-        throw new BadRequestError(`Image with ID ${data.image_id} not found.`);
-      }
+  async createPaymentMethod(
+    data: { name: string; phone_number: string; status?: boolean },
+    file?: Express.Multer.File
+  ): Promise<PaymentMethodResponse> {
+    let image_id: number | null = null;
+
+    if (file) {
+      const image = await imageService.uploadImage(file, { compress: true });
+      image_id = image.id;
     }
 
-    return prisma.payment_methods.create({
+    const created = await prisma.payment_methods.create({
       data: {
         name: data.name,
         phone_number: data.phone_number,
         status: data.status !== undefined ? data.status : true,
-        image_id: data.image_id,
+        image_id,
       },
       include: {
         images: true
       }
     });
+
+    return formatPaymentMethod(created);
   },
 
   /**
    * Update an existing payment method
    */
-  async updatePaymentMethod(id: number, data: { name?: string; phone_number?: string; status?: boolean; image_id?: number }): Promise<payment_methods> {
+  async updatePaymentMethod(
+    id: number,
+    data: { name?: string; phone_number?: string; status?: boolean },
+    file?: Express.Multer.File
+  ): Promise<PaymentMethodResponse> {
     const existing = await prisma.payment_methods.findUnique({ where: { id } });
     if (!existing) {
       throw new NotFoundError(`Payment method with ID ${id} not found.`);
     }
 
-    if (data.image_id) {
-      const imageExists = await prisma.images.findUnique({ where: { id: data.image_id } });
-      if (!imageExists) {
-        throw new BadRequestError(`Image with ID ${data.image_id} not found.`);
-      }
+    let image_id = existing.image_id;
+
+    if (file) {
+      const image = await imageService.replaceImage(existing.image_id, file, { compress: true });
+      image_id = image.id;
     }
 
-    return prisma.payment_methods.update({
+    const updated = await prisma.payment_methods.update({
       where: { id },
-      data,
+      data: {
+        name: data.name,
+        phone_number: data.phone_number,
+        status: data.status,
+        image_id,
+      },
       include: {
         images: true
       }
     });
+
+    return formatPaymentMethod(updated);
   },
 
   /**
@@ -102,10 +131,14 @@ export const paymentMethodService = {
       throw new NotFoundError(`Payment method with ID ${id} not found.`);
     }
 
-    // Rather than hard delete, typically we soft delete or ensure no relations are broken.
-    // However, schema indicates on_delete: SetNull for relations, so we can delete.
+    // Attempt to delete DB record
     await prisma.payment_methods.delete({
       where: { id },
     });
+
+    // Clean up associated image if it exists
+    if (existing.image_id) {
+      await imageService.deleteImage(existing.image_id).catch(() => {});
+    }
   }
 };

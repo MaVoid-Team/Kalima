@@ -50,8 +50,13 @@ export const paymentMethodController = {
 
   async createPaymentMethod(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log("[DEBUG createPaymentMethod] Content-Type:", req.headers["content-type"]);
+      console.log("[DEBUG createPaymentMethod] Body:", req.body);
+      console.log("[DEBUG createPaymentMethod] File:", req.file ? req.file.originalname : "No file");
+      
       const dto = await validateDto(CreatePaymentMethodDto, req.body);
-      const result = await paymentMethodService.createPaymentMethod(dto);
+      const file = req.file as Express.Multer.File | undefined;
+      const result = await paymentMethodService.createPaymentMethod(dto, file);
       
       res.status(201).json({
         success: true,
@@ -69,7 +74,8 @@ export const paymentMethodController = {
       if (isNaN(id)) throw new BadRequestError("Invalid payment method ID");
 
       const dto = await validateDto(UpdatePaymentMethodDto, req.body);
-      const result = await paymentMethodService.updatePaymentMethod(id, dto);
+      const file = req.file as Express.Multer.File | undefined;
+      const result = await paymentMethodService.updatePaymentMethod(id, dto, file);
 
       res.status(200).json({
         success: true,

@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsInt } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from "class-validator";
+import { Transform } from "class-transformer";
 
 export class CreatePaymentMethodDto {
   @IsString()
@@ -9,13 +10,13 @@ export class CreatePaymentMethodDto {
   @IsNotEmpty()
   phone_number!: string;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') return undefined;
+    return value === 'true' || value === true;
+  })
   @IsBoolean()
   @IsOptional()
   status?: boolean;
-
-  @IsInt()
-  @IsOptional()
-  image_id?: number;
 }
 
 export class UpdatePaymentMethodDto {
@@ -27,11 +28,11 @@ export class UpdatePaymentMethodDto {
   @IsOptional()
   phone_number?: string;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') return undefined;
+    return value === 'true' || value === true;
+  })
   @IsBoolean()
   @IsOptional()
   status?: boolean;
-
-  @IsInt()
-  @IsOptional()
-  image_id?: number;
 }
