@@ -34,4 +34,9 @@ This workflow outlines the established patterns in the frontend architecture. De
 - **Translations:** Use `react-i18next` (`useTranslation`) for all user-facing text. Avoid hardcoded strings in the UI components.
 - **RTL & Logical Properties:** Ensure layouts naturally adapt to Right-To-Left (RTL) languages like Arabic. Use Tailwind's logical properties (e.g., `ms-2`, `pe-4`, `text-start`) instead of directional ones (e.g., `ml-2`, `pr-4`, `text-left`).
 
+## 7. Responsive & Mobile-Friendly Design
+- **Mobile-First Approach:** Always start by styling for smaller screens and use Tailwind's responsive prefixes (e.g., `sm:`, `md:`, `lg:`, `xl:`) to adapt layouts for larger devices.
+- **Fluid Layouts:** Rely on Flexbox (`flex`) and CSS Grid (`grid`) paired with relative units where appropriate to create highly adaptable fluid layouts.
+- **Touch and Accessibility:** Ensure interactive elements (buttons, links, inputs) have adequate sizing, padding, and spacing to be easily usable on mobile touch devices.
+
 **By following these guidelines, you will ensure the frontend codebase remains clean, maintainable, and uniform.**

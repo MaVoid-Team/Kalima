@@ -6,11 +6,13 @@ export const useOrders = (optionsOrId = null) => {
 
     let id = null;
     let initialLimit = 20;
+    let autoFetch = true;
 
     if (optionsOrId !== null) {
         if (typeof optionsOrId === 'object') {
             id = optionsOrId.id || null;
             initialLimit = optionsOrId.limit || 20;
+            if (optionsOrId.autoFetch !== undefined) autoFetch = optionsOrId.autoFetch;
         } else {
             id = optionsOrId;
         }
@@ -84,6 +86,36 @@ export const useOrders = (optionsOrId = null) => {
         }
     }, [fetchApi, buildQuery]);
 
+    const fetchMyOrders = useCallback(async () => {
+        try {
+            const data = await fetchApi({
+                endpoint: `/purchases/my?${buildQuery()}`,
+                method: 'get'
+            });
+
+            if (data?.success) {
+                const resultData = data.data?.purchases || data.data || [];
+                setOrders(resultData);
+
+                const responsePage = data.pagination || data;
+                setPagination(prev => ({
+                    ...prev,
+                    total: responsePage.total ?? prev.total,
+                    page: responsePage.page ?? prev.page,
+                    pages: responsePage.pages ?? prev.pages,
+                    limit: responsePage.limit ?? prev.limit,
+                }));
+            } else {
+                setOrders([]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch my orders:", error);
+            setOrders([]);
+        } finally {
+            setInitLoading(false);
+        }
+    }, [fetchApi, buildQuery]);
+
     const fetchOrderById = useCallback(async (orderId) => {
         try {
             const data = await fetchApi({
@@ -107,13 +139,17 @@ export const useOrders = (optionsOrId = null) => {
     }, [fetchApi]);
 
     useEffect(() => {
+        if (!autoFetch) {
+            setInitLoading(false);
+            return;
+        }
         setInitLoading(true);
         if (id) {
             fetchOrderById(id);
         } else {
             fetchOrders();
         }
-    }, [id, fetchOrders, fetchOrderById]);
+    }, [id, fetchOrders, fetchOrderById, autoFetch]);
 
     const handleAction = async (actionFn) => {
         setActionLoading(true);
@@ -162,6 +198,7 @@ export const useOrders = (optionsOrId = null) => {
 
         // Actions
         fetchOrders,
+        fetchMyOrders,
         fetchOrderById,
         receiveOrder,
         confirmOrder,

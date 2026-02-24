@@ -11,10 +11,28 @@
         "admin": "الإدارة",
         "loading": "جاري التحميل...",
         "cancel": "إلغاء",
-        "confirm": "تأكيد"
+        "confirm": "تأكيد",
+        "pagination": {
+            "previous": "السابق",
+            "next": "التالي"
+        }
     },
     "orders": {
+        "status": {
+            "all": "جميع الطلبات",
+            "pending": "قيد الانتظار",
+            "received": "تم الاستلام",
+            "confirmed": "مؤكد",
+            "returned": "مرتجع",
+            "created": "تم الإنشاء"
+        },
+        "total": "الإجمالي",
         "title": "إدارة الطلبات",
+        "myOrders": "طلباتي",
+        "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
+        "noOrders": "لا توجد طلبات",
+        "noOrdersForStatus": "ليس لديك أي طلبات بهذه الحالة.",
+        "noOrdersDescription": "يبدو أنك لم تقم بأي طلبات بعد.",
         "totalOrders": "{{count}} طلبات",
         "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
         "statusAll": "كل الحالات",
@@ -34,6 +52,7 @@
             "actions": "إجراءات"
         },
         "items": {
+            "items": "الطلبات",
             "product": "المنتج",
             "type": "النوع",
             "price": "السعر",

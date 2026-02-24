@@ -11,10 +11,28 @@
         "admin": "Admin",
         "loading": "Loading...",
         "cancel": "Cancel",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "pagination": {
+            "previous": "Previous",
+            "next": "Next"
+        }
     },
     "orders": {
+        "status": {
+            "all": "All Orders",
+            "pending": "Pending",
+            "received": "Received",
+            "confirmed": "Confirmed",
+            "returned": "Returned",
+            "created": "Created"
+        },
+        "total": "Total",
         "title": "Orders Management",
+        "myOrders": "My Orders",
+        "subtitle": "Track, manage, and view your order history",
+        "noOrders": "No orders found",
+        "noOrdersForStatus": "You have no orders with this status.",
+        "noOrdersDescription": "Looks like you haven't placed any orders yet.",
         "totalOrders": "{{count}} orders",
         "searchPlaceholder": "Search by serial, name, email...",
         "statusAll": "All Statuses",
@@ -34,6 +52,7 @@
             "actions": "Actions"
         },
         "items": {
+            "items": "Items",
             "product": "Product",
             "type": "Type",
             "price": "Price",
