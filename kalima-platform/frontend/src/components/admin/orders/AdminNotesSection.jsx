@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Button } from '../../ui/button';
+import { Button } from '@/ui/button';
 import { Save } from 'lucide-react';
-import useAuth from '../../../hooks/auth/useAuth';
-import { formatOrderDate } from '../../../lib/storeUtils';
+import useAuth from '@/../hooks/auth/useAuth';
+import { formatOrderDate } from '@/../lib/storeUtils';
 
 export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) {
     const { t, i18n } = useTranslation('admin');

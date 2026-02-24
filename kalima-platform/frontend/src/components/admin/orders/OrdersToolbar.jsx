@@ -3,18 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { Calendar as CalendarIcon, Search, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { arSA } from "react-day-picker/locale"
-import { cn } from '../../../lib/utils';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover';
-import { Calendar } from '../../ui/calendar';
+import { cn } from '@/../lib/utils';
+import { Input } from '@/ui/input';
+import { Button } from '@/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui/popover';
+import { Calendar } from '@/ui/calendar';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../../ui/dropdown-menu";
-import { ORDER_STATUSES } from '../../../lib/storeUtils';
+} from "@/ui/dropdown-menu";
+import { ORDER_STATUSES } from '@/../lib/storeUtils';
 
 export default function OrdersToolbar({ filters, onSearchChange, onStatusChange, onDateRangeChange }) {
     const { t, i18n } = useTranslation('admin');

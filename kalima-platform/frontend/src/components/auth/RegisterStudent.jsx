@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
-import useRegister from "../../hooks/auth/useRegister";
-import useLookups from "../../hooks/useLookups";
+import useRegister from "@/hooks/auth/useRegister";
+import useLookups from "@/hooks/useLookups";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterStudent({ onBack }) {

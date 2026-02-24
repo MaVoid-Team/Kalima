@@ -6,7 +6,7 @@ import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import usePassword from "../../hooks/auth/usePassword";
+import usePassword from "@/hooks/auth/usePassword";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";

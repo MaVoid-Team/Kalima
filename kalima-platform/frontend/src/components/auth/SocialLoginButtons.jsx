@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { googleProvider, facebookProvider } from "../../lib/firebase";
+import { googleProvider, facebookProvider } from "@/lib/firebase";
 
 export default function SocialLoginButtons({ onProviderSelect, isLoading, textGoogle, textFacebook }) {
     return (

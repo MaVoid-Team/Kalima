@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
     DropdownMenuSeparator,
-} from "../../ui/dropdown-menu";
+} from "@/ui/dropdown-menu";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,15 +18,15 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../../ui/alert-dialog';
+} from '@/ui/alert-dialog';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from "../../ui/dialog";
-import { Button } from "../../ui/button";
-import useOrders from '../../../hooks/useOrders';
+} from "@/ui/dialog";
+import { Button } from "@/ui/button";
+import useOrders from '@/../hooks/useOrders';
 
 export default function OrderActions({ order, onActionSuccess }) {
     const { t } = useTranslation('admin');

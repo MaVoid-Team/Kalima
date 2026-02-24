@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle, Mail } from "lucide-react";
-import useEmailVerification from "../../hooks/auth/useEmailVerification";
+import useEmailVerification from "@/hooks/auth/useEmailVerification";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 
 import { Button } from "@/components/ui/button";

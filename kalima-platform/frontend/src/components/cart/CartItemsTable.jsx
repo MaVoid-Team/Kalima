@@ -267,7 +267,7 @@ export default function CartItemsTable({
             className="p-4 min-w-0 w-full max-w-full overflow-x-hidden"
           >
             <div className="flex gap-4">
-              <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
+              <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
                 <img src={item?.products?.thumbnail_image?.url
                   ? new URL(item.products.thumbnail_image.url, baseURL).toString()
                   : 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
@@ -520,7 +520,7 @@ export default function CartItemsTable({
                                     if (originalUrl && hasSelectedFile) {
                                       return (
                                         <div className="mt-2 flex flex-wrap items-center gap-3 max-w-full min-w-0">
-                                          <div className="w-20 h-20 overflow-hidden rounded bg-gray-50 border flex-shrink-0">
+                                          <div className="w-20 h-20 overflow-hidden rounded bg-gray-50 border shrink-0">
                                             {!brokenOld ? (
                                               <img
                                                 src={originalUrl}
@@ -535,7 +535,7 @@ export default function CartItemsTable({
                                             )}
                                           </div>
                                           <ArrowRight className="w-5 h-5 text-muted-foreground" />
-                                          <div className="w-20 h-20 overflow-hidden rounded bg-gray-50 border flex-shrink-0">
+                                          <div className="w-20 h-20 overflow-hidden rounded bg-gray-50 border shrink-0">
                                             {!brokenNew ? (
                                               <img
                                                 src={selectedUrl}
