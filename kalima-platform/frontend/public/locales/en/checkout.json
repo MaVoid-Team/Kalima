@@ -50,7 +50,8 @@
     "uploadScreenshotButton": "Upload image",
     "removeScreenshot": "Remove screenshot",
     "cancel": "Cancel",
-    "preview": "Preview"
+    "preview": "Preview",
+    "backToCart": "Return to Cart"
   },
   "order_summary": {
     "title": "Order Summary",
@@ -94,5 +95,9 @@
       "failed": "Failed",
       "refunded": "Refunded"
     }
+  },
+  "wizard": {
+    "cart": "Cart",
+    "payment": "Payment"
   }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import HeroSection from "@/components/MarketPage/HeroSection";
 import PromoBanner from "@/components/MarketPage/PromoBanner";

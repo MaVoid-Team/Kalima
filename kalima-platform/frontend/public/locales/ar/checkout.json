@@ -50,7 +50,8 @@
     "uploadScreenshotButton": "تحميل الصورة",
     "removeScreenshot": "إزالة لقطة الشاشة",
     "cancel": "إلغاء",
-    "preview": "معاينة"
+    "preview": "معاينة",
+    "backToCart": "العودة إلى السلة"
   },
   "order_summary": {
     "title": "ملخص الطلب",
@@ -94,5 +95,9 @@
       "failed": "فشل",
       "refunded": "تم الاسترداد"
     }
-  }
+  },
+    "wizard": {
+      "cart": "السلة",
+      "payment": "الدفع"
+    }
 }
