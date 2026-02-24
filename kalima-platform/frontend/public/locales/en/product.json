@@ -18,6 +18,7 @@
   "actions": {
     "addToCart": "Add to Cart",
     "buyNow": "Buy Now",
+    "viewSample": "View Sample",
     "follow": "Follow"
   },
   "info": {

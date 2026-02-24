@@ -37,9 +37,10 @@ export default function VerifyEmailPage() {
                 // Extract user and tokens if the backend automatically authenticates the user upon verification
                 const user = response?.data?.user || response?.user;
                 const tokens = response?.data?.tokens || response?.tokens;
+                const portalAccess = response?.data?.portalAccess || response?.portalAccess;
 
                 if (user && tokens) {
-                    loginSuccess(user, tokens);
+                    loginSuccess(user, tokens, portalAccess);
                 }
 
                 if (isMounted) setStatus("success");

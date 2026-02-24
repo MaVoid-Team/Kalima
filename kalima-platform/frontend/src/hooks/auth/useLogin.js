@@ -11,8 +11,8 @@ const useLogin = () => {
             data: credentials,
             defaultSuccessMessage: 'Login successful!'
         });
-        const { user, tokens } = data.data;
-        loginSuccess(user, tokens);
+        const { user, tokens, portalAccess } = data.data;
+        loginSuccess(user, tokens, portalAccess);
         return data;
     };
 
@@ -22,8 +22,8 @@ const useLogin = () => {
             data: { idToken },
             defaultSuccessMessage: 'Login successful!'
         });
-        const { user, tokens } = data.data || data;
-        loginSuccess(user, tokens);
+        const { user, tokens, portalAccess } = data.data || data;
+        loginSuccess(user, tokens, portalAccess);
         return data;
     };
 

@@ -1,0 +1,104 @@
+{
+    "dashboardTitle": "Admin Dashboard",
+    "nav": {
+        "orders": "Orders",
+        "backToStore": "Back to Store",
+        "logout": "Logout"
+    },
+    "common": {
+        "currencyEGP": "EGP",
+        "na": "N/A",
+        "admin": "Admin",
+        "loading": "Loading...",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pagination": {
+            "previous": "Previous",
+            "next": "Next"
+        }
+    },
+    "orders": {
+        "status": {
+            "all": "All Orders",
+            "pending": "Pending",
+            "received": "Received",
+            "confirmed": "Confirmed",
+            "returned": "Returned",
+            "created": "Created"
+        },
+        "total": "Total",
+        "title": "Orders Management",
+        "myOrders": "My Orders",
+        "subtitle": "Track, manage, and view your order history",
+        "noOrders": "No orders found",
+        "noOrdersForStatus": "You have no orders with this status.",
+        "noOrdersDescription": "Looks like you haven't placed any orders yet.",
+        "totalOrders": "{{count}} orders",
+        "searchPlaceholder": "Search by serial, name, email...",
+        "statusAll": "All Statuses",
+        "statusPending": "Pending",
+        "statusReceived": "Received",
+        "statusConfirmed": "Confirmed",
+        "statusReturned": "Returned",
+        "statusCreated": "Created",
+        "clearFilters": "Clear",
+        "filterByDate": "Filter by date",
+        "table": {
+            "serial": "Serial",
+            "customer": "Customer",
+            "status": "Status",
+            "total": "Total",
+            "payment": "Payment Method",
+            "actions": "Actions"
+        },
+        "items": {
+            "items": "Items",
+            "product": "Product",
+            "type": "Type",
+            "price": "Price",
+            "discount": "Discount",
+            "actions": "Actions",
+            "unknownProduct": "Unknown Product"
+        },
+        "actions": {
+            "view": "View Details",
+            "receive": "Mark Received",
+            "confirm": "Confirm Order",
+            "return": "Return Order",
+            "delete": "Delete Order",
+            "deleteItem": "Remove Item"
+        },
+        "messages": {
+            "receiveSuccess": "Order marked as received",
+            "confirmSuccess": "Order marked as confirmed",
+            "returnSuccess": "Order marked as returned",
+            "saveNoteSuccess": "Admin note saved successfully",
+            "deleteOrderWarning": "Are you sure you want to delete this order? This action cannot be undone.",
+            "deleteItemWarning": "Are you sure you want to remove this item from the order?",
+            "deleteOrderSuccess": "Order deleted successfully",
+            "deleteItemSuccess": "Item removed successfully"
+        },
+        "details": {
+            "backToOrders": "Back to Orders",
+            "customerInfo": "Customer Info",
+            "orderSummary": "Order Summary",
+            "paymentInfo": "Payment Info",
+            "statusTimeline": "Status Timeline",
+            "orderItems": "Order Items",
+            "adminNotes": "Admin Notes",
+            "couponInfo": "Applied Coupon",
+            "dateCreated": "Date Created",
+            "itemsCount": "Items Count",
+            "subtotal": "Subtotal",
+            "discount": "Discount",
+            "method": "Payment Method",
+            "transferFrom": "Transferred From",
+            "paymentNumber": "Payment Number",
+            "screenshot": "Payment Screenshot",
+            "saveNote": "Save Note",
+            "total": "Total",
+            "by": "by",
+            "lastNoteBy": "Last note by: {{name}}"
+        }
+    }
+}
