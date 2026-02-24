@@ -88,6 +88,12 @@
     "terms": "Terms of Service",
     "refund": "Refund Policy"
   },
+  "fastBuy": {
+    "checkoutSuccess": "Checkout successful! Redirecting to market..."
+  },
+  "success":{
+    "copied": "Copied to clipboard"
+  },
   "failed": "Checkout failed, please try again",
   "receipt": {
     "title": "Purchase Receipt",

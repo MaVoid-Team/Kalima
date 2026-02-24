@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import useApiMutation from '../useApiMutation';
 import { performLocalLogout } from '@/lib/authUtils';
 
 const useLogout = () => {
     const { mutate, loading, error } = useApiMutation();
+    const { t } = useTranslation('auth');
 
     const logout = async () => {
         try {
@@ -21,7 +23,7 @@ const useLogout = () => {
         try {
             await mutate({
                 endpoint: '/auth/logout-all',
-                defaultSuccessMessage: 'Logged out from all devices'
+                defaultSuccessMessage: t('logout.successAllDevices', 'Logged out from all devices successfully!'),
             });
         } catch (err) {
             // Error handling done by mutate

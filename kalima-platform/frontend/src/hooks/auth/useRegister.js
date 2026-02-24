@@ -1,15 +1,15 @@
+import { useTranslation } from 'react-i18next';
 import useApiMutation from '../useApiMutation';
-import useAuth from './useAuth';
 
 const useRegister = () => {
-    const { loginSuccess } = useAuth();
     const { mutate, loading, error } = useApiMutation();
+    const { t } = useTranslation('auth');
 
     const handleRegister = async (endpoint, data) => {
         const responseData = await mutate({
             endpoint,
             data,
-            defaultSuccessMessage: 'Registration successful! Please check your email to verify your account.'
+            defaultSuccessMessage: t('signup.success', 'Registration successful! Please check your email for verification instructions.'),
         });
         return responseData;
     };

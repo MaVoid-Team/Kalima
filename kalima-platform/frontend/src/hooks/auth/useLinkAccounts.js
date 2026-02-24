@@ -1,14 +1,15 @@
 import { useCallback } from 'react';
 import useApiMutation from '../useApiMutation';
+import { useTranslation } from 'react-i18next';
 
 const useLinkAccounts = () => {
     const { mutate, loading, error } = useApiMutation();
-
+    const { t } = useTranslation('auth');
     const linkFirebaseAccount = async (idToken) => {
         return await mutate({
             endpoint: '/auth/link/firebase',
             data: { idToken },
-            defaultSuccessMessage: 'Account linked successfully'
+            defaultSuccessMessage: t('linkingAccounts.linked', 'Account linked successfully')
         });
     };
 
@@ -16,7 +17,7 @@ const useLinkAccounts = () => {
         return await mutate({
             endpoint: '/auth/unlink',
             data: { provider },
-            defaultSuccessMessage: 'Account unlinked successfully'
+            defaultSuccessMessage: t('linkingAccounts.unlinked', 'Account unlinked successfully')
         });
     };
 

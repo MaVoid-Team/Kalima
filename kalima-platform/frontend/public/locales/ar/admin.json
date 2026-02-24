@@ -76,7 +76,8 @@
             "deleteOrderWarning": "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
             "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
             "deleteOrderSuccess": "تم حذف الطلب بنجاح",
-            "deleteItemSuccess": "تم حذف العنصر بنجاح"
+            "deleteItemSuccess": "تم حذف العنصر بنجاح",
+            "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
         },
         "details": {
             "backToOrders": "العودة للطلبات",

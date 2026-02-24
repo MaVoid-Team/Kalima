@@ -41,7 +41,7 @@ const separateRequiredFields = (itemFields) => {
 export function useFastBuyCheckoutPage() {
   const { mutate, loading: isSubmitting } = useApiMutation();
   const navigate = useNavigate();
-
+  const { t } = useTranslation('checkout');
   const [preview, setPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -123,7 +123,7 @@ export function useFastBuyCheckoutPage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("تم الشراء بنجاح");
+      toast.success(t('fastBuy.checkoutSuccess', 'Checkout successful! Redirecting to market...'));
       navigate("/market", { replace: true });
     } catch {
       // Global error handler will trigger toasts

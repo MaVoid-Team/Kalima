@@ -78,7 +78,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             const result = await signInWithPopup(auth, provider);
             const idToken = await result.user.getIdToken();
             setFirebaseToken(idToken);
-            toast.success("Successfully authenticated with Firebase. Please complete the remaining fields.");
+            toast.success(t("signup.firebaseAuthenticated", "Successfully authenticated with Firebase. Please complete the remaining fields."));
         } catch (error) {
             console.error("Firebase Login failed:", error);
             toast.error(error?.message || "Failed to authenticate with Firebase");
