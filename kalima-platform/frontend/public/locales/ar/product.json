@@ -31,7 +31,8 @@
     "thumbnail": "صورة مصغرة",
     "reviews": "مراجعات",
     "createdBy": "تم إنشاؤه بواسطة",
-    "currency": "ج"
+    "currency": "ج",
+    "requiredInfo": "معلومات مطلوبة للشراء:"
   },
   "trustSignals": {
     "secureTransaction": "معاملة آمنة",
