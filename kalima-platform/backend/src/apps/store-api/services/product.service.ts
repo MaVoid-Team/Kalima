@@ -27,6 +27,22 @@ import {
 // SHARED INCLUDES
 // ============================================
 
+/** Enrich product with computed release fields (not stored in DB) */
+function enrichProductWithReleaseInfo<T extends { release_at?: Date | null }>(
+  product: T,
+): T & { is_released: boolean; time_until_release_ms: number | null } {
+  const releaseAt = product.release_at ? new Date(product.release_at) : null;
+  const now = new Date();
+  const isReleased = !releaseAt || releaseAt <= now;
+  const timeUntilReleaseMs =
+    releaseAt && releaseAt > now ? releaseAt.getTime() - now.getTime() : null;
+  return {
+    ...product,
+    is_released: isReleased,
+    time_until_release_ms: timeUntilReleaseMs,
+  } as T & { is_released: boolean; time_until_release_ms: number | null };
+}
+
 /** Minimal include for product list (getAllProducts) */
 const PRODUCT_LIST_INCLUDE = {
   thumbnail_image: true,
@@ -106,7 +122,8 @@ class ProductService {
       thumbnailId = image.id;
     }
 
-    // Create product
+    const releaseAt = dto.release_at ? new Date(dto.release_at) : null;
+
     const product = await this.db.products.create({
       data: {
         title: dto.title,
@@ -117,6 +134,7 @@ class ProductService {
         serial: dto.serial,
         sample_url: dto.sample_url,
         thumbnail_id: thumbnailId,
+        release_at: releaseAt,
       },
       include: PRODUCT_INCLUDE,
     });
@@ -174,7 +192,7 @@ class ProductService {
       };
     }
 
-    const [data, total] = await Promise.all([
+    const [rawData, total] = await Promise.all([
       this.db.products.findMany({
         where,
         include: PRODUCT_LIST_INCLUDE,
@@ -185,6 +203,7 @@ class ProductService {
       this.db.products.count({ where }),
     ]);
 
+    const data = rawData.map((p) => enrichProductWithReleaseInfo(p));
     return { data, total, page, limit };
   }
 
@@ -202,7 +221,7 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    return product;
+    return enrichProductWithReleaseInfo(product) as products;
   }
 
   // ============================================
@@ -227,6 +246,8 @@ class ProductService {
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
+    if (dto.release_at !== undefined)
+      data.release_at = dto.release_at ? new Date(dto.release_at) : null;
 
     const updated = await this.db.products.update({
       where: { id },
@@ -234,7 +255,7 @@ class ProductService {
       include: PRODUCT_INCLUDE,
     });
 
-    return updated;
+    return enrichProductWithReleaseInfo(updated) as products;
   }
 
   // ============================================
