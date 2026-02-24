@@ -1,0 +1,79 @@
+{
+    "pagination": {
+        "previous": "السابق",
+        "next": "التالي"
+    },
+    "title": "إدارة المستخدمين",
+    "subtitle": "إدارة المستخدمين والأدوار وصلاحيات الوصول",
+    "usersList": "قائمة المستخدمين",
+    "totalUsers": "إجمالي المستخدمين: {{count}}",
+    "searchPlaceholder": "البحث بالاسم، البريد الإلكتروني، رقم الهاتف...",
+    "filters": {
+        "allRoles": "جميع الأدوار",
+        "allPortals": "جميع البوابات"
+    },
+    "table": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "role": "الدور الأساسي",
+        "status": "مفعل",
+        "joined": "تاريخ الانضمام",
+        "actions": "إجراءات"
+    },
+    "status": {
+        "verified": "حساب موثق",
+        "pending": "قيد الانتظار"
+    },
+    "actions": {
+        "view": "عرض الملف",
+        "create": "إضافة مستخدم",
+        "addRole": "إضافة دور",
+        "revoke": "إلغاء",
+        "makeAdmin": "إضافة مدير",
+        "makeSubAdmin": "إضافة نائب مدير",
+        "makeModerator": "إضافة مشرف",
+        "makeAssistant": "إضافة مساعد"
+    },
+    "details": {
+        "title": "ملف المستخدم",
+        "back": "العودة للمستخدمين",
+        "rolesTitle": "الأدوار والصلاحيات",
+        "personalInfo": "المعلومات الشخصية",
+        "portal": "البوابة",
+        "role": "الدور"
+    },
+    "roles": {
+        "Admin": "مدير",
+        "SubAdmin": "نائب مدير",
+        "Teacher": "معلم",
+        "Student": "طالب",
+        "Parent": "ولي أمر",
+        "Lecturer": "محاضر",
+        "Moderator": "مشرف",
+        "Assistant": "مساعد"
+    },
+    "portals": {
+        "store": "المتجر",
+        "academy": "الأكاديمية"
+    },
+    "messages": {
+        "roleAssigned": "تم تعيين الدور بنجاح",
+        "roleRevoked": "تم إلغاء الدور بنجاح",
+        "userCreated": "تم إنشاء المستخدم بنجاح",
+        "revokeConfirm": "هل أنت متأكد من إلغاء هذا الدور؟",
+        "noRoles": "لا توجد أدوار معينة للمستخدم."
+    },
+    "createDialog": {
+        "title": "إنشاء مستخدم إداري",
+        "type": "نوع المستخدم",
+        "name": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "phone": "رقم الهاتف",
+        "secondaryPhone": "رقم هاتف إضافي (اختياري)",
+        "gender": "الجنس",
+        "male": "ذكر",
+        "female": "أنثى"
+    }
+}
