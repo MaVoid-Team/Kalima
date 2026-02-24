@@ -11,14 +11,23 @@ import MainLayout from "./layouts/MainLayout";
 const LandingPage = lazy(() => import("./pages/landing/LandingPage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
 const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
-const ForgotPasswordPage = lazy(() => import("./pages/auth/ForgotPasswordPage"));
+const ForgotPasswordPage = lazy(
+  () => import("./pages/auth/ForgotPasswordPage"),
+);
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
 const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"));
 const CartPage = lazy(() => import("./pages/cart/CartPage"));
 const MarketPage = lazy(() => import("./pages/market/MarketPage"));
 const CheckoutPage = lazy(() => import("./pages/checkout/CheckoutPage"));
-const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage"));
-const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
+const FastBuyCheckoutPage = lazy(
+  () => import("./pages/checkout/FastBuyCheckoutPage"),
+);
+const ProductDetailsPage = lazy(
+  () => import("./pages/product/ProductDetailsPage"),
+);
+const BookletDetailsPage = lazy(
+  () => import("./pages/booklet/BookletDetailsPage"),
+);
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 const PageLoader = () => (
@@ -50,6 +59,10 @@ function App() {
             <Route element={<ProtectedRoute requireAuth={true} />}>
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route
+                path="/fast-buy/checkout"
+                element={<FastBuyCheckoutPage />}
+              />
             </Route>
 
             {/* 404 Fallback */}
@@ -62,7 +75,10 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/auth/reset-password"
+                element={<ResetPasswordPage />}
+              />
               <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
             </Route>
           </Route>
