@@ -303,7 +303,7 @@ class ProductService {
       include: PRODUCT_INCLUDE,
     });
 
-    return updated;
+    return enrichProductWithReleaseInfo(updated) as products;
   }
 
   // ============================================
@@ -449,18 +449,22 @@ class ProductService {
     "video/webm",
     "video/quicktime",
   ]);
+  private videoDirInitPromise: Promise<unknown> | null = null;
+
+  private async ensureVideoDirExists(): Promise<void> {
+    if (!this.videoDirInitPromise) {
+      this.videoDirInitPromise = fsPromises.mkdir(
+        ProductService.GALLERY_VIDEO_DIR,
+        { recursive: true },
+      );
+    }
+    await this.videoDirInitPromise;
+  }
 
   async addVideoToGallery(
     productId: number,
     file: Express.Multer.File,
   ): Promise<product_gallery_videos> {
-    const product = await this.db.products.findFirst({
-      where: { id: productId, deleted_at: null },
-    });
-    if (!product) {
-      throw new NotFoundError("Product not found");
-    }
-
     if (!file.buffer) {
       throw new BadRequestError("Video file buffer is required");
     }
@@ -470,7 +474,23 @@ class ProductService {
       );
     }
 
-    await fsPromises.mkdir(ProductService.GALLERY_VIDEO_DIR, { recursive: true });
+    // Verify product exists and get max sort order in parallel
+    const [product, maxSort] = await Promise.all([
+      this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { id: true },
+      }),
+      this.db.product_gallery_videos.findFirst({
+        where: { product_id: productId },
+        orderBy: { sort_order: "desc" },
+        select: { sort_order: true },
+      }),
+    ]);
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    await this.ensureVideoDirExists();
 
     const ext = path.extname(file.originalname) || ".mp4";
     const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
@@ -479,12 +499,6 @@ class ProductService {
     await fsPromises.writeFile(filePath, file.buffer);
 
     const url = `/uploads/gallery_videos/${filename}`;
-
-    const maxSort = await this.db.product_gallery_videos.findFirst({
-      where: { product_id: productId },
-      orderBy: { sort_order: "desc" },
-      select: { sort_order: true },
-    });
     const sortOrder = (maxSort?.sort_order ?? -1) + 1;
 
     return this.db.product_gallery_videos.create({
@@ -508,22 +522,24 @@ class ProductService {
     productId: number,
     url: string,
   ): Promise<product_gallery_videos> {
-    const product = await this.db.products.findFirst({
-      where: { id: productId, deleted_at: null },
-    });
-    if (!product) {
-      throw new NotFoundError("Product not found");
-    }
-
     if (!url || !url.startsWith("http")) {
       throw new BadRequestError("Valid URL (http/https) is required");
     }
 
-    const maxSort = await this.db.product_gallery_videos.findFirst({
-      where: { product_id: productId },
-      orderBy: { sort_order: "desc" },
-      select: { sort_order: true },
-    });
+    const [product, maxSort] = await Promise.all([
+      this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { id: true },
+      }),
+      this.db.product_gallery_videos.findFirst({
+        where: { product_id: productId },
+        orderBy: { sort_order: "desc" },
+        select: { sort_order: true },
+      }),
+    ]);
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
     const sortOrder = (maxSort?.sort_order ?? -1) + 1;
 
     return this.db.product_gallery_videos.create({

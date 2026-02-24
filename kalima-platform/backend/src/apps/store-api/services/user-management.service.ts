@@ -386,8 +386,10 @@ class UserManagementService {
     input: StudentFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
-    const requiresReview = await accountReviewService.roleRequiresReview(role_enum.Student);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Student),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -440,8 +442,10 @@ class UserManagementService {
     input: ParentFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
-    const requiresReview = await accountReviewService.roleRequiresReview(role_enum.Parent);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Parent),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({
@@ -488,8 +492,10 @@ class UserManagementService {
     input: LecturerFirebaseRegistrationDto,
     firebaseUser: FirebaseUserData,
   ): Promise<{ user: any; email: string }> {
-    await this.ensureEmailNotExists(firebaseUser.email);
-    const requiresReview = await accountReviewService.roleRequiresReview(role_enum.Lecturer);
+    const [, requiresReview] = await Promise.all([
+      this.ensureEmailNotExists(firebaseUser.email),
+      accountReviewService.roleRequiresReview(role_enum.Lecturer),
+    ]);
 
     const user = await this.db.$transaction(async (tx) => {
       const created = await tx.users.create({

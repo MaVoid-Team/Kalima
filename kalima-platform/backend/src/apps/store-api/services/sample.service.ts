@@ -289,71 +289,49 @@ class SampleService {
     highQualityFile?: Express.Multer.File,
     lowQualityFile?: Express.Multer.File,
   ): Promise<samples> {
-    // Verify section exists
-    const section = await this.db.sample_sections.findUnique({
-      where: { id: sectionId },
-    });
-    if (!section) {
-      throw new NotFoundError("Sample section not found");
-    }
-
-    // Verify product exists
-    const product = await this.db.products.findFirst({
-      where: { id: productId, deleted_at: null },
-    });
-    if (!product) {
-      throw new NotFoundError("Product not found");
-    }
-
     if (!highQualityFile && !lowQualityFile) {
       throw new BadRequestError(
         "At least one of high_quality or low_quality file must be provided",
       );
     }
 
-    let mediaType: sample_media_type_enum = sample_media_type_enum.pdf;
-    let originalName = "sample";
-    let mimeType = "application/pdf";
-    let size = 0;
-
-    let highQualityUrl: string | null = null;
-    let lowQualityUrl: string | null = null;
-
-    if (highQualityFile?.buffer) {
-      if (!SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)) {
-        throw new BadRequestError(
-          `Invalid high_quality file type: ${highQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
-        );
-      }
-      mediaType = MIME_TO_MEDIA_TYPE[highQualityFile.mimetype] ?? sample_media_type_enum.pdf;
-      originalName = highQualityFile.originalname;
-      mimeType = highQualityFile.mimetype;
-      size = highQualityFile.buffer.length;
-      highQualityUrl = await this.saveFileToDisk(
-        highQualityFile.buffer,
-        highQualityFile.mimetype,
-        "high_quality",
+    // Validate mime types eagerly before any I/O
+    if (highQualityFile?.buffer && !SAMPLE_MIME_TYPES.has(highQualityFile.mimetype)) {
+      throw new BadRequestError(
+        `Invalid high_quality file type: ${highQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+      );
+    }
+    if (lowQualityFile?.buffer && !SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)) {
+      throw new BadRequestError(
+        `Invalid low_quality file type: ${lowQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
       );
     }
 
-    if (lowQualityFile?.buffer) {
-      if (!SAMPLE_MIME_TYPES.has(lowQualityFile.mimetype)) {
-        throw new BadRequestError(
-          `Invalid low_quality file type: ${lowQualityFile.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
-        );
-      }
-      if (!highQualityFile?.buffer) {
-        mediaType = MIME_TO_MEDIA_TYPE[lowQualityFile.mimetype] ?? sample_media_type_enum.pdf;
-        originalName = lowQualityFile.originalname;
-        mimeType = lowQualityFile.mimetype;
-        size = lowQualityFile.buffer.length;
-      }
-      lowQualityUrl = await this.saveFileToDisk(
-        lowQualityFile.buffer,
-        lowQualityFile.mimetype,
-        "low_quality",
-      );
-    }
+    // Verify section + product exist in parallel
+    const [section, product] = await Promise.all([
+      this.db.sample_sections.findUnique({ where: { id: sectionId } }),
+      this.db.products.findFirst({ where: { id: productId, deleted_at: null } }),
+    ]);
+    if (!section) throw new NotFoundError("Sample section not found");
+    if (!product) throw new NotFoundError("Product not found");
+
+    // Determine metadata from primary file
+    const primaryFile = highQualityFile?.buffer ? highQualityFile : lowQualityFile!;
+    const mediaType = MIME_TO_MEDIA_TYPE[primaryFile.mimetype] ?? sample_media_type_enum.pdf;
+    const originalName = primaryFile.originalname;
+    const mimeType = primaryFile.mimetype;
+    const size = primaryFile.buffer!.length;
+
+    // Write files to disk in parallel when both are provided
+    const fileWrites: Promise<string | null>[] = [
+      highQualityFile?.buffer
+        ? this.saveFileToDisk(highQualityFile.buffer, highQualityFile.mimetype, "high_quality")
+        : Promise.resolve(null),
+      lowQualityFile?.buffer
+        ? this.saveFileToDisk(lowQualityFile.buffer, lowQualityFile.mimetype, "low_quality")
+        : Promise.resolve(null),
+    ];
+    const [highQualityUrl, lowQualityUrl] = await Promise.all(fileWrites);
 
     return this.db.samples.create({
       data: {
