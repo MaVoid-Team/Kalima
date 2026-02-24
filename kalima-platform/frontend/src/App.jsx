@@ -14,9 +14,8 @@ const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/auth/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
 const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"));
-const CartPage = lazy(() => import("./pages/cart/CartPage"));
 const MarketPage = lazy(() => import("./pages/market/MarketPage"));
-const CheckoutPage = lazy(() => import("./pages/checkout/CheckoutPage"));
+const WizardCheckoutPage = lazy(() => import("./pages/checkout/WizardCheckoutPage"));
 const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage"));
 const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -48,8 +47,8 @@ function App() {
 
             {/* Protected Routes inside MainLayout */}
             <Route element={<ProtectedRoute requireAuth={true} />}>
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/cart" element={<WizardCheckoutPage />} />
+              <Route path="/checkout" element={<WizardCheckoutPage />} />
             </Route>
 
             {/* 404 Fallback */}

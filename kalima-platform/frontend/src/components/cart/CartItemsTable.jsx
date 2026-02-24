@@ -23,11 +23,11 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 
-export default function CartItemsTable({ 
-  cartItems, 
-  updateQuantity, 
-  removeFromCart, 
-  applyCoupon, 
+export default function CartItemsTable({
+  cartItems,
+  updateQuantity,
+  removeFromCart,
+  applyCoupon,
   removeCoupon,
   updateCartItemRequiredFields,
   updateCartItemRequiredFieldsImage
@@ -95,18 +95,18 @@ export default function CartItemsTable({
   }, [openItems]);
 
 
-  
+
   // derive just the origin (scheme+host+port) once; strip any appended paths like `/api/v2`
-    const baseURL = useMemo(() => {
-      const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      try {
-        return new URL(raw).origin;
-      } catch {
-        // fallback to manual fallback if URL parsing fails
-        return raw.split('/api/v2')[0];
-      }
-    }, []);
-    
+  const baseURL = useMemo(() => {
+    const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    try {
+      return new URL(raw).origin;
+    } catch {
+      // fallback to manual fallback if URL parsing fails
+      return raw.split('/api/v2')[0];
+    }
+  }, []);
+
   // When cartItems change (e.g., after upload and parent reloads), resync local preview state
   useEffect(() => {
     if (!cartItems || cartItems.length === 0) return;
@@ -170,7 +170,7 @@ export default function CartItemsTable({
           !(imageFields[itemId] && imageFields[itemId].value instanceof File)
         ) {
           hasError = true;
-          errors[`${itemId}_${rf.field_definition_id}`] = t('pleaseSelectFile','Please select a file');
+          errors[`${itemId}_${rf.field_definition_id}`] = t('pleaseSelectFile', 'Please select a file');
         }
       });
       if (hasError) {
@@ -269,8 +269,8 @@ export default function CartItemsTable({
             <div className="flex gap-4">
               <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
                 <img src={item?.products?.thumbnail_image?.url
-                            ? new URL(item.products.thumbnail_image.url, baseURL).toString()
-                            : 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
+                  ? new URL(item.products.thumbnail_image.url, baseURL).toString()
+                  : 'https://via.placeholder.com/150'} alt={item?.products?.title} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
@@ -317,11 +317,11 @@ export default function CartItemsTable({
                 {item.coupons ? (
                   <div className="flex items-center justify-between flex-row gap-2">
                     <div className="flex items-center gap-1">
-                    <span className="text-sm text-green-600" title={t('applied', 'Applied')}><TicketCheck className={`w-4 h-4 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} /></span>
-                    <Badge variant="success" className="h-5 px-1.5 text-xs bg-accent">{item?.coupons?.code}</Badge>
-                    {item?.coupons?.discount_percentage != 0 && <span className="text-sm text-muted-foreground">{i18n.language==='en' && '-'}{item?.coupons?.discount_percentage}%{i18n.language==='ar' && '-'}</span>}
-                    {item?.coupons?.discount_amount != 0 && <span className="text-sm text-muted-foreground">-{item?.coupons?.discount_amount} {t('L.E')}</span>}
-                    {item?.coupons?.discount_percentage != 0 && <span className="text-xs text-muted-foreground ml-1">({" - " +  item?.discount} {t('L.E')})</span>}
+                      <span className="text-sm text-green-600" title={t('applied', 'Applied')}><TicketCheck className={`w-4 h-4 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} /></span>
+                      <Badge variant="success" className="h-5 px-1.5 text-xs bg-accent">{item?.coupons?.code}</Badge>
+                      {item?.coupons?.discount_percentage != 0 && <span className="text-sm text-muted-foreground">{i18n.language === 'en' && '-'}{item?.coupons?.discount_percentage}%{i18n.language === 'ar' && '-'}</span>}
+                      {item?.coupons?.discount_amount != 0 && <span className="text-sm text-muted-foreground">-{item?.coupons?.discount_amount} {t('L.E')}</span>}
+                      {item?.coupons?.discount_percentage != 0 && <span className="text-xs text-muted-foreground ml-1">({" - " + item?.discount} {t('L.E')})</span>}
                     </div>
                     <Button size="icon" variant="ghost" onClick={() => handleRemove(item.id)}>
                       <Trash className="w-4 h-4 text-destructive" />
@@ -401,7 +401,7 @@ export default function CartItemsTable({
                 >
                   <AccordionItem value="fields">
                     <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-green-600" : "text-primary")}>
-                      {openItems[item.id] ? t('hideDetails','Hide details') : t('viewMore','View more')}
+                      {openItems[item.id] ? t('hideDetails', 'Hide details') : t('viewMore', 'View more')}
                     </AccordionTrigger>
                     <AccordionContent className="mt-2 space-y-2 p-2 border rounded overflow-x-hidden min-w-0 w-full box-border max-w-full">
                       <form onSubmit={(e) => handleCartRequiredFieldsSubmit(e, item.id)} className='flex flex-col gap-2 w-full max-w-full overflow-x-hidden'>
@@ -464,7 +464,7 @@ export default function CartItemsTable({
                                     }}
                                     className="sr-only"
                                   />
-                                    {imageFields[item.id]?.value ? (
+                                  {imageFields[item.id]?.value ? (
                                     <div className="flex items-center gap-2 min-w-0">
                                       <span className="text-sm max-w-40 truncate block" title={imageFields[item.id].value.name}>
                                         {imageFields[item.id].value.name}
@@ -524,7 +524,7 @@ export default function CartItemsTable({
                                             {!brokenOld ? (
                                               <img
                                                 src={originalUrl}
-                                                alt={t('oldImage','Old image')}
+                                                alt={t('oldImage', 'Old image')}
                                                 className="w-full h-full object-cover max-w-full"
                                                 onError={() => setBrokenPreviews(prev => ({ ...prev, [`${key}_old`]: true }))}
                                               />
@@ -539,7 +539,7 @@ export default function CartItemsTable({
                                             {!brokenNew ? (
                                               <img
                                                 src={selectedUrl}
-                                                alt={t('newImage','New image')}
+                                                alt={t('newImage', 'New image')}
                                                 className="w-full h-full object-cover max-w-full"
                                                 onError={() => setBrokenPreviews(prev => ({ ...prev, [`${key}_new`]: true }))}
                                               />
@@ -560,7 +560,7 @@ export default function CartItemsTable({
                                       return (
                                         <img
                                           src={singleUrl}
-                                          alt={t('preview','Preview')}
+                                          alt={t('preview', 'Preview')}
                                           className="mt-2 w-24 max-w-full h-auto rounded"
                                           style={{ display: 'block', maxWidth: '100%' }}
                                           onError={() => {
@@ -603,9 +603,9 @@ export default function CartItemsTable({
                           type="submit"
                           className="w-fit self-end"
                         >
-                        {t('save','Save')}
-                      </Button>
-                    </form>
+                          {t('save', 'Save')}
+                        </Button>
+                      </form>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
@@ -613,24 +613,24 @@ export default function CartItemsTable({
             )}
 
             <Button className="w-full" onClick={() => { setItemToDelete(item.id); setDialogOpen(true); }}>
-                {t('removeFromCart', 'Remove From Cart')}
-              </Button>
+              {t('removeFromCart', 'Remove From Cart')}
+            </Button>
           </motion.div>
         ))}
       </div>
-      
+
       {/* coupon dialog */}
       <AlertDialog open={couponDialogOpen} onOpenChange={setCouponDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('applyCouponTitle','Enter coupon code')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('applyCouponDesc','Type your promo code and hit apply.')}</AlertDialogDescription>
+            <AlertDialogTitle>{t('applyCouponTitle', 'Enter coupon code')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('applyCouponDesc', 'Type your promo code and hit apply.')}</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-2 mt-2">
             <Input
               value={couponValue}
-              onChange={(e)=>setCouponValue(e.target.value)}
-              placeholder={t('enterCode','Code')}
+              onChange={(e) => setCouponValue(e.target.value)}
+              placeholder={t('enterCode', 'Code')}
               className="w-full"
             />
             <Button
@@ -648,11 +648,11 @@ export default function CartItemsTable({
                 }
               }}
             >
-              {t('applyCoupon','Apply Coupon')}
+              {t('applyCoupon', 'Apply Coupon')}
             </Button>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCouponDialogOpen(false)}>{t('cancel','Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setCouponDialogOpen(false)}>{t('cancel', 'Cancel')}</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
