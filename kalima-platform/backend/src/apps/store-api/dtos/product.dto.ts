@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 import {
   IsArray,
   IsBoolean,
+  IsDateString,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -71,6 +72,11 @@ export class CreateProductDto {
   @IsOptional()
   @Type(() => Number)
   category_ids?: number[];
+
+  /** ISO date string – exact minute of scheduled release. Null = immediately available. */
+  @IsDateString()
+  @IsOptional()
+  release_at?: string;
 }
 
 // ============================================
@@ -117,6 +123,11 @@ export class UpdateProductDto {
   @IsBoolean()
   @IsOptional()
   is_archived?: boolean;
+
+  /** ISO date string – exact minute of scheduled release. Null = immediately available. */
+  @IsDateString()
+  @IsOptional()
+  release_at?: string;
 }
 
 // ============================================

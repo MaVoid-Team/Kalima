@@ -428,6 +428,7 @@ export const ProductsScalarFieldEnum = {
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
   is_archived: 'is_archived',
+  release_at: 'release_at',
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
