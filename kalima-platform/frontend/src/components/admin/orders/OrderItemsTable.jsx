@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../ui/table';
-import { formatCurrency, buildProductImages } from '../../../lib/storeUtils';
-import { Button } from '../../ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
+import { formatCurrency, buildProductImages } from '@/../lib/storeUtils';
+import { Button } from '@/ui/button';
 import { Trash2 } from 'lucide-react';
 import {
     AlertDialog,
@@ -13,7 +13,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../../ui/alert-dialog';
+} from '@/ui/alert-dialog';
 
 export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
     const { t, i18n } = useTranslation('admin');

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import useOrders from '../../../hooks/useOrders';
-import OrdersToolbar from '../../../components/admin/orders/OrdersToolbar';
-import OrdersTable from '../../../components/admin/orders/OrdersTable';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '../../../components/ui/pagination';
+import useOrders from '@/../hooks/useOrders';
+import OrdersToolbar from '@/../components/admin/orders/OrdersToolbar';
+import OrdersTable from '@/../components/admin/orders/OrdersTable';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/../components/ui/pagination';
 
 export default function OrdersPage() {
     const { t } = useTranslation('admin');

@@ -1,5 +1,5 @@
 import useApiMutation from '../useApiMutation';
-import { performLocalLogout } from '../../lib/authUtils';
+import { performLocalLogout } from '@/lib/authUtils';
 
 const useLogout = () => {
     const { mutate, loading, error } = useApiMutation();

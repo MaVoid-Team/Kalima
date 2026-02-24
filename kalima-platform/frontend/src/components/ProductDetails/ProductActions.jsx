@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
-import { useCart } from "../../contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 
 /**
@@ -36,12 +36,12 @@ export default function ProductActions({ price, productId, sampleUrl }) {
         </div>
         <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
           {loading ? (
-              <LoadingSpinner className="h-5 w-5 border-white" />
-            ) : (<>
-              <ShoppingCart className="h-5 w-5" />
-              {t("actions.addToCart")}
-              </>
-            )}
+            <LoadingSpinner className="h-5 w-5 border-white" />
+          ) : (<>
+            <ShoppingCart className="h-5 w-5" />
+            {t("actions.addToCart")}
+          </>
+          )}
         </Button>
       </div>
 
@@ -78,7 +78,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
             ) : (<>
               <ShoppingCart className="h-5 w-5" />
               {t("actions.addToCart")}
-              </>
+            </>
             )}
           </Button>
         </div>
