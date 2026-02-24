@@ -13,7 +13,7 @@ export default function OrderSummary({ items, pricing, onPay }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{t('order_summary.title')}</CardTitle>
+                <CardTitle>{t('orderSummary.title')}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-6">
                 <div className="flex flex-col gap-4">

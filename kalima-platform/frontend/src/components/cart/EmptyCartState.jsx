@@ -16,14 +16,14 @@ export default function EmptyCartState({ onBrowseProducts }) {
       className="py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-2xl mx-auto">
-        <Card className="rounded-2xl shadow-sm border border-gray-200 text-center">
+        <Card className="rounded-2xl shadow-sm border border-border text-center">
           <CardContent className="p-12">
             <div className="mb-6 flex justify-center">
               <div className="relative">
                 <div className="w-32 h-32 rounded-full flex items-center justify-center">
                   <ShoppingCart className="w-16 h-16" strokeWidth={1.5} />
                 </div>
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <div className="absolute -top-2 -right-2 w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center">
                   <span className="text-2xl">😕</span>
                 </div>
               </div>
@@ -44,7 +44,7 @@ export default function EmptyCartState({ onBrowseProducts }) {
               {t('browseProducts')}
             </Button>
 
-            <div className="mt-12 pt-8 border-t border-gray-200">
+            <div className="mt-12 pt-8 border-t border-border">
               <p className="text-sm mb-4">{t('popularCategories')}</p>
               <div className="flex flex-wrap gap-2 justify-center">
                 {[t('categories.textbooks'), t('categories.schoolSupplies'), t('categories.studyGuides'), t('categories.digitalResources')].map((category, idx) => (

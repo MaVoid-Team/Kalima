@@ -25,14 +25,14 @@ export default function OrderSummaryCard({
         <Card className="border-0 shadow-lg ring-1 ring-border/50">
           <CardHeader className="pb-4">
             <CardTitle className="text-2xl font-bold tracking-tight">
-              {t("order_summary.title", "Order Summary")}
+              {t("orderSummary.title", "Order Summary")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-4 group">
-                  <div className="h-16 w-16 rounded-lg bg-muted overflow-hidden flex-shrink-0 border border-border/50">
+                  <div className="h-16 w-16 rounded-lg bg-muted overflow-hidden shrink-0 border border-border/50">
                     {item.image ? (
                       <img
                         src={item.image}
@@ -58,7 +58,7 @@ export default function OrderSummaryCard({
                       </p>
                     )}
                     <p className="text-xs font-semibold text-foreground mt-1">
-                      {t("order_summary.qty", "Qty")}: {item.quantity}
+                      {t("orderSummary.qty", "Qty")}: {item.quantity}
                     </p>
                   </div>
                   <div className="flex flex-col justify-center items-end pl-2">
@@ -73,7 +73,7 @@ export default function OrderSummaryCard({
             <div className="space-y-3 pt-6 border-t border-border/50">
               <div className="flex justify-between items-end">
                 <span className="text-lg font-bold text-foreground">
-                  {t("order_summary.total", "Total")}
+                  {t("orderSummary.total", "Total")}
                 </span>
                 <span className="text-2xl font-black text-primary tracking-tight">
                   {formatPrice(subtotal)}

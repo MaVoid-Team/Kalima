@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { formatOrderDate } from '@/../lib/storeUtils';
+import { formatOrderDate } from '@/lib/storeUtils';
 
 export default function StatusTimeline({ order }) {
     const { t, i18n } = useTranslation('admin');
