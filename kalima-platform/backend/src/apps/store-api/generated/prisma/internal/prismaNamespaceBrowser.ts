@@ -88,7 +88,8 @@ export const ModelName = {
   payment_methods: 'payment_methods',
   sample_sections: 'sample_sections',
   images: 'images',
-  product_gallery: 'product_gallery'
+  product_gallery: 'product_gallery',
+  product_gallery_videos: 'product_gallery_videos'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -606,6 +607,22 @@ export const Product_galleryScalarFieldEnum = {
 } as const
 
 export type Product_galleryScalarFieldEnum = (typeof Product_galleryScalarFieldEnum)[keyof typeof Product_galleryScalarFieldEnum]
+
+
+export const Product_gallery_videosScalarFieldEnum = {
+  id: 'id',
+  product_id: 'product_id',
+  url: 'url',
+  source_type: 'source_type',
+  original_name: 'original_name',
+  mime_type: 'mime_type',
+  size: 'size',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at'
+} as const
+
+export type Product_gallery_videosScalarFieldEnum = (typeof Product_gallery_videosScalarFieldEnum)[keyof typeof Product_gallery_videosScalarFieldEnum]
 
 
 export const SortOrder = {

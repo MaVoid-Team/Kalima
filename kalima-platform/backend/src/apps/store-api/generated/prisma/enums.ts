@@ -87,6 +87,14 @@ export const location_type_enum = {
 export type location_type_enum = (typeof location_type_enum)[keyof typeof location_type_enum]
 
 
+export const video_source_type_enum = {
+  upload: 'upload',
+  external: 'external'
+} as const
+
+export type video_source_type_enum = (typeof video_source_type_enum)[keyof typeof video_source_type_enum]
+
+
 export const sample_media_type_enum = {
   pdf: 'pdf',
   image: 'image',

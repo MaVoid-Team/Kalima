@@ -166,3 +166,37 @@ export const uploadSampleFiles = multer({
   { name: "high_quality", maxCount: 1 },
   { name: "low_quality", maxCount: 1 },
 ]);
+
+// ============================================
+// GALLERY VIDEO — single video upload (mp4, webm, quicktime)
+// ============================================
+
+const GALLERY_VIDEO_MIME_TYPES = new Set([
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
+
+function galleryVideoFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (GALLERY_VIDEO_MIME_TYPES.has(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new BadRequestError(
+        `Invalid video type: ${file.mimetype}. Allowed: mp4, webm, quicktime`,
+      ) as unknown as Error,
+      false,
+    );
+  }
+}
+
+/** Single gallery video upload. Max 100 MB. */
+export const uploadGalleryVideo = multer({
+  storage: memoryStorage,
+  fileFilter: galleryVideoFilter,
+  limits: { fileSize: 100 * 1024 * 1024 },
+}).single("video");
