@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
-import useAuth from '../../hooks/auth/useAuth';
+import useAuth from '@/hooks/auth/useAuth';
 
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     const { t, i18n } = useTranslation('admin');
