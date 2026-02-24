@@ -284,6 +284,28 @@ class CartService {
       arr.push(pf);
     }
 
+    // Collect image IDs for batch fetching
+    const imageIds = new Set<number>();
+    for (const item of cart.cart_items) {
+      for (const rf of item.cart_item_required_fields) {
+        if (rf.required_field_definitions?.field_type === "image" && rf.value) {
+          const id = Number(rf.value);
+          if (!isNaN(id)) imageIds.add(id);
+        }
+      }
+    }
+
+    const imagesMap = new Map<number, string>();
+    if (imageIds.size > 0) {
+      const images = await this.db.images.findMany({
+        where: { id: { in: Array.from(imageIds) } },
+        select: { id: true, url: true },
+      });
+      for (const img of images) {
+        imagesMap.set(img.id, img.url);
+      }
+    }
+
     // Merge into each cart item
     const enrichedItems = cart.cart_items.map((item) => {
       const defs = fieldsByProduct.get(item.product_id) ?? [];
@@ -298,6 +320,14 @@ class CartService {
         if (typeof val === "string" && val.trim() === "") {
           val = null;
         }
+
+        if (val !== null && def.required_field_definitions?.field_type === "image") {
+          const imgId = Number(val);
+          if (!isNaN(imgId) && imagesMap.has(imgId)) {
+            val = imagesMap.get(imgId)!;
+          }
+        }
+
         return {
           field_definition_id: def.field_definition_id,
           is_required: def.is_required,
