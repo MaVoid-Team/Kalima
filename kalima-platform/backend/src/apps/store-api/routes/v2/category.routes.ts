@@ -3,6 +3,7 @@ import { categoryController } from "../../controllers/category.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -14,6 +15,8 @@ const adminAuth = [
 // ============================================
 // PUBLIC — read (some endpoints unauthenticated)
 // ============================================
+
+router.get("/export", authenticateToken, makeExportHandler("categories"));
 
 // Public / unauthenticated helpers
 router.get("/roots", categoryController.getRootCategories);

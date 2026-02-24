@@ -4,6 +4,7 @@ import { zonesController } from "../../controllers/zones.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -14,6 +15,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC — read-only
+router.get("/export", makeExportHandler("governments"));
 router.get("/", governmentController.getAllGovernments);
 router.get("/:id", governmentController.getGovernmentById);
 router.get("/:governmentId/zones", zonesController.getZonesByGovernment);
