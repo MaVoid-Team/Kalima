@@ -13,7 +13,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC
-router.get("/export", makeExportHandler("subjects"));
+router.get("/export", ...adminAuth, makeExportHandler("subjects"));
 router.get("/", subjectsController.getAllSubjects);
 router.get("/:id", subjectsController.getSubjectById);
 

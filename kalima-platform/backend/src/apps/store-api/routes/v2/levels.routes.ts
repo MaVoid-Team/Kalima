@@ -13,7 +13,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC
-router.get("/export", makeExportHandler("levels"));
+router.get("/export", ...adminAuth, makeExportHandler("levels"));
 router.get("/", levelsController.getAllLevels);
 router.get("/:id", levelsController.getLevelById);
 
