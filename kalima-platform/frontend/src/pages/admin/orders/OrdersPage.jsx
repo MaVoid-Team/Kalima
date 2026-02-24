@@ -66,6 +66,7 @@ export default function OrdersPage() {
                                 <PaginationPrevious
                                     onClick={() => setPage(Math.max(1, pagination.page - 1))}
                                     className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    text={t('common.pagination.previous')}
                                 />
                             </PaginationItem>
 
@@ -85,6 +86,7 @@ export default function OrdersPage() {
                                 <PaginationNext
                                     onClick={() => setPage(Math.min(pagination.pages, pagination.page + 1))}
                                     className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    text={t('common.pagination.next')}
                                 />
                             </PaginationItem>
                         </PaginationContent>

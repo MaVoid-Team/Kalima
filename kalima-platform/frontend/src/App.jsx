@@ -26,6 +26,10 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
 const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
+
+// User lazy-loaded pages
+const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
+
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -55,6 +59,7 @@ function App() {
             <Route element={<ProtectedRoute requireAuth={true} />}>
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/orders" element={<MyOrdersPage />} />
             </Route>
 
             {/* 404 Fallback */}
