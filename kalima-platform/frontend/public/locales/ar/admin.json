@@ -24,6 +24,7 @@
         "statusReturned": "مرتجع",
         "statusCreated": "تم الإنشاء",
         "clearFilters": "مسح",
+        "filterByDate": "تصفية حسب التاريخ",
         "table": {
             "serial": "الرقم التسلسلي",
             "customer": "العميل",

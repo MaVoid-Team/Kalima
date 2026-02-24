@@ -13,6 +13,7 @@ export default function OrdersPage() {
         loading,
         setSearch,
         setStatus,
+        setDateRange,
         setPage,
         fetchOrders
     } = useOrders({ limit: 6 });
@@ -23,6 +24,10 @@ export default function OrdersPage() {
 
     const handleStatus = (status) => {
         setStatus(status);
+    };
+
+    const handleDateRangeChange = (range) => {
+        setDateRange(range?.from || null, range?.to || null);
     };
 
     const handleActionSuccess = () => {
@@ -44,6 +49,7 @@ export default function OrdersPage() {
                 filters={filters}
                 onSearchChange={handleSearch}
                 onStatusChange={handleStatus}
+                onDateRangeChange={handleDateRangeChange}
             />
 
             <OrdersTable

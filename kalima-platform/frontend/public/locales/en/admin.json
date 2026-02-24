@@ -24,6 +24,7 @@
         "statusReturned": "Returned",
         "statusCreated": "Created",
         "clearFilters": "Clear",
+        "filterByDate": "Filter by date",
         "table": {
             "serial": "Serial",
             "customer": "Customer",

@@ -15,5 +15,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 <Toaster richColors position="bottom-right" />
             </AuthProvider>
         </BrowserRouter>
-    </React.StrictMode>,
+    </React.StrictMode>
 )
