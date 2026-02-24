@@ -13,7 +13,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC
-router.get("/export", makeExportHandler("zones"));
+router.get("/export", ...adminAuth, makeExportHandler("zones"));
 router.get("/", zonesController.getAllZones);
 router.get("/:id", zonesController.getZoneById);
 

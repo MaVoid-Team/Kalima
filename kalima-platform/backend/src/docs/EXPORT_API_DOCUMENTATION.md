@@ -47,7 +47,7 @@ GET /api/v2/coupons/export?format=csv&ids=3,7
 
 ## Endpoint Reference
 
-### Public Endpoints (no auth)
+**All export endpoints require Admin or SubAdmin authentication.** Include `Authorization: Bearer <token>` in the request.
 
 | Resource     | Endpoint                          | Columns                                                    |
 | ------------ | --------------------------------- | ---------------------------------------------------------- |
@@ -59,26 +59,12 @@ GET /api/v2/coupons/export?format=csv&ids=3,7
 | Levels       | `GET /api/v2/levels/export`       | ID, Title, Active, Created At                              |
 | Subjects     | `GET /api/v2/subjects/export`     | ID, Title, Active, Created At                              |
 
-### Authenticated Endpoints
-
-| Resource     | Endpoint                          | Auth           | Columns                                  |
-| ------------ | --------------------------------- | -------------- | ---------------------------------------- |
-| Categories   | `GET /api/v2/categories/export`   | Any auth user  | ID, Title, Description, Parent ID, Active, Created At |
-
-### Admin / SubAdmin Endpoints
-
-| Resource               | Endpoint                                      | Columns                                                                                      |
-| ---------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Coupons                | `GET /api/v2/coupons/export`                  | ID, Code, Product ID, Product Title, Discount Amount, Discount %, Active, Starts At, Expires At, Created At |
-| Purchases              | `GET /api/v2/purchases/export`                | ID, Serial, User Name, User Email, User Phone, Items, Subtotal, Discount, Total, Status, Payment Method, Number Transferred From, Received By/At, Confirmed By/At, Returned By/At, Notes, Admin Notes, Created At |
-| Users                  | `GET /api/v2/admin/users/export`              | ID, Name, Email, Phone, Secondary Phone, Gender, Roles, Email Verified, Confirmed, Created At |
-| Required Fields        | `GET /api/v2/required-fields/definitions/export` | ID, Label, Field Type, Active, Created At |
-
-### Admin-Only Endpoints
-
-| Resource         | Endpoint                              | Columns                                    |
-| ---------------- | ------------------------------------- | ------------------------------------------ |
-| Payment Methods  | `GET /api/v2/payment-methods/export`  | ID, Name, Phone Number, Active, Created At |
+| Categories   | `GET /api/v2/categories/export`   | ID, Title, Description, Parent ID, Active, Created At |
+| Coupons      | `GET /api/v2/coupons/export`      | ID, Code, Product ID, Product Title, Discount Amount, Discount %, Active, Starts At, Expires At, Created At |
+| Purchases    | `GET /api/v2/purchases/export`    | ID, Serial, User Name, User Email, User Phone, Items, Subtotal, Discount, Total, Status, Payment Method, Number Transferred From, Received By/At, Confirmed By/At, Returned By/At, Notes, Admin Notes, Created At |
+| Required Fields | `GET /api/v2/required-fields/definitions/export` | ID, Label, Field Type, Active, Created At |
+| Users        | `GET /api/v2/admin/users/export`  | ID, Name, Email, Phone, Secondary Phone, Gender, Roles, Email Verified, Confirmed, Created At |
+| Payment Methods | `GET /api/v2/payment-methods/export` | ID, Name, Phone Number, Active, Created At |
 
 ---
 
@@ -88,6 +74,7 @@ GET /api/v2/coupons/export?format=csv&ids=3,7
 
 ```bash
 curl -o products.csv \
+  -H "Authorization: Bearer <token>" \
   "https://api.example.com/api/v2/products/export?format=csv"
 ```
 

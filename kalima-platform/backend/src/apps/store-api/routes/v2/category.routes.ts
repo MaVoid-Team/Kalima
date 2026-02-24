@@ -16,7 +16,7 @@ const adminAuth = [
 // PUBLIC — read (some endpoints unauthenticated)
 // ============================================
 
-router.get("/export", authenticateToken, makeExportHandler("categories"));
+router.get("/export", ...adminAuth, makeExportHandler("categories"));
 
 // Public / unauthenticated helpers
 router.get("/roots", categoryController.getRootCategories);

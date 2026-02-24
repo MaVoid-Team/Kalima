@@ -8,12 +8,12 @@ import { makeExportHandler } from "../../export";
 
 const router = Router();
 
-router.get(
-  "/export",
+const adminAuth = [
   authenticateToken,
-  requireRole([role_enum.Admin]),
-  makeExportHandler("payment-methods"),
-);
+  requireRole([role_enum.Admin, role_enum.SubAdmin]),
+];
+
+router.get("/export", ...adminAuth, makeExportHandler("payment-methods"));
 
 router.get(
   "/",

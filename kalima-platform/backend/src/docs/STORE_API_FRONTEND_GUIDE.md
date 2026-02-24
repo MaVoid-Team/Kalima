@@ -419,7 +419,7 @@ Use `multipart/form-data` for endpoints that accept files (e.g. product create, 
 
 ## Export Endpoints
 
-Every list resource supports a `GET /export` endpoint for CSV and XLSX download:
+Every list resource supports a `GET /export` endpoint for CSV and XLSX download. **All export endpoints require Admin or SubAdmin authentication.**
 
 ```
 GET /api/v2/<resource>/export?format=csv
@@ -431,7 +431,7 @@ GET /api/v2/<resource>/export?format=xlsx&ids=1,2,3
 | `format` | string | Yes      | `"csv"` or `"xlsx"`                    |
 | `ids`    | string | No       | Comma-separated IDs for selected rows  |
 
-Auth follows the same rules as the corresponding list endpoint. See `EXPORT_API_DOCUMENTATION.md` for full details.
+See `EXPORT_API_DOCUMENTATION.md` for full details.
 
 ---
 

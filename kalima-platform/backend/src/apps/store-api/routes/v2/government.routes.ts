@@ -15,7 +15,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC — read-only
-router.get("/export", makeExportHandler("governments"));
+router.get("/export", ...adminAuth, makeExportHandler("governments"));
 router.get("/", governmentController.getAllGovernments);
 router.get("/:id", governmentController.getGovernmentById);
 router.get("/:governmentId/zones", zonesController.getZonesByGovernment);
