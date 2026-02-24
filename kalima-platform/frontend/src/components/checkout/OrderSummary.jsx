@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useTranslation } from "react-i18next";
 import OrderItem from "./OrderItem";
-import DiscountCode from "./DiscountCode";
+
 import PricingSummary from "./PricingSummary";
 import { Lock, Heart, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";

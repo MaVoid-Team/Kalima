@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner";
 
 import ErrorBoundary from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import MainLayout from "./layouts/MainLayout";
 
 // Lazy-loaded pages
@@ -19,6 +20,14 @@ const WizardCheckoutPage = lazy(() => import("./pages/checkout/WizardCheckoutPag
 const ProductDetailsPage = lazy(() => import("./pages/product/ProductDetailsPage"));
 const BookletDetailsPage = lazy(() => import("./pages/booklet/BookletDetailsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
+// Admin lazy-loaded pages
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
+const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
+
+// User lazy-loaded pages
+const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
 
 const PageLoader = () => (
   <div className="flex min-h-screen items-center justify-center">
@@ -49,10 +58,19 @@ function App() {
             <Route element={<ProtectedRoute requireAuth={true} />}>
               <Route path="/cart" element={<WizardCheckoutPage />} />
               <Route path="/checkout" element={<WizardCheckoutPage />} />
+              <Route path="/orders" element={<MyOrdersPage />} />
             </Route>
 
             {/* 404 Fallback */}
             <Route path="*" element={<NotFoundPage />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/orders" element={<OrdersPage />} />
+              <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+            </Route>
           </Route>
 
           {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}

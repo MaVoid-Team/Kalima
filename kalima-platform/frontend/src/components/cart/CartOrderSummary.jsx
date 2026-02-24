@@ -31,7 +31,9 @@ export default function CartOrderSummary({
     <div className="space-y-6 sticky top-20">
       <Card className="rounded-lg shadow-sm border border-gray-200">
         <CardHeader className="pb-0">
-          <CardTitle className="text-xl font-bold">{t('orderSummary')}</CardTitle>
+          <CardTitle className="text-xl font-bold">
+            {t("orderSummary")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
           <div className="space-y-4 mb-6">
@@ -61,7 +63,7 @@ export default function CartOrderSummary({
 
           <div className="flex items-center justify-center gap-2 text-xs">
             <Lock className="w-3 h-3" />
-            <span>{t('secureCheckout')}</span>
+            <span>{t("secureCheckout")}</span>
           </div>
         </CardContent>
       </Card>
@@ -73,10 +75,13 @@ export default function CartOrderSummary({
               <MessageCircle className="w-5 h-5 text-red-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-bold mb-1">{t('needHelp')}</h3>
-              <p className="text-xs mb-3">{t('needHelpText')}</p>
-              <Button variant="link" className="text-xs font-semibold text-red-600 hover:text-red-700 p-0 h-auto">
-                {t('chatWithUs')}
+              <h3 className="text-sm font-bold mb-1">{t("needHelp")}</h3>
+              <p className="text-xs mb-3">{t("needHelpText")}</p>
+              <Button
+                variant="link"
+                className="text-xs font-semibold text-red-600 hover:text-red-700 p-0 h-auto"
+              >
+                {t("chatWithUs")}
               </Button>
             </div>
           </div>

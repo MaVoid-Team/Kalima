@@ -18,6 +18,7 @@
   "actions": {
     "addToCart": "إضافة إلى السلة",
     "buyNow": "اشتري الآن",
+    "viewSample": "عرض نموذج",
     "follow": "متابعة"
   },
   "info": {

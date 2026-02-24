@@ -53,7 +53,7 @@ export default function Footer() {
                 className="h-8 w-auto object-contain"
               />
             </div>
-            <p className="text-sm text-muted-foreground/80 max-w-xs">
+            <p className="text-sm text-muted-foreground/80 max-w-xs text-start">
               {t("footer.description")}
             </p>
           </div>
@@ -61,10 +61,10 @@ export default function Footer() {
           {/* Footer Sections */}
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title} className="flex flex-col items-start">
-              <h3 className="text-foreground font-semibold mb-4">
+              <h3 className="text-foreground font-semibold mb-4 text-start">
                 {section.title}
               </h3>
-              <ul className="space-y-2 text-sm">
+              <ul className="space-y-2 text-sm text-start">
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link
