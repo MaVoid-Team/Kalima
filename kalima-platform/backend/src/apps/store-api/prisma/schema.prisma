@@ -342,18 +342,27 @@ model products {
   purchase_items          purchase_items[] // <-- Add this line for the opposite relation
   thumbnail_image         images?                   @relation("ProductThumbnail", fields: [thumbnail_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   coupons                 coupons[]
-  samples                 samples?
+  samples                 samples[]
 }
 
 model samples {
-  id            Int       @id @default(autoincrement())
-  product_id    Int       @unique
-  url           String
-  original_name String    @db.VarChar(255)
-  mime_type     String    @db.VarChar(100)
-  size          Int
-  created_at    DateTime? @default(now()) @db.Timestamp(6)
-  products      products  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id               Int                   @id @default(autoincrement())
+  section_id       Int
+  product_id       Int
+  media_type       sample_media_type_enum
+  high_quality_url String?
+  low_quality_url  String?
+  original_name    String                @db.VarChar(255)
+  mime_type        String                @db.VarChar(100)
+  size             Int
+  created_at       DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?             @db.Timestamp(6)
+  sample_sections  sample_sections       @relation(fields: [section_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products         products              @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([section_id], map: "ix_samples_section_id")
+  @@index([product_id], map: "ix_samples_product_id")
+  @@index([section_id, product_id], map: "ix_samples_section_product")
 }
 
 model required_field_definitions {
@@ -549,6 +558,28 @@ enum product_type_enum {
 enum location_type_enum {
   School
   Center
+}
+
+enum sample_media_type_enum {
+  pdf
+  image
+  video
+  word
+  powerpoint
+}
+
+model sample_sections {
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(255)
+  description  String?   @db.Text
+  thumbnail_url String?   @db.VarChar(500)
+  sort_order   Int       @default(0)
+  active       Boolean?  @default(true)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @db.Timestamp(6)
+  samples      samples[]
+
+  @@index([sort_order], map: "ix_sample_sections_sort_order")
 }
 
 model images {

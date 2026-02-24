@@ -307,7 +307,7 @@ export type productsWhereInput = {
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   thumbnail_image?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   coupons?: Prisma.CouponsListRelationFilter
-  samples?: Prisma.XOR<Prisma.SamplesNullableScalarRelationFilter, Prisma.samplesWhereInput> | null
+  samples?: Prisma.SamplesListRelationFilter
 }
 
 export type productsOrderByWithRelationInput = {
@@ -332,7 +332,7 @@ export type productsOrderByWithRelationInput = {
   purchase_items?: Prisma.purchase_itemsOrderByRelationAggregateInput
   thumbnail_image?: Prisma.imagesOrderByWithRelationInput
   coupons?: Prisma.couponsOrderByRelationAggregateInput
-  samples?: Prisma.samplesOrderByWithRelationInput
+  samples?: Prisma.samplesOrderByRelationAggregateInput
 }
 
 export type productsWhereUniqueInput = Prisma.AtLeast<{
@@ -360,7 +360,7 @@ export type productsWhereUniqueInput = Prisma.AtLeast<{
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   thumbnail_image?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
   coupons?: Prisma.CouponsListRelationFilter
-  samples?: Prisma.XOR<Prisma.SamplesNullableScalarRelationFilter, Prisma.samplesWhereInput> | null
+  samples?: Prisma.SamplesListRelationFilter
 }, "id" | "mongo_id">
 
 export type productsOrderByWithAggregationInput = {
@@ -425,7 +425,7 @@ export type productsCreateInput = {
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateInput = {
@@ -449,7 +449,7 @@ export type productsUncheckedCreateInput = {
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsUpdateInput = {
@@ -472,7 +472,7 @@ export type productsUpdateInput = {
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateInput = {
@@ -496,7 +496,7 @@ export type productsUncheckedUpdateInput = {
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateManyInput = {
@@ -799,7 +799,7 @@ export type productsCreateWithoutProduct_categoriesInput = {
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutProduct_categoriesInput = {
@@ -822,7 +822,7 @@ export type productsUncheckedCreateWithoutProduct_categoriesInput = {
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutProduct_categoriesInput = {
@@ -860,7 +860,7 @@ export type productsUpdateWithoutProduct_categoriesInput = {
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutProduct_categoriesInput = {
@@ -883,7 +883,7 @@ export type productsUncheckedUpdateWithoutProduct_categoriesInput = {
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateWithoutCouponsInput = {
@@ -905,7 +905,7 @@ export type productsCreateWithoutCouponsInput = {
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutCouponsInput = {
@@ -928,7 +928,7 @@ export type productsUncheckedCreateWithoutCouponsInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutCouponsInput = {
@@ -966,7 +966,7 @@ export type productsUpdateWithoutCouponsInput = {
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutCouponsInput = {
@@ -989,7 +989,7 @@ export type productsUncheckedUpdateWithoutCouponsInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateWithoutProduct_required_fieldsInput = {
@@ -1011,7 +1011,7 @@ export type productsCreateWithoutProduct_required_fieldsInput = {
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutProduct_required_fieldsInput = {
@@ -1034,7 +1034,7 @@ export type productsUncheckedCreateWithoutProduct_required_fieldsInput = {
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutProduct_required_fieldsInput = {
@@ -1072,7 +1072,7 @@ export type productsUpdateWithoutProduct_required_fieldsInput = {
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutProduct_required_fieldsInput = {
@@ -1095,7 +1095,7 @@ export type productsUncheckedUpdateWithoutProduct_required_fieldsInput = {
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateWithoutSamplesInput = {
@@ -1223,7 +1223,7 @@ export type productsCreateWithoutCart_itemsInput = {
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutCart_itemsInput = {
@@ -1246,7 +1246,7 @@ export type productsUncheckedCreateWithoutCart_itemsInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutCart_itemsInput = {
@@ -1284,7 +1284,7 @@ export type productsUpdateWithoutCart_itemsInput = {
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutCart_itemsInput = {
@@ -1307,7 +1307,7 @@ export type productsUncheckedUpdateWithoutCart_itemsInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateWithoutPurchase_itemsInput = {
@@ -1329,7 +1329,7 @@ export type productsCreateWithoutPurchase_itemsInput = {
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutPurchase_itemsInput = {
@@ -1352,7 +1352,7 @@ export type productsUncheckedCreateWithoutPurchase_itemsInput = {
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutPurchase_itemsInput = {
@@ -1390,7 +1390,7 @@ export type productsUpdateWithoutPurchase_itemsInput = {
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutPurchase_itemsInput = {
@@ -1413,7 +1413,7 @@ export type productsUncheckedUpdateWithoutPurchase_itemsInput = {
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateWithoutThumbnail_imageInput = {
@@ -1435,7 +1435,7 @@ export type productsCreateWithoutThumbnail_imageInput = {
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutThumbnail_imageInput = {
@@ -1458,7 +1458,7 @@ export type productsUncheckedCreateWithoutThumbnail_imageInput = {
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutThumbnail_imageInput = {
@@ -1526,7 +1526,7 @@ export type productsCreateWithoutProduct_galleryInput = {
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
 }
 
 export type productsUncheckedCreateWithoutProduct_galleryInput = {
@@ -1549,7 +1549,7 @@ export type productsUncheckedCreateWithoutProduct_galleryInput = {
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
-  samples?: Prisma.samplesUncheckedCreateNestedOneWithoutProductsInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
 }
 
 export type productsCreateOrConnectWithoutProduct_galleryInput = {
@@ -1587,7 +1587,7 @@ export type productsUpdateWithoutProduct_galleryInput = {
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutProduct_galleryInput = {
@@ -1610,7 +1610,7 @@ export type productsUncheckedUpdateWithoutProduct_galleryInput = {
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsCreateManyThumbnail_imageInput = {
@@ -1648,7 +1648,7 @@ export type productsUpdateWithoutThumbnail_imageInput = {
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateWithoutThumbnail_imageInput = {
@@ -1671,7 +1671,7 @@ export type productsUncheckedUpdateWithoutThumbnail_imageInput = {
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
-  samples?: Prisma.samplesUncheckedUpdateOneWithoutProductsNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
 }
 
 export type productsUncheckedUpdateManyWithoutThumbnail_imageInput = {
@@ -1702,6 +1702,7 @@ export type ProductsCountOutputType = {
   cart_items: number
   purchase_items: number
   coupons: number
+  samples: number
 }
 
 export type ProductsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1711,6 +1712,7 @@ export type ProductsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   cart_items?: boolean | ProductsCountOutputTypeCountCart_itemsArgs
   purchase_items?: boolean | ProductsCountOutputTypeCountPurchase_itemsArgs
   coupons?: boolean | ProductsCountOutputTypeCountCouponsArgs
+  samples?: boolean | ProductsCountOutputTypeCountSamplesArgs
 }
 
 /**
@@ -1763,6 +1765,13 @@ export type ProductsCountOutputTypeCountPurchase_itemsArgs<ExtArgs extends runti
  */
 export type ProductsCountOutputTypeCountCouponsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.couponsWhereInput
+}
+
+/**
+ * ProductsCountOutputType without action
+ */
+export type ProductsCountOutputTypeCountSamplesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.samplesWhereInput
 }
 
 
@@ -1874,7 +1883,7 @@ export type $productsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     purchase_items: Prisma.$purchase_itemsPayload<ExtArgs>[]
     thumbnail_image: Prisma.$imagesPayload<ExtArgs> | null
     coupons: Prisma.$couponsPayload<ExtArgs>[]
-    samples: Prisma.$samplesPayload<ExtArgs> | null
+    samples: Prisma.$samplesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -2292,7 +2301,7 @@ export interface Prisma__productsClient<T, Null = never, ExtArgs extends runtime
   purchase_items<T extends Prisma.products$purchase_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$purchase_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   thumbnail_image<T extends Prisma.products$thumbnail_imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$thumbnail_imageArgs<ExtArgs>>): Prisma.Prisma__imagesClient<runtime.Types.Result.GetResult<Prisma.$imagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   coupons<T extends Prisma.products$couponsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$couponsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$couponsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  samples<T extends Prisma.products$samplesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$samplesArgs<ExtArgs>>): Prisma.Prisma__samplesClient<runtime.Types.Result.GetResult<Prisma.$samplesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  samples<T extends Prisma.products$samplesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$samplesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$samplesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2920,6 +2929,11 @@ export type products$samplesArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   include?: Prisma.samplesInclude<ExtArgs> | null
   where?: Prisma.samplesWhereInput
+  orderBy?: Prisma.samplesOrderByWithRelationInput | Prisma.samplesOrderByWithRelationInput[]
+  cursor?: Prisma.samplesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SamplesScalarFieldEnum | Prisma.SamplesScalarFieldEnum[]
 }
 
 /**

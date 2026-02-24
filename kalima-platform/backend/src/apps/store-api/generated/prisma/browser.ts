@@ -193,6 +193,11 @@ export type purchase_item_required_fields = Prisma.purchase_item_required_fields
  */
 export type payment_methods = Prisma.payment_methodsModel
 /**
+ * Model sample_sections
+ * 
+ */
+export type sample_sections = Prisma.sample_sectionsModel
+/**
  * Model images
  * 
  */

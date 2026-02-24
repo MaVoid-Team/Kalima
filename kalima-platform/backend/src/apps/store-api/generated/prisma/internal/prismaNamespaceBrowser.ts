@@ -86,6 +86,7 @@ export const ModelName = {
   purchase_items: 'purchase_items',
   purchase_item_required_fields: 'purchase_item_required_fields',
   payment_methods: 'payment_methods',
+  sample_sections: 'sample_sections',
   images: 'images',
   product_gallery: 'product_gallery'
 } as const
@@ -425,12 +426,16 @@ export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typ
 
 export const SamplesScalarFieldEnum = {
   id: 'id',
+  section_id: 'section_id',
   product_id: 'product_id',
-  url: 'url',
+  media_type: 'media_type',
+  high_quality_url: 'high_quality_url',
+  low_quality_url: 'low_quality_url',
   original_name: 'original_name',
   mime_type: 'mime_type',
   size: 'size',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
@@ -563,6 +568,20 @@ export const Payment_methodsScalarFieldEnum = {
 } as const
 
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
+
+
+export const Sample_sectionsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  thumbnail_url: 'thumbnail_url',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Sample_sectionsScalarFieldEnum = (typeof Sample_sectionsScalarFieldEnum)[keyof typeof Sample_sectionsScalarFieldEnum]
 
 
 export const ImagesScalarFieldEnum = {

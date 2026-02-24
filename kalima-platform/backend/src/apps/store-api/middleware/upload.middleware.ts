@@ -17,6 +17,22 @@ const IMAGE_MIME_TYPES = new Set([
 
 const SAMPLE_MIME_TYPES = new Set(["application/pdf"]);
 
+/** Expanded sample mime types: PDF, images, video, Word, PowerPoint */
+const SAMPLE_SECTION_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
 // ============================================
 // FILE FILTER — images only
 // ============================================
@@ -115,4 +131,38 @@ export const uploadProductWithSample = multer({
 export const uploadFastBuy = createImageUpload(5).fields([
   { name: "payment_screenshot", maxCount: 1 },
   { name: "product_image", maxCount: 1 },
+]);
+
+// ============================================
+// SAMPLE FILES — high_quality + low_quality (PDF, images, video, Word, PowerPoint)
+// ============================================
+
+function sampleFilesFilter(
+  _req: Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback,
+): void {
+  if (
+    (file.fieldname === "high_quality" || file.fieldname === "low_quality") &&
+    SAMPLE_SECTION_MIME_TYPES.has(file.mimetype)
+  ) {
+    cb(null, true);
+  } else {
+    cb(
+      new BadRequestError(
+        `Invalid file type for ${file.fieldname}: ${file.mimetype}. Allowed: PDF, images, video, Word, PowerPoint`,
+      ) as unknown as Error,
+      false,
+    );
+  }
+}
+
+/** Sample create/update: high_quality and/or low_quality files. Max 150 MB per file. */
+export const uploadSampleFiles = multer({
+  storage: memoryStorage,
+  fileFilter: sampleFilesFilter,
+  limits: { fileSize: 150 * 1024 * 1024 },
+}).fields([
+  { name: "high_quality", maxCount: 1 },
+  { name: "low_quality", maxCount: 1 },
 ]);

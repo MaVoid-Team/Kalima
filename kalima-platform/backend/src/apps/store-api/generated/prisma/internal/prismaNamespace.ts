@@ -419,6 +419,7 @@ export const ModelName = {
   purchase_items: 'purchase_items',
   purchase_item_required_fields: 'purchase_item_required_fields',
   payment_methods: 'payment_methods',
+  sample_sections: 'sample_sections',
   images: 'images',
   product_gallery: 'product_gallery'
 } as const
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "images" | "product_gallery"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3030,6 +3031,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    sample_sections: {
+      payload: Prisma.$sample_sectionsPayload<ExtArgs>
+      fields: Prisma.sample_sectionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.sample_sectionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.sample_sectionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        findFirst: {
+          args: Prisma.sample_sectionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.sample_sectionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        findMany: {
+          args: Prisma.sample_sectionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        create: {
+          args: Prisma.sample_sectionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        createMany: {
+          args: Prisma.sample_sectionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.sample_sectionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        delete: {
+          args: Prisma.sample_sectionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        update: {
+          args: Prisma.sample_sectionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.sample_sectionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.sample_sectionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.sample_sectionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.sample_sectionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$sample_sectionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Sample_sectionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSample_sections>
+        }
+        groupBy: {
+          args: Prisma.sample_sectionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Sample_sectionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.sample_sectionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Sample_sectionsCountAggregateOutputType> | number
+        }
+      }
+    }
     images: {
       payload: Prisma.$imagesPayload<ExtArgs>
       fields: Prisma.imagesFieldRefs
@@ -3536,12 +3611,16 @@ export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typ
 
 export const SamplesScalarFieldEnum = {
   id: 'id',
+  section_id: 'section_id',
   product_id: 'product_id',
-  url: 'url',
+  media_type: 'media_type',
+  high_quality_url: 'high_quality_url',
+  low_quality_url: 'low_quality_url',
   original_name: 'original_name',
   mime_type: 'mime_type',
   size: 'size',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 } as const
 
 export type SamplesScalarFieldEnum = (typeof SamplesScalarFieldEnum)[keyof typeof SamplesScalarFieldEnum]
@@ -3674,6 +3753,20 @@ export const Payment_methodsScalarFieldEnum = {
 } as const
 
 export type Payment_methodsScalarFieldEnum = (typeof Payment_methodsScalarFieldEnum)[keyof typeof Payment_methodsScalarFieldEnum]
+
+
+export const Sample_sectionsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  thumbnail_url: 'thumbnail_url',
+  sort_order: 'sort_order',
+  active: 'active',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Sample_sectionsScalarFieldEnum = (typeof Sample_sectionsScalarFieldEnum)[keyof typeof Sample_sectionsScalarFieldEnum]
 
 
 export const ImagesScalarFieldEnum = {
@@ -3878,6 +3971,20 @@ export type ListEnumproduct_type_enumFieldRefInput<$PrismaModel> = FieldRefInput
 
 
 /**
+ * Reference to a field of type 'sample_media_type_enum'
+ */
+export type Enumsample_media_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'sample_media_type_enum'>
+    
+
+
+/**
+ * Reference to a field of type 'sample_media_type_enum[]'
+ */
+export type ListEnumsample_media_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'sample_media_type_enum[]'>
+    
+
+
+/**
  * Reference to a field of type 'field_type_enum'
  */
 export type Enumfield_type_enumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'field_type_enum'>
@@ -4048,6 +4155,7 @@ export type GlobalOmitConfig = {
   purchase_items?: Prisma.purchase_itemsOmit
   purchase_item_required_fields?: Prisma.purchase_item_required_fieldsOmit
   payment_methods?: Prisma.payment_methodsOmit
+  sample_sections?: Prisma.sample_sectionsOmit
   images?: Prisma.imagesOmit
   product_gallery?: Prisma.product_galleryOmit
 }
