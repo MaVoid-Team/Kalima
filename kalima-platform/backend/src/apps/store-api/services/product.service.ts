@@ -7,7 +7,6 @@ import {
   product_required_fields,
 } from "../generated/prisma/client";
 import { imageService, UploadImageOptions } from "./image.service";
-import { sampleService } from "./sample.service";
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -73,7 +72,6 @@ class ProductService {
   async createProduct(
     dto: CreateProductDto,
     thumbnailFile?: Express.Multer.File,
-    sampleFile?: Express.Multer.File,
   ): Promise<products> {
     // If category_ids provided, verify they all exist
     if (dto.category_ids && dto.category_ids.length > 0) {
@@ -125,12 +123,7 @@ class ProductService {
       });
     }
 
-    // Upload sample if provided
-    if (sampleFile) {
-      await sampleService.uploadSample(sampleFile, product.id);
-    }
-
-    // Re-fetch to include categories and sample
+    // Re-fetch to include categories and samples
     return this.getProductById(product.id);
   }
 
