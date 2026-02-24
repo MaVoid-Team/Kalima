@@ -9,6 +9,7 @@ import { useRole } from '@/hooks/useRole';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import UserRolesSection from '@/components/admin/users/UserRolesSection';
 
@@ -101,13 +102,12 @@ export default function UserDetailPage() {
                     </CardHeader>
                     <CardContent className="pt-6 space-y-4">
                         <div className="flex justify-center mb-6">
-                            <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold uppercase overflow-hidden border-4 border-background shadow-sm">
-                                {selectedUser.profile_pic_url ? (
-                                    <img src={selectedUser.profile_pic_url} alt={selectedUser.name} className="h-full w-full object-cover" />
-                                ) : (
-                                    selectedUser.name?.charAt(0) || 'U'
-                                )}
-                            </div>
+                            <Avatar className="h-24 w-24 overflow-hidden border-4 border-background shadow-sm">
+                                <AvatarImage src={selectedUser.profile_pic_url} alt={selectedUser.name} className="object-cover" />
+                                <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold uppercase">
+                                    {selectedUser.name?.charAt(0) || 'U'}
+                                </AvatarFallback>
+                            </Avatar>
                         </div>
 
                         <div className="space-y-3">

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 export default function UsersTable({ users, loading }) {
@@ -52,7 +53,17 @@ export default function UsersTable({ users, loading }) {
                 <TableBody>
                     {users.map((user) => (
                         <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.name}</TableCell>
+                            <TableCell className="font-medium">
+                                <div className="flex items-center gap-3">
+                                    <Avatar className="h-8 w-8 shrink-0">
+                                        <AvatarImage src={user.profile_pic_url} alt={user.name} />
+                                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                                            {user.name?.charAt(0)?.toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span>{user.name}</span>
+                                </div>
+                            </TableCell>
                             <TableCell>{user.email || '—'}</TableCell>
                             <TableCell>{user.phone || '—'}</TableCell>
                             <TableCell>
