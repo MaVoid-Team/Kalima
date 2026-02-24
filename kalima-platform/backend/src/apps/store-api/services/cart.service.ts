@@ -385,11 +385,13 @@ class CartService {
     });
     if (!product) throw new NotFoundError("Product not found");
 
-    if (product.release_at && new Date(product.release_at) > new Date()) {
-      const releaseDate = new Date(product.release_at);
-      throw new BadRequestError(
-        `This product has not been released yet. It releases at ${releaseDate.toISOString()}`,
-      );
+    if (product.release_at) {
+      const releaseAt = new Date(product.release_at);
+      if (releaseAt > new Date()) {
+        throw new BadRequestError(
+          `This product has not been released yet. It releases at ${releaseAt.toISOString()}`,
+        );
+      }
     }
 
     // Use findFirst + conditional upsert to reduce roundtrips

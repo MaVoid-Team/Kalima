@@ -49,28 +49,26 @@ class AccountReviewService {
 
   /** Approve a user (set confirmed = true) */
   async approveUser(userId: number) {
-    const user = await this.db.users.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    return this.db.users.update({
+    const updated = await this.db.users.updateMany({
       where: { id: userId },
       data: { confirmed: true },
     });
+    if (updated.count === 0) {
+      throw new NotFoundError("User not found");
+    }
+    return { id: userId, confirmed: true };
   }
 
   /** Reject a user (set confirmed = false) */
   async rejectUser(userId: number) {
-    const user = await this.db.users.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundError("User not found");
-    }
-
-    return this.db.users.update({
+    const updated = await this.db.users.updateMany({
       where: { id: userId },
       data: { confirmed: false },
     });
+    if (updated.count === 0) {
+      throw new NotFoundError("User not found");
+    }
+    return { id: userId, confirmed: false };
   }
 }
 
