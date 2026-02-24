@@ -485,14 +485,47 @@ class CartService {
   async updateCartItem(user_id: number, dto: UpdateCartItemDto, cartStatus: "active" | "fastbuy" = "active") {
     const [cart, cartItem] = await Promise.all([
       this.getActiveCartByUser(user_id, cartStatus),
-      this.db.cart_items.findUnique({ where: { id: dto.cart_item_id } }),
+      this.db.cart_items.findUnique({ 
+        where: { id: dto.cart_item_id },
+        select: { 
+          id: true,
+          cart_id: true,
+          price_at_add: true, 
+          discount: true, 
+          quantity: true,
+          coupon_id: true,
+        } 
+      }),
     ]);
     if (!cartItem || cartItem.cart_id !== cart.id) {
       throw new NotFoundError("Cart item not found in user's cart");
     }
+
+    const coupon = await this.db.coupons.findUnique({ 
+      where: { id: cartItem.coupon_id }, 
+      select: { 
+        discount_amount: true,
+        discount_percentage: true,
+      } 
+    });
+
+    if (!coupon) {
+      throw new NotFoundError("Coupon not found");
+    }
+
+    const discount =  Number(coupon.discount_amount) === 0? 
+                      Number(coupon.discount_amount) : 
+                      (Number(coupon.discount_percentage) / 100 ) * Number(cartItem.price_at_add) * dto.quantity;
+
+    const final_price = Number(cartItem.price_at_add) * dto.quantity - discount;
+
     const updated = await this.db.cart_items.update({
       where: { id: dto.cart_item_id },
-      data: { quantity: dto.quantity },
+      data: { 
+        quantity: dto.quantity,
+        discount: discount,
+        final_price: final_price,
+      },
     });
 
     // Coupon discount recalculation is handled inside #recalculateAndSaveCart
