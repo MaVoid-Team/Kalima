@@ -8,6 +8,7 @@ import {
   uploadProductWithSample,
 } from "../../middleware/upload.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -20,6 +21,7 @@ const adminAuth = [
 // PUBLIC — no auth required
 // ============================================
 
+router.get("/export", makeExportHandler("products"));
 router.get("/", productController.getAllProducts);
 router.get("/:id", productController.getProductById);
 router.get("/:id/coupons", productController.getProductCoupons);

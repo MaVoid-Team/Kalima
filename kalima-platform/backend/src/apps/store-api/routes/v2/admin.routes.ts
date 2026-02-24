@@ -4,6 +4,7 @@ import { adminUserStatsController } from "../../controllers/admin-user-stats.con
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 
@@ -19,6 +20,9 @@ const adminAuth = [
 
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
+
+// Export users
+router.get("/users/export", ...adminAuth, makeExportHandler("users"));
 
 // List / search users
 router.get("/users", ...adminAuth, adminController.listUsers);
