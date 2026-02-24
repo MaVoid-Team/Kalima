@@ -30,17 +30,17 @@ export default function WelcomeSection() {
             className={`flex flex-col justify-center space-y-8 text-left`}
           >
             <div className="space-y-6">
-              <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl xl:text-7xl leading-tight text-balance">
+              <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl xl:text-7xl leading-tight text-balance text-start">
                 {t("welcome.title")}{" "}
                 <span
-                  className='text-primary'
+                  className='text-primary text-start'
                 >
                   {t("welcome.titleHighlight")}
                 </span>{" "}
                 {t("welcome.titleEnd")}
               </h1>
 
-              <p className="max-w-[600px] text-muted-foreground leading-relaxed font-medium text-lg text-balance">
+              <p className="max-w-[600px] text-start text-muted-foreground leading-relaxed font-medium text-lg text-balance">
                 {t("welcome.description")}
               </p>
             </div>
