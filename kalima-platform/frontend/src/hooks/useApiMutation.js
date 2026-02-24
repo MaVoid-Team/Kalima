@@ -7,38 +7,38 @@ import { toast } from 'sonner';
  * Standardizes loading, error, and success toast states.
  */
 export default function useApiMutation() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const mutate = useCallback(async (config) => {
-        const { endpoint, method = 'post', data, defaultSuccessMessage } = config;
+  const mutate = useCallback(async (config) => {
+    const { endpoint, method = 'post', data, defaultSuccessMessage } = config;
 
-        setLoading(true);
-        setError(null);
+    setLoading(true);
+    setError(null);
 
-        try {
-            // if we are sending a FormData object, make sure we don't force JSON
-            const axiosConfig = { method, url: endpoint, data };
-            if (data instanceof FormData) {
-                axiosConfig.headers = { 'Content-Type': 'multipart/form-data' };
-            }
+    try {
+      // if we are sending a FormData object, make sure we don't force JSON
+      const axiosConfig = { method, url: endpoint, data };
+      if (data instanceof FormData) {
+        axiosConfig.headers = { 'Content-Type': 'multipart/form-data' };
+      }
 
-            const response = await axios(axiosConfig);
+      const response = await axios(axiosConfig);
 
-            const message = response.data?.message || defaultSuccessMessage;
-            if (message) {
-                toast.success(message);
-            }
+      const message = response.data?.message || defaultSuccessMessage;
+      if (message) {
+        toast.success(message);
+      }
 
-            return response.data;
-        } catch (err) {
-            setError(err);
-            // Error toasts are handled globally by the axios response interceptor
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+      return response.data;
+    } catch (err) {
+      setError(err);
+      // Error toasts are handled globally by the axios response interceptor
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    return { mutate, loading, error };
+  return { mutate, loading, error };
 }

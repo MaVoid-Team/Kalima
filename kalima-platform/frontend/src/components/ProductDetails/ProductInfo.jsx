@@ -5,22 +5,29 @@ import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/storeUtils";
 
 export default function ProductInfo({ product }) {
-  const { t } = useTranslation("product");
+  const { t } = useTranslation(["product", "checkout"]);
 
   const currentPrice = product.price_after_discount || product.price;
   const originalPrice = product.price_after_discount ? product.price : null;
-  const discount = originalPrice && currentPrice
-    ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
-    : null;
+  const discount =
+    originalPrice && currentPrice
+      ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
+      : null;
 
   return (
     <div className="flex flex-col gap-6">
       {/* Badges / Meta Info */}
       <div className="flex flex-wrap gap-2">
-        {product.is_archived && <Badge variant="destructive">{t("badges.archived") || "Archived"}</Badge>}
+        {product.is_archived && (
+          <Badge variant="destructive">
+            {t("badges.archived") || "Archived"}
+          </Badge>
+        )}
         {product.type && <Badge variant="secondary">{product.type}</Badge>}
-        {product.product_categories?.map(pc => (
-          <Badge key={pc.category_id} variant="outline">{pc.categories?.title}</Badge>
+        {product.product_categories?.map((pc) => (
+          <Badge key={pc.category_id} variant="outline">
+            {pc.categories?.title}
+          </Badge>
         ))}
       </div>
 
@@ -60,16 +67,28 @@ export default function ProductInfo({ product }) {
       </Card>
 
       {/* Required Fields Info */}
-      {product.product_required_fields && product.product_required_fields.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h3 className="font-semibold text-sm">Required Information for Purchase:</h3>
-          <ul className="list-disc pl-5 text-sm text-muted-foreground">
-            {product.product_required_fields.map(field => (
-              <li key={field.id}>{field.required_field_definitions?.label} {field.is_required && "*"}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {product.product_required_fields &&
+        product.product_required_fields.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <h3 className="font-semibold text-sm">
+              {t(
+                "product:info.requiredInfo",
+                "Required Information for Purchase:",
+              )}
+            </h3>
+            <ul className="list-disc ps-5 text-sm text-muted-foreground">
+              {product.product_required_fields.map((field) => {
+                const label = field.required_field_definitions?.label;
+                return (
+                  <li key={field.id}>
+                    {t(`checkout:payment.${label}`, label)}{" "}
+                    {field.is_required && "*"}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
     </div>
   );
 }

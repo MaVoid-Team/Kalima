@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Heart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
 import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { useFastBuy } from "@/hooks/useFastBuy";
 
 /**
  * ProductActions
@@ -19,6 +20,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const { addToCart, loading } = useCart();
+  const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
 
@@ -32,15 +34,18 @@ export default function ProductActions({ price, productId, sampleUrl }) {
           <span className="text-xs text-muted-foreground">
             {t("info.totalPrice")}
           </span>
-          <span className="text-xl font-black">{formattedPrice} {t("info.currency")}</span>
+          <span className="text-xl font-black">
+            {formattedPrice} {t("info.currency")}
+          </span>
         </div>
         <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
           {loading ? (
             <LoadingSpinner className="h-5 w-5 border-white" />
-          ) : (<>
-            <ShoppingCart className="h-5 w-5" />
-            {t("actions.addToCart")}
-          </>
+          ) : (
+            <>
+              <ShoppingCart className="h-5 w-5" />
+              {t("actions.addToCart")}
+            </>
           )}
         </Button>
       </div>
@@ -75,28 +80,48 @@ export default function ProductActions({ price, productId, sampleUrl }) {
           <Button className="gap-2 flex-1" size="lg" onClick={() => addToCart(productId, quantity)} disabled={loading}>
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
-            ) : (<>
-              <ShoppingCart className="h-5 w-5" />
-              {t("actions.addToCart")}
-            </>
+            ) : (
+              <>
+                <ShoppingCart className="h-5 w-5" />
+                {t("actions.addToCart")}
+              </>
             )}
           </Button>
         </div>
 
         {/* Secondary Actions */}
         <div className="flex gap-3">
-          <Button variant="secondary" className="text-sm flex-1" size="lg">
-            {t("actions.buyNow")}
+          <Button
+            variant="secondary"
+            className="text-sm flex-1"
+            size="lg"
+            onClick={() => startFastBuy(productId, quantity)}
+            disabled={fastBuyLoading}
+          >
+            {fastBuyLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              t("actions.buyNow")
+            )}
           </Button>
           {sampleUrl && (
-            <Button variant="outline" className="text-sm flex-1" size="lg" asChild>
-              <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="outline"
+              className="text-sm flex-1"
+              size="lg"
+              asChild
+            >
+              <a
+                href={getImageUrl(sampleUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Sample
               </a>
             </Button>
           )}
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
