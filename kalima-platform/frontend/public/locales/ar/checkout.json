@@ -1,7 +1,7 @@
 {
   "header": {
-    "secure_checkout": "دفع آمن",
-    "market_name": "سوق كلمة"
+    "secureCheckout": "دفع آمن",
+    "marketName": "سوق كلمة"
   },
   "steps": {
     "information": "المعلومات",
@@ -11,51 +11,51 @@
   "contact": {
     "title": "معلومات الاتصال",
     "login": "تسجيل الدخول",
-    "email_label": "البريد الإلكتروني",
-    "email_placeholder": "you@example.com",
-    "news_offers": "أرسل لي أخباراً وعروضاً"
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "newsOffers": "أرسل لي الأخبار والعروض"
   },
   "shipping": {
     "title": "عنوان الشحن",
-    "country_label": "البلد / المنطقة",
-    "first_name": "الاسم الأول",
-    "last_name": "اسم العائلة",
-    "address_label": "العنوان",
-    "apartment_placeholder": "شقة، جناح، إلخ (اختياري)",
+    "countryLabel": "البلد / المنطقة",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "addressLabel": "العنوان",
+    "apartmentPlaceholder": "شقة، جناح، إلخ (اختياري)",
     "city": "المدينة",
-    "state": "المحافظة / المقاطعة",
-    "zip_code": "الرمز البريدي"
+    "state": "المنطقة / المحافظة",
+    "zipCode": "الرمز البريدي"
   },
   "payment": {
     "title": "الدفع",
-    "secure_notice": "جميع المعاملات آمنة ومشفرة.",
-    "credit_card": "بطاقة الائتمان",
+    "secureNotice": "جميع المعاملات آمنة ومشفرة.",
+    "creditCard": "بطاقة الائتمان",
     "paypal": "باي بال",
-    "apple_pay": "أبل باي",
-    "card_number": "رقم البطاقة",
-    "card_placeholder": "0000 0000 0000 0000",
+    "applePay": "أبل باي",
+    "cardNumber": "رقم البطاقة",
+    "cardPlaceholder": "0000 0000 0000 0000",
     "expiration": "تاريخ الانتهاء (شهر/سنة)",
-    "expiration_placeholder": "شهر / سنة",
-    "security_code": "رمز الحماية",
-    "cvc_placeholder": "CVC",
-    "name_on_card": "الاسم على البطاقة",
+    "expirationPlaceholder": "شهر / سنة",
+    "securityCode": "رمز الحماية",
+    "cvcPlaceholder": "CVC",
+    "nameOnCard": "الاسم على البطاقة",
     "phone": "رقم الهاتف",
-    "transfer_number_required": "يرجى إدخال الرقم الذي تم التحويل منه",
-    "screenshot_required": "يرجى تحميل لقطة شاشة للدفع",
-    "method_required": "يرجى اختيار طريقة دفع",
-    "transfer_number": "رقم التحويل",
+    "transferNumberRequired": "الرجاء إدخال رقم المحفظة المحول منها",
+    "screenshotRequired": "الرجاء رفع صورة التحويل",
+    "methodRequired": "الرجاء اختيار طريقة الدفع",
+    "transferNumber": "رقم المحفظة المحول منها",
     "notes": "ملاحظات إضافية",
-    "screenshot": "لقطة شاشة للدفع",
-    "choose_method": "اختر طريقة الدفع",
+    "screenshot": "صورة إيصال التحويل",
+    "chooseMethod": "اختر طريقة الدفع",
     "uploadScreenshotButton": "تحميل الصورة",
     "removeScreenshot": "إزالة لقطة الشاشة",
     "cancel": "إلغاء",
     "preview": "معاينة",
     "backToCart": "العودة إلى السلة"
   },
-  "order_summary": {
+  "orderSummary": {
     "title": "ملخص الطلب",
-    "discount_placeholder": "كود الخصم",
+    "discountPlaceholder": "كود الخصم",
     "apply": "تطبيق",
     "subtotal": "المجموع الفرعي",
     "shipping": "الشحن",
@@ -66,7 +66,7 @@
     "discount": "الخصم الكلي"
   },
   "footer": {
-    "return_to_cart": "العودة إلى السلة",
+    "returnToCart": "العودة للسلة",
     "copyright": "© 2023 سوق كلمة. جميع الحقوق محفوظة.",
     "privacy": "سياسة الخصوصية",
     "terms": "شروط الخدمة",
@@ -84,11 +84,11 @@
     "item": "العنصر",
     "type": "النوع",
     "price": "السعر",
-    "paid_on": "تاريخ الدفع",
-    "payment_method": "طريقة الدفع",
+    "paidOn": "تم الدفع في",
+    "paymentMethod": "طريقة الدفع",
     "print": "طباعة",
-    "unable_to_print": "تعذر طباعة الإيصال",
-    "popup_blocked": "يرجى السماح بالنوافذ المنبثقة لطباعة الإيصال",
+    "unableToPrint": "تعذر طباعة الإيصال",
+    "popupBlocked": "الرجاء السماح للنوافذ المنبثقة لطباعة الإيصال",
     "statuses": {
       "pending": "قيد الانتظار",
       "completed": "مكتمل",
@@ -96,8 +96,8 @@
       "refunded": "تم الاسترداد"
     }
   },
-    "wizard": {
-      "cart": "السلة",
-      "payment": "الدفع"
-    }
+  "wizard": {
+    "cart": "السلة",
+    "payment": "الدفع"
+  }
 }

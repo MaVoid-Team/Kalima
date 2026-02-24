@@ -29,7 +29,7 @@ export default function CartOrderSummary({
   };
   return (
     <div className="space-y-6 sticky top-20">
-      <Card className="rounded-lg shadow-sm border border-gray-200">
+      <Card className="rounded-lg shadow-sm border border-border">
         <CardHeader className="pb-0">
           <CardTitle className="text-xl font-bold">
             {t("orderSummary")}
@@ -49,7 +49,7 @@ export default function CartOrderSummary({
             )}
           </div>
 
-          <div className="flex justify-between items-center py-4 border-t border-b border-gray-200 mb-6">
+          <div className="flex justify-between items-center py-4 border-t border-b border-border mb-6">
             <span className="text-base font-bold">{t('total')}</span>
             <span className="text-2xl font-bold">{total} {t('L.E')}</span>
           </div>
@@ -68,18 +68,18 @@ export default function CartOrderSummary({
         </CardContent>
       </Card>
 
-      <Card className="rounded-lg shadow-sm border border-gray-200 mt-6">
+      <Card className="rounded-lg shadow-sm border border-border mt-6">
         <CardContent className="p-6">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-              <MessageCircle className="w-5 h-5 text-red-600" />
+              <MessageCircle className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold mb-1">{t("needHelp")}</h3>
               <p className="text-xs mb-3">{t("needHelpText")}</p>
               <Button
                 variant="link"
-                className="text-xs font-semibold text-red-600 hover:text-red-700 p-0 h-auto"
+                className="text-xs font-semibold text-primary hover:text-primary/80 p-0 h-auto"
               >
                 {t("chatWithUs")}
               </Button>

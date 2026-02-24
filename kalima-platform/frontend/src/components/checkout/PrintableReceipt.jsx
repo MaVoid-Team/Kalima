@@ -23,7 +23,7 @@ export default function PrintableReceipt({ purchase, paymentMethodName = '', bas
             <div> {t('receipt.discount', 'Discount')}: {purchase.discount} </div>
             <div> {t('receipt.total', 'Total')}: {purchase.total} </div>
             <div> {t('receipt.items', 'Items')}: {purchase.purchase_items?.length || 0}</div>
-            {paymentMethodName && <div>{t('receipt.payment_method', 'Payment Method')}: {paymentMethodName}</div>}
+            {paymentMethodName && <div>{t('receipt.paymentMethod', 'Payment Method')}: {paymentMethodName}</div>}
           </section>
 
           <section className="mb-4">
@@ -58,7 +58,7 @@ export default function PrintableReceipt({ purchase, paymentMethodName = '', bas
           </section>
 
           <footer className="mt-6 text-xs text-muted-foreground">
-            <div className="flex justify-between"><span>{t('checkout:receipt.paid_on', { defaultValue: 'Paid on' })}:</span><span>{paymentDate}</span></div>
+            <div className="flex justify-between"><span>{t('checkout:receipt.paidOn', { defaultValue: 'Paid on' })}:</span><span>{paymentDate}</span></div>
           </footer>
         </div>
       </div>

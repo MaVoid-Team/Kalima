@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft } from 'lucide-react';
-import useOrders from '@/../hooks/useOrders';
-import { Button } from '@/../components/ui/button';
-import { Badge } from '@/../components/ui/badge';
-import StatusTimeline from '@/../components/admin/orders/StatusTimeline';
-import OrderItemsTable from '@/../components/admin/orders/OrderItemsTable';
-import AdminNotesSection from '@/../components/admin/orders/AdminNotesSection';
+import useOrders from '@/hooks/useOrders';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import StatusTimeline from '@/components/admin/orders/StatusTimeline';
+import OrderItemsTable from '@/components/admin/orders/OrderItemsTable';
+import AdminNotesSection from '@/components/admin/orders/AdminNotesSection';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,8 +18,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
     AlertDialogTrigger,
-} from '@/../components/ui/alert-dialog';
-import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor } from '@/../lib/storeUtils';
+} from '@/components/ui/alert-dialog';
+import { formatCurrency, formatOrderDate, getImageUrl, getStatusColor } from '@/lib/storeUtils';
 
 export default function OrderDetailPage() {
     const { id } = useParams();

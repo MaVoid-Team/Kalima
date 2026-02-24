@@ -11,20 +11,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { getBaseUrl } from '@/lib/storeUtils';
 
 export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }) {
   const { t, i18n } = useTranslation('cart');
   const navigate = useNavigate();
-  // derive just the origin (scheme+host+port) once; strip any appended paths like `/api/v2`
-  const baseURL = useMemo(() => {
-    const raw = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    try {
-      return new URL(raw).origin;
-    } catch {
-      // fallback to manual fallback if URL parsing fails
-      return raw.split('/api/v2')[0];
-    }
-  }, []);
+  const baseURL = useMemo(() => getBaseUrl(), []);
 
   const onContinueShopping = () => {
     onOpenChange(false);
@@ -52,12 +44,12 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
             <p className="text-sm text-muted-foreground mb-6">
               {t('emptyHint')}
             </p>
-            <button
+            <Button
               onClick={() => onContinueShopping()}
               variant='secondary'
             >
               {t('goShopping')}
-            </button>
+            </Button>
           </div>
         ) : (
           <>
@@ -88,14 +80,14 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                           <span className="font-semibold">
                             {item?.final_price}{t('L.E')}
                           </span>
-                          <span className={"text-muted-foreground" + (i18n.language === 'ar' ? ' mr-1' : ' ml-1')}>
+                          <span className={"text-muted-foreground ms-1"}>
                             {t('qty')} {item?.quantity}
                           </span>
                         </div>
                         {item?.coupons &&
                           <div className='flex justify-center items-center gap-1'>
-                            <TicketCheck className={`w-5 h-5 text-green-500 scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} />
-                            <span className="text-xs text-green-500">
+                            <TicketCheck className={`w-5 h-5 text-success scale-x-[${i18n.language === 'ar' ? '-1' : '1'}]`} />
+                            <span className="text-xs text-success">
                               {item?.coupons?.discount_percentage != 0 && `${item?.coupons?.discount_percentage}%`}
                               {item?.coupons?.discount_amount != 0 && `${item?.coupons?.discount_amount} ${t('L.E')}`}
                             </span>
@@ -115,7 +107,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                {t('shipping_calculated_next')}
+                {t('shippingCalculatedNext')}
               </p>
 
               <div className="space-y-2 flex flex-col">

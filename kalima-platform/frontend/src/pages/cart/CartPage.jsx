@@ -48,7 +48,7 @@ export default function CartPage() {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
-  const shippingEstimate = t("shipping_calculated_next");
+  const shippingEstimate = t("shippingCalculatedNext");
   const taxEstimate = 15.2;
   const total = subtotal + taxEstimate;
 
@@ -62,7 +62,7 @@ export default function CartPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8"
+      className="min-h-screen bg-muted/50 py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}

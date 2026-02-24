@@ -8,7 +8,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Button } from '@/components/ui/button';
 import PrintableReceipt from '@/components/checkout/PrintableReceipt';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function PaymentStep({ onBack }) {
     const { cart, checkout, getPaymentMethods } = useCart();
@@ -39,16 +39,16 @@ export default function PaymentStep({ onBack }) {
 
     const handlePay = async () => {
         if (!selectedPaymentMethod) {
-            toast.error(t('payment.method_required') || 'Please select a payment method');
+            toast.error(t('payment.methodRequired') || 'Please select a payment method');
             return;
         }
         if (!numberTransferredFrom) {
-            toast.error(t('payment.transfer_number_required') || 'Please enter the number you transferred from');
+            toast.error(t('payment.transferNumberRequired') || 'Please enter the number you transferred from');
             return;
         }
         // Assuming screenshot might be optional in some cases but required here
         if (!screenshotFile) {
-            toast.error(t('payment.screenshot_required') || 'Please upload payment screenshot');
+            toast.error(t('payment.screenshotRequired') || 'Please upload payment screenshot');
             return;
         }
 
@@ -99,13 +99,13 @@ export default function PaymentStep({ onBack }) {
     const handlePrintReceipt = () => {
         const contentNode = receiptRef.current?.querySelector('[data-print-body]');
         if (!contentNode) {
-            toast.error(t('receipt.unable_to_print', 'Unable to print receipt'));
+            toast.error(t('receipt.unableToPrint', 'Unable to print receipt'));
             return;
         }
 
         const printWindow = globalThis.open('', '_blank', 'width=900,height=1200');
         if (!printWindow) {
-            toast.error(t('receipt.popup_blocked', 'Please allow popups to print receipt'));
+            toast.error(t('receipt.popupBlocked', 'Please allow popups to print receipt'));
             return;
         }
 
@@ -183,7 +183,7 @@ export default function PaymentStep({ onBack }) {
                                 <p>{t('receipt.total', 'Total')}: {purchase.total} {t('cart:L.E')}</p>
                                 <p>{t('receipt.items', 'Items')}: {purchase.purchase_items?.length || 0}</p>
                                 {paymentMethodName && (
-                                    <p>{t('receipt.payment_method', 'Payment Method')}: {paymentMethodName}</p>
+                                    <p>{t('receipt.paymentMethod', 'Payment Method')}: {paymentMethodName}</p>
                                 )}
                             </div>
                         )}

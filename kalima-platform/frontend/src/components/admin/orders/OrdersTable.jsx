@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/ui/table';
-import { formatCurrency, formatOrderDate, getStatusColor } from '@/../lib/storeUtils';
-import { Badge } from '@/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatCurrency, formatOrderDate, getStatusColor } from '@/lib/storeUtils';
+import { Badge } from '@/components/ui/badge';
 import OrderActions from './OrderActions';
 import { Link } from 'react-router-dom';
 

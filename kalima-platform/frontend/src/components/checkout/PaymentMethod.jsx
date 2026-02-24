@@ -38,12 +38,12 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
         <Card>
             <CardHeader>
                 <CardTitle>{t('payment.title')}</CardTitle>
-                <CardDescription>{t('payment.secure_notice')}</CardDescription>
+                <CardDescription>{t('payment.secureNotice')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-2">
                     <Label htmlFor="transfer-screenshot" className="text-xs uppercase tracking-wide">
-                        {t('payment.choose_method')}
+                        {t('payment.chooseMethod')}
                         <span className="text-destructive">*</span>
                     </Label>
                     <RadioGroup
@@ -86,7 +86,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                 <div className="grid gap-4 mt-6">
                     <div className="grid gap-2">
                         <Label htmlFor="transfer-number" className="text-xs uppercase tracking-wide">
-                            {t('payment.transfer_number')}
+                            {t('payment.transferNumber')}
                             <span className="text-destructive">*</span>
                         </Label>
                         <Input
@@ -115,7 +115,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                         </Label>
                         <div className="flex items-center gap-2">
                             {screenshotFile ? (
-                                <> 
+                                <>
                                     <Button
                                         type="button"
                                         variant="link"
@@ -132,7 +132,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                             setScreenshotFile(null);
                                             if (fileInputRef.current) fileInputRef.current.value = '';
                                         }}
-                                        aria-label={t('payment.removeScreenshot','Remove screenshot')}
+                                        aria-label={t('payment.removeScreenshot', 'Remove screenshot')}
                                     >
                                         &times;
                                     </Button>
@@ -142,7 +142,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                     htmlFor="transfer-screenshot"
                                     className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
                                 >
-                                    {t('payment.uploadScreenshotButton','Upload image')}
+                                    {t('payment.uploadScreenshotButton', 'Upload image')}
                                 </Label>
                             )}
                         </div>
@@ -162,19 +162,19 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                         />
                     </div>
                 </div>
-                </CardContent>
-                {/* preview dialog */}
-                <AlertDialog open={showPreview} onOpenChange={setShowPreview}>
-                    <AlertDialogContent>
-                        {previewUrl ? <img src={previewUrl} alt={t('payment.preview','Screenshot preview')} className="w-full h-auto" /> : <ImageOff className="w-16 h-16 text-muted-foreground mx-auto my-8" />}
-                        <AlertDialogFooter>
-                            <Button variant="destructive" onClick={() => {setScreenshotFile(null); if (fileInputRef.current) fileInputRef.current.value = '';}}>
-                                {t('payment.removeScreenshot','Remove')}
-                            </Button>
-                            <AlertDialogCancel>{t('payment.cancel','Cancel')}</AlertDialogCancel>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+            </CardContent>
+            {/* preview dialog */}
+            <AlertDialog open={showPreview} onOpenChange={setShowPreview}>
+                <AlertDialogContent>
+                    {previewUrl ? <img src={previewUrl} alt={t('payment.preview', 'Screenshot preview')} className="w-full h-auto" /> : <ImageOff className="w-16 h-16 text-muted-foreground mx-auto my-8" />}
+                    <AlertDialogFooter>
+                        <Button variant="destructive" onClick={() => { setScreenshotFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>
+                            {t('payment.removeScreenshot', 'Remove')}
+                        </Button>
+                        <AlertDialogCancel>{t('payment.cancel', 'Cancel')}</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }

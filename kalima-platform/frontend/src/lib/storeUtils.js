@@ -32,6 +32,20 @@ export function getImageUrl(path) {
 }
 
 /**
+ * Returns the base API URL without trailing paths
+ * @returns {string}
+ */
+export function getBaseUrl() {
+  const raw = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v2";
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return raw.split("/api/v2")[0];
+  }
+}
+
+
+/**
  * Builds the images object expected by ImageGallery from API data.
  * @param {object} product  - raw product from GET /products/:id
  * @param {Array}  gallery  - raw gallery from GET /products/:id/gallery

@@ -33,11 +33,10 @@
   "needHelpText": "Contact our support team for bulk orders or assistance",
   "chatWithUs": "Chat with us",
   "each": "{{price}} each",
-  "shipping_calculated_next": "Calculated at next step",
-
+  "shippingCalculatedNext": "Calculated at next step",
   "previewTitle": "Shopping Cart ({{count}})",
   "previewDescription": "View and manage items in your shopping cart",
-  "items_ready": "{{count}} items ready for checkout",
+  "itemsReady": "{{count}} items ready for checkout",
   "empty": "Your cart is empty",
   "emptyHint": "Add items to get started!",
   "startTitle": "Start Shopping",
@@ -80,21 +79,39 @@
   },
   "applyCouponTitle": "Enter coupon code",
   "applyCouponDesc": "Type your promo code and hit apply.",
-
   "productTypes": {
     "physical": "Physical Item",
     "instant": "Instant Download"
   },
-
   "stock": {
     "inStock": "In Stock",
     "deliveredViaEmail": "Delivered via email",
     "lowStock": "Low Stock"
   },
-
   "products": {
-    "p1": { "name": "Advanced Calculus Textbook", "description": "Hardcover • 4th Edition", "nameEn": "Advanced Calculus Textbook", "nameAr": "كتاب حساب متقدم", "descriptionEn": "Hardcover • 4th Edition", "descriptionAr": "غلاف مقوى • الطبعة الرابعة" },
-    "p2": { "name": "History Lesson Plan Bundle", "description": "PDF Download • Grade 9-12", "nameEn": "History Lesson Plan Bundle", "nameAr": "حزمة خطط درس التاريخ", "descriptionEn": "PDF Download • Grade 9-12", "descriptionAr": "تحميل PDF • الصف 9-12" },
-    "p3": { "name": "Premium Geometry Set", "description": "Stainless Steel • 12 Piece Kit", "nameEn": "Premium Geometry Set", "nameAr": "مجموعة هندسة مميزة", "descriptionEn": "Stainless Steel • 12 Piece Kit", "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة" }
+    "p1": {
+      "name": "Advanced Calculus Textbook",
+      "description": "Hardcover • 4th Edition",
+      "nameEn": "Advanced Calculus Textbook",
+      "nameAr": "كتاب حساب متقدم",
+      "descriptionEn": "Hardcover • 4th Edition",
+      "descriptionAr": "غلاف مقوى • الطبعة الرابعة"
+    },
+    "p2": {
+      "name": "History Lesson Plan Bundle",
+      "description": "PDF Download • Grade 9-12",
+      "nameEn": "History Lesson Plan Bundle",
+      "nameAr": "حزمة خطط درس التاريخ",
+      "descriptionEn": "PDF Download • Grade 9-12",
+      "descriptionAr": "تحميل PDF • الصف 9-12"
+    },
+    "p3": {
+      "name": "Premium Geometry Set",
+      "description": "Stainless Steel • 12 Piece Kit",
+      "nameEn": "Premium Geometry Set",
+      "nameAr": "مجموعة هندسة مميزة",
+      "descriptionEn": "Stainless Steel • 12 Piece Kit",
+      "descriptionAr": "مكونات من الفولاذ المقاوم للصدأ • 12 قطعة"
+    }
   }
 }
