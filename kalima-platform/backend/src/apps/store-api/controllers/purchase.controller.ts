@@ -86,11 +86,22 @@ export const purchaseController = {
   async getMyPurchases(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req.user as any).userId;
-      const purchases = await purchasesService.getByUser(userId);
+      const dto = await validateDto(PurchaseFilterDto, req.query);
+      const result = await purchasesService.getByUser(userId, {
+        status: dto.status,
+        page: dto.page,
+        limit: dto.limit,
+      });
       res.status(200).json({
         success: true,
-        results: purchases.length,
-        data: { purchases },
+        results: result.purchases.length,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          pages: result.pages,
+          limit: result.limit,
+        },
+        data: { purchases: result.purchases },
       });
     } catch (err) {
       next(err);

@@ -4911,7 +4911,7 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/v2/ec/cart-purchases",
+              "raw": "{{base_url}}/api/v2/ec/cart-purchases?page=1&limit=10&status=pending",
               "host": [
                 "{{base_url}}"
               ],
@@ -4920,6 +4920,23 @@
                 "v2",
                 "ec",
                 "cart-purchases"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of items per page"
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by purchase status (e.g., pending, confirmed, received, returned)"
+                }
               ]
             },
             "description": "Get all purchases for current user"

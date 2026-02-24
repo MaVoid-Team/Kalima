@@ -263,12 +263,34 @@ class PurchasesService {
   }
 
   /** Teacher's own purchases */
-  async getByUser(userId: number) {
-    return this.db.purchases.findMany({
-      where: { user_id: userId },
-      include: PURCHASE_INCLUDE,
-      orderBy: { created_at: "desc" },
-    });
+  async getByUser(userId: number, filters?: { status?: string; page?: number; limit?: number }) {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.purchasesWhereInput = { user_id: userId };
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    const [purchases, total] = await Promise.all([
+      this.db.purchases.findMany({
+        where,
+        include: PURCHASE_INCLUDE,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.purchases.count({ where }),
+    ]);
+
+    return {
+      purchases,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    };
   }
 
   /** Single purchase by ID */
