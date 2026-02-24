@@ -1,46 +1,40 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import useOrders from '@/hooks/useOrders';
-import OrdersToolbar from '@/components/admin/orders/OrdersToolbar';
-import OrdersTable from '@/components/admin/orders/OrdersTable';
+import { UsersIcon } from 'lucide-react';
+
+import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
-    PaginationLink,
-    PaginationNext,
     PaginationPrevious,
+    PaginationNext,
+    PaginationLink,
     PaginationEllipsis
 } from '@/components/ui/pagination';
+import UserFilters from '@/components/admin/users/UserFilters';
+import UsersTable from '@/components/admin/users/UsersTable';
+import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
 
-export default function OrdersPage() {
-    const { t } = useTranslation('admin');
+export default function UsersPage() {
+    const { t } = useTranslation('userManagement');
+
     const {
-        orders,
+        users,
         pagination,
         filters,
         loading,
+        fetchUsers,
         setSearch,
-        setStatus,
-        setDateRange,
-        setPage,
-        fetchOrders
-    } = useOrders({ limit: 6 });
+        setRole,
+        setPortal,
+        setPage
+    } = useAdminUsers();
 
-    const handleSearch = (query) => {
-        setSearch(query);
-    };
-
-    const handleStatus = (status) => {
-        setStatus(status);
-    };
-
-    const handleDateRangeChange = (range) => {
-        setDateRange(range?.from || null, range?.to || null);
-    };
-
-    const handleActionSuccess = () => {
-        fetchOrders();
-    };
+    // Fetch users when component mounts or dependencies change
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers]);
 
     const getPageNumbers = () => {
         const { page: currentPage, pages: totalPages } = pagination;
@@ -58,37 +52,46 @@ export default function OrdersPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{t('orders.title')}</h1>
+                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <UsersIcon className="h-8 w-8 text-primary" />
+                        {t('title')}
+                    </h1>
                     <p className="text-muted-foreground mt-1">
-                        {t('orders.totalOrders', { count: pagination.total || 0 })}
+                        {t('subtitle')}
                     </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <p className="text-sm text-muted-foreground hidden sm:block">
+                        {t('totalUsers', { count: pagination.total })}
+                    </p>
+                    <CreateUserDialog onSuccess={fetchUsers} />
                 </div>
             </div>
 
-            <OrdersToolbar
+            <UserFilters
                 filters={filters}
-                onSearchChange={handleSearch}
-                onStatusChange={handleStatus}
-                onDateRangeChange={handleDateRangeChange}
+                onSearchChange={setSearch}
+                onRoleChange={setRole}
+                onPortalChange={setPortal}
             />
 
-            <OrdersTable
-                orders={orders}
+            <UsersTable
+                users={users}
                 loading={loading}
-                onActionSuccess={handleActionSuccess}
             />
 
             {pagination.pages > 1 && (
-                <div className="mt-6 flex justify-end">
+                <div className="mt-4 flex justify-end">
                     <Pagination>
                         <PaginationContent>
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => setPage(Math.max(1, pagination.page - 1))}
                                     className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    text={t('common.pagination.previous')}
+                                    text={t('pagination.previous')}
                                 />
                             </PaginationItem>
 
@@ -118,7 +121,7 @@ export default function OrdersPage() {
                                 <PaginationNext
                                     onClick={() => setPage(Math.min(pagination.pages, pagination.page + 1))}
                                     className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    text={t('common.pagination.next')}
+                                    text={t('pagination.next')}
                                 />
                             </PaginationItem>
                         </PaginationContent>

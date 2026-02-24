@@ -30,6 +30,9 @@ const CartPage = lazy(() => import("./pages/cart/CartPage"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
 const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
+const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
+const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
+
 
 // User lazy-loaded pages
 const MyOrdersPage = lazy(() => import("./pages/orders/MyOrdersPage"));
@@ -78,6 +81,8 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin/orders" element={<OrdersPage />} />
               <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/admin/users" element={<UsersPage />} />
+              <Route path="/admin/users/:id" element={<UserDetailPage />} />
             </Route>
           </Route >
 
