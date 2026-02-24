@@ -170,3 +170,13 @@ export class AttachRequiredFieldsDto {
   @Type(() => AttachRequiredFieldEntry)
   fields: AttachRequiredFieldEntry[];
 }
+
+// ============================================
+// ADD EXTERNAL VIDEO DTO
+// ============================================
+
+export class AddExternalVideoDto {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+}

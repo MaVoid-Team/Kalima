@@ -1,11 +1,16 @@
+import path from "path";
+import crypto from "crypto";
+import { promises as fsPromises } from "fs";
 import type { PrismaClient } from "../../../libs/db/prisma";
 import { prisma } from "../../../libs/db/prisma";
 import {
   products,
   product_gallery,
+  product_gallery_videos,
   product_categories,
   product_required_fields,
 } from "../generated/prisma/client";
+import { video_source_type_enum } from "../generated/prisma/client";
 import { imageService, UploadImageOptions } from "./image.service";
 import {
   CreateProductDto,
@@ -35,6 +40,9 @@ const PRODUCT_INCLUDE = {
   thumbnail_image: true,
   product_gallery: {
     include: { images: true },
+    orderBy: { sort_order: "asc" as const },
+  },
+  product_gallery_videos: {
     orderBy: { sort_order: "asc" as const },
   },
   product_categories: {
@@ -405,6 +413,184 @@ class ProductService {
     // Delete gallery row first, then clean up the image file
     await this.db.product_gallery.delete({ where: { id: galleryId } });
     await imageService.deleteImage(entry.image_id);
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — UPLOAD
+  // ============================================
+
+  private static readonly GALLERY_VIDEO_DIR = path.resolve(
+    __dirname,
+    "../../../../uploads/gallery_videos",
+  );
+  private static readonly GALLERY_VIDEO_MIME_TYPES = new Set([
+    "video/mp4",
+    "video/webm",
+    "video/quicktime",
+  ]);
+
+  async addVideoToGallery(
+    productId: number,
+    file: Express.Multer.File,
+  ): Promise<product_gallery_videos> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (!file.buffer) {
+      throw new BadRequestError("Video file buffer is required");
+    }
+    if (!ProductService.GALLERY_VIDEO_MIME_TYPES.has(file.mimetype)) {
+      throw new BadRequestError(
+        `Invalid video type: ${file.mimetype}. Allowed: mp4, webm, quicktime`,
+      );
+    }
+
+    await fsPromises.mkdir(ProductService.GALLERY_VIDEO_DIR, { recursive: true });
+
+    const ext = path.extname(file.originalname) || ".mp4";
+    const uniqueId = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
+    const filename = `${uniqueId}${ext}`;
+    const filePath = path.join(ProductService.GALLERY_VIDEO_DIR, filename);
+    await fsPromises.writeFile(filePath, file.buffer);
+
+    const url = `/uploads/gallery_videos/${filename}`;
+
+    const maxSort = await this.db.product_gallery_videos.findFirst({
+      where: { product_id: productId },
+      orderBy: { sort_order: "desc" },
+      select: { sort_order: true },
+    });
+    const sortOrder = (maxSort?.sort_order ?? -1) + 1;
+
+    return this.db.product_gallery_videos.create({
+      data: {
+        product_id: productId,
+        url,
+        source_type: video_source_type_enum.upload,
+        original_name: file.originalname,
+        mime_type: file.mimetype,
+        size: file.buffer.length,
+        sort_order: sortOrder,
+      },
+    });
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — EXTERNAL URL
+  // ============================================
+
+  async addExternalVideoToGallery(
+    productId: number,
+    url: string,
+  ): Promise<product_gallery_videos> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (!url || !url.startsWith("http")) {
+      throw new BadRequestError("Valid URL (http/https) is required");
+    }
+
+    const maxSort = await this.db.product_gallery_videos.findFirst({
+      where: { product_id: productId },
+      orderBy: { sort_order: "desc" },
+      select: { sort_order: true },
+    });
+    const sortOrder = (maxSort?.sort_order ?? -1) + 1;
+
+    return this.db.product_gallery_videos.create({
+      data: {
+        product_id: productId,
+        url,
+        source_type: video_source_type_enum.external,
+        sort_order: sortOrder,
+      },
+    });
+  }
+
+  // ============================================
+  // GALLERY VIDEOS — REMOVE
+  // ============================================
+
+  async removeVideoFromGallery(
+    productId: number,
+    videoId: number,
+  ): Promise<void> {
+    const video = await this.db.product_gallery_videos.findFirst({
+      where: { id: videoId, product_id: productId },
+    });
+    if (!video) {
+      throw new NotFoundError("Gallery video not found");
+    }
+
+    if (video.source_type === video_source_type_enum.upload && video.url) {
+      const absolutePath = path.resolve(
+        __dirname,
+        "../../../..",
+        video.url.startsWith("/") ? video.url.slice(1) : video.url,
+      );
+      void fsPromises.unlink(absolutePath).catch(() => {});
+    }
+
+    await this.db.product_gallery_videos.delete({ where: { id: videoId } });
+  }
+
+  // ============================================
+  // GALLERY — FULL (images + videos combined)
+  // ============================================
+
+  async getFullGallery(productId: number): Promise<{
+    images: Array<{ id: number; type: "image"; url: string; sort_order: number }>;
+    videos: Array<{
+      id: number;
+      type: "video";
+      url: string;
+      source_type: string;
+      sort_order: number;
+    }>;
+  }> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    const [galleryImages, galleryVideos] = await Promise.all([
+      this.db.product_gallery.findMany({
+        where: { product_id: productId, active: true },
+        include: { images: true },
+        orderBy: { sort_order: "asc" },
+      }),
+      this.db.product_gallery_videos.findMany({
+        where: { product_id: productId, active: true },
+        orderBy: { sort_order: "asc" },
+      }),
+    ]);
+
+    const images = galleryImages.map((g) => ({
+      id: g.id,
+      type: "image" as const,
+      url: (g as any).images?.url ?? "",
+      sort_order: g.sort_order ?? 0,
+    }));
+
+    const videos = galleryVideos.map((v) => ({
+      id: v.id,
+      type: "video" as const,
+      url: v.url,
+      source_type: v.source_type,
+      sort_order: v.sort_order ?? 0,
+    }));
+
+    return { images, videos };
   }
 
   // ============================================

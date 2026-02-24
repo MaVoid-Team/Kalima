@@ -303,6 +303,7 @@ export type productsWhereInput = {
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   product_categories?: Prisma.Product_categoriesListRelationFilter
   product_gallery?: Prisma.Product_galleryListRelationFilter
+  product_gallery_videos?: Prisma.Product_gallery_videosListRelationFilter
   cart_items?: Prisma.Cart_itemsListRelationFilter
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   thumbnail_image?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
@@ -328,6 +329,7 @@ export type productsOrderByWithRelationInput = {
   product_required_fields?: Prisma.product_required_fieldsOrderByRelationAggregateInput
   product_categories?: Prisma.product_categoriesOrderByRelationAggregateInput
   product_gallery?: Prisma.product_galleryOrderByRelationAggregateInput
+  product_gallery_videos?: Prisma.product_gallery_videosOrderByRelationAggregateInput
   cart_items?: Prisma.cart_itemsOrderByRelationAggregateInput
   purchase_items?: Prisma.purchase_itemsOrderByRelationAggregateInput
   thumbnail_image?: Prisma.imagesOrderByWithRelationInput
@@ -356,6 +358,7 @@ export type productsWhereUniqueInput = Prisma.AtLeast<{
   product_required_fields?: Prisma.Product_required_fieldsListRelationFilter
   product_categories?: Prisma.Product_categoriesListRelationFilter
   product_gallery?: Prisma.Product_galleryListRelationFilter
+  product_gallery_videos?: Prisma.Product_gallery_videosListRelationFilter
   cart_items?: Prisma.Cart_itemsListRelationFilter
   purchase_items?: Prisma.Purchase_itemsListRelationFilter
   thumbnail_image?: Prisma.XOR<Prisma.ImagesNullableScalarRelationFilter, Prisma.imagesWhereInput> | null
@@ -421,6 +424,7 @@ export type productsCreateInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -446,6 +450,7 @@ export type productsUncheckedCreateInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -468,6 +473,7 @@ export type productsUpdateInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -493,6 +499,7 @@ export type productsUncheckedUpdateInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -780,6 +787,20 @@ export type productsUpdateOneRequiredWithoutProduct_galleryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.productsUpdateToOneWithWhereWithoutProduct_galleryInput, Prisma.productsUpdateWithoutProduct_galleryInput>, Prisma.productsUncheckedUpdateWithoutProduct_galleryInput>
 }
 
+export type productsCreateNestedOneWithoutProduct_gallery_videosInput = {
+  create?: Prisma.XOR<Prisma.productsCreateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedCreateWithoutProduct_gallery_videosInput>
+  connectOrCreate?: Prisma.productsCreateOrConnectWithoutProduct_gallery_videosInput
+  connect?: Prisma.productsWhereUniqueInput
+}
+
+export type productsUpdateOneRequiredWithoutProduct_gallery_videosNestedInput = {
+  create?: Prisma.XOR<Prisma.productsCreateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedCreateWithoutProduct_gallery_videosInput>
+  connectOrCreate?: Prisma.productsCreateOrConnectWithoutProduct_gallery_videosInput
+  upsert?: Prisma.productsUpsertWithoutProduct_gallery_videosInput
+  connect?: Prisma.productsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.productsUpdateToOneWithWhereWithoutProduct_gallery_videosInput, Prisma.productsUpdateWithoutProduct_gallery_videosInput>, Prisma.productsUncheckedUpdateWithoutProduct_gallery_videosInput>
+}
+
 export type productsCreateWithoutProduct_categoriesInput = {
   title: string
   description?: string | null
@@ -795,6 +816,7 @@ export type productsCreateWithoutProduct_categoriesInput = {
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -819,6 +841,7 @@ export type productsUncheckedCreateWithoutProduct_categoriesInput = {
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -856,6 +879,7 @@ export type productsUpdateWithoutProduct_categoriesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -880,6 +904,7 @@ export type productsUncheckedUpdateWithoutProduct_categoriesInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -902,6 +927,7 @@ export type productsCreateWithoutCouponsInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -926,6 +952,7 @@ export type productsUncheckedCreateWithoutCouponsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
@@ -963,6 +990,7 @@ export type productsUpdateWithoutCouponsInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -987,6 +1015,7 @@ export type productsUncheckedUpdateWithoutCouponsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1007,6 +1036,7 @@ export type productsCreateWithoutProduct_required_fieldsInput = {
   deleted_at?: Date | string | null
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -1031,6 +1061,7 @@ export type productsUncheckedCreateWithoutProduct_required_fieldsInput = {
   deleted_at?: Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -1068,6 +1099,7 @@ export type productsUpdateWithoutProduct_required_fieldsInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -1092,6 +1124,7 @@ export type productsUncheckedUpdateWithoutProduct_required_fieldsInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -1114,6 +1147,7 @@ export type productsCreateWithoutSamplesInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -1138,6 +1172,7 @@ export type productsUncheckedCreateWithoutSamplesInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -1175,6 +1210,7 @@ export type productsUpdateWithoutSamplesInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -1199,6 +1235,7 @@ export type productsUncheckedUpdateWithoutSamplesInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -1220,6 +1257,7 @@ export type productsCreateWithoutCart_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
@@ -1244,6 +1282,7 @@ export type productsUncheckedCreateWithoutCart_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
   samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
@@ -1281,6 +1320,7 @@ export type productsUpdateWithoutCart_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
@@ -1305,6 +1345,7 @@ export type productsUncheckedUpdateWithoutCart_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
   samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1326,6 +1367,7 @@ export type productsCreateWithoutPurchase_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
@@ -1350,6 +1392,7 @@ export type productsUncheckedCreateWithoutPurchase_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
   samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
@@ -1387,6 +1430,7 @@ export type productsUpdateWithoutPurchase_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
@@ -1411,6 +1455,7 @@ export type productsUncheckedUpdateWithoutPurchase_itemsInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
   samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
@@ -1432,6 +1477,7 @@ export type productsCreateWithoutThumbnail_imageInput = {
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
@@ -1455,6 +1501,7 @@ export type productsUncheckedCreateWithoutThumbnail_imageInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
   product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -1522,6 +1569,7 @@ export type productsCreateWithoutProduct_galleryInput = {
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
   thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
@@ -1546,6 +1594,7 @@ export type productsUncheckedCreateWithoutProduct_galleryInput = {
   deleted_at?: Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
   product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedCreateNestedManyWithoutProductsInput
   cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
   purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
   coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
@@ -1583,6 +1632,7 @@ export type productsUpdateWithoutProduct_galleryInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
@@ -1607,6 +1657,117 @@ export type productsUncheckedUpdateWithoutProduct_galleryInput = {
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
+  cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
+  purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
+  coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
+  samples?: Prisma.samplesUncheckedUpdateManyWithoutProductsNestedInput
+}
+
+export type productsCreateWithoutProduct_gallery_videosInput = {
+  title: string
+  description?: string | null
+  type?: $Enums.product_type_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  price_after_discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  serial?: string | null
+  sample_url?: string | null
+  is_archived?: boolean | null
+  mongo_id?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsCreateNestedManyWithoutProductsInput
+  product_categories?: Prisma.product_categoriesCreateNestedManyWithoutProductsInput
+  product_gallery?: Prisma.product_galleryCreateNestedManyWithoutProductsInput
+  cart_items?: Prisma.cart_itemsCreateNestedManyWithoutProductsInput
+  purchase_items?: Prisma.purchase_itemsCreateNestedManyWithoutProductsInput
+  thumbnail_image?: Prisma.imagesCreateNestedOneWithoutProduct_thumbnailInput
+  coupons?: Prisma.couponsCreateNestedManyWithoutProductInput
+  samples?: Prisma.samplesCreateNestedManyWithoutProductsInput
+}
+
+export type productsUncheckedCreateWithoutProduct_gallery_videosInput = {
+  id?: number
+  title: string
+  description?: string | null
+  type?: $Enums.product_type_enum
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  price_after_discount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  serial?: string | null
+  thumbnail_id?: number | null
+  sample_url?: string | null
+  is_archived?: boolean | null
+  mongo_id?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  deleted_at?: Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedCreateNestedManyWithoutProductsInput
+  product_categories?: Prisma.product_categoriesUncheckedCreateNestedManyWithoutProductsInput
+  product_gallery?: Prisma.product_galleryUncheckedCreateNestedManyWithoutProductsInput
+  cart_items?: Prisma.cart_itemsUncheckedCreateNestedManyWithoutProductsInput
+  purchase_items?: Prisma.purchase_itemsUncheckedCreateNestedManyWithoutProductsInput
+  coupons?: Prisma.couponsUncheckedCreateNestedManyWithoutProductInput
+  samples?: Prisma.samplesUncheckedCreateNestedManyWithoutProductsInput
+}
+
+export type productsCreateOrConnectWithoutProduct_gallery_videosInput = {
+  where: Prisma.productsWhereUniqueInput
+  create: Prisma.XOR<Prisma.productsCreateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedCreateWithoutProduct_gallery_videosInput>
+}
+
+export type productsUpsertWithoutProduct_gallery_videosInput = {
+  update: Prisma.XOR<Prisma.productsUpdateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedUpdateWithoutProduct_gallery_videosInput>
+  create: Prisma.XOR<Prisma.productsCreateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedCreateWithoutProduct_gallery_videosInput>
+  where?: Prisma.productsWhereInput
+}
+
+export type productsUpdateToOneWithWhereWithoutProduct_gallery_videosInput = {
+  where?: Prisma.productsWhereInput
+  data: Prisma.XOR<Prisma.productsUpdateWithoutProduct_gallery_videosInput, Prisma.productsUncheckedUpdateWithoutProduct_gallery_videosInput>
+}
+
+export type productsUpdateWithoutProduct_gallery_videosInput = {
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.Enumproduct_type_enumFieldUpdateOperationsInput | $Enums.product_type_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price_after_discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sample_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
+  product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
+  product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
+  purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
+  thumbnail_image?: Prisma.imagesUpdateOneWithoutProduct_thumbnailNestedInput
+  coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
+  samples?: Prisma.samplesUpdateManyWithoutProductsNestedInput
+}
+
+export type productsUncheckedUpdateWithoutProduct_gallery_videosInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.Enumproduct_type_enumFieldUpdateOperationsInput | $Enums.product_type_enum
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price_after_discount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  serial?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnail_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  sample_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_archived?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  mongo_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
+  product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -1645,6 +1806,7 @@ export type productsUpdateWithoutThumbnail_imageInput = {
   product_required_fields?: Prisma.product_required_fieldsUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUpdateManyWithoutProductNestedInput
@@ -1668,6 +1830,7 @@ export type productsUncheckedUpdateWithoutThumbnail_imageInput = {
   product_required_fields?: Prisma.product_required_fieldsUncheckedUpdateManyWithoutProductsNestedInput
   product_categories?: Prisma.product_categoriesUncheckedUpdateManyWithoutProductsNestedInput
   product_gallery?: Prisma.product_galleryUncheckedUpdateManyWithoutProductsNestedInput
+  product_gallery_videos?: Prisma.product_gallery_videosUncheckedUpdateManyWithoutProductsNestedInput
   cart_items?: Prisma.cart_itemsUncheckedUpdateManyWithoutProductsNestedInput
   purchase_items?: Prisma.purchase_itemsUncheckedUpdateManyWithoutProductsNestedInput
   coupons?: Prisma.couponsUncheckedUpdateManyWithoutProductNestedInput
@@ -1699,6 +1862,7 @@ export type ProductsCountOutputType = {
   product_required_fields: number
   product_categories: number
   product_gallery: number
+  product_gallery_videos: number
   cart_items: number
   purchase_items: number
   coupons: number
@@ -1709,6 +1873,7 @@ export type ProductsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   product_required_fields?: boolean | ProductsCountOutputTypeCountProduct_required_fieldsArgs
   product_categories?: boolean | ProductsCountOutputTypeCountProduct_categoriesArgs
   product_gallery?: boolean | ProductsCountOutputTypeCountProduct_galleryArgs
+  product_gallery_videos?: boolean | ProductsCountOutputTypeCountProduct_gallery_videosArgs
   cart_items?: boolean | ProductsCountOutputTypeCountCart_itemsArgs
   purchase_items?: boolean | ProductsCountOutputTypeCountPurchase_itemsArgs
   coupons?: boolean | ProductsCountOutputTypeCountCouponsArgs
@@ -1744,6 +1909,13 @@ export type ProductsCountOutputTypeCountProduct_categoriesArgs<ExtArgs extends r
  */
 export type ProductsCountOutputTypeCountProduct_galleryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.product_galleryWhereInput
+}
+
+/**
+ * ProductsCountOutputType without action
+ */
+export type ProductsCountOutputTypeCountProduct_gallery_videosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.product_gallery_videosWhereInput
 }
 
 /**
@@ -1793,6 +1965,7 @@ export type productsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   product_required_fields?: boolean | Prisma.products$product_required_fieldsArgs<ExtArgs>
   product_categories?: boolean | Prisma.products$product_categoriesArgs<ExtArgs>
   product_gallery?: boolean | Prisma.products$product_galleryArgs<ExtArgs>
+  product_gallery_videos?: boolean | Prisma.products$product_gallery_videosArgs<ExtArgs>
   cart_items?: boolean | Prisma.products$cart_itemsArgs<ExtArgs>
   purchase_items?: boolean | Prisma.products$purchase_itemsArgs<ExtArgs>
   thumbnail_image?: boolean | Prisma.products$thumbnail_imageArgs<ExtArgs>
@@ -1859,6 +2032,7 @@ export type productsInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   product_required_fields?: boolean | Prisma.products$product_required_fieldsArgs<ExtArgs>
   product_categories?: boolean | Prisma.products$product_categoriesArgs<ExtArgs>
   product_gallery?: boolean | Prisma.products$product_galleryArgs<ExtArgs>
+  product_gallery_videos?: boolean | Prisma.products$product_gallery_videosArgs<ExtArgs>
   cart_items?: boolean | Prisma.products$cart_itemsArgs<ExtArgs>
   purchase_items?: boolean | Prisma.products$purchase_itemsArgs<ExtArgs>
   thumbnail_image?: boolean | Prisma.products$thumbnail_imageArgs<ExtArgs>
@@ -1879,6 +2053,7 @@ export type $productsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     product_required_fields: Prisma.$product_required_fieldsPayload<ExtArgs>[]
     product_categories: Prisma.$product_categoriesPayload<ExtArgs>[]
     product_gallery: Prisma.$product_galleryPayload<ExtArgs>[]
+    product_gallery_videos: Prisma.$product_gallery_videosPayload<ExtArgs>[]
     cart_items: Prisma.$cart_itemsPayload<ExtArgs>[]
     purchase_items: Prisma.$purchase_itemsPayload<ExtArgs>[]
     thumbnail_image: Prisma.$imagesPayload<ExtArgs> | null
@@ -2297,6 +2472,7 @@ export interface Prisma__productsClient<T, Null = never, ExtArgs extends runtime
   product_required_fields<T extends Prisma.products$product_required_fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$product_required_fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_required_fieldsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   product_categories<T extends Prisma.products$product_categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$product_categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_categoriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   product_gallery<T extends Prisma.products$product_galleryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$product_galleryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_galleryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  product_gallery_videos<T extends Prisma.products$product_gallery_videosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$product_gallery_videosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$product_gallery_videosPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cart_items<T extends Prisma.products$cart_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$cart_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$cart_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   purchase_items<T extends Prisma.products$purchase_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$purchase_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$purchase_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   thumbnail_image<T extends Prisma.products$thumbnail_imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.products$thumbnail_imageArgs<ExtArgs>>): Prisma.Prisma__imagesClient<runtime.Types.Result.GetResult<Prisma.$imagesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2819,6 +2995,30 @@ export type products$product_galleryArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.Product_galleryScalarFieldEnum | Prisma.Product_galleryScalarFieldEnum[]
+}
+
+/**
+ * products.product_gallery_videos
+ */
+export type products$product_gallery_videosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the product_gallery_videos
+   */
+  select?: Prisma.product_gallery_videosSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the product_gallery_videos
+   */
+  omit?: Prisma.product_gallery_videosOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.product_gallery_videosInclude<ExtArgs> | null
+  where?: Prisma.product_gallery_videosWhereInput
+  orderBy?: Prisma.product_gallery_videosOrderByWithRelationInput | Prisma.product_gallery_videosOrderByWithRelationInput[]
+  cursor?: Prisma.product_gallery_videosWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Product_gallery_videosScalarFieldEnum | Prisma.Product_gallery_videosScalarFieldEnum[]
 }
 
 /**

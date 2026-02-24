@@ -227,3 +227,8 @@ export type images = Prisma.imagesModel
  * 
  */
 export type product_gallery = Prisma.product_galleryModel
+/**
+ * Model product_gallery_videos
+ * 
+ */
+export type product_gallery_videos = Prisma.product_gallery_videosModel
