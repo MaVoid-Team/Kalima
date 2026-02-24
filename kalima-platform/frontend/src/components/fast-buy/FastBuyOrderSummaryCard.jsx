@@ -140,18 +140,13 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
     setCode(""); // clear input on success (backend will reflect new prices)
   };
 
-  const translations = {
-    placeholder: t("order_summary.discount_placeholder", "Discount code"),
-    apply: t("order_summary.apply", "Apply"),
-  };
-
   return (
     <div className="flex gap-2 mt-3 items-center w-full min-w-[200px] max-w-sm">
       <Input
         value={code}
         onChange={(e) => setCode(e.target.value)}
-        placeholder={translations.placeholder}
-        className="h-10 text-sm rounded-xl bg-background flex-1 border-muted-foreground/30 focus-visible:ring-0 text-start"
+        placeholder={t("order_summary.discount_placeholder", "Discount code")}
+        className="h-10 text-sm  flex-1 border-muted-foreground/30 focus-visible:ring-0 text-start"
       />
       <Button
         type="button"
@@ -159,12 +154,12 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
         size="sm"
         disabled={isApplying || !code.trim()}
         onClick={handleApply}
-        className="h-10 text-sm px-6 rounded-xl bg-muted/60 hover:bg-muted font-semibold text-foreground transition-colors shadow-none border border-transparent"
+        className="h-10 text-sm px-6 bg-muted/60  font-semibold text-foreground "
       >
         {isApplying ? (
           <Loader2 className="w-4 h-4 animate-spin" />
         ) : (
-          translations.apply
+          t("order_summary.apply", "Apply")
         )}
       </Button>
     </div>
