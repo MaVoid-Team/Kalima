@@ -52,12 +52,28 @@ Returns the authenticated user's purchases, sorted by newest first.
 **Endpoint:** `GET /my`  
 **Auth Required:** Yes (Teacher)
 
+**Query Parameters:**
+
+| Param    | Type   | Default | Description                                                      |
+| -------- | ------ | ------- | ---------------------------------------------------------------- |
+| `status` | string | —       | Filter by status (`pending`, `received`, `confirmed`, `returned`) |
+| `page`   | number | 1       | Page number                                                      |
+| `limit`  | number | 10      | Items per page                                                   |
+
+**Example:** `GET /my?status=pending&page=1&limit=10`
+
 **Success Response (200):**
 
 ```json
 {
   "success": true,
   "results": 2,
+  "pagination": {
+    "total": 2,
+    "page": 1,
+    "pages": 1,
+    "limit": 10
+  },
   "data": {
     "purchases": [
       {
