@@ -335,6 +335,8 @@ model products {
   created_at              DateTime?                 @default(now()) @db.Timestamp(6)
   updated_at              DateTime?                 @db.Timestamp(6)
   deleted_at              DateTime?                 @db.Timestamp(6)
+  perks                   String?
+
   product_required_fields product_required_fields[]
   product_categories      product_categories[]
   product_gallery         product_gallery[]
