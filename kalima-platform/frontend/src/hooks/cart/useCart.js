@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import useApiMutation from "../useApiMutation";
 import { toast } from 'sonner';
 import { useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ export default function useCart() {
     const { mutate, loading, error } = useApiMutation();
     const { t } = useTranslation('cart');
 
-    const getCart = async () => {
+    const getCart = useCallback(async () => {
         try {
             let res = await mutate({
                 method: "get",
@@ -23,9 +23,9 @@ export default function useCart() {
             console.error("Failed to fetch cart:", error);
             throw error;
         }
-    }
+    }, []);
 
-    const addToCart = async (productId, quantity) => {
+    const addToCart = useCallback(async (productId, quantity) => {
         try {
             const res = await mutate({
                 method: "POST",
@@ -43,9 +43,9 @@ export default function useCart() {
             console.error("Failed to add item to cart:", error);
             throw error;
         }
-    };
+    }, []);
 
-    const changeItemQuantity = async (itemId, quantity) => {
+    const changeItemQuantity = useCallback(async (itemId, quantity) => {
         try {
             const res = await mutate({
                 method: "PATCH",
@@ -62,9 +62,9 @@ export default function useCart() {
             console.error("Failed to change item quantity:", error);
             throw error;
         }
-    };
+    }, []);
 
-    const clearCart = async () => {
+    const clearCart = useCallback(async () => {
         try {
             const res = await mutate({
                 method: "DELETE",
@@ -80,16 +80,16 @@ export default function useCart() {
             console.error("Failed to clear cart:", error);
             throw error;
         }
-    };
+    }, []);
 
-    const removeFromCart = async (itemId) => {
+    const removeFromCart = useCallback(async (itemId) => {
         return await mutate({
             method: "DELETE",
             endpoint: `/cart/items/${itemId}`
         });
-    };
+    }, []);
 
-    const applyCoupon = async (itemId, couponCode) => {
+    const applyCoupon = useCallback(async (itemId, couponCode) => {
         try {
             const res = await mutate({
                 method: "POST",
@@ -105,9 +105,9 @@ export default function useCart() {
             console.error("Failed to apply coupon:", error);
             throw error;
         }
-    };
+    }, []);
 
-    const removeCoupon = async (itemId) => {
+    const removeCoupon = useCallback(async (itemId) => {
         try {
             const res = await mutate({
                 method: "DELETE",
@@ -122,9 +122,9 @@ export default function useCart() {
             console.error("Failed to remove coupon:", error);
             throw error;
         }
-    };
+    }, []);
 
-    const updateCartItemRequiredFields = async (itemId, requiredFieldsData) => {
+    const updateCartItemRequiredFields = useCallback(async (itemId, requiredFieldsData) => {
         try {
             const res = await mutate({
                 method: "PATCH",
@@ -142,7 +142,71 @@ export default function useCart() {
             console.error("Failed to update cart item required fields:", error);
             throw error;
         }
-    };
+    }, []);
+
+    const updateCartItemRequiredFieldsImage = useCallback(async (itemId, reqFieldDefId, file) => {
+        try {
+            const formData = new FormData();
+            formData.append("cart_item_id", itemId);
+            formData.append("required_field_definition_id", reqFieldDefId);
+            formData.append("image", file);
+
+            const res = await mutate({
+                method: "PATCH",
+                endpoint: `/cart/items/required-fields/image`,
+                data: formData,
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+            if (res.success) {
+                toast.success(t("requiredFieldsImageUpdated", "Required fields image updated"));
+                return res.data;
+            }
+            else {
+                throw new Error(res?.message || "Failed to update cart item required fields image");
+            }
+        } catch (error) {
+            console.error("Failed to update cart item required fields image:", error);
+            throw error;
+        }
+    }, []);
+
+    const checkout = useCallback(async (checkoutData) => {
+        try {
+            const res = await mutate({
+                method: "POST",
+                endpoint: `/cart/checkout`,
+                data: checkoutData
+            });
+            if (res.success) {
+                toast.success(t("checkoutSuccess", "Checkout successful"));
+                return res.data;
+            } else {
+                throw new Error(res?.message || "Failed to checkout");
+            }
+        } catch (error) {
+            console.error("Failed to checkout:", error);
+            throw error;
+        }
+    }, []);
+
+    const getPaymentMethods = useCallback(async () => {
+        try {
+            const res = await mutate({
+                method: "GET",
+                endpoint: `/payment-methods`
+            });
+            if (res.success) {
+                return res.data;
+            } else {
+                throw new Error(res?.message || "Failed to get payment methods");
+            }
+        } catch (error) {
+            console.error("Failed to get payment methods:", error);
+            throw error;
+        }
+    }, []);
 
     return {
         getCart,
@@ -153,6 +217,9 @@ export default function useCart() {
         applyCoupon,
         removeCoupon,
         updateCartItemRequiredFields,
+        updateCartItemRequiredFieldsImage,
+        checkout,
+        getPaymentMethods,
         loading,
         error
     };

@@ -17,6 +17,7 @@ export default function CartPage() {
     applyCoupon,
     removeCoupon,
     updateCartItemRequiredFields,
+    updateCartItemRequiredFieldsImage
   } = useCart();
   const navigator = useNavigate();
 
@@ -100,6 +101,7 @@ export default function CartPage() {
               applyCoupon={applyCoupon}
               removeCoupon={removeCoupon}
               updateCartItemRequiredFields={updateCartItemRequiredFields}
+              updateCartItemRequiredFieldsImage={updateCartItemRequiredFieldsImage}
             />
           </div>
 

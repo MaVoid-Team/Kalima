@@ -38,7 +38,19 @@
         "expiration_placeholder": "MM / YY",
         "security_code": "SECURITY CODE",
         "cvc_placeholder": "CVC",
-        "name_on_card": "NAME ON CARD"
+        "name_on_card": "NAME ON CARD", 
+        "phone": "PHONE NUMBER",
+        "transfer_number_required": "Please enter the number you transferred from",
+        "screenshot_required": "Please upload payment screenshot",
+        "method_required": "Please select a payment method",
+        "transfer_number": "Transfer Number",
+        "notes": "Additional Notes",
+        "screenshot": "Payment Screenshot",
+        "choose_method": "Choose Payment Method",
+        "uploadScreenshotButton": "Upload image",
+        "removeScreenshot": "Remove screenshot",
+        "cancel": "Cancel",
+        "preview": "Preview"
     },
     "order_summary": {
         "title": "Order Summary",
@@ -49,7 +61,8 @@
         "taxes": "Taxes (estimated)",
         "total": "Total",
         "currency": "USD",
-        "pay": "Pay"
+        "pay": "Pay",
+        "discount": "Total Discount"
     },
     "footer": {
         "return_to_cart": "Return to Cart",
@@ -57,5 +70,29 @@
         "privacy": "Privacy Policy",
         "terms": "Terms of Service",
         "refund": "Refund Policy"
+    },
+    "failed": "Checkout failed, please try again",
+    "receipt": {
+        "title": "Purchase Receipt",
+        "serial": "Serial",
+        "status": "Status",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "total": "Total",
+        "items": "Items",
+        "item": "Item",
+        "type": "Type",
+        "price": "Price",
+        "paid_on": "Paid on",
+        "payment_method": "Payment Method",
+        "print": "Print",
+        "unable_to_print": "Unable to print receipt",
+        "popup_blocked": "Please allow popups to print receipt",
+        "statuses":{
+            "pending": "Pending",
+            "completed": "Completed",
+            "failed": "Failed",
+            "refunded": "Refunded"
+        }
     }
-}
+} 
