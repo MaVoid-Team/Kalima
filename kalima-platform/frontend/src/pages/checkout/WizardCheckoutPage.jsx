@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '@/components/ui/loading-spinner';
