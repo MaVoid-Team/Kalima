@@ -3477,6 +3477,7 @@ export type Product_categoriesScalarFieldEnum = (typeof Product_categoriesScalar
 export const CouponsScalarFieldEnum = {
   id: 'id',
   code: 'code',
+  product_id: 'product_id',
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
@@ -3523,7 +3524,6 @@ export const ProductsScalarFieldEnum = {
   serial: 'serial',
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
-  coupon_id: 'coupon_id',
   is_archived: 'is_archived',
   mongo_id: 'mongo_id',
   created_at: 'created_at',

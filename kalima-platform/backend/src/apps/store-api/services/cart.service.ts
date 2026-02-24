@@ -130,11 +130,11 @@ class CartService {
       throw new NotFoundError("Cart item not found in user's cart");
     }
 
-    // 2. Validate coupon (active, date range, not already used by this user)
-    // couponService is now a static import (avoid dynamic import overhead)
+    // 2. Validate coupon (active, date range, product match, not already used by this user)
     const { isValid, coupon } = await couponService.validateCoupon(
       coupon_code,
       user_id,
+      cartItem.product_id,
     );
     if (!isValid) throw new BadRequestError("Invalid coupon code");
 
@@ -161,8 +161,8 @@ class CartService {
 
     // 5. Apply coupon to the item (set coupon_id, discount)
     let discount = 0;
-    if (coupon.discount_amount && coupon.discount_amount.toNumber() > 0) {
-      discount = coupon.discount_amount.toNumber();
+    if (coupon.discount_amount && Number(coupon.discount_amount) > 0) {
+      discount = Number(coupon.discount_amount);
     } else if (coupon.discount_percentage && coupon.discount_percentage > 0) {
       discount = Math.floor(
         Number(cartItem.price_at_add) *
@@ -171,12 +171,17 @@ class CartService {
       );
     }
 
+    // Clamp so final_price never goes below 0
+    const subtotal = Number(cartItem.price_at_add) * cartItem.quantity;
+    const cappedDiscount = Math.min(discount, subtotal);
+    const newFinalPrice = Math.max(0, subtotal - cappedDiscount);
+
     await this.db.cart_items.update({
       where: { id: cart_item_id },
       data: {
         coupon_id: coupon.id,
-        discount,
-        final_price: Number(cartItem.final_price) - discount,
+        discount: cappedDiscount,
+        final_price: newFinalPrice,
       },
     });
 

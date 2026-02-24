@@ -22,6 +22,7 @@ const adminAuth = [
 
 router.get("/", productController.getAllProducts);
 router.get("/:id", productController.getProductById);
+router.get("/:id/coupons", productController.getProductCoupons);
 router.get("/:id/thumbnail", productController.getThumbnail);
 router.get("/:id/gallery", productController.getGallery);
 router.get("/:id/required-fields", productController.getProductRequiredFields);

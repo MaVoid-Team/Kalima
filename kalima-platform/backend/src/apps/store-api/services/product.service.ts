@@ -44,7 +44,18 @@ const PRODUCT_INCLUDE = {
   product_required_fields: {
     include: { required_field_definitions: true },
   },
-  coupons: true,
+  coupons: {
+    where: { deleted_at: null, active: true },
+    select: {
+      id: true,
+      code: true,
+      discount_amount: true,
+      discount_percentage: true,
+      active: true,
+      expires_at: true,
+    },
+    orderBy: { created_at: "desc" as const },
+  },
   samples: true,
 };
 
@@ -64,16 +75,6 @@ class ProductService {
     thumbnailFile?: Express.Multer.File,
     sampleFile?: Express.Multer.File,
   ): Promise<products> {
-    // If coupon_id provided, verify it exists
-    if (dto.coupon_id) {
-      const coupon = await this.db.coupons.findUnique({
-        where: { id: dto.coupon_id },
-      });
-      if (!coupon) {
-        throw new NotFoundError("Coupon not found");
-      }
-    }
-
     // If category_ids provided, verify they all exist
     if (dto.category_ids && dto.category_ids.length > 0) {
       const categories = await this.db.categories.findMany({
@@ -109,7 +110,6 @@ class ProductService {
         price_after_discount: dto.price_after_discount,
         serial: dto.serial,
         sample_url: dto.sample_url,
-        coupon_id: dto.coupon_id ?? null,
         thumbnail_id: thumbnailId,
       },
       include: PRODUCT_INCLUDE,
@@ -216,16 +216,6 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    // If changing coupon, verify it exists
-    if (dto.coupon_id !== undefined && dto.coupon_id !== null) {
-      const coupon = await this.db.coupons.findUnique({
-        where: { id: dto.coupon_id },
-      });
-      if (!coupon) {
-        throw new NotFoundError("Coupon not found");
-      }
-    }
-
     const data: any = { updated_at: new Date() };
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.description !== undefined) data.description = dto.description;
@@ -235,7 +225,6 @@ class ProductService {
       data.price_after_discount = dto.price_after_discount;
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
-    if (dto.coupon_id !== undefined) data.coupon_id = dto.coupon_id;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
 
     const updated = await this.db.products.update({
