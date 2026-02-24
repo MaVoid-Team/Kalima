@@ -55,6 +55,7 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
   government: 'government',
@@ -173,6 +174,17 @@ export const UsersScalarFieldEnum = {
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const Account_review_settingsScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  requires_review: 'requires_review',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Account_review_settingsScalarFieldEnum = (typeof Account_review_settingsScalarFieldEnum)[keyof typeof Account_review_settingsScalarFieldEnum]
 
 
 export const Refresh_tokensScalarFieldEnum = {

@@ -388,6 +388,7 @@ export const ModelName = {
   user_analytics: 'user_analytics',
   user_roles: 'user_roles',
   users: 'users',
+  account_review_settings: 'account_review_settings',
   refresh_tokens: 'refresh_tokens',
   assistants: 'assistants',
   government: 'government',
@@ -438,7 +439,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
+    modelProps: "auth_identities" | "user_analytics" | "user_roles" | "users" | "account_review_settings" | "refresh_tokens" | "assistants" | "government" | "lecturers" | "levels" | "parent_children" | "parents" | "sites" | "social_media" | "students" | "subjects" | "teachers" | "teaches_at" | "zones" | "email_verification_tokens" | "password_reset_tokens" | "categories" | "product_categories" | "coupons" | "coupon_usages" | "product_required_fields" | "products" | "samples" | "required_field_definitions" | "carts" | "cart_items" | "cart_item_required_fields" | "purchases" | "purchase_items" | "purchase_item_required_fields" | "payment_methods" | "sample_sections" | "images" | "product_gallery" | "product_gallery_videos"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -735,6 +736,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.usersCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UsersCountAggregateOutputType> | number
+        }
+      }
+    }
+    account_review_settings: {
+      payload: Prisma.$account_review_settingsPayload<ExtArgs>
+      fields: Prisma.account_review_settingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.account_review_settingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.account_review_settingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        findFirst: {
+          args: Prisma.account_review_settingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.account_review_settingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        findMany: {
+          args: Prisma.account_review_settingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        create: {
+          args: Prisma.account_review_settingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        createMany: {
+          args: Prisma.account_review_settingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.account_review_settingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        delete: {
+          args: Prisma.account_review_settingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        update: {
+          args: Prisma.account_review_settingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.account_review_settingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.account_review_settingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.account_review_settingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.account_review_settingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$account_review_settingsPayload>
+        }
+        aggregate: {
+          args: Prisma.Account_review_settingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccount_review_settings>
+        }
+        groupBy: {
+          args: Prisma.account_review_settingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Account_review_settingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.account_review_settingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Account_review_settingsCountAggregateOutputType> | number
         }
       }
     }
@@ -3434,6 +3509,17 @@ export const UsersScalarFieldEnum = {
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
 
 
+export const Account_review_settingsScalarFieldEnum = {
+  id: 'id',
+  role: 'role',
+  requires_review: 'requires_review',
+  updated_at: 'updated_at',
+  updated_by: 'updated_by'
+} as const
+
+export type Account_review_settingsScalarFieldEnum = (typeof Account_review_settingsScalarFieldEnum)[keyof typeof Account_review_settingsScalarFieldEnum]
+
+
 export const Refresh_tokensScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
@@ -4229,6 +4315,7 @@ export type GlobalOmitConfig = {
   user_analytics?: Prisma.user_analyticsOmit
   user_roles?: Prisma.user_rolesOmit
   users?: Prisma.usersOmit
+  account_review_settings?: Prisma.account_review_settingsOmit
   refresh_tokens?: Prisma.refresh_tokensOmit
   assistants?: Prisma.assistantsOmit
   government?: Prisma.governmentOmit

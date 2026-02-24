@@ -58,6 +58,11 @@ export type user_roles = Prisma.user_rolesModel
  */
 export type users = Prisma.usersModel
 /**
+ * Model account_review_settings
+ * 
+ */
+export type account_review_settings = Prisma.account_review_settingsModel
+/**
  * Model refresh_tokens
  * 
  */
