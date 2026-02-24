@@ -11,13 +11,18 @@ export default function CartOrderSummary({
   discount = '0',
   total,
   isCartItemsRequiredFieldsFilled = true,
+  onProceed
 }) {
   const { t } = useTranslation('cart');
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    if (isCartItemsRequiredFieldsFilled){
-      navigate('/checkout');
+    if (isCartItemsRequiredFieldsFilled) {
+      if (onProceed) {
+        onProceed();
+      } else {
+        navigate('/checkout');
+      }
       return;
     }
     toast.error(t('fillRequiredFields'), { description: t('fillRequiredFieldsHint') });
@@ -64,7 +69,7 @@ export default function CartOrderSummary({
       <Card className="rounded-lg shadow-sm border border-gray-200 mt-6">
         <CardContent className="p-6">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
               <MessageCircle className="w-5 h-5 text-red-600" />
             </div>
             <div className="flex-1">

@@ -13,7 +13,7 @@ export default function CartHeader({ itemCount }) {
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
         <Button
-          onClick={()=> navigate('/market')}
+          onClick={() => navigate('/market')}
           variant="link"
           className="flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium p-0 h-auto"
         >
