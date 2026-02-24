@@ -1,12 +1,38 @@
-import { CreditCard, HelpCircle } from "lucide-react";
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AlertDialog, AlertDialogContent, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "../ui/input";
+import { ImageOff } from "lucide-react";
 
-export default function PaymentMethod() {
-    const { t } = useTranslation('checkout');
+export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
+    numberTransferredFrom, setNumberTransferredFrom,
+    notes, setNotes,
+    screenshotFile, setScreenshotFile }) {
+    const { t, i18n } = useTranslation('checkout');
+    const [methods, setMethods] = useState([]);
+    const fileInputRef = useRef(null);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
+
+    useEffect(() => {
+        if (screenshotFile) {
+            const url = URL.createObjectURL(screenshotFile);
+            setPreviewUrl(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setPreviewUrl('');
+        }
+    }, [screenshotFile]);
+
+    useEffect(() => {
+        getPaymentMethods().then(setMethods).catch(console.error);
+    }, [getPaymentMethods]);
 
     return (
         <Card>
@@ -15,90 +41,140 @@ export default function PaymentMethod() {
                 <CardDescription>{t('payment.secure_notice')}</CardDescription>
             </CardHeader>
             <CardContent>
-                <RadioGroup defaultValue="card" className="grid gap-4">
-                    {/* Credit Card Option */}
-                    <div className="border-2 border-primary rounded-md overflow-hidden">
-                        <div className="flex justify-between items-center p-4 bg-primary/5">
-                            <div className="flex items-center space-x-3">
-                                <RadioGroupItem value="card" id="card" className="accent-primary" />
-                                <Label htmlFor="card" className="font-medium cursor-pointer">{t('payment.credit_card')}</Label>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <CreditCard className="w-6 h-6 text-muted-foreground" />
-                            </div>
-                        </div>
-
-                        <div className="p-4 bg-muted/30 border-t border-border grid gap-4">
-                            <div className="grid gap-2">
-                                <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
-                                    {t('payment.card_number')}
-                                </Label>
-                                <div className="relative">
-                                    <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                                    <Input
-                                        type="text"
-                                        placeholder={t('payment.card_placeholder')}
-                                        className="pl-10"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="grid gap-2">
-                                    <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
-                                        {t('payment.expiration')}
-                                    </Label>
-                                    <Input
-                                        type="text"
-                                        placeholder={t('payment.expiration_placeholder')}
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
-                                        {t('payment.security_code')}
-                                    </Label>
-                                    <div className="relative">
-                                        <Input
-                                            type="text"
-                                            placeholder={t('payment.cvc_placeholder')}
+                <div className="grid gap-2">
+                    <Label htmlFor="transfer-screenshot" className="text-xs uppercase tracking-wide">
+                        {t('payment.choose_method')}
+                        <span className="text-destructive">*</span>
+                    </Label>
+                    <RadioGroup
+                        value={selectedId?.toString()}
+                        onValueChange={val => onSelect && onSelect(Number(val))}
+                        className="grid gap-4"
+                        dir={i18n.dir()}
+                    >
+                        {methods.map(m => (
+                            <div key={m.id} className="border rounded-md overflow-hidden">
+                                <div className="flex justify-between items-center p-4">
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem
+                                            value={m.id.toString()}
+                                            id={`pm-${m.id}`}
                                         />
-                                        <HelpCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground cursor-pointer" />
+                                        <Label htmlFor={`pm-${m.id}`} className="font-medium cursor-pointer">
+                                            {m.name}
+                                        </Label>
                                     </div>
+                                    {m.image_url && (
+                                        <img
+                                            src={new URL(m.image_url, import.meta.env.VITE_API_URL || 'http://localhost:3000').toString()}
+                                            alt={m.name}
+                                            className="w-8 h-8 object-contain"
+                                        />
+                                    )}
                                 </div>
+                                {m.phone_number && (
+                                    <div className="p-4 bg-muted/30 border-t border-border text-xs text-muted-foreground">
+                                        {t('payment.phone')}: {m.phone_number}
+                                    </div>
+                                )}
                             </div>
+                        ))}
+                    </RadioGroup>
+                </div>
 
-                            <div className="grid gap-2">
-                                <Label className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
-                                    {t('payment.name_on_card')}
+                {/* bank transfer inputs */}
+                <div className="grid gap-4 mt-6">
+                    <div className="grid gap-2">
+                        <Label htmlFor="transfer-number" className="text-xs uppercase tracking-wide">
+                            {t('payment.transfer_number')}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="transfer-number"
+                            type="text"
+                            value={numberTransferredFrom}
+                            onChange={e => setNumberTransferredFrom(e.target.value)}
+                            className="w-full"
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="transfer-notes" className="text-xs uppercase tracking-wide">
+                            {t('payment.notes')}
+                        </Label>
+                        <Textarea
+                            id="transfer-notes"
+                            value={notes}
+                            onChange={e => setNotes(e.target.value)}
+                            className="input w-full h-20 resize-none"
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label className="text-xs uppercase tracking-wide flex items-center justify-between">
+                            {t('payment.screenshot')}
+                            <span className="text-destructive">*</span>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                            {screenshotFile ? (
+                                <> 
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        className="text-sm underline text-primary"
+                                        onClick={() => setShowPreview(true)}
+                                    >
+                                        {screenshotFile.name}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className="text-destructive"
+                                        onClick={() => {
+                                            setScreenshotFile(null);
+                                            if (fileInputRef.current) fileInputRef.current.value = '';
+                                        }}
+                                        aria-label={t('payment.removeScreenshot','Remove screenshot')}
+                                    >
+                                        &times;
+                                    </Button>
+                                </>
+                            ) : (
+                                <Label
+                                    htmlFor="transfer-screenshot"
+                                    className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                >
+                                    {t('payment.uploadScreenshotButton','Upload image')}
                                 </Label>
-                                <Input type="text" />
-                            </div>
+                            )}
                         </div>
+                        {/* hidden input used for selecting file */}
+                        <Input
+                            id="transfer-screenshot"
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={e => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    setScreenshotFile(file);
+                                }
+                            }}
+                        />
                     </div>
-
-                    {/* PayPal Option */}
-                    <div className="border border-border rounded-md">
-                        <div className="flex justify-between items-center p-4 bg-muted/30">
-                            <div className="flex items-center space-x-3">
-                                <RadioGroupItem value="paypal" id="paypal" />
-                                <Label htmlFor="paypal" className="font-medium cursor-pointer">{t('payment.paypal')}</Label>
-                            </div>
-                            <a href="#" className="text-primary text-sm hover:underline">{t('payment.paypal')}</a>
-                        </div>
-                    </div>
-
-                    {/* Apple Pay Option */}
-                    <div className="border border-border rounded-md">
-                        <div className="flex justify-between items-center p-4 bg-muted/30">
-                            <div className="flex items-center space-x-3">
-                                <RadioGroupItem value="apple" id="apple" />
-                                <Label htmlFor="apple" className="font-medium cursor-pointer">{t('payment.apple_pay')}</Label>
-                            </div>
-                            <span className="text-sm text-foreground">⌘ Pay</span>
-                        </div>
-                    </div>
-                </RadioGroup>
-            </CardContent>
+                </div>
+                </CardContent>
+                {/* preview dialog */}
+                <AlertDialog open={showPreview} onOpenChange={setShowPreview}>
+                    <AlertDialogContent>
+                        {previewUrl ? <img src={previewUrl} alt={t('payment.preview','Screenshot preview')} className="w-full h-auto" /> : <ImageOff className="w-16 h-16 text-muted-foreground mx-auto my-8" />}
+                        <AlertDialogFooter>
+                            <Button variant="destructive" onClick={() => {setScreenshotFile(null); if (fileInputRef.current) fileInputRef.current.value = '';}}>
+                                {t('payment.removeScreenshot','Remove')}
+                            </Button>
+                            <AlertDialogCancel>{t('payment.cancel','Cancel')}</AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
         </Card>
     );
 }

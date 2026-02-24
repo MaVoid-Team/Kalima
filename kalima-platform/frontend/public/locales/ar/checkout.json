@@ -38,7 +38,19 @@
         "expiration_placeholder": "شهر / سنة",
         "security_code": "رمز الحماية",
         "cvc_placeholder": "CVC",
-        "name_on_card": "الاسم على البطاقة"
+        "name_on_card": "الاسم على البطاقة", 
+        "phone": "رقم الهاتف",
+        "transfer_number_required": "يرجى إدخال الرقم الذي تم التحويل منه",
+        "screenshot_required": "يرجى تحميل لقطة شاشة للدفع",
+        "method_required": "يرجى اختيار طريقة دفع",
+        "transfer_number": "رقم التحويل",
+        "notes": "ملاحظات إضافية",
+        "screenshot": "لقطة شاشة للدفع",
+        "choose_method": "اختر طريقة الدفع",
+        "uploadScreenshotButton": "تحميل الصورة",
+        "removeScreenshot": "إزالة لقطة الشاشة",
+        "cancel": "إلغاء",
+        "preview": "معاينة"
     },
     "order_summary": {
         "title": "ملخص الطلب",
@@ -49,7 +61,8 @@
         "taxes": "الضرائب (تقديري)",
         "total": "الإجمالي",
         "currency": "دولار أمريكي",
-        "pay": "ادفع"
+        "pay": "ادفع",
+        "discount": "الخصم الكلي"
     },
     "footer": {
         "return_to_cart": "العودة إلى السلة",
@@ -57,5 +70,29 @@
         "privacy": "سياسة الخصوصية",
         "terms": "شروط الخدمة",
         "refund": "سياسة الاسترداد"
+    },
+    "failed": "فشل في إتمام الدفع، يرجى المحاولة مرة أخرى",
+    "receipt": {
+        "title": "إيصال الشراء",
+        "serial": "الرقم التسلسلي",
+        "status": "الحالة",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "total": "الإجمالي",
+        "items": "العناصر",
+        "item": "العنصر",
+        "type": "النوع",
+        "price": "السعر",
+        "paid_on": "تاريخ الدفع",
+        "payment_method": "طريقة الدفع",
+        "print": "طباعة",
+        "unable_to_print": "تعذر طباعة الإيصال",
+        "popup_blocked": "يرجى السماح بالنوافذ المنبثقة لطباعة الإيصال",
+        "statuses": {
+            "pending": "قيد الانتظار",
+            "completed": "مكتمل",
+            "failed": "فشل",
+            "refunded": "تم الاسترداد"
+        }
     }
-}
+} 

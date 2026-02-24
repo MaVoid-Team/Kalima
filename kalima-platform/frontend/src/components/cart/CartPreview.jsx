@@ -86,7 +86,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                       <div className={"flex items-center justify-between"}>
                         <div className="text-sm">
                           <span className="font-semibold">
-                            {item?.final_price}
+                            {item?.final_price}{t('L.E')}
                           </span>
                           <span className={"text-muted-foreground" + (i18n.language === 'ar' ? ' mr-1' : ' ml-1')}>
                             {t('qty')} {item?.quantity}
@@ -111,7 +111,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
             <SheetFooter className="px-6 py-4 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{t('subtotal')}</span>
-                <span className="text-xl font-bold">{cart?.subtotal}</span>
+                <span className="text-xl font-bold">{cart?.subtotal}{t('L.E')}</span>
               </div>
 
               <p className="text-xs text-muted-foreground text-center">

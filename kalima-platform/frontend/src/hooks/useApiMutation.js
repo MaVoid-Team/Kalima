@@ -17,7 +17,13 @@ export default function useApiMutation() {
         setError(null);
 
         try {
-            const response = await axios({ method, url: endpoint, data });
+            // if we are sending a FormData object, make sure we don't force JSON
+            const axiosConfig = { method, url: endpoint, data };
+            if (data instanceof FormData) {
+                axiosConfig.headers = { 'Content-Type': 'multipart/form-data' };
+            }
+
+            const response = await axios(axiosConfig);
 
             const message = response.data?.message || defaultSuccessMessage;
             if (message) {

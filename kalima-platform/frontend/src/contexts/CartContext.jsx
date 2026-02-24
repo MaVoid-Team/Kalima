@@ -13,22 +13,51 @@ export function CartProvider({ children }) {
     addToCart,
     changeItemQuantity,
     clearCart,
+    getPaymentMethods,
+    checkout: checkoutNetwork,
     removeFromCart: removeItemNetwork,
     applyCoupon: applyCouponNetwork,
     removeCoupon: removeCouponNetwork,
     updateCartItemRequiredFields: updateCartItemRequiredFieldsNetwork,
+    updateCartItemRequiredFieldsImage: updateCartItemRequiredFieldsImageNetwork,
     loading,
     error,
   } = useCartNetwork();
 
-  const [cart, setCart] = useState({ cart_items: [], subtotal: 0, discount: 0, total: 0 });
+  const EMPTY_CART = { cart_items: [], subtotal: 0, discount: 0, total: 0 };
+  const [cart, setCart] = useState(EMPTY_CART);
+
+  const normalizeCart = (raw) => {
+    if (!raw) return EMPTY_CART;
+    if (Array.isArray(raw.cart_items)) return { ...EMPTY_CART, ...raw };
+    if (raw.data && Array.isArray(raw.data.cart_items)) return { ...EMPTY_CART, ...raw.data };
+    if (raw.cart && Array.isArray(raw.cart.cart_items)) return { ...EMPTY_CART, ...raw.cart };
+    if (Array.isArray(raw.items)) {
+      return {
+        ...EMPTY_CART,
+        cart_items: raw.items,
+        subtotal: raw.subtotal ?? 0,
+        discount: raw.discount ?? 0,
+        total: raw.total ?? 0,
+      };
+    }
+    for (const key of Object.keys(raw)) {
+      const nested = raw[key];
+      if (nested && typeof nested === 'object' && Array.isArray(nested.cart_items)) {
+        return { ...EMPTY_CART, ...nested };
+      }
+    }
+    return EMPTY_CART;
+  };
 
   const loadCart = async () => {
     try {
       const c = await getCart();
-      setCart(c);
+      setCart(normalizeCart(c));
     } catch (e) {
       console.error('failed to load cart', e);
+      // Important: if backend returns 404/empty after checkout, context must still refresh to empty cart
+      setCart(EMPTY_CART);
     }
   };
 
@@ -36,7 +65,7 @@ export function CartProvider({ children }) {
     if (isAuthenticated) {
       loadCart();
     } else {
-      setCart({ cart_items: [], subtotal: 0, discount: 0, total: 0 });
+      setCart(EMPTY_CART);
     }
   }, [isAuthenticated]);
 
@@ -81,6 +110,19 @@ export function CartProvider({ children }) {
     await loadCart();
   };
 
+  const updateCartItemRequiredFieldsImage = async (itemId, reqFieldDefId, imageData) => {
+    await updateCartItemRequiredFieldsImageNetwork(itemId, reqFieldDefId, imageData);
+    await loadCart();
+  }
+
+  const checkout = async (formData) => {
+    const result = await checkoutNetwork(formData);
+    // optimistic clear so UI updates immediately even if /cart response is delayed
+    setCart(EMPTY_CART);
+    await loadCart();
+    return result;
+  };
+
   const value = {
     cart,
     loading,
@@ -93,6 +135,9 @@ export function CartProvider({ children }) {
     applyCoupon,
     removeCoupon,
     updateCartItemRequiredFields,
+    updateCartItemRequiredFieldsImage,
+    checkout,
+    getPaymentMethods,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
