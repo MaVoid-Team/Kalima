@@ -420,6 +420,7 @@ Use `multipart/form-data` for endpoints that accept files (e.g. product create, 
 ## Related Documentation
 
 - `AUTH_API_DOCUMENTATION.md` — Auth endpoints in detail
+- `PRODUCT_SAMPLE_API_DOCUMENTATION.md` — Product sample read API and creation flow
 - `PRODUCTS_API_DOCUMENTATION.md` — Product CRUD and media
 - `COUPON_API_DOCUMENTATION.md` — Coupon admin and usage
 - `REQUIRED_FIELDS_API_DOCUMENTATION.md` — Checkout required fields
