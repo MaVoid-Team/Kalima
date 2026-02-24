@@ -13,6 +13,7 @@
 1. [Public Endpoints](#public-endpoints-no-auth-required)
    - [Get All Products](#get-all-products)
    - [Get Product by ID](#get-product-by-id)
+   - [Get Product Coupons](#get-product-coupons)
    - [Get Product Gallery](#get-product-gallery)
    - [Get Product Required Fields](#get-product-required-fields)
 2. [Admin / SubAdmin Endpoints](#admin--subadmin-endpoints)
@@ -83,7 +84,6 @@ Returns a paginated list of products with optional filters.
       "price_after_discount": null,
       "serial": "ALG-101",
       "sample_url": null,
-      "coupon_id": null,
       "is_archived": false,
       "thumbnail_image": {
         "id": 5,
@@ -99,7 +99,7 @@ Returns a paginated list of products with optional filters.
       "product_gallery": [],
       "product_required_fields": [],
       "samples": null,
-      "coupons": null,
+      "coupons": [],
       "created_at": "2026-02-20T10:00:00.000Z",
       "updated_at": null
     }
@@ -114,7 +114,7 @@ Returns a paginated list of products with optional filters.
 
 ### Get Product by ID
 
-Returns a single product with linked categories, gallery entries, sample, coupon, and required-field definitions. Returns 404 if the product does not exist or has been soft-deleted.
+Returns a single product with linked categories, gallery entries, sample, coupons (array of active coupons for this product), and required-field definitions. Returns 404 if the product does not exist or has been soft-deleted.
 
 **Endpoint:** `GET /:id`  
 **Auth Required:** No
@@ -139,7 +139,6 @@ Returns a single product with linked categories, gallery entries, sample, coupon
     "price_after_discount": null,
     "serial": "ALG-101",
     "sample_url": null,
-    "coupon_id": null,
     "is_archived": false,
     "thumbnail_image": {
       "id": 5,
@@ -166,7 +165,7 @@ Returns a single product with linked categories, gallery entries, sample, coupon
       "size": 204800,
       "created_at": "2026-02-20T10:00:00.000Z"
     },
-    "coupons": null,
+    "coupons": [{ "id": 1, "code": "KLM-ABC123", "discount_amount": "50.00", "discount_percentage": 0, "expires_at": "2026-06-01T00:00:00.000Z" }],
     "created_at": "2026-02-20T10:00:00.000Z",
     "updated_at": null
   }
@@ -179,6 +178,47 @@ Returns a single product with linked categories, gallery entries, sample, coupon
 | ------ | -------------------- | ----------------------------------------- |
 | 400    | `Invalid product ID` | ID is not a number                        |
 | 404    | `Product not found`  | Product does not exist or is soft-deleted |
+
+---
+
+### Get Product Coupons
+
+Returns active coupons for a specific product.
+
+**Endpoint:** `GET /:id/coupons`  
+**Auth Required:** No
+
+**URL Parameters:**
+
+| Param | Type   | Description |
+| ----- | ------ | ----------- |
+| `id`  | number | Product ID  |
+
+**Query Parameters:**
+
+| Param    | Type    | Default | Description                          |
+| -------- | ------- | ------- | ------------------------------------ |
+| `active` | boolean | true    | Filter by active status (`true`/`false`) |
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "code": "KLM-ABC123",
+      "product_id": 1,
+      "discount_amount": "50.00",
+      "discount_percentage": 0,
+      "active": true,
+      "expires_at": "2026-06-01T00:00:00.000Z",
+      "product": { "id": 1, "title": "Algebra Book" }
+    }
+  ]
+}
+```
 
 ---
 
@@ -348,7 +388,6 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
   "price_after_discount": "number (optional, >= 0)",
   "serial": "string (optional, max 255)",
   "sample_url": "string (optional)",
-  "coupon_id": "number (optional, must reference existing coupon)",
   "category_ids": "JSON array of ints (optional, e.g. [1, 3])"
 }
 ```
@@ -398,7 +437,6 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
     "price_after_discount": null,
     "serial": null,
     "sample_url": null,
-    "coupon_id": null,
     "is_archived": false,
     "thumbnail_image": null,
     "product_categories": [
@@ -420,7 +458,6 @@ Creates a new product. Supports `multipart/form-data` with an optional `thumbnai
 | ------ | ---------------------------------------------------- | ----------------------------- |
 | 400    | `category_ids must be a valid JSON array of integers` | Malformed category_ids string |
 | 404    | `Category ID(s) not found: 99`                       | Invalid category ID           |
-| 404    | `Coupon not found`                                   | Invalid coupon_id             |
 | 422    | Validation errors array                              | Invalid or missing fields     |
 
 ---
@@ -449,7 +486,6 @@ Updates one or more fields on an existing product. All fields are optional.
   "price_after_discount": "number (>= 0)",
   "serial": "string (max 255)",
   "sample_url": "string",
-  "coupon_id": "number",
   "is_archived": "boolean"
 }
 ```
@@ -479,7 +515,6 @@ Updates one or more fields on an existing product. All fields are optional.
 | ------ | -------------------- | ----------------------------------------- |
 | 400    | `Invalid product ID` | ID is not a number                        |
 | 404    | `Product not found`  | Product does not exist or is soft-deleted |
-| 404    | `Coupon not found`   | Invalid coupon_id                         |
 | 422    | Validation errors    | Invalid fields                            |
 
 ---
@@ -914,7 +949,6 @@ Removes a required-field definition from a product.
   "thumbnail_id": "number | null",
   "thumbnail_image": "Image object | null",
   "sample_url": "string | null",
-  "coupon_id": "number | null",
   "is_archived": "boolean — defaults to false",
   "created_at": "timestamp",
   "updated_at": "timestamp | null",
@@ -922,7 +956,7 @@ Removes a required-field definition from a product.
   "product_gallery": "GalleryEntry[]",
   "product_required_fields": "ProductRequiredField[]",
   "samples": "Sample object | null",
-  "coupons": "Coupon object | null"
+  "coupons": "Coupon[] — array of active coupons for this product"
 }
 ```
 

@@ -61,12 +61,6 @@ export class CreateProductDto {
   @IsOptional()
   sample_url?: string;
 
-  @Type(() => Number)
-  @IsInt()
-  @IsPositive()
-  @IsOptional()
-  coupon_id?: number;
-
   /**
    * Array of category IDs to attach on creation.
    * Sent as JSON string in multipart form data.
@@ -118,12 +112,6 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   sample_url?: string;
-
-  @Type(() => Number)
-  @IsInt()
-  @IsPositive()
-  @IsOptional()
-  coupon_id?: number;
 
   @Type(() => Boolean)
   @IsBoolean()
