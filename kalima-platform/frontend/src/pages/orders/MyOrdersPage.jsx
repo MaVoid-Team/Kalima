@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOrders } from '@/hooks/useOrders';
-import { Loader2, PackageOpen } from 'lucide-react';
+import { PackageOpen } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import OrderCard from './OrderCard';
 import {
     Pagination,
@@ -75,12 +76,7 @@ const MyOrdersPage = () => {
             {/* Orders List */}
             <div className="min-h-[400px]">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground animate-pulse">
-                            {t('common.loading', 'Loading...')}
-                        </p>
-                    </div>
+                    <LoadingSpinner />
                 ) : orders && orders.length > 0 ? (
                     <div className="flex flex-col space-y-4">
                         {orders.map((order) => (

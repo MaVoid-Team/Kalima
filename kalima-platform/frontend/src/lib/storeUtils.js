@@ -14,6 +14,25 @@ export function formatPrice(amount) {
 }
 
 /**
+ * Calculates discount percentage from original and discounted prices.
+ * @param {number|string} mainPrice
+ * @param {number|string} priceAfterDiscount
+ * @param {number} precision number of decimal places in the result
+ * @returns {number}
+ */
+export function calculateDiscountPercentage(mainPrice, priceAfterDiscount, precision = 2) {
+  const original = Number.parseFloat(mainPrice);
+  const discounted = Number.parseFloat(priceAfterDiscount);
+
+  if (Number.isNaN(original) || Number.isNaN(discounted) || original <= 0) return 0;
+
+  const raw = ((original - discounted) / original) * 100;
+  const bounded = Math.max(0, Math.min(100, raw));
+
+  return Number(bounded.toFixed(precision));
+}
+
+/**
  * Builds the absolute URL for an uploaded file using the API base URL.
  * @param {string|null} path
  * @returns {string|null}

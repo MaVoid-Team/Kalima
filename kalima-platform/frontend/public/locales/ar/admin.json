@@ -19,6 +19,7 @@
     },
     "orders": {
         "status": {
+            "label": "الحالة",
             "all": "جميع الطلبات",
             "pending": "قيد الانتظار",
             "received": "تم الاستلام",
@@ -27,6 +28,35 @@
             "created": "تم الإنشاء"
         },
         "total": "الإجمالي",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "createdAt": "تاريخ الإنشاء",
+        "itemPrice": "سعر العنصر",
+        "requiredFields": "الحقول المطلوبة",
+        "field": "الحقل",
+        "unknownProduct": "منتج غير معروف",
+        "sections": {
+            "summary": "الملخص",
+            "customer": "العميل",
+            "payment": "الدفع",
+            "notes": "الملاحظات"
+        },
+        "customer": {
+            "name": "الاسم",
+            "email": "البريد الإلكتروني",
+            "phone": "رقم الهاتف"
+        },
+        "payment": {
+            "method": "الطريقة",
+            "methodPhone": "رقم الدفع",
+            "transferredFrom": "محول من",
+            "targetNumber": "الرقم المستهدف",
+            "screenshot": "صورة الدفع"
+        },
+        "notes": {
+            "customer": "ملاحظات العميل",
+            "admin": "ملاحظات الإدارة"
+        },
         "title": "إدارة الطلبات",
         "myOrders": "طلباتي",
         "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
@@ -53,6 +83,7 @@
         },
         "items": {
             "items": "الطلبات",
+            "empty": "لا توجد عناصر",
             "product": "المنتج",
             "type": "النوع",
             "price": "السعر",
@@ -62,6 +93,7 @@
         },
         "actions": {
             "view": "عرض التفاصيل",
+            "viewDetails": "عرض التفاصيل",
             "receive": "تحديد كمستلم",
             "confirm": "تأكيد الطلب",
             "return": "إرجاع الطلب",
@@ -80,6 +112,7 @@
             "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
         },
         "details": {
+            "title": "تفاصيل الطلب",
             "backToOrders": "العودة للطلبات",
             "customerInfo": "معلومات العميل",
             "orderSummary": "ملخص الطلب",

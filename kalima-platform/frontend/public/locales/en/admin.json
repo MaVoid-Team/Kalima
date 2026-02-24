@@ -19,6 +19,7 @@
     },
     "orders": {
         "status": {
+            "label": "Status",
             "all": "All Orders",
             "pending": "Pending",
             "received": "Received",
@@ -27,6 +28,35 @@
             "created": "Created"
         },
         "total": "Total",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "createdAt": "Created at",
+        "itemPrice": "Item price",
+        "requiredFields": "Required fields",
+        "field": "Field",
+        "unknownProduct": "Unknown Product",
+        "sections": {
+            "summary": "Summary",
+            "customer": "Customer",
+            "payment": "Payment",
+            "notes": "Notes"
+        },
+        "customer": {
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone"
+        },
+        "payment": {
+            "method": "Method",
+            "methodPhone": "Payment phone",
+            "transferredFrom": "Transferred from",
+            "targetNumber": "Target number",
+            "screenshot": "Payment screenshot"
+        },
+        "notes": {
+            "customer": "Customer notes",
+            "admin": "Admin notes"
+        },
         "title": "Orders Management",
         "myOrders": "My Orders",
         "subtitle": "Track, manage, and view your order history",
@@ -53,6 +83,7 @@
         },
         "items": {
             "items": "Items",
+            "empty": "No items",
             "product": "Product",
             "type": "Type",
             "price": "Price",
@@ -62,6 +93,7 @@
         },
         "actions": {
             "view": "View Details",
+            "viewDetails": "View details",
             "receive": "Mark Received",
             "confirm": "Confirm Order",
             "return": "Return Order",
@@ -80,6 +112,7 @@
             "noteSaved": "Admin note saved successfully"
         },
         "details": {
+            "title": "Order details",
             "backToOrders": "Back to Orders",
             "customerInfo": "Customer Info",
             "orderSummary": "Order Summary",

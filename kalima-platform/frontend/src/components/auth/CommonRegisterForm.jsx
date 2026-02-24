@@ -103,7 +103,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                     <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 pl-0 text-muted-foreground hover:text-foreground">
-                        {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+                        <ArrowLeft className="h-4 w-4" />
                         {t("signup.roleLabel")}
                     </Button>
                 </div>
@@ -118,8 +118,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                             <SocialLoginButtons
                                 onProviderSelect={handleFirebaseLogin}
                                 isLoading={isLoading}
-                                textGoogle="Sign up with Google"
-                                textFacebook="Sign up with Facebook"
+                                textGoogle={t("signup.google")}
                             />
 
                             <div className="relative my-4">
@@ -128,7 +127,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
                                     <span className="bg-background px-2 text-muted-foreground">
-                                        Or continue with email
+                                        {t("signup.continueWith")}
                                     </span>
                                 </div>
                             </div>
@@ -189,7 +188,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{t("signup.fields.gender")}</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
                                             <SelectValue placeholder={t("signup.fields.genderPlaceholder")} />

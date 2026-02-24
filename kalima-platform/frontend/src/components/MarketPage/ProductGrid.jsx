@@ -74,9 +74,9 @@ export default function ProductGrid({
                     const mappedProduct = {
                         ...product,
                         category: product.product_categories?.[0]?.categories?.title || product.category,
+                        priceAfterDiscount: product.price_after_discount,
                         image: getImageUrl(product.thumbnail_image?.url) || product.image,
-                        originalPrice: product.price_after_discount ? product.price : product.originalPrice,
-                        price: product.price_after_discount || product.price,
+                        price: product.price,
                     };
                     return (
                         <motion.div

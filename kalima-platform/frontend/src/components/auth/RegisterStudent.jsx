@@ -20,12 +20,11 @@ import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
-import { useNavigate } from "react-router-dom";
 
 export default function RegisterStudent({ onBack }) {
     const { t } = useTranslation("auth");
     const { registerStudent, registerFirebaseStudent } = useRegister();
-
+    
     // Schema
     const studentSchema = z.object({
         level_id: z.string().min(1, { message: t("validation.required") }),
@@ -77,10 +76,10 @@ export default function RegisterStudent({ onBack }) {
 }
 
 function StudentFields() {
-    const { t } = useTranslation("auth");
+    const { t, i18n } = useTranslation("auth");
     const { control, watch, setValue } = useFormContext();
     const { governments, zones, getZonesByGovernment, levels, loading: lookupsLoading } = useLookups();
-
+    const isRTL = i18n.dir() === "rtl";
     const selectedGov = watch("government_id");
 
     const handleGovChange = (value) => {
@@ -98,7 +97,7 @@ function StudentFields() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t("signup.fields.government")}</FormLabel>
-                            <Select onValueChange={handleGovChange} defaultValue={field.value}>
+                            <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={handleGovChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t("signup.fields.selectGovernment")} />
@@ -124,6 +123,7 @@ function StudentFields() {
                         <FormItem>
                             <FormLabel>{t("signup.fields.zone")}</FormLabel>
                             <Select
+                                dir={isRTL ? "rtl" : "ltr"} 
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                                 disabled={!selectedGov || zones.length === 0}
@@ -153,7 +153,7 @@ function StudentFields() {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t("signup.fields.level")}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder={t("signup.fields.selectLevel")} />
