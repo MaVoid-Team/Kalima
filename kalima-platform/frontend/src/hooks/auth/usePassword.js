@@ -1,13 +1,15 @@
+import { useTranslation } from 'react-i18next';
 import useApiMutation from '../useApiMutation';
 
 const usePassword = () => {
     const { mutate, loading, error } = useApiMutation();
+    const { t } = useTranslation('auth');
 
     const forgotPassword = async (email) => {
         return await mutate({
             endpoint: '/auth/forgot-password',
             data: { email },
-            defaultSuccessMessage: 'Password reset email sent'
+            defaultSuccessMessage: t('forgotPassword.resetEmailSent', 'Password reset email sent')
         });
     };
 
@@ -15,7 +17,7 @@ const usePassword = () => {
         return await mutate({
             endpoint: '/auth/reset-password',
             data: { token, newPassword },
-            defaultSuccessMessage: 'Password reset successfully'
+            defaultSuccessMessage: t('resetPassword.resetSuccess', 'Password reset successfully')
         });
     };
 
@@ -23,7 +25,7 @@ const usePassword = () => {
         return await mutate({
             endpoint: '/auth/change-password',
             data: { currentPassword, newPassword },
-            defaultSuccessMessage: 'Password changed successfully'
+            defaultSuccessMessage: t('changePassword.passwordChangedSuccess', 'Password changed successfully')
         });
     };
 
@@ -31,7 +33,7 @@ const usePassword = () => {
         return await mutate({
             endpoint: '/auth/set-password',
             data: { password },
-            defaultSuccessMessage: 'Password set successfully'
+            defaultSuccessMessage: t('setPassword.setSuccess', 'Password set successfully')
         });
     };
 

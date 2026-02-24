@@ -1,15 +1,17 @@
+import { useTranslation } from 'react-i18next';
 import useApiMutation from '../useApiMutation';
 import useAuth from './useAuth';
 
 const useLogin = () => {
     const { loginSuccess } = useAuth();
     const { mutate, loading, error } = useApiMutation();
+    const { t } = useTranslation('auth');
 
     const login = async (credentials) => {
         const data = await mutate({
             endpoint: '/auth/login',
             data: credentials,
-            defaultSuccessMessage: 'Login successful!'
+            defaultSuccessMessage: t('success', 'Login successful! Redirecting...')
         });
         const { user, tokens, portalAccess } = data.data;
         loginSuccess(user, tokens, portalAccess);
@@ -20,7 +22,7 @@ const useLogin = () => {
         const data = await mutate({
             endpoint: '/auth/login/firebase',
             data: { idToken },
-            defaultSuccessMessage: 'Login successful!'
+            defaultSuccessMessage: t('success', 'Login successful! Redirecting...')
         });
         const { user, tokens, portalAccess } = data.data || data;
         loginSuccess(user, tokens, portalAccess);

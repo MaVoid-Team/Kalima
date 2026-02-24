@@ -76,7 +76,8 @@
             "deleteOrderWarning": "Are you sure you want to delete this order? This action cannot be undone.",
             "deleteItemWarning": "Are you sure you want to remove this item from the order?",
             "deleteOrderSuccess": "Order deleted successfully",
-            "deleteItemSuccess": "Item removed successfully"
+            "deleteItemSuccess": "Item removed successfully",
+            "noteSaved": "Admin note saved successfully"
         },
         "details": {
             "backToOrders": "Back to Orders",
