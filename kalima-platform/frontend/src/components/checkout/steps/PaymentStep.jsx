@@ -143,8 +143,8 @@ export default function PaymentStep({ onBack }) {
         <div className="w-full">
             <div className="mb-6 flex items-center justify-between">
                 <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={onBack}>
-                    {i18n.dir() === 'rtl' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-                    {t('backToCart', 'Back to Cart')}
+                    <ArrowLeft className="w-4 h-4" />
+                    {t('payment.backToCart', 'Back to Cart')}
                 </Button>
             </div>
 

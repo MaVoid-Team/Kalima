@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function PricingSummary({ pricing, onPay }) {
-    const { t, i18n } = useTranslation(['checkout', 'cart']);
+    const { t } = useTranslation(['checkout', 'cart']);
 
     return (
         <div className="flex flex-col gap-3">
@@ -35,11 +35,8 @@ export default function PricingSummary({ pricing, onPay }) {
                 // disabled={!onPay}
             >
                 {t('order_summary.pay')}
-                {i18n.language === 'ar' ? (
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                ) : (
-                    <ArrowLeft className="w-5 h-5 ml-2" />
-                )}
+                
+                <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
         </div>
     );

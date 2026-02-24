@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ShoppingCart, CreditCard } from 'lucide-react';
 
 export default function WizardStepper({ currentStep }) {
-    const { t } = useTranslation('checkout');
+    const { t, i18n } = useTranslation('checkout');
+    const isRTL = i18n.dir() === 'rtl';
 
     const steps = [
         { id: 1, label: t('wizard.cart', 'Cart'), icon: ShoppingCart },
@@ -34,7 +35,9 @@ export default function WizardStepper({ currentStep }) {
                             {index < steps.length - 1 && (
                                 <div className="flex-1 h-1 bg-gray-200 relative overflow-hidden mx-4 rounded" style={{ top: '-14px' }}>
                                     {isCompleted && (
-                                        <div className="absolute top-0 left-0 h-full bg-primary w-full animate-in slide-in-from-left duration-500" />
+                                        <div
+                                            className={`absolute top-0 left-0 h-full bg-primary w-full animate-in duration-500 ${isRTL ? 'slide-in-from-right' : 'slide-in-from-left'}`}
+                                        />
                                     )}
                                 </div>
                             )}
