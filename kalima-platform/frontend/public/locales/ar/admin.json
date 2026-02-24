@@ -98,7 +98,8 @@
             "confirm": "تأكيد الطلب",
             "return": "إرجاع الطلب",
             "delete": "حذف الطلب",
-            "deleteItem": "حذف العنصر"
+            "deleteItem": "حذف العنصر",
+            "whatsapp": "تواصل عبر واتساب"
         },
         "messages": {
             "receiveSuccess": "تم تحديث الطلب إلى مستلم",
@@ -115,6 +116,7 @@
             "title": "تفاصيل الطلب",
             "backToOrders": "العودة للطلبات",
             "customerInfo": "معلومات العميل",
+            "customerNotes": "ملاحظات العميل",
             "orderSummary": "ملخص الطلب",
             "paymentInfo": "معلومات الدفع",
             "statusTimeline": "الجدول الزمني للحالة",
@@ -132,7 +134,8 @@
             "saveNote": "حفظ الملاحظة",
             "total": "الإجمالي",
             "by": "بواسطة",
-            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}"
+            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
+            "contactWhatsApp": "تواصل عبر واتساب"
         }
     }
 }

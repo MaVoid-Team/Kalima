@@ -32,7 +32,7 @@ export default function PricingSummary({ pricing, onPay }) {
                 className="w-full py-6 mt-2 text-base"
                 size="lg"
                 onClick={onPay}
-            // disabled={!onPay}
+                disabled={!onPay}
             >
                 {t('orderSummary.pay')}
 

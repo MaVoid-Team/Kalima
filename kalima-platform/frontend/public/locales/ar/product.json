@@ -32,7 +32,8 @@
     "reviews": "مراجعات",
     "createdBy": "تم إنشاؤه بواسطة",
     "currency": "ج",
-    "requiredInfo": "معلومات مطلوبة للشراء:"
+    "requiredInfo": "معلومات مطلوبة للشراء:",
+    "perks": "مميزات المنتج:"
   },
   "trustSignals": {
     "secureTransaction": "معاملة آمنة",

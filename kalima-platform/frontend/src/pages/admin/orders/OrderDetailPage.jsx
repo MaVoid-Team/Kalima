@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package, CheckCircle, RotateCcw, Trash2, ArrowLeft, MessageCircle } from 'lucide-react';
 import useOrders from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -201,11 +201,33 @@ export default function OrderDetailPage() {
                         <div className="space-y-1 text-sm overflow-hidden">
                             <div className="font-medium truncate" title={order.users?.name || 'N/A'}>{order.users?.name || 'N/A'}</div>
                             <div className="text-muted-foreground truncate" title={order.users?.email}>{order.users?.email}</div>
-                            {order.users?.phone_number && (
-                                <div className="text-muted-foreground truncate" title={order.users.phone_number}>{order.users.phone_number}</div>
+                            {order.users?.phone && (
+                                <div className="flex items-center gap-3 mt-2">
+                                    <div className="text-muted-foreground truncate" title={order.users.phone}>{order.users.phone}</div>
+                                    <a
+                                        href={`https://wa.me/${order.users.phone.replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
+                                        title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
+                                    >
+                                        <MessageCircle className="h-3 w-3 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
+                                        WhatsApp
+                                    </a>
+                                </div>
                             )}
                         </div>
                     </div>
+
+                    {/* Customer Notes */}
+                    {order.notes && (
+                        <div className="border rounded-md p-4 space-y-3">
+                            <h3 className="font-medium">{t('orders.details.customerNotes', 'Customer Notes')}</h3>
+                            <div className="text-sm whitespace-pre-wrap text-muted-foreground">
+                                {order.notes}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Payment Info */}
                     <div className="border rounded-md p-4 space-y-3">
@@ -215,10 +237,10 @@ export default function OrderDetailPage() {
                                 <span className="text-muted-foreground shrink-0">{t('orders.details.method')}:</span>
                                 <span className="text-right truncate flex-1" title={order.payment_methods?.name || 'N/A'}>{order.payment_methods?.name || 'N/A'}</span>
                             </div>
-                            {order.transferred_from_number && (
+                            {order.number_transferred_from && (
                                 <div className="flex justify-between align-top gap-2">
                                     <span className="text-muted-foreground shrink-0">{t('orders.details.transferFrom')}:</span>
-                                    <span className="text-right truncate flex-1" title={order.transferred_from_number}>{order.transferred_from_number}</span>
+                                    <span className="text-right truncate flex-1" title={order.number_transferred_from}>{order.number_transferred_from}</span>
                                 </div>
                             )}
                             {order.payment_number && (
@@ -242,11 +264,15 @@ export default function OrderDetailPage() {
                     <StatusTimeline order={order} />
 
                     {/* Coupon Info */}
-                    {order.used_coupon && (
+                    {order.coupon_usages && order.coupon_usages.length > 0 && (
                         <div className="border rounded-md p-4 space-y-2">
                             <h3 className="font-medium">{t('orders.details.couponInfo')}</h3>
-                            <div className="text-sm">
-                                <span className="font-mono bg-muted px-2 py-1 rounded inline-block">{order.used_coupon}</span>
+                            <div className="flex flex-wrap gap-2 text-sm">
+                                {order.coupon_usages.map((cu, idx) => (
+                                    <span key={cu.id || idx} className="font-mono bg-muted px-2 py-1 rounded inline-block">
+                                        {cu.coupons?.code || cu.coupon?.code || cu.code || t('orders.details.couponInfo')}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     )}
