@@ -1,5 +1,5 @@
 ---
-description: How to follow the core frontend architectural design and principles when implementing a task.
+description: How to follow the core frontend architectural design and principles when implementing a task.sss
 ---
 
 This workflow outlines the established patterns in the frontend architecture. Developers and agents should strictly adhere to these principles for consistency and maintainability when working on the frontend (`kalima-platform/frontend`).
