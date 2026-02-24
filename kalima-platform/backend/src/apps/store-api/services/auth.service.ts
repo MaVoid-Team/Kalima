@@ -164,7 +164,7 @@ class AuthService {
         name: user.name,
         role: this.formatRoleName(user.role!),
         provider: firebaseUser.provider,
-        loginUrl: `${APP_URL}/auth/login`,
+        loginUrl: `${APP_URL}/login`,
       });
     }
 
@@ -190,7 +190,7 @@ class AuthService {
         name: user.name,
         role: this.formatRoleName(user.role!),
         provider: firebaseUser.provider,
-        loginUrl: `${APP_URL}/auth/login`,
+        loginUrl: `${APP_URL}/login`,
       });
     }
 
@@ -216,7 +216,7 @@ class AuthService {
         name: user.name,
         role: this.formatRoleName(user.role!),
         provider: firebaseUser.provider,
-        loginUrl: `${APP_URL}/auth/login`,
+        loginUrl: `${APP_URL}/login`,
       });
     }
 
@@ -242,7 +242,7 @@ class AuthService {
         name: user.name,
         role: this.formatRoleName(user.role!),
         provider: firebaseUser.provider,
-        loginUrl: `${APP_URL}/auth/login`,
+        loginUrl: `${APP_URL}/login`,
       });
     }
 
@@ -587,7 +587,7 @@ class AuthService {
     await this.userService.markEmailVerificationTokenUsed(verificationToken.id);
 
     // Send welcome email
-    const loginUrl = `${APP_URL}/auth/login`;
+    const loginUrl = `${APP_URL}/login`;
     const roleName = this.formatRoleName(verificationToken.users.role!);
 
     if (verificationToken.users.email) {

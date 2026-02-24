@@ -75,18 +75,14 @@ class ProductService {
     thumbnailFile?: Express.Multer.File,
     sampleFile?: Express.Multer.File,
   ): Promise<products> {
-    // If category_ids provided, verify they all exist
-    if (dto.category_ids && dto.category_ids.length > 0) {
-      const categories = await this.db.categories.findMany({
-        where: { id: { in: dto.category_ids } },
+    // If category_id provided, verify it exists
+    if (dto.category_id) {
+      const category = await this.db.categories.findUnique({
+        where: { id: dto.category_id },
         select: { id: true },
       });
-      if (categories.length !== dto.category_ids.length) {
-        const foundIds = new Set(categories.map((c) => c.id));
-        const missing = dto.category_ids.filter((id) => !foundIds.has(id));
-        throw new NotFoundError(
-          `Category ID(s) not found: ${missing.join(", ")}`,
-        );
+      if (!category) {
+        throw new NotFoundError(`Category ID not found: ${dto.category_id}`);
       }
     }
 
@@ -111,17 +107,18 @@ class ProductService {
         serial: dto.serial,
         sample_url: dto.sample_url,
         thumbnail_id: thumbnailId,
+        perks: dto.perks,
       },
       include: PRODUCT_INCLUDE,
     });
 
-    // Attach categories if provided
-    if (dto.category_ids && dto.category_ids.length > 0) {
-      await this.db.product_categories.createMany({
-        data: dto.category_ids.map((categoryId) => ({
+    // Attach category if provided
+    if (dto.category_id) {
+      await this.db.product_categories.create({
+        data: {
           product_id: product.id,
-          category_id: categoryId,
-        })),
+          category_id: dto.category_id,
+        },
       });
     }
 
@@ -226,6 +223,7 @@ class ProductService {
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
+    if (dto.perks !== undefined) data.perks = dto.perks;
 
     const updated = await this.db.products.update({
       where: { id },
@@ -541,9 +539,7 @@ class ProductService {
   // REQUIRED FIELDS — GET
   // ============================================
 
-  async getProductRequiredFields(
-    productId: number,
-  ): Promise<any[]> {
+  async getProductRequiredFields(productId: number): Promise<any[]> {
     const product = await this.db.products.findFirst({
       where: { id: productId, deleted_at: null },
     });

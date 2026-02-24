@@ -10,7 +10,11 @@ import {
   AttachCategoriesDto,
   AttachRequiredFieldsDto,
 } from "../dtos/product.dto";
-import { ValidationError, BadRequestError, NotFoundError } from "../../../libs/errors";
+import {
+  ValidationError,
+  BadRequestError,
+  NotFoundError,
+} from "../../../libs/errors";
 
 // ============================================
 // HELPER
@@ -52,15 +56,13 @@ export const productController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      // Parse category_ids from JSON string if sent via form-data
-      if (typeof req.body.category_ids === "string") {
-        try {
-          req.body.category_ids = JSON.parse(req.body.category_ids);
-        } catch {
-          throw new BadRequestError(
-            "category_ids must be a valid JSON array of integers",
-          );
+      // Parse category_id from string if sent via form-data
+      if (typeof req.body.category_id === "string") {
+        const parsed = parseInt(req.body.category_id, 10);
+        if (isNaN(parsed)) {
+          throw new BadRequestError("category_id must be a valid integer");
         }
+        req.body.category_id = parsed;
       }
 
       const dto = await validateDto(CreateProductDto, req.body);
@@ -157,9 +159,7 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const active =
-        req.query.active !== undefined
-          ? req.query.active === "true"
-          : true;
+        req.query.active !== undefined ? req.query.active === "true" : true;
 
       const coupons = await couponService.getCouponsByProduct(id, active);
 
@@ -184,7 +184,7 @@ export const productController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
-      const product = await productService.getProductById(id) as any;
+      const product = (await productService.getProductById(id)) as any;
 
       if (!product.thumbnail_image) {
         throw new NotFoundError("Thumbnail not found for this product");
