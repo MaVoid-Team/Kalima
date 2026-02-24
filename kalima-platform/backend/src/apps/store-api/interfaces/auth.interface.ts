@@ -88,6 +88,7 @@ export interface BaseUserData {
   secondary_phone?: string | null;
   gender: string;
   is_email_verified: boolean;
+  confirmed: boolean;
   profile_pic_url?: string | null;
   created_at: Date;
 }

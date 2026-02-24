@@ -2,6 +2,7 @@ import { Router } from "express";
 import { cartController } from "../../controllers/cart.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { uploadSingleImage } from "../../middleware/upload.middleware";
+import { requireConfirmed } from "../../middleware/requireConfirmed.middleware";
 
 const router = Router();
 
@@ -47,6 +48,7 @@ router.patch(
 router.get("/checkout/preview", cartController.getCheckoutPreview);
 router.post(
   "/checkout",
+  requireConfirmed,
   uploadSingleImage("paymentScreenshot"),
   cartController.checkout,
 );
@@ -75,6 +77,7 @@ router.patch(
 router.get("/fast-buy/checkout/preview", cartController.getFastBuyCheckoutPreview);
 router.post(
   "/fast-buy/checkout",
+  requireConfirmed,
   uploadSingleImage("paymentScreenshot"),
   cartController.fastBuyCheckout,
 );

@@ -81,8 +81,18 @@ model users {
   coupon_usages             coupon_usages[]
   creator_user              users?                     @relation("UserCreator", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
   created_users             users[]                    @relation("UserCreator")
+  account_review_settings_updated account_review_settings[] @relation("AccountReviewUpdatedBy")
 
   @@index([mongo_id], map: "ix_users_mongo_id")
+}
+
+model account_review_settings {
+  id              Int        @id @default(autoincrement())
+  role            role_enum  @unique
+  requires_review Boolean?   @default(false)
+  updated_at      DateTime?  @db.Timestamp(6)
+  updated_by      Int?
+  updated_by_user users?     @relation("AccountReviewUpdatedBy", fields: [updated_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
 
 model refresh_tokens {

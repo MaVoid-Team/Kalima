@@ -17,6 +17,13 @@ const adminAuth = [
 // USER MANAGEMENT
 // ============================================
 
+// ============================================
+// ACCOUNT REVIEW
+// ============================================
+
+router.get("/account-review-settings", ...adminAuth, adminController.getAccountReviewSettings);
+router.put("/account-review-settings", ...adminAuth, adminController.upsertAccountReviewSettings);
+
 // Create user (respects privilege matrix)
 router.post("/users", ...adminAuth, adminController.createUser);
 
@@ -28,6 +35,10 @@ router.get("/users/stats/created-accounts", ...adminAuth, adminUserStatsControll
 
 // Get single user with all roles
 router.get("/users/:userId", ...adminAuth, adminController.getUser);
+
+// Account review: approve / reject users (must be before :userId/roles to avoid conflict)
+router.post("/users/:userId/approve", ...adminAuth, adminController.approveUser);
+router.post("/users/:userId/reject", ...adminAuth, adminController.rejectUser);
 
 // ============================================
 // ROLE MANAGEMENT
