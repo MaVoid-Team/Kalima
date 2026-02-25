@@ -320,7 +320,7 @@ export const adminDashboardController = {
 
   /**
    * GET /admin/dashboard/user-stats
-   * Returns: total users, total users per role (distinct users), total verified users.
+   * Returns: total users, total users per role, total verified users.
    */
   async getUserStats(
     req: Request,
@@ -331,17 +331,16 @@ export const adminDashboardController = {
       const [totalUsers, totalVerifiedUsers, countsByRole] = await Promise.all([
         prisma.users.count(),
         prisma.users.count({ where: { is_email_verified: true } }),
-        prisma.$queryRaw<{ role: string; count: bigint }[]>`
-          SELECT role, COUNT(DISTINCT user_id)::bigint as count
-          FROM user_roles
-          GROUP BY role
-          ORDER BY role
-        `,
+        prisma.user_roles.groupBy({
+          by: ["role"],
+          _count: { user_id: true },
+          orderBy: { role: "asc" },
+        }),
       ]);
 
       const byRole: Record<string, number> = {};
       countsByRole.forEach((row) => {
-        byRole[row.role] = Number(row.count);
+        byRole[row.role] = row._count.user_id;
       });
 
       res.status(200).json({
