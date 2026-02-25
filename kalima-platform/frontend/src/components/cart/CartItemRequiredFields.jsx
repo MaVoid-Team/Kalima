@@ -18,7 +18,7 @@ export default function CartItemRequiredFields({
     onOpenChange
 }) {
     const { t } = useTranslation('cart');
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
     const [fieldValues, setFieldValues] = useState({});
     const [imageFields, setImageFields] = useState({});
     const [originalImages, setOriginalImages] = useState({});
@@ -134,6 +134,7 @@ export default function CartItemRequiredFields({
             <Accordion
                 type="single"
                 collapsible
+                defaultValue="fields"
                 className="w-full mb-2 overflow-x-hidden"
                 onValueChange={val => {
                     const open = !!val;
