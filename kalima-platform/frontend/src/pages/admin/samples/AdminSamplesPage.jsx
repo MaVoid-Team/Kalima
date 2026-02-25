@@ -5,16 +5,26 @@ import { FileText, Download, ExternalLink, ChevronLeft, ChevronRight } from 'luc
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
 import useApiMutation from '@/hooks/useApiMutation';
+import useExport from '@/hooks/useExport';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
     const { mutate: fetchApi, loading } = useApiMutation();
+    const { exportData, loading: exportLoading } = useExport();
 
     const [samples, setSamples] = useState([]);
     const [fetched, setFetched] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
 
     const loadSamples = useCallback(async () => {
         try {
@@ -31,6 +41,28 @@ export default function AdminSamplesPage() {
         loadSamples();
     }, [loadSamples]);
 
+    const handleSelect = (id, checked) => {
+        setSelectedIds(prev =>
+            checked ? [...prev, id] : prev.filter(selectedId => selectedId !== id)
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(samples.map(s => s.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleExport = (format) => {
+        exportData({
+            resource: 'samples',
+            format,
+            ids: selectedIds,
+        });
+    };
+
     return (
         <div className="space-y-6" data-testid="admin-samples-page">
             {/* Header */}
@@ -39,11 +71,39 @@ export default function AdminSamplesPage() {
                     <h1 className="text-2xl font-bold tracking-tight">{t('samples.title')}</h1>
                     <p className="text-muted-foreground text-sm mt-1">{t('samples.subtitle')}</p>
                 </div>
-                {fetched && !loading && (
-                    <Badge variant="outline" className="shrink-0" data-testid="admin-samples-count">
-                        {samples.length} {t('samples.count', { count: samples.length })}
-                    </Badge>
-                )}
+                <div className="flex items-center gap-3">
+                    {fetched && !loading && (
+                        <Badge variant="outline" className="shrink-0" data-testid="admin-samples-count">
+                            {samples.length} {t('samples.count', { count: samples.length })}
+                        </Badge>
+                    )}
+
+                    {/* Export dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline" data-testid="samples-export-button">
+                                <Download className="me-2 h-4 w-4" />
+                                {t('orders.export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => handleExport('csv')}
+                                disabled={exportLoading}
+                                data-testid="samples-export-csv"
+                            >
+                                {t('orders.exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => handleExport('xlsx')}
+                                disabled={exportLoading}
+                                data-testid="samples-export-excel"
+                            >
+                                {t('orders.exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             {/* Table / List */}
@@ -63,7 +123,15 @@ export default function AdminSamplesPage() {
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground">
                             <tr>
-                                <th className="text-start ps-4 py-3 font-medium">{t('samples.table.file')}</th>
+                                <th className="ps-4 py-3 w-10">
+                                    <Checkbox
+                                        checked={samples.length > 0 && selectedIds.length === samples.length}
+                                        onCheckedChange={handleSelectAll}
+                                        aria-label="Select all samples"
+                                        data-testid="samples-table-select-all"
+                                    />
+                                </th>
+                                <th className="text-start py-3 font-medium">{t('samples.table.file')}</th>
                                 <th className="text-start py-3 font-medium hidden sm:table-cell">{t('samples.table.product')}</th>
                                 <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.table.size')}</th>
                                 <th className="text-start py-3 font-medium hidden md:table-cell">{t('samples.table.type')}</th>
@@ -73,8 +141,18 @@ export default function AdminSamplesPage() {
                         <tbody className="divide-y divide-border">
                             {samples.map((sample) => (
                                 <tr key={sample.id} className="hover:bg-muted/30 transition-colors" data-testid={`admin-samples-row-${sample.id}`}>
-                                    {/* File name */}
+                                    {/* Checkbox */}
                                     <td className="ps-4 py-3">
+                                        <Checkbox
+                                            checked={selectedIds.includes(sample.id)}
+                                            onCheckedChange={(checked) => handleSelect(sample.id, checked)}
+                                            aria-label={`Select sample ${sample.original_name}`}
+                                            data-testid={`samples-table-select-${sample.id}`}
+                                        />
+                                    </td>
+
+                                    {/* File name */}
+                                    <td className="py-3">
                                         <div className="flex items-center gap-2">
                                             <FileText className="h-4 w-4 text-primary shrink-0" />
                                             <span className="font-medium truncate max-w-[180px]">{sample.original_name}</span>

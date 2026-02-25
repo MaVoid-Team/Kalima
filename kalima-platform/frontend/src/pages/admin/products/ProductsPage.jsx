@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Package, PlusCircle } from 'lucide-react';
+import { Package, PlusCircle, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import useExport from '@/hooks/useExport';
 import {
     Pagination,
     PaginationContent,
@@ -15,6 +16,12 @@ import {
     PaginationEllipsis,
     generatePaginationLinks
 } from '@/components/ui/pagination';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
@@ -39,6 +46,9 @@ export default function ProductsPage() {
         setPage,
     } = useAdminProducts();
 
+    const { exportData, loading: exportLoading } = useExport();
+    const [selectedIds, setSelectedIds] = useState([]);
+
     const [editProduct, setEditProduct] = useState(null);
     const [editOpen, setEditOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
@@ -51,6 +61,20 @@ export default function ProductsPage() {
     useEffect(() => {
         load();
     }, [load]);
+
+    const handleSelect = (id, checked) => {
+        setSelectedIds(prev =>
+            checked ? [...prev, id] : prev.filter(selectedId => selectedId !== id)
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(products.map(p => p.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
 
     const handleEdit = (product) => {
         setEditProduct(product);
@@ -77,6 +101,15 @@ export default function ProductsPage() {
         }
     };
 
+    const handleExport = (format) => {
+        exportData({
+            resource: 'products',
+            format,
+            ids: selectedIds,
+            filters,
+        });
+    };
+
     return (
         <div className="space-y-6 no-scrollbar" data-testid="products-page">
             {/* Header */}
@@ -93,6 +126,33 @@ export default function ProductsPage() {
                     <p className="text-sm text-muted-foreground hidden sm:block">
                         {t('products.totalProducts', { count: pagination.total })}
                     </p>
+
+                    {/* Export dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline" data-testid="products-export-button">
+                                <Download className="me-2 h-4 w-4" />
+                                {t('orders.export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => handleExport('csv')}
+                                disabled={exportLoading}
+                                data-testid="products-export-csv"
+                            >
+                                {t('orders.exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => handleExport('xlsx')}
+                                disabled={exportLoading}
+                                data-testid="products-export-excel"
+                            >
+                                {t('orders.exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <Link to="/admin/products/create">
                         <Button data-testid="create-product-page-trigger">
                             <PlusCircle className="me-2 h-4 w-4" />
@@ -117,6 +177,9 @@ export default function ProductsPage() {
                 onEdit={handleEdit}
                 onArchiveToggle={handleArchiveToggle}
                 onDelete={handleDelete}
+                selectedIds={selectedIds}
+                onSelect={handleSelect}
+                onSelectAll={handleSelectAll}
             />
 
             {/* Pagination */}

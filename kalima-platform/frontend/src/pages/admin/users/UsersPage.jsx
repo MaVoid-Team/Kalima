@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UsersIcon } from 'lucide-react';
+import { UsersIcon, Download } from 'lucide-react';
 
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
+import useExport from '@/hooks/useExport';
+import { Button } from '@/components/ui/button';
 import {
     Pagination,
     PaginationContent,
@@ -13,6 +15,12 @@ import {
     PaginationEllipsis,
     generatePaginationLinks
 } from '@/components/ui/pagination';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import UserFilters from '@/components/admin/users/UserFilters';
 import UsersTable from '@/components/admin/users/UsersTable';
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
@@ -33,10 +41,35 @@ export default function UsersPage() {
         setPage
     } = useAdminUsers();
 
-    // Fetch users when component mounts or dependencies change
+    const { exportData, loading: exportLoading } = useExport();
+    const [selectedIds, setSelectedIds] = useState([]);
+
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    const handleSelect = (id, checked) => {
+        setSelectedIds(prev =>
+            checked ? [...prev, id] : prev.filter(selectedId => selectedId !== id)
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(users.map(u => u.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleExport = (format) => {
+        exportData({
+            resource: 'admin/users',
+            format,
+            ids: selectedIds,
+            filters,
+        });
+    };
 
     return (
         <div className="space-y-6 no-scrollbar">
@@ -55,6 +88,33 @@ export default function UsersPage() {
                     <p className="text-sm text-muted-foreground hidden sm:block">
                         {t('totalUsers', { count: pagination.total })}
                     </p>
+
+                    {/* Export dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline" data-testid="users-export-button">
+                                <Download className="me-2 h-4 w-4" />
+                                {t('export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => handleExport('csv')}
+                                disabled={exportLoading}
+                                data-testid="users-export-csv"
+                            >
+                                {t('exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => handleExport('xlsx')}
+                                disabled={exportLoading}
+                                data-testid="users-export-excel"
+                            >
+                                {t('exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <CreateUserDialog onSuccess={fetchUsers} />
                 </div>
             </div>
@@ -71,6 +131,9 @@ export default function UsersPage() {
             <UsersTable
                 users={users}
                 loading={loading}
+                selectedIds={selectedIds}
+                onSelect={handleSelect}
+                onSelectAll={handleSelectAll}
             />
 
             {pagination.pages > 1 && (
