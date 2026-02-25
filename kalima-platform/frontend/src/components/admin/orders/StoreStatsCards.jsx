@@ -36,37 +36,37 @@ export default function StoreStatsCards() {
 
     const stats = [
         {
-            title: t('orders.stats.totalPurchases', 'Total Purchases'),
+            title: t('orders.statsToday.totalPurchases', 'Total Purchases'),
             value: dailyStoreStats.totalPurchases || 0,
             icon: ShoppingCart,
             color: "text-primary"
         },
         {
-            title: t('orders.stats.totalRevenue', 'Total Revenue'),
+            title: t('orders.statsToday.totalRevenue', 'Total Revenue'),
             value: formatCurrency(dailyStoreStats.totalRevenue || 0, t),
             icon: DollarSign,
             color: "text-success"
         },
         {
-            title: t('orders.stats.averagePrice', 'Average Price'),
+            title: t('orders.statsToday.averagePrice', 'Average Price'),
             value: formatCurrency(dailyStoreStats.averagePrice || 0, t),
             icon: Activity,
             color: "text-chart-2"
         },
         {
-            title: t('orders.stats.confirmedPurchases', 'Confirmed Purchases'),
+            title: t('orders.statsToday.confirmedPurchases', 'Confirmed Purchases'),
             value: dailyStoreStats.confirmedPurchases || 0,
             icon: CheckCircle,
             color: "text-chart-4"
         },
         {
-            title: t('orders.stats.confirmedRevenue', 'Confirmed Revenue'),
+            title: t('orders.statsToday.confirmedRevenue', 'Confirmed Revenue'),
             value: formatCurrency(dailyStoreStats.confirmedRevenue || 0, t),
             icon: DollarSign,
             color: "text-chart-5"
         },
         {
-            title: t('orders.stats.pendingPurchases', 'Pending Purchases'),
+            title: t('orders.statsToday.pendingPurchases', 'Pending Purchases'),
             value: dailyStoreStats.pendingPurchases || 0,
             icon: Clock,
             color: "text-chart-3"

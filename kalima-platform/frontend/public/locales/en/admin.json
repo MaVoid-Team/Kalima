@@ -26,6 +26,14 @@
             "confirmedRevenue": "Confirmed Revenue",
             "pendingPurchases": "Pending Purchases"
         },
+        "statsToday": {
+            "totalPurchases": "Total Purchases Today",
+            "totalRevenue": "Total Revenue Today",
+            "averagePrice": "Average price Today",
+            "confirmedPurchases": "Confirmed Purchases Today",
+            "confirmedRevenue": "Confirmed Revenue Today",
+            "pendingPurchases": "Pending Purchases Today"
+        },
         "status": {
             "label": "Status",
             "all": "All Orders",
