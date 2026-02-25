@@ -599,7 +599,7 @@ export type $parent_childrenPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type parent_childrenGetPayload<S extends boolean | null | undefined | parent_childrenDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$parent_childrenPayload, S>
 
 export type parent_childrenCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<parent_childrenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<parent_childrenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Parent_childrenCountAggregateInputType | true
   }
 
@@ -1044,6 +1044,7 @@ export type parent_childrenFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which parent_children to fetch.
    */
   where: Prisma.parent_childrenWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,6 +1067,7 @@ export type parent_childrenFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which parent_children to fetch.
    */
   where: Prisma.parent_childrenWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1118,6 +1120,7 @@ export type parent_childrenFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of parent_children.
    */
   distinct?: Prisma.Parent_childrenScalarFieldEnum | Prisma.Parent_childrenScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1170,6 +1173,7 @@ export type parent_childrenFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of parent_children.
    */
   distinct?: Prisma.Parent_childrenScalarFieldEnum | Prisma.Parent_childrenScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1217,6 +1221,7 @@ export type parent_childrenFindManyArgs<ExtArgs extends runtime.Types.Extensions
    */
   skip?: number
   distinct?: Prisma.Parent_childrenScalarFieldEnum | Prisma.Parent_childrenScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1239,6 +1244,7 @@ export type parent_childrenCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a parent_children.
    */
   data: Prisma.XOR<Prisma.parent_childrenCreateInput, Prisma.parent_childrenUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1299,6 +1305,7 @@ export type parent_childrenUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which parent_children to update.
    */
   where: Prisma.parent_childrenWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1377,6 +1384,7 @@ export type parent_childrenUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the parent_children was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.parent_childrenUpdateInput, Prisma.parent_childrenUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1399,6 +1407,7 @@ export type parent_childrenDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which parent_children to delete.
    */
   where: Prisma.parent_childrenWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -530,7 +530,7 @@ export type $email_verification_tokensPayload<ExtArgs extends runtime.Types.Exte
 export type email_verification_tokensGetPayload<S extends boolean | null | undefined | email_verification_tokensDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$email_verification_tokensPayload, S>
 
 export type email_verification_tokensCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<email_verification_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<email_verification_tokensFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: Email_verification_tokensCountAggregateInputType | true
   }
 
@@ -977,6 +977,7 @@ export type email_verification_tokensFindUniqueArgs<ExtArgs extends runtime.Type
    * Filter, which email_verification_tokens to fetch.
    */
   where: Prisma.email_verification_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -999,6 +1000,7 @@ export type email_verification_tokensFindUniqueOrThrowArgs<ExtArgs extends runti
    * Filter, which email_verification_tokens to fetch.
    */
   where: Prisma.email_verification_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1051,6 +1053,7 @@ export type email_verification_tokensFindFirstArgs<ExtArgs extends runtime.Types
    * Filter by unique combinations of email_verification_tokens.
    */
   distinct?: Prisma.Email_verification_tokensScalarFieldEnum | Prisma.Email_verification_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1103,6 +1106,7 @@ export type email_verification_tokensFindFirstOrThrowArgs<ExtArgs extends runtim
    * Filter by unique combinations of email_verification_tokens.
    */
   distinct?: Prisma.Email_verification_tokensScalarFieldEnum | Prisma.Email_verification_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1150,6 +1154,7 @@ export type email_verification_tokensFindManyArgs<ExtArgs extends runtime.Types.
    */
   skip?: number
   distinct?: Prisma.Email_verification_tokensScalarFieldEnum | Prisma.Email_verification_tokensScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1177,7 @@ export type email_verification_tokensCreateArgs<ExtArgs extends runtime.Types.Ex
    * The data needed to create a email_verification_tokens.
    */
   data: Prisma.XOR<Prisma.email_verification_tokensCreateInput, Prisma.email_verification_tokensUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1232,6 +1238,7 @@ export type email_verification_tokensUpdateArgs<ExtArgs extends runtime.Types.Ex
    * Choose, which email_verification_tokens to update.
    */
   where: Prisma.email_verification_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1310,6 +1317,7 @@ export type email_verification_tokensUpsertArgs<ExtArgs extends runtime.Types.Ex
    * In case the email_verification_tokens was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.email_verification_tokensUpdateInput, Prisma.email_verification_tokensUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1340,7 @@ export type email_verification_tokensDeleteArgs<ExtArgs extends runtime.Types.Ex
    * Filter which email_verification_tokens to delete.
    */
   where: Prisma.email_verification_tokensWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

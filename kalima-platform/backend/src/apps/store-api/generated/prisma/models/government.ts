@@ -719,7 +719,7 @@ export type $governmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type governmentGetPayload<S extends boolean | null | undefined | governmentDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$governmentPayload, S>
 
 export type governmentCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<governmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<governmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: GovernmentCountAggregateInputType | true
   }
 
@@ -1166,6 +1166,7 @@ export type governmentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which government to fetch.
    */
   where: Prisma.governmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1188,6 +1189,7 @@ export type governmentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which government to fetch.
    */
   where: Prisma.governmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1240,6 +1242,7 @@ export type governmentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of governments.
    */
   distinct?: Prisma.GovernmentScalarFieldEnum | Prisma.GovernmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1292,6 +1295,7 @@ export type governmentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of governments.
    */
   distinct?: Prisma.GovernmentScalarFieldEnum | Prisma.GovernmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1339,6 +1343,7 @@ export type governmentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   skip?: number
   distinct?: Prisma.GovernmentScalarFieldEnum | Prisma.GovernmentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1361,6 +1366,7 @@ export type governmentCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a government.
    */
   data: Prisma.XOR<Prisma.governmentCreateInput, Prisma.governmentUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1417,6 +1423,7 @@ export type governmentUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which government to update.
    */
   where: Prisma.governmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1491,6 +1498,7 @@ export type governmentUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the government was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.governmentUpdateInput, Prisma.governmentUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1513,6 +1521,7 @@ export type governmentDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which government to delete.
    */
   where: Prisma.governmentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

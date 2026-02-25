@@ -3228,6 +3228,14 @@ export const Auth_identitiesScalarFieldEnum = {
 export type Auth_identitiesScalarFieldEnum = (typeof Auth_identitiesScalarFieldEnum)[keyof typeof Auth_identitiesScalarFieldEnum]
 
 
+export const RelationLoadStrategy = {
+  query: 'query',
+  join: 'join'
+} as const
+
+export type RelationLoadStrategy = (typeof RelationLoadStrategy)[keyof typeof RelationLoadStrategy]
+
+
 export const User_analyticsScalarFieldEnum = {
   user_id: 'user_id',
   views: 'views',
@@ -3269,7 +3277,8 @@ export const UsersScalarFieldEnum = {
   hasPromoCode: 'hasPromoCode',
   hasUsedPromoCode: 'hasUsedPromoCode',
   email_verified_at: 'email_verified_at',
-  role: 'role'
+  role: 'role',
+  created_by: 'created_by'
 } as const
 
 export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
@@ -3468,6 +3477,7 @@ export type Product_categoriesScalarFieldEnum = (typeof Product_categoriesScalar
 export const CouponsScalarFieldEnum = {
   id: 'id',
   code: 'code',
+  product_id: 'product_id',
   discount_amount: 'discount_amount',
   discount_percentage: 'discount_percentage',
   active: 'active',
@@ -3514,12 +3524,12 @@ export const ProductsScalarFieldEnum = {
   serial: 'serial',
   thumbnail_id: 'thumbnail_id',
   sample_url: 'sample_url',
-  coupon_id: 'coupon_id',
   is_archived: 'is_archived',
   mongo_id: 'mongo_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  perks: 'perks'
 } as const
 
 export type ProductsScalarFieldEnum = (typeof ProductsScalarFieldEnum)[keyof typeof ProductsScalarFieldEnum]

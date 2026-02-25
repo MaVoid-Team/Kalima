@@ -14,8 +14,11 @@ import {
 import { emitStorePurchaseToAdmins } from "./libs/redis/socketNotificationEmitter";
 import cors from "cors";
 import corsOptions from "./config/corsOptions";
+import { registerAllExportResources } from "./apps/store-api/export";
 
 const app = express();
+
+registerAllExportResources();
 
 app.use(cors(corsOptions));
 app.use(express.json());

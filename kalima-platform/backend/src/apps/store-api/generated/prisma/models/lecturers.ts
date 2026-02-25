@@ -540,7 +540,7 @@ export type $lecturersPayload<ExtArgs extends runtime.Types.Extensions.InternalA
 export type lecturersGetPayload<S extends boolean | null | undefined | lecturersDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$lecturersPayload, S>
 
 export type lecturersCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<lecturersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<lecturersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: LecturersCountAggregateInputType | true
   }
 
@@ -985,6 +985,7 @@ export type lecturersFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter, which lecturers to fetch.
    */
   where: Prisma.lecturersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1007,6 +1008,7 @@ export type lecturersFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which lecturers to fetch.
    */
   where: Prisma.lecturersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1059,6 +1061,7 @@ export type lecturersFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of lecturers.
    */
   distinct?: Prisma.LecturersScalarFieldEnum | Prisma.LecturersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1111,6 +1114,7 @@ export type lecturersFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of lecturers.
    */
   distinct?: Prisma.LecturersScalarFieldEnum | Prisma.LecturersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1158,6 +1162,7 @@ export type lecturersFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   skip?: number
   distinct?: Prisma.LecturersScalarFieldEnum | Prisma.LecturersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1180,6 +1185,7 @@ export type lecturersCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * The data needed to create a lecturers.
    */
   data: Prisma.XOR<Prisma.lecturersCreateInput, Prisma.lecturersUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1240,6 +1246,7 @@ export type lecturersUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Choose, which lecturers to update.
    */
   where: Prisma.lecturersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1318,6 +1325,7 @@ export type lecturersUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * In case the lecturers was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.lecturersUpdateInput, Prisma.lecturersUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1340,6 +1348,7 @@ export type lecturersDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter which lecturers to delete.
    */
   where: Prisma.lecturersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

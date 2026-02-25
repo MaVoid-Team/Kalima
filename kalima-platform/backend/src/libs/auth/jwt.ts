@@ -1,5 +1,6 @@
-import jwt, { type SignOptions } from "jsonwebtoken";
-import crypto from "crypto";
+import * as jwt from "jsonwebtoken";
+import type { SignOptions } from "jsonwebtoken";
+import * as crypto from "crypto";
 import { prisma } from "../db/prisma";
 
 function getJwtSecret(): string {

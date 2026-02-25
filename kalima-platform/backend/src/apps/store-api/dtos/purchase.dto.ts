@@ -83,9 +83,15 @@ export class CreatePurchaseDto {
 }
 
 export class AdminNoteDto {
+  @IsOptional()
   @IsString()
   @MaxLength(5000)
-  admin_notes: string;
+  admin_notes?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(5000)
+  adminNote?: string;
 }
 
 export class PurchaseFilterDto {
