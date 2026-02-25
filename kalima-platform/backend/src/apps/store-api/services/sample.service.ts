@@ -25,6 +25,47 @@ const MIME_TO_EXT: Record<string, string> = {
     ".docx",
 };
 
+const SAMPLE_LIST_SELECT = {
+  id: true,
+  url: true,
+  original_name: true,
+  mime_type: true,
+  size: true,
+  created_at: true,
+  products: {
+    select: {
+      id: true,
+      title: true,
+    },
+  },
+};
+
+interface SampleListFilters {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface SampleResponse {
+  id: number;
+  url: string;
+  original_name: string;
+  mime_type: string;
+  size: number;
+  created_at: Date;
+  products: {
+    id: number;
+    title: string;
+  };
+}
+
+interface SampleListResponse {
+  data: SampleResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 // ============================================
 // SAMPLE SERVICE
 // ============================================
@@ -79,11 +120,39 @@ class SampleService {
     return sample;
   }
 
-  async getAllSamples(): Promise<samples[]> {
-    return this.db.samples.findMany({
-      include: { products: true },
-      orderBy: { created_at: "desc" },
-    });
+  async getAllSamples(
+    filters?: SampleListFilters,
+  ): Promise<SampleListResponse> {
+    const page = filters?.page ?? 1;
+    const limit = filters?.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (filters?.search) {
+      where.OR = [
+        { title: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.db.samples.findMany({
+        where,
+        select: SAMPLE_LIST_SELECT,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.samples.count({ where }),
+    ]);
+
+    return {
+      data: data,
+      total: total,
+      page,
+      limit,
+    };
   }
 
   async getSampleById(id: number): Promise<samples> {
