@@ -16,6 +16,7 @@ import {
 import UserFilters from '@/components/admin/users/UserFilters';
 import UsersTable from '@/components/admin/users/UsersTable';
 import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
+import UserStatsCards from '@/components/admin/users/UserStatsCards';
 
 export default function UsersPage() {
     const { t } = useTranslation('userManagement');
@@ -57,6 +58,8 @@ export default function UsersPage() {
                     <CreateUserDialog onSuccess={fetchUsers} />
                 </div>
             </div>
+
+            <UserStatsCards />
 
             <UserFilters
                 filters={filters}
