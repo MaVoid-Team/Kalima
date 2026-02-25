@@ -110,7 +110,9 @@
             "return": "إرجاع الطلب",
             "delete": "حذف الطلب",
             "deleteItem": "حذف العنصر",
-            "whatsapp": "تواصل عبر واتساب"
+            "whatsapp": "تواصل عبر واتساب",
+            "collapseItems": "إخفاء العناصر",
+            "expandItems": "عرض العناصر"
         },
         "messages": {
             "receiveSuccess": "تم تحديث الطلب إلى مستلم",

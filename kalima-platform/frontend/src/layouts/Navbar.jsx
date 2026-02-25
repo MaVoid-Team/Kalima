@@ -16,6 +16,7 @@ import logo from "../assets/Logo.png";
 import CartPreview from "../components/cart/CartPreview";
 import useAuth from "../hooks/auth/useAuth";
 import { useCart } from "../contexts/CartContext";
+import { useRole } from "@/hooks/useRole";
 
 export default function Navbar() {
   const { cart, loading } = useCart();
@@ -23,6 +24,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
+  const { isAdmin } = useRole();
   // getCart is now handled by provider; cart data available directly
   const navigate = useNavigate();
   const location = useLocation();
@@ -162,14 +164,14 @@ export default function Navbar() {
                   >
                     <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
                   </Button>
-                  <Button
+                  {isAdmin && <Button
                     variant="default"
                     size="default"
                     className="font-bold px-6"
                     asChild
                   >
                     <Link to="/admin/orders">{t("navbar.dashboard", "Dashboard")}</Link>
-                  </Button>
+                  </Button>}
                   <Button
                     variant="outline"
                     size="default"
@@ -275,21 +277,21 @@ export default function Navbar() {
                   {isAuthenticated ? (
                     <>
                       <Button
-                        variant="outline"
+                        variant="default"
                         className="w-full font-bold justify-center h-12 text-base"
                         onClick={() => setIsMenuOpen(false)}
                         asChild
                       >
                         <Link to="/orders">{t("navbar.myOrders", "My Orders")}</Link>
                       </Button>
-                      <Button
+                      {isAdmin && <Button
                         variant="default"
                         className="w-full font-bold justify-center h-12 text-base"
                         onClick={() => setIsMenuOpen(false)}
                         asChild
                       >
                         <Link to="/dashboard">{t("navbar.dashboard", "Dashboard")}</Link>
-                      </Button>
+                      </Button>}
                       <Button
                         variant="outline"
                         className="w-full font-bold justify-center h-12 text-base text-destructive hover:text-destructive/90 hover:bg-destructive/10 border-destructive/20 mt-2"
