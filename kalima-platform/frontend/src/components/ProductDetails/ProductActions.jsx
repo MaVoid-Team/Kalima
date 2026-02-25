@@ -3,6 +3,7 @@ import { Minus, Plus, ShoppingCart, Eye, ScanBarcode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { formatPrice, getImageUrl } from "@/lib/storeUtils";
 import { useCart } from "@/contexts/CartContext";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -12,10 +13,11 @@ import { useFastBuy } from "@/hooks/useFastBuy";
  * ProductActions
  * Props:
  *   - price: number
- *   - productId: string | number   (passed in for future cart integration)
- *   - sampleUrl: string | null
+ *   - productId: string | number
+ *   - sampleUrl: string | null   (legacy fallback — external URL)
+ *   - sampleId: number | null    (preferred — links to /samples/:id)
  */
-export default function ProductActions({ price, productId, sampleUrl }) {
+export default function ProductActions({ price, productId, sampleUrl, sampleId }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
   const { addToCart, loading } = useCart();
@@ -99,12 +101,19 @@ export default function ProductActions({ price, productId, sampleUrl }) {
             </Button>
           </div>
 
-          {sampleUrl && (
+          {(sampleId || sampleUrl) && (
             <Button variant="outline" className="w-full h-10" size="sm" asChild data-testid="product-actions-mobile-view-sample-button">
-              <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
-                <Eye className="h-4 w-4" />
-                <span className="ms-2">{t("actions.viewSample")}</span>
-              </a>
+              {sampleId ? (
+                <Link to={`/samples/${sampleId}`}>
+                  <Eye className="h-4 w-4" />
+                  <span className="ms-2">{t("actions.viewSample")}</span>
+                </Link>
+              ) : (
+                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                  <Eye className="h-4 w-4" />
+                  <span className="ms-2">{t("actions.viewSample")}</span>
+                </a>
+              )}
             </Button>
           )}
         </div>
@@ -166,7 +175,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               t("actions.buyNow")
             )}
           </Button>
-          {sampleUrl && (
+          {(sampleId || sampleUrl) && (
             <Button
               variant="outline"
               className="text-sm flex-1"
@@ -174,13 +183,15 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               asChild
               data-testid="product-actions-desktop-view-sample-button"
             >
-              <a
-                href={getImageUrl(sampleUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("actions.viewSample")}
-              </a>
+              {sampleId ? (
+                <Link to={`/samples/${sampleId}`}>
+                  {t("actions.viewSample")}
+                </Link>
+              ) : (
+                <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                  {t("actions.viewSample")}
+                </a>
+              )}
             </Button>
           )}
         </div>

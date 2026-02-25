@@ -124,5 +124,14 @@
   },
   "navigation": {
     "goBack": "Go Back"
+  },
+  "samples": {
+    "heroTitle": "Explore Free Samples",
+    "heroSubtitle": "Download or preview high quality resources, templates, and document samples before you buy.",
+    "availableSamples": "Available Samples",
+    "count": "Samples",
+    "noSamples": "No samples found.",
+    "view": "Preview",
+    "download": "Download"
   }
 }

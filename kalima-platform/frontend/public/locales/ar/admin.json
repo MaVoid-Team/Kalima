@@ -3,6 +3,7 @@
     "nav": {
         "orders": "الطلبات",
         "products": "المنتجات",
+        "samples": "العينات",
         "backToStore": "العودة للمتجر",
         "logout": "تسجيل الخروج"
     },
@@ -265,7 +266,28 @@
             "fieldType": "النوع",
             "fieldRequired": "مطلوب",
             "yes": "نعم",
-            "no": "لا"
+            "no": "لا",
+            "sample": "ملف العينة",
+            "noSample": "لا يوجد ملف عينة. يمكن إرفاق العينات عند إنشاء المنتج.",
+            "viewSample": "عرض بملء الشاشة",
+            "downloadSample": "تحميل",
+            "sampleFileName": "الملف",
+            "sampleFileSize": "الحجم",
+            "sampleFileType": "النوع",
+            "openSamplePage": "فتح صفحة العينة"
+        }
+    },
+    "samples": {
+        "title": "إدارة العينات",
+        "subtitle": "جميع ملفات عينات المنتجات في المتجر",
+        "count": "عينات",
+        "noSamples": "لا توجد ملفات عينات.",
+        "table": {
+            "file": "الملف",
+            "product": "المنتج",
+            "size": "الحجم",
+            "type": "النوع",
+            "actions": "الإجراءات"
         }
     }
 }

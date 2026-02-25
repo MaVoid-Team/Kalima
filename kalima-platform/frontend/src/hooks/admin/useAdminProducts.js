@@ -238,6 +238,18 @@ export const useAdminProducts = () => {
             return res;
         }));
 
+    // ─── Samples ──────────────────────────────────────────────────────────────
+
+    const fetchAllSamples = useCallback(async () => {
+        try {
+            const data = await fetchApi({ endpoint: '/samples', method: 'get' });
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch samples:', error);
+            return null;
+        }
+    }, [fetchApi]);
+
     // ─── Filter Setters ───────────────────────────────────────────────────────
 
     const setSearch = useCallback((query) => {
@@ -297,6 +309,9 @@ export const useAdminProducts = () => {
         // Required Fields
         attachRequiredFields,
         detachRequiredField,
+
+        // Samples
+        fetchAllSamples,
 
         // Filter Setters
         setSearch,
