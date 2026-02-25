@@ -63,6 +63,8 @@ router.delete(
   productController.removeThumbnail,
 );
 
+router.delete("/:id/sample", ...adminAuth, productController.removeSample);
+
 // ============================================
 // ADMIN / SUBADMIN — gallery
 // ============================================
