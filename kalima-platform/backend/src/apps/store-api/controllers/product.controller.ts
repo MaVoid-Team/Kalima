@@ -111,7 +111,8 @@ export const productController = {
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 20,
       };
 
-      const result = await productService.getAllProducts(filters);
+      const userId = (req.user as any)?.userId;
+      const result = await productService.getAllProducts(userId, filters);
 
       res.status(200).json({
         success: true,
@@ -134,6 +135,7 @@ export const productController = {
       const id = parseInt(req.params.id as string, 10);
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
+      const userId = (req.user as any)?.userId;
       const product = await productService.getProductById(id);
 
       res.status(200).json({

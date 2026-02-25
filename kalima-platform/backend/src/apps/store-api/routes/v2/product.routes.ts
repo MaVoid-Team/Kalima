@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { productController } from "../../controllers/product.controller";
-import { authenticateToken } from "../../../../libs/auth/middleware";
+import {
+  authenticateToken,
+  optionalAuthenticateToken,
+} from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import {
   uploadSingleImage,
@@ -18,12 +21,12 @@ const adminAuth = [
 ];
 
 // ============================================
-// PUBLIC — no auth required
+// PUBLIC — optionally authenticated
 // ============================================
 
 router.get("/export", ...adminAuth, makeExportHandler("products"));
-router.get("/", productController.getAllProducts);
-router.get("/:id", productController.getProductById);
+router.get("/", optionalAuthenticateToken, productController.getAllProducts);
+router.get("/:id", optionalAuthenticateToken, productController.getProductById);
 router.get("/:id/coupons", productController.getProductCoupons);
 router.get("/:id/thumbnail", productController.getThumbnail);
 router.get("/:id/gallery", productController.getGallery);
