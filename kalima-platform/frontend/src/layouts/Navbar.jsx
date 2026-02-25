@@ -299,7 +299,7 @@ export default function Navbar() {
                         onClick={() => setIsMenuOpen(false)}
                         asChild
                       >
-                        <Link to="/dashboard">{t("navbar.dashboard", "Dashboard")}</Link>
+                        <Link to="/admin/orders">{t("navbar.dashboard", "Dashboard")}</Link>
                       </Button>}
                       <Button
                         variant="outline"
