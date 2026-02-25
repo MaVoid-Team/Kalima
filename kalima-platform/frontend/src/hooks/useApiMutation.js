@@ -11,7 +11,7 @@ export default function useApiMutation() {
   const [error, setError] = useState(null);
 
   const mutate = useCallback(async (config) => {
-    const { endpoint, method = 'post', data, defaultSuccessMessage } = config;
+    const { endpoint, method = 'post', data, defaultSuccessMessage, onUploadProgress } = config;
 
     setLoading(true);
     setError(null);
@@ -19,6 +19,9 @@ export default function useApiMutation() {
     try {
       // if we are sending a FormData object, make sure we don't force JSON
       const axiosConfig = { method, url: endpoint, data };
+      if (onUploadProgress) {
+        axiosConfig.onUploadProgress = onUploadProgress;
+      }
       if (data instanceof FormData) {
         axiosConfig.headers = { 'Content-Type': 'multipart/form-data' };
       }
