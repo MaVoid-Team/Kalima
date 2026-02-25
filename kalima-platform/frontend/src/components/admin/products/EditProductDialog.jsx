@@ -445,7 +445,7 @@ export default function EditProductDialog({
                                             disabled={actionLoading || !currentChildren?.length}
                                         >
                                             <SelectTrigger className="flex-1" data-testid="edit-product-category-child-select">
-                                                <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory...')} />
+                                                <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory (optional)')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {currentChildren.map((child) => (

@@ -1,22 +1,47 @@
 import { PDFViewer } from '@embedpdf/react-pdf-viewer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Download, Maximize2, ExternalLink } from 'lucide-react';
+import { FileText, Download, Maximize2, ExternalLink, Link2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { getImageUrl, formatFileSize } from '@/lib/storeUtils';
 import SampleViewerDialog from './SampleViewerDialog';
+import { toast } from 'sonner';
 
 const PDF_MIME_TYPE = 'application/pdf';
 
 export default function SampleManager({ product }) {
     const { t } = useTranslation('admin');
     const [viewerOpen, setViewerOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     const sample = product?.samples;
     const sampleUrl = sample ? getImageUrl(sample.url) : null;
     const isPdf = sample?.mime_type === PDF_MIME_TYPE;
+
+    const shareLink = sample ? `${window.location.origin}/samples/${sample.id}` : null;
+
+    const handleCopyShareLink = async () => {
+        if (!shareLink) return;
+        try {
+            await navigator.clipboard.writeText(shareLink);
+            setCopied(true);
+            toast.success(t('products.detail.shareLinkCopied', 'Share link copied to clipboard!'));
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // Fallback for browsers without clipboard API
+            const el = document.createElement('textarea');
+            el.value = shareLink;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            setCopied(true);
+            toast.success(t('products.detail.shareLinkCopied', 'Share link copied to clipboard!'));
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     if (!sample) {
         return (
@@ -45,6 +70,39 @@ export default function SampleManager({ product }) {
                     {formatFileSize(sample.size)}
                 </span>
             </div>
+
+            {/* Quick share link display */}
+            {shareLink && (
+                <div
+                    className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm"
+                    data-testid="sample-manager-share-link-bar"
+                >
+                    <Link2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="flex-1 text-muted-foreground truncate font-mono text-xs">
+                        {shareLink}
+                    </span>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 shrink-0"
+                        onClick={handleCopyShareLink}
+                        data-testid="sample-manager-copy-link-button"
+                        title={t('products.detail.copyShareLink', 'Copy share link')}
+                    >
+                        {copied ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                            <Link2 className="h-4 w-4" />
+                        )}
+                        <span className="ms-1 text-xs hidden sm:inline">
+                            {copied
+                                ? t('products.detail.copied', 'Copied!')
+                                : t('products.detail.copyLink', 'Copy')}
+                        </span>
+                    </Button>
+                </div>
+            )}
 
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2">
