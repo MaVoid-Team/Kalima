@@ -469,6 +469,41 @@ Returns statistics on how many user accounts were created by each Admin/SubAdmin
 
 ---
 
+### User Stats (Analytics)
+
+Returns total users, total verified users, and count of unique users per role.
+
+**Endpoint:** `GET /admin/dashboard/user-stats`  
+**Auth Required:** Yes (Admin / SubAdmin)
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 1250,
+    "totalVerifiedUsers": 980,
+    "byRole": {
+      "Admin": 2,
+      "Teacher": 450,
+      "Student": 600,
+      "Parent": 150,
+      "Lecturer": 30,
+      "SubAdmin": 3,
+      "Moderator": 5,
+      "Assistant": 10
+    }
+  }
+}
+```
+
+- `totalUsers` — Total number of users in the system
+- `totalVerifiedUsers` — Number of users with `is_email_verified` true
+- `byRole` — Map of role name to count of distinct users with that role (a user with multiple role assignments counts once per role)
+
+---
+
 > **Planned Future Endpoints:**  
 > - `POST /admin/users/:userId/ban` — Ban/suspend a user
 > - `POST /admin/users/:userId/unban` — Unban a user
