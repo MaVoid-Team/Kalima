@@ -45,6 +45,9 @@ export default function OrdersTable({ orders, loading, onActionSuccess }) {
                                 <TableCell>
                                     <div className="font-medium">{order.users?.name || t('common.na', 'N/A')}</div>
                                     <div className="text-xs text-muted-foreground">{order.users?.email}</div>
+                                    {order.users?.phone && (
+                                        <div className="text-xs text-muted-foreground mt-0.5">{order.users.phone}</div>
+                                    )}
                                 </TableCell>
                                 <TableCell>
                                     <Badge variant="outline" className={getStatusColor(order.status)}>
@@ -88,6 +91,9 @@ export default function OrdersTable({ orders, loading, onActionSuccess }) {
                             <div>
                                 <div className="text-muted-foreground">{t('orders.table.customer')}</div>
                                 <div className="font-medium truncate" title={order.users?.name || t('common.na', 'N/A')}>{order.users?.name || t('common.na', 'N/A')}</div>
+                                {order.users?.phone && (
+                                    <div className="text-xs text-muted-foreground truncate mt-0.5" title={order.users.phone}>{order.users.phone}</div>
+                                )}
                             </div>
                             <div>
                                 <div className="text-muted-foreground">{t('orders.table.payment')}</div>
