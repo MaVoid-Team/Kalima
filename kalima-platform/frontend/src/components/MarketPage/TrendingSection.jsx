@@ -25,6 +25,7 @@ const TrendingSection = () => {
       priceAfterDiscount: 12.0,
       image: PRODUCT_IMAGES.CALCULUS,
       badge: null,
+      isPurchased: true
     },
     {
       id: 2,
@@ -34,6 +35,7 @@ const TrendingSection = () => {
       priceAfterDiscount: 19.99,
       image: PRODUCT_IMAGES.PENS,
       badge: null,
+      isPurchased: true
     },
     {
       id: 3,
@@ -43,6 +45,7 @@ const TrendingSection = () => {
       priceAfterDiscount: 6.5,
       image: PRODUCT_IMAGES.NOTEBOOK,
       badge: null,
+      isPurchased: true
     },
     {
       id: 4,
@@ -52,6 +55,7 @@ const TrendingSection = () => {
       priceAfterDiscount: 28.0,
       image: PRODUCT_IMAGES.LAMP,
       badge: null,
+      isPurchased: true
     },
   ];
 
