@@ -34,6 +34,11 @@ const ProductsPage = lazy(() => import("./pages/admin/products/ProductsPage"));
 const ProductDetailPage = lazy(() => import("./pages/admin/products/ProductDetailPage"));
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
+const AdminSamplesPage = lazy(() => import("./pages/admin/samples/AdminSamplesPage"));
+
+// Public viewer (no layout)
+const SamplePage = lazy(() => import("./pages/sample/SamplePage"));
+const SamplesDirectoryPage = lazy(() => import("./pages/sample/SamplesDirectoryPage"));
 
 
 // User lazy-loaded pages
@@ -61,6 +66,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/market" element={<MarketPage />} />
+            <Route path="/samples" element={<SamplesDirectoryPage />} />
             <Route path="/product/:id" element={<ProductDetailsPage />} />
             <Route path="/booklet/:id" element={<BookletDetailsPage />} />
 
@@ -87,8 +93,12 @@ function App() {
               <Route path="/admin/products/:id" element={<ProductDetailPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
+              <Route path="/admin/samples" element={<AdminSamplesPage />} />
             </Route>
           </Route >
+
+          {/* Public sample viewer — standalone, no MainLayout, no auth */}
+          <Route path="/samples/:id" element={<SamplePage />} />
 
           {/* Guest-only routes with AuthLayout (No Navbar/Footer) */}
           < Route element={< MainLayout />}>

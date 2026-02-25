@@ -16,6 +16,7 @@ import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import GalleryManager from '@/components/admin/products/GalleryManager';
 import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
+import SampleManager from '@/components/admin/products/SampleManager';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -209,6 +210,13 @@ export default function ProductDetailPage() {
                         loading={actionLoading}
                     />
                 </div>
+            </div>
+
+            {/* Sample */}
+            <div className="rounded-xl border border-border p-5 space-y-3" data-testid="product-detail-sample">
+                <h2 className="font-semibold text-foreground">{t('products.detail.sample')}</h2>
+                <Separator />
+                <SampleManager product={product} />
             </div>
 
             {/* Categories */}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Globe, Search, ShoppingCart } from "lucide-react";
+import { Menu, X, Globe, Search, ShoppingCart, FileText } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export default function Navbar() {
   const location = useLocation();
   const { t, i18n } = useTranslation("landing");
   const [commandValue, setCommandValue] = useState("");
-  
+
   useEffect(() => {
     const down = (e) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -46,7 +46,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = ["/market"];
+    const routeValues = ["/market", "/samples"];
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
   }, [open, location.pathname]);
@@ -75,6 +75,7 @@ export default function Navbar() {
 
   const NAV_LINKS = [
     { label: t("navbar.market"), href: "/market" },
+    { label: t("navbar.samples"), href: "/samples" },
   ];
 
 
@@ -129,6 +130,14 @@ export default function Navbar() {
               >
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 {t("navbar.market")}
+              </Button>
+              {/* Samples Button */}
+              <Button
+                variant="default"
+                onClick={() => navigate("/samples")}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                {t("navbar.samples")}
               </Button>
               {/* Language Toggle */}
               <Button

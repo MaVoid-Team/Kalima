@@ -3,6 +3,7 @@
     "nav": {
         "orders": "Orders",
         "products": "Products",
+        "samples": "Samples",
         "backToStore": "Back to Store",
         "logout": "Logout"
     },
@@ -265,7 +266,28 @@
             "fieldType": "Type",
             "fieldRequired": "Required",
             "yes": "Yes",
-            "no": "No"
+            "no": "No",
+            "sample": "Sample File",
+            "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
+            "viewSample": "View Full Screen",
+            "downloadSample": "Download",
+            "sampleFileName": "File",
+            "sampleFileSize": "Size",
+            "sampleFileType": "Type",
+            "openSamplePage": "Open Sample Page"
+        }
+    },
+    "samples": {
+        "title": "Samples Management",
+        "subtitle": "All product sample files across the store",
+        "count": "samples",
+        "noSamples": "No sample files found.",
+        "table": {
+            "file": "File",
+            "product": "Product",
+            "size": "Size",
+            "type": "Type",
+            "actions": "Actions"
         }
     }
 }
