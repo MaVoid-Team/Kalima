@@ -36,11 +36,11 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { login, loginWithFirebase, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
-    
+
     React.useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
-    
+
     const formSchema = React.useMemo(() => {
         return z.object({
             email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
@@ -98,7 +98,7 @@ export default function LoginPage() {
                                             <FormItem>
                                                 <FormLabel>{t("login.emailLabel")}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="name@example.com" type="email" {...field} className="bg-background" />
+                                                    <Input placeholder="name@example.com" type="email" {...field} className="bg-background" data-testid="login-email-input" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -116,6 +116,7 @@ export default function LoginPage() {
                                                             type={showPassword ? "text" : "password"}
                                                             className="bg-background pr-10"
                                                             {...field}
+                                                            data-testid="login-password-input"
                                                         />
                                                         <Button
                                                             type="button"
@@ -123,6 +124,7 @@ export default function LoginPage() {
                                                             size="sm"
                                                             className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                             onClick={() => setShowPassword(!showPassword)}
+                                                            data-testid="login-show-password-button"
                                                         >
                                                             {showPassword ? (
                                                                 <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -137,6 +139,7 @@ export default function LoginPage() {
                                                     <Link
                                                         to="/forgot-password"
                                                         className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                                                        data-testid="login-forgot-password-link"
                                                     >
                                                         {t("login.forgotPassword", "Forgot Password?")}
                                                     </Link>
@@ -144,7 +147,7 @@ export default function LoginPage() {
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="w-full" disabled={loading}>
+                                    <Button type="submit" className="w-full" disabled={loading} data-testid="login-submit-button">
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
@@ -176,6 +179,7 @@ export default function LoginPage() {
                                 <Link
                                     to="/signup"
                                     className="underline underline-offset-4 hover:text-primary font-medium"
+                                    data-testid="login-signup-link"
                                 >
                                     {t("login.signupLink", "Sign up")}
                                 </Link>

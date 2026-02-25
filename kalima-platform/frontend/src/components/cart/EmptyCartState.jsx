@@ -39,6 +39,7 @@ export default function EmptyCartState({ onBrowseProducts }) {
             <Button
               onClick={onBrowseProducts}
               className="inline-flex items-center gap-2 font-semibold py-3 px-8 rounded-lg"
+              data-testid="cart-empty-browse-button"
             >
               <ArrowLeft className="w-5 h-5" />
               {t('browseProducts')}
@@ -53,6 +54,7 @@ export default function EmptyCartState({ onBrowseProducts }) {
                     variant="secondary"
                     size="sm"
                     className="px-4 py-2 text-sm font-medium rounded-full"
+                    data-testid={`cart-empty-category-${idx}`}
                   >
                     {category}
                   </Button>

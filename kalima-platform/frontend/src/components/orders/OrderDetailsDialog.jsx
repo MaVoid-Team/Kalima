@@ -28,7 +28,7 @@ export default function OrderDetailsDialog({ order }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" data-testid="order-details-trigger-button">
           {t('orders.actions.viewDetails', 'View details')}
         </Button>
       </DialogTrigger>

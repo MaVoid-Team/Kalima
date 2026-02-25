@@ -34,6 +34,7 @@ export default function BookDetailsCard({
               value={state.nameOnBook}
               onChange={(e) => updateField("nameOnBook", e.target.value)}
               className="h-12"
+              data-testid="checkout-name-on-book-input"
             />
           </div>
         )}
@@ -50,6 +51,7 @@ export default function BookDetailsCard({
               value={state.numberOnBook}
               onChange={(e) => updateField("numberOnBook", e.target.value)}
               className="h-12"
+              data-testid="checkout-number-on-book-input"
             />
           </div>
         )}
@@ -66,6 +68,7 @@ export default function BookDetailsCard({
               value={state.seriesName}
               onChange={(e) => updateField("seriesName", e.target.value)}
               className="h-12"
+              data-testid="checkout-series-name-input"
             />
           </div>
         )}

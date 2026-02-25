@@ -89,11 +89,11 @@ export default function VerifyEmailPage() {
                                     <p className="text-muted-foreground mb-4">
                                         {t("verify_email.pending", "Registration successful! Please check your inbox for the verification link.")}
                                     </p>
-                                    <Button onClick={handleResend} variant="outline" className="w-full" disabled={loading}>
+                                    <Button onClick={handleResend} variant="outline" className="w-full" disabled={loading} data-testid="verify-email-resend-button">
                                         {loading && <LoadingSpinner className="mr-2 h-4 w-4" />}
                                         {t("verify_email.resend", "Resend Verification Email")}
                                     </Button>
-                                    <Button asChild variant="ghost" className="w-full mt-2">
+                                    <Button asChild variant="ghost" className="w-full mt-2" data-testid="verify-email-pending-login-link">
                                         <Link to="/login">
                                             {t("verify_email.backToLogin", "Go to Login")}
                                         </Link>
@@ -105,7 +105,7 @@ export default function VerifyEmailPage() {
                                     <p className="text-muted-foreground">
                                         {t("verify_email.success", "Your email has been successfully verified! You can now access all features of your account.")}
                                     </p>
-                                    <Button asChild className="w-full mt-6">
+                                    <Button asChild className="w-full mt-6" data-testid="verify-email-success-login-link">
                                         <Link to="/login">
                                             {t("verify_email.backToLogin", "Go to Login")}
                                         </Link>
@@ -118,7 +118,7 @@ export default function VerifyEmailPage() {
                                         {t("verify_email.error", "The verification link is invalid or has expired.")}
                                     </p>
                                     <div className="flex flex-col gap-3 w-full mt-6">
-                                        <Button asChild variant="outline" className="w-full">
+                                        <Button asChild variant="outline" className="w-full" data-testid="verify-email-error-login-link">
                                             <Link to="/login">
                                                 {t("verify_email.backToLogin", "Go to Login")}
                                             </Link>

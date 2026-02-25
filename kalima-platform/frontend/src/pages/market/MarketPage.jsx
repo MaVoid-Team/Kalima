@@ -88,6 +88,7 @@ export default function MarketPage() {
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground hover:bg-muted/80"
                   )}
+                  data-testid="market-all-categories-button"
                 >
                   {t("sidebar.allCategories", { defaultValue: "الكل" })}
                 </button>
@@ -101,6 +102,7 @@ export default function MarketPage() {
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-foreground hover:bg-muted/80"
                     )}
+                    data-testid={`market-child-category-${child.id}`}
                   >
                     {child.title ?? child.name}
                   </button>

@@ -67,7 +67,7 @@ export default function BookletInfo({ product }) {
           </span>
           <span className="font-bold text-sm">ScienceWithSarah</span>
         </div>
-        <button className="ms-auto text-xs font-bold border px-3 py-1 rounded-full">
+        <button className="ms-auto text-xs font-bold border px-3 py-1 rounded-full" data-testid="booklet-info-follow-button">
           {t("actions.follow")}
         </button>
       </div>

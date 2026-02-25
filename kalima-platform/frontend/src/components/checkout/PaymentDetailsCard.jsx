@@ -50,6 +50,7 @@ export default function PaymentDetailsCard({
                 "Enter transfer number",
               )}
               className="h-12 bg-background focus-visible:ring-primary/20"
+              data-testid="checkout-payment-transfer-number"
             />
           </div>
         )}
@@ -66,6 +67,7 @@ export default function PaymentDetailsCard({
             <div
               className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-8 flex flex-col items-center justify-center gap-4 "
               onClick={() => document.getElementById("screenshot").click()}
+              data-testid="checkout-payment-upload-button"
             >
               <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                 <Upload className="w-6 h-6" />
@@ -90,6 +92,7 @@ export default function PaymentDetailsCard({
                 updateField("paymentScreenshot", e.target.files?.[0] ?? null)
               }
               className="hidden"
+              data-testid="checkout-payment-file-input"
             />
           </div>
         )}

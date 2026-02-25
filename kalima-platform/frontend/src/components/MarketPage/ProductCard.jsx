@@ -20,7 +20,7 @@ const ProductCard = ({ id, title, category, price, priceAfterDiscount, image, is
   const hasDiscount = discountPercentage > 0;
 
   return (
-    <Link to={`/product/${id}`} className="group block">
+    <Link to={`/product/${id}`} className="group block" data-testid={`market-product-card-${id}-link`}>
       <Card className="border-none shadow-none">
         <CardContent className="p-0 relative overflow-hidden rounded-4xl mb-4 aspect-4/5 sm:aspect-square bg-muted">
           {hasDiscount && (

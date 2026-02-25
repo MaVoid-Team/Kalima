@@ -142,7 +142,7 @@ export default function PaymentStep({ onBack }) {
     return (
         <div className="w-full">
             <div className="mb-6 flex items-center justify-between">
-                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={onBack}>
+                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={onBack} data-testid="checkout-payment-step-back-button">
                     <ArrowLeft className="w-4 h-4" />
                     {t('payment.backToCart', 'Back to Cart')}
                 </Button>
@@ -203,8 +203,8 @@ export default function PaymentStep({ onBack }) {
                         )}
                     </div>
                     <AlertDialogFooter>
-                        <Button onClick={handlePrintReceipt}>{t('receipt.print', 'Print')}</Button>
-                        <AlertDialogCancel>{t('cancel', 'Close')}</AlertDialogCancel>
+                        <Button onClick={handlePrintReceipt} data-testid="checkout-payment-step-receipt-print-button">{t('receipt.print', 'Print')}</Button>
+                        <AlertDialogCancel data-testid="checkout-payment-step-receipt-close-button">{t('cancel', 'Close')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

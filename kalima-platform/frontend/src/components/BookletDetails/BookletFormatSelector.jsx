@@ -31,6 +31,7 @@ export default function BookletFormatSelector({
                   ? "border-primary bg-primary/10"
                   : "border-border hover:border-primary/50 bg-card",
               )}
+              data-testid={`booklet-format-selector-${format.id}-button`}
             >
               <div className="flex items-center gap-4">
                 <div

@@ -24,7 +24,7 @@ import useLookups from "@/hooks/useLookups";
 export default function RegisterStudent({ onBack }) {
     const { t } = useTranslation("auth");
     const { registerStudent, registerFirebaseStudent } = useRegister();
-    
+
     // Schema
     const studentSchema = z.object({
         level_id: z.string().min(1, { message: t("validation.required") }),
@@ -97,7 +97,7 @@ function StudentFields() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t("signup.fields.government")}</FormLabel>
-                            <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={handleGovChange} defaultValue={field.value}>
+                            <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={handleGovChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t("signup.fields.selectGovernment")} />
@@ -123,7 +123,7 @@ function StudentFields() {
                         <FormItem>
                             <FormLabel>{t("signup.fields.zone")}</FormLabel>
                             <Select
-                                dir={isRTL ? "rtl" : "ltr"} 
+                                dir={isRTL ? "rtl" : "ltr"}
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                                 disabled={!selectedGov || zones.length === 0}
@@ -153,7 +153,7 @@ function StudentFields() {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t("signup.fields.level")}</FormLabel>
-                        <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder={t("signup.fields.selectLevel")} />
@@ -179,7 +179,7 @@ function StudentFields() {
                     <FormItem>
                         <FormLabel>{t("signup.fields.parentPhone")}</FormLabel>
                         <FormControl>
-                            <Input placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} />
+                            <Input placeholder={t("signup.fields.parentPhonePlaceholder")} {...field} data-testid="auth-register-student-parent-phone-input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -193,7 +193,7 @@ function StudentFields() {
                     <FormItem>
                         <FormLabel>{t("signup.fields.studentCode")}</FormLabel>
                         <FormControl>
-                            <Input placeholder={t("signup.fields.studentCodePlaceholder")} {...field} />
+                            <Input placeholder={t("signup.fields.studentCodePlaceholder")} {...field} data-testid="auth-register-student-code-input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

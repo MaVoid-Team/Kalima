@@ -46,12 +46,13 @@ export default function WelcomeSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-start">
-              <Button variant="default" className="w-full sm:w-fit h-12 text-base">
+              <Button variant="default" className="w-full sm:w-fit h-12 text-base" data-testid="landing-welcome-browse-courses-button">
                 {t("welcome.browseCourses")}
               </Button>
               <Button
                 variant="secondary"
                 className="w-full sm:w-fit h-12 text-base"
+                data-testid="landing-welcome-teachers-button"
               >
                 {t("welcome.teachers")}
               </Button>

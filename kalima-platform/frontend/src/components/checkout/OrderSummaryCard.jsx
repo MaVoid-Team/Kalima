@@ -85,6 +85,7 @@ export default function OrderSummaryCard({
               onClick={onSubmit}
               disabled={loading || isSubmitDisabled}
               className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20 rounded-xl"
+              data-testid="checkout-summary-submit-button"
             >
               {submitLabel}
             </Button>

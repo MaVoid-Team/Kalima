@@ -17,6 +17,7 @@ export default function BookletStickyFooter({ productId, price, onAddToCart }) {
           className="flex-1 gap-2 font-bold border-primary text-primary hover:bg-primary/10"
           size="lg"
           onClick={onAddToCart}
+          data-testid="booklet-footer-add-to-cart-button"
         >
           <ShoppingCart className="w-5 h-5" />
           {t("actions.addToCart", "Add to Cart")}
@@ -28,6 +29,7 @@ export default function BookletStickyFooter({ productId, price, onAddToCart }) {
           size="lg"
           onClick={() => startFastBuy(productId, 1)}
           disabled={fastBuyLoading}
+          data-testid="booklet-footer-buy-now-button"
         >
           {t("actions.buyNow", "Buy Now")}
         </Button>

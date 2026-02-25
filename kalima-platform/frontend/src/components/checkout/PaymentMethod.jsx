@@ -59,6 +59,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                         <RadioGroupItem
                                             value={m.id.toString()}
                                             id={`pm-${m.id}`}
+                                            data-testid={`checkout-payment-method-${m.id}`}
                                         />
                                         <Label htmlFor={`pm-${m.id}`} className="font-medium cursor-pointer">
                                             {m.name}
@@ -95,6 +96,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                             value={numberTransferredFrom}
                             onChange={e => setNumberTransferredFrom(e.target.value)}
                             className="w-full"
+                            data-testid="checkout-payment-method-transfer-number"
                         />
                     </div>
                     <div className="grid gap-2">
@@ -106,6 +108,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                             value={notes}
                             onChange={e => setNotes(e.target.value)}
                             className="input w-full h-20 resize-none"
+                            data-testid="checkout-payment-method-notes"
                         />
                     </div>
                     <div className="grid gap-2">
@@ -121,6 +124,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                         variant="link"
                                         className="text-sm underline text-primary"
                                         onClick={() => setShowPreview(true)}
+                                        data-testid="checkout-payment-method-preview-button"
                                     >
                                         {screenshotFile.name}
                                     </Button>
@@ -133,6 +137,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                             if (fileInputRef.current) fileInputRef.current.value = '';
                                         }}
                                         aria-label={t('payment.removeScreenshot', 'Remove screenshot')}
+                                        data-testid="checkout-payment-method-remove-button"
                                     >
                                         &times;
                                     </Button>
@@ -141,6 +146,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                 <Label
                                     htmlFor="transfer-screenshot"
                                     className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                    data-testid="checkout-payment-method-upload-button"
                                 >
                                     {t('payment.uploadScreenshotButton', 'Upload image')}
                                 </Label>
@@ -159,6 +165,7 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                                     setScreenshotFile(file);
                                 }
                             }}
+                            data-testid="checkout-payment-method-file-input"
                         />
                     </div>
                 </div>
@@ -168,10 +175,10 @@ export default function PaymentMethod({ getPaymentMethods, selectedId, onSelect,
                 <AlertDialogContent>
                     {previewUrl ? <img src={previewUrl} alt={t('payment.preview', 'Screenshot preview')} className="w-full h-auto" /> : <ImageOff className="w-16 h-16 text-muted-foreground mx-auto my-8" />}
                     <AlertDialogFooter>
-                        <Button variant="destructive" onClick={() => { setScreenshotFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>
+                        <Button variant="destructive" onClick={() => { setScreenshotFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} data-testid="checkout-payment-method-dialog-remove-button">
                             {t('payment.removeScreenshot', 'Remove')}
                         </Button>
-                        <AlertDialogCancel>{t('payment.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel data-testid="checkout-payment-method-dialog-cancel-button">{t('payment.cancel', 'Cancel')}</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

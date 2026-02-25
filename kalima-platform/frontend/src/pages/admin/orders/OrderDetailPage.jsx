@@ -49,7 +49,7 @@ export default function OrderDetailPage() {
         return (
             <div className="p-8 text-center">
                 <div className="text-muted-foreground mb-4">{t('orders.details.notFound', 'Order not found.')}</div>
-                <Button variant="outline" onClick={() => navigate('/admin/orders')}>
+                <Button variant="outline" onClick={() => navigate('/admin/orders')} data-testid="order-detail-back-to-orders">
                     {t('orders.details.backToOrders')}
                 </Button>
             </div>
@@ -77,8 +77,8 @@ export default function OrderDetailPage() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                        <AlertDialogCancel data-testid="order-detail-delete-cancel">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground" data-testid="order-detail-delete-confirm">
                             {t('common.confirm', 'Confirm')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -88,7 +88,7 @@ export default function OrderDetailPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                    <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0">
+                    <Button variant="ghost" size="icon" onClick={() => navigate('/admin/orders')} className="shrink-0" data-testid="order-detail-back-button">
                         {isRtl ? <ChevronRight /> : <ChevronLeft />}
                     </Button>
                     <div>
@@ -113,6 +113,7 @@ export default function OrderDetailPage() {
                             disabled={actionLoading}
                             variant="secondary"
                             className="bg-primary/10 text-primary hover:bg-primary/20"
+                            data-testid="order-detail-receive-button"
                         >
                             <Package className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
                             {t('orders.actions.receive')}
@@ -124,6 +125,7 @@ export default function OrderDetailPage() {
                             onClick={() => confirmOrder(order.id)}
                             disabled={actionLoading}
                             className="bg-success text-success-foreground hover:bg-success/90"
+                            data-testid="order-detail-confirm-button"
                         >
                             <CheckCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
                             {t('orders.actions.confirm')}
@@ -136,6 +138,7 @@ export default function OrderDetailPage() {
                             disabled={actionLoading}
                             variant="outline"
                             className="text-highlight border-highlight hover:bg-highlight/10"
+                            data-testid="order-detail-return-button"
                         >
                             <RotateCcw className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
                             {t('orders.actions.return')}
@@ -147,6 +150,7 @@ export default function OrderDetailPage() {
                         onClick={() => setDeleteDialogOpen(true)}
                         disabled={actionLoading}
                         className="ml-auto"
+                        data-testid="order-detail-delete-button"
                     >
                         <Trash2 className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
                         {t('orders.actions.delete')}
@@ -210,6 +214,7 @@ export default function OrderDetailPage() {
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-background hover:bg-accent hover:text-accent-foreground h-7 px-2 py-1 text-success border-success/30 hover:border-success/50"
                                         title={t('orders.details.contactWhatsApp', 'Contact on WhatsApp')}
+                                        data-testid="order-detail-whatsapp-link"
                                     >
                                         <MessageCircle className="h-3 w-3 mr-1.5 rtl:mr-0 rtl:ml-1.5" />
                                         WhatsApp
@@ -252,7 +257,7 @@ export default function OrderDetailPage() {
                             {paymentScreenshot && (
                                 <div className="mt-4">
                                     <span className="text-muted-foreground block mb-2">{t('orders.details.screenshot')}:</span>
-                                    <a href={paymentScreenshot} target="_blank" rel="noreferrer" className="block border rounded-md overflow-hidden hover:opacity-90">
+                                    <a href={paymentScreenshot} target="_blank" rel="noreferrer" className="block border rounded-md overflow-hidden hover:opacity-90" data-testid="order-detail-payment-screenshot">
                                         <img src={paymentScreenshot} alt={t('orders.details.screenshot', 'Payment screenshot')} className="w-full object-cover" style={{ maxHeight: '200px' }} />
                                     </a>
                                 </div>

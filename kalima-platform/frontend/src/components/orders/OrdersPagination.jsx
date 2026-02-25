@@ -21,6 +21,7 @@ export default function OrdersPagination({ pagination, onPageChange, t }) {
               disabled={pagination.page <= 1}
               className={pagination.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               text={t('common.pagination.previous', 'Previous')}
+              data-testid="orders-pagination-previous-button"
             />
           </PaginationItem>
 
@@ -30,6 +31,7 @@ export default function OrdersPagination({ pagination, onPageChange, t }) {
                 onClick={() => onPageChange(i + 1)}
                 isActive={pagination.page === i + 1}
                 className="cursor-pointer"
+                data-testid={`orders-pagination-page-${i + 1}-button`}
               >
                 {i + 1}
               </PaginationLink>
@@ -42,6 +44,7 @@ export default function OrdersPagination({ pagination, onPageChange, t }) {
               disabled={pagination.page >= pagination.pages}
               className={pagination.page >= pagination.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               text={t('common.pagination.next', 'Next')}
+              data-testid="orders-pagination-next-button"
             />
           </PaginationItem>
         </PaginationContent>

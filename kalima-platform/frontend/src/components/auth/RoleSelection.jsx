@@ -48,6 +48,7 @@ export default function RoleSelection({ onRoleSelect }) {
                             variant="outline"
                             className="h-24 justify-start px-6 hover:border-primary hover:bg-primary/5 transition-all group"
                             onClick={() => onRoleSelect(r.id)}
+                            data-testid={`auth-role-select-${r.id}`}
                         >
                             <div className="flex items-center gap-4">
                                 <div className="bg-primary/10 p-3 rounded-full group-hover:bg-primary/20 transition-colors">
@@ -64,7 +65,7 @@ export default function RoleSelection({ onRoleSelect }) {
             </div>
             <div className="text-sm text-muted-foreground w-full text-center">
                 {t("signup.hasAccount")}{" "}
-                <Link to="/login" className="underline underline-offset-4 hover:text-primary font-medium">
+                <Link to="/login" className="underline underline-offset-4 hover:text-primary font-medium" data-testid="auth-role-login-link">
                     {t("signup.loginLink")}
                 </Link>
             </div>

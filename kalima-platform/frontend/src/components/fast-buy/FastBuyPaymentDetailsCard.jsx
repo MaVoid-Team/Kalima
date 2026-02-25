@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import {
   CreditCard,
   Upload,
-  } from "lucide-react";
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -48,11 +48,11 @@ export default function FastBuyPaymentDetailsCard({
                   <div
                     key={method.id}
                     onClick={() => updateField("paymentMethodId", method.id)}
-                    className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      isSelected
+                    className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${isSelected
                         ? "border-primary bg-primary/5 shadow-sm"
                         : "border-border hover:border-primary/50 hover:bg-muted/50"
-                    }`}
+                      }`}
+                    data-testid={`fastbuy-payment-method-${method.id}`}
                   >
                     {method.images ? (
                       <img
@@ -102,6 +102,7 @@ export default function FastBuyPaymentDetailsCard({
                 "Enter transfer number",
               )}
               className="h-12 bg-background focus-visible:ring-primary/20"
+              data-testid="fastbuy-payment-transfer-number"
             />
           </div>
         )}
@@ -119,6 +120,7 @@ export default function FastBuyPaymentDetailsCard({
             <div
               className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-5 flex flex-col items-center justify-center gap-3 cursor-pointer "
               onClick={() => document.getElementById("screenshot").click()}
+              data-testid="fastbuy-payment-upload-button"
             >
               <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                 <Upload className="w-5 h-5" />
@@ -143,6 +145,7 @@ export default function FastBuyPaymentDetailsCard({
                 updateField("paymentScreenshot", e.target.files?.[0] ?? null)
               }
               className="hidden"
+              data-testid="fastbuy-payment-file-input"
             />
           </div>
         )}

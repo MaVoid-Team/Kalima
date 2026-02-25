@@ -143,7 +143,7 @@ export default function CartItemRequiredFields({
                 }}
             >
                 <AccordionItem value="fields">
-                    <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-success" : "text-primary")}>
+                    <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-success" : "text-primary")} data-testid={`cart-item-fields-accordion-${item.id}`}>
                         {isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}
                     </AccordionTrigger>
                     <AccordionContent className="mt-2 space-y-2 p-2 border rounded overflow-x-hidden min-w-0 w-full box-border max-w-full">
@@ -160,6 +160,7 @@ export default function CartItemRequiredFields({
                                                 <label
                                                     htmlFor={`file-${item.id}-${rf.field_definition_id}`}
                                                     className="cursor-pointer px-3 py-1 bg-accent text-accent-foreground rounded-sm text-sm"
+                                                    data-testid={`cart-item-fields-upload-${item.id}-${rf.field_definition_id}`}
                                                 >
                                                     {originalImages[rf.field_definition_id]
                                                         ? t('replaceImage', 'Replace image')
@@ -194,6 +195,7 @@ export default function CartItemRequiredFields({
                                                         }
                                                     }}
                                                     className="sr-only"
+                                                    data-testid={`cart-item-fields-file-${item.id}-${rf.field_definition_id}`}
                                                 />
                                                 {imageFields[rf.field_definition_id] ? (
                                                     <div className="flex items-center gap-2 min-w-0">
@@ -217,6 +219,7 @@ export default function CartItemRequiredFields({
                                                                 if (inputEl) inputEl.value = '';
                                                             }}
                                                             className="text-xs"
+                                                            data-testid={`cart-item-fields-remove-image-${item.id}-${rf.field_definition_id}`}
                                                         >
                                                             <Trash className="w-3 h-3" />
                                                         </Button>
@@ -310,6 +313,7 @@ export default function CartItemRequiredFields({
                                                 }));
                                             }}
                                             className="input-sm"
+                                            data-testid={`cart-item-fields-input-${item.id}-${rf.field_definition_id}`}
                                         />
                                     )}
                                 </div>
@@ -318,6 +322,7 @@ export default function CartItemRequiredFields({
                                 size="sm"
                                 type="submit"
                                 className="w-fit self-end"
+                                data-testid={`cart-item-fields-save-${item.id}`}
                             >
                                 {t('save', 'Save')}
                             </Button>

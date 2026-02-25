@@ -95,7 +95,7 @@ export default function UsersTable({ users, loading }) {
                                     size="sm"
                                     asChild
                                 >
-                                    <Link to={`/admin/users/${user.id}`}>
+                                    <Link to={`/admin/users/${user.id}`} data-testid={`admin-users-table-view-link-${user.id}`}>
                                         <Eye className="mr-2 h-4 w-4" />
                                         {t('actions.view')}
                                     </Link>

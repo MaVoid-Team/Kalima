@@ -90,8 +90,8 @@ export default function ImageGallery({ images, badge }) {
           {imagesList.length > 1 && (
             <>
               <div className="hidden md:block">
-                <CarouselPrevious className="start-4 bg-background/80 hover:bg-background" />
-                <CarouselNext className="end-4 bg-background/80 hover:bg-background" />
+                <CarouselPrevious className="start-4 bg-background/80 hover:bg-background" data-testid="product-gallery-prev-button" />
+                <CarouselNext className="end-4 bg-background/80 hover:bg-background" data-testid="product-gallery-next-button" />
               </div>
               {/* Mobile Dots */}
               <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 md:hidden">
@@ -105,6 +105,7 @@ export default function ImageGallery({ images, badge }) {
                         : "bg-primary/30",
                     )}
                     onClick={() => mainApi?.scrollTo(index)}
+                    data-testid={`product-gallery-dot-${index}-button`}
                   />
                 ))}
               </div>
@@ -145,6 +146,7 @@ export default function ImageGallery({ images, badge }) {
                         : "border-transparent hover:border-border",
                     )}
                     onClick={() => onThumbClick(index)}
+                    data-testid={`product-gallery-thumb-${index}-button`}
                   >
                     <img
                       src={thumb}

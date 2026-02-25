@@ -10,6 +10,7 @@ export default function OrdersStatusFilter({ statusOptions, filters, onStatusCha
             ? 'bg-background text-foreground shadow-sm'
             : 'text-muted-foreground hover:text-foreground'
             }`}
+          data-testid={`orders-status-filter-${opt.value}-button`}
         >
           {opt.label}
         </button>

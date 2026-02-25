@@ -16,6 +16,7 @@ export default function CartHeader({ itemCount }) {
           onClick={() => navigate('/market')}
           variant="link"
           className="flex items-center gap-1 text-primary hover:text-primary/80 text-sm font-medium p-0 h-auto"
+          data-testid="cart-header-continue-shopping-button"
         >
           {/* arrow always visible */}
           {i18n.language === 'ar' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}

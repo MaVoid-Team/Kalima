@@ -54,7 +54,7 @@ export default function CartOrderSummary({
             <span className="text-2xl font-bold">{total} {t('L.E')}</span>
           </div>
 
-          <Button onClick={handleCheckout} className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4">
+          <Button onClick={handleCheckout} className="w-full text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4" data-testid="cart-summary-checkout-button">
             {t('proceedToCheckout')}
             <span>
               <ArrowRight className="w-4 h-4" />
@@ -80,6 +80,7 @@ export default function CartOrderSummary({
               <Button
                 variant="link"
                 className="text-xs font-semibold text-primary hover:text-primary/80 p-0 h-auto"
+                data-testid="cart-summary-chat-button"
               >
                 {t("chatWithUs")}
               </Button>

@@ -51,6 +51,7 @@ export default function ProductDetailsPage() {
           <Link
             to="/market"
             className="text-primary underline underline-offset-4 text-sm"
+            data-testid="product-notfound-market-link"
           >
             {t("breadcrumbs.digitalProducts")}
           </Link>

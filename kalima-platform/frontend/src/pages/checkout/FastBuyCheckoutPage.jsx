@@ -11,7 +11,7 @@ export default function FastBuyCheckoutPage() {
   const { state, handleCheckout, handleApplyCoupon } = useFastBuyCheckoutPage();
   const { preview, isLoading, error, isSubmitting } = state;
 
-  
+
   React.useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -33,6 +33,7 @@ export default function FastBuyCheckoutPage() {
         <button
           className="text-primary hover:underline"
           onClick={() => navigate(-1)}
+          data-testid="fast-buy-checkout-go-back-button"
         >
           {t("general.go_back", "Go Back")}
         </button>

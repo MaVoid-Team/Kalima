@@ -54,6 +54,7 @@ export default function CartItem({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                        data-testid={`cart-item-decrease-${item.id}`}
                     >
                         <Minus className="w-4 h-4" />
                     </Button>
@@ -64,6 +65,7 @@ export default function CartItem({
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                        data-testid={`cart-item-increase-${item.id}`}
                     >
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -84,7 +86,7 @@ export default function CartItem({
                                 {item?.coupons?.discount_amount != 0 && <span className="text-sm text-muted-foreground">-{item?.coupons?.discount_amount} {t('L.E')}</span>}
                                 {item?.coupons?.discount_percentage != 0 && <span className="text-xs text-muted-foreground ms-1">({" - " + item?.discount} {t('L.E')})</span>}
                             </div>
-                            <Button size="icon" variant="ghost" onClick={() => removeCoupon(item.id)}>
+                            <Button size="icon" variant="ghost" onClick={() => removeCoupon(item.id)} data-testid={`cart-item-remove-coupon-${item.id}`}>
                                 <Trash className="w-4 h-4 text-destructive" />
                             </Button>
                         </div>
@@ -98,6 +100,7 @@ export default function CartItem({
                                 size="sm"
                                 className="bg-accent not-hover:text-accent-foreground flex items-center"
                                 onClick={() => onApplyCouponClick(item.id)}
+                                data-testid={`cart-item-apply-coupon-${item.id}`}
                             >
                                 <TicketPlus className="w-4 h-4" />
                                 <motion.span
@@ -126,7 +129,7 @@ export default function CartItem({
                 onOpenChange={onOpenChange}
             />
 
-            <Button className="w-full" onClick={() => onRemoveClick(item.id)}>
+            <Button className="w-full" onClick={() => onRemoveClick(item.id)} data-testid={`cart-item-remove-${item.id}`}>
                 {t('removeFromCart', 'Remove From Cart')}
             </Button>
         </motion.div>

@@ -40,7 +40,7 @@ export default function FastBuyOrderSummaryCard({
                 className="flex flex-col pb-4 border-b border-border/10 last:pb-0 last:border-0"
               >
                 <div className="flex gap-4 group">
-                  <div className="h-16 w-16 rounded-lg overflow-hidden flex-shrink-0 border border-border/50">
+                  <div className="h-16 w-16 rounded-lg overflow-hidden shrink-0 border border-border/50">
                     {item.image ? (
                       <img
                         src={item.image}
@@ -118,6 +118,7 @@ export default function FastBuyOrderSummaryCard({
             onClick={onSubmit}
             disabled={loading || isSubmitDisabled}
             className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20 rounded-xl"
+            data-testid="fastbuy-summary-submit-button"
           >
             {submitLabel}
           </Button>
@@ -147,6 +148,7 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
         onChange={(e) => setCode(e.target.value)}
         placeholder={t("orderSummary.discountPlaceholder", "Discount code")}
         className="h-10 text-sm flex-1 min-w-0 border-muted-foreground/30 focus-visible:ring-0 text-start"
+        data-testid="fastbuy-summary-coupon-input"
       />
       <Button
         type="button"
@@ -155,6 +157,7 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
         disabled={isApplying || !code.trim()}
         onClick={handleApply}
         className="h-10 text-sm px-4 sm:px-6 bg-muted/60 font-semibold text-foreground shrink-0"
+        data-testid="fastbuy-summary-coupon-apply-button"
       >
         {isApplying ? (
           <LoadingSpinner className="w-4 h-4" />

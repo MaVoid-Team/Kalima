@@ -37,7 +37,7 @@ export default function BookletReviews({ product }) {
             ({product.reviewCount})
           </span>
         </h2>
-        <button className="text-primary font-bold text-sm hover:underline">
+        <button className="text-primary font-bold text-sm hover:underline" data-testid="booklet-reviews-see-all-button">
           {t("reviews.seeAll", "See All")}
         </button>
       </div>

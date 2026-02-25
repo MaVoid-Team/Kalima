@@ -38,6 +38,7 @@ export default function UserFilters({ filters, onSearchChange, onRoleChange, onP
                     value={searchValue}
                     onChange={handleSearchChange}
                     className="ps-10"
+                    data-testid="admin-users-filters-search-input"
                 />
             </div>
 

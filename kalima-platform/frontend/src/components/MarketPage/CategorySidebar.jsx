@@ -36,6 +36,7 @@ export default function CategorySidebar({
                             ? "bg-primary text-primary-foreground"
                             : "text-foreground hover:bg-muted"
                     )}
+                    data-testid="market-category-all-button"
                 >
                     <LayoutGrid className="h-4 w-4 shrink-0" />
                     {t("sidebar.allCategories")}
@@ -65,6 +66,7 @@ export default function CategorySidebar({
                                     ? "bg-primary text-primary-foreground"
                                     : "text-foreground hover:bg-muted"
                             )}
+                            data-testid={`market-category-${cat.id}-button`}
                         >
                             <span className="truncate">{cat.title ?? cat.name}</span>
                         </motion.button>

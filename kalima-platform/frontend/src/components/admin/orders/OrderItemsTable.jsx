@@ -118,6 +118,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                                     onClick={() => setDeleteItemId(item.id)}
                                                     disabled={items.length <= 1}
                                                     title={items.length <= 1 ? "Cannot delete the only item" : t('orders.actions.deleteItem')}
+                                                    data-testid={`admin-orders-item-delete-${item.id}`}
                                                 >
                                                     <Trash2 className="h-4 w-4 text-destructive" />
                                                 </Button>
@@ -157,6 +158,7 @@ export default function OrderItemsTable({ items, onDeleteItem, orderId }) {
                                             onClick={() => setDeleteItemId(item.id)}
                                             disabled={items.length <= 1}
                                             className="shrink-0 h-8 w-8"
+                                            data-testid={`admin-orders-item-delete-mobile-${item.id}`}
                                         >
                                             <Trash2 className="h-4 w-4 text-destructive" />
                                         </Button>

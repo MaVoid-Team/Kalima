@@ -57,7 +57,7 @@ export default function OrdersTable({
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                    <Link to={`/admin/orders/${order.id}`} className="text-primary hover:underline">
+                                    <Link to={`/admin/orders/${order.id}`} className="text-primary hover:underline" data-testid={`admin-orders-table-link-${order.id}`}>
                                         {order.purchase_serial || `#${order.id}`}
                                     </Link>
                                     <div className="text-xs text-muted-foreground mt-1">
@@ -104,7 +104,7 @@ export default function OrdersTable({
                                     aria-label={`Select order ${order.purchase_serial || order.id}`}
                                 />
                                 <div>
-                                    <Link to={`/admin/orders/${order.id}`} className="font-semibold text-primary hover:underline text-lg">
+                                    <Link to={`/admin/orders/${order.id}`} className="font-semibold text-primary hover:underline text-lg" data-testid={`admin-orders-table-link-mobile-${order.id}`}>
                                         {order.purchase_serial || `#${order.id}`}
                                     </Link>
                                     <div className="text-sm text-muted-foreground mt-1">

@@ -69,7 +69,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
 
                 <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                     <DialogTrigger asChild>
-                        <Button size="sm" className="gap-2">
+                        <Button size="sm" className="gap-2" data-testid="admin-users-roles-add-button">
                             <Plus className="h-4 w-4" />
                             {t('actions.addRole')}
                         </Button>
@@ -117,13 +117,14 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         </div>
 
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={actionLoading}>
+                            <Button variant="outline" onClick={() => setIsAddOpen(false)} disabled={actionLoading} data-testid="admin-users-roles-add-cancel">
                                 {t('common:cancel')}
                             </Button>
                             <Button
                                 onClick={handleAddSubmit}
                                 disabled={!newPortal || !newRole || actionLoading}
                                 className="min-w-[100px]"
+                                data-testid="admin-users-roles-add-submit"
                             >
                                 {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('common:confirm')}
                             </Button>
@@ -166,6 +167,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                                             onClick={() => setRevokeData({ portal: roleObj.portal, role: roleObj.role })}
                                             disabled={actionLoading}
                                             className="h-8 gap-1 px-2"
+                                            data-testid={`admin-users-roles-revoke-${roleObj.portal}-${roleObj.role}`}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                             {t('actions.revoke')}
@@ -187,7 +189,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={actionLoading}>{t('common:cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel disabled={actionLoading} data-testid="admin-users-roles-revoke-cancel">{t('common:cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();
@@ -195,6 +197,7 @@ export default function UserRolesSection({ roles, onAddRole, onRevokeRole, actio
                             }}
                             disabled={actionLoading}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            data-testid="admin-users-roles-revoke-submit"
                         >
                             {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('actions.revoke')}
                         </AlertDialogAction>

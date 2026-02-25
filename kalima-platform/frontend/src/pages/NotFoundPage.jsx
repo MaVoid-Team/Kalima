@@ -20,7 +20,7 @@ export default function NotFoundPage() {
             <p className="text-muted-foreground text-lg mb-8 max-w-[500px]">
                 {t("notFound.description", "Oops! The page you are looking for doesn't exist or has been moved.")}
             </p>
-            <Button asChild size="lg" className="font-medium">
+            <Button asChild size="lg" className="font-medium" data-testid="notfound-home-link">
                 <Link to="/" className="gap-2">
                     <Home className="w-4 h-4" />
                     {t("notFound.backHome", "Back to Home")}

@@ -88,6 +88,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                     className="h-8 w-8 p-0 text-primary hover:text-primary/90 hover:bg-primary/10"
                     onClick={() => setNoteDialogOpen(true)}
                     title={t('orders.actions.viewNote', 'View Note')}
+                    data-testid="admin-orders-action-view-note"
                 >
                     <span className="sr-only">{t('orders.actions.viewNote', 'View Note')}</span>
                     <FileText className="h-4 w-4" />
@@ -103,7 +104,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                        <Link to={`/admin/orders/${order.id}`} className="cursor-pointer flex items-center">
+                        <Link to={`/admin/orders/${order.id}`} className="cursor-pointer flex items-center" data-testid="admin-orders-action-view-link">
                             <Eye className="mr-2 h-4 w-4" />
                             {t('orders.actions.view')}
                         </Link>
@@ -118,6 +119,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="cursor-pointer flex items-center text-success focus:text-success focus:bg-success/10"
+                                data-testid="admin-orders-action-whatsapp-link"
                             >
                                 <MessageCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
                                 {t('orders.actions.whatsapp', 'Contact WhatsApp')}
@@ -129,6 +131,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                         <DropdownMenuItem
                             onClick={() => handleAction(() => receiveOrder(order.id))}
                             className="cursor-pointer flex items-center"
+                            data-testid="admin-orders-action-receive"
                         >
                             <Package className="mr-2 h-4 w-4" />
                             {t('orders.actions.receive')}
@@ -139,6 +142,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                         <DropdownMenuItem
                             onClick={() => handleAction(() => confirmOrder(order.id))}
                             className="cursor-pointer flex items-center text-success focus:text-success"
+                            data-testid="admin-orders-action-confirm"
                         >
                             <CheckCircle className="mr-2 h-4 w-4" />
                             {t('orders.actions.confirm')}
@@ -149,6 +153,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                         <DropdownMenuItem
                             onClick={() => handleAction(() => returnOrder(order.id))}
                             className="cursor-pointer flex items-center text-highlight focus:text-highlight"
+                            data-testid="admin-orders-action-return"
                         >
                             <RotateCcw className="mr-2 h-4 w-4" />
                             {t('orders.actions.return')}
@@ -163,6 +168,7 @@ export default function OrderActions({ order, onActionSuccess }) {
                             setDeleteDialogOpen(true);
                         }}
                         className="cursor-pointer flex items-center text-destructive focus:bg-destructive/10 focus:text-destructive"
+                        data-testid="admin-orders-action-delete"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         {t('orders.actions.delete')}

@@ -47,6 +47,7 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
             <Button
               onClick={() => onContinueShopping()}
               variant='secondary'
+              data-testid="cart-preview-empty-shopping-button"
             >
               {t('goShopping')}
             </Button>
@@ -114,12 +115,14 @@ export default function CartPreview({ open, onOpenChange, cart, onViewFullCart }
                 <Button
                   onClick={onViewFullCart}
                   variant='default'
+                  data-testid="cart-preview-view-cart-button"
                 >
                   {t('viewFullCart')}
                 </Button>
                 <Button
                   onClick={onContinueShopping}
                   variant='outline'
+                  data-testid="cart-preview-continue-shopping-button"
                 >
                   {t('continueShopping')}
                 </Button>
