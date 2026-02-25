@@ -2,6 +2,8 @@
     "dashboardTitle": "لوحة الإدارة",
     "nav": {
         "orders": "الطلبات",
+        "products": "المنتجات",
+        "samples": "العينات",
         "backToStore": "العودة للمتجر",
         "logout": "تسجيل الخروج"
     },
@@ -157,6 +159,135 @@
             "by": "بواسطة",
             "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
             "contactWhatsApp": "تواصل عبر واتساب"
+        }
+    },
+    "products": {
+        "title": "إدارة المنتجات",
+        "subtitle": "إدارة منتجات المتجر والوسائط والإعدادات",
+        "totalProducts": "{{count}} منتجات",
+        "searchPlaceholder": "البحث بالعنوان، الوصف، الرقم التسلسلي...",
+        "noProducts": "لا توجد منتجات",
+        "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
+        "createProduct": "إنشاء منتج",
+        "backToProducts": "العودة للمنتجات",
+        "filters": {
+            "allCategories": "جميع الفئات",
+            "allStatuses": "جميع الحالات",
+            "active": "نشط",
+            "archived": "مؤرشف",
+            "archivedToggle": "عرض المؤرشف"
+        },
+        "table": {
+            "thumbnail": "الصورة",
+            "title": "العنوان",
+            "type": "النوع",
+            "price": "السعر",
+            "categories": "الفئات",
+            "status": "الحالة",
+            "actions": "الإجراءات"
+        },
+        "status": {
+            "active": "نشط",
+            "archived": "مؤرشف"
+        },
+        "type": {
+            "Book": "كتاب",
+            "Product": "منتج"
+        },
+        "actions": {
+            "view": "عرض التفاصيل",
+            "edit": "تعديل المنتج",
+            "archive": "أرشفة",
+            "unarchive": "استعادة",
+            "delete": "حذف المنتج"
+        },
+        "form": {
+            "title": "العنوان",
+            "titlePlaceholder": "عنوان المنتج",
+            "description": "الوصف",
+            "descriptionPlaceholder": "وصف المنتج (اختياري)",
+            "type": "النوع",
+            "price": "السعر (ج.م)",
+            "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
+            "serial": "الرقم التسلسلي",
+            "serialPlaceholder": "مثل: ALG-101 (اختياري)",
+            "couponId": "معرف الكوبون",
+            "couponIdPlaceholder": "معرف الكوبون (اختياري)",
+            "thumbnail": "صورة الغلاف",
+            "sample": "ملف النموذج (PDF)",
+            "categories": "الفئات",
+            "isArchived": "مؤرشف",
+            "perks": "المميزات",
+            "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code"
+        },
+        "create": {
+            "dialogTitle": "إنشاء منتج جديد",
+            "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
+            "submit": "إنشاء المنتج",
+            "creating": "جاري الإنشاء..."
+        },
+        "edit": {
+            "dialogTitle": "تعديل المنتج",
+            "dialogDescription": "تحديث تفاصيل المنتج.",
+            "submit": "حفظ التغييرات",
+            "saving": "جاري الحفظ..."
+        },
+        "delete": {
+            "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+            "confirmTitle": "حذف المنتج",
+            "success": "تم حذف المنتج بنجاح"
+        },
+        "detail": {
+            "info": "معلومات المنتج",
+            "media": "الوسائط",
+            "thumbnail": "صورة الغلاف",
+            "gallery": "معرض الصور",
+            "categories": "الفئات",
+            "requiredFields": "الحقول المطلوبة",
+            "noThumbnail": "لا توجد صورة غلاف",
+            "uploadThumbnail": "رفع صورة الغلاف",
+            "replaceThumbnail": "استبدال صورة الغلاف",
+            "removeThumbnail": "حذف صورة الغلاف",
+            "addGalleryImages": "إضافة صور للمعرض",
+            "noGalleryImages": "لا توجد صور في المعرض",
+            "galleryImageActive": "مرئي",
+            "galleryImageHidden": "مخفي",
+            "toggleVisibility": "تبديل الرؤية",
+            "removeImage": "حذف",
+            "noCategories": "لا توجد فئات مرتبطة",
+            "attachCategory": "إضافة فئة",
+            "selectCategory": "اختر فئة...",
+            "detachCategory": "حذف",
+            "noRequiredFields": "لا توجد حقول مطلوبة مرتبطة",
+            "attachField": "إضافة حقل",
+            "selectField": "اختر حقلاً...",
+            "detachField": "حذف",
+            "fieldLabel": "الحقل",
+            "fieldType": "النوع",
+            "fieldRequired": "مطلوب",
+            "yes": "نعم",
+            "no": "لا",
+            "sample": "ملف العينة",
+            "noSample": "لا يوجد ملف عينة. يمكن إرفاق العينات عند إنشاء المنتج.",
+            "viewSample": "عرض بملء الشاشة",
+            "downloadSample": "تحميل",
+            "sampleFileName": "الملف",
+            "sampleFileSize": "الحجم",
+            "sampleFileType": "النوع",
+            "openSamplePage": "فتح صفحة العينة"
+        }
+    },
+    "samples": {
+        "title": "إدارة العينات",
+        "subtitle": "جميع ملفات عينات المنتجات في المتجر",
+        "count": "عينات",
+        "noSamples": "لا توجد ملفات عينات.",
+        "table": {
+            "file": "الملف",
+            "product": "المنتج",
+            "size": "الحجم",
+            "type": "النوع",
+            "actions": "الإجراءات"
         }
     }
 }

@@ -158,14 +158,14 @@ export default function UserDetailPage() {
                             <CardContent className="p-4 flex gap-4 flex-wrap">
                                 {selectedUser.teachers && (
                                     <div className="bg-primary/5 rounded border p-3 flex-1 min-w-[200px]">
-                                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">Teacher Info</p>
-                                        <p className="font-mono text-sm">{selectedUser.teachers.serial || 'N/A'}</p>
+                                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">{t('details.teacherInfo')}</p>
+                                        <p className="text-sm">{selectedUser.teachers.serial || 'N/A'}</p>
                                     </div>
                                 )}
                                 {selectedUser.students && (
                                     <div className="bg-primary/5 rounded border p-3 flex-1 min-w-[200px]">
-                                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">Student Info</p>
-                                        <p className="text-sm">Level ID: {selectedUser.students.level_id || 'N/A'}</p>
+                                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1">{t('details.studentInfo')}</p>
+                                        <p className="text-sm">{t('details.levelId')}: {selectedUser.students.level_id || 'N/A'}</p>
                                     </div>
                                 )}
                             </CardContent>
