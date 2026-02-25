@@ -6,13 +6,13 @@ import { formatCurrency } from '@/lib/storeUtils';
 import { ShoppingCart, DollarSign, Activity, CheckCircle, Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function StoreStatsCards({ startDate, endDate }) {
+export default function StoreStatsCards() {
     const { t } = useTranslation('admin');
     const { dailyStoreStats, loading, fetchDailyStoreStats } = useAnalytics();
 
     useEffect(() => {
-        fetchDailyStoreStats(startDate, endDate);
-    }, [fetchDailyStoreStats, startDate, endDate]);
+        fetchDailyStoreStats();
+    }, [fetchDailyStoreStats]);
 
     if (loading) {
         return (
