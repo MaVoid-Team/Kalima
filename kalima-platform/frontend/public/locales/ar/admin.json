@@ -289,5 +289,12 @@
             "type": "النوع",
             "actions": "الإجراءات"
         }
+    },
+    "coupons":{
+        "api":{
+            "createSuccess": "تم إنشاء الكوبون بنجاح",
+            "updateSuccess": "تم تحديث الكوبون بنجاح",
+            "deleteSuccess": "تم حذف الكوبون بنجاح"
+        }
     }
 }

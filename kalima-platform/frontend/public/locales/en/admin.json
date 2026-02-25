@@ -289,5 +289,12 @@
             "type": "Type",
             "actions": "Actions"
         }
+    },
+    "coupons":{
+        "api":{
+            "createSuccess": "Coupon created successfully!",
+            "updateSuccess": "Coupon updated successfully!",
+            "deleteSuccess": "Coupon deleted successfully!"
+        }
     }
 }
