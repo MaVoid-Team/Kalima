@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MoreHorizontal, Eye, CheckCircle, RotateCcw, Package, Trash2, FileText } from 'lucide-react';
+import { MoreHorizontal, Eye, CheckCircle, RotateCcw, Package, Trash2, FileText, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
     DropdownMenu,
@@ -110,6 +110,20 @@ export default function OrderActions({ order, onActionSuccess }) {
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
+
+                    {order.users?.phone && (
+                        <DropdownMenuItem asChild>
+                            <a
+                                href={`https://wa.me/${order.users.phone.replace(/\D/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="cursor-pointer flex items-center text-success focus:text-success focus:bg-success/10"
+                            >
+                                <MessageCircle className="mr-2 h-4 w-4 rtl:mr-0 rtl:ml-2" />
+                                {t('orders.actions.whatsapp', 'Contact WhatsApp')}
+                            </a>
+                        </DropdownMenuItem>
+                    )}
 
                     {status === 'pending' && (
                         <DropdownMenuItem

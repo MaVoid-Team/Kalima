@@ -1,8 +1,9 @@
-import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import FastBuyCheckoutForm from "@/components/fast-buy/FastBuyCheckoutForm";
 import { useFastBuyCheckoutPage } from "@/hooks/useFastBuyCheckoutPage";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../components/ui/loading-spinner";
+import React from "react";
 
 export default function FastBuyCheckoutPage() {
   const { t } = useTranslation("checkout");
@@ -10,10 +11,16 @@ export default function FastBuyCheckoutPage() {
   const { state, handleCheckout, handleApplyCoupon } = useFastBuyCheckoutPage();
   const { preview, isLoading, error, isSubmitting } = state;
 
+  
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <LoadingSpinner className="h-8 w-8" />
       </div>
     );
   }

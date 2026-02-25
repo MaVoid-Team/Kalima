@@ -1,8 +1,8 @@
-import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import CheckoutSuccess from "@/components/checkout/CheckoutSuccess";
 import { useCheckoutPage } from "@/hooks/useCheckoutPage";
+import LoadingSpinner from "../../components/ui/loading-spinner";
 
 export default function CheckoutPage() {
   const { t } = useTranslation("checkout");
@@ -12,7 +12,7 @@ export default function CheckoutPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <LoadingSpinner className="h-8 w-8" />
       </div>
     );
   }

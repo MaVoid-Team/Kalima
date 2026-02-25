@@ -59,7 +59,8 @@
     "viewDetails": "View Details",
     "addToCart": "Add to Cart",
     "purchased": "PURCHASED",
-    "new": "NEW"
+    "new": "NEW",
+    "off": "OFF"
   },
   "products": {
     "trending": {

@@ -18,7 +18,16 @@
         }
     },
     "orders": {
+        "stats": {
+            "totalPurchases": "Total Purchases",
+            "totalRevenue": "Total Revenue",
+            "averagePrice": "Average Price",
+            "confirmedPurchases": "Confirmed Purchases",
+            "confirmedRevenue": "Confirmed Revenue",
+            "pendingPurchases": "Pending Purchases"
+        },
         "status": {
+            "label": "Status",
             "all": "All Orders",
             "pending": "Pending",
             "received": "Received",
@@ -27,6 +36,35 @@
             "created": "Created"
         },
         "total": "Total",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "createdAt": "Created at",
+        "itemPrice": "Item price",
+        "requiredFields": "Required fields",
+        "field": "Field",
+        "unknownProduct": "Unknown Product",
+        "sections": {
+            "summary": "Summary",
+            "customer": "Customer",
+            "payment": "Payment",
+            "notes": "Notes"
+        },
+        "customer": {
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone"
+        },
+        "payment": {
+            "method": "Method",
+            "methodPhone": "Payment phone",
+            "transferredFrom": "Transferred from",
+            "targetNumber": "Target number",
+            "screenshot": "Payment screenshot"
+        },
+        "notes": {
+            "customer": "Customer notes",
+            "admin": "Admin notes"
+        },
         "title": "Orders Management",
         "myOrders": "My Orders",
         "subtitle": "Track, manage, and view your order history",
@@ -35,6 +73,9 @@
         "noOrdersDescription": "Looks like you haven't placed any orders yet.",
         "totalOrders": "{{count}} orders",
         "searchPlaceholder": "Search by serial, name, email...",
+        "export": "Export",
+        "exportCsv": "Export as CSV",
+        "exportXlsx": "Export as Excel",
         "statusAll": "All Statuses",
         "statusPending": "Pending",
         "statusReceived": "Received",
@@ -53,6 +94,7 @@
         },
         "items": {
             "items": "Items",
+            "empty": "No items",
             "product": "Product",
             "type": "Type",
             "price": "Price",
@@ -62,11 +104,13 @@
         },
         "actions": {
             "view": "View Details",
+            "viewDetails": "View details",
             "receive": "Mark Received",
             "confirm": "Confirm Order",
             "return": "Return Order",
             "delete": "Delete Order",
-            "deleteItem": "Remove Item"
+            "deleteItem": "Remove Item",
+            "whatsapp": "Contact WhatsApp"
         },
         "messages": {
             "receiveSuccess": "Order marked as received",
@@ -80,8 +124,10 @@
             "noteSaved": "Admin note saved successfully"
         },
         "details": {
+            "title": "Order details",
             "backToOrders": "Back to Orders",
             "customerInfo": "Customer Info",
+            "customerNotes": "Customer Notes",
             "orderSummary": "Order Summary",
             "paymentInfo": "Payment Info",
             "statusTimeline": "Status Timeline",
@@ -99,7 +145,8 @@
             "saveNote": "Save Note",
             "total": "Total",
             "by": "by",
-            "lastNoteBy": "Last note by: {{name}}"
+            "lastNoteBy": "Last note by: {{name}}",
+            "contactWhatsApp": "Contact on WhatsApp"
         }
     }
 }

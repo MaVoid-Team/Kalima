@@ -134,7 +134,8 @@ axiosInstance.interceptors.response.use(
             errorMessage = i18n.t('auth:errors.network_error');
         }
 
-        toast.error(errorMessage);
+        // in case of empy cart no need to show error toast, as this is a common scenario and we handle it gracefully in the UI
+        errorMessage !== "Active cart not found" && toast.error(errorMessage);
         return Promise.reject(error);
     }
 );

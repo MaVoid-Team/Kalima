@@ -76,9 +76,10 @@ export default function RegisterTeacher({ onBack }) {
 }
 
 function TeacherFields() {
-    const { t } = useTranslation("auth");
+    const { t, i18n } = useTranslation("auth");
     const { control, watch, setValue } = useFormContext();
     const { governments, zones, getZonesByGovernment, subjects, loading: lookupsLoading } = useLookups();
+    const isRTL = i18n.dir() === "rtl";
 
     const selectedGov = watch("government_id");
 
@@ -100,7 +101,7 @@ function TeacherFields() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t("signup.fields.government")}</FormLabel>
-                            <Select onValueChange={handleGovChange} defaultValue={field.value}>
+                            <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={handleGovChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t("signup.fields.selectGovernment")} />
@@ -126,6 +127,7 @@ function TeacherFields() {
                         <FormItem>
                             <FormLabel>{t("signup.fields.zone")}</FormLabel>
                             <Select
+                                dir={isRTL ? "rtl" : "ltr"} 
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                                 disabled={!selectedGov || zones.length === 0}
@@ -155,7 +157,7 @@ function TeacherFields() {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t("signup.fields.subject")}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder={t("signup.fields.selectSubject")} />

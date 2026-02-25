@@ -18,7 +18,16 @@
         }
     },
     "orders": {
+        "stats": {
+            "totalPurchases": "إجمالي المشتريات",
+            "totalRevenue": "إجمالي الإيرادات",
+            "averagePrice": "متوسط السعر",
+            "confirmedPurchases": "المشتريات المؤكدة",
+            "confirmedRevenue": "الإيرادات المؤكدة",
+            "pendingPurchases": "مشتريات قيد الانتظار"
+        },
         "status": {
+            "label": "الحالة",
             "all": "جميع الطلبات",
             "pending": "قيد الانتظار",
             "received": "تم الاستلام",
@@ -27,6 +36,35 @@
             "created": "تم الإنشاء"
         },
         "total": "الإجمالي",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "createdAt": "تاريخ الإنشاء",
+        "itemPrice": "سعر العنصر",
+        "requiredFields": "الحقول المطلوبة",
+        "field": "الحقل",
+        "unknownProduct": "منتج غير معروف",
+        "sections": {
+            "summary": "الملخص",
+            "customer": "العميل",
+            "payment": "الدفع",
+            "notes": "الملاحظات"
+        },
+        "customer": {
+            "name": "الاسم",
+            "email": "البريد الإلكتروني",
+            "phone": "رقم الهاتف"
+        },
+        "payment": {
+            "method": "الطريقة",
+            "methodPhone": "رقم الدفع",
+            "transferredFrom": "محول من",
+            "targetNumber": "الرقم المستهدف",
+            "screenshot": "صورة الدفع"
+        },
+        "notes": {
+            "customer": "ملاحظات العميل",
+            "admin": "ملاحظات الإدارة"
+        },
         "title": "إدارة الطلبات",
         "myOrders": "طلباتي",
         "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
@@ -35,6 +73,9 @@
         "noOrdersDescription": "يبدو أنك لم تقم بأي طلبات بعد.",
         "totalOrders": "{{count}} طلبات",
         "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
+        "export": "تصدير",
+        "exportCsv": "تصدير كـ CSV",
+        "exportXlsx": "تصدير كـ Excel",
         "statusAll": "كل الحالات",
         "statusPending": "قيد الانتظار",
         "statusReceived": "تم الاستلام",
@@ -53,6 +94,7 @@
         },
         "items": {
             "items": "الطلبات",
+            "empty": "لا توجد عناصر",
             "product": "المنتج",
             "type": "النوع",
             "price": "السعر",
@@ -62,11 +104,13 @@
         },
         "actions": {
             "view": "عرض التفاصيل",
+            "viewDetails": "عرض التفاصيل",
             "receive": "تحديد كمستلم",
             "confirm": "تأكيد الطلب",
             "return": "إرجاع الطلب",
             "delete": "حذف الطلب",
-            "deleteItem": "حذف العنصر"
+            "deleteItem": "حذف العنصر",
+            "whatsapp": "تواصل عبر واتساب"
         },
         "messages": {
             "receiveSuccess": "تم تحديث الطلب إلى مستلم",
@@ -80,8 +124,10 @@
             "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
         },
         "details": {
+            "title": "تفاصيل الطلب",
             "backToOrders": "العودة للطلبات",
             "customerInfo": "معلومات العميل",
+            "customerNotes": "ملاحظات العميل",
             "orderSummary": "ملخص الطلب",
             "paymentInfo": "معلومات الدفع",
             "statusTimeline": "الجدول الزمني للحالة",
@@ -99,7 +145,8 @@
             "saveNote": "حفظ الملاحظة",
             "total": "الإجمالي",
             "by": "بواسطة",
-            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}"
+            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
+            "contactWhatsApp": "تواصل عبر واتساب"
         }
     }
 }

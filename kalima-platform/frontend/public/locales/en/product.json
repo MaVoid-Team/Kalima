@@ -32,7 +32,8 @@
     "reviews": "reviews",
     "createdBy": "Created by",
     "currency": "EGP",
-    "requiredInfo": "Required Information for Purchase:"
+    "requiredInfo": "Required Information for Purchase:",
+    "perks": "Product Features:"
   },
   "trustSignals": {
     "secureTransaction": "Secure Transaction",

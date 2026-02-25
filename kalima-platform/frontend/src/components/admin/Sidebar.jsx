@@ -8,7 +8,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     const { t, i18n } = useTranslation('admin');
     const { logout } = useAuth();
     const location = useLocation();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
 
     const isRtl = i18n.dir() === 'rtl';
 

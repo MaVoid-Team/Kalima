@@ -59,7 +59,8 @@
     "viewDetails": "عرض التفاصيل",
     "addToCart": "أضف للسلة",
     "purchased": "تم الشراء",
-    "new": "جديد"
+    "new": "جديد",
+    "off": "خصم"
   },
   "products": {
     "trending": {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import RoleSelection from "@/components/auth/RoleSelection";
@@ -11,6 +11,10 @@ export default function SignupPage() {
     const { t, i18n } = useTranslation("auth");
     const [role, setRole] = useState(null);
     const isRTL = i18n.dir() === "rtl";
+
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const renderStep = () => {
         if (!role) {

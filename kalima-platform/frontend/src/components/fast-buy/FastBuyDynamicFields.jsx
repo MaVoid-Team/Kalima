@@ -55,7 +55,8 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
   return (
     <div className="space-y-3">
       <Label className="font-semibold text-foreground/80">
-        {t(`payment.${field.label}`)}
+        {field?.label}
+        <span className="text-destructive">*</span>
       </Label>
       {isImage ? (
         <>
@@ -73,7 +74,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
                   : t("payment.upload", "Click to upload")}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {t("payment.upload_hint", "PNG, JPG up to 5MB")}
+                {t("payment.uploadHint", "PNG, JPG up to 5MB")}
               </p>
             </div>
           </div>
@@ -88,9 +89,8 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
       ) : (
         <Input
           type="text"
-          placeholder={t("payment.enter_field", {
-            field: t(`payment.${field.label}`),
-            defaultValue: `Enter ${t(`payment.${field.label}`)}`,
+          placeholder={t("payment.enterField", {
+            field: field?.label || "Field",
           })}
           value={value || ""}
           onChange={handleChange}
