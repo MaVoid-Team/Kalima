@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useFormContext } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 
 import {
@@ -20,10 +21,13 @@ import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
+import useAuth from "@/hooks/auth/useAuth";
 
 export default function RegisterStudent({ onBack }) {
     const { t } = useTranslation("auth");
+    const navigate = useNavigate();
     const { registerStudent, registerFirebaseStudent } = useRegister();
+    const { loginSuccess } = useAuth();
 
     // Schema
     const studentSchema = z.object({
@@ -47,12 +51,20 @@ export default function RegisterStudent({ onBack }) {
         };
 
         if (firebaseToken) {
-            await registerFirebaseStudent({ ...payload, idToken: firebaseToken });
+            // OAuth flow: backend auto-verifies → returns user+tokens → auto-login
+            const res = await registerFirebaseStudent({ ...payload, idToken: firebaseToken });
+            const user = res?.data?.user || res?.user;
+            const tokens = res?.data?.tokens || res?.tokens;
+            const portalAccess = res?.data?.portalAccess || res?.portalAccess;
+            if (user && tokens) {
+                loginSuccess(user, tokens, portalAccess);
+                navigate("/");
+            }
         } else {
+            // Email/password flow: backend sends verification email → stay on page
             await registerStudent(payload);
+            // No navigation — user must verify email first. Toast is shown by useApiMutation.
         }
-
-        navigate(`/auth/verify-email?email=${encodeURIComponent(data.email || "")}`);
     };
 
     return (

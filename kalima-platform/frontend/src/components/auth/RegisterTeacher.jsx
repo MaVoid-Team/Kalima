@@ -21,10 +21,13 @@ import CommonRegisterForm from "./CommonRegisterForm";
 import useRegister from "@/hooks/auth/useRegister";
 import useLookups from "@/hooks/useLookups";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/auth/useAuth";
 
 export default function RegisterTeacher({ onBack }) {
     const { t } = useTranslation("auth");
+    const navigate = useNavigate();
     const { registerTeacher, registerFirebaseTeacher } = useRegister();
+    const { loginSuccess } = useAuth();
 
     // Schema
     const teacherSchema = z.object({
@@ -47,12 +50,20 @@ export default function RegisterTeacher({ onBack }) {
         };
 
         if (firebaseToken) {
-            await registerFirebaseTeacher({ ...payload, idToken: firebaseToken });
+            // OAuth flow: backend auto-verifies → returns user+tokens → auto-login
+            const res = await registerFirebaseTeacher({ ...payload, idToken: firebaseToken });
+            const user = res?.data?.user || res?.user;
+            const tokens = res?.data?.tokens || res?.tokens;
+            const portalAccess = res?.data?.portalAccess || res?.portalAccess;
+            if (user && tokens) {
+                loginSuccess(user, tokens, portalAccess);
+                navigate("/");
+            }
         } else {
+            // Email/password flow: backend sends verification email → stay on page
             await registerTeacher(payload);
+            // No navigation — user must verify email first. Toast is shown by useApiMutation.
         }
-
-        navigate(`/auth/verify-email?email=${encodeURIComponent(data.email || "")}`);
     };
 
     return (

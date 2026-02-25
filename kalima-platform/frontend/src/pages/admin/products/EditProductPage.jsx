@@ -1,18 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle } from 'lucide-react';
-
-import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
-import { useCategories } from '@/hooks/useCategories';
-
+import {
+    ChevronLeft, ChevronRight, PlusCircle, X, Loader2, Package, Save
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
     Form,
     FormControl,
@@ -21,6 +19,8 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -28,11 +28,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
+import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useCategories } from '@/hooks/useCategories';
 
-// ─── Validation Schema ────────────────────────────────────────────────────────
-
-const createProductSchema = z.object({
+const editProductSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255),
     price: z.coerce.number().positive('Price must be greater than 0'),
     type: z.enum(['Product', 'Book']),
@@ -47,67 +47,93 @@ const createProductSchema = z.object({
         z.coerce.number().int().positive().optional()
     ),
     perks: z.string().optional().or(z.literal('')),
+    is_archived: z.boolean(),
 }).refine(
     (data) => !data.price_after_discount || data.price_after_discount < data.price,
     { message: 'Discounted price must be less than the original price', path: ['price_after_discount'] }
 );
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default function CreateProductPage() {
-    const { t, i18n } = useTranslation('admin');
+export default function EditProductPage() {
+    const { id } = useParams();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
 
     const {
-        createProduct,
+        selectedProduct,
+        loading,
+        actionLoading,
+        fetchProductById,
+        updateProduct,
+        attachCategories,
+        detachCategory,
         attachRequiredFields,
+        detachRequiredField,
         fetchFieldDefinitions,
         fieldDefinitions,
-        actionLoading,
     } = useAdminProducts();
 
     const { categories: roots, childCategories, fetchChildCategories } = useCategories();
 
-    const [thumbnail, setThumbnail] = useState(null);
-    const [sample, setSample] = useState(null);
+    const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
 
-    // Category picker state — single category only
+    // Category state
+    const [pickedCategory, setPickedCategory] = useState(null);
     const [selectedRootId, setSelectedRootId] = useState('');
     const [selectedChildId, setSelectedChildId] = useState('');
     const [childrenLoading, setChildrenLoading] = useState(false);
-    const [pickedCategory, setPickedCategory] = useState(null); // { id, title } | null
 
-    // Required fields picker state
-    const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
-    const [pickedFields, setPickedFields] = useState([]); // { id, label, field_type }[]
-
-    // Upload progress state
-    const [uploadProgress, setUploadProgress] = useState(0);
-
-    // Fetch field definitions on mount
-    useEffect(() => {
-        fetchFieldDefinitions();
-    }, [fetchFieldDefinitions]);
+    const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
+    const hasChildren = currentChildren && currentChildren.length > 0;
 
     const form = useForm({
-        resolver: zodResolver(createProductSchema),
+        resolver: zodResolver(editProductSchema),
         defaultValues: {
             title: '',
-            price: '',
-            type: 'Product',
             description: '',
+            type: 'Product',
+            price: '',
             price_after_discount: '',
             serial: '',
             coupon_id: '',
             perks: '',
+            is_archived: false,
         },
     });
 
-    // ─── Category helpers ─────────────────────────────────────────────────────
+    useEffect(() => {
+        fetchProductById(id);
+        fetchFieldDefinitions();
+    }, [fetchProductById, fetchFieldDefinitions, id]);
 
-    const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
-    const hasChildren = currentChildren && currentChildren.length > 0;
+    useEffect(() => {
+        if (selectedProduct) {
+            form.reset({
+                title: selectedProduct.title ?? '',
+                description: selectedProduct.description ?? '',
+                type: selectedProduct.type ?? 'Product',
+                price: selectedProduct.price != null ? String(selectedProduct.price) : '',
+                price_after_discount: selectedProduct.price_after_discount != null
+                    ? String(selectedProduct.price_after_discount) : '',
+                serial: selectedProduct.serial ?? '',
+                coupon_id: selectedProduct.coupon_id != null ? String(selectedProduct.coupon_id) : '',
+                perks: selectedProduct.perks ?? '',
+                is_archived: selectedProduct.is_archived ?? false,
+            });
+
+            const existingCat = selectedProduct?.product_categories?.[0];
+            if (existingCat) {
+                setPickedCategory({ id: existingCat.category_id, title: existingCat.categories?.title ?? '' });
+            } else {
+                setPickedCategory(null);
+            }
+            setSelectedRootId('');
+            setSelectedChildId('');
+            setSelectedFieldDefId('');
+        }
+    }, [selectedProduct, form]);
+
+    // ─── Category helpers ──────────────────────────────────────────────────────
 
     const handleRootChange = async (rootId) => {
         setSelectedRootId(rootId);
@@ -117,13 +143,8 @@ export default function CreateProductPage() {
             await fetchChildCategories(parseInt(rootId));
             setChildrenLoading(false);
         }
-        // Update picked category to this root immediately (child may override)
         const label = roots.find(r => r.id === parseInt(rootId))?.title;
-        if (rootId) {
-            setPickedCategory({ id: parseInt(rootId), title: label });
-        } else {
-            setPickedCategory(null);
-        }
+        setPickedCategory(rootId ? { id: parseInt(rootId), title: label } : null);
     };
 
     const handleChildChange = (childId) => {
@@ -132,7 +153,6 @@ export default function CreateProductPage() {
             const label = currentChildren?.find(c => c.id === parseInt(childId))?.title;
             setPickedCategory({ id: parseInt(childId), title: label });
         } else {
-            // Revert to root selection
             const label = roots.find(r => r.id === parseInt(selectedRootId))?.title;
             setPickedCategory(selectedRootId ? { id: parseInt(selectedRootId), title: label } : null);
         }
@@ -144,81 +164,93 @@ export default function CreateProductPage() {
         setSelectedChildId('');
     };
 
-    // ─── Required field helpers ───────────────────────────────────────────────
+    // ─── Required field helpers ────────────────────────────────────────────────
 
-    const pickedFieldIds = new Set(pickedFields.map(f => f.id));
-    const availableFieldDefs = fieldDefinitions.filter(def => !pickedFieldIds.has(def.id));
+    const attachedFields = selectedProduct?.product_required_fields ?? [];
+    const attachedDefIds = new Set(attachedFields.map(f => f.field_definition_id));
+    const availableFieldDefs = fieldDefinitions.filter(def => !attachedDefIds.has(def.id));
 
-    const handleAddField = () => {
-        if (!selectedFieldDefId) return;
-        const def = fieldDefinitions.find(d => d.id === parseInt(selectedFieldDefId));
-        if (!def || pickedFieldIds.has(def.id)) return;
-        setPickedFields(prev => [...prev, { id: def.id, label: def.label, field_type: def.field_type }]);
+    const handleAttachField = async () => {
+        if (!selectedFieldDefId || !id) return;
+        const fields = [{ field_definition_id: parseInt(selectedFieldDefId), is_required: true }];
+        await attachRequiredFields(id, fields);
         setSelectedFieldDefId('');
+        fetchProductById(id);
     };
 
-    const handleRemoveField = (id) => {
-        setPickedFields(prev => prev.filter(f => f.id !== id));
+    const handleDetachField = async (fieldDefinitionId) => {
+        if (!id) return;
+        await detachRequiredField(id, fieldDefinitionId);
+        fetchProductById(id);
     };
 
-    // ─── Submit ───────────────────────────────────────────────────────────────
+    // ─── Submit ────────────────────────────────────────────────────────────────
 
     const onSubmit = async (values) => {
-        const formData = new FormData();
-        formData.append('title', values.title);
-        formData.append('price', values.price);
-        formData.append('type', values.type);
-        if (values.description) formData.append('description', values.description);
-        if (values.price_after_discount) formData.append('price_after_discount', values.price_after_discount);
-        if (values.serial) formData.append('serial', values.serial);
-        if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
-        if (values.perks) formData.append('perks', values.perks);
-        if (pickedCategory) {
-            formData.append('category_ids', JSON.stringify([pickedCategory.id]));
-        }
-        if (thumbnail) formData.append('thumbnail', thumbnail);
-        if (sample) formData.append('sample', sample);
+        const payload = {
+            title: values.title,
+            type: values.type,
+            price: values.price,
+            is_archived: values.is_archived,
+        };
+        if (values.description) payload.description = values.description;
+        if (values.price_after_discount) payload.price_after_discount = values.price_after_discount;
+        if (values.serial) payload.serial = values.serial;
+        if (values.coupon_id) payload.coupon_id = values.coupon_id;
+        payload.perks = values.perks || '';
 
-        setUploadProgress(0);
-        const res = await createProduct(formData, (progressEvent) => {
-            if (progressEvent.total) {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                setUploadProgress(percentCompleted);
-            }
-        });
+        const res = await updateProduct(id, payload);
+        if (!res?.success) return;
 
-        if (res?.success) {
-            const newProductId = res.data?.id;
-            // Attach required fields after the product is created
-            if (pickedFields.length > 0 && newProductId) {
-                await attachRequiredFields(
-                    newProductId,
-                    pickedFields.map(f => ({ field_definition_id: f.id, is_required: true }))
-                );
+        // Reconcile category
+        const existingCatId = selectedProduct?.product_categories?.[0]?.category_id ?? null;
+        const newCatId = pickedCategory?.id ?? null;
+
+        if (existingCatId !== newCatId) {
+            if (existingCatId) {
+                await detachCategory(id, existingCatId);
             }
-            // Navigate to the new product's detail page
-            if (newProductId) {
-                navigate(`/admin/products/${newProductId}`);
-            } else {
-                navigate('/admin/products');
+            if (newCatId) {
+                await attachCategories(id, [newCatId]);
             }
         }
+
+        navigate(`/admin/products/${id}`);
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────
+    // ─── Loading / Not Found States ────────────────────────────────────────────
+
+    if (loading && !selectedProduct) {
+        return (
+            <div className="space-y-6" data-testid="edit-product-skeleton">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-64 w-full rounded-xl" />
+            </div>
+        );
+    }
+
+    if (!selectedProduct) {
+        return (
+            <div className="text-center py-16" data-testid="edit-product-not-found">
+                <p className="text-muted-foreground">{t('products.noProducts')}</p>
+                <Button variant="link" onClick={() => navigate('/admin/products')} className="mt-2">
+                    {t('products.backToProducts')}
+                </Button>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-6" data-testid="create-product-page">
-
+        <div className="space-y-6" data-testid="edit-product-page">
             {/* Breadcrumb / Back */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Link
-                    to="/admin/products"
+                    to={`/admin/products/${id}`}
                     className="hover:text-foreground transition-colors flex items-center gap-1"
-                    data-testid="create-product-back-link"
+                    data-testid="edit-product-back-link"
                 >
                     {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-                    {t('products.backToProducts')}
+                    {t('products.backToProduct', 'Back to Product')}
                 </Link>
             </div>
 
@@ -226,20 +258,19 @@ export default function CreateProductPage() {
             <div className="flex items-start gap-3">
                 <Package className="h-8 w-8 text-primary mt-1 shrink-0" />
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{t('products.create.dialogTitle')}</h1>
-                    <p className="text-muted-foreground mt-1 text-sm">{t('products.create.dialogDescription')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight">{t('products.edit.dialogTitle')}</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">{selectedProduct.title}</p>
                 </div>
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="create-product-form">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="edit-product-form">
 
-                    {/* ── Section: Core Details ── */}
+                    {/* ── Section: Core Info ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
                         <h2 className="font-semibold text-foreground">{t('products.detail.info')}</h2>
                         <Separator />
 
-                        {/* Title */}
                         <FormField
                             control={form.control}
                             name="title"
@@ -247,18 +278,13 @@ export default function CreateProductPage() {
                                 <FormItem>
                                     <FormLabel>{t('products.form.title')} *</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder={t('products.form.titlePlaceholder')}
-                                            data-testid="create-product-title-input"
-                                            {...field}
-                                        />
+                                        <Input data-testid="edit-product-title-input" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        {/* Price + Type */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -271,7 +297,7 @@ export default function CreateProductPage() {
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                data-testid="create-product-price-input"
+                                                data-testid="edit-product-price-input"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -285,9 +311,9 @@ export default function CreateProductPage() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{t('products.form.type')}</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger data-testid="create-product-type-select">
+                                                <SelectTrigger data-testid="edit-product-type-select">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -302,7 +328,6 @@ export default function CreateProductPage() {
                             />
                         </div>
 
-                        {/* Price after discount + Serial */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
@@ -315,7 +340,7 @@ export default function CreateProductPage() {
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
-                                                data-testid="create-product-discount-input"
+                                                data-testid="edit-product-discount-input"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -332,7 +357,7 @@ export default function CreateProductPage() {
                                         <FormControl>
                                             <Input
                                                 placeholder={t('products.form.serialPlaceholder')}
-                                                data-testid="create-product-serial-input"
+                                                data-testid="edit-product-serial-input"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -342,7 +367,6 @@ export default function CreateProductPage() {
                             />
                         </div>
 
-                        {/* Description */}
                         <FormField
                             control={form.control}
                             name="description"
@@ -351,9 +375,8 @@ export default function CreateProductPage() {
                                     <FormLabel>{t('products.form.description')}</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder={t('products.form.descriptionPlaceholder')}
                                             rows={4}
-                                            data-testid="create-product-description-input"
+                                            data-testid="edit-product-description-input"
                                             {...field}
                                         />
                                     </FormControl>
@@ -362,7 +385,6 @@ export default function CreateProductPage() {
                             )}
                         />
 
-                        {/* Perks */}
                         <FormField
                             control={form.control}
                             name="perks"
@@ -372,7 +394,7 @@ export default function CreateProductPage() {
                                     <FormControl>
                                         <Input
                                             placeholder={t('products.form.perksPlaceholder')}
-                                            data-testid="create-product-perks-input"
+                                            data-testid="edit-product-perks-input"
                                             {...field}
                                         />
                                     </FormControl>
@@ -380,32 +402,55 @@ export default function CreateProductPage() {
                                 </FormItem>
                             )}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="is_archived"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center gap-3">
+                                    <FormControl>
+                                        <Switch
+                                            id="edit-product-archived"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            data-testid="edit-product-archived-switch"
+                                        />
+                                    </FormControl>
+                                    <FormLabel htmlFor="edit-product-archived" className="mt-0!">
+                                        {t('products.form.isArchived')}
+                                    </FormLabel>
+                                </FormItem>
+                            )}
+                        />
                     </div>
 
                     {/* ── Section: Category ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-category">
                         <h2 className="font-semibold text-foreground">{t('products.detail.categories')}</h2>
                         <Separator />
 
-                        {/* Selected category badge */}
-                        {pickedCategory && (
+                        {/* Picked category badge */}
+                        {pickedCategory ? (
                             <div className="flex flex-wrap gap-2">
                                 <span
                                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
-                                    data-testid="create-product-selected-category"
+                                    data-testid="edit-product-category-badge"
                                 >
                                     {pickedCategory.title}
                                     <button
                                         type="button"
                                         onClick={handleClearCategory}
-                                        className="rounded-full hover:bg-primary/20 p-0.5"
+                                        disabled={actionLoading}
+                                        className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
                                         aria-label={`Remove ${pickedCategory.title}`}
-                                        data-testid="create-product-remove-category"
+                                        data-testid="edit-product-category-remove"
                                     >
                                         <X className="h-3 w-3" />
                                     </button>
                                 </span>
                             </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">{t('products.detail.noCategories')}</p>
                         )}
 
                         {/* Cascading root → child selects */}
@@ -413,9 +458,9 @@ export default function CreateProductPage() {
                             <Select
                                 value={selectedRootId}
                                 onValueChange={handleRootChange}
-                                disabled={roots.length === 0}
+                                disabled={actionLoading || roots.length === 0}
                             >
-                                <SelectTrigger className="flex-1" data-testid="create-product-category-root-select">
+                                <SelectTrigger className="flex-1" data-testid="edit-product-category-root-select">
                                     <SelectValue placeholder={t('products.detail.selectCategory')} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -437,9 +482,9 @@ export default function CreateProductPage() {
                                     <Select
                                         value={selectedChildId}
                                         onValueChange={handleChildChange}
-                                        disabled={!currentChildren?.length}
+                                        disabled={actionLoading || !currentChildren?.length}
                                     >
-                                        <SelectTrigger className="flex-1" data-testid="create-product-category-child-select">
+                                        <SelectTrigger className="flex-1" data-testid="edit-product-category-child-select">
                                             <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory (optional)')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -456,42 +501,43 @@ export default function CreateProductPage() {
                     </div>
 
                     {/* ── Section: Required Fields ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
+                    <div className="rounded-xl border border-border p-5 space-y-4" data-testid="edit-product-required-fields">
                         <h2 className="font-semibold text-foreground">{t('products.detail.requiredFields')}</h2>
                         <Separator />
 
-                        {/* Picked field tags */}
-                        {pickedFields.length > 0 ? (
+                        {attachedFields.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
+                        ) : (
                             <div className="flex flex-wrap gap-2">
-                                {pickedFields.map((field) => (
+                                {attachedFields.map((field) => (
                                     <span
                                         key={field.id}
                                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
-                                        data-testid={`create-product-required-field-tag-${field.id}`}
+                                        data-testid={`edit-product-required-field-tag-${field.id}`}
                                     >
-                                        {field.label}
-                                        <span className="text-xs text-muted-foreground opacity-70">({field.field_type})</span>
+                                        {field.required_field_definitions?.label}
+                                        <Badge variant="outline" className="text-xs ms-1">
+                                            {field.required_field_definitions?.field_type}
+                                        </Badge>
                                         <button
                                             type="button"
-                                            onClick={() => handleRemoveField(field.id)}
-                                            className="rounded-full hover:bg-primary/20 p-0.5"
-                                            aria-label={`Remove ${field.label}`}
-                                            data-testid={`create-product-remove-field-${field.id}`}
+                                            onClick={() => handleDetachField(field.field_definition_id)}
+                                            disabled={actionLoading}
+                                            className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
+                                            aria-label={`Remove ${field.required_field_definitions?.label}`}
+                                            data-testid={`edit-product-detach-field-${field.id}`}
                                         >
                                             <X className="h-3 w-3" />
                                         </button>
                                     </span>
                                 ))}
                             </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
                         )}
 
-                        {/* Field picker */}
                         {availableFieldDefs.length > 0 && (
                             <div className="flex items-center gap-2">
                                 <Select value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
-                                    <SelectTrigger className="flex-1" data-testid="create-product-field-def-select">
+                                    <SelectTrigger className="flex-1" data-testid="edit-product-field-def-select">
                                         <SelectValue placeholder={t('products.detail.selectField')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -504,12 +550,10 @@ export default function CreateProductPage() {
                                 </Select>
                                 <Button
                                     type="button"
-                                    variant="outline"
                                     size="sm"
-                                    className="shrink-0"
-                                    disabled={!selectedFieldDefId}
-                                    onClick={handleAddField}
-                                    data-testid="create-product-add-field-button"
+                                    disabled={!selectedFieldDefId || actionLoading}
+                                    onClick={handleAttachField}
+                                    data-testid="edit-product-attach-field-button"
                                 >
                                     <PlusCircle className="me-2 h-4 w-4" />
                                     {t('products.detail.attachField')}
@@ -518,75 +562,28 @@ export default function CreateProductPage() {
                         )}
                     </div>
 
-                    {/* ── Section: Media ── */}
-                    <div className="rounded-xl border border-border p-5 space-y-4">
-                        <h2 className="font-semibold text-foreground">{t('products.detail.media')}</h2>
-                        <Separator />
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {/* Thumbnail */}
-                            <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.thumbnail')}</span>
-                                <Input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setThumbnail(e.target.files?.[0] ?? null)}
-                                    data-testid="create-product-thumbnail-input"
-                                />
-                                {thumbnail && (
-                                    <p className="text-xs text-muted-foreground truncate">{thumbnail.name}</p>
-                                )}
-                            </div>
-
-                            {/* Sample */}
-                            <div className="space-y-1.5">
-                                <span className="text-sm font-medium leading-none">{t('products.form.sample')}</span>
-                                <Input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={(e) => setSample(e.target.files?.[0] ?? null)}
-                                    data-testid="create-product-sample-input"
-                                />
-                                {sample && (
-                                    <p className="text-xs text-muted-foreground truncate">{sample.name}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ── Upload Progress ── */}
-                    {actionLoading && uploadProgress > 0 && (
-                        <div className="mb-4">
-                            <div className="flex justify-between text-sm mb-1 text-muted-foreground">
-                                <span>{uploadProgress < 100 ? t('products.create.uploading', 'Uploading...') : t('products.create.processing', 'Processing...')}</span>
-                                <span>{uploadProgress}%</span>
-                            </div>
-                            <Progress value={uploadProgress} />
-                        </div>
-                    )}
-
                     {/* ── Action Buttons ── */}
                     <div className="flex justify-end gap-3 pb-4">
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => navigate('/admin/products')}
-                            data-testid="create-product-cancel-button"
+                            onClick={() => navigate(`/admin/products/${id}`)}
+                            data-testid="edit-product-cancel-button"
                         >
                             {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={actionLoading}
-                            data-testid="create-product-submit-button"
+                            data-testid="edit-product-submit-button"
                         >
-                            {actionLoading
-                                ? <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.create.creating')}</>
-                                : t('products.create.submit')
-                            }
+                            {actionLoading ? (
+                                <><Loader2 className="me-2 h-4 w-4 animate-spin" />{t('products.edit.saving')}</>
+                            ) : (
+                                <><Save className="me-2 h-4 w-4" />{t('products.edit.submit')}</>
+                            )}
                         </Button>
                     </div>
-
                 </form>
             </Form>
         </div>

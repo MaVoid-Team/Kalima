@@ -34,9 +34,7 @@ export default function CategoriesManager({ product, onAttach, onDetach, loading
     // The ID that will actually be attached — child if one is picked, otherwise root
     const effectiveCategoryId = selectedChildId ? parseInt(selectedChildId) : (selectedRootId ? parseInt(selectedRootId) : null);
     const canAttach = effectiveCategoryId !== null
-        && !attachedIds.has(effectiveCategoryId)
-        // If children are loaded and exist, a child selection is required
-        && (!hasChildren || !!selectedChildId);
+        && !attachedIds.has(effectiveCategoryId);
 
     const handleRootChange = async (rootId) => {
         setSelectedRootId(rootId);
@@ -121,7 +119,7 @@ export default function CategoriesManager({ product, onAttach, onDetach, loading
                             disabled={loading || availableChildren.length === 0}
                         >
                             <SelectTrigger className="flex-1" data-testid="categories-manager-child-select">
-                                <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory...')} />
+                                <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory (optional)')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {availableChildren.map((child) => (

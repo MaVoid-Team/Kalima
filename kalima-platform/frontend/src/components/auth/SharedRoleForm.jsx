@@ -6,6 +6,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import CommonRegisterForm from "./CommonRegisterForm";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/auth/useAuth";
 
 export default function SharedRoleForm({ role, onBack, registerFn, registerFirebaseFn }) {
     // Memoize the schema to prevent recreation on every render
@@ -13,6 +14,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
         secondary_phone: z.string().optional(),
     }), []);
     const navigate = useNavigate();
+    const { loginSuccess } = useAuth();
 
     const handleSubmit = async (values, firebaseToken) => {
         const { confirmPassword, ...data } = values;
@@ -22,12 +24,20 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
         }
 
         if (firebaseToken) {
-            await registerFirebaseFn({ ...data, idToken: firebaseToken });
+            // OAuth flow: backend auto-verifies → returns user+tokens → auto-login
+            const res = await registerFirebaseFn({ ...data, idToken: firebaseToken });
+            const user = res?.data?.user || res?.user;
+            const tokens = res?.data?.tokens || res?.tokens;
+            const portalAccess = res?.data?.portalAccess || res?.portalAccess;
+            if (user && tokens) {
+                loginSuccess(user, tokens, portalAccess);
+                navigate("/");
+            }
         } else {
+            // Email/password flow: backend sends verification email → stay on page
             await registerFn(data);
+            // No navigation — user must verify email first. Toast is shown by useApiMutation.
         }
-
-        navigate(`/auth/verify-email?email=${encodeURIComponent(data.email || "")}`);
     };
 
     return (

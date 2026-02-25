@@ -10,13 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
-import EditProductDialog from '@/components/admin/products/EditProductDialog';
-import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 import ThumbnailManager from '@/components/admin/products/ThumbnailManager';
 import GalleryManager from '@/components/admin/products/GalleryManager';
 import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
+import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -44,7 +43,6 @@ export default function ProductDetailPage() {
         detachRequiredField,
     } = useAdminProducts();
 
-    const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     const refresh = useCallback(() => {
@@ -124,11 +122,13 @@ export default function ProductDetailPage() {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditOpen(true)}
+                        asChild
                         data-testid="product-detail-edit-button"
                     >
-                        <Pencil className="me-2 h-4 w-4" />
-                        {t('products.actions.edit')}
+                        <Link to={`/admin/products/${id}/edit`}>
+                            <Pencil className="me-2 h-4 w-4" />
+                            {t('products.actions.edit')}
+                        </Link>
                     </Button>
                     <Button
                         variant="destructive"
@@ -244,18 +244,6 @@ export default function ProductDetailPage() {
                     loading={actionLoading}
                 />
             </div>
-
-            {/* Edit Dialog */}
-            <EditProductDialog
-                product={product}
-                open={editOpen}
-                onOpenChange={setEditOpen}
-                onSuccess={refresh}
-                fieldDefinitions={fieldDefinitions}
-                onLoadDefinitions={fetchFieldDefinitions}
-                onAttachField={(productId, fields) => attachRequiredFields(productId, fields)}
-                onDetachField={(productId, fieldDefinitionId) => detachRequiredField(productId, fieldDefinitionId)}
-            />
 
             {/* Delete Confirmation Dialog */}
             <DeleteProductDialog
