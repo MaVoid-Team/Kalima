@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Package } from 'lucide-react';
+import { Package, PlusCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
+import { Button } from '@/components/ui/button';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import {
     Pagination,
@@ -16,7 +18,6 @@ import {
 
 import ProductFilters from '@/components/admin/products/ProductFilters';
 import ProductsTable from '@/components/admin/products/ProductsTable';
-import CreateProductDialog from '@/components/admin/products/CreateProductDialog';
 import EditProductDialog from '@/components/admin/products/EditProductDialog';
 import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
 
@@ -92,7 +93,12 @@ export default function ProductsPage() {
                     <p className="text-sm text-muted-foreground hidden sm:block">
                         {t('products.totalProducts', { count: pagination.total })}
                     </p>
-                    <CreateProductDialog onSuccess={load} />
+                    <Link to="/admin/products/create">
+                        <Button data-testid="create-product-page-trigger">
+                            <PlusCircle className="me-2 h-4 w-4" />
+                            {t('products.createProduct')}
+                        </Button>
+                    </Link>
                 </div>
             </div>
 

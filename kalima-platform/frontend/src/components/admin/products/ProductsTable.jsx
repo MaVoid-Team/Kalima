@@ -101,14 +101,20 @@ export default function ProductsTable({ products, loading, onEdit, onArchiveTogg
                                 </TableCell>
 
                                 {/* Price */}
-                                <TableCell>
-                                    <div>
-                                        <p className="font-semibold text-sm">{formatCurrency(product.price, t)}</p>
-                                        {product.price_after_discount && (
+                                {product.price_after_discount && product.price_after_discount !== product.price ? (
+                                    <TableCell>
+                                        <div>
+                                            <p className="font-semibold text-sm">{formatCurrency(product.price_after_discount, t)}</p>
                                             <p className="text-xs text-muted-foreground line-through">{formatCurrency(product.price, t)}</p>
-                                        )}
-                                    </div>
-                                </TableCell>
+                                        </div>
+                                    </TableCell>
+                                ) : (
+                                    <TableCell>
+                                        <div>
+                                            <p className="font-semibold text-sm">{formatCurrency(product.price, t)}</p>
+                                        </div>
+                                    </TableCell>
+                                )}
 
                                 {/* Categories */}
                                 <TableCell className="hidden lg:table-cell">
