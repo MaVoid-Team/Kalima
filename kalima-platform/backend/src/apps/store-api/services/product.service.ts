@@ -24,7 +24,14 @@ import {
 // ============================================
 
 /** Minimal include for product list (getAllProducts) */
-const PRODUCT_LIST_INCLUDE = {
+const PRODUCT_LIST_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  type: true,
+  price: true,
+  is_archived: true,
+  price_after_discount: true,
   thumbnail_image: true,
   product_categories: {
     include: { categories: { select: { id: true, title: true } } },
@@ -135,14 +142,17 @@ class ProductService {
   // READ — ALL
   // ============================================
 
-  async getAllProducts(filters?: {
-    is_archived?: boolean;
-    category_id?: number;
-    search?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{
-    data: products[];
+  async getAllProducts(
+    userId?: number,
+    filters?: {
+      is_archived?: boolean;
+      category_id?: number;
+      search?: string;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<{
+    data: any[];
     total: number;
     page: number;
     limit: number;
@@ -173,7 +183,7 @@ class ProductService {
     const [data, total] = await Promise.all([
       this.db.products.findMany({
         where,
-        include: PRODUCT_LIST_INCLUDE,
+        select: PRODUCT_LIST_SELECT,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -181,7 +191,26 @@ class ProductService {
       this.db.products.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    // Handle is_purchased if userId is provided
+    let purchasedProductIds = new Set<number>();
+    if (userId) {
+      const purchases = await this.db.purchase_items.findMany({
+        where: {
+          purchases: {
+            user_id: userId,
+          },
+        },
+        select: { product_id: true },
+      });
+      purchasedProductIds = new Set(purchases.map((p) => p.product_id));
+    }
+
+    const productsWithPurchased = data.map((product) => ({
+      ...product,
+      isPurchased: purchasedProductIds.has(product.id),
+    }));
+
+    return { data: productsWithPurchased, total, page, limit };
   }
 
   // ============================================
