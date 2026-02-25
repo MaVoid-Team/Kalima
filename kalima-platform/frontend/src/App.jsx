@@ -30,6 +30,8 @@ const CartPage = lazy(() => import("./pages/cart/CartPage"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const OrdersPage = lazy(() => import("./pages/admin/orders/OrdersPage"));
 const OrderDetailPage = lazy(() => import("./pages/admin/orders/OrderDetailPage"));
+const ProductsPage = lazy(() => import("./pages/admin/products/ProductsPage"));
+const ProductDetailPage = lazy(() => import("./pages/admin/products/ProductDetailPage"));
 const UsersPage = lazy(() => import("./pages/admin/users/UsersPage"));
 const UserDetailPage = lazy(() => import("./pages/admin/users/UserDetailPage"));
 
@@ -81,6 +83,8 @@ function App() {
             <Route element={<AdminLayout />}>
               <Route path="/admin/orders" element={<OrdersPage />} />
               <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/admin/products" element={<ProductsPage />} />
+              <Route path="/admin/products/:id" element={<ProductDetailPage />} />
               <Route path="/admin/users" element={<UsersPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
             </Route>

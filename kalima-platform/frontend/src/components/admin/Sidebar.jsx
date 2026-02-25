@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X, Package } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
@@ -15,6 +15,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     // Using userManagement namespace explicitly for the users translation
     const navigation = [
         { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart },
+        { name: t('nav.products'), href: '/admin/products', icon: Package },
         { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
     ];
 
