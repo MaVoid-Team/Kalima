@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, PlusCircle, Loader2, X, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, X, Package } from 'lucide-react';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
@@ -71,11 +71,11 @@ export default function CreateProductPage() {
     const [thumbnail, setThumbnail] = useState(null);
     const [sample, setSample] = useState(null);
 
-    // Category picker state
+    // Category picker state — single category only
     const [selectedRootId, setSelectedRootId] = useState('');
     const [selectedChildId, setSelectedChildId] = useState('');
     const [childrenLoading, setChildrenLoading] = useState(false);
-    const [pickedCategories, setPickedCategories] = useState([]); // { id, title }[]
+    const [pickedCategory, setPickedCategory] = useState(null); // { id, title } | null
 
     // Required fields picker state
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
@@ -104,11 +104,6 @@ export default function CreateProductPage() {
 
     const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
     const hasChildren = currentChildren && currentChildren.length > 0;
-    const pickedIds = new Set(pickedCategories.map(c => c.id));
-    const canAddCategory =
-        selectedRootId &&
-        (!hasChildren || !!selectedChildId) &&
-        !pickedIds.has(selectedChildId ? parseInt(selectedChildId) : parseInt(selectedRootId));
 
     const handleRootChange = async (rootId) => {
         setSelectedRootId(rootId);
@@ -118,22 +113,31 @@ export default function CreateProductPage() {
             await fetchChildCategories(parseInt(rootId));
             setChildrenLoading(false);
         }
+        // Update picked category to this root immediately (child may override)
+        const label = roots.find(r => r.id === parseInt(rootId))?.title;
+        if (rootId) {
+            setPickedCategory({ id: parseInt(rootId), title: label });
+        } else {
+            setPickedCategory(null);
+        }
     };
 
-    const handleAddCategory = () => {
-        if (!canAddCategory) return;
-        const effectiveId = selectedChildId ? parseInt(selectedChildId) : parseInt(selectedRootId);
-        if (pickedIds.has(effectiveId)) return;
-        const label = selectedChildId
-            ? currentChildren.find(c => c.id === parseInt(selectedChildId))?.title
-            : roots.find(r => r.id === parseInt(selectedRootId))?.title;
-        setPickedCategories(prev => [...prev, { id: effectiveId, title: label }]);
+    const handleChildChange = (childId) => {
+        setSelectedChildId(childId);
+        if (childId) {
+            const label = currentChildren?.find(c => c.id === parseInt(childId))?.title;
+            setPickedCategory({ id: parseInt(childId), title: label });
+        } else {
+            // Revert to root selection
+            const label = roots.find(r => r.id === parseInt(selectedRootId))?.title;
+            setPickedCategory(selectedRootId ? { id: parseInt(selectedRootId), title: label } : null);
+        }
+    };
+
+    const handleClearCategory = () => {
+        setPickedCategory(null);
         setSelectedRootId('');
         setSelectedChildId('');
-    };
-
-    const handleRemoveCategory = (id) => {
-        setPickedCategories(prev => prev.filter(c => c.id !== id));
     };
 
     // ─── Required field helpers ───────────────────────────────────────────────
@@ -165,8 +169,8 @@ export default function CreateProductPage() {
         if (values.serial) formData.append('serial', values.serial);
         if (values.coupon_id) formData.append('coupon_id', values.coupon_id);
         if (values.perks) formData.append('perks', values.perks);
-        if (pickedCategories.length > 0) {
-            formData.append('category_ids', JSON.stringify(pickedCategories.map(c => c.id)));
+        if (pickedCategory) {
+            formData.append('category_ids', JSON.stringify([pickedCategory.id]));
         }
         if (thumbnail) formData.append('thumbnail', thumbnail);
         if (sample) formData.append('sample', sample);
@@ -367,31 +371,29 @@ export default function CreateProductPage() {
                         />
                     </div>
 
-                    {/* ── Section: Categories ── */}
+                    {/* ── Section: Category ── */}
                     <div className="rounded-xl border border-border p-5 space-y-4">
                         <h2 className="font-semibold text-foreground">{t('products.detail.categories')}</h2>
                         <Separator />
 
-                        {/* Picked category tags */}
-                        {pickedCategories.length > 0 && (
+                        {/* Selected category badge */}
+                        {pickedCategory && (
                             <div className="flex flex-wrap gap-2">
-                                {pickedCategories.map((cat) => (
-                                    <span
-                                        key={cat.id}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                <span
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                    data-testid="create-product-selected-category"
+                                >
+                                    {pickedCategory.title}
+                                    <button
+                                        type="button"
+                                        onClick={handleClearCategory}
+                                        className="rounded-full hover:bg-primary/20 p-0.5"
+                                        aria-label={`Remove ${pickedCategory.title}`}
+                                        data-testid="create-product-remove-category"
                                     >
-                                        {cat.title}
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveCategory(cat.id)}
-                                            className="rounded-full hover:bg-primary/20 p-0.5"
-                                            aria-label={`Remove ${cat.title}`}
-                                            data-testid={`create-product-remove-category-${cat.id}`}
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </button>
-                                    </span>
-                                ))}
+                                        <X className="h-3 w-3" />
+                                    </button>
+                                </span>
                             </div>
                         )}
 
@@ -423,7 +425,7 @@ export default function CreateProductPage() {
                                 ) : hasChildren ? (
                                     <Select
                                         value={selectedChildId}
-                                        onValueChange={setSelectedChildId}
+                                        onValueChange={handleChildChange}
                                         disabled={!currentChildren?.length}
                                     >
                                         <SelectTrigger className="flex-1" data-testid="create-product-category-child-select">
@@ -439,19 +441,6 @@ export default function CreateProductPage() {
                                     </Select>
                                 ) : null
                             )}
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="shrink-0"
-                                disabled={!canAddCategory}
-                                onClick={handleAddCategory}
-                                data-testid="create-product-add-category-button"
-                            >
-                                <PlusCircle className="me-2 h-4 w-4" />
-                                {t('products.detail.attachCategory')}
-                            </Button>
                         </div>
                     </div>
 
