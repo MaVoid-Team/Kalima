@@ -28,7 +28,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
     return (
         <aside
-            className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:static lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
+            className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
         >
             {/* Header + Toggles */}
             <div className={`flex h-16 items-center px-4 border-b border-sidebar-border ${isCollapsed ? 'lg:justify-center justify-between' : 'justify-between'}`}>

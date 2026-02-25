@@ -13,7 +13,7 @@ export default function AdminLayout() {
     }, [location.pathname]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background">
+        <div className="flex min-h-screen bg-background">
             {/* Mobile Sidebar Overlay */}
             {isMobileOpen && (
                 <div
@@ -26,9 +26,9 @@ export default function AdminLayout() {
             <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
             {/* Main Column */}
-            <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+            <div className="flex flex-1 flex-col min-w-0">
                 {/* Header */}
-                <header className="flex h-16 items-center justify-between border-b border-border px-4 sm:px-6 lg:px-8">
+                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6 lg:px-8">
                     <button
                         type="button"
                         className="text-muted-foreground border-border px-2 focus:outline-none lg:hidden -ml-2"
@@ -46,7 +46,7 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-12 lg:p-16">
+                <main className="flex-1 p-4 sm:p-12 lg:p-16">
                     <Outlet />
                 </main>
             </div>
