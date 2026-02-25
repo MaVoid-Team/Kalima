@@ -22,7 +22,7 @@ This workflow outlines the established patterns in the frontend architecture. De
 
 ## 4. Handling Duplicate Code (Helpers & Constants)
 - **DRY Principle:** Do not duplicate code! Extract duplicate calculations (e.g., totaling prices), formatting logic (e.g., currency), or parsing logic.
-- **Helpers:** Create shared helper/lib files in the `src/lib/` directory (e.g., `src/lib/storeUtils.js` or `src/lib/cartUtils.js`). 
+- **Helpers:** Use helper files at all times! Create shared helper/lib files in the `src/lib/` directory (e.g., `src/lib/storeUtils.js` or `src/lib/cartUtils.js`) for any extracted or reusable logic, rather than keeping it inside components.
 - **Constants:** Extract hardcoded string literals or reused static values as shared constants.
 
 ## 5. Styling
@@ -38,5 +38,8 @@ This workflow outlines the established patterns in the frontend architecture. De
 - **Mobile-First Approach:** Always start by styling for smaller screens and use Tailwind's responsive prefixes (e.g., `sm:`, `md:`, `lg:`, `xl:`) to adapt layouts for larger devices.
 - **Fluid Layouts:** Rely on Flexbox (`flex`) and CSS Grid (`grid`) paired with relative units where appropriate to create highly adaptable fluid layouts.
 - **Touch and Accessibility:** Ensure interactive elements (buttons, links, inputs) have adequate sizing, padding, and spacing to be easily usable on mobile touch devices.
+
+## 8. Testing & Automation
+- **Selenium-Friendly Code:** Always write Selenium-friendly code for testing. Add identifiable data attributes (e.g., `data-testid`, `id`, `name`) to interactive elements, links, buttons, and forms. This ensures UI automation tests can reliably interact with the DOM without depending on fragile CSS classes or layout structures.
 
 **By following these guidelines, you will ensure the frontend codebase remains clean, maintainable, and uniform.**
