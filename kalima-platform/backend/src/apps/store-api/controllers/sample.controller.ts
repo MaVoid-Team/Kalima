@@ -21,8 +21,11 @@ export const sampleController = {
 
       res.status(200).json({
         success: true,
-        results: samples.length,
-        data: samples,
+        results: samples.total,
+        page: samples.page,
+        totalPages: Math.ceil(samples.total / samples.limit),
+        limit: samples.limit,
+        data: samples.data,
       });
     } catch (error) {
       next(error);
