@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { ShieldCheck, Lock, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/storeUtils";
+import LoadingSpinner from "../ui/loading-spinner";
 
 export default function OrderSummaryCard({
   items,
@@ -14,7 +14,7 @@ export default function OrderSummaryCard({
   const { t } = useTranslation("checkout");
 
   const submitLabel = loading ? (
-    <Loader2 className="w-5 h-5 animate-spin" />
+    <LoadingSpinner className="w-5 h-5" />
   ) : (
     t("payment.complete_purchase", "Complete Purchase")
   );

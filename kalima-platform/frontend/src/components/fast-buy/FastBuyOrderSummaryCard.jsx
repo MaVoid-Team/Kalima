@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice } from "@/lib/storeUtils";
+import LoadingSpinner from "../ui/loading-spinner";
 
 export default function FastBuyOrderSummaryCard({
   items,
@@ -19,7 +19,7 @@ export default function FastBuyOrderSummaryCard({
   const { t } = useTranslation("checkout");
 
   const submitLabel = loading ? (
-    <Loader2 className="w-5 h-5 animate-spin" />
+    <LoadingSpinner className="w-5 h-5" />
   ) : (
     t("payment.complete_purchase", "Complete Purchase")
   );
@@ -29,7 +29,7 @@ export default function FastBuyOrderSummaryCard({
       <Card className="border-0 shadow-lg ring-1 ring-border/50">
         <CardHeader className="pb-4">
           <CardTitle className="text-2xl font-bold tracking-tight">
-            {t("order_summary.title", "Order Summary")}
+            {t("orderSummary.title", "Order Summary")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -66,12 +66,12 @@ export default function FastBuyOrderSummaryCard({
                       </p>
                     )}
                     <p className="text-xs font-semibold text-foreground mt-1 text-start">
-                      {t("order_summary.qty", "Qty")}: {item.quantity}
+                      {t("orderSummary.qty", "Qty")}: {item.quantity}
                     </p>
                   </div>
                   <div className="flex flex-col justify-start pt-1 items-end pl-2">
                     <span className="font-bold text-base whitespace-nowrap text-end">
-                      {formatPrice(item.price * item.quantity)}
+                      {formatPrice(item.price * item.quantity)}{t('L.E')}
                     </span>
                   </div>
                 </div>
@@ -90,26 +90,26 @@ export default function FastBuyOrderSummaryCard({
           <div className="space-y-4 pt-6 border-t border-border/20">
             <div className="flex justify-between items-center text-muted-foreground font-medium text-sm mb-2">
               <span className="text-start">
-                {t("order_summary.subtotal", "Subtotal")}
+                {t("orderSummary.subtotal", "Subtotal")}
               </span>
-              <span className="text-end">{formatPrice(subtotal)}</span>
+              <span className="text-end">{formatPrice(subtotal)}{t('L.E')}</span>
             </div>
 
             {discount > 0 && (
               <div className="flex justify-between items-center text-destructive font-medium text-sm mb-3">
                 <span className="text-start">
-                  {t("order_summary.discount", "Discount")}
+                  {t("orderSummary.discount", "Discount")}
                 </span>
-                <span className="text-end">-{formatPrice(discount)}</span>
+                <span className="text-end">-{formatPrice(discount)}{t('L.E')}</span>
               </div>
             )}
 
             <div className="flex justify-between items-center pt-2 border-t border-border/20 mt-2 pb-2">
               <span className="text-lg font-bold text-foreground text-start">
-                {t("order_summary.total", "Total")}
+                {t("orderSummary.total", "Total")}
               </span>
               <span className="text-3xl font-black text-destructive tracking-tight text-end">
-                {formatPrice(total)}
+                {formatPrice(total)}{t('L.E')}
               </span>
             </div>
           </div>
@@ -141,12 +141,12 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
   };
 
   return (
-    <div className="flex gap-2 mt-3 items-center w-full min-w-[200px] max-w-sm">
+    <div className="flex gap-2 mt-3 items-center w-full min-w-0">
       <Input
         value={code}
         onChange={(e) => setCode(e.target.value)}
-        placeholder={t("order_summary.discount_placeholder", "Discount code")}
-        className="h-10 text-sm  flex-1 border-muted-foreground/30 focus-visible:ring-0 text-start"
+        placeholder={t("orderSummary.discountPlaceholder", "Discount code")}
+        className="h-10 text-sm flex-1 min-w-0 border-muted-foreground/30 focus-visible:ring-0 text-start"
       />
       <Button
         type="button"
@@ -154,12 +154,12 @@ const ItemCouponInput = ({ itemId, onApplyCoupon }) => {
         size="sm"
         disabled={isApplying || !code.trim()}
         onClick={handleApply}
-        className="h-10 text-sm px-6 bg-muted/60  font-semibold text-foreground "
+        className="h-10 text-sm px-4 sm:px-6 bg-muted/60 font-semibold text-foreground shrink-0"
       >
         {isApplying ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <LoadingSpinner className="w-4 h-4" />
         ) : (
-          t("order_summary.apply", "Apply")
+          t("orderSummary.apply", "Apply")
         )}
       </Button>
     </div>

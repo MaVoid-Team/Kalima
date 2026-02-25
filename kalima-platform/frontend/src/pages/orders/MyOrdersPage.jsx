@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOrders } from '@/hooks/useOrders';
 import { PackageOpen } from 'lucide-react';
@@ -26,6 +26,10 @@ const MyOrdersPage = () => {
         filters,
         setStatus,
     } = useOrders({ limit: 6, autoFetch: false });
+
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     useEffect(() => {
         fetchMyOrders();

@@ -28,7 +28,7 @@
   },
   "payment": {
     "title": "Payment",
-    "secureNotice": "All transactions are secure and encrypted.",
+    "secureNotice": "Your payment information is secure.",
     "creditCard": "Credit Card",
     "paypal": "PayPal",
     "applePay": "Apple Pay",
@@ -67,7 +67,8 @@
     "notesLabel": "Delivery instructions or special requests",
     "optional": "Optional",
     "securePayment": "Secure Payment",
-    "encryptedCheckout": "Encrypted Checkout"
+    "encryptedCheckout": "Encrypted Checkout",
+    "transferNumberPlaceholder": "Enter transfer number"
   },
   "orderSummary": {
     "title": "Order Summary",
@@ -79,7 +80,8 @@
     "discount": "Discount",
     "total": "Total",
     "currency": "USD",
-    "pay": "Pay"
+    "pay": "Pay",
+    "qty": "Qty"
   },
   "footer": {
     "returnToCart": "Return to Cart",
@@ -121,5 +123,6 @@
   "wizard": {
     "cart": "Cart",
     "payment": "Payment"
-  }
+  },
+  "L.E": " L.E"
 }

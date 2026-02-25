@@ -31,7 +31,7 @@ export default function FastBuyPaymentDetailsCard({
           {t("payment.title", "Payment Details")}
         </CardTitle>
         <CardDescription className="text-sm">
-          {t("payment.secure_notice", "Your payment information is secure")}
+          {t("payment.secureNotice", "Your payment information is secure")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-6 animate-in fade-in duration-500">
@@ -39,6 +39,7 @@ export default function FastBuyPaymentDetailsCard({
           <div className="space-y-3">
             <Label className="font-semibold text-foreground/80">
               {t("payment.method", "Select Payment Method")}
+              <span className="text-destructive">*</span>
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {paymentMethods.map((method) => {
@@ -87,7 +88,8 @@ export default function FastBuyPaymentDetailsCard({
               htmlFor="transferNumber"
               className="font-semibold text-foreground/80"
             >
-              {t("payment.transfer_number", "Transfer Number")}
+              {t("payment.transferNumber", "Transfer Number")}
+              <span className="text-destructive">*</span>
             </Label>
             <Input
               id="transferNumber"
@@ -96,7 +98,7 @@ export default function FastBuyPaymentDetailsCard({
                 updateField("numberTransferredFrom", e.target.value)
               }
               placeholder={t(
-                "payment.transfer_number_placeholder",
+                "payment.transferNumberPlaceholder",
                 "Enter transfer number",
               )}
               className="h-12 bg-background focus-visible:ring-primary/20"
@@ -111,6 +113,7 @@ export default function FastBuyPaymentDetailsCard({
               className="font-semibold text-foreground/80"
             >
               {t("payment.screenshot", "Payment Screenshot")}
+              <span className="text-destructive">*</span>
             </Label>
 
             <div

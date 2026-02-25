@@ -28,7 +28,7 @@
   },
   "payment": {
     "title": "الدفع",
-    "secureNotice": "جميع المعاملات آمنة ومشفرة.",
+    "secureNotice": "معلومات الدفع الخاصة بك آمنة.",
     "creditCard": "بطاقة الائتمان",
     "paypal": "باي بال",
     "applePay": "أبل باي",
@@ -68,7 +68,8 @@
     "uploadHint": "PNG للصور، بحجم أقصى 5 ميجا",
     "optional": "اختياري",
     "securePayment": "دفع آمن",
-    "encryptedCheckout": "إتمام شراء مشفر"
+    "encryptedCheckout": "إتمام شراء مشفر",
+    "transferNumberPlaceholder": "أدخل رقم المحفظة المحول منها"
   },
   "orderSummary": {
     "title": "ملخص الطلب",
@@ -80,7 +81,8 @@
     "discount": "الخصم",
     "total": "الإجمالي",
     "currency": "دولار أمريكي",
-    "pay": "ادفع"
+    "pay": "ادفع",
+    "qty": "الكمية"
   },
   "footer": {
     "returnToCart": "العودة للسلة",
@@ -122,5 +124,6 @@
   "wizard": {
     "cart": "السلة",
     "payment": "الدفع"
-  }
+  },
+  "L.E": " ج.م"
 }
