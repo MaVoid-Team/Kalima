@@ -4,6 +4,7 @@ import { Package, PlusCircle, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import useExport from '@/hooks/useExport';
 import {
@@ -46,7 +47,7 @@ export default function ProductsPage() {
         setPage,
     } = useAdminProducts();
 
-    const { exportData, loading: exportLoading } = useExport();
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
 
     const [editProduct, setEditProduct] = useState(null);
@@ -161,6 +162,16 @@ export default function ProductsPage() {
                     </Link>
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             {/* Filters */}
             <ProductFilters
