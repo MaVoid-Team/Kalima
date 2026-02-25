@@ -165,12 +165,6 @@ class CartService {
       );
     }
 
-    console.log(
-      "=================================",
-      cartItem.products.price_after_discount,
-      cartItem.products.price,
-      "=========================================",
-    );
     const productPrice = Math.min(
       Number(cartItem.products.price_after_discount),
       Number(cartItem.products.price),
@@ -831,11 +825,11 @@ class CartService {
     });
 
     // 5. Assemble purchase payload (typed)
-    // Here we split the cart items into `quantity` purchase items
+    // We map each cart item directly to a purchase item without flattening
     const flattenedItems: CreatePurchaseDto["items"] = [];
     for (const item of cart.cart_items) {
       const unitPrice = Number(item.price_at_add);
-      const unitDiscount = Number(item.discount || 0) / item.quantity;
+      const itemDiscount = Number(item.discount || 0);
       const required_fields = (item.cart_item_required_fields || []).map(
         (rf) => ({
           field_definition_id: rf.field_definition_id,
@@ -843,14 +837,15 @@ class CartService {
         }),
       );
 
-      for (let i = 0; i < item.quantity; i++) {
-        flattenedItems.push({
-          product_id: item.product_id,
-          price_at_purchase: unitPrice,
-          discount: unitDiscount,
-          required_fields,
-        });
-      }
+      flattenedItems.push({
+        product_id: item.product_id,
+        price_at_purchase: unitPrice,
+        discount: itemDiscount,
+        quantity: item.quantity,
+        final_price: Number(item.final_price || 0),
+        coupon_id: (item as any).coupon_id || null, // handle missing strict type temporarily
+        required_fields,
+      });
     }
 
     const purchaseInput: CreatePurchaseDto = {

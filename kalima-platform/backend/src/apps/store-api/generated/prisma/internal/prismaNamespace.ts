@@ -3643,6 +3643,9 @@ export const Purchase_itemsScalarFieldEnum = {
   price_at_purchase: 'price_at_purchase',
   discount: 'discount',
   required_fields_filled: 'required_fields_filled',
+  final_price: 'final_price',
+  quantity: 'quantity',
+  coupon_id: 'coupon_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
   deleted_at: 'deleted_at'

@@ -148,6 +148,9 @@ class PurchasesService {
       product_id: item.product_id,
       price_at_purchase: item.price_at_purchase,
       discount: item.discount,
+      quantity: item.quantity,
+      final_price: item.final_price,
+      coupon_id: item.coupon_id || null,
     }));
 
     const createdItems = await client.purchase_items.createManyAndReturn({
@@ -210,8 +213,7 @@ class PurchasesService {
 
     if (filters.startDate || filters.endDate) {
       where.created_at = {};
-      if (filters.startDate)
-        where.created_at.gte = new Date(filters.startDate);
+      if (filters.startDate) where.created_at.gte = new Date(filters.startDate);
       if (filters.endDate) where.created_at.lte = new Date(filters.endDate);
     }
 
@@ -263,7 +265,10 @@ class PurchasesService {
   }
 
   /** Teacher's own purchases */
-  async getByUser(userId: number, filters?: { status?: string; page?: number; limit?: number }) {
+  async getByUser(
+    userId: number,
+    filters?: { status?: string; page?: number; limit?: number },
+  ) {
     const page = filters?.page || 1;
     const limit = filters?.limit || 10;
     const skip = (page - 1) * limit;
@@ -443,7 +448,7 @@ class PurchasesService {
 
     const remaining = purchase.purchase_items.filter((i) => i.id !== itemId);
     const newSubtotal = remaining.reduce(
-      (sum, i) => sum + Number(i.price_at_purchase),
+      (sum, i) => sum + Number(i.price_at_purchase) * i.quantity,
       0,
     );
     const newTotal = Math.max(0, newSubtotal - Number(purchase.discount));
