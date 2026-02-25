@@ -7,6 +7,7 @@ export const useAnalytics = () => {
 
     const [storeStats, setStoreStats] = useState(null);
     const [dailyStoreStats, setDailyStoreStats] = useState(null);
+    const [userStats, setUserStats] = useState(null);
     const [initLoading, setInitLoading] = useState(true);
 
     const loading = apiLoading || initLoading;
@@ -70,15 +71,38 @@ export const useAnalytics = () => {
         }
     }, [fetchApi]);
 
+    const fetchUserStats = useCallback(async () => {
+        setInitLoading(true);
+        try {
+            const data = await fetchApi({
+                endpoint: '/admin/dashboard/user-stats',
+                method: 'get'
+            });
+
+            if (data?.success) {
+                setUserStats(data.data);
+            } else {
+                setUserStats(null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user stats:", error);
+            setUserStats(null);
+        } finally {
+            setInitLoading(false);
+        }
+    }, [fetchApi]);
+
     return {
         // State
         storeStats,
         dailyStoreStats,
+        userStats,
         loading,
 
         // Actions
         fetchStoreStats,
-        fetchDailyStoreStats
+        fetchDailyStoreStats,
+        fetchUserStats
     };
 };
 
