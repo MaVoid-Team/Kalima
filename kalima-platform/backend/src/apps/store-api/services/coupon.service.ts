@@ -71,6 +71,17 @@ class CouponService {
       throw new BadRequestError("starts_at must be before expires_at");
     }
 
+    if (dto.expires_at < new Date()) {
+      throw new BadRequestError("expires_at must be after now");
+    }
+
+    if (dto.discount_type === DiscountType.PERCENTAGE) {
+      if (dto.discount_percentage > 100) {
+        throw new BadRequestError("Discount percentage cannot exceed 100%");
+      }
+    }
+
+    let couponType = "percentage";
     // Fixed discount cannot exceed product price
     if (dto.discount_type === DiscountType.AMOUNT) {
       const productPrice = Number(product.price);
@@ -79,6 +90,7 @@ class CouponService {
           `Discount amount (${dto.discount_amount}) cannot exceed product price (${productPrice})`,
         );
       }
+      couponType = "fixed";
     }
 
     // Build data based on discount type
@@ -87,6 +99,7 @@ class CouponService {
       product_id: dto.product_id,
       starts_at: dto.starts_at ?? null,
       expires_at: dto.expires_at,
+      type: couponType,
     };
 
     if (dto.discount_type === DiscountType.AMOUNT) {
@@ -110,6 +123,9 @@ class CouponService {
     limit?: number;
     active?: boolean;
     product_id?: number;
+    startDate?: Date;
+    endDate?: Date;
+    isAmount?: boolean;
   }): Promise<{
     coupons: coupons[];
     total: number;
@@ -130,6 +146,22 @@ class CouponService {
 
     if (filters?.product_id !== undefined) {
       where.product_id = filters.product_id;
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      where.created_at = {};
+      if (filters.startDate) {
+        where.created_at.gte = filters.startDate;
+      }
+      if (filters.endDate) {
+        const endOfDay = new Date(filters.endDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        where.created_at.lte = endOfDay;
+      }
+    }
+
+    if (filters?.isAmount !== undefined && filters?.isAmount !== null) {
+      where.type = filters.isAmount ? "fixed" : "percentage";
     }
 
     const [coupons, total] = await Promise.all([
@@ -190,7 +222,9 @@ class CouponService {
   async updateCoupon(id: number, dto: UpdateCouponDto): Promise<coupons> {
     const coupon = await this.db.coupons.findFirst({
       where: { id, deleted_at: null },
-      include: { product: { select: { id: true, price: true, is_archived: true } } },
+      include: {
+        product: { select: { id: true, price: true, is_archived: true } },
+      },
     });
     if (!coupon) {
       throw new NotFoundError("Coupon not found");
@@ -234,13 +268,18 @@ class CouponService {
     }
 
     // Discount vs price check when amount discount is being set
-    const product = productForPrice ?? (await this.db.products.findFirst({
-      where: { id: productId, deleted_at: null },
-      select: { price: true },
-    }));
+    const product =
+      productForPrice ??
+      (await this.db.products.findFirst({
+        where: { id: productId, deleted_at: null },
+        select: { price: true },
+      }));
     if (product) {
       let amountToCheck: number | undefined;
-      if (dto.discount_type === DiscountType.AMOUNT && dto.discount_amount !== undefined) {
+      if (
+        dto.discount_type === DiscountType.AMOUNT &&
+        dto.discount_amount !== undefined
+      ) {
         amountToCheck = dto.discount_amount;
       } else if (dto.discount_amount !== undefined) {
         amountToCheck = dto.discount_amount;

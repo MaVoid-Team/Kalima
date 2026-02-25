@@ -7,6 +7,7 @@ import {
   UpdateCouponDto,
   ValidateCouponDto,
   UseCouponDto,
+  getAllCouponsDto,
 } from "../dtos/coupon.dto";
 import { ValidationError, BadRequestError } from "../../../libs/errors";
 
@@ -104,26 +105,8 @@ export const couponController = {
     _next: NextFunction,
   ): Promise<void> {
     try {
-      const page = req.query.page
-        ? parseInt(req.query.page as string, 10)
-        : undefined;
-      const limit = req.query.limit
-        ? parseInt(req.query.limit as string, 10)
-        : undefined;
-      const active =
-        req.query.active !== undefined
-          ? req.query.active === "true"
-          : undefined;
-      const product_id = req.query.product_id
-        ? parseInt(req.query.product_id as string, 10)
-        : undefined;
-
-      const result = await couponService.getAllCoupons({
-        page,
-        limit,
-        active,
-        product_id,
-      });
+      const dto = await validateDto(getAllCouponsDto, req.query);
+      const result = await couponService.getAllCoupons(dto);
 
       res.status(200).json({
         success: true,
