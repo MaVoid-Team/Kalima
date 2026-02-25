@@ -10,6 +10,30 @@ import { BadRequestError, NotFoundError } from "../../../libs/errors";
 
 const MAX_NESTING_DEPTH = 3;
 
+const CATEGORY_SELECT = {
+  id: true,
+  title: true,
+  active: true,
+  description: true,
+  parent: { select: { id: true, title: true } },
+  product_categories: {
+    select: { product_id: true },
+  },
+  created_at: true,
+  updated_at: true,
+};
+
+interface CATEGORY_RETURN {
+  id: number;
+  title: string;
+  active: boolean;
+  description: string;
+  parent: { id: number; title: string } | null;
+  product_categories: { product_id: number }[];
+  created_at: Date;
+  updated_at: Date;
+}
+
 // ============================================
 // CATEGORY SERVICE
 // ============================================
@@ -63,7 +87,7 @@ class CategoryService {
     page?: number;
     limit?: number;
   }): Promise<{
-    data: categories[];
+    data: CATEGORY_RETURN[];
     total: number;
     page: number;
     limit: number;
@@ -84,31 +108,7 @@ class CategoryService {
     const [data, total] = await Promise.all([
       this.db.categories.findMany({
         where,
-        include: {
-          other_categories: {
-            where:
-              filters?.active !== undefined ? { active: filters.active } : {},
-            include: {
-              other_categories: {
-                where:
-                  filters?.active !== undefined
-                    ? { active: filters.active }
-                    : {},
-                include: {
-                  product_categories: {
-                    select: { product_id: true },
-                  },
-                },
-              },
-              product_categories: {
-                select: { product_id: true },
-              },
-            },
-          },
-          product_categories: {
-            select: { product_id: true },
-          },
-        },
+        select: CATEGORY_SELECT,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -129,12 +129,13 @@ class CategoryService {
    */
   async getRootCategories(filters?: {
     active?: boolean;
-  }): Promise<categories[]> {
+  }): Promise<CATEGORY_RETURN[]> {
     const where: any = { parent_id: null };
     if (filters?.active !== undefined) where.active = filters.active;
 
     const roots = await this.db.categories.findMany({
       where,
+      select: CATEGORY_SELECT,
       orderBy: { created_at: "desc" },
     });
 
@@ -148,9 +149,10 @@ class CategoryService {
   async getChildrenByParent(
     parentId: number,
     filters?: { active?: boolean },
-  ): Promise<categories[]> {
+  ): Promise<CATEGORY_RETURN[]> {
     const parent = await this.db.categories.findUnique({
       where: { id: parentId },
+      select: { id: true },
     });
     if (!parent) throw new NotFoundError("Parent category not found");
 
@@ -160,6 +162,7 @@ class CategoryService {
     const children = await this.db.categories.findMany({
       where,
       orderBy: { created_at: "desc" },
+      select: CATEGORY_SELECT,
     });
 
     return children;
@@ -169,28 +172,10 @@ class CategoryService {
   // READ — SINGLE
   // ============================================
 
-  async getCategoryById(id: number): Promise<categories> {
+  async getCategoryById(id: number): Promise<CATEGORY_RETURN> {
     const category = await this.db.categories.findUnique({
       where: { id },
-      include: {
-        other_categories: {
-          include: {
-            other_categories: {
-              include: {
-                product_categories: {
-                  select: { product_id: true },
-                },
-              },
-            },
-            product_categories: {
-              select: { product_id: true },
-            },
-          },
-        },
-        product_categories: {
-          select: { product_id: true },
-        },
-      },
+      select: CATEGORY_SELECT,
     });
 
     if (!category) {
