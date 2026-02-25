@@ -103,6 +103,20 @@ class ProductService {
       thumbnailId = image.id;
     }
 
+    if (dto.price < 0) {
+      throw new BadRequestError("Price cannot be negative");
+    }
+
+    let priceAfterDiscount = dto.price;
+    if (dto.price_after_discount || dto.price_after_discount === 0) {
+      if (dto.price_after_discount > dto.price) {
+        throw new BadRequestError(
+          "Price after discount cannot be greater than price",
+        );
+      }
+      priceAfterDiscount = dto.price_after_discount;
+    }
+
     // Create product
     const product = await this.db.products.create({
       data: {
@@ -110,7 +124,7 @@ class ProductService {
         description: dto.description,
         type: dto.type,
         price: dto.price,
-        price_after_discount: dto.price_after_discount,
+        price_after_discount: priceAfterDiscount,
         serial: dto.serial,
         sample_url: dto.sample_url,
         thumbnail_id: thumbnailId,
