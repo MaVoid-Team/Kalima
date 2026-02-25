@@ -57,7 +57,7 @@ export default function UserDetailPage() {
         return (
             <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
                 <p className="text-xl text-muted-foreground">User not found.</p>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild data-testid="user-detail-back-button">
                     <Link to="/admin/users">{t('details.back')}</Link>
                 </Button>
             </div>
@@ -69,7 +69,7 @@ export default function UserDetailPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="shrink-0">
+                    <Button variant="ghost" size="icon" asChild className="shrink-0" data-testid="user-detail-top-back-button">
                         <Link to="/admin/users">
                             {isRtl ? <ArrowRight className="h-5 w-5" /> : <ArrowLeft className="h-5 w-5" />}
                         </Link>

@@ -92,16 +92,16 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button disabled={exportLoading} variant="outline">
+                            <Button disabled={exportLoading} variant="outline" data-testid="orders-export-button">
                                 <Download className="mr-2 h-4 w-4" />
                                 {t('orders.export', 'Export')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleExport('csv')} disabled={exportLoading}>
+                            <DropdownMenuItem onClick={() => handleExport('csv')} disabled={exportLoading} data-testid="orders-export-csv">
                                 {t('orders.exportCsv', 'Export as CSV')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={exportLoading}>
+                            <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={exportLoading} data-testid="orders-export-excel">
                                 {t('orders.exportXlsx', 'Export as Excel')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -136,6 +136,7 @@ export default function OrdersPage() {
                                     onClick={() => setPage(Math.max(1, pagination.page - 1))}
                                     className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                     text={t('common.pagination.previous')}
+                                    data-testid="orders-pagination-prev"
                                 />
                             </PaginationItem>
 
@@ -154,6 +155,7 @@ export default function OrdersPage() {
                                             onClick={() => setPage(pageNumber)}
                                             isActive={pagination.page === pageNumber}
                                             className="cursor-pointer"
+                                            data-testid={`orders-pagination-${pageNumber}`}
                                         >
                                             {pageNumber}
                                         </PaginationLink>
@@ -166,6 +168,7 @@ export default function OrdersPage() {
                                     onClick={() => setPage(Math.min(pagination.pages, pagination.page + 1))}
                                     className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                     text={t('common.pagination.next')}
+                                    data-testid="orders-pagination-next"
                                 />
                             </PaginationItem>
                         </PaginationContent>

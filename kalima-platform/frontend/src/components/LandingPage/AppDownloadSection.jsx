@@ -69,7 +69,7 @@ export default function AppDownloadSection() {
             </div>
 
             {/* Download Button */}
-            <Button variant="default" size="lg" className="w-full sm:w-fit gap-3 h-11 sm:h-12 text-base">
+            <Button variant="default" size="lg" className="w-full sm:w-fit gap-3 h-11 sm:h-12 text-base" data-testid="landing-app-download-button">
               <Download className="h-5 w-5" />
               {t("appDownload.downloadButton")}
             </Button>

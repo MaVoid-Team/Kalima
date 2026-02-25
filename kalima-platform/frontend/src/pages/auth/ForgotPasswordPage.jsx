@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
     const { t } = useTranslation("auth");
     const { forgotPassword, loading } = usePassword();
 
-      React.useEffect(() => {
+    React.useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
@@ -76,13 +76,13 @@ export default function ForgotPasswordPage() {
                                             <FormItem>
                                                 <FormLabel>{t("login.emailLabel")}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="name@example.com" type="email" {...field} className="bg-background" />
+                                                    <Input placeholder="name@example.com" type="email" {...field} className="bg-background" data-testid="forgot-password-email-input" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="w-full" disabled={loading}>
+                                    <Button type="submit" className="w-full" disabled={loading} data-testid="forgot-password-submit-button">
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
@@ -96,6 +96,7 @@ export default function ForgotPasswordPage() {
                                 <Link
                                     to="/login"
                                     className="flex items-center justify-center gap-2 underline underline-offset-4 hover:text-primary font-medium"
+                                    data-testid="forgot-password-back-link"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     {t("forgotPassword.backToLogin", "Back to login")}

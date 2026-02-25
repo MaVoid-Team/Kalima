@@ -19,6 +19,7 @@ export default function OrderItemsCollapsible({ order }) {
           size="sm"
           className="h-8 px-2 text-xs"
           onClick={() => setIsExpanded((prev) => !prev)}
+          data-testid="order-items-expand-button"
         >
           {isExpanded ? t('orders.actions.collapseItems', 'Collapse') : t('orders.actions.expandItems', 'Expand')}
           {isExpanded ? <ChevronUp className="h-4 w-4 ms-1" /> : <ChevronDown className="h-4 w-4 ms-1" />}

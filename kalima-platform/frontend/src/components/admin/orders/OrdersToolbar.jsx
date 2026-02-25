@@ -55,6 +55,7 @@ export default function OrdersToolbar({ filters, onSearchChange, onStatusChange,
                         className="pl-8 w-full"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        data-testid="admin-orders-toolbar-search"
                     />
                 </div>
             </form>
@@ -69,6 +70,7 @@ export default function OrdersToolbar({ filters, onSearchChange, onStatusChange,
                                 "flex-1 sm:w-[240px] justify-start text-muted-foreground w-full",
                                 filters.startDate && "text-foreground"
                             )}
+                            data-testid="admin-orders-toolbar-date-picker"
                         >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {filters.startDate ? (
@@ -104,7 +106,7 @@ export default function OrdersToolbar({ filters, onSearchChange, onStatusChange,
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="flex-1 sm:w-[180px] justify-start text-muted-foreground w-full">
+                        <Button variant="outline" className="flex-1 sm:w-[180px] justify-start text-muted-foreground w-full" data-testid="admin-orders-toolbar-status-filter">
                             {filters.status && filters.status !== 'all'
                                 ? t(`orders.status${filters.status.charAt(0).toUpperCase() + filters.status.slice(1).toLowerCase()}`)
                                 : t('orders.statusAll')}
@@ -127,6 +129,7 @@ export default function OrdersToolbar({ filters, onSearchChange, onStatusChange,
                     onClick={handleClear}
                     title={t('orders.clearFilters')}
                     className="w-full sm:w-10 sm:px-0"
+                    data-testid="admin-orders-toolbar-clear-filters"
                 >
                     <X className="h-4 w-4 text-muted-foreground me-2 sm:me-0" />
                     <span className="sm:sr-only">{t('orders.clearFilters')}</span>

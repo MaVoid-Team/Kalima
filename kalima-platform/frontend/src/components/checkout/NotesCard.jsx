@@ -25,6 +25,7 @@ export default function NotesCard({ state, updateField }) {
               "Delivery instructions or special requests",
             )}
             className="h-12"
+            data-testid="checkout-notes-input"
           />
         </div>
       </CardContent>

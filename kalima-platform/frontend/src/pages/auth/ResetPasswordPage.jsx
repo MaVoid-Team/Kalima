@@ -99,6 +99,7 @@ export default function ResetPasswordPage() {
                                                             type={showPassword ? "text" : "password"}
                                                             className="bg-background pr-10"
                                                             {...field}
+                                                            data-testid="reset-password-input"
                                                         />
                                                         <Button
                                                             type="button"
@@ -106,6 +107,7 @@ export default function ResetPasswordPage() {
                                                             size="sm"
                                                             className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                             onClick={() => setShowPassword(!showPassword)}
+                                                            data-testid="reset-password-show-button"
                                                         >
                                                             {showPassword ? (
                                                                 <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -131,6 +133,7 @@ export default function ResetPasswordPage() {
                                                             type={showConfirmPassword ? "text" : "password"}
                                                             className="bg-background pr-10"
                                                             {...field}
+                                                            data-testid="reset-password-confirm-input"
                                                         />
                                                         <Button
                                                             type="button"
@@ -138,6 +141,7 @@ export default function ResetPasswordPage() {
                                                             size="sm"
                                                             className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                            data-testid="reset-password-show-confirm-button"
                                                         >
                                                             {showConfirmPassword ? (
                                                                 <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -151,7 +155,7 @@ export default function ResetPasswordPage() {
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="w-full" disabled={loading}>
+                                    <Button type="submit" className="w-full" disabled={loading} data-testid="reset-password-submit-button">
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
@@ -165,6 +169,7 @@ export default function ResetPasswordPage() {
                                 <Link
                                     to="/login"
                                     className="flex items-center justify-center gap-2 underline underline-offset-4 hover:text-primary font-medium"
+                                    data-testid="reset-password-back-link"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     {t("resetPassword.backToLogin", "Back to login")}

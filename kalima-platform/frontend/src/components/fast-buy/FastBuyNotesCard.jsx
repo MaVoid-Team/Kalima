@@ -25,6 +25,7 @@ export default function FastBuyNotesCard({ state, updateField }) {
               "Delivery instructions or special requests",
             )}
             className="h-12"
+            data-testid="fastbuy-notes-input"
           />
         </div>
       </CardContent>

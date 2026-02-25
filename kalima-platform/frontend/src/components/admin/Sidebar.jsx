@@ -40,6 +40,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className="text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5 hidden lg:block"
                         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                        data-testid="admin-sidebar-mobile-toggle-button"
                     >
                         {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
                     </button>
@@ -49,6 +50,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                         className="lg:hidden text-sidebar-foreground hover:bg-sidebar-accent rounded-md p-1.5"
                         onClick={() => setIsMobileOpen(false)}
                         title="Close Sidebar"
+                        data-testid="admin-sidebar-mobile-close-button"
                     >
                         <X size={20} />
                     </button>
@@ -64,6 +66,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                             key={item.name}
                             to={item.href}
                             title={isCollapsed ? item.name : undefined}
+                            data-testid={`admin-sidebar-nav-${item.name.toLowerCase()}`}
                             className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive
                                 ? 'bg-sidebar-primary text-sidebar-primary-foreground'
                                 : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -82,6 +85,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     onClick={toggleLanguage}
                     title={isCollapsed ? (i18n.language === 'ar' ? 'English' : 'العربية') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+                    data-testid="admin-sidebar-language-toggle"
                 >
                     <Globe className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{i18n.language === 'ar' ? 'English' : 'العربية'}</span>
@@ -91,6 +95,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     to="/market"
                     title={isCollapsed ? t('nav.backToStore') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${isCollapsed ? 'lg:justify-center' : ''}`}
+                    data-testid="admin-sidebar-back-store-link"
                 >
                     <Home className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{t('nav.backToStore')}</span>
@@ -100,6 +105,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
                     onClick={logout}
                     title={isCollapsed ? t('nav.logout') : undefined}
                     className={`group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 ${isCollapsed ? 'lg:justify-center' : ''}`}
+                    data-testid="admin-sidebar-logout-button"
                 >
                     <LogOut className={`h-5 w-5 shrink-0 me-3 ${isCollapsed ? 'lg:me-0' : ''}`} />
                     <span className={`truncate ${isCollapsed ? 'lg:hidden' : ''}`}>{t('nav.logout')}</span>

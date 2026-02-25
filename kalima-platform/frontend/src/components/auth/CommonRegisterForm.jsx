@@ -102,7 +102,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
         <div className="w-full space-y-6">
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center gap-2 mb-2">
-                    <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 pl-0 text-muted-foreground hover:text-foreground">
+                    <Button variant="ghost" size="sm" onClick={onBack} className="gap-1 pl-0 text-muted-foreground hover:text-foreground" data-testid="auth-register-back-button">
                         <ArrowLeft className="h-4 w-4" />
                         {t("signup.roleLabel")}
                     </Button>
@@ -139,7 +139,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                     <FormItem>
                                         <FormLabel htmlFor="name">{t("signup.fields.name")}</FormLabel>
                                         <FormControl>
-                                            <Input id="name" {...field} />
+                                            <Input id="name" {...field} data-testid="auth-register-name-input" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -153,7 +153,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                     <FormItem>
                                         <FormLabel htmlFor="email">{t("signup.fields.email")}</FormLabel>
                                         <FormControl>
-                                            <Input id="email" type="email" {...field} />
+                                            <Input id="email" type="email" {...field} data-testid="auth-register-email-input" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -175,7 +175,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                             <FormItem>
                                 <FormLabel htmlFor="phone">{t("signup.fields.phone")}</FormLabel>
                                 <FormControl>
-                                    <Input id="phone" type="tel" {...field} />
+                                    <Input id="phone" type="tel" {...field} data-testid="auth-register-phone-input" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -219,6 +219,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                     type={showPassword ? "text" : "password"}
                                                     className={cn(isRTL ? "pl-10" : "pr-10", "bg-background")}
                                                     {...field}
+                                                    data-testid="auth-register-password-input"
                                                 />
                                                 <Button
                                                     type="button"
@@ -229,6 +230,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                         isRTL ? "left-0" : "right-0"
                                                     )}
                                                     onClick={() => setShowPassword(!showPassword)}
+                                                    data-testid="auth-register-password-toggle"
                                                 >
                                                     {showPassword ? (
                                                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -255,6 +257,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                     type={showPassword ? "text" : "password"}
                                                     className={cn(isRTL ? "pl-10" : "pr-10", "bg-background")}
                                                     {...field}
+                                                    data-testid="auth-register-confirm-password-input"
                                                 />
                                                 <Button
                                                     type="button"
@@ -265,6 +268,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                                                         isRTL ? "left-0" : "right-0"
                                                     )}
                                                     onClick={() => setShowPassword(!showPassword)}
+                                                    data-testid="auth-register-confirm-password-toggle"
                                                 >
                                                     {showPassword ? (
                                                         <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -283,7 +287,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
 
                     {children}
 
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button type="submit" className="w-full" disabled={isLoading} data-testid="auth-register-submit-button">
                         {isLoading && <LoadingSpinner className="mr-2 h-4 w-4" />}
                         {t("signup.submit")}
                     </Button>
@@ -295,6 +299,7 @@ export default function CommonRegisterForm({ role, onBack, children, extraSchema
                 <Link
                     to="/login"
                     className="underline underline-offset-4 hover:text-primary font-medium"
+                    data-testid="auth-register-login-link"
                 >
                     {t("signup.loginLink")}
                 </Link>

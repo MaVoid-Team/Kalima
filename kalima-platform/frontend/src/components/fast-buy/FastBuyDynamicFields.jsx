@@ -63,6 +63,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
           <div
             className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-5 flex flex-col items-center justify-center gap-3 cursor-pointer "
             onClick={() => document.getElementById(inputId).click()}
+            data-testid="fastbuy-dynamic-fields-upload-button"
           >
             <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
               <Upload className="w-5 h-5" />
@@ -84,6 +85,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
             accept="image/*"
             onChange={handleChange}
             className="hidden"
+            data-testid="fastbuy-dynamic-fields-file-input"
           />
         </>
       ) : (
@@ -95,6 +97,7 @@ const DynamicFieldInput = ({ field, cartItemId, value, onChange }) => {
           value={value || ""}
           onChange={handleChange}
           className="h-12 bg-background focus-visible:ring-primary/20"
+          data-testid="fastbuy-dynamic-fields-text-input"
         />
       )}
     </div>

@@ -26,6 +26,7 @@ class ErrorBoundary extends React.Component {
                         <button
                             onClick={() => window.location.reload()}
                             className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium"
+                            data-testid="error-boundary-reload-button"
                         >
                             Reload Page
                         </button>

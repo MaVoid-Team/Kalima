@@ -49,6 +49,7 @@ export default function CheckoutSuccess({ purchaseSerial }) {
                     size="icon"
                     onClick={handleCopySerial}
                     aria-label={t("success.copy")}
+                    data-testid="checkout-success-copy-button"
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -61,6 +62,7 @@ export default function CheckoutSuccess({ purchaseSerial }) {
             onClick={handleContinueShopping}
             className="w-full mt-4"
             size="lg"
+            data-testid="checkout-success-continue-shopping-button"
           >
             {t("success.continue_shopping")}
             <ArrowRight className="w-4 h-4 ms-2" />

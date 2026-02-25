@@ -236,13 +236,14 @@ export default function CreateUserDialog({ onSuccess }) {
                         />
 
                         <DialogFooter className="pt-4">
-                            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={actionLoading}>
+                            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={actionLoading} data-testid="admin-users-create-cancel-button">
                                 {t('common:cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={actionLoading}
                                 className="min-w-[100px]"
+                                data-testid="admin-users-create-submit-button"
                             >
                                 {actionLoading ? <LoadingSpinner className="h-4 w-4" /> : t('common:confirm')}
                             </Button>

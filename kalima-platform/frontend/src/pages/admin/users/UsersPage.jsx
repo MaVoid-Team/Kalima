@@ -82,6 +82,7 @@ export default function UsersPage() {
                                     onClick={() => setPage(Math.max(1, pagination.page - 1))}
                                     className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                     text={t('pagination.previous')}
+                                    data-testid="users-pagination-prev"
                                 />
                             </PaginationItem>
 
@@ -100,6 +101,7 @@ export default function UsersPage() {
                                             onClick={() => setPage(pageNumber)}
                                             isActive={pagination.page === pageNumber}
                                             className="cursor-pointer"
+                                            data-testid={`users-pagination-${pageNumber}`}
                                         >
                                             {pageNumber}
                                         </PaginationLink>
@@ -112,6 +114,7 @@ export default function UsersPage() {
                                     onClick={() => setPage(Math.min(pagination.pages, pagination.page + 1))}
                                     className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                                     text={t('pagination.next')}
+                                    data-testid="users-pagination-next"
                                 />
                             </PaginationItem>
                         </PaginationContent>

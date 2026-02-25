@@ -70,6 +70,7 @@ export default function HeroSection({ onSearch }) {
               placeholder={t("hero.searchPlaceholder")}
               className="h-12"
               onValueChange={handleValueChange}
+              data-testid="market-hero-search-input"
             />
           </div>
           <CommandList className="hidden" />

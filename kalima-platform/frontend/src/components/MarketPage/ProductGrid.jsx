@@ -101,6 +101,7 @@ export default function ProductGrid({
                         size="icon"
                         onClick={() => onPageChange(pagination.currentPage - 1)}
                         disabled={pagination.currentPage <= 1}
+                        data-testid="market-grid-prev-page-button"
                     >
                         <PrevIcon className="h-4 w-4" />
                     </Button>
@@ -115,6 +116,7 @@ export default function ProductGrid({
                         size="icon"
                         onClick={() => onPageChange(pagination.currentPage + 1)}
                         disabled={pagination.currentPage >= pagination.totalPages}
+                        data-testid="market-grid-next-page-button"
                     >
                         <NextIcon className="h-4 w-4" />
                     </Button>

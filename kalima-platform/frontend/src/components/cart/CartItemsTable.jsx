@@ -132,6 +132,7 @@ export default function CartItemsTable({
               onChange={(e) => setCouponValue(e.target.value)}
               placeholder={t('enterCode', 'Code')}
               className="w-full"
+              data-testid="cart-coupon-input"
             />
             <Button
               onClick={() => {
@@ -139,12 +140,13 @@ export default function CartItemsTable({
                   handleApply(itemForCoupon, couponValue.trim());
                 }
               }}
+              data-testid="cart-coupon-submit"
             >
               {t('applyCoupon', 'Apply Coupon')}
             </Button>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setCouponDialogOpen(false)}>{t('cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setCouponDialogOpen(false)} data-testid="cart-coupon-cancel">{t('cancel', 'Cancel')}</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -157,7 +159,7 @@ export default function CartItemsTable({
             <AlertDialogDescription>{t('confirmDeleteDesc', 'Are you sure you want to remove this item from your cart? This action cannot be undone.')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDialogOpen(false)}>{t('cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDialogOpen(false)} data-testid="cart-delete-cancel">{t('cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (itemToDelete) {
@@ -167,6 +169,7 @@ export default function CartItemsTable({
                 setItemToDelete(null);
               }}
               className="text-destructive"
+              data-testid="cart-delete-confirm"
             >
               {t('delete', 'Delete')}
             </AlertDialogAction>

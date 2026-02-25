@@ -63,6 +63,7 @@ export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) 
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
                         maxLength={remainingChars}
+                        data-testid="admin-orders-note-textarea"
                     />
                     <div className="flex items-center justify-between">
                         <div className="text-xs text-muted-foreground">
@@ -71,7 +72,7 @@ export default function AdminNotesSection({ orderId, initialNote, onSaveNote }) 
                             <span className="text-xs text-muted-foreground" dir="ltr">
                                 {newNote.length} / {remainingChars}
                             </span>
-                            <Button onClick={handleSave} size="sm" className="flex items-center" disabled={!newNote.trim()}>
+                            <Button onClick={handleSave} size="sm" className="flex items-center" disabled={!newNote.trim()} data-testid="admin-orders-save-note-button">
                                 <Save className="h-4 w-4 me-2" />
                                 {t('orders.details.saveNote')}
                             </Button>

@@ -47,6 +47,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
                 onClick={handleDecrement}
                 disabled={quantity <= 1}
                 className="h-9 w-9"
+                data-testid="product-actions-mobile-decrement-button"
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -56,7 +57,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
                 readOnly
                 className="w-12 h-9 text-center font-bold shadow-none px-0"
               />
-              <Button variant="outline" size="icon" onClick={handleIncrement} className="h-9 w-9">
+              <Button variant="outline" size="icon" onClick={handleIncrement} className="h-9 w-9" data-testid="product-actions-mobile-increment-button">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -67,6 +68,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               className="h-11 gap-2"
               disabled={loading}
               onClick={() => addToCart(productId, quantity)}
+              data-testid="product-actions-mobile-add-cart-button"
             >
               {loading ? (
                 <LoadingSpinner className="h-5 w-5 border-white" />
@@ -83,13 +85,14 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               className="h-11 gap-2"
               onClick={() => startFastBuy(productId, quantity)}
               disabled={fastBuyLoading}
+              data-testid="product-actions-mobile-buy-now-button"
             >
               {fastBuyLoading ? (
                 <LoadingSpinner className="h-5 w-5" />
               ) : (
                 <>
                   <ScanBarcode className="h-4 w-4" />
-                  
+
                   <span>{t("actions.buyNow")}</span>
                 </>
               )}
@@ -97,7 +100,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
           </div>
 
           {sampleUrl && (
-            <Button variant="outline" className="w-full h-10" size="sm" asChild>
+            <Button variant="outline" className="w-full h-10" size="sm" asChild data-testid="product-actions-mobile-view-sample-button">
               <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
                 <Eye className="h-4 w-4" />
                 <span className="ms-2">{t("actions.viewSample")}</span>
@@ -117,6 +120,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               size="icon"
               onClick={handleDecrement}
               disabled={quantity <= 1}
+              data-testid="product-actions-desktop-decrement-button"
             >
               <Minus className="h-4 w-4" />
             </Button>
@@ -128,13 +132,13 @@ export default function ProductActions({ price, productId, sampleUrl }) {
                 className="w-14 text-center font-bold shadow-none border-transparent px-0"
               />
             </div>
-            <Button variant="outline" size="icon" onClick={handleIncrement}>
+            <Button variant="outline" size="icon" onClick={handleIncrement} data-testid="product-actions-desktop-increment-button">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Add to Cart */}
-          <Button className="gap-2 flex-1" size="lg" onClick={() => addToCart(productId, quantity)} disabled={loading}>
+          <Button className="gap-2 flex-1" size="lg" onClick={() => addToCart(productId, quantity)} disabled={loading} data-testid="product-actions-desktop-add-cart-button">
             {loading ? (
               <LoadingSpinner className="h-5 w-5 border-white" />
             ) : (
@@ -154,6 +158,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
             size="lg"
             onClick={() => startFastBuy(productId, quantity)}
             disabled={fastBuyLoading}
+            data-testid="product-actions-desktop-buy-now-button"
           >
             {fastBuyLoading ? (
               <LoadingSpinner className="h-5 w-5" />
@@ -167,6 +172,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
               className="text-sm flex-1"
               size="lg"
               asChild
+              data-testid="product-actions-desktop-view-sample-button"
             >
               <a
                 href={getImageUrl(sampleUrl)}

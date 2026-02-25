@@ -73,7 +73,7 @@ const NewArrivalsSection = () => {
           className="text-primary hover:bg-transparent group px-0 md:px-4"
           asChild
         >
-          <Link to="#">
+          <Link to="#" data-testid="market-new-arrivals-view-all-link">
             <span className="text-sm md:text-base">{t("sections.newArrivals.viewAll")}</span>
             <ArrowRight className="h-3 w-3 transition-transform group-hover:-translate-x-1 ml-2" />
           </Link>

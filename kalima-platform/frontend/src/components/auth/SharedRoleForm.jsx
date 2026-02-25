@@ -55,7 +55,7 @@ function SharedFields() {
                 <FormItem>
                     <FormLabel>{t("signup.fields.secondaryPhone")}</FormLabel>
                     <FormControl>
-                        <Input dir={i18n.dir()} placeholder={t("signup.fields.secondaryPhonePlaceholder")} type="tel" {...field} />
+                        <Input dir={i18n.dir()} placeholder={t("signup.fields.secondaryPhonePlaceholder")} type="tel" {...field} data-testid="auth-register-secondary-phone-input" />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

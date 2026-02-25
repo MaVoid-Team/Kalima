@@ -33,6 +33,7 @@ export default function PricingSummary({ pricing, onPay }) {
                 size="lg"
                 onClick={onPay}
                 disabled={!onPay}
+                data-testid="checkout-pricing-summary-pay-button"
             >
                 {t('orderSummary.pay')}
 

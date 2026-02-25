@@ -101,7 +101,7 @@ function TeacherFields() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t("signup.fields.government")}</FormLabel>
-                            <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={handleGovChange} defaultValue={field.value}>
+                            <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={handleGovChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t("signup.fields.selectGovernment")} />
@@ -127,7 +127,7 @@ function TeacherFields() {
                         <FormItem>
                             <FormLabel>{t("signup.fields.zone")}</FormLabel>
                             <Select
-                                dir={isRTL ? "rtl" : "ltr"} 
+                                dir={isRTL ? "rtl" : "ltr"}
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                                 disabled={!selectedGov || zones.length === 0}
@@ -157,7 +157,7 @@ function TeacherFields() {
                 render={({ field }) => (
                     <FormItem>
                         <FormLabel>{t("signup.fields.subject")}</FormLabel>
-                        <Select dir={isRTL ? "rtl" : "ltr"}  onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select dir={isRTL ? "rtl" : "ltr"} onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder={t("signup.fields.selectSubject")} />
@@ -188,6 +188,7 @@ function TeacherFields() {
                                     <Checkbox
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
+                                        data-testid="auth-register-teacher-primary-checkbox"
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
@@ -207,6 +208,7 @@ function TeacherFields() {
                                     <Checkbox
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
+                                        data-testid="auth-register-teacher-preparatory-checkbox"
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
@@ -226,6 +228,7 @@ function TeacherFields() {
                                     <Checkbox
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
+                                        data-testid="auth-register-teacher-secondary-checkbox"
                                     />
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
