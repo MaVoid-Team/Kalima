@@ -26,6 +26,14 @@
             "confirmedRevenue": "الإيرادات المؤكدة",
             "pendingPurchases": "مشتريات قيد الانتظار"
         },
+        "statsToday": {
+            "totalPurchases": "إجمالي المشتريات اليوم",
+            "totalRevenue": "إجمالي الإيرادات اليوم",
+            "averagePrice": "متوسط السعر اليوم",
+            "confirmedPurchases": "المشتريات المؤكدة اليوم",
+            "confirmedRevenue": "الإيرادات المؤكدة اليوم",
+            "pendingPurchases": "مشتريات قيد الانتظار اليوم"
+        },
         "status": {
             "label": "الحالة",
             "all": "جميع الطلبات",
