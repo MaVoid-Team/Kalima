@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileText, Download, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,7 +21,7 @@ export default function AdminSamplesPage() {
     const { t, i18n } = useTranslation('admin');
     const isRtl = i18n.dir() === 'rtl';
     const { mutate: fetchApi, loading } = useApiMutation();
-    const { exportData, loading: exportLoading } = useExport();
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
 
     const [samples, setSamples] = useState([]);
     const [fetched, setFetched] = useState(false);
@@ -105,6 +106,16 @@ export default function AdminSamplesPage() {
                     </DropdownMenu>
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             {/* Table / List */}
             {loading && !fetched ? (

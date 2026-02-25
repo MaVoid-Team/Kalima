@@ -6,6 +6,7 @@ import OrdersTable from '@/components/admin/orders/OrdersTable';
 import StoreStatsCards from '@/components/admin/orders/StoreStatsCards';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import useExport from '@/hooks/useExport';
 import {
     Pagination,
@@ -38,7 +39,7 @@ export default function OrdersPage() {
         fetchOrders
     } = useOrders({ limit: 6 });
 
-    const { exportData, loading: exportLoading } = useExport();
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
 
     const handleSelect = (id, checked) => {
@@ -108,6 +109,16 @@ export default function OrdersPage() {
                     </DropdownMenu>
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             <StoreStatsCards />
 

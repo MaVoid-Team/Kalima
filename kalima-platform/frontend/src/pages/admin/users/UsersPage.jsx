@@ -5,6 +5,7 @@ import { UsersIcon, Download } from 'lucide-react';
 import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
 import useExport from '@/hooks/useExport';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import {
     Pagination,
     PaginationContent,
@@ -41,7 +42,7 @@ export default function UsersPage() {
         setPage
     } = useAdminUsers();
 
-    const { exportData, loading: exportLoading } = useExport();
+    const { exportData, loading: exportLoading, exportProgress } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
 
     useEffect(() => {
@@ -118,6 +119,16 @@ export default function UsersPage() {
                     <CreateUserDialog onSuccess={fetchUsers} />
                 </div>
             </div>
+
+            {exportLoading && exportProgress > 0 && (
+                <div>
+                    <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                        <span>{exportProgress < 100 ? t('export.exporting', 'Exporting...') : t('export.processing', 'Processing...')}</span>
+                        <span>{exportProgress}%</span>
+                    </div>
+                    <Progress value={exportProgress} />
+                </div>
+            )}
 
             <UserStatsCards />
 

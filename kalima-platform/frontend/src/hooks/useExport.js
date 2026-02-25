@@ -6,10 +6,12 @@ import { buildQueryString } from '@/lib/queryUtils';
 
 export const useExport = () => {
     const [loading, setLoading] = useState(false);
+    const [exportProgress, setExportProgress] = useState(0);
     const { t } = useTranslation('common');
 
     const exportData = async ({ resource, format = 'csv', ids = [], filters = {} }) => {
         setLoading(true);
+        setExportProgress(0);
         try {
             // Use buildQueryString to handle filters/dates appropriately
             const baseQuery = buildQueryString({ filters });
@@ -23,7 +25,18 @@ export const useExport = () => {
             }
 
             const response = await axios.get(`/${resource}/export?${params.toString()}`, {
-                responseType: 'blob'
+                responseType: 'blob',
+                onDownloadProgress: (progressEvent) => {
+                    if (progressEvent.total) {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        setExportProgress(percentCompleted);
+                    } else if (progressEvent.loaded) {
+                        // Fallback logic if total is not available (e.g. chunked transfer)
+                        // This won't be a 0-100 percentage, but we can set an indeterminate state
+                        // For now we'll set to 99 so the bar shows some progress until completed
+                        setExportProgress(99);
+                    }
+                }
             });
 
             // Extract filename from Content-Disposition header if available
@@ -57,10 +70,11 @@ export const useExport = () => {
             // Error toast is handled globally by the axios response interceptor
         } finally {
             setLoading(false);
+            setExportProgress(0); // clear progress when done or errored
         }
     };
 
-    return { exportData, loading };
+    return { exportData, loading, exportProgress };
 };
 
 export default useExport;
