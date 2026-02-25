@@ -18,6 +18,14 @@
         }
     },
     "orders": {
+        "stats": {
+            "totalPurchases": "Total Purchases",
+            "totalRevenue": "Total Revenue",
+            "averagePrice": "Average Price",
+            "confirmedPurchases": "Confirmed Purchases",
+            "confirmedRevenue": "Confirmed Revenue",
+            "pendingPurchases": "Pending Purchases"
+        },
         "status": {
             "label": "Status",
             "all": "All Orders",

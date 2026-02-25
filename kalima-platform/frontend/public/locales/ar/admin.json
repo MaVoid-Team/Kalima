@@ -18,6 +18,14 @@
         }
     },
     "orders": {
+        "stats": {
+            "totalPurchases": "إجمالي المشتريات",
+            "totalRevenue": "إجمالي الإيرادات",
+            "averagePrice": "متوسط السعر",
+            "confirmedPurchases": "المشتريات المؤكدة",
+            "confirmedRevenue": "الإيرادات المؤكدة",
+            "pendingPurchases": "مشتريات قيد الانتظار"
+        },
         "status": {
             "label": "الحالة",
             "all": "جميع الطلبات",
