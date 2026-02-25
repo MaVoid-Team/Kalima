@@ -31,6 +31,10 @@ export default function ForgotPasswordPage() {
     const { t } = useTranslation("auth");
     const { forgotPassword, loading } = usePassword();
 
+      React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const formSchema = React.useMemo(() => {
         return z.object({
             email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),

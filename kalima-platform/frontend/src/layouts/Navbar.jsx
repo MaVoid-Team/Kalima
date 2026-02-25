@@ -44,7 +44,7 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return;
 
-    const routeValues = ["/teachers", "/market"];
+    const routeValues = ["/market"];
     const current = routeValues.find((route) => location.pathname.startsWith(route));
     setCommandValue(current || "");
   }, [open, location.pathname]);
@@ -72,7 +72,6 @@ export default function Navbar() {
   };
 
   const NAV_LINKS = [
-    { label: t("navbar.teachers"), href: "/teachers" },
     { label: t("navbar.market"), href: "/market" },
   ];
 
@@ -95,7 +94,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation & Actions */}
           <div className="hidden md:flex items-center gap-8">
-            <nav className="flex items-center gap-6">
+            {/* <nav className="flex items-center gap-6">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.label}
@@ -105,11 +104,11 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-            </nav>
+            </nav> */}
 
             <div className="flex items-center gap-3">
               {/* Search Trigger */}
-              <Button
+              {/* <Button
                 variant="outline"
                 className="w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
                 onClick={() => setOpen(true)}
@@ -120,8 +119,15 @@ export default function Navbar() {
                 <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                   <span className="text-xs">{t("navbar.shortcuts.open")}</span>
                 </kbd>
+              </Button> */}
+              {/* Market Button */}
+              <Button
+                variant="default"
+                onClick={() => navigate("/market")}
+              >
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                {t("navbar.market")}
               </Button>
-
               {/* Language Toggle */}
               <Button
                 variant="ghost"
@@ -197,14 +203,14 @@ export default function Navbar() {
 
           {/* Mobile Menu Button with Search Icon nearby if needed, or just keep inside menu */}
           <div className="flex items-center gap-2 md:hidden">
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               onClick={() => setOpen(true)}
               className="text-muted-foreground"
             >
               <Search className="h-5 w-5" />
-            </Button>
+            </Button> */}
 
             {/* Cart Button */}
             {/* Note that this button will take the place of login/signup buttons after logging in */}
@@ -239,7 +245,7 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-background border-t border-border p-6 animate-in slide-in-from-top-5">
-            <nav className="flex flex-col gap-4 h-full overflow-y-auto pb-8">
+            <nav className="flex flex-col gap-4 overflow-y-auto pb-8">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.label}
@@ -339,9 +345,6 @@ export default function Navbar() {
         <CommandList>
           <CommandEmpty>{t("navbar.noResults")}</CommandEmpty>
           <CommandGroup heading={t("navbar.pages")}>
-            <CommandItem value="/teachers" onSelect={() => runCommand(() => navigate("/teachers"))}>
-              {t("navbar.teachers")}
-            </CommandItem>
             <CommandItem value="/market" onSelect={() => runCommand(() => navigate("/market"))}>
               {t("navbar.market")}
             </CommandItem>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from "react-i18next";
 import HeroSection from "@/components/MarketPage/HeroSection";
-import PromoBanner from "@/components/MarketPage/PromoBanner";
 import CategorySidebar from "@/components/MarketPage/CategorySidebar";
 import ProductGrid from "@/components/MarketPage/ProductGrid";
 import { useProducts } from "@/hooks/useProducts";

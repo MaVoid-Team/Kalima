@@ -36,7 +36,11 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { login, loginWithFirebase, loading } = useLogin();
     const [showPassword, setShowPassword] = useState(false);
-
+    
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+    
     const formSchema = React.useMemo(() => {
         return z.object({
             email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),

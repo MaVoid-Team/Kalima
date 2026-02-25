@@ -7,9 +7,18 @@ import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
 export default function ProductInfo({ product }) {
   const { t } = useTranslation(["product", "checkout"]);
 
-  const currentPrice = product.price_after_discount || product.price;
-  const originalPrice = product.price_after_discount ? product.price : null;
-  const discount = calculateDiscountPercentage(originalPrice, currentPrice, 0);
+  const originalPrice = Number.parseFloat(product?.price);
+  const discountedPrice = Number.parseFloat(product?.price_after_discount);
+  const hasValidDiscount =
+    !Number.isNaN(originalPrice) &&
+    !Number.isNaN(discountedPrice) &&
+    discountedPrice > 0 &&
+    discountedPrice < originalPrice;
+
+  const currentPrice = hasValidDiscount ? discountedPrice : originalPrice;
+  const discount = hasValidDiscount
+    ? calculateDiscountPercentage(originalPrice, currentPrice, 0)
+    : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,12 +56,12 @@ export default function ProductInfo({ product }) {
             <span className="text-3xl font-black">
               {formatPrice(currentPrice)} {t("info.currency")}
             </span>
-            {originalPrice && (
+            {discount > 0 && (
               <>
                 <span className="text-lg text-muted-foreground line-through mb-1">
                   {formatPrice(originalPrice)} {t("info.currency")}
                 </span>
-                {discount && (
+                {discount > 0 && (
                   <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded-full mb-1">
                     {t("info.save")} {discount}%
                   </span>
