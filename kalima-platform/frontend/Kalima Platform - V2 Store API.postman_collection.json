@@ -11678,7 +11678,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "4"
+                  "value": "8"
                 }
               ]
             }
@@ -11932,7 +11932,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "4"
+                  "value": "5"
                 }
               ]
             }
@@ -16424,9 +16424,39 @@
             },
             {
               "name": "User Statistics",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
               "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
                 "method": "GET",
-                "header": []
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": []
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v2/admin/dashboard/user-stats",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "admin",
+                    "dashboard",
+                    "user-stats"
+                  ]
+                }
               },
               "response": [
                 {
@@ -16528,7 +16558,70 @@
                 },
                 "description": "Returns the authenticated user's full profile"
               },
-              "response": []
+              "response": [
+                {
+                  "name": "Get My Profile",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/profile/me",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "profile",
+                        "me"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "997"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"3e5-73eE28xlhTK36uYhmuboqI0zqRw\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 25 Feb 2026 19:50:00 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1797,\n        \"name\": \" admin test\",\n        \"email\": \"test.admin@frontend.com\",\n        \"phone\": \"0100000000000\",\n        \"secondary_phone\": null,\n        \"gender\": \"male\",\n        \"profile_pic_url\": null,\n        \"is_email_verified\": false,\n        \"created_at\": \"2026-02-25T04:59:40.376Z\",\n        \"user_roles\": [\n            {\n                \"portal\": \"store\",\n                \"role\": \"Admin\"\n            },\n            {\n                \"portal\": \"academy\",\n                \"role\": \"Admin\"\n            }\n        ],\n        \"user_analytics\": {\n            \"user_id\": 1797,\n            \"views\": 0,\n            \"total_spent\": \"0\",\n            \"number_of_purchases\": 0,\n            \"successful_invites\": 0,\n            \"monthly_confirmed_count\": 0,\n            \"last_confirmed_count_update\": \"2026-02-25T04:59:40.376Z\"\n        },\n        \"teachers\": {\n            \"serial\": \"ري001\",\n            \"is_primary\": true,\n            \"is_preparatory\": false,\n            \"is_secondary\": true,\n            \"government_id\": 14,\n            \"zone_id\": 48,\n            \"subject_id\": 2,\n            \"government\": {\n                \"id\": 14,\n                \"title\": \"محافظة الإسكندرية\"\n            },\n            \"zones\": {\n                \"id\": 48,\n                \"title\": \"إدارة المنتزة أول\"\n            },\n            \"subjects\": {\n                \"id\": 2,\n                \"title\": \"رياضيات\"\n            }\n        },\n        \"students\": null,\n        \"parents\": null,\n        \"lecturers\": null,\n        \"userCreated\": {\n            \"Admin\": 0,\n            \"SubAdmin\": 1,\n            \"Moderator\": 1,\n            \"Teacher\": 0,\n            \"Student\": 0,\n            \"Parent\": 0,\n            \"Lecturer\": 0,\n            \"Assistant\": 0\n        }\n    }\n}"
+                }
+              ]
             },
             {
               "name": "Update My Profile",
@@ -16965,6 +17058,69 @@
                   ],
                   "cookie": [],
                   "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1050,\n        \"name\": \"شيماء جمال معاذ\",\n        \"email\": \"shima2.elkhateeb@gmail.com\",\n        \"phone\": \"201015423446\",\n        \"secondary_phone\": \"201068248368\",\n        \"gender\": \"female\",\n        \"profile_pic_url\": null,\n        \"is_email_verified\": true,\n        \"created_at\": \"2025-11-13T20:44:35.135Z\",\n        \"user_roles\": [\n            {\n                \"portal\": \"academy\",\n                \"role\": \"Teacher\"\n            }\n        ],\n        \"user_analytics\": null,\n        \"teachers\": {\n            \"serial\": null,\n            \"is_primary\": false,\n            \"is_preparatory\": false,\n            \"is_secondary\": false,\n            \"government_id\": null,\n            \"zone_id\": null,\n            \"subject_id\": null,\n            \"government\": null,\n            \"zones\": null,\n            \"subjects\": null\n        },\n        \"students\": null,\n        \"parents\": null,\n        \"lecturers\": null\n    }\n}"
+                },
+                {
+                  "name": "Get User Profile",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base_url}}/api/v2/profile/users/{{userId}}",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v2",
+                        "profile",
+                        "users",
+                        "{{userId}}"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "X-Powered-By",
+                      "value": "Express"
+                    },
+                    {
+                      "key": "Vary",
+                      "value": "Origin"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Credentials",
+                      "value": "true"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json; charset=utf-8"
+                    },
+                    {
+                      "key": "Content-Length",
+                      "value": "483"
+                    },
+                    {
+                      "key": "ETag",
+                      "value": "W/\"1e3-GdRtOOMUCDfM+BlO1LOqE/ep7s0\""
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Wed, 25 Feb 2026 19:49:22 GMT"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "keep-alive"
+                    },
+                    {
+                      "key": "Keep-Alive",
+                      "value": "timeout=5"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"success\": true,\n    \"data\": {\n        \"id\": 1801,\n        \"name\": \"Ahmed\",\n        \"email\": \"emailadress@user.com\",\n        \"phone\": \"0109317212\",\n        \"secondary_phone\": \"\",\n        \"gender\": \"male\",\n        \"profile_pic_url\": null,\n        \"is_email_verified\": true,\n        \"created_at\": \"2026-02-25T19:12:26.637Z\",\n        \"user_roles\": [\n            {\n                \"portal\": \"academy\",\n                \"role\": \"Moderator\"\n            }\n        ],\n        \"user_analytics\": null,\n        \"teachers\": null,\n        \"students\": null,\n        \"parents\": null,\n        \"lecturers\": null,\n        \"userCreated\": {\n            \"Admin\": 0,\n            \"SubAdmin\": 0,\n            \"Moderator\": 0,\n            \"Teacher\": 0,\n            \"Student\": 0,\n            \"Parent\": 0,\n            \"Lecturer\": 0,\n            \"Assistant\": 0\n        }\n    }\n}"
                 }
               ]
             },
