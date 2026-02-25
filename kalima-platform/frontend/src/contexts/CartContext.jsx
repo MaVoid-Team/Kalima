@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import useCartNetwork from '../hooks/cart/useCart';
 import useAuth from '../hooks/auth/useAuth';
+import useRole from '../hooks/useRole';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const { isAuthenticated } = useAuth();
+  const { isAdmin } = useRole();
   // this hook is only responsible for performing API calls; the provider
   // wraps its results with state and caching.
   const {
@@ -62,12 +64,12 @@ export function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isAdmin) {
       loadCart();
     } else {
       setCart(EMPTY_CART);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAdmin]);
 
   const updateQuantity = async (itemId, quantity) => {
     if (quantity < 1) return;
