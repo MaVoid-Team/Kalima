@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
+import { is } from "date-fns/locale/is";
 
 const PRODUCT_IMAGES = {
   AGENDA:
@@ -27,6 +28,7 @@ const NewArrivalsSection = () => {
       price: 10.0,
       image: PRODUCT_IMAGES.AGENDA,
       badge: "newBadge",
+      isPurchased: true
     },
     {
       id: 6,
@@ -36,6 +38,7 @@ const NewArrivalsSection = () => {
       price: 45.0,
       image: PRODUCT_IMAGES.CHEMISTRY,
       badge: "newBadge",
+      isPurchased: true
     },
     {
       id: 7,
@@ -45,6 +48,7 @@ const NewArrivalsSection = () => {
       price: 35.0,
       image: PRODUCT_IMAGES.BOOKS,
       badge: "newBadge",
+      isPurchased: true
     },
     {
       id: 8,
@@ -54,6 +58,7 @@ const NewArrivalsSection = () => {
       price: 18.99,
       image: PRODUCT_IMAGES.MARKERS,
       badge: "newBadge",
+      isPurchased: true
     },
   ];
 
