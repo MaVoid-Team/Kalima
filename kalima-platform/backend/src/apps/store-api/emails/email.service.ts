@@ -21,6 +21,14 @@ import {
   getAccountCreatedEmailText,
   getAccountCreatedEmailSubject,
   AccountCreatedEmailData,
+  getWelcomeOAuthEmailHtml,
+  getWelcomeOAuthEmailText,
+  getWelcomeOAuthEmailSubject,
+  WelcomeOAuthEmailData,
+  getOrderReceivedEmailHtml,
+  getOrderReceivedEmailText,
+  getOrderReceivedEmailSubject,
+  OrderReceivedEmailData,
 } from './templates';
 
 export interface EmailConfig {
@@ -154,6 +162,18 @@ export class EmailService {
   }
 
   /**
+   * Send welcome email for OAuth Users (pre-verified)
+   */
+  async sendWelcomeOAuthEmail(to: string, data: WelcomeOAuthEmailData): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getWelcomeOAuthEmailSubject(),
+      html: getWelcomeOAuthEmailHtml(data),
+      text: getWelcomeOAuthEmailText(data),
+    });
+  }
+
+  /**
    * Send password changed notification
    */
   async sendPasswordChangedEmail(
@@ -180,6 +200,21 @@ export class EmailService {
       subject: getAccountCreatedEmailSubject(),
       html: getAccountCreatedEmailHtml(data),
       text: getAccountCreatedEmailText(data),
+    });
+  }
+
+  /**
+   * Send order received confirmation
+   */
+  async sendOrderReceivedEmail(
+    to: string,
+    data: OrderReceivedEmailData
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to,
+      subject: getOrderReceivedEmailSubject(),
+      html: getOrderReceivedEmailHtml(data),
+      text: getOrderReceivedEmailText(data),
     });
   }
 

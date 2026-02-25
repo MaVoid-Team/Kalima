@@ -33,11 +33,25 @@ class RequiredFieldService {
   async createDefinition(
     dto: CreateFieldDefinitionDto,
   ): Promise<required_field_definitions> {
-    // Check label uniqueness (among non-deleted)
+    // Check label uniqueness (both active and soft-deleted)
     const existing = await this.db.required_field_definitions.findFirst({
-      where: { label: dto.label, deleted_at: null },
+      where: { label: dto.label },
     });
+
     if (existing) {
+      if (existing.deleted_at !== null) {
+        // Restore the soft-deleted definition and update its details
+        return this.db.required_field_definitions.update({
+          where: { id: existing.id },
+          data: {
+            deleted_at: null,
+            active: true,
+            field_type: dto.field_type as field_type_enum,
+            updated_at: new Date(),
+          },
+        });
+      }
+
       throw new ConflictError(
         `Field definition with label "${dto.label}" already exists`,
       );
@@ -100,11 +114,13 @@ class RequiredFieldService {
     // If label is being changed, check uniqueness
     if (dto.label && dto.label !== definition.label) {
       const existing = await this.db.required_field_definitions.findFirst({
-        where: { label: dto.label, deleted_at: null },
+        where: { label: dto.label },
       });
       if (existing) {
         throw new ConflictError(
-          `Field definition with label "${dto.label}" already exists`,
+          `Field definition with label "${dto.label}" already exists${
+            existing.deleted_at ? " (it is currently deleted, please reuse or restore it)" : ""
+          }`,
         );
       }
     }

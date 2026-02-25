@@ -8,7 +8,12 @@ const globalForRedis = global as unknown as {
 
 function createRedisClient(): Redis | null {
   if (!REDIS_URL) return null;
-  const client = new Redis(REDIS_URL, { maxRetriesPerRequest: 3 });
+  const client = new Redis(REDIS_URL, {
+    maxRetriesPerRequest: 3,
+    connectTimeout: 5000,
+    commandTimeout: 5000,
+    enableReadyCheck: true,
+  });
   client.on("error", (err) => console.error("[Redis] Error:", err.message));
   client.on("connect", () => console.log("[Redis] Connected"));
   return client;

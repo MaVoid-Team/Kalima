@@ -2,9 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
 import { plainToInstance } from "class-transformer";
 import { userManagementService } from "../services/user-management.service";
-import { AssignRoleDto, RevokeRoleDto, SetRolesDto } from "../dtos/admin.dto";
+import { AssignRoleDto, RevokeRoleDto, SetRolesDto, CreateAdminDto, CreateSubAdminDto, CreateModeratorDto, CreateAssistantDto } from "../dtos/admin.dto";
 import { role_enum, portal_enum } from "../generated/prisma/client";
-import { ValidationError, BadRequestError } from "../../../libs/errors";
+import { ValidationError, BadRequestError, ForbiddenError } from "../../../libs/errors";
+import { TeacherRegistrationDto, StudentRegistrationDto, ParentRegistrationDto, LecturerRegistrationDto } from "../dtos/auth.dto";
+import { CreatorContext } from "../interfaces/auth.interface";
 
 // ============================================
 // HELPER FUNCTIONS
@@ -52,6 +54,90 @@ function validateEnums(
 // ============================================
 
 export const adminController = {
+  // ============================================
+  // CREATE USER (ADMIN DASHBOARD)
+  // ============================================
+
+  /**
+   * POST /admin/users
+   * Body must include `role` and the corresponding fields for that role.
+   */
+  async createUser(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const role = req.body.role;
+      if (!role) {
+        throw new BadRequestError("Role is required in the request body");
+      }
+
+      if (!VALID_ROLES.includes(role as role_enum)) {
+        throw new BadRequestError(`Invalid role "${role}".`);
+      }
+
+      const creator: CreatorContext = {
+        userId: (req as any).user.userId || (req as any).user.id,
+        roles: (req as any).user.roles || [],
+      };
+
+      let result;
+      switch (role as role_enum) {
+        case role_enum.Admin:
+          const adminDto = await validateDto(CreateAdminDto, req.body);
+          result = await userManagementService.createAdmin(adminDto, creator);
+          break;
+        case role_enum.SubAdmin:
+          const subAdminDto = await validateDto(CreateSubAdminDto, req.body);
+          result = await userManagementService.createSubAdmin(subAdminDto, creator);
+          break;
+        case role_enum.Moderator:
+          const modDto = await validateDto(CreateModeratorDto, req.body);
+          result = await userManagementService.createModerator(modDto, creator);
+          break;
+        case role_enum.Assistant:
+          const assistantDto = await validateDto(CreateAssistantDto, req.body);
+          result = await userManagementService.createAssistant(assistantDto, creator);
+          break;
+        case role_enum.Teacher:
+          const hasPermTeacher = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
+          if (!hasPermTeacher) throw new ForbiddenError("Not allowed to create Teacher");
+          const teacherDto = await validateDto(TeacherRegistrationDto, req.body);
+          result = (await userManagementService.createTeacher(teacherDto, creator)).user;
+          break;
+        case role_enum.Student:
+          const hasPermStudent = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
+          if (!hasPermStudent) throw new ForbiddenError("Not allowed to create Student");
+          const studentDto = await validateDto(StudentRegistrationDto, req.body);
+          result = (await userManagementService.createStudent(studentDto, creator)).user;
+          break;
+        case role_enum.Parent:
+          const hasPermParent = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
+          if (!hasPermParent) throw new ForbiddenError("Not allowed to create Parent");
+          const parentDto = await validateDto(ParentRegistrationDto, req.body);
+          result = (await userManagementService.createParent(parentDto, creator)).user;
+          break;
+        case role_enum.Lecturer:
+          const hasPermLecturer = creator.roles.some((r) => ([role_enum.Admin, role_enum.SubAdmin, role_enum.Moderator] as role_enum[]).includes(r.role));
+          if (!hasPermLecturer) throw new ForbiddenError("Not allowed to create Lecturer");
+          const lecturerDto = await validateDto(LecturerRegistrationDto, req.body);
+          result = (await userManagementService.createLecturer(lecturerDto, creator)).user;
+          break;
+        default:
+          throw new BadRequestError(`Role ${role} creation is not supported via this endpoint.`);
+      }
+
+      res.status(201).json({
+        success: true,
+        message: `User with role ${role} created successfully`,
+        data: result,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
   // ============================================
   // LIST / SEARCH USERS
   // ============================================

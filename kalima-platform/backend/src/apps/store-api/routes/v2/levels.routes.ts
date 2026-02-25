@@ -3,6 +3,7 @@ import { levelsController } from "../../controllers/levels.controller";
 import { authenticateToken } from "../../../../libs/auth/middleware";
 import { requireRole } from "../../middleware/requireRole.middleware";
 import { role_enum } from "../../generated/prisma/client";
+import { makeExportHandler } from "../../export";
 
 const router = Router();
 const adminAuth = [
@@ -12,6 +13,7 @@ const adminAuth = [
 const adminOnlyAuth = [authenticateToken, requireRole([role_enum.Admin])];
 
 // PUBLIC
+router.get("/export", ...adminAuth, makeExportHandler("levels"));
 router.get("/", levelsController.getAllLevels);
 router.get("/:id", levelsController.getLevelById);
 

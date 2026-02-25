@@ -449,7 +449,7 @@ export type $levelsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type levelsGetPayload<S extends boolean | null | undefined | levelsDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$levelsPayload, S>
 
 export type levelsCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<levelsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<levelsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: LevelsCountAggregateInputType | true
   }
 
@@ -893,6 +893,7 @@ export type levelsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter, which levels to fetch.
    */
   where: Prisma.levelsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -915,6 +916,7 @@ export type levelsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which levels to fetch.
    */
   where: Prisma.levelsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -967,6 +969,7 @@ export type levelsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of levels.
    */
   distinct?: Prisma.LevelsScalarFieldEnum | Prisma.LevelsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1019,6 +1022,7 @@ export type levelsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of levels.
    */
   distinct?: Prisma.LevelsScalarFieldEnum | Prisma.LevelsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1066,6 +1070,7 @@ export type levelsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   skip?: number
   distinct?: Prisma.LevelsScalarFieldEnum | Prisma.LevelsScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1088,6 +1093,7 @@ export type levelsCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * The data needed to create a levels.
    */
   data: Prisma.XOR<Prisma.levelsCreateInput, Prisma.levelsUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1144,6 +1150,7 @@ export type levelsUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Choose, which levels to update.
    */
   where: Prisma.levelsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1218,6 +1225,7 @@ export type levelsUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * In case the levels was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.levelsUpdateInput, Prisma.levelsUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1240,6 +1248,7 @@ export type levelsDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter which levels to delete.
    */
   where: Prisma.levelsWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

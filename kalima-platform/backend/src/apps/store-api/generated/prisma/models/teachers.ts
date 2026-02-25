@@ -1044,7 +1044,7 @@ export type $teachersPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type teachersGetPayload<S extends boolean | null | undefined | teachersDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$teachersPayload, S>
 
 export type teachersCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<teachersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<teachersFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: TeachersCountAggregateInputType | true
   }
 
@@ -1496,6 +1496,7 @@ export type teachersFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which teachers to fetch.
    */
   where: Prisma.teachersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1518,6 +1519,7 @@ export type teachersFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which teachers to fetch.
    */
   where: Prisma.teachersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1570,6 +1572,7 @@ export type teachersFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of teachers.
    */
   distinct?: Prisma.TeachersScalarFieldEnum | Prisma.TeachersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1622,6 +1625,7 @@ export type teachersFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of teachers.
    */
   distinct?: Prisma.TeachersScalarFieldEnum | Prisma.TeachersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1669,6 +1673,7 @@ export type teachersFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   skip?: number
   distinct?: Prisma.TeachersScalarFieldEnum | Prisma.TeachersScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1691,6 +1696,7 @@ export type teachersCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a teachers.
    */
   data: Prisma.XOR<Prisma.teachersCreateInput, Prisma.teachersUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1751,6 +1757,7 @@ export type teachersUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which teachers to update.
    */
   where: Prisma.teachersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1829,6 +1836,7 @@ export type teachersUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the teachers was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.teachersUpdateInput, Prisma.teachersUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1851,6 +1859,7 @@ export type teachersDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which teachers to delete.
    */
   where: Prisma.teachersWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

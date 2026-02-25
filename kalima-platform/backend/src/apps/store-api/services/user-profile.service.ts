@@ -111,28 +111,30 @@ class UserProfileService {
     // ── Teacher-specific ──
     if (userRoles.includes("Teacher")) {
       const teacherData: Record<string, unknown> = {};
-      let hasTeacherUpdate = false;
+      const [subj, gov, zone] = await Promise.all([
+        dto.subject_id != null
+          ? this.db.subjects.findUnique({ where: { id: dto.subject_id } })
+          : null,
+        dto.government_id != null
+          ? this.db.government.findUnique({ where: { id: dto.government_id } })
+          : null,
+        dto.zone_id != null
+          ? this.db.zones.findUnique({ where: { id: dto.zone_id } })
+          : null,
+      ]);
 
+      let hasTeacherUpdate = false;
       if (dto.subject_id !== undefined) {
-        const subj = await this.db.subjects.findUnique({
-          where: { id: dto.subject_id },
-        });
         if (!subj) throw new NotFoundError("Subject not found");
         teacherData.subject_id = dto.subject_id;
         hasTeacherUpdate = true;
       }
       if (dto.government_id !== undefined) {
-        const gov = await this.db.government.findUnique({
-          where: { id: dto.government_id },
-        });
         if (!gov) throw new NotFoundError("Government not found");
         teacherData.government_id = dto.government_id;
         hasTeacherUpdate = true;
       }
       if (dto.zone_id !== undefined) {
-        const zone = await this.db.zones.findUnique({
-          where: { id: dto.zone_id },
-        });
         if (!zone) throw new NotFoundError("Zone not found");
         teacherData.zone_id = dto.zone_id;
         hasTeacherUpdate = true;

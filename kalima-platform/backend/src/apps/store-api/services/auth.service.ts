@@ -42,7 +42,8 @@ import {
   portal_enum,
   auth_provider_enum,
 } from "../generated/prisma/client";
-import { getEmailService } from "../emails";
+import { getEmailService } from "../emails/email.service";
+import fs from "fs";
 import { userManagementService } from "./user-management.service";
 import {
   UnauthorizedError,
@@ -57,8 +58,8 @@ import {
 
 const RESET_TOKEN_EXPIRY_HOURS = 24;
 const VERIFICATION_TOKEN_EXPIRY_HOURS = 48;
-const APP_URL = process.env.APP_URL || "http://localhost:5000";
-const SUPPORT_URL = process.env.SUPPORT_URL || "http://localhost:5000/support";
+const APP_URL = process.env.APP_URL || "http://localhost:5173";
+const SUPPORT_URL = process.env.SUPPORT_URL || "http://localhost:5173/support";
 
 // ============================================
 // AUTH SERVICE CLASS
@@ -157,6 +158,16 @@ class AuthService {
     );
     const tokens = await this.issueTokens(user.id);
 
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/login`,
+      });
+    }
+
     return {
       user: this.userService.mapToBaseUserData(user),
       tokens,
@@ -172,6 +183,16 @@ class AuthService {
       firebaseUser,
     );
     const tokens = await this.issueTokens(user.id);
+
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/login`,
+      });
+    }
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -189,6 +210,16 @@ class AuthService {
     );
     const tokens = await this.issueTokens(user.id);
 
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/login`,
+      });
+    }
+
     return {
       user: this.userService.mapToBaseUserData(user),
       tokens,
@@ -204,6 +235,16 @@ class AuthService {
       firebaseUser,
     );
     const tokens = await this.issueTokens(user.id);
+
+    // Send Welcome OAuth Email
+    if (user.email) {
+      await getEmailService().sendWelcomeOAuthEmail(user.email, {
+        name: user.name,
+        role: this.formatRoleName(user.role!),
+        provider: firebaseUser.provider,
+        loginUrl: `${APP_URL}/login`,
+      });
+    }
 
     return {
       user: this.userService.mapToBaseUserData(user),
@@ -546,7 +587,7 @@ class AuthService {
     await this.userService.markEmailVerificationTokenUsed(verificationToken.id);
 
     // Send welcome email
-    const loginUrl = `${APP_URL}/auth/login`;
+    const loginUrl = `${APP_URL}/login`;
     const roleName = this.formatRoleName(verificationToken.users.role!);
 
     if (verificationToken.users.email) {

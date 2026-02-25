@@ -114,8 +114,16 @@ export const couponController = {
         req.query.active !== undefined
           ? req.query.active === "true"
           : undefined;
+      const product_id = req.query.product_id
+        ? parseInt(req.query.product_id as string, 10)
+        : undefined;
 
-      const result = await couponService.getAllCoupons({ page, limit, active });
+      const result = await couponService.getAllCoupons({
+        page,
+        limit,
+        active,
+        product_id,
+      });
 
       res.status(200).json({
         success: true,
@@ -221,7 +229,7 @@ export const couponController = {
 
   /**
    * POST /coupons/validate
-   * Body: { code }
+   * Body: { code, product_id? }
    */
   async validateCoupon(
     req: Request,
@@ -230,7 +238,11 @@ export const couponController = {
   ): Promise<void> {
     try {
       const dto = await validateDto(ValidateCouponDto, req.body);
-      const result = await couponService.validateCoupon(dto.code);
+      const result = await couponService.validateCoupon(
+        dto.code,
+        undefined,
+        dto.product_id,
+      );
 
       res.status(200).json({
         success: true,

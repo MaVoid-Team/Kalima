@@ -61,22 +61,19 @@ export class CreateProductDto {
   @IsOptional()
   sample_url?: string;
 
-  @Type(() => Number)
+  /**
+   * Category ID to attach on creation.
+   * Sent as string in multipart form data.
+   */
   @IsInt()
   @IsPositive()
   @IsOptional()
-  coupon_id?: number;
-
-  /**
-   * Array of category IDs to attach on creation.
-   * Sent as JSON string in multipart form data.
-   */
-  @IsArray()
-  @IsInt({ each: true })
-  @IsPositive({ each: true })
-  @IsOptional()
   @Type(() => Number)
-  category_ids?: number[];
+  category_id?: number;
+
+  @IsString()
+  @IsOptional()
+  perks?: string;
 }
 
 // ============================================
@@ -119,16 +116,14 @@ export class UpdateProductDto {
   @IsOptional()
   sample_url?: string;
 
-  @Type(() => Number)
-  @IsInt()
-  @IsPositive()
-  @IsOptional()
-  coupon_id?: number;
-
   @Type(() => Boolean)
   @IsBoolean()
   @IsOptional()
   is_archived?: boolean;
+
+  @IsString()
+  @IsOptional()
+  perks?: string;
 }
 
 // ============================================

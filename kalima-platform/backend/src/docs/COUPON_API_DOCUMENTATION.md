@@ -8,6 +8,15 @@
 
 ---
 
+## Product Coupons Endpoint
+
+**Endpoint:** `GET /api/v2/products/:id/coupons`  
+**Auth Required:** No (public)
+
+Returns active coupons for a specific product. Query param `active` (default `true`) filters by active status.
+
+---
+
 ## Table of Contents
 
 1. [Admin / SubAdmin Endpoints](#admin--subadmin-endpoints)
@@ -75,19 +84,24 @@ Creates a new coupon. The code must be unique. Only **one** discount type is all
 
 ```json
 {
-  "code": "string (required, unique)",
+  "code": "string (required, unique, max 50 chars, [A-Z0-9-] only)",
+  "product_id": "number (required) — the product this coupon applies to",
   "discount_type": "amount | percentage (required)",
-  "discount_amount": "number (required when discount_type is 'amount', must be > 0)",
+  "discount_amount": "number (required when discount_type is 'amount', must be > 0 and <= product price)",
   "discount_percentage": "number (required when discount_type is 'percentage', must be > 0 and <= 100)",
-  "expires_at": "ISO 8601 date string (required)"
+  "expires_at": "ISO 8601 date string (required)",
+  "starts_at": "ISO 8601 date string (optional) — must be before expires_at"
 }
 ```
+
+**Product-Coupon Relation:** Each coupon belongs to exactly one product. A product can have many coupons.
 
 **Example — Fixed Amount:**
 
 ```json
 {
   "code": "KLM-A3F1B2",
+  "product_id": 1,
   "discount_type": "amount",
   "discount_amount": 50.0,
   "expires_at": "2026-06-01T00:00:00.000Z"
@@ -99,6 +113,7 @@ Creates a new coupon. The code must be unique. Only **one** discount type is all
 ```json
 {
   "code": "SUMMER20",
+  "product_id": 1,
   "discount_type": "percentage",
   "discount_percentage": 20,
   "expires_at": "2026-06-01T00:00:00.000Z"
@@ -114,6 +129,7 @@ Creates a new coupon. The code must be unique. Only **one** discount type is all
   "data": {
     "id": 1,
     "code": "KLM-A3F1B2",
+    "product_id": 1,
     "discount_amount": "50.00",
     "discount_percentage": 0,
     "active": true,
@@ -144,13 +160,14 @@ Returns a paginated list of all non-deleted coupons. Supports filtering by activ
 
 **Query Parameters:**
 
-| Param    | Type    | Default | Description                                 |
-| -------- | ------- | ------- | ------------------------------------------- |
-| `page`   | number  | 1       | Page number                                 |
-| `limit`  | number  | 20      | Items per page                              |
-| `active` | boolean | —       | Filter by active status (`true` or `false`) |
+| Param       | Type    | Default | Description                                      |
+| ----------- | ------- | ------- | ------------------------------------------------ |
+| `page`      | number  | 1       | Page number                                      |
+| `limit`     | number  | 20      | Items per page                                   |
+| `active`    | boolean | —       | Filter by active status (`true` or `false`)       |
+| `product_id`| number  | —       | Filter by product (returns coupons for that product) |
 
-**Example:** `GET /coupons?page=1&limit=10&active=true`
+**Example:** `GET /coupons?page=1&limit=10&active=true&product_id=1`
 
 **Success Response (200):**
 
@@ -368,12 +385,13 @@ Checks whether a coupon code is valid (exists, is active, and has not expired). 
 
 **Error Responses:**
 
-| Status | Message                           | Condition                                     |
-| ------ | --------------------------------- | --------------------------------------------- |
-| 400    | `This coupon is no longer active` | Coupon exists but `active` is `false`         |
-| 400    | `This coupon has expired`         | Coupon exists but `expires_at` is in the past |
-| 404    | `Invalid coupon code`             | Code does not exist or is soft-deleted        |
-| 422    | Validation errors array           | Missing `code` field                          |
+| Status | Message                                | Condition                                      |
+| ------ | -------------------------------------- | ---------------------------------------------- |
+| 400    | `This coupon is no longer active`      | Coupon exists but `active` is `false`          |
+| 400    | `This coupon has expired`              | Coupon exists but `expires_at` is in the past  |
+| 400    | `This coupon is not valid for this product` | Coupon applies to a different product (when `product_id` provided) |
+| 404    | `Invalid coupon code`                  | Code does not exist or is soft-deleted         |
+| 422    | Validation errors array                | Missing `code` field                           |
 
 ---
 

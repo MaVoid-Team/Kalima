@@ -143,185 +143,45 @@ class PurchasesService {
       },
     });
 
-    for (const item of input.items) {
-      const purchaseItem = await client.purchase_items.create({
-        data: {
-          purchase_id: created.id,
-          product_id: item.product_id,
-          price_at_purchase: item.price_at_purchase,
-          discount: item.discount,
-        },
-      });
+    const purchaseItemsData = input.items.map((item) => ({
+      purchase_id: created.id,
+      product_id: item.product_id,
+      price_at_purchase: item.price_at_purchase,
+      discount: item.discount,
+    }));
 
-      if (item.required_fields && item.required_fields.length > 0) {
-        await client.purchase_item_required_fields.createMany({
-          data: item.required_fields.map((rf) => ({
+    const createdItems = await client.purchase_items.createManyAndReturn({
+      data: purchaseItemsData,
+    });
+
+    const requiredFieldsData: Array<{
+      purchase_item_id: number;
+      field_definition_id: number;
+      value: string;
+    }> = [];
+    for (let i = 0; i < input.items.length; i++) {
+      const item = input.items[i];
+      const purchaseItem = createdItems[i];
+      if (item.required_fields?.length && purchaseItem) {
+        for (const rf of item.required_fields) {
+          requiredFieldsData.push({
             purchase_item_id: purchaseItem.id,
             field_definition_id: rf.field_definition_id,
             value: rf.value,
-          })),
-        });
+          });
+        }
       }
+    }
+    if (requiredFieldsData.length > 0) {
+      await client.purchase_item_required_fields.createMany({
+        data: requiredFieldsData,
+      });
     }
 
     return client.purchases.findUnique({
       where: { id: created.id },
       include: PURCHASE_INCLUDE,
     });
-  }
-
-  // ---------------------------------------------------------------
-  // Create purchase from active cart
-  // ---------------------------------------------------------------
-  async createPurchaseFromCart(
-    user_id: number,
-    input: {
-      payment_method_id: number;
-      payment_screenshot_id: number;
-      number_transferred_from?: string;
-      notes?: string;
-    },
-    txClient?: PrismaClient,
-  ) {
-    const client = txClient ?? this.db;
-
-    type CartWithItems = Prisma.cartsGetPayload<{
-      include: { cart_items: { include: { cart_item_required_fields: true } } };
-    }>;
-    const cart = (await client.carts.findFirst({
-      where: { user_id, status: "active" },
-      include: { cart_items: { include: { cart_item_required_fields: true } } },
-    })) as CartWithItems | null;
-    if (!cart || !cart.cart_items || cart.cart_items.length === 0)
-      throw new BadRequestError("Active cart is empty");
-
-    const items: CreatePurchaseItemDto[] = cart.cart_items.map((ci) => ({
-      product_id: ci.product_id,
-      price_at_purchase: Number(ci.price_at_add),
-      discount: Number(ci.discount || 0),
-      required_fields: (ci.cart_item_required_fields || []).map((rf) => ({
-        field_definition_id: rf.field_definition_id,
-        value: rf.value,
-      })),
-    }));
-
-    const purchaseDto: CreatePurchaseDto = {
-      user_id,
-      payment_method_id: input.payment_method_id,
-      payment_screenshot_id: input.payment_screenshot_id,
-      items,
-      subtotal: Number(cart.subtotal),
-      discount: Number(cart.discount),
-      total: Number(cart.total),
-      number_transferred_from: input.number_transferred_from || undefined,
-      payment_number: undefined,
-      notes: input.notes || undefined,
-    };
-
-    const purchase = await this.createPurchase(purchaseDto, txClient);
-
-    const couponIds = [
-      ...new Set(
-        cart.cart_items
-          .filter((ci) => ci.coupon_id != null)
-          .map((ci) => ci.coupon_id as number),
-      ),
-    ];
-    for (const couponId of couponIds) {
-      await couponService.recordCouponUsage(
-        user_id,
-        couponId,
-        purchase?.id ?? undefined,
-      );
-    }
-
-    return purchase;
-  }
-
-  // ---------------------------------------------------------------
-  // Fast-buy (single product, no cart mutation)
-  // ---------------------------------------------------------------
-  async fastBuy(
-    user_id: number,
-    product_id: number,
-    quantity: number,
-    checkout: CheckoutDto,
-    payment_screenshot_file: Express.Multer.File,
-    txClient?: PrismaClient,
-  ) {
-    const client = txClient ?? this.db;
-
-    const product = await client.products.findUnique({
-      where: { id: product_id },
-    });
-    if (!product) throw new NotFoundError("Product not found");
-
-    const requiredDefs = await client.product_required_fields.findMany({
-      where: { product_id, is_required: true, active: true },
-      select: { field_definition_id: true },
-    });
-    if (requiredDefs.length > 0) {
-      const provided = checkout.required_fields || [];
-      const providedSet = new Set(
-        provided.map((p) => p.required_field_definition_id),
-      );
-      const missing = requiredDefs.filter(
-        (r) => !providedSet.has(r.field_definition_id),
-      );
-      if (missing.length > 0)
-        throw new BadRequestError(
-          `Missing required product fields: ${missing.map((m) => m.field_definition_id).join(", ")}`,
-        );
-    }
-
-    if (!payment_screenshot_file) {
-      throw new BadRequestError("Payment screenshot is required");
-    }
-    const screenshot = await imageService.uploadImage(
-      payment_screenshot_file,
-      { compress: true, quality: 80 },
-    );
-
-    const unitPrice = Number(product.price);
-    const subtotal = unitPrice * quantity;
-    const discount = 0;
-    const total = Math.max(0, subtotal - discount);
-
-    const paymentMethod = await validatePaymentForCheckout(client, {
-      total,
-      numberTransferredFrom: checkout.numberTransferredFrom,
-      payment_method_id: checkout.payment_method_id,
-    });
-
-    const requiredFieldsMapped = (checkout.required_fields || []).map((f) => ({
-      field_definition_id: f.required_field_definition_id,
-      value: f.value,
-    }));
-    const items: CreatePurchaseItemDto[] = Array.from(
-      { length: quantity },
-      () => ({
-        product_id,
-        price_at_purchase: unitPrice,
-        discount: 0,
-        required_fields:
-          requiredFieldsMapped.length > 0 ? requiredFieldsMapped : undefined,
-      }),
-    );
-
-    const purchaseDto: CreatePurchaseDto = {
-      user_id,
-      payment_method_id: checkout.payment_method_id,
-      payment_screenshot_id: screenshot.id,
-      items,
-      subtotal,
-      discount,
-      total,
-      number_transferred_from: checkout.numberTransferredFrom || undefined,
-      payment_number: paymentMethod?.phone_number || undefined,
-      notes: checkout.notes || undefined,
-    };
-
-    return this.createPurchase(purchaseDto, txClient);
   }
 
   // =============================================================
@@ -403,12 +263,34 @@ class PurchasesService {
   }
 
   /** Teacher's own purchases */
-  async getByUser(userId: number) {
-    return this.db.purchases.findMany({
-      where: { user_id: userId },
-      include: PURCHASE_INCLUDE,
-      orderBy: { created_at: "desc" },
-    });
+  async getByUser(userId: number, filters?: { status?: string; page?: number; limit?: number }) {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.purchasesWhereInput = { user_id: userId };
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+
+    const [purchases, total] = await Promise.all([
+      this.db.purchases.findMany({
+        where,
+        include: PURCHASE_INCLUDE,
+        orderBy: { created_at: "desc" },
+        skip,
+        take: limit,
+      }),
+      this.db.purchases.count({ where }),
+    ]);
+
+    return {
+      purchases,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      limit,
+    };
   }
 
   /** Single purchase by ID */
@@ -527,17 +409,17 @@ class PurchasesService {
   async deletePurchase(purchaseId: number) {
     const purchase = await this.db.purchases.findUnique({
       where: { id: purchaseId },
-      include: { coupon_usages: true },
     });
     if (!purchase) throw new NotFoundError("Purchase not found");
 
-    if (purchase.status === "confirmed" && purchase.coupon_usages.length > 0) {
-      for (const usage of purchase.coupon_usages) {
-        await this.db.coupon_usages.delete({ where: { id: usage.id } });
+    await this.db.$transaction(async (tx) => {
+      if (purchase.status === "confirmed") {
+        await tx.coupon_usages.deleteMany({
+          where: { purchase_id: purchaseId },
+        });
       }
-    }
-
-    await this.db.purchases.delete({ where: { id: purchaseId } });
+      await tx.purchases.delete({ where: { id: purchaseId } });
+    });
   }
 
   /** Remove a single item; recalculate totals. Cannot remove last item. */

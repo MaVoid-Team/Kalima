@@ -23,6 +23,22 @@ import {
 // SHARED INCLUDES
 // ============================================
 
+/** Minimal include for product list (getAllProducts) */
+const PRODUCT_LIST_SELECT = {
+  id: true,
+  title: true,
+  description: true,
+  type: true,
+  price: true,
+  is_archived: true,
+  price_after_discount: true,
+  thumbnail_image: true,
+  product_categories: {
+    include: { categories: { select: { id: true, title: true } } },
+  },
+};
+
+/** Full include for single product (getProductById, create, update) */
 const PRODUCT_INCLUDE = {
   thumbnail_image: true,
   product_gallery: {
@@ -35,7 +51,18 @@ const PRODUCT_INCLUDE = {
   product_required_fields: {
     include: { required_field_definitions: true },
   },
-  coupons: true,
+  coupons: {
+    where: { deleted_at: null, active: true },
+    select: {
+      id: true,
+      code: true,
+      discount_amount: true,
+      discount_percentage: true,
+      active: true,
+      expires_at: true,
+    },
+    orderBy: { created_at: "desc" as const },
+  },
   samples: true,
 };
 
@@ -55,28 +82,14 @@ class ProductService {
     thumbnailFile?: Express.Multer.File,
     sampleFile?: Express.Multer.File,
   ): Promise<products> {
-    // If coupon_id provided, verify it exists
-    if (dto.coupon_id) {
-      const coupon = await this.db.coupons.findUnique({
-        where: { id: dto.coupon_id },
-      });
-      if (!coupon) {
-        throw new NotFoundError("Coupon not found");
-      }
-    }
-
-    // If category_ids provided, verify they all exist
-    if (dto.category_ids && dto.category_ids.length > 0) {
-      const categories = await this.db.categories.findMany({
-        where: { id: { in: dto.category_ids } },
+    // If category_id provided, verify it exists
+    if (dto.category_id) {
+      const category = await this.db.categories.findUnique({
+        where: { id: dto.category_id },
         select: { id: true },
       });
-      if (categories.length !== dto.category_ids.length) {
-        const foundIds = new Set(categories.map((c) => c.id));
-        const missing = dto.category_ids.filter((id) => !foundIds.has(id));
-        throw new NotFoundError(
-          `Category ID(s) not found: ${missing.join(", ")}`,
-        );
+      if (!category) {
+        throw new NotFoundError(`Category ID not found: ${dto.category_id}`);
       }
     }
 
@@ -100,19 +113,19 @@ class ProductService {
         price_after_discount: dto.price_after_discount,
         serial: dto.serial,
         sample_url: dto.sample_url,
-        coupon_id: dto.coupon_id ?? null,
         thumbnail_id: thumbnailId,
+        perks: dto.perks,
       },
       include: PRODUCT_INCLUDE,
     });
 
-    // Attach categories if provided
-    if (dto.category_ids && dto.category_ids.length > 0) {
-      await this.db.product_categories.createMany({
-        data: dto.category_ids.map((categoryId) => ({
+    // Attach category if provided
+    if (dto.category_id) {
+      await this.db.product_categories.create({
+        data: {
           product_id: product.id,
-          category_id: categoryId,
-        })),
+          category_id: dto.category_id,
+        },
       });
     }
 
@@ -129,14 +142,17 @@ class ProductService {
   // READ — ALL
   // ============================================
 
-  async getAllProducts(filters?: {
-    is_archived?: boolean;
-    category_id?: number;
-    search?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{
-    data: products[];
+  async getAllProducts(
+    userId?: number,
+    filters?: {
+      is_archived?: boolean;
+      category_id?: number;
+      search?: string;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<{
+    data: any[];
     total: number;
     page: number;
     limit: number;
@@ -167,7 +183,7 @@ class ProductService {
     const [data, total] = await Promise.all([
       this.db.products.findMany({
         where,
-        include: PRODUCT_INCLUDE,
+        select: PRODUCT_LIST_SELECT,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
@@ -175,7 +191,26 @@ class ProductService {
       this.db.products.count({ where }),
     ]);
 
-    return { data, total, page, limit };
+    // Handle is_purchased if userId is provided
+    let purchasedProductIds = new Set<number>();
+    if (userId) {
+      const purchases = await this.db.purchase_items.findMany({
+        where: {
+          purchases: {
+            user_id: userId,
+          },
+        },
+        select: { product_id: true },
+      });
+      purchasedProductIds = new Set(purchases.map((p) => p.product_id));
+    }
+
+    const productsWithPurchased = data.map((product) => ({
+      ...product,
+      isPurchased: purchasedProductIds.has(product.id),
+    }));
+
+    return { data: productsWithPurchased, total, page, limit };
   }
 
   // ============================================
@@ -207,16 +242,6 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    // If changing coupon, verify it exists
-    if (dto.coupon_id !== undefined && dto.coupon_id !== null) {
-      const coupon = await this.db.coupons.findUnique({
-        where: { id: dto.coupon_id },
-      });
-      if (!coupon) {
-        throw new NotFoundError("Coupon not found");
-      }
-    }
-
     const data: any = { updated_at: new Date() };
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.description !== undefined) data.description = dto.description;
@@ -226,8 +251,8 @@ class ProductService {
       data.price_after_discount = dto.price_after_discount;
     if (dto.serial !== undefined) data.serial = dto.serial;
     if (dto.sample_url !== undefined) data.sample_url = dto.sample_url;
-    if (dto.coupon_id !== undefined) data.coupon_id = dto.coupon_id;
     if (dto.is_archived !== undefined) data.is_archived = dto.is_archived;
+    if (dto.perks !== undefined) data.perks = dto.perks;
 
     const updated = await this.db.products.update({
       where: { id },
@@ -329,7 +354,6 @@ class ProductService {
       throw new NotFoundError("Product not found");
     }
 
-    // Get current max sort_order
     const maxEntry = await this.db.product_gallery.findFirst({
       where: { product_id: productId },
       orderBy: { sort_order: "desc" },
@@ -337,27 +361,24 @@ class ProductService {
     });
     let nextSort = (maxEntry?.sort_order ?? -1) + 1;
 
-    const entries: product_gallery[] = [];
+    const images = await Promise.all(
+      files.map((file) =>
+        imageService.uploadImage(file, { compress, quality: 75 }),
+      ),
+    );
 
-    for (const file of files) {
-      const image = await imageService.uploadImage(file, {
-        compress,
-        quality: 75,
-      });
+    const createData = images.map((image) => ({
+      product_id: productId,
+      image_id: image.id,
+      sort_order: nextSort++,
+    }));
 
-      const entry = await this.db.product_gallery.create({
-        data: {
-          product_id: productId,
-          image_id: image.id,
-          sort_order: nextSort++,
-        },
-        include: { images: true },
-      });
+    const created = await this.db.product_gallery.createManyAndReturn({
+      data: createData,
+      include: { images: true },
+    });
 
-      entries.push(entry);
-    }
-
-    return entries;
+    return created;
   }
 
   // ============================================
@@ -547,9 +568,7 @@ class ProductService {
   // REQUIRED FIELDS — GET
   // ============================================
 
-  async getProductRequiredFields(
-    productId: number,
-  ): Promise<product_required_fields[]> {
+  async getProductRequiredFields(productId: number): Promise<any[]> {
     const product = await this.db.products.findFirst({
       where: { id: productId, deleted_at: null },
     });
@@ -559,7 +578,16 @@ class ProductService {
 
     return this.db.product_required_fields.findMany({
       where: { product_id: productId, active: true },
-      include: { required_field_definitions: true },
+      select: {
+        field_definition_id: true,
+        is_required: true,
+        required_field_definitions: {
+          select: {
+            label: true,
+            field_type: true,
+          },
+        },
+      },
     });
   }
 

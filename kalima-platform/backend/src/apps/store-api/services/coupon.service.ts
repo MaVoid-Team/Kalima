@@ -5,11 +5,10 @@ import {
   UpdateCouponDto,
   DiscountType,
 } from "../dtos/coupon.dto";
-import { coupons, role_enum } from "../generated/prisma/client";
+import { coupons } from "../generated/prisma/client";
 import {
   BadRequestError,
   NotFoundError,
-  ForbiddenError,
   ConflictError,
 } from "../../../libs/errors";
 import crypto from "crypto";
@@ -55,9 +54,37 @@ class CouponService {
       throw new ConflictError(`Coupon code "${dto.code}" already exists`);
     }
 
+    // Validate product exists, is not deleted, and is not archived
+    const product = await this.db.products.findFirst({
+      where: { id: dto.product_id, deleted_at: null },
+      select: { id: true, price: true, is_archived: true },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+    if (product.is_archived) {
+      throw new BadRequestError("Cannot create coupon for archived product");
+    }
+
+    // Date sanity: starts_at must be before expires_at when both provided
+    if (dto.starts_at && dto.expires_at && dto.starts_at >= dto.expires_at) {
+      throw new BadRequestError("starts_at must be before expires_at");
+    }
+
+    // Fixed discount cannot exceed product price
+    if (dto.discount_type === DiscountType.AMOUNT) {
+      const productPrice = Number(product.price);
+      if (dto.discount_amount > productPrice) {
+        throw new BadRequestError(
+          `Discount amount (${dto.discount_amount}) cannot exceed product price (${productPrice})`,
+        );
+      }
+    }
+
     // Build data based on discount type
     const data: any = {
       code: dto.code,
+      product_id: dto.product_id,
       starts_at: dto.starts_at ?? null,
       expires_at: dto.expires_at,
     };
@@ -82,6 +109,7 @@ class CouponService {
     page?: number;
     limit?: number;
     active?: boolean;
+    product_id?: number;
   }): Promise<{
     coupons: coupons[];
     total: number;
@@ -100,12 +128,18 @@ class CouponService {
       where.active = filters.active;
     }
 
+    if (filters?.product_id !== undefined) {
+      where.product_id = filters.product_id;
+    }
+
     const [coupons, total] = await Promise.all([
       this.db.coupons.findMany({
         where,
         orderBy: { created_at: "desc" },
         skip,
         take: limit,
+        include: { product: { select: { id: true, title: true } } },
+        relationLoadStrategy: "join",
       }),
       this.db.coupons.count({ where }),
     ]);
@@ -120,11 +154,33 @@ class CouponService {
   async getCouponById(id: number): Promise<coupons> {
     const coupon = await this.db.coupons.findFirst({
       where: { id, deleted_at: null },
+      include: { product: { select: { id: true, title: true } } },
     });
     if (!coupon) {
       throw new NotFoundError("Coupon not found");
     }
     return coupon;
+  }
+
+  /**
+   * Get coupons for a specific product.
+   */
+  async getCouponsByProduct(
+    product_id: number,
+    active?: boolean,
+  ): Promise<coupons[]> {
+    const where: any = {
+      product_id,
+      deleted_at: null,
+    };
+    if (active !== undefined) {
+      where.active = active;
+    }
+    return this.db.coupons.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+      include: { product: { select: { id: true, title: true } } },
+    });
   }
 
   // ============================================
@@ -134,6 +190,7 @@ class CouponService {
   async updateCoupon(id: number, dto: UpdateCouponDto): Promise<coupons> {
     const coupon = await this.db.coupons.findFirst({
       where: { id, deleted_at: null },
+      include: { product: { select: { id: true, price: true, is_archived: true } } },
     });
     if (!coupon) {
       throw new NotFoundError("Coupon not found");
@@ -149,11 +206,62 @@ class CouponService {
       }
     }
 
+    // If product_id is being changed, validate the new product
+    const productId = dto.product_id ?? coupon.product_id;
+    let productForPrice: { price: { toNumber?: () => number } } | null = null;
+
+    if (dto.product_id !== undefined && dto.product_id !== coupon.product_id) {
+      const newProduct = await this.db.products.findFirst({
+        where: { id: dto.product_id, deleted_at: null },
+        select: { id: true, price: true, is_archived: true },
+      });
+      if (!newProduct) {
+        throw new NotFoundError("Product not found");
+      }
+      if (newProduct.is_archived) {
+        throw new BadRequestError("Cannot assign coupon to archived product");
+      }
+      productForPrice = newProduct;
+    } else {
+      productForPrice = coupon.product;
+    }
+
+    // Date sanity
+    const startsAt = dto.starts_at ?? coupon.starts_at;
+    const expiresAt = dto.expires_at ?? coupon.expires_at;
+    if (startsAt && expiresAt && startsAt >= expiresAt) {
+      throw new BadRequestError("starts_at must be before expires_at");
+    }
+
+    // Discount vs price check when amount discount is being set
+    const product = productForPrice ?? (await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+      select: { price: true },
+    }));
+    if (product) {
+      let amountToCheck: number | undefined;
+      if (dto.discount_type === DiscountType.AMOUNT && dto.discount_amount !== undefined) {
+        amountToCheck = dto.discount_amount;
+      } else if (dto.discount_amount !== undefined) {
+        amountToCheck = dto.discount_amount;
+      }
+      if (
+        amountToCheck !== undefined &&
+        amountToCheck > 0 &&
+        amountToCheck > Number(product.price)
+      ) {
+        throw new BadRequestError(
+          `Discount amount cannot exceed product price (${product.price})`,
+        );
+      }
+    }
+
     const data: any = {
       updated_at: new Date(),
     };
 
     if (dto.code !== undefined) data.code = dto.code;
+    if (dto.product_id !== undefined) data.product_id = dto.product_id;
     if (dto.starts_at !== undefined) data.starts_at = dto.starts_at;
     if (dto.expires_at !== undefined) data.expires_at = dto.expires_at;
     if (dto.is_active !== undefined) data.active = dto.is_active;
@@ -212,12 +320,27 @@ class CouponService {
    * Validates a coupon for use.
    * @param code - Coupon code
    * @param user_id - Optional. When provided, checks if user has already used this coupon (one-time per user).
+   * @param product_id - Optional. When provided, ensures the coupon is valid for this product.
    */
   async validateCoupon(
     code: string,
     user_id?: number,
+    product_id?: number,
   ): Promise<{ isValid: boolean; coupon: coupons }> {
-    const coupon = await this.db.coupons.findUnique({ where: { code } });
+    const coupon = await this.db.coupons.findUnique({
+      where: { code },
+      select: {
+        id: true,
+        code: true,
+        product_id: true,
+        discount_amount: true,
+        discount_percentage: true,
+        active: true,
+        starts_at: true,
+        expires_at: true,
+        deleted_at: true,
+      },
+    });
 
     if (!coupon || coupon.deleted_at) {
       throw new NotFoundError("Invalid coupon code");
@@ -237,6 +360,10 @@ class CouponService {
       throw new BadRequestError("This coupon has expired");
     }
 
+    if (product_id !== undefined && coupon.product_id !== product_id) {
+      throw new BadRequestError("This coupon is not valid for this product");
+    }
+
     if (user_id !== undefined) {
       const alreadyUsed = await this.db.coupon_usages.findUnique({
         where: {
@@ -248,7 +375,7 @@ class CouponService {
       }
     }
 
-    return { isValid: true, coupon };
+    return { isValid: true, coupon: coupon as coupons };
   }
 
   /**
@@ -258,8 +385,10 @@ class CouponService {
     user_id: number,
     coupon_id: number,
     purchase_id?: number,
+    tx?: PrismaClient,
   ): Promise<void> {
-    await this.db.coupon_usages.create({
+    const db = tx || this.db;
+    await db.coupon_usages.create({
       data: {
         user_id,
         coupon_id,
