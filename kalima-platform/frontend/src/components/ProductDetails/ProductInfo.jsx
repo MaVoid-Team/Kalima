@@ -2,17 +2,23 @@ import { Star, StarHalf } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/storeUtils";
+import { calculateDiscountPercentage, formatPrice } from "@/lib/storeUtils";
 
 export default function ProductInfo({ product }) {
   const { t } = useTranslation(["product", "checkout"]);
 
-  const currentPrice = product.price_after_discount || product.price;
-  const originalPrice = product.price_after_discount ? product.price : null;
-  const discount =
-    originalPrice && currentPrice
-      ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
-      : null;
+  const originalPrice = Number.parseFloat(product?.price);
+  const discountedPrice = Number.parseFloat(product?.price_after_discount);
+  const hasValidDiscount =
+    !Number.isNaN(originalPrice) &&
+    !Number.isNaN(discountedPrice) &&
+    discountedPrice > 0 &&
+    discountedPrice < originalPrice;
+
+  const currentPrice = hasValidDiscount ? discountedPrice : originalPrice;
+  const discount = hasValidDiscount
+    ? calculateDiscountPercentage(originalPrice, currentPrice, 0)
+    : 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,12 +56,12 @@ export default function ProductInfo({ product }) {
             <span className="text-3xl font-black">
               {formatPrice(currentPrice)} {t("info.currency")}
             </span>
-            {originalPrice && (
+            {discount > 0 && (
               <>
                 <span className="text-lg text-muted-foreground line-through mb-1">
                   {formatPrice(originalPrice)} {t("info.currency")}
                 </span>
-                {discount && (
+                {discount > 0 && (
                   <span className="text-xs font-bold text-success bg-success/10 px-2 py-1 rounded-full mb-1">
                     {t("info.save")} {discount}%
                   </span>
@@ -89,6 +95,20 @@ export default function ProductInfo({ product }) {
             </ul>
           </div>
         )}
+
+      {/* Perks Info */}
+      {product.perks && (
+        <div className="flex flex-col gap-2 mt-2">
+          <h3 className="font-semibold text-sm">
+            {t("product:info.perks", "Product Features:")}
+          </h3>
+          <ul className="list-disc ps-5 text-sm text-muted-foreground">
+            {product.perks.split(',').map((perk, index) => (
+              <li key={index}>{perk.trim()}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import useApiMutation from './useApiMutation';
+import { buildQueryString } from '@/lib/queryUtils';
 
 export const useOrders = (optionsOrId = null) => {
     const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
@@ -42,17 +43,7 @@ export const useOrders = (optionsOrId = null) => {
     const loading = apiLoading || initLoading;
 
     const buildQuery = useCallback(() => {
-        const query = new URLSearchParams({
-            page: pagination.page,
-            limit: pagination.limit,
-        });
-
-        if (filters.search) query.append('search', filters.search);
-        if (filters.status && filters.status !== 'all') query.append('status', filters.status);
-        if (filters.startDate) query.append('startDate', filters.startDate.toISOString());
-        if (filters.endDate) query.append('endDate', filters.endDate.toISOString());
-
-        return query.toString();
+        return buildQueryString({ pagination, filters });
     }, [pagination.page, pagination.limit, filters]);
 
     const fetchOrders = useCallback(async () => {

@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useOrders from '@/hooks/useOrders';
 import OrdersToolbar from '@/components/admin/orders/OrdersToolbar';
 import OrdersTable from '@/components/admin/orders/OrdersTable';
+import StoreStatsCards from '@/components/admin/orders/StoreStatsCards';
+import { Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import useExport from '@/hooks/useExport';
 import {
     Pagination,
     PaginationContent,
@@ -9,8 +14,15 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-    PaginationEllipsis
+    PaginationEllipsis,
+    generatePaginationLinks
 } from '@/components/ui/pagination';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function OrdersPage() {
     const { t } = useTranslation('admin');
@@ -25,6 +37,23 @@ export default function OrdersPage() {
         setPage,
         fetchOrders
     } = useOrders({ limit: 6 });
+
+    const { exportData, loading: exportLoading } = useExport();
+    const [selectedIds, setSelectedIds] = useState([]);
+
+    const handleSelect = (id, checked) => {
+        setSelectedIds(prev =>
+            checked ? [...prev, id] : prev.filter(selectedId => selectedId !== id)
+        );
+    };
+
+    const handleSelectAll = (checked) => {
+        if (checked) {
+            setSelectedIds(orders.map(order => order.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
 
     const handleSearch = (query) => {
         setSearch(query);
@@ -42,18 +71,13 @@ export default function OrdersPage() {
         fetchOrders();
     };
 
-    const getPageNumbers = () => {
-        const { page: currentPage, pages: totalPages } = pagination;
-        if (totalPages <= 5) {
-            return Array.from({ length: totalPages }, (_, i) => i + 1);
-        }
-        if (currentPage <= 3) {
-            return [1, 2, 3, 4, 'ellipsis', totalPages];
-        }
-        if (currentPage >= totalPages - 2) {
-            return [1, 'ellipsis', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-        }
-        return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages];
+    const handleExport = (format) => {
+        exportData({
+            resource: 'purchases',
+            format: format,
+            ids: selectedIds,
+            filters // pass current filters to export function
+        });
     };
 
     return (
@@ -65,7 +89,27 @@ export default function OrdersPage() {
                         {t('orders.totalOrders', { count: pagination.total || 0 })}
                     </p>
                 </div>
+                <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={exportLoading} variant="outline">
+                                <Download className="mr-2 h-4 w-4" />
+                                {t('orders.export', 'Export')}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleExport('csv')} disabled={exportLoading}>
+                                {t('orders.exportCsv', 'Export as CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={exportLoading}>
+                                {t('orders.exportXlsx', 'Export as Excel')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
+
+            <StoreStatsCards />
 
             <OrdersToolbar
                 filters={filters}
@@ -78,6 +122,9 @@ export default function OrdersPage() {
                 orders={orders}
                 loading={loading}
                 onActionSuccess={handleActionSuccess}
+                selectedIds={selectedIds}
+                onSelect={handleSelect}
+                onSelectAll={handleSelectAll}
             />
 
             {pagination.pages > 1 && (
@@ -92,7 +139,7 @@ export default function OrdersPage() {
                                 />
                             </PaginationItem>
 
-                            {getPageNumbers().map((pageNumber, index) => {
+                            {generatePaginationLinks(pagination.page, pagination.pages).map((pageNumber, index) => {
                                 if (pageNumber === 'ellipsis') {
                                     return (
                                         <PaginationItem key={`ellipsis-${index}`}>

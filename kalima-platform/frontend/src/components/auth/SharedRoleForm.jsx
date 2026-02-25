@@ -44,7 +44,7 @@ export default function SharedRoleForm({ role, onBack, registerFn, registerFireb
 }
 
 function SharedFields() {
-    const { t } = useTranslation("auth");
+    const { t, i18n } = useTranslation("auth");
     const { control } = useFormContext();
 
     return (
@@ -55,7 +55,7 @@ function SharedFields() {
                 <FormItem>
                     <FormLabel>{t("signup.fields.secondaryPhone")}</FormLabel>
                     <FormControl>
-                        <Input placeholder={t("signup.fields.secondaryPhonePlaceholder")} type="tel" {...field} />
+                        <Input dir={i18n.dir()} placeholder={t("signup.fields.secondaryPhonePlaceholder")} type="tel" {...field} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>

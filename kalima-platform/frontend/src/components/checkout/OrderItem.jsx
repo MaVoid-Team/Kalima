@@ -29,7 +29,7 @@ export default function OrderItem({ item }) {
                 <p className="text-xs text-muted-foreground">{item?.type}</p>
             </div>
 
-            <div className="flex flex-col items-end justify-between text-right flex-shrink-0">
+            <div className="flex flex-col items-end justify-between text-right shrink-0">
                 {discount > 0 ? (
                     <>
                         <p className="text-sm text-muted-foreground line-through">

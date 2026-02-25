@@ -81,8 +81,8 @@ export default function ResetPasswordPage() {
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <Card className="border-0 shadow-none sm:border sm:shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-2xl">{t("reset_password.title", "Reset Password")}</CardTitle>
-                            <CardDescription>{t("reset_password.description", "Enter your new password below.")}</CardDescription>
+                            <CardTitle className="text-2xl">{t("resetPassword.title", "Reset Password")}</CardTitle>
+                            <CardDescription>{t("resetPassword.description", "Enter your new password below.")}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
                                         name="password"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t("reset_password.newPasswordLabel", "New Password")}</FormLabel>
+                                                <FormLabel>{t("resetPassword.newPasswordLabel", "New Password")}</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input
@@ -124,7 +124,7 @@ export default function ResetPasswordPage() {
                                         name="confirmPassword"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>{t("reset_password.confirmPasswordLabel", "Confirm New Password")}</FormLabel>
+                                                <FormLabel>{t("resetPassword.confirmPasswordLabel", "Confirm New Password")}</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
                                                         <Input
@@ -155,7 +155,7 @@ export default function ResetPasswordPage() {
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
-                                        {t("reset_password.submit", "Reset Password")}
+                                        {t("resetPassword.submit", "Reset Password")}
                                     </Button>
                                 </form>
                             </Form>
@@ -167,7 +167,7 @@ export default function ResetPasswordPage() {
                                     className="flex items-center justify-center gap-2 underline underline-offset-4 hover:text-primary font-medium"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    {t("reset_password.backToLogin", "Back to login")}
+                                    {t("resetPassword.backToLogin", "Back to login")}
                                 </Link>
                             </div>
                         </CardFooter>

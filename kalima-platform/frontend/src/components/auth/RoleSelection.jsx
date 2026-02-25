@@ -25,12 +25,12 @@ export default function RoleSelection({ onRoleSelect }) {
             icon: User,
             description: t("signup.roleDescriptions.parent")
         },
-        {
-            id: "lecturer",
-            label: t("signup.roles.lecturer"),
-            icon: Mic2,
-            description: t("signup.roleDescriptions.lecturer")
-        }
+        // {
+        //     id: "lecturer",
+        //     label: t("signup.roles.lecturer"),
+        //     icon: Mic2,
+        //     description: t("signup.roleDescriptions.lecturer")
+        // }
     ];
 
     return (

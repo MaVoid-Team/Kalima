@@ -11,7 +11,7 @@ const useLogin = () => {
         const data = await mutate({
             endpoint: '/auth/login',
             data: credentials,
-            defaultSuccessMessage: t('success', 'Login successful! Redirecting...')
+            defaultSuccessMessage: t('login.success', 'Login successful! Redirecting...')
         });
         const { user, tokens, portalAccess } = data.data;
         loginSuccess(user, tokens, portalAccess);
@@ -22,7 +22,7 @@ const useLogin = () => {
         const data = await mutate({
             endpoint: '/auth/login/firebase',
             data: { idToken },
-            defaultSuccessMessage: t('success', 'Login successful! Redirecting...')
+            defaultSuccessMessage: t('login.success', 'Login successful! Redirecting...')
         });
         const { user, tokens, portalAccess } = data.data || data;
         loginSuccess(user, tokens, portalAccess);

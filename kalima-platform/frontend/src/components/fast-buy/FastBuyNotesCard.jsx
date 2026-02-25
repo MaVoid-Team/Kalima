@@ -21,7 +21,7 @@ export default function FastBuyNotesCard({ state, updateField }) {
             value={state.notes}
             onChange={(e) => updateField("notes", e.target.value)}
             placeholder={t(
-              "payment.notes_label",
+              "payment.notesLabel",
               "Delivery instructions or special requests",
             )}
             className="h-12"

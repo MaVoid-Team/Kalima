@@ -17,7 +17,6 @@ import { motion } from "framer-motion";
 import ImageGallery from "@/components/ProductDetails/ImageGallery";
 import ProductInfo from "@/components/ProductDetails/ProductInfo";
 import ProductActions from "@/components/ProductDetails/ProductActions";
-
 import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductDetailsPage() {
@@ -117,7 +116,7 @@ export default function ProductDetailsPage() {
               <ProductInfo product={productProps} />
 
               <ProductActions
-                price={productProps.price_after_discount || productProps.price}
+                price={productProps.price_after_discount == 0 ? productProps.price : productProps.price_after_discount}
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
               />

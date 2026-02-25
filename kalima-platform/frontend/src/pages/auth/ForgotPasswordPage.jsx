@@ -31,6 +31,10 @@ export default function ForgotPasswordPage() {
     const { t } = useTranslation("auth");
     const { forgotPassword, loading } = usePassword();
 
+      React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const formSchema = React.useMemo(() => {
         return z.object({
             email: z.string().min(1, { message: t("validation.required") }).email({ message: t("validation.email_invalid") }),
@@ -59,8 +63,8 @@ export default function ForgotPasswordPage() {
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <Card className="border-0 shadow-none sm:border sm:shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-2xl">{t("forgot_password.title", "Forgot Password")}</CardTitle>
-                            <CardDescription>{t("forgot_password.description", "Enter your email address and we will send you a link to reset your password.")}</CardDescription>
+                            <CardTitle className="text-2xl">{t("forgotPassword.title", "Forgot Password")}</CardTitle>
+                            <CardDescription>{t("forgotPassword.description", "Enter your email address and we will send you a link to reset your password.")}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Form {...form}>
@@ -82,7 +86,7 @@ export default function ForgotPasswordPage() {
                                         {loading && (
                                             <LoadingSpinner className="mr-2 h-4 w-4" />
                                         )}
-                                        {t("forgot_password.submit", "Send Reset Link")}
+                                        {t("forgotPassword.submit", "Send Reset Link")}
                                     </Button>
                                 </form>
                             </Form>
@@ -94,7 +98,7 @@ export default function ForgotPasswordPage() {
                                     className="flex items-center justify-center gap-2 underline underline-offset-4 hover:text-primary font-medium"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
-                                    {t("forgot_password.backToLogin", "Back to login")}
+                                    {t("forgotPassword.backToLogin", "Back to login")}
                                 </Link>
                             </div>
                         </CardFooter>

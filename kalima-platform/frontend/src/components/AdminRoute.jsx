@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/auth/useAuth';
 import useRole from '../hooks/useRole';
-import { Loader2 } from 'lucide-react';
+import LoadingSpinner from './ui/loading-spinner';
 
 const AdminRoute = () => {
     const { isAuthenticated, loading: authLoading } = useAuth();
@@ -11,7 +11,7 @@ const AdminRoute = () => {
     if (authLoading) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <LoadingSpinner className="h-8 w-8" />
             </div>
         );
     }

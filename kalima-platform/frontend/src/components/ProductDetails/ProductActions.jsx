@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart, Heart, Loader2 } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Eye, ScanBarcode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,6 @@ import { useFastBuy } from "@/hooks/useFastBuy";
 export default function ProductActions({ price, productId, sampleUrl }) {
   const { t } = useTranslation("product");
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const { addToCart, loading } = useCart();
   const { startFastBuy, loading: fastBuyLoading } = useFastBuy();
   const handleIncrement = () => setQuantity((prev) => prev + 1);
@@ -29,25 +28,83 @@ export default function ProductActions({ price, productId, sampleUrl }) {
   return (
     <div className="flex flex-col gap-4 mt-2">
       {/* Mobile Sticky Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 z-50 md:hidden shadow-lg flex items-center justify-between gap-4">
-        <div className="flex flex-col">
-          <span className="text-xs text-muted-foreground">
-            {t("info.totalPrice")}
-          </span>
-          <span className="text-xl font-black">
-            {formattedPrice} {t("info.currency")}
-          </span>
-        </div>
-        <Button className="flex-1 gap-2 h-12 text-lg font-bold" size="lg" disabled={loading} onClick={() => addToCart(productId, quantity)}>
-          {loading ? (
-            <LoadingSpinner className="h-5 w-5 border-white" />
-          ) : (
-            <>
-              <ShoppingCart className="h-5 w-5" />
-              {t("actions.addToCart")}
-            </>
+      <div className="fixed bottom-0 left-0 right-0 z-30 md:hidden border-t bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80 shadow-lg">
+        <div className="p-3 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col min-w-0">
+              <span className="text-[11px] text-muted-foreground leading-none">
+                {t("info.totalPrice")}
+              </span>
+              <span className="text-lg font-black truncate">
+                {formattedPrice} {t("info.currency")}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleDecrement}
+                disabled={quantity <= 1}
+                className="h-9 w-9"
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                type="text"
+                value={quantity}
+                readOnly
+                className="w-12 h-9 text-center font-bold shadow-none px-0"
+              />
+              <Button variant="outline" size="icon" onClick={handleIncrement} className="h-9 w-9">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              className="h-11 gap-2"
+              disabled={loading}
+              onClick={() => addToCart(productId, quantity)}
+            >
+              {loading ? (
+                <LoadingSpinner className="h-5 w-5 border-white" />
+              ) : (
+                <>
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>{t("actions.addToCart")}</span>
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="secondary"
+              className="h-11 gap-2"
+              onClick={() => startFastBuy(productId, quantity)}
+              disabled={fastBuyLoading}
+            >
+              {fastBuyLoading ? (
+                <LoadingSpinner className="h-5 w-5" />
+              ) : (
+                <>
+                  <ScanBarcode className="h-4 w-4" />
+                  
+                  <span>{t("actions.buyNow")}</span>
+                </>
+              )}
+            </Button>
+          </div>
+
+          {sampleUrl && (
+            <Button variant="outline" className="w-full h-10" size="sm" asChild>
+              <a href={getImageUrl(sampleUrl)} target="_blank" rel="noopener noreferrer">
+                <Eye className="h-4 w-4" />
+                <span className="ms-2">{t("actions.viewSample")}</span>
+              </a>
+            </Button>
           )}
-        </Button>
+        </div>
       </div>
 
       {/* Desktop Layout */}
@@ -99,7 +156,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
             disabled={fastBuyLoading}
           >
             {fastBuyLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <LoadingSpinner className="h-5 w-5" />
             ) : (
               t("actions.buyNow")
             )}
@@ -116,7 +173,7 @@ export default function ProductActions({ price, productId, sampleUrl }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View Sample
+                {t("actions.viewSample")}
               </a>
             </Button>
           )}
