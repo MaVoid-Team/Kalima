@@ -41,7 +41,10 @@
         "rolesTitle": "Roles & Access",
         "personalInfo": "Personal Information",
         "portal": "Portal",
-        "role": "Role"
+        "role": "Role",
+        "teacherInfo": "Teacher Info",
+        "studentInfo": "Student Info",
+        "levelId": "Level ID:"
     },
     "roles": {
         "Admin": "Admin",

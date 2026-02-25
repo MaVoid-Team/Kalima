@@ -41,7 +41,10 @@
         "rolesTitle": "الأدوار والصلاحيات",
         "personalInfo": "المعلومات الشخصية",
         "portal": "البوابة",
-        "role": "الدور"
+        "role": "الدور",
+        "teacherInfo": "بيانات المعلم",
+        "studentInfo": "بيانات الطالب",
+        "levelId": "معرف المستوى:"
     },
     "roles": {
         "Admin": "مدير",
