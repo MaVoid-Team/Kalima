@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getImageUrl, formatCurrency } from '@/lib/storeUtils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,7 +23,16 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ProductsTable({ products, loading, onEdit, onArchiveToggle, onDelete }) {
+export default function ProductsTable({
+    products,
+    loading,
+    onEdit,
+    onArchiveToggle,
+    onDelete,
+    selectedIds = [],
+    onSelect,
+    onSelectAll,
+}) {
     const { t, i18n } = useTranslation('admin');
     const navigate = useNavigate();
 
@@ -51,6 +61,14 @@ export default function ProductsTable({ products, loading, onEdit, onArchiveTogg
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead className="w-10">
+                            <Checkbox
+                                checked={products.length > 0 && selectedIds.length === products.length}
+                                onCheckedChange={onSelectAll}
+                                aria-label="Select all"
+                                data-testid="products-table-select-all"
+                            />
+                        </TableHead>
                         <TableHead className="w-16">{t('products.table.thumbnail')}</TableHead>
                         <TableHead>{t('products.table.title')}</TableHead>
                         <TableHead className="hidden md:table-cell">{t('products.table.type')}</TableHead>
@@ -68,12 +86,22 @@ export default function ProductsTable({ products, loading, onEdit, onArchiveTogg
                         return (
                             <TableRow
                                 key={product.id}
-                                className={cn('cursor-pointer hover:bg-muted/50', isArchived && 'opacity-60')}
-                                onClick={() => navigate(`/admin/products/${product.id}`)}
+                                className={cn('hover:bg-muted/50', isArchived && 'opacity-60')}
+                                data-state={selectedIds.includes(product.id) && 'selected'}
                                 data-testid={`products-table-row-${product.id}`}
                             >
+                                {/* Checkbox */}
+                                <TableCell onClick={(e) => e.stopPropagation()}>
+                                    <Checkbox
+                                        checked={selectedIds.includes(product.id)}
+                                        onCheckedChange={(checked) => onSelect?.(product.id, checked)}
+                                        aria-label={`Select product ${product.title}`}
+                                        data-testid={`products-table-select-${product.id}`}
+                                    />
+                                </TableCell>
+
                                 {/* Thumbnail */}
-                                <TableCell>
+                                <TableCell className="cursor-pointer" onClick={() => navigate(`/admin/products/${product.id}`)}>
                                     {thumbnailUrl ? (
                                         <img
                                             src={thumbnailUrl}
@@ -88,7 +116,7 @@ export default function ProductsTable({ products, loading, onEdit, onArchiveTogg
                                 </TableCell>
 
                                 {/* Title */}
-                                <TableCell>
+                                <TableCell className="cursor-pointer" onClick={() => navigate(`/admin/products/${product.id}`)}>
                                     <p className="font-medium line-clamp-1">{product.title}</p>
                                     {product.serial && (
                                         <p className="text-xs text-muted-foreground">{product.serial}</p>
