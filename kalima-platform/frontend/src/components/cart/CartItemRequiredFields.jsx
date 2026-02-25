@@ -144,7 +144,7 @@ export default function CartItemRequiredFields({
             >
                 <AccordionItem value="fields">
                     <AccordionTrigger className={"text-sm " + (item.required_fields_filled ? "text-success" : "text-primary")}>
-                        {isOpen ? t('hideDetails', 'Hide details') : t('viewMore', 'View more')}
+                        {isOpen ? t('hideRequiredFields', 'Hide required fields') : t('viewRequiredFields', 'View required fields')}
                     </AccordionTrigger>
                     <AccordionContent className="mt-2 space-y-2 p-2 border rounded overflow-x-hidden min-w-0 w-full box-border max-w-full">
                         <form onSubmit={handleCartRequiredFieldsSubmit} className='flex flex-col gap-2 w-full max-w-full overflow-x-hidden'>
