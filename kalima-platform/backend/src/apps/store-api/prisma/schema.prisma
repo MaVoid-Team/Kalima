@@ -259,9 +259,9 @@ model categories {
   mongo_id           String?              @unique
   created_at         DateTime?            @default(now()) @db.Timestamp(6)
   updated_at         DateTime?            @db.Timestamp(6)
-  categories         categories?          @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  other_categories   categories[]         @relation("categoriesTocategories")
+  parent             categories?          @relation("categoriesTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   product_categories product_categories[]
+  sub_categories     categories[]         @relation("categoriesTocategories")
 }
 
 model product_categories {
