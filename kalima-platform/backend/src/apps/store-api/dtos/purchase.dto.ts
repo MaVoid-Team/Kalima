@@ -32,6 +32,18 @@ export class CreatePurchaseItemDto {
   @IsNumber()
   discount: number;
 
+  @IsInt()
+  @IsPositive()
+  quantity: number;
+
+  @IsNumber()
+  final_price: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  coupon_id?: number | null;
+
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
