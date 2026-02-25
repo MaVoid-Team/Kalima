@@ -150,3 +150,43 @@ export class UseCouponDto {
   @IsNotEmpty()
   code: string;
 }
+
+export class getAllCouponsDto {
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  page?: number;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  limit?: number;
+
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  product_id?: number;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  startDate?: Date;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  endDate?: Date;
+
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  isAmount?: boolean;
+}
