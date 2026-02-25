@@ -13,10 +13,11 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
-export default function UsersTable({ users, loading }) {
+export default function UsersTable({ users, loading, selectedIds = [], onSelect, onSelectAll }) {
     const { t, i18n } = useTranslation('userManagement');
     const isRtl = i18n.dir() === 'rtl';
 
@@ -41,18 +42,38 @@ export default function UsersTable({ users, loading }) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead >{t('table.name')}</TableHead>
-                        <TableHead >{t('table.email')}</TableHead>
-                        <TableHead >{t('table.phone')}</TableHead>
-                        <TableHead >{t('table.role')}</TableHead>
-                        <TableHead >{t('table.status')}</TableHead>
-                        <TableHead >{t('table.joined')}</TableHead>
-                        <TableHead >{t('table.actions')}</TableHead>
+                        <TableHead className="w-10">
+                            <Checkbox
+                                checked={users.length > 0 && selectedIds.length === users.length}
+                                onCheckedChange={onSelectAll}
+                                aria-label="Select all users"
+                                data-testid="users-table-select-all"
+                            />
+                        </TableHead>
+                        <TableHead>{t('table.name')}</TableHead>
+                        <TableHead>{t('table.email')}</TableHead>
+                        <TableHead>{t('table.phone')}</TableHead>
+                        <TableHead>{t('table.role')}</TableHead>
+                        <TableHead>{t('table.status')}</TableHead>
+                        <TableHead>{t('table.joined')}</TableHead>
+                        <TableHead>{t('table.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {users.map((user) => (
-                        <TableRow key={user.id}>
+                        <TableRow
+                            key={user.id}
+                            data-state={selectedIds.includes(user.id) && 'selected'}
+                            data-testid={`users-table-row-${user.id}`}
+                        >
+                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                <Checkbox
+                                    checked={selectedIds.includes(user.id)}
+                                    onCheckedChange={(checked) => onSelect?.(user.id, checked)}
+                                    aria-label={`Select user ${user.name}`}
+                                    data-testid={`users-table-select-${user.id}`}
+                                />
+                            </TableCell>
                             <TableCell className="font-medium">
                                 <div className="flex items-center gap-3">
                                     <Avatar className="h-8 w-8 shrink-0">

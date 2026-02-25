@@ -2,6 +2,8 @@
     "dashboardTitle": "Admin Dashboard",
     "nav": {
         "orders": "Orders",
+        "products": "Products",
+        "samples": "Samples",
         "backToStore": "Back to Store",
         "logout": "Logout"
     },
@@ -157,6 +159,135 @@
             "by": "by",
             "lastNoteBy": "Last note by: {{name}}",
             "contactWhatsApp": "Contact on WhatsApp"
+        }
+    },
+    "products": {
+        "title": "Products Management",
+        "subtitle": "Manage your store products, media, and settings",
+        "totalProducts": "{{count}} products",
+        "searchPlaceholder": "Search by title, description, serial...",
+        "noProducts": "No products found",
+        "noProductsDescription": "No products match your current filters.",
+        "createProduct": "Create Product",
+        "backToProducts": "Back to Products",
+        "filters": {
+            "allCategories": "All Categories",
+            "allStatuses": "All Statuses",
+            "active": "Active",
+            "archived": "Archived",
+            "archivedToggle": "Show Archived"
+        },
+        "table": {
+            "thumbnail": "Image",
+            "title": "Title",
+            "type": "Type",
+            "price": "Price",
+            "categories": "Categories",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "status": {
+            "active": "Active",
+            "archived": "Archived"
+        },
+        "type": {
+            "Book": "Book",
+            "Product": "Product"
+        },
+        "actions": {
+            "view": "View Details",
+            "edit": "Edit Product",
+            "archive": "Archive",
+            "unarchive": "Restore",
+            "delete": "Delete Product"
+        },
+        "form": {
+            "title": "Title",
+            "titlePlaceholder": "Product title",
+            "description": "Description",
+            "descriptionPlaceholder": "Product description (optional)",
+            "type": "Type",
+            "price": "Price (EGP)",
+            "priceAfterDiscount": "Price After Discount (EGP)",
+            "serial": "Serial",
+            "serialPlaceholder": "e.g. ALG-101 (optional)",
+            "couponId": "Coupon ID",
+            "couponIdPlaceholder": "Coupon ID (optional)",
+            "thumbnail": "Thumbnail Image",
+            "sample": "Sample File (PDF)",
+            "categories": "Categories",
+            "isArchived": "Archived",
+            "perks": "Perks (Features)",
+            "perksPlaceholder": "e.g. Carton Cover, 200 pages, QR code"
+        },
+        "create": {
+            "dialogTitle": "Create New Product",
+            "dialogDescription": "Fill in the product details. You can manage media and fields from the detail page.",
+            "submit": "Create Product",
+            "creating": "Creating..."
+        },
+        "edit": {
+            "dialogTitle": "Edit Product",
+            "dialogDescription": "Update the product details.",
+            "submit": "Save Changes",
+            "saving": "Saving..."
+        },
+        "delete": {
+            "confirm": "Are you sure you want to delete this product? This action cannot be undone.",
+            "confirmTitle": "Delete Product",
+            "success": "Product deleted successfully"
+        },
+        "detail": {
+            "info": "Product Info",
+            "media": "Media",
+            "thumbnail": "Thumbnail",
+            "gallery": "Gallery",
+            "categories": "Categories",
+            "requiredFields": "Required Fields",
+            "noThumbnail": "No thumbnail uploaded",
+            "uploadThumbnail": "Upload Thumbnail",
+            "replaceThumbnail": "Replace Thumbnail",
+            "removeThumbnail": "Remove Thumbnail",
+            "addGalleryImages": "Add Gallery Images",
+            "noGalleryImages": "No gallery images yet",
+            "galleryImageActive": "Active",
+            "galleryImageHidden": "Hidden",
+            "toggleVisibility": "Toggle Visibility",
+            "removeImage": "Remove",
+            "noCategories": "No categories attached",
+            "attachCategory": "Attach Category",
+            "selectCategory": "Select a category...",
+            "detachCategory": "Remove",
+            "noRequiredFields": "No required fields attached",
+            "attachField": "Attach Field",
+            "selectField": "Select a field...",
+            "detachField": "Remove",
+            "fieldLabel": "Field",
+            "fieldType": "Type",
+            "fieldRequired": "Required",
+            "yes": "Yes",
+            "no": "No",
+            "sample": "Sample File",
+            "noSample": "No sample file uploaded. Samples can be attached when creating a product.",
+            "viewSample": "View Full Screen",
+            "downloadSample": "Download",
+            "sampleFileName": "File",
+            "sampleFileSize": "Size",
+            "sampleFileType": "Type",
+            "openSamplePage": "Open Sample Page"
+        }
+    },
+    "samples": {
+        "title": "Samples Management",
+        "subtitle": "All product sample files across the store",
+        "count": "samples",
+        "noSamples": "No sample files found.",
+        "table": {
+            "file": "File",
+            "product": "Product",
+            "size": "Size",
+            "type": "Type",
+            "actions": "Actions"
         }
     }
 }

@@ -120,6 +120,7 @@ export default function ProductDetailsPage() {
                 price={productProps.price_after_discount == 0 ? productProps.price : productProps.price_after_discount}
                 productId={productProps.id}
                 sampleUrl={productProps.sample_url}
+                sampleId={productProps.samples?.id ?? null}
               />
 
               {/* Description Text */}

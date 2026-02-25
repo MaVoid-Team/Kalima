@@ -4,12 +4,20 @@ import { useOrders } from '@/hooks/useOrders';
 import OrdersPageHeader from '@/components/orders/OrdersPageHeader';
 import OrdersStatusFilter from '@/components/orders/OrdersStatusFilter';
 import OrdersListState from '@/components/orders/OrdersListState';
-import OrdersPagination from '@/components/orders/OrdersPagination';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationLink,
+    PaginationEllipsis,
+    generatePaginationLinks,
+} from '@/components/ui/pagination';
 
 const MyOrdersPage = () => {
     const { t } = useTranslation('admin');
 
-    // Use a limit of 6 as requested
     const {
         orders,
         pagination,
@@ -63,11 +71,50 @@ const MyOrdersPage = () => {
                 t={t}
             />
 
-            <OrdersPagination
-                pagination={pagination}
-                onPageChange={handlePageChange}
-                t={t}
-            />
+            {pagination.pages > 1 && (
+                <div className="mt-4 flex justify-end">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => handlePageChange(pagination.page - 1)}
+                                    className={pagination.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    text={t('common.pagination.previous', 'Previous')}
+                                    data-testid="orders-pagination-previous-button"
+                                />
+                            </PaginationItem>
+
+                            {generatePaginationLinks(pagination.page, pagination.pages).map((link, idx) =>
+                                link === 'ellipsis' ? (
+                                    <PaginationItem key={`ellipsis-${idx}`}>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                ) : (
+                                    <PaginationItem key={link}>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(link)}
+                                            isActive={pagination.page === link}
+                                            className="cursor-pointer"
+                                            data-testid={`orders-pagination-page-${link}-button`}
+                                        >
+                                            {link}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )
+                            )}
+
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => handlePageChange(pagination.page + 1)}
+                                    className={pagination.page >= pagination.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    text={t('common.pagination.next', 'Next')}
+                                    data-testid="orders-pagination-next-button"
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Users, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
+import { ShoppingCart, Users, LogOut, Home, Globe, ChevronLeft, ChevronRight, Menu, X, Package, FileText } from 'lucide-react';
 import useAuth from '@/hooks/auth/useAuth';
 
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
@@ -15,6 +15,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
     // Using userManagement namespace explicitly for the users translation
     const navigation = [
         { name: t('nav.orders'), href: '/admin/orders', icon: ShoppingCart },
+        { name: t('nav.products'), href: '/admin/products', icon: Package },
+        { name: t('nav.samples'), href: '/admin/samples', icon: FileText },
         { name: i18n.t('userManagement:usersList', 'Users'), href: '/admin/users', icon: Users },
     ];
 
@@ -28,7 +30,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }) {
 
     return (
         <aside
-            className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:static lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
+            className={`fixed inset-y-0 start-0 z-50 ${widthClass} transform bg-sidebar text-sidebar-foreground transition-all duration-300 ease-in-out flex flex-col lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${isMobileOpen ? 'translate-x-0' : (isRtl ? 'translate-x-full' : '-translate-x-full')}`}
         >
             {/* Header + Toggles */}
             <div className={`flex h-16 items-center px-4 border-b border-sidebar-border ${isCollapsed ? 'lg:justify-center justify-between' : 'justify-between'}`}>

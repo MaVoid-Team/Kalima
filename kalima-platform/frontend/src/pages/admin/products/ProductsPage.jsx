@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UsersIcon, Download } from 'lucide-react';
+import { Package, PlusCircle, Download } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-import { useAdminUsers } from '@/hooks/admin/useAdminUsers';
-import useExport from '@/hooks/useExport';
 import { Button } from '@/components/ui/button';
+import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import useExport from '@/hooks/useExport';
 import {
     Pagination,
     PaginationContent,
@@ -21,32 +22,45 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import UserFilters from '@/components/admin/users/UserFilters';
-import UsersTable from '@/components/admin/users/UsersTable';
-import CreateUserDialog from '@/components/admin/users/CreateUserDialog';
-import UserStatsCards from '@/components/admin/users/UserStatsCards';
 
-export default function UsersPage() {
-    const { t } = useTranslation('userManagement');
+import ProductFilters from '@/components/admin/products/ProductFilters';
+import ProductsTable from '@/components/admin/products/ProductsTable';
+import EditProductDialog from '@/components/admin/products/EditProductDialog';
+import DeleteProductDialog from '@/components/admin/products/DeleteProductDialog';
+
+export default function ProductsPage() {
+    const { t } = useTranslation('admin');
 
     const {
-        users,
+        products,
         pagination,
         filters,
         loading,
-        fetchUsers,
+        actionLoading,
+        fetchProducts,
+        updateProduct,
+        deleteProduct,
         setSearch,
-        setRole,
-        setPortal,
-        setPage
-    } = useAdminUsers();
+        setCategoryFilter,
+        setArchivedFilter,
+        setPage,
+    } = useAdminProducts();
 
     const { exportData, loading: exportLoading } = useExport();
     const [selectedIds, setSelectedIds] = useState([]);
 
+    const [editProduct, setEditProduct] = useState(null);
+    const [editOpen, setEditOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+
+    const load = useCallback(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        load();
+    }, [load]);
 
     const handleSelect = (id, checked) => {
         setSelectedIds(prev =>
@@ -56,15 +70,40 @@ export default function UsersPage() {
 
     const handleSelectAll = (checked) => {
         if (checked) {
-            setSelectedIds(users.map(u => u.id));
+            setSelectedIds(products.map(p => p.id));
         } else {
             setSelectedIds([]);
         }
     };
 
+    const handleEdit = (product) => {
+        setEditProduct(product);
+        setEditOpen(true);
+    };
+
+    const handleArchiveToggle = async (product) => {
+        await updateProduct(product.id, { is_archived: !product.is_archived });
+        load();
+    };
+
+    const handleDelete = async (product) => {
+        setDeleteTarget(product);
+        setDeleteOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+        const res = await deleteProduct(deleteTarget.id);
+        if (res?.success) {
+            setDeleteOpen(false);
+            setDeleteTarget(null);
+            load();
+        }
+    };
+
     const handleExport = (format) => {
         exportData({
-            resource: 'admin/users',
+            resource: 'products',
             format,
             ids: selectedIds,
             filters,
@@ -72,70 +111,78 @@ export default function UsersPage() {
     };
 
     return (
-        <div className="space-y-6 no-scrollbar">
+        <div className="space-y-6 no-scrollbar" data-testid="products-page">
+            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <UsersIcon className="h-8 w-8 text-primary" />
-                        {t('title')}
+                        <Package className="h-8 w-8 text-primary" />
+                        {t('products.title')}
                     </h1>
-                    <p className="text-muted-foreground mt-1">
-                        {t('subtitle')}
-                    </p>
+                    <p className="text-muted-foreground mt-1">{t('products.subtitle')}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <p className="text-sm text-muted-foreground hidden sm:block">
-                        {t('totalUsers', { count: pagination.total })}
+                        {t('products.totalProducts', { count: pagination.total })}
                     </p>
 
                     {/* Export dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button disabled={exportLoading} variant="outline" data-testid="users-export-button">
+                            <Button disabled={exportLoading} variant="outline" data-testid="products-export-button">
                                 <Download className="me-2 h-4 w-4" />
-                                {t('export', 'Export')}
+                                {t('orders.export', 'Export')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
                                 onClick={() => handleExport('csv')}
                                 disabled={exportLoading}
-                                data-testid="users-export-csv"
+                                data-testid="products-export-csv"
                             >
-                                {t('exportCsv', 'Export as CSV')}
+                                {t('orders.exportCsv', 'Export as CSV')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => handleExport('xlsx')}
                                 disabled={exportLoading}
-                                data-testid="users-export-excel"
+                                data-testid="products-export-excel"
                             >
-                                {t('exportXlsx', 'Export as Excel')}
+                                {t('orders.exportXlsx', 'Export as Excel')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <CreateUserDialog onSuccess={fetchUsers} />
+                    <Link to="/admin/products/create">
+                        <Button data-testid="create-product-page-trigger">
+                            <PlusCircle className="me-2 h-4 w-4" />
+                            {t('products.createProduct')}
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
-            <UserStatsCards />
-
-            <UserFilters
+            {/* Filters */}
+            <ProductFilters
                 filters={filters}
                 onSearchChange={setSearch}
-                onRoleChange={setRole}
-                onPortalChange={setPortal}
+                onCategoryChange={setCategoryFilter}
+                onArchivedChange={setArchivedFilter}
             />
 
-            <UsersTable
-                users={users}
+            {/* Table */}
+            <ProductsTable
+                products={products}
                 loading={loading}
+                onEdit={handleEdit}
+                onArchiveToggle={handleArchiveToggle}
+                onDelete={handleDelete}
                 selectedIds={selectedIds}
                 onSelect={handleSelect}
                 onSelectAll={handleSelectAll}
             />
 
+            {/* Pagination */}
             {pagination.pages > 1 && (
                 <div className="mt-4 flex justify-end">
                     <Pagination>
@@ -143,9 +190,9 @@ export default function UsersPage() {
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => setPage(Math.max(1, pagination.page - 1))}
-                                    className={pagination.page <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    text={t('pagination.previous')}
-                                    data-testid="users-pagination-prev"
+                                    className={pagination.page <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    text={t('common.pagination.previous')}
+                                    data-testid="products-pagination-prev"
                                 />
                             </PaginationItem>
 
@@ -157,14 +204,13 @@ export default function UsersPage() {
                                         </PaginationItem>
                                     );
                                 }
-
                                 return (
                                     <PaginationItem key={pageNumber}>
                                         <PaginationLink
                                             onClick={() => setPage(pageNumber)}
                                             isActive={pagination.page === pageNumber}
                                             className="cursor-pointer"
-                                            data-testid={`users-pagination-${pageNumber}`}
+                                            data-testid={`products-pagination-${pageNumber}`}
                                         >
                                             {pageNumber}
                                         </PaginationLink>
@@ -175,15 +221,32 @@ export default function UsersPage() {
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => setPage(Math.min(pagination.pages, pagination.page + 1))}
-                                    className={pagination.page >= pagination.pages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                                    text={t('pagination.next')}
-                                    data-testid="users-pagination-next"
+                                    className={pagination.page >= pagination.pages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    text={t('common.pagination.next')}
+                                    data-testid="products-pagination-next"
                                 />
                             </PaginationItem>
                         </PaginationContent>
                     </Pagination>
                 </div>
             )}
+
+            {/* Edit Dialog */}
+            <EditProductDialog
+                product={editProduct}
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                onSuccess={load}
+            />
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteProductDialog
+                open={deleteOpen}
+                onOpenChange={(v) => { setDeleteOpen(v); if (!v) setDeleteTarget(null); }}
+                onConfirm={handleDeleteConfirm}
+                loading={actionLoading}
+                productTitle={deleteTarget?.title}
+            />
         </div>
     );
 }
