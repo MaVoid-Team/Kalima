@@ -41,5 +41,6 @@ This workflow outlines the established patterns in the frontend architecture. De
 
 ## 8. Testing & Automation
 - **Selenium-Friendly Code:** Always write Selenium-friendly code for testing. Add identifiable data attributes (e.g., `data-testid`, `id`, `name`) to interactive elements, links, buttons, and forms. This ensures UI automation tests can reliably interact with the DOM without depending on fragile CSS classes or layout structures.
+You can follow this format for consistency : pageName-elementType-elementIdentifier (e.g., data-testid="login-page-submit-button").
 
 **By following these guidelines, you will ensure the frontend codebase remains clean, maintainable, and uniform.**
