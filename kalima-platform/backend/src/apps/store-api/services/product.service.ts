@@ -274,6 +274,19 @@ class ProductService {
       include: PRODUCT_INCLUDE,
     });
 
+    // When sample_url is updated to a non-null value, also update the sample record's url if one exists
+    if (
+      dto.sample_url !== undefined &&
+      dto.sample_url !== null &&
+      updated.samples
+    ) {
+      await this.db.samples.update({
+        where: { id: updated.samples.id },
+        data: { url: dto.sample_url },
+      });
+      return this.getProductById(id);
+    }
+
     return updated;
   }
 
@@ -323,6 +336,32 @@ class ProductService {
     });
 
     return updated;
+  }
+
+  // ============================================
+  // SAMPLE — REMOVE
+  // ============================================
+
+  async removeSample(productId: number): Promise<products> {
+    const product = await this.db.products.findFirst({
+      where: { id: productId, deleted_at: null },
+      include: { samples: true },
+    });
+    if (!product) {
+      throw new NotFoundError("Product not found");
+    }
+
+    if (!product.samples) {
+      throw new BadRequestError("Product has no sample");
+    }
+
+    await sampleService.deleteSample(product.samples.id);
+    await this.db.products.update({
+      where: { id: productId },
+      data: { sample_url: null, updated_at: new Date() },
+    });
+
+    return this.getProductById(productId);
   }
 
   // ============================================

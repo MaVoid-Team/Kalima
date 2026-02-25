@@ -282,6 +282,30 @@ export const productController = {
   },
 
   /**
+   * DELETE /products/:id/sample
+   */
+  async removeSample(
+    req: Request,
+    res: Response,
+    _next: NextFunction,
+  ): Promise<void> {
+    try {
+      const id = parseInt(req.params.id as string, 10);
+      if (isNaN(id)) throw new BadRequestError("Invalid product ID");
+
+      const product = await productService.removeSample(id);
+
+      res.status(200).json({
+        success: true,
+        message: "Sample removed successfully",
+        data: product,
+      });
+    } catch (error) {
+      _next(error);
+    }
+  },
+
+  /**
    * DELETE /products/:id/thumbnail
    */
   async removeThumbnail(
