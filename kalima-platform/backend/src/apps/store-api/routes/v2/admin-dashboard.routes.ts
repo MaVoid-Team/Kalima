@@ -31,4 +31,7 @@ router.get("/response-time", ...adminAuth, adminDashboardController.getResponseT
 // Staff Performance Tracking (Received/Confirmed/Returned/Response Times)
 router.get("/staff-report", ...adminAuth, adminDashboardController.getStaffPerformanceReport);
 
+// User Stats (total users, by role, verified)
+router.get("/user-stats", ...adminAuth, adminDashboardController.getUserStats);
+
 export default router;
