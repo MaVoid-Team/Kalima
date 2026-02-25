@@ -107,7 +107,9 @@
             "return": "Return Order",
             "delete": "Delete Order",
             "deleteItem": "Remove Item",
-            "whatsapp": "Contact WhatsApp"
+            "whatsapp": "Contact WhatsApp",
+            "collapseItems": "Collapse",
+            "expandItems": "Expand"
         },
         "messages": {
             "receiveSuccess": "Order marked as received",
