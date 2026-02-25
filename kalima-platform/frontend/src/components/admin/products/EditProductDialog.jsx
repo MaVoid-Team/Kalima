@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { PlusCircle, X } from 'lucide-react';
+import { PlusCircle, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
+import { useCategories } from '@/hooks/useCategories';
 
 const editProductSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255),
@@ -70,6 +71,8 @@ export default function EditProductDialog({
     const { t } = useTranslation('admin');
     const {
         updateProduct,
+        attachCategories,
+        detachCategory,
         attachRequiredFields,
         detachRequiredField,
         fetchFieldDefinitions,
@@ -77,10 +80,23 @@ export default function EditProductDialog({
         actionLoading,
     } = useAdminProducts();
 
+    const { categories: roots, childCategories, fetchChildCategories } = useCategories();
+
     const fieldDefinitions = externalFieldDefs ?? internalFieldDefs;
     const loadDefinitions = onLoadDefinitions ?? fetchFieldDefinitions;
 
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
+
+    // ─── Category state (single category) ─────────────────────────────────────
+    // pickedCategory reflects what the user has *chosen* in this dialog session.
+    // null means "no category". Initialised from the product on open.
+    const [pickedCategory, setPickedCategory] = useState(null); // { id, title } | null
+    const [selectedRootId, setSelectedRootId] = useState('');
+    const [selectedChildId, setSelectedChildId] = useState('');
+    const [childrenLoading, setChildrenLoading] = useState(false);
+
+    const currentChildren = selectedRootId ? (childCategories[selectedRootId] ?? undefined) : undefined;
+    const hasChildren = currentChildren && currentChildren.length > 0;
 
     const form = useForm({
         resolver: zodResolver(editProductSchema),
@@ -97,7 +113,7 @@ export default function EditProductDialog({
         },
     });
 
-    // Reset form and fetch field definitions whenever the dialog opens
+    // Reset form and category state whenever the dialog opens
     useEffect(() => {
         if (product && open) {
             form.reset({
@@ -113,8 +129,53 @@ export default function EditProductDialog({
             });
             loadDefinitions();
             setSelectedFieldDefId('');
+
+            // Pre-populate with the existing category (take the first one)
+            const existingCat = product?.product_categories?.[0];
+            if (existingCat) {
+                setPickedCategory({ id: existingCat.category_id, title: existingCat.categories?.title ?? '' });
+            } else {
+                setPickedCategory(null);
+            }
+            setSelectedRootId('');
+            setSelectedChildId('');
         }
     }, [product, open, form, loadDefinitions]);
+
+    // ─── Category helpers ─────────────────────────────────────────────────────
+
+    const handleRootChange = async (rootId) => {
+        setSelectedRootId(rootId);
+        setSelectedChildId('');
+        if (rootId && !childCategories[rootId]) {
+            setChildrenLoading(true);
+            await fetchChildCategories(parseInt(rootId));
+            setChildrenLoading(false);
+        }
+        // Pick root immediately; child selection may override
+        const label = roots.find(r => r.id === parseInt(rootId))?.title;
+        setPickedCategory(rootId ? { id: parseInt(rootId), title: label } : null);
+    };
+
+    const handleChildChange = (childId) => {
+        setSelectedChildId(childId);
+        if (childId) {
+            const label = currentChildren?.find(c => c.id === parseInt(childId))?.title;
+            setPickedCategory({ id: parseInt(childId), title: label });
+        } else {
+            // Revert to root
+            const label = roots.find(r => r.id === parseInt(selectedRootId))?.title;
+            setPickedCategory(selectedRootId ? { id: parseInt(selectedRootId), title: label } : null);
+        }
+    };
+
+    const handleClearCategory = () => {
+        setPickedCategory(null);
+        setSelectedRootId('');
+        setSelectedChildId('');
+    };
+
+    // ─── Required field helpers ───────────────────────────────────────────────
 
     const attachedFields = product?.product_required_fields ?? [];
     const attachedDefIds = new Set(attachedFields.map(f => f.field_definition_id));
@@ -140,7 +201,10 @@ export default function EditProductDialog({
         }
     };
 
+    // ─── Submit ───────────────────────────────────────────────────────────────
+
     const onSubmit = async (values) => {
+        // 1. Update basic product fields
         const payload = {
             title: values.title,
             type: values.type,
@@ -154,10 +218,23 @@ export default function EditProductDialog({
         payload.perks = values.perks || '';
 
         const res = await updateProduct(product.id, payload);
-        if (res?.success) {
-            onOpenChange(false);
-            onSuccess?.();
+        if (!res?.success) return;
+
+        // 2. Reconcile category: detach old → attach new (if changed)
+        const existingCatId = product?.product_categories?.[0]?.category_id ?? null;
+        const newCatId = pickedCategory?.id ?? null;
+
+        if (existingCatId !== newCatId) {
+            if (existingCatId) {
+                await detachCategory(product.id, existingCatId);
+            }
+            if (newCatId) {
+                await attachCategories(product.id, [newCatId]);
+            }
         }
+
+        onOpenChange(false);
+        onSuccess?.();
     };
 
     return (
@@ -306,6 +383,82 @@ export default function EditProductDialog({
                                 </FormItem>
                             )}
                         />
+
+                        {/* Category — single selection */}
+                        <div className="space-y-3" data-testid="edit-product-category">
+                            <span className="text-sm font-medium leading-none">{t('products.detail.categories')}</span>
+                            <Separator />
+
+                            {/* Current / picked category badge */}
+                            {pickedCategory ? (
+                                <div className="flex flex-wrap gap-2">
+                                    <span
+                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                        data-testid="edit-product-category-badge"
+                                    >
+                                        {pickedCategory.title}
+                                        <button
+                                            type="button"
+                                            onClick={handleClearCategory}
+                                            disabled={actionLoading}
+                                            className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
+                                            aria-label={`Remove ${pickedCategory.title}`}
+                                            data-testid="edit-product-category-remove"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </span>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">{t('products.detail.noCategories')}</p>
+                            )}
+
+                            {/* Cascading root → child picker */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <Select
+                                    value={selectedRootId}
+                                    onValueChange={handleRootChange}
+                                    disabled={actionLoading || roots.length === 0}
+                                >
+                                    <SelectTrigger className="flex-1" data-testid="edit-product-category-root-select">
+                                        <SelectValue placeholder={t('products.detail.selectCategory')} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {roots.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.id.toString()}>
+                                                {cat.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                {selectedRootId && (
+                                    childrenLoading ? (
+                                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground px-2 py-2">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <span>{t('common.loading')}</span>
+                                        </div>
+                                    ) : hasChildren ? (
+                                        <Select
+                                            value={selectedChildId}
+                                            onValueChange={handleChildChange}
+                                            disabled={actionLoading || !currentChildren?.length}
+                                        >
+                                            <SelectTrigger className="flex-1" data-testid="edit-product-category-child-select">
+                                                <SelectValue placeholder={t('products.detail.selectChildCategory', 'Subcategory...')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {currentChildren.map((child) => (
+                                                    <SelectItem key={child.id} value={child.id.toString()}>
+                                                        {child.title}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    ) : null
+                                )}
+                            </div>
+                        </div>
 
                         {/* Required Fields */}
                         <div className="space-y-3" data-testid="edit-product-required-fields">
