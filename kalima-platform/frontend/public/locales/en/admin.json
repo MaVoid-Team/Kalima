@@ -18,6 +18,14 @@
         }
     },
     "orders": {
+        "stats": {
+            "totalPurchases": "Total Purchases",
+            "totalRevenue": "Total Revenue",
+            "averagePrice": "Average Price",
+            "confirmedPurchases": "Confirmed Purchases",
+            "confirmedRevenue": "Confirmed Revenue",
+            "pendingPurchases": "Pending Purchases"
+        },
         "status": {
             "label": "Status",
             "all": "All Orders",
@@ -98,7 +106,8 @@
             "confirm": "Confirm Order",
             "return": "Return Order",
             "delete": "Delete Order",
-            "deleteItem": "Remove Item"
+            "deleteItem": "Remove Item",
+            "whatsapp": "Contact WhatsApp"
         },
         "messages": {
             "receiveSuccess": "Order marked as received",
@@ -115,6 +124,7 @@
             "title": "Order details",
             "backToOrders": "Back to Orders",
             "customerInfo": "Customer Info",
+            "customerNotes": "Customer Notes",
             "orderSummary": "Order Summary",
             "paymentInfo": "Payment Info",
             "statusTimeline": "Status Timeline",
@@ -132,7 +142,8 @@
             "saveNote": "Save Note",
             "total": "Total",
             "by": "by",
-            "lastNoteBy": "Last note by: {{name}}"
+            "lastNoteBy": "Last note by: {{name}}",
+            "contactWhatsApp": "Contact on WhatsApp"
         }
     }
 }

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import useOrders from '@/hooks/useOrders';
 import OrdersToolbar from '@/components/admin/orders/OrdersToolbar';
 import OrdersTable from '@/components/admin/orders/OrdersTable';
+import StoreStatsCards from '@/components/admin/orders/StoreStatsCards';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 export default function OrdersPage() {
@@ -44,6 +45,8 @@ export default function OrdersPage() {
                     </p>
                 </div>
             </div>
+
+            <StoreStatsCards startDate={filters.startDate} endDate={filters.endDate} />
 
             <OrdersToolbar
                 filters={filters}

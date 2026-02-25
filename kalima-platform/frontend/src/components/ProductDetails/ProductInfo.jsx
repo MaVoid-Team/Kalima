@@ -95,6 +95,20 @@ export default function ProductInfo({ product }) {
             </ul>
           </div>
         )}
+
+      {/* Perks Info */}
+      {product.perks && (
+        <div className="flex flex-col gap-2 mt-2">
+          <h3 className="font-semibold text-sm">
+            {t("product:info.perks", "Product Features:")}
+          </h3>
+          <ul className="list-disc ps-5 text-sm text-muted-foreground">
+            {product.perks.split(',').map((perk, index) => (
+              <li key={index}>{perk.trim()}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
