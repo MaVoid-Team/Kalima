@@ -120,11 +120,12 @@ export const useAdminProducts = () => {
 
     // ─── Product CRUD ─────────────────────────────────────────────────────────
 
-    const createProduct = (formData) =>
+    const createProduct = (formData, onUploadProgress) =>
         handleAction(() => fetchApi({
             endpoint: '/products',
             method: 'post',
             data: formData,
+            onUploadProgress,
         }));
 
     const updateProduct = (productId, data) =>

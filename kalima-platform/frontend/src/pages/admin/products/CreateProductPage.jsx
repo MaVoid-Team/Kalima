@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, Loader2, X, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, X, Package, PlusCircle } from 'lucide-react';
 
 import { useAdminProducts } from '@/hooks/admin/useAdminProducts';
 import { useCategories } from '@/hooks/useCategories';
@@ -28,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 
 // ─── Validation Schema ────────────────────────────────────────────────────────
 
@@ -80,6 +81,9 @@ export default function CreateProductPage() {
     // Required fields picker state
     const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
     const [pickedFields, setPickedFields] = useState([]); // { id, label, field_type }[]
+
+    // Upload progress state
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     // Fetch field definitions on mount
     useEffect(() => {
@@ -175,7 +179,14 @@ export default function CreateProductPage() {
         if (thumbnail) formData.append('thumbnail', thumbnail);
         if (sample) formData.append('sample', sample);
 
-        const res = await createProduct(formData);
+        setUploadProgress(0);
+        const res = await createProduct(formData, (progressEvent) => {
+            if (progressEvent.total) {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            }
+        });
+
         if (res?.success) {
             const newProductId = res.data?.id;
             // Attach required fields after the product is created
@@ -542,6 +553,17 @@ export default function CreateProductPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* ── Upload Progress ── */}
+                    {actionLoading && uploadProgress > 0 && (
+                        <div className="mb-4">
+                            <div className="flex justify-between text-sm mb-1 text-muted-foreground">
+                                <span>{uploadProgress < 100 ? t('products.create.uploading', 'Uploading...') : t('products.create.processing', 'Processing...')}</span>
+                                <span>{uploadProgress}%</span>
+                            </div>
+                            <Progress value={uploadProgress} />
+                        </div>
+                    )}
 
                     {/* ── Action Buttons ── */}
                     <div className="flex justify-end gap-3 pb-4">
