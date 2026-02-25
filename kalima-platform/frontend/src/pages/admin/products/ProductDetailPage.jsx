@@ -251,6 +251,10 @@ export default function ProductDetailPage() {
                 open={editOpen}
                 onOpenChange={setEditOpen}
                 onSuccess={refresh}
+                fieldDefinitions={fieldDefinitions}
+                onLoadDefinitions={fetchFieldDefinitions}
+                onAttachField={(productId, fields) => attachRequiredFields(productId, fields)}
+                onDetachField={(productId, fieldDefinitionId) => detachRequiredField(productId, fieldDefinitionId)}
             />
 
             {/* Delete Confirmation Dialog */}

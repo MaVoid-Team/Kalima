@@ -10,7 +10,7 @@ export const useProducts = (id = null) => {
     const [pagination, setPagination] = useState({
         total: 0,
         page: 1,
-        limit: 20
+        limit: 6
     });
     const [filters, setFilters] = useState({
         search: '',

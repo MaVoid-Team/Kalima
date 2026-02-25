@@ -1,9 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { PlusCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import {
     Dialog,
     DialogContent,
@@ -52,9 +55,32 @@ const editProductSchema = z.object({
     { message: 'Discounted price must be less than the original price', path: ['price_after_discount'] }
 );
 
-export default function EditProductDialog({ product, open, onOpenChange, onSuccess }) {
+export default function EditProductDialog({
+    product,
+    open,
+    onOpenChange,
+    onSuccess,
+    // Optional overrides — used by ProductDetailPage so operations stay in-sync
+    // with the parent's hook instance (which holds the live `selectedProduct`).
+    onAttachField,
+    onDetachField,
+    fieldDefinitions: externalFieldDefs,
+    onLoadDefinitions,
+}) {
     const { t } = useTranslation('admin');
-    const { updateProduct, actionLoading } = useAdminProducts();
+    const {
+        updateProduct,
+        attachRequiredFields,
+        detachRequiredField,
+        fetchFieldDefinitions,
+        fieldDefinitions: internalFieldDefs,
+        actionLoading,
+    } = useAdminProducts();
+
+    const fieldDefinitions = externalFieldDefs ?? internalFieldDefs;
+    const loadDefinitions = onLoadDefinitions ?? fetchFieldDefinitions;
+
+    const [selectedFieldDefId, setSelectedFieldDefId] = useState('');
 
     const form = useForm({
         resolver: zodResolver(editProductSchema),
@@ -71,7 +97,7 @@ export default function EditProductDialog({ product, open, onOpenChange, onSucce
         },
     });
 
-    // Reset form whenever the product data changes
+    // Reset form and fetch field definitions whenever the dialog opens
     useEffect(() => {
         if (product && open) {
             form.reset({
@@ -85,8 +111,34 @@ export default function EditProductDialog({ product, open, onOpenChange, onSucce
                 perks: product.perks ?? '',
                 is_archived: product.is_archived ?? false,
             });
+            loadDefinitions();
+            setSelectedFieldDefId('');
         }
-    }, [product, open, form]);
+    }, [product, open, form, loadDefinitions]);
+
+    const attachedFields = product?.product_required_fields ?? [];
+    const attachedDefIds = new Set(attachedFields.map(f => f.field_definition_id));
+    const availableFieldDefs = fieldDefinitions.filter(def => !attachedDefIds.has(def.id));
+
+    const handleAttachField = () => {
+        if (!selectedFieldDefId || !product?.id) return;
+        const fields = [{ field_definition_id: parseInt(selectedFieldDefId), is_required: true }];
+        if (onAttachField) {
+            onAttachField(product.id, fields);
+        } else {
+            attachRequiredFields(product.id, fields);
+        }
+        setSelectedFieldDefId('');
+    };
+
+    const handleDetachField = (fieldDefinitionId) => {
+        if (!product?.id) return;
+        if (onDetachField) {
+            onDetachField(product.id, fieldDefinitionId);
+        } else {
+            detachRequiredField(product.id, fieldDefinitionId);
+        }
+    };
 
     const onSubmit = async (values) => {
         const payload = {
@@ -254,6 +306,72 @@ export default function EditProductDialog({ product, open, onOpenChange, onSucce
                                 </FormItem>
                             )}
                         />
+
+                        {/* Required Fields */}
+                        <div className="space-y-3" data-testid="edit-product-required-fields">
+                            <div>
+                                <span className="text-sm font-medium leading-none">{t('products.detail.requiredFields')}</span>
+                            </div>
+                            <Separator />
+
+                            {/* Attached fields */}
+                            {attachedFields.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">{t('products.detail.noRequiredFields')}</p>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {attachedFields.map((field) => (
+                                        <span
+                                            key={field.id}
+                                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm bg-primary/10 text-primary border border-primary/20"
+                                            data-testid={`edit-product-required-field-tag-${field.id}`}
+                                        >
+                                            {field.required_field_definitions?.label}
+                                            <Badge variant="outline" className="text-xs ms-1">
+                                                {field.required_field_definitions?.field_type}
+                                            </Badge>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDetachField(field.field_definition_id)}
+                                                disabled={actionLoading}
+                                                className="rounded-full hover:bg-destructive/20 p-0.5 text-destructive"
+                                                aria-label={`Remove ${field.required_field_definitions?.label}`}
+                                                data-testid={`edit-product-detach-field-${field.id}`}
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Attach picker */}
+                            {availableFieldDefs.length > 0 && (
+                                <div className="flex items-center gap-2">
+                                    <Select value={selectedFieldDefId} onValueChange={setSelectedFieldDefId}>
+                                        <SelectTrigger className="flex-1" data-testid="edit-product-field-def-select">
+                                            <SelectValue placeholder={t('products.detail.selectField')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {availableFieldDefs.map((def) => (
+                                                <SelectItem key={def.id} value={def.id.toString()}>
+                                                    {def.label} ({def.field_type})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        disabled={!selectedFieldDefId || actionLoading}
+                                        onClick={handleAttachField}
+                                        data-testid="edit-product-attach-field-button"
+                                    >
+                                        <PlusCircle className="me-2 h-4 w-4" />
+                                        {t('products.detail.attachField')}
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Archived toggle */}
                         <FormField

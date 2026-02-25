@@ -1,10 +1,18 @@
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, PackageOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PackageOpen } from "lucide-react";
 import ProductCard from "./ProductCard";
-import { cn } from "@/lib/utils";
-import { formatPrice, getImageUrl } from "@/lib/storeUtils";
+import { getImageUrl } from "@/lib/storeUtils";
 import { motion } from "framer-motion";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationEllipsis,
+    generatePaginationLinks,
+} from "@/components/ui/pagination";
 
 /**
  * ProductGrid
@@ -23,8 +31,11 @@ export default function ProductGrid({
     const { t, i18n } = useTranslation("market");
     const isRtl = i18n.dir() === "rtl";
 
-    const PrevIcon = isRtl ? ChevronRight : ChevronLeft;
-    const NextIcon = isRtl ? ChevronLeft : ChevronRight;
+    // Support both { currentPage, totalPages } and { page, total, limit } shapes
+    const currentPage = pagination?.currentPage ?? pagination?.page ?? 1;
+    const totalPages = pagination?.totalPages ??
+        (pagination?.limit ? Math.ceil((pagination?.total ?? 0) / pagination.limit) : 1);
+    const paginationLinks = generatePaginationLinks(currentPage, totalPages);
 
     if (loading) {
         return (
@@ -94,33 +105,51 @@ export default function ProductGrid({
             </motion.div>
 
             {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-center gap-3">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => onPageChange(pagination.currentPage - 1)}
-                        disabled={pagination.currentPage <= 1}
-                        data-testid="market-grid-prev-page-button"
-                    >
-                        <PrevIcon className="h-4 w-4" />
-                    </Button>
+            {pagination && totalPages > 1 && (
+                <Pagination>
+                    <PaginationContent>
+                        <PaginationItem>
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); if (currentPage > 1) onPageChange(currentPage - 1); }}
+                                aria-disabled={currentPage <= 1}
+                                className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+                                text={isRtl ? t("pagination.next", "التالي") : t("pagination.prev", "السابق")}
+                                data-testid="market-grid-prev-page-button"
+                            />
+                        </PaginationItem>
 
-                    <span className="text-sm text-muted-foreground">
-                        {t("pagination.page")} {pagination.currentPage}{" "}
-                        {t("pagination.of")} {pagination.totalPages}
-                    </span>
+                        {paginationLinks.map((link, idx) =>
+                            link === "ellipsis" ? (
+                                <PaginationItem key={`ellipsis-${idx}`}>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                            ) : (
+                                <PaginationItem key={link}>
+                                    <PaginationLink
+                                        href="#"
+                                        isActive={link === currentPage}
+                                        onClick={(e) => { e.preventDefault(); onPageChange(link); }}
+                                        data-testid={`market-grid-page-${link}`}
+                                    >
+                                        {link}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            )
+                        )}
 
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => onPageChange(pagination.currentPage + 1)}
-                        disabled={pagination.currentPage >= pagination.totalPages}
-                        data-testid="market-grid-next-page-button"
-                    >
-                        <NextIcon className="h-4 w-4" />
-                    </Button>
-                </div>
+                        <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) onPageChange(currentPage + 1); }}
+                                aria-disabled={currentPage >= totalPages}
+                                className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+                                text={isRtl ? t("pagination.prev", "السابق") : t("pagination.next", "التالي")}
+                                data-testid="market-grid-next-page-button"
+                            />
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
             )}
         </div>
     );
