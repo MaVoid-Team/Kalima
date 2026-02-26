@@ -1,271 +1,326 @@
 {
-    "dashboardTitle": "لوحة الإدارة",
-    "nav": {
-        "orders": "الطلبات",
-        "products": "المنتجات",
-        "backToStore": "العودة للمتجر",
-        "logout": "تسجيل الخروج"
-    },
-    "common": {
-        "currencyEGP": "ج.م",
-        "na": "غير متوفر",
-        "admin": "الإدارة",
-        "loading": "جاري التحميل...",
-        "cancel": "إلغاء",
-        "confirm": "تأكيد",
-        "pagination": {
-            "previous": "السابق",
-            "next": "التالي"
-        }
-    },
-    "orders": {
-        "stats": {
-            "totalPurchases": "إجمالي المشتريات",
-            "totalRevenue": "إجمالي الإيرادات",
-            "averagePrice": "متوسط السعر",
-            "confirmedPurchases": "المشتريات المؤكدة",
-            "confirmedRevenue": "الإيرادات المؤكدة",
-            "pendingPurchases": "مشتريات قيد الانتظار"
-        },
-        "statsToday": {
-            "totalPurchases": "إجمالي المشتريات اليوم",
-            "totalRevenue": "إجمالي الإيرادات اليوم",
-            "averagePrice": "متوسط السعر اليوم",
-            "confirmedPurchases": "المشتريات المؤكدة اليوم",
-            "confirmedRevenue": "الإيرادات المؤكدة اليوم",
-            "pendingPurchases": "مشتريات قيد الانتظار اليوم"
-        },
-        "status": {
-            "label": "الحالة",
-            "all": "جميع الطلبات",
-            "pending": "قيد الانتظار",
-            "received": "تم الاستلام",
-            "confirmed": "مؤكد",
-            "returned": "مرتجع",
-            "created": "تم الإنشاء"
-        },
-        "total": "الإجمالي",
-        "subtotal": "المجموع الفرعي",
-        "discount": "الخصم",
-        "createdAt": "تاريخ الإنشاء",
-        "itemPrice": "سعر العنصر",
-        "requiredFields": "الحقول المطلوبة",
-        "field": "الحقل",
-        "unknownProduct": "منتج غير معروف",
-        "sections": {
-            "summary": "الملخص",
-            "customer": "العميل",
-            "payment": "الدفع",
-            "notes": "الملاحظات"
-        },
-        "customer": {
-            "name": "الاسم",
-            "email": "البريد الإلكتروني",
-            "phone": "رقم الهاتف"
-        },
-        "payment": {
-            "method": "الطريقة",
-            "methodPhone": "رقم الدفع",
-            "transferredFrom": "محول من",
-            "targetNumber": "الرقم المستهدف",
-            "screenshot": "صورة الدفع"
-        },
-        "notes": {
-            "customer": "ملاحظات العميل",
-            "admin": "ملاحظات الإدارة"
-        },
-        "title": "إدارة الطلبات",
-        "myOrders": "طلباتي",
-        "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
-        "noOrders": "لا توجد طلبات",
-        "noOrdersForStatus": "ليس لديك أي طلبات بهذه الحالة.",
-        "noOrdersDescription": "يبدو أنك لم تقم بأي طلبات بعد.",
-        "totalOrders": "{{count}} طلبات",
-        "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
-        "export": "تصدير",
-        "exportCsv": "تصدير كـ CSV",
-        "exportXlsx": "تصدير كـ Excel",
-        "statusAll": "كل الحالات",
-        "statusPending": "قيد الانتظار",
-        "statusReceived": "تم الاستلام",
-        "statusConfirmed": "مؤكد",
-        "statusReturned": "مرتجع",
-        "statusCreated": "تم الإنشاء",
-        "clearFilters": "مسح",
-        "filterByDate": "تصفية حسب التاريخ",
-        "table": {
-            "serial": "الرقم التسلسلي",
-            "customer": "العميل",
-            "status": "الحالة",
-            "total": "الإجمالي",
-            "payment": "وسيله الدفع",
-            "actions": "إجراءات"
-        },
-        "items": {
-            "items": "الطلبات",
-            "empty": "لا توجد عناصر",
-            "product": "المنتج",
-            "type": "النوع",
-            "price": "السعر",
-            "discount": "الخصم",
-            "actions": "الإجراءات",
-            "unknownProduct": "منتج غير معروف"
-        },
-        "actions": {
-            "view": "عرض التفاصيل",
-            "viewDetails": "عرض التفاصيل",
-            "receive": "تحديد كمستلم",
-            "confirm": "تأكيد الطلب",
-            "return": "إرجاع الطلب",
-            "delete": "حذف الطلب",
-            "deleteItem": "حذف العنصر",
-            "whatsapp": "تواصل عبر واتساب",
-            "collapseItems": "إخفاء العناصر",
-            "expandItems": "عرض العناصر"
-        },
-        "messages": {
-            "receiveSuccess": "تم تحديث الطلب إلى مستلم",
-            "confirmSuccess": "تم تأكيد الطلب",
-            "returnSuccess": "تم إرجاع الطلب",
-            "saveNoteSuccess": "تم حفظ ملاحظات الإدارة بنجاح",
-            "deleteOrderWarning": "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
-            "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
-            "deleteOrderSuccess": "تم حذف الطلب بنجاح",
-            "deleteItemSuccess": "تم حذف العنصر بنجاح",
-            "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
-        },
-        "details": {
-            "title": "تفاصيل الطلب",
-            "backToOrders": "العودة للطلبات",
-            "customerInfo": "معلومات العميل",
-            "customerNotes": "ملاحظات العميل",
-            "orderSummary": "ملخص الطلب",
-            "paymentInfo": "معلومات الدفع",
-            "statusTimeline": "الجدول الزمني للحالة",
-            "orderItems": "عناصر الطلب",
-            "adminNotes": "ملاحظات الإدارة",
-            "couponInfo": "الكوبون المستخدم",
-            "dateCreated": "تاريخ الإنشاء",
-            "itemsCount": "عدد العناصر",
-            "subtotal": "المجموع الفرعي",
-            "discount": "الخصم",
-            "method": "طريقة الدفع",
-            "transferFrom": "محول من",
-            "paymentNumber": "رقم الدفع",
-            "screenshot": "صورة الحوالة",
-            "saveNote": "حفظ الملاحظة",
-            "total": "الإجمالي",
-            "by": "بواسطة",
-            "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
-            "contactWhatsApp": "تواصل عبر واتساب"
-        }
-    },
-    "products": {
-        "title": "إدارة المنتجات",
-        "subtitle": "إدارة منتجات المتجر والوسائط والإعدادات",
-        "totalProducts": "{{count}} منتجات",
-        "searchPlaceholder": "البحث بالعنوان، الوصف، الرقم التسلسلي...",
-        "noProducts": "لا توجد منتجات",
-        "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
-        "createProduct": "إنشاء منتج",
-        "backToProducts": "العودة للمنتجات",
-        "filters": {
-            "allCategories": "جميع الفئات",
-            "allStatuses": "جميع الحالات",
-            "active": "نشط",
-            "archived": "مؤرشف",
-            "archivedToggle": "عرض المؤرشف"
-        },
-        "table": {
-            "thumbnail": "الصورة",
-            "title": "العنوان",
-            "type": "النوع",
-            "price": "السعر",
-            "categories": "الفئات",
-            "status": "الحالة",
-            "actions": "الإجراءات"
-        },
-        "status": {
-            "active": "نشط",
-            "archived": "مؤرشف"
-        },
-        "type": {
-            "Book": "كتاب",
-            "Product": "منتج"
-        },
-        "actions": {
-            "view": "عرض التفاصيل",
-            "edit": "تعديل المنتج",
-            "archive": "أرشفة",
-            "unarchive": "استعادة",
-            "delete": "حذف المنتج"
-        },
-        "form": {
-            "title": "العنوان",
-            "titlePlaceholder": "عنوان المنتج",
-            "description": "الوصف",
-            "descriptionPlaceholder": "وصف المنتج (اختياري)",
-            "type": "النوع",
-            "price": "السعر (ج.م)",
-            "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
-            "serial": "الرقم التسلسلي",
-            "serialPlaceholder": "مثل: ALG-101 (اختياري)",
-            "couponId": "معرف الكوبون",
-            "couponIdPlaceholder": "معرف الكوبون (اختياري)",
-            "thumbnail": "صورة الغلاف",
-            "sample": "ملف النموذج (PDF)",
-            "categories": "الفئات",
-            "isArchived": "مؤرشف",
-            "perks": "المميزات",
-            "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code"
-        },
-        "create": {
-            "dialogTitle": "إنشاء منتج جديد",
-            "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
-            "submit": "إنشاء المنتج",
-            "creating": "جاري الإنشاء..."
-        },
-        "edit": {
-            "dialogTitle": "تعديل المنتج",
-            "dialogDescription": "تحديث تفاصيل المنتج.",
-            "submit": "حفظ التغييرات",
-            "saving": "جاري الحفظ..."
-        },
-        "delete": {
-            "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
-            "confirmTitle": "حذف المنتج",
-            "success": "تم حذف المنتج بنجاح"
-        },
-        "detail": {
-            "info": "معلومات المنتج",
-            "media": "الوسائط",
-            "thumbnail": "صورة الغلاف",
-            "gallery": "معرض الصور",
-            "categories": "الفئات",
-            "requiredFields": "الحقول المطلوبة",
-            "noThumbnail": "لا توجد صورة غلاف",
-            "uploadThumbnail": "رفع صورة الغلاف",
-            "replaceThumbnail": "استبدال صورة الغلاف",
-            "removeThumbnail": "حذف صورة الغلاف",
-            "addGalleryImages": "إضافة صور للمعرض",
-            "noGalleryImages": "لا توجد صور في المعرض",
-            "galleryImageActive": "مرئي",
-            "galleryImageHidden": "مخفي",
-            "toggleVisibility": "تبديل الرؤية",
-            "removeImage": "حذف",
-            "noCategories": "لا توجد فئات مرتبطة",
-            "attachCategory": "إضافة فئة",
-            "selectCategory": "اختر فئة...",
-            "detachCategory": "حذف",
-            "noRequiredFields": "لا توجد حقول مطلوبة مرتبطة",
-            "attachField": "إضافة حقل",
-            "selectField": "اختر حقلاً...",
-            "detachField": "حذف",
-            "fieldLabel": "الحقل",
-            "fieldType": "النوع",
-            "fieldRequired": "مطلوب",
-            "yes": "نعم",
-            "no": "لا"
-        }
+  "dashboardTitle": "لوحة الإدارة",
+  "nav": {
+    "orders": "الطلبات",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "backToStore": "العودة للمتجر",
+    "logout": "تسجيل الخروج"
+  },
+  "common": {
+    "currencyEGP": "ج.م",
+    "na": "غير متوفر",
+    "admin": "الإدارة",
+    "loading": "جاري التحميل...",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "pagination": {
+      "previous": "السابق",
+      "next": "التالي"
     }
+  },
+  "orders": {
+    "stats": {
+      "totalPurchases": "إجمالي المشتريات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "averagePrice": "متوسط السعر",
+      "confirmedPurchases": "المشتريات المؤكدة",
+      "confirmedRevenue": "الإيرادات المؤكدة",
+      "pendingPurchases": "مشتريات قيد الانتظار"
+    },
+    "statsToday": {
+      "totalPurchases": "إجمالي المشتريات اليوم",
+      "totalRevenue": "إجمالي الإيرادات اليوم",
+      "averagePrice": "متوسط السعر اليوم",
+      "confirmedPurchases": "المشتريات المؤكدة اليوم",
+      "confirmedRevenue": "الإيرادات المؤكدة اليوم",
+      "pendingPurchases": "مشتريات قيد الانتظار اليوم"
+    },
+    "status": {
+      "label": "الحالة",
+      "all": "جميع الطلبات",
+      "pending": "قيد الانتظار",
+      "received": "تم الاستلام",
+      "confirmed": "مؤكد",
+      "returned": "مرتجع",
+      "created": "تم الإنشاء"
+    },
+    "total": "الإجمالي",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "createdAt": "تاريخ الإنشاء",
+    "itemPrice": "سعر العنصر",
+    "requiredFields": "الحقول المطلوبة",
+    "field": "الحقل",
+    "unknownProduct": "منتج غير معروف",
+    "sections": {
+      "summary": "الملخص",
+      "customer": "العميل",
+      "payment": "الدفع",
+      "notes": "الملاحظات"
+    },
+    "customer": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف"
+    },
+    "payment": {
+      "method": "الطريقة",
+      "methodPhone": "رقم الدفع",
+      "transferredFrom": "محول من",
+      "targetNumber": "الرقم المستهدف",
+      "screenshot": "صورة الدفع"
+    },
+    "notes": {
+      "customer": "ملاحظات العميل",
+      "admin": "ملاحظات الإدارة"
+    },
+    "title": "إدارة الطلبات",
+    "myOrders": "طلباتي",
+    "subtitle": "تتبع وإدارة وعرض سجل طلباتك",
+    "noOrders": "لا توجد طلبات",
+    "noOrdersForStatus": "ليس لديك أي طلبات بهذه الحالة.",
+    "noOrdersDescription": "يبدو أنك لم تقم بأي طلبات بعد.",
+    "totalOrders": "{{count}} طلبات",
+    "searchPlaceholder": "البحث بالرقم التسلسلي، الاسم، البريد...",
+    "export": "تصدير",
+    "exportCsv": "تصدير كـ CSV",
+    "exportXlsx": "تصدير كـ Excel",
+    "statusAll": "كل الحالات",
+    "statusPending": "قيد الانتظار",
+    "statusReceived": "تم الاستلام",
+    "statusConfirmed": "مؤكد",
+    "statusReturned": "مرتجع",
+    "statusCreated": "تم الإنشاء",
+    "clearFilters": "مسح",
+    "filterByDate": "تصفية حسب التاريخ",
+    "table": {
+      "serial": "الرقم التسلسلي",
+      "customer": "العميل",
+      "status": "الحالة",
+      "total": "الإجمالي",
+      "payment": "وسيله الدفع",
+      "actions": "إجراءات"
+    },
+    "items": {
+      "items": "الطلبات",
+      "empty": "لا توجد عناصر",
+      "product": "المنتج",
+      "type": "النوع",
+      "price": "السعر",
+      "discount": "الخصم",
+      "actions": "الإجراءات",
+      "unknownProduct": "منتج غير معروف"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "viewDetails": "عرض التفاصيل",
+      "receive": "تحديد كمستلم",
+      "confirm": "تأكيد الطلب",
+      "return": "إرجاع الطلب",
+      "delete": "حذف الطلب",
+      "deleteItem": "حذف العنصر",
+      "whatsapp": "تواصل عبر واتساب",
+      "collapseItems": "إخفاء العناصر",
+      "expandItems": "عرض العناصر"
+    },
+    "messages": {
+      "receiveSuccess": "تم تحديث الطلب إلى مستلم",
+      "confirmSuccess": "تم تأكيد الطلب",
+      "returnSuccess": "تم إرجاع الطلب",
+      "saveNoteSuccess": "تم حفظ ملاحظات الإدارة بنجاح",
+      "deleteOrderWarning": "هل أنت متأكد من حذف هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleteItemWarning": "هل أنت متأكد من حذف هذا العنصر من الطلب؟",
+      "deleteOrderSuccess": "تم حذف الطلب بنجاح",
+      "deleteItemSuccess": "تم حذف العنصر بنجاح",
+      "noteSaved": "تم حفظ ملاحظة الإدارة بنجاح"
+    },
+    "details": {
+      "title": "تفاصيل الطلب",
+      "backToOrders": "العودة للطلبات",
+      "customerInfo": "معلومات العميل",
+      "customerNotes": "ملاحظات العميل",
+      "orderSummary": "ملخص الطلب",
+      "paymentInfo": "معلومات الدفع",
+      "statusTimeline": "الجدول الزمني للحالة",
+      "orderItems": "عناصر الطلب",
+      "adminNotes": "ملاحظات الإدارة",
+      "couponInfo": "الكوبون المستخدم",
+      "dateCreated": "تاريخ الإنشاء",
+      "itemsCount": "عدد العناصر",
+      "subtotal": "المجموع الفرعي",
+      "discount": "الخصم",
+      "method": "طريقة الدفع",
+      "transferFrom": "محول من",
+      "paymentNumber": "رقم الدفع",
+      "screenshot": "صورة الحوالة",
+      "saveNote": "حفظ الملاحظة",
+      "total": "الإجمالي",
+      "by": "بواسطة",
+      "lastNoteBy": "آخر ملاحظة بواسطة: {{name}}",
+      "contactWhatsApp": "تواصل عبر واتساب"
+    }
+  },
+  "products": {
+    "title": "إدارة المنتجات",
+    "subtitle": "إدارة منتجات المتجر والوسائط والإعدادات",
+    "totalProducts": "{{count}} منتجات",
+    "searchPlaceholder": "البحث بالعنوان، الوصف، الرقم التسلسلي...",
+    "noProducts": "لا توجد منتجات",
+    "noProductsDescription": "لا توجد منتجات تطابق الفلاتر الحالية.",
+    "createProduct": "إنشاء منتج",
+    "backToProducts": "العودة للمنتجات",
+    "filters": {
+      "allCategories": "جميع الفئات",
+      "allStatuses": "جميع الحالات",
+      "active": "نشط",
+      "archived": "مؤرشف",
+      "archivedToggle": "عرض المؤرشف"
+    },
+    "table": {
+      "thumbnail": "الصورة",
+      "title": "العنوان",
+      "type": "النوع",
+      "price": "السعر",
+      "categories": "الفئات",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "archived": "مؤرشف"
+    },
+    "type": {
+      "Book": "كتاب",
+      "Product": "منتج"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "edit": "تعديل المنتج",
+      "archive": "أرشفة",
+      "unarchive": "استعادة",
+      "delete": "حذف المنتج"
+    },
+    "form": {
+      "title": "العنوان",
+      "titlePlaceholder": "عنوان المنتج",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف المنتج (اختياري)",
+      "type": "النوع",
+      "price": "السعر (ج.م)",
+      "priceAfterDiscount": "السعر بعد الخصم (ج.م)",
+      "serial": "الرقم التسلسلي",
+      "serialPlaceholder": "مثل: ALG-101 (اختياري)",
+      "couponId": "معرف الكوبون",
+      "couponIdPlaceholder": "معرف الكوبون (اختياري)",
+      "thumbnail": "صورة الغلاف",
+      "sample": "ملف النموذج (PDF)",
+      "categories": "الفئات",
+      "isArchived": "مؤرشف",
+      "perks": "المميزات",
+      "perksPlaceholder": "مثل: غلاف كرتون، 200 صفحة، QR code"
+    },
+    "create": {
+      "dialogTitle": "إنشاء منتج جديد",
+      "dialogDescription": "أدخل تفاصيل المنتج. يمكنك إدارة الوسائط والحقول من صفحة التفاصيل.",
+      "submit": "إنشاء المنتج",
+      "creating": "جاري الإنشاء..."
+    },
+    "edit": {
+      "dialogTitle": "تعديل المنتج",
+      "dialogDescription": "تحديث تفاصيل المنتج.",
+      "submit": "حفظ التغييرات",
+      "saving": "جاري الحفظ..."
+    },
+    "delete": {
+      "confirm": "هل تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirmTitle": "حذف المنتج",
+      "success": "تم حذف المنتج بنجاح"
+    },
+    "detail": {
+      "info": "معلومات المنتج",
+      "media": "الوسائط",
+      "thumbnail": "صورة الغلاف",
+      "gallery": "معرض الصور",
+      "categories": "الفئات",
+      "requiredFields": "الحقول المطلوبة",
+      "noThumbnail": "لا توجد صورة غلاف",
+      "uploadThumbnail": "رفع صورة الغلاف",
+      "replaceThumbnail": "استبدال صورة الغلاف",
+      "removeThumbnail": "حذف صورة الغلاف",
+      "addGalleryImages": "إضافة صور للمعرض",
+      "noGalleryImages": "لا توجد صور في المعرض",
+      "galleryImageActive": "مرئي",
+      "galleryImageHidden": "مخفي",
+      "toggleVisibility": "تبديل الرؤية",
+      "removeImage": "حذف",
+      "noCategories": "لا توجد فئات مرتبطة",
+      "attachCategory": "إضافة فئة",
+      "selectCategory": "اختر فئة...",
+      "detachCategory": "حذف",
+      "noRequiredFields": "لا توجد حقول مطلوبة مرتبطة",
+      "attachField": "إضافة حقل",
+      "selectField": "اختر حقلاً...",
+      "detachField": "حذف",
+      "fieldLabel": "الحقل",
+      "fieldType": "النوع",
+      "fieldRequired": "مطلوب",
+      "yes": "نعم",
+      "no": "لا"
+    }
+  },
+  "categories": {
+    "title": "إدارة الفئات",
+    "subtitle": "إدارة هيكل فئات المتجر",
+    "totalCategories": "{{count}} فئات",
+    "searchPlaceholder": "البحث بالعنوان...",
+    "noCategories": "لا توجد فئات",
+    "noCategoriesDescription": "لم تقم بإضافة أي فئات بعد.",
+    "noSubCategories": "لا توجد فئات فرعية",
+    "createCategory": "إنشاء فئة",
+    "backToCategories": "العودة للفئات",
+    "table": {
+      "title": "العنوان",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "title": "العنوان",
+      "titlePlaceholder": "عنوان الفئة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "parentCategory": "الفئة الأب",
+      "selectParentCategory": "اختر الفئة الأب...",
+      "rootLevel": "تصنيف رئيسي",
+      "isArchived": "مؤرشف",
+      "depthWarning": "الحد الأقصى لعمق الفئات هو 3 مستويات."
+    },
+    "actions": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "create": {
+      "dialogTitle": "إنشاء فئة جديدة",
+      "dialogDescription": "إضافة فئة جديدة.",
+      "submit": "إنشاء",
+      "creating": "جاري الإنشاء..."
+    },
+    "edit": {
+      "dialogTitle": "تعديل الفئة",
+      "dialogDescription": "تحديث تفاصيل الفئة.",
+      "submit": "حفظ التغييرات",
+      "saving": "جاري الحفظ..."
+    },
+    "delete": {
+      "confirmTitle": "حذف الفئة",
+      "confirm": "هل أنت متأكد من حذف هذه الفئة؟ سيتم أيضاً حذف جميع الفئات الفرعية التابعة لها.",
+      "deleteProductsLabel": "حذف المنتجات المرتبطة",
+      "deleteProductsDescription": "إذا لم يتم تحديده، سيتم فقط إلغاء ربط المنتجات.",
+      "success": "تم حذف الفئة بنجاح"
+    },
+    "messages": {
+      "archiveWarning": "أرشفة هذه الفئة سيؤدي لأرشفة جميع فئاتها الفرعية.",
+      "depthLimitReached": "لا يمكن إضافة المزيد من المستويات المودعة. تم الوصول للحد الأقصى وهو 3."
+    }
+  }
 }
