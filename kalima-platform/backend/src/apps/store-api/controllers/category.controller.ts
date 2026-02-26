@@ -140,13 +140,24 @@ export const categoryController = {
           ? req.query.active === "true"
           : undefined;
 
-      const children = await categoryService.getChildrenByParent(id, {
-        active,
-      });
+      if (id === 0) {
+        const categories = await categoryService.getRootCategories({ active });
+        res.status(200).json({
+          success: true,
+          results: categories.length,
+          data: categories,
+        });
+      } else {
+        const children = await categoryService.getChildrenByParent(id, {
+          active,
+        });
 
-      res
-        .status(200)
-        .json({ success: true, results: children.length, data: children });
+        res.status(200).json({
+          success: true,
+          results: children.length,
+          data: children,
+        });
+      }
     } catch (error) {
       _next(error);
     }
