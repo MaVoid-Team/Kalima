@@ -9,6 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import CouponTableRow from '@/components/admin/coupons/CouponTableRow';
 import CouponMobileTableRow from '@/components/admin/coupons/CouponMobileTableRow';
@@ -16,7 +17,7 @@ import CouponsTablePagination from '@/components/admin/coupons/CouponsTablePagin
 import { getCouponId } from '@/lib/couponUtils';
 
 
-export default function CouponsTable({ coupons, loading, onEdit, onDelete, onToggleActivation, pagination, onPageChange }) {
+export default function CouponsTable({ coupons, loading, onEdit, onDelete, onToggleActivation, pagination, onPageChange, selectedIds = [], onSelect, onSelectAll }) {
     const { t } = useTranslation('admin');
 
     if (loading) {
@@ -41,6 +42,14 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                 <Table>
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="w-10">
+                                <Checkbox
+                                    checked={coupons.length > 0 && selectedIds.length === coupons.length}
+                                    onCheckedChange={(checked) => onSelectAll?.(!!checked)}
+                                    aria-label="Select all coupons"
+                                    data-testid="coupons-table-select-all"
+                                />
+                            </TableHead>
                             <TableHead>{t('coupons.table.code')}</TableHead>
                             <TableHead>{t('coupons.table.discountType')}</TableHead>
                             <TableHead>{t('coupons.table.discountValue')}</TableHead>
@@ -58,6 +67,8 @@ export default function CouponsTable({ coupons, loading, onEdit, onDelete, onTog
                                 onEdit={onEdit}
                                 onDelete={onDelete}
                                 onToggleActivation={onToggleActivation}
+                                isSelected={selectedIds.includes(getCouponId(coupon))}
+                                onSelect={onSelect}
                             />
                         ))}
                     </TableBody>
