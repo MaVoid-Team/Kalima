@@ -27,13 +27,13 @@ export default function CreateCouponDiscountFields({ form, discountType, t }) {
                                 className="grid grid-cols-2 gap-4"
                                 data-testid="coupons-create-discount-type"
                             >
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center gap-2">
                                     <RadioGroupItem value="PERCENTAGE" id="create-discount-percentage" />
                                     <Label htmlFor="create-discount-percentage">
                                         {t('coupons.discountType.percentage')}
                                     </Label>
                                 </div>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center gap-2">
                                     <RadioGroupItem value="AMOUNT" id="create-discount-amount" />
                                     <Label htmlFor="create-discount-amount">
                                         {t('coupons.discountType.amount')}

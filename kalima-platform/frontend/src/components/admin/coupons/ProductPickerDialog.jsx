@@ -44,6 +44,9 @@ export default function ProductPickerDialog({
 }) {
     const { t } = useTranslation('admin');
     const [searchValue, setSearchValue] = useState(search || '');
+    
+    // Per-render counter used to generate unique keys for pagination ellipsis items.
+    // This is intentionally reset to 0 on every render.
     let ellipsisCount = 0;
 
     const totalPages = Math.max(1, Math.ceil((pagination?.total || 0) / (pagination?.limit || 1)));

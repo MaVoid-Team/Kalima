@@ -10,9 +10,8 @@ import CreateCouponDialog from '@/components/admin/coupons/CreateCouponDialog';
 import EditCouponDialog from '@/components/admin/coupons/EditCouponDialog';
 import DeleteCouponDialog from '@/components/admin/coupons/DeleteCouponDialog';
 import { useProducts } from '@/hooks/useProducts';
+import { getCouponId, isCouponActive } from '@/lib/couponUtils';
 
-const getCouponId = (coupon) => coupon?.id || coupon?._id;
-const isCouponActive = (coupon) => coupon?.is_active ?? coupon?.active ?? false;
 const getProductId = (product) => product?.id || product?._id;
 
 export default function CouponsPage() {

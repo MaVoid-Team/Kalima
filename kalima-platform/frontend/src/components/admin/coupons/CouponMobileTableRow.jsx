@@ -5,26 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import CouponMobileActions from '@/components/admin/coupons/CouponMobileActions';
-
-const getCouponId = (coupon) => coupon?.id || coupon?._id;
-const isCouponActive = (coupon) => coupon?.is_active ?? coupon?.active ?? false;
-
-const getDiscountType = (coupon) => {
-    if (coupon?.discount_type === 'PERCENTAGE' || coupon?.discount_type === 'AMOUNT') {
-        return coupon.discount_type;
-    }
-
-    const amount = Number(coupon?.discount_amount ?? 0);
-    return amount > 0 ? 'AMOUNT' : 'PERCENTAGE';
-};
-
-const formatDiscount = (coupon, t, i18n) => {
-    if (getDiscountType(coupon) === 'PERCENTAGE') {
-        return `${i18n.language === 'ar' ? '%' : ''}${coupon.discount_percentage ?? 0}${i18n.language === 'en' ? '%' : ''}`;
-    }
-
-    return `${coupon?.discount_amount ?? '—'} ${t('coupons.form.units.amount')}`;
-};
+import { getDiscountType, getCouponId, isCouponActive, formatDiscount } from '@/lib/couponUtils';
 
 export default function CouponMobileTableRow({ coupon, onEdit, onDelete, onToggleActivation }) {
     const { t, i18n } = useTranslation('admin');

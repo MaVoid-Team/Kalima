@@ -21,17 +21,7 @@ import GalleryManager from '@/components/admin/products/GalleryManager';
 import CategoriesManager from '@/components/admin/products/CategoriesManager';
 import RequiredFieldsManager from '@/components/admin/products/RequiredFieldsManager';
 import SampleManager from '@/components/admin/products/SampleManager';
-
-const getCouponId = (coupon) => coupon?.id || coupon?._id;
-const isCouponActive = (coupon) => coupon?.is_active ?? coupon?.active ?? false;
-const getDiscountType = (coupon) => {
-    if (coupon?.discount_type === 'PERCENTAGE' || coupon?.discount_type === 'AMOUNT') {
-        return coupon.discount_type;
-    }
-
-    const amount = Number(coupon?.discount_amount ?? 0);
-    return amount > 0 ? 'AMOUNT' : 'PERCENTAGE';
-};
+import { getDiscountType, getCouponId, isCouponActive } from '@/lib/couponUtils';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
