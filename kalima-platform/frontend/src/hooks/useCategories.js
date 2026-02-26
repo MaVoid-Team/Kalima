@@ -5,13 +5,13 @@ export const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const { mutate: fetchApi, loading: apiLoading } = useApiMutation();
   const [initLoading, setInitLoading] = useState(true);
-  const [childCategories, setChildCategories] = useState({});
 
   const loading = apiLoading || initLoading;
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        // Fetch root categories (the backend provides the nested tree here)
         const data = await fetchApi({
           endpoint: "/categories/roots?active=true",
           method: "get",
@@ -33,35 +33,8 @@ export const useCategories = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchChildCategories = useCallback(
-    async (parentId) => {
-      if (!parentId || childCategories[parentId]) return;
-
-      try {
-        const data = await fetchApi({
-          endpoint: `/categories/${parentId}/children?active=true`,
-          method: "get",
-        });
-        if (data?.success) {
-          setChildCategories((prev) => ({
-            ...prev,
-            [parentId]: data.data,
-          }));
-        }
-      } catch (error) {
-        console.error(
-          `Failed to fetch child categories for parent ${parentId}:`,
-          error,
-        );
-      }
-    },
-    [childCategories, fetchApi],
-  );
-
   return {
     categories,
-    childCategories,
-    fetchChildCategories,
     loading,
   };
 };
