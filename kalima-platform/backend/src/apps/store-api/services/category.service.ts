@@ -10,6 +10,12 @@ import { BadRequestError, NotFoundError } from "../../../libs/errors";
 
 const MAX_NESTING_DEPTH = 1000;
 
+const SUB_CATEGORIES_SELECT = {
+  id: true,
+  title: true,
+  active: true,
+};
+
 const CATEGORY_SELECT = {
   id: true,
   title: true,
@@ -20,7 +26,10 @@ const CATEGORY_SELECT = {
     select: { product_id: true },
   },
   sub_categories: {
-    select: { id: true, title: true },
+    select: {
+      ...SUB_CATEGORIES_SELECT,
+      sub_categories: { select: SUB_CATEGORIES_SELECT },
+    },
   },
   created_at: true,
   updated_at: true,
@@ -33,7 +42,12 @@ interface CATEGORY_RETURN {
   description: string;
   parent: { id: number; title: string } | null;
   product_categories: { product_id: number }[];
-  sub_categories: { id: number; title: string }[];
+  sub_categories: {
+    id: number;
+    title: string;
+    active: boolean;
+    sub_categories: {}[];
+  }[];
   created_at: Date;
   updated_at: Date;
 }
