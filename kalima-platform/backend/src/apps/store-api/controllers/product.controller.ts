@@ -203,6 +203,7 @@ export const productController = {
 
   /**
    * PATCH /products/:id
+   * Accepts JSON or multipart/form-data. If "sample" file is included, replaces existing sample.
    */
   async updateProduct(
     req: Request,
@@ -214,7 +215,12 @@ export const productController = {
       if (isNaN(id)) throw new BadRequestError("Invalid product ID");
 
       const dto = await validateDto(UpdateProductDto, req.body);
-      const product = await productService.updateProduct(id, dto);
+      const files = req.files as
+        | { sample?: Express.Multer.File[] }
+        | undefined;
+      const sampleFile = files?.sample?.[0];
+
+      const product = await productService.updateProduct(id, dto, sampleFile);
 
       res.status(200).json({
         success: true,

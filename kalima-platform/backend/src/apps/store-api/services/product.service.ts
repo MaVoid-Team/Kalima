@@ -248,12 +248,26 @@ class ProductService {
   // UPDATE
   // ============================================
 
-  async updateProduct(id: number, dto: UpdateProductDto): Promise<products> {
+  async updateProduct(
+    id: number,
+    dto: UpdateProductDto,
+    sampleFile?: Express.Multer.File,
+  ): Promise<products> {
     const product = await this.db.products.findFirst({
       where: { id, deleted_at: null },
+      include: { samples: true },
     });
     if (!product) {
       throw new NotFoundError("Product not found");
+    }
+
+    // When a new sample file is provided: delete old sample, upload new one
+    if (sampleFile) {
+      if (product.samples) {
+        await sampleService.deleteSample(product.samples.id);
+      }
+      const newSample = await sampleService.uploadSample(sampleFile, id);
+      dto = { ...dto, sample_url: newSample.url };
     }
 
     const data: any = { updated_at: new Date() };
@@ -274,10 +288,11 @@ class ProductService {
       include: PRODUCT_INCLUDE,
     });
 
-    // When sample_url is updated to a non-null value, also update the sample record's url if one exists
+    // When sample_url is updated to a non-null value (from DTO, not file), sync to sample record if one exists
     if (
       dto.sample_url !== undefined &&
       dto.sample_url !== null &&
+      !sampleFile &&
       updated.samples
     ) {
       await this.db.samples.update({
@@ -287,7 +302,7 @@ class ProductService {
       return this.getProductById(id);
     }
 
-    return updated;
+    return sampleFile ? this.getProductById(id) : updated;
   }
 
   // ============================================
